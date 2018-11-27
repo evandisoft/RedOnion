@@ -23,7 +23,6 @@ namespace kLua.src
                 DynValue result = base.DoString(str);
                 return result;
             }
-            
         }
     }
 }

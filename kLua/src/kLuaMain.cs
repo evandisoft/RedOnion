@@ -102,12 +102,13 @@ namespace kLua
         GUIStyle outputStyle; 
 
 
-        Rect inputRect = new Rect(10, 100, 300, 300);
+        Rect inputRect = new Rect(0, 400, 700, 100);
         Rect completionRect = new Rect(310, 100, 300, 300);
-        Rect outputRect= new Rect(610, 100, 300, 300);
+        Rect outputRect= new Rect(0, 0, 700, 400);
+        Rect windowRect = new Rect(100, 100, 700, 500);
         int cursorpos = 0;
         bool completing;
-
+        int windowID = 0;
 
         public void OnGUI()
         {
@@ -116,13 +117,20 @@ namespace kLua
             }
 
             try{
-                InputBox();
-                OutputBox();
+                windowRect=GUI.Window(windowID, windowRect, WindowFunc, "kLua REPL");
                 CompletionBox();
             }
             catch(Exception e){
-                outputContent.text += Environment.NewLine + e;
+                Debug.Log(e);
             }
+        }
+
+
+        void WindowFunc(int id){
+            GUI.DragWindow(new Rect(0, 0, windowRect.width, windowRect.height));
+            InputBox();
+            OutputBox();
+
         }
 
         void InputBox(){
@@ -196,21 +204,20 @@ namespace kLua
                         }
                     }
                 } catch(Exception e){
-                    outputContent.text += Environment.NewLine + e;
+                    Debug.Log(e);
                 }
                 guiContent.text = "";
                 cursorpos = 0;
                 completionContent.text = "";
 
-            } else{
-                completionContent.text = "";
-            }
+            } 
             GUI.EndScrollView();
         }
 
         void CompletionBox(){
             completionRect.height= outputStyle.CalcSize(completionContent).y;
-            completionContent.text = GUI.TextArea(completionRect, completionContent.text);
+            completionRect.y = windowRect.y;
+            completionRect.x = windowRect.x + windowRect.width;
             if (guiContent.text.Contains(".") && !guiContent.text.Contains(Environment.NewLine)) {
                 var splitAt = guiContent.text.LastIndexOf('.');
                 var baseStr = guiContent.text.Substring(0, splitAt);
@@ -241,8 +248,11 @@ namespace kLua
                     foreach (var methodname in compatibleMethods) {
                         completionContent.text += methodname + Environment.NewLine;
                     }
+                    completionContent.text = GUI.TextArea(completionRect, completionContent.text);
                 }
 
+            } else{
+                completionContent.text = "";
             }
         }
     }
