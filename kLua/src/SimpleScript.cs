@@ -15,26 +15,15 @@ namespace kLua.src
 
         public DynValue DoString(string str){
             try{
+                DynValue result = base.DoString("return "+str);
+                return result;
+            }
+            catch (SyntaxErrorException e)
+            {
                 DynValue result = base.DoString(str);
                 return result;
             }
-            catch (SyntaxErrorException see)
-            {
-                try{
-                    DynValue result = base.DoString("return "+str);
-                    return result;
-                }
-                catch (Exception e)
-                {
-                    Debug.Log(see.StackTrace);
-                    Debug.Log(e.StackTrace);
-                    return new DynValue();
-                }
-            }
-            catch(Exception e){
-                Debug.Log(e.StackTrace);
-                return new DynValue();
-            }
+            
         }
     }
 }

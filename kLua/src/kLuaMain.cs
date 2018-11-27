@@ -17,42 +17,51 @@ namespace kLua
     public class kLuaMain : MonoBehaviour
     {
         public delegate void ToggleGUI();
-        static public ToggleGUI toggleGUI;
+        // ToggleGui has to be reset to a new relevant value each time we 
+        // enter a new scene, otherwise its referencing stuff that
+        // no longer has any relevance.
+        static public ToggleGUI ToggleGui;
 
         SimpleScript script;
         static Texture2D toolbarTexture;
         Boolean guiOn = false;
+        int maxOutputBytes = 80000;
 
-        static public List<string> ListAllMethods(object o){
-            var strs = new List<string>();
-            foreach(var method in o.GetType().GetMethods()){
-                if(method.Name.Contains("_")){
-                    strs.Add(method.Name.Split('_')[1]);
+        static public HashSet<string> ListAllMembers(object o){
+            var strs = new HashSet<string>();
+            foreach(var member in o.GetType().GetMembers()){
+                if(member.Name.Contains("_")){
+                    strs.Add(member.Name.Split('_')[1]);
                 }
                 else{
-                    strs.Add(method.Name);
+                    strs.Add(member.Name);
                 }
             }
             return strs;
         }
 
+
+
         public void Awake()
         {
-            if (toggleGUI == null)
+            if (ToggleGui == null)
             {
                 ApplicationLauncher.Instance.AddModApplication(
-                    () => { toggleGUI(); },
-                    () => { toggleGUI(); },
+                    () => { ToggleGui(); },
+                    () => { ToggleGui(); },
                 null, null, null, null,
                 ApplicationLauncher.AppScenes.ALWAYS,
                 toolbarTexture
                 );
             }
-            toggleGUI = OnClick;
+            // We have to connect it with a function that has relevance in this
+            // particular scene. If ToggleGui was already set, it was with
+            // a delegate from another scene.
+            ToggleGui = LocalToggleGui;
 
         }
 
-        private void OnClick()
+        void LocalToggleGui()
         {
             if (guiOn)
             {
@@ -72,14 +81,12 @@ namespace kLua
             script = new SimpleScript();
             UserData.RegistrationPolicy = InteropRegistrationPolicy.Automatic;
             script.Globals["this"] = this;
-            
+
             script.Globals["flight"] = new FlightGlobals();
-            script.Options.DebugPrint = s => { Debug.Log(s); };
-            //List<DialogGUIBase> dialog = new List<DialogGUIBase>();
+            script.Options.DebugPrint = s => { outputContent.text += Environment.NewLine + s; };
 
 
-
-             
+            //outputStyle.normal.textColor = Color.yellow;
         }
 
         public void Update()
@@ -88,17 +95,18 @@ namespace kLua
             //Debug.Log(popo);
         }
 
-        string completionText = "";
-        string input="";
-        //string toEval = "";
-        string output = "";
-        Boolean cycle = false;
+        GUISkin guiSkin = new GUISkin();
+        GUIContent completionContent= new GUIContent("");
+        GUIContent outputContent = new GUIContent("");
         GUIContent guiContent = new GUIContent("");
+        GUIStyle outputStyle; 
 
 
-        private Rect _rect = new Rect(10, 100, 300, 300);
-        private int cursorpos = 0;
-
+        Rect inputRect = new Rect(10, 100, 300, 300);
+        Rect completionRect = new Rect(310, 100, 300, 300);
+        Rect outputRect= new Rect(610, 100, 300, 300);
+        int cursorpos = 0;
+        bool completing;
 
 
         public void OnGUI()
@@ -106,114 +114,132 @@ namespace kLua
             if(!guiOn){
                 return;
             }
-            Event e = Event.current;
-            
 
-            if (e.type == EventType.Repaint)
-            {
+            try{
+                InputBox();
+                OutputBox();
+                CompletionBox();
+            }
+            catch(Exception e){
+                outputContent.text += Environment.NewLine + e;
+            }
+        }
+
+        void InputBox(){
+            Event e = Event.current;
+
+
+            if (e.type == EventType.Repaint) {
                 // I have no idea how to use IMGUI library correctly beyond simple examples. 
                 // Docs are hideously insufficient
                 // This obscure solution for text selection and cursor control found at:
                 // https://answers.unity.com/questions/145698/guistyledrawwithtextselection-how-to-use-.html
-                int id = GUIUtility.GetControlID(guiContent, FocusType.Keyboard, _rect);
+                int id = GUIUtility.GetControlID(guiContent, FocusType.Keyboard, inputRect);
                 //GUIUtility.keyboardControl = id; // added
-                GUI.skin.textArea.DrawCursor(_rect, guiContent, id, cursorpos);
+                GUI.skin.textArea.DrawCursor(inputRect, guiContent, id, cursorpos);
 
-                GUI.skin.textArea.DrawWithTextSelection(_rect, guiContent, id, 0, 0);
-            }
-            else if (e.type == EventType.KeyDown)
-            {
-                switch(e.keyCode){
-                    case KeyCode.Backspace:
-                        int curlen = guiContent.text.Length;
-                        if (curlen > 0)
-                        {
-                            guiContent.text = guiContent.text.Substring(0, curlen - 1);
-                            cursorpos -= 1;
-                        }
-                        break;
-                    case KeyCode.Return:
+                GUI.skin.textArea.DrawWithTextSelection(inputRect, guiContent, id, 0, 0);
+            } else if (e.type == EventType.KeyDown) {
+                switch (e.keyCode) {
+                case KeyCode.Backspace:
+                    int curlen = guiContent.text.Length;
+                    if (curlen > 0) {
+                        guiContent.text = guiContent.text.Substring(0, curlen - 1);
+                        cursorpos -= 1;
+                    }
+                    break;
+                case KeyCode.Return:
+                    guiContent.text += e.character;
+                    cursorpos += 1;
+                    break;
+                case KeyCode.Tab:
+                    completing = true;
+                    break;
+                default:
+                    char ch = e.character;
+                    if (!Char.IsControl(ch)) {
                         guiContent.text += e.character;
                         cursorpos += 1;
-                        break;
-                    default:
-                        char ch = e.character;
-                        if (!Char.IsControl(ch))
-                        {
-                            guiContent.text += e.character;
-                            cursorpos += 1;
-                        }
-                        break;
+                    }
+                    break;
                 }
-                e.Use();
+                int diff = outputContent.text.Length- maxOutputBytes;
+                if(diff>0){
+                    outputContent.text = outputContent.text.Substring(diff);
+                }
+
+            } else if (e.type == EventType.MouseDown) {
 
             }
-            else if(e.type==EventType.MouseDown){
 
-            }
+        }
+        Vector2 scrollPos = new Vector2(0, 0);
+        void OutputBox(){
+            outputStyle = new GUIStyle(GUI.skin.textArea) {
+                alignment = TextAnchor.LowerLeft
+            };
 
-            output = GUILayout.TextArea(output);
-            completionText = GUI.TextArea(new Rect(310, 100, 300, 300), completionText);
-            if (guiContent.text.EndsWith("\n\n"))
-            {
-                DynValue result = script.DoString(guiContent.text);
+            scrollPos =GUI.BeginScrollView(outputRect, scrollPos, outputRect);
+            outputContent.text = GUI.TextArea(outputRect, outputContent.text, outputStyle);
+            // if the user pressed enter twice in a row, submit the value
+            if (guiContent.text.EndsWith(Environment.NewLine + Environment.NewLine)) {
+                DynValue result = new DynValue();
+                try{
+                    result=script.DoString(guiContent.text);
+                    outputContent.text += Environment.NewLine;
+                    if (result.UserData == null) {
+                        outputContent.text += result;
+                    } else {
+                        outputContent.text += result.UserData.Object;
+                        if (result.UserData.Object == null) {
+                            outputContent.text += " (" + result.UserData.Object.GetType() + ")";
+                        }
+                    }
+                } catch(Exception e){
+                    outputContent.text += Environment.NewLine + e;
+                }
                 guiContent.text = "";
                 cursorpos = 0;
-                if (result.IsNil())
-                {
-                    output = "";
-                }
-                else
-                {
-                    output = result + "\n";
-                    if (result.UserData == null)
-                    {
-                        output += result.Type;
-                    }
-                    else
-                    {
-                        output += result.UserData.Object.GetType();
-                    }
-                }
+                completionContent.text = "";
 
+            } else{
+                completionContent.text = "";
             }
-            else if (guiContent.text.Contains(".") && !guiContent.text.Contains("\n"))
-            {
+            GUI.EndScrollView();
+        }
+
+        void CompletionBox(){
+            completionRect.height= outputStyle.CalcSize(completionContent).y;
+            completionContent.text = GUI.TextArea(completionRect, completionContent.text);
+            if (guiContent.text.Contains(".") && !guiContent.text.Contains(Environment.NewLine)) {
                 var splitAt = guiContent.text.LastIndexOf('.');
                 var baseStr = guiContent.text.Substring(0, splitAt);
                 var toEval = baseStr;
-                if (toEval.Contains("="))
-                {
+                if (toEval.Contains("=")) {
                     toEval = toEval.Split('=')[1];
                 }
                 var completion = guiContent.text.Substring(splitAt + 1);
                 var result = script.DoString(toEval);
-                if (result.IsNotNil() && result.UserData != null)
-                {
-                    Boolean completing = false;
-                    if (completion.Contains(" "))
-                    {
-                        completion = completion.Trim();
-                        completing = true;
+                if (result.IsNotNil() && result.UserData != null) {
+                    HashSet<string> allMembers = ListAllMembers(result.UserData.Object);
+                    List<string> compatibleMethods = new List<string>();
+                    foreach(var memberName in allMembers){
+                        if (memberName.StartsWith(completion)) { compatibleMethods.Add(memberName); }
                     }
-
-                    List<string> allMethods = ListAllMethods(result.UserData.Object);
-                    List<string> compatibleMethods = new Trie(allMethods).Find(completion);
-                    if (completing)
-                    {
-
-                        if (compatibleMethods.Count > 0)
-                        {
+                    compatibleMethods.Sort();
+                    if (completing) {
+                        if (compatibleMethods.Count > 0) {
                             var newCompletion = compatibleMethods[0];
 
                             guiContent.text = baseStr + "." + newCompletion;
                             cursorpos = guiContent.text.Length;
                         }
+
+                        completing = false;
                     }
-                    completionText = "";
-                    foreach (var methodname in compatibleMethods)
-                    {
-                        completionText += methodname + "\n";
+                    completionContent.text = "";
+                    foreach (var methodname in compatibleMethods) {
+                        completionContent.text += methodname + Environment.NewLine;
                     }
                 }
 

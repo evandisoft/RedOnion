@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 namespace kLua.src
 {
+    // this datastructure is not necessary at this time
     public class Trie{
         RootNode root = new RootNode();
         // Other than making the algorithm simpler, the 'sentinel' is ignored
@@ -16,7 +17,7 @@ namespace kLua.src
 
         public List<string> Find(string str){
             List<string> matchingStrings = new List<string>();
-            root.AddMatchingStrings(sentinel+str,matchingStrings);
+            root.FindMatchingStrings(sentinel+str,matchingStrings);
             return matchingStrings;
         }
 
@@ -25,7 +26,7 @@ namespace kLua.src
         class TrieNode : Dictionary<char, TrieNode>
         {
 
-            List<string> matchingStrings = new List<string>();
+            HashSet<string> matchingStrings = new HashSet<string>();
             char ch;
             public void addString(string rest,string fullstring){
                 ch = rest[0];
@@ -43,11 +44,11 @@ namespace kLua.src
                 }
             }
 
-            public void AddMatchingStrings(string str,List<string> matchingStrings){
+            public void FindMatchingStrings(string str,List<string> matchingStrings){
                 if(str.Length>1){
                     TrieNode nextNode;
                     if(TryGetValue(str[1],out nextNode)){
-                        nextNode.AddMatchingStrings(str.Substring(1), matchingStrings);
+                        nextNode.FindMatchingStrings(str.Substring(1), matchingStrings);
                     }else{
                         return;
                     }
