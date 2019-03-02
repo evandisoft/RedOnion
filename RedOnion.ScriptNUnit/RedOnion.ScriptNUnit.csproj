@@ -31,10 +31,15 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Test.cs" />
+    <Compile Include="OpCodeTests.cs" />
+    <Compile Include="ParseExpressionTests.cs" />
+    <Compile Include="ScannerTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <ProjectReference Include="..\RedOnion.Script\RedOnion.Script.csproj">
+      <Project>{0D0A04F3-0A82-49CD-8178-7640ACE88BFF}</Project>
+      <Name>RedOnion.Script</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

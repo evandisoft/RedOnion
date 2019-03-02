@@ -61,19 +61,19 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="OpCodeTests.cs" />
     <Compile Include="ParseExpressionTests.cs" />
     <Compile Include="ScannerTests.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RedOnion.Script\RedOnion.Script.csproj">
       <Project>{0d0a04f3-0a82-49cd-8178-7640ace88bff}</Project>
       <Name>RedOnion.Script</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
