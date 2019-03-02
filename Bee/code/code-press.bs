@@ -60,7 +60,7 @@ def codeGenerator pseudoGenerator parser.iGenerator partial
 				if string[1] != '"' || string[string.length-1] != '"'
 					raise invalidOperationException()
 				string = string.substring 2, string.length - 3
-				break
+				goto case opcode.ident
 			if string[0] != '"' || string[string.length-1] != '"'
 				raise invalidOperationException()
 			_sb.length = 0

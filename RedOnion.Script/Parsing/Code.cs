@@ -131,11 +131,16 @@ namespace RedOnion.Script.Parsing
 		/// </summary>
 		protected void Write(string value)
 		{
-			if (StringValuesAt == StringValues.Length)
-				Array.Resize(ref _stringValues, StringValues.Length << 1);
-			StringValues[StringValuesAt++] = value;
-
-			Write(Encoding.UTF8.GetBytes(value));
+			if (_stringMap.TryGetValue(value, out var index))
+				Write(index);
+			else
+			{
+				Write(StringsAt);
+				_stringMap[value] = StringsAt;
+				if (StringsAt == _stringTable.Length)
+					Array.Resize(ref _stringTable, _stringTable.Length << 1);
+				_stringTable[StringsAt++] = value;
+			}
 		}
 
 		/// <summary>
@@ -149,81 +154,63 @@ namespace RedOnion.Script.Parsing
 		}
 
 		/// <summary>
-		/// write string literal or identifier to code buffer
-		/// @OpCode	leading code (type of literal or identifier)
-		/// @blen	true for byte-length (e.g. identifier), false for short/int length (string literal)
+		/// Write string literal or identifier to code buffer
 		/// @string	value to write to code buffer
 		/// </summary>
-		protected void Write(OpCode OpCode, bool blen, string @string)
+		/// <param name="code">Leading code (type of literal or identifier)</param>
+		protected void Write(OpCode code, string value)
 		{
-			Write(OpCode, blen, Encoding.UTF8.GetBytes(@string));
+			Write((byte)code);
+			Write(value);
 		}
 
+		/*	NOTE: THIS MAY NOT BE NEEDED IN THIS VERSION
+			(probably relict from Bee without string tables)
+
 		/// <summary>
-		/// write string literal or identifier to code buffer
+		/// Write string literal or identifier to code buffer
 		/// @OpCode	leading code (type of literal or identifier)
 		/// @blen	true for byte-length (e.g. identifier), false for short/int length (string literal)
 		/// @bytes	array of bytes to write to code buffer
 		/// </summary>
-		protected void Write(OpCode OpCode, bool blen, byte[] bytes)
+		protected void Write(OpCode code, bool blen, byte[] bytes)
 		{
 			if (blen)
 			{
 				if (bytes.Length > 255)
-				{
 					throw new InvalidOperationException("Byte array too long");
-				}
 				Reserve(2 + bytes.Length);
-				Code[CodeAt++] = unchecked((byte)OpCode);
-				Code[CodeAt++] = unchecked((byte)bytes.Length);
+				Code[CodeAt++] = (byte)code;
+				Code[CodeAt++] = (byte)bytes.Length;
 			}
 			else
 			{
 				Reserve(5 + bytes.Length);
-				Code[CodeAt++] = unchecked((byte)OpCode);
-				Code[CodeAt++] = unchecked((byte)bytes.Length);
-				Code[CodeAt++] = unchecked((byte)(bytes.Length >> 8));
-				Code[CodeAt++] = unchecked((byte)(bytes.Length >> 16));
-				Code[CodeAt++] = unchecked((byte)(bytes.Length >> 24));
+				Code[CodeAt++] = (byte)code;
+				Code[CodeAt++] = (byte)bytes.Length;
+				Code[CodeAt++] = (byte)(bytes.Length >> 8);
+				Code[CodeAt++] = (byte)(bytes.Length >> 16);
+				Code[CodeAt++] = (byte)(bytes.Length >> 24);
 			}
 			Array.Copy(bytes, 0, Code, CodeAt, bytes.Length);
 			CodeAt += bytes.Length;
 		}
+		*/
 
 		/// <summary>
-		/// copy string literal or identifier from vals to code buffer
-		/// @OpCode	leading code (type of literal or identifier)
-		/// @blen	true for byte-length (e.g. identifier), false for int length (string literal)
-		/// @string	value to write to code buffer
+		/// Copy string literal or identifier from vals to code buffer
 		/// </summary>
-		protected void Copy(OpCode OpCode, bool blen, int top, int start)
+		/// <param name="code">Leading code (type of literal or identifier)</param>
+		protected void CopyString(OpCode code, int top, int start)
 		{
-			var len = top - start;
-			if (blen)
-			{
-				if (len > 255)
-				{
-					throw new InvalidOperationException("Byte array too long");
-				}
-				Reserve(2 + len);
-				Code[CodeAt++] = unchecked((byte)OpCode);
-				Code[CodeAt++] = unchecked((byte)len);
-			}
-			else
-			{
-				Reserve(5 + len);
-				Code[CodeAt++] = unchecked((byte)OpCode);
-				Code[CodeAt++] = unchecked((byte)len);
-				Code[CodeAt++] = unchecked((byte)(len >> 8));
-				Code[CodeAt++] = unchecked((byte)(len >> 16));
-				Code[CodeAt++] = unchecked((byte)(len >> 24));
-			}
-			Array.Copy(Values, start, Code, CodeAt, len);
-			CodeAt += len;
+			Debug.Assert(top - start == 4);
+			Write((byte)code);
+			var index = TopInt(top);
+			Write(index == -1 ? "" : StringValues[index]);
 		}
 
 		/// <summary>
-		/// copy block from parsed values to code buffer
+		/// Copy block from parsed values to code buffer
 		/// </summary>
 		protected void Copy(int top, int start)
 		{
@@ -234,7 +221,7 @@ namespace RedOnion.Script.Parsing
 		}
 
 		/// <summary>
-		/// rewrite code from parsed value buffer/stack to code buffer
+		/// Rewrite code from parsed value buffer/stack to code buffer
 		/// </summary>
 		protected virtual void Rewrite(int top, bool type = false)
 		{
@@ -247,21 +234,21 @@ namespace RedOnion.Script.Parsing
 			Debug.Assert(op.Kind() < OpKind.Statement);
 			if (op.Kind() <= OpKind.Number)
 			{
-				if ((!type) && (!create))
+				if (!type && !create)
 				{
 					Literal(op, top, start);
 					return;
 				}
 				if (op == OpCode.Identifier)
 				{
-					Copy(op, true, top, start);
+					CopyString(op, top, start);
 					return;
 				}
 				Debug.Assert(op > OpCode.Identifier || op == OpCode.Undefined || op == OpCode.This || op == OpCode.Null);
-				Write(unchecked((byte)op));
+				Write((byte)op);
 				return;
 			}
-			Write(unchecked((byte)op));
+			Write((byte)op);
 			if (op.Unary())
 			{
 				create |= op == OpCode.Create;
@@ -276,28 +263,22 @@ namespace RedOnion.Script.Parsing
 					top -= 4;
 					op = ((OpCode)Values[--top]).Extend();
 					if (op != OpCode.Identifier)
-					{
 						throw new InvalidOperationException();
-					}
 					var len = top - start;
 					if (len > 127)
-					{
 						throw new InvalidOperationException("Identifier too long");
-					}
 					Reserve(1 + len);
-					Code[CodeAt++] = unchecked((byte)len);
+					Code[CodeAt++] = (byte)len;
 					Array.Copy(Values, start, Code, CodeAt, len);
 					CodeAt += len;
 					return;
 				}
 				if (op != OpCode.LogicAnd && op != OpCode.LogicOr)
-				{
 					goto full;
-				}
 				var second = CodeAt;
 				Write(0);
 				Rewrite(top);
-				Write((CodeAt - second) - 4, second);
+				Write(CodeAt - second - 4, second);
 				return;
 			}
 			if (op.Ternary())
@@ -347,7 +328,7 @@ namespace RedOnion.Script.Parsing
 		}
 
 		/// <summary>
-		/// rewrite n-expressions/values from parsed value buffer/stack to code buffer
+		/// Rewrite n-expressions/values from parsed value buffer/stack to code buffer
 		/// </summary>
 		protected void Rewrite(int top, int n, bool type = false, bool create = false)
 		{
@@ -360,17 +341,32 @@ namespace RedOnion.Script.Parsing
 		}
 
 		/// <summary>
-		/// rewrite literal from parsed value buffer/stack to code buffer
+		/// Rewrite literal from parsed value buffer/stack to code buffer
 		/// </summary>
-		protected virtual void Literal(OpCode op, int top, int start)
+		protected virtual void Literal(OpCode code, int top, int start)
 		{
-			if (op < OpCode.Identifier || op == OpCode.Exception)
+			if (code == OpCode.Identifier || code == OpCode.String)
 			{
-				Write(unchecked((byte)op));
+				CopyString(code, top, start);
 				return;
 			}
-			Debug.Assert(((op == OpCode.Identifier || op == OpCode.Number) || op == OpCode.String) || op == OpCode.Char);
-			Copy(op, op != OpCode.String && op != OpCode.Char, top, start);
+			if (code < OpCode.Identifier || code == OpCode.Exception)
+			{
+				Write((byte)code);
+				return;
+			}
+			var len = top - start;
+			if (code.Kind() <= OpKind.Number && (byte)code >= OpCode.Char.Code())
+			{
+				Debug.Assert(code <= OpCode.Double);
+				Debug.Assert(len == code.NumberSize());
+				Reserve(len + 1);
+				Code[CodeAt++] = (byte)code;
+				Array.Copy(Values, start, Code, CodeAt, len);
+				CodeAt += len;
+				return;
+			}
+			throw new InvalidOperationException();
 		}
 	}
 }

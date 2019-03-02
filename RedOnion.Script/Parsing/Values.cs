@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Text;
+using System.Globalization;
 using RedOnion.Script.Execution;
 
 namespace RedOnion.Script.Parsing
@@ -41,27 +42,264 @@ namespace RedOnion.Script.Parsing
 		/// <summary>
 		/// push string value (string, identifier)
 		/// </summary>
-		void Push(OpCode OpCode, string value)
+		void Push(OpCode code, string value)
 		{
 			var start = ValuesAt;
-			ValuesReserve(9);
-			ValuesPush(value);
-			ValuesPush((byte)OpCode);
-			ValuesPush(start);
+			int i;
+			uint u;
+			ulong ul;
+			long ll;
+			double d;
+			char c;
+			switch (code)
+			{
+			case OpCode.Identifier:
+				ValuesReserve(9);
+				ValuesPush(value);
+				ValuesPush((byte)code);
+				ValuesPush(start);
+				return;
+
+			case OpCode.Char:
+				if (value.Length == 4 && value[0] == '\'' && value[3] == '\''
+					&& value[1] >= (char)0xD800 && value[1] <= (char)0xDFFF
+					&& value[2] >= (char)0xD800 && value[2] <= (char)0xDFFF)
+				{
+					int hi = value[1];
+					int lo = value[2];
+					if (hi >= 0xDC00 && lo < 0xDC00)
+					{
+						hi = value[2];
+						lo = value[1];
+					}
+					ValuesReserve(9);
+					ValuesPush(0x010000 + ((hi & 0x3FF) << 10) + (lo & 0x3FF));
+					ValuesPush(OpCode.LongChar);
+					ValuesPush(start);
+					return;
+				}
+				if (value.Length == 4 && value[0] == '\'' && value[1] == '\\' && value[3] == '\'')
+				{
+					c = value[2];
+					switch (c)
+					{
+					case 'r':
+						c = '\r';
+						break;
+					case 'n':
+						c = '\n';
+						break;
+					case 't':
+						c = '\t';
+						break;
+					}
+				}
+				else
+				{
+					if (value.Length != 3 || value[0] != '\'' || value[2] != '\'')
+						throw new InvalidOperationException();
+					c = value[1];
+				}
+				if ((char)(byte)c == c)
+				{
+					ValuesReserve(6);
+					ValuesPush((byte)c);
+					ValuesPush((byte)code);
+					ValuesPush(start);
+					return;
+				}
+				ValuesReserve(7);
+				ValuesPush((byte)c);
+				ValuesPush((byte)(c >> 8));
+				ValuesPush(OpCode.WideChar);
+				ValuesPush(start);
+				return;
+
+			case OpCode.String:
+				if (value[0] == '@')
+				{
+					if (value[1] != '"' || value[value.Length - 1] != '"')
+						throw new InvalidOperationException();
+					value = value.Substring(2, value.Length - 3);
+					ValuesReserve(9);
+					ValuesPush(value);
+					ValuesPush((byte)code);
+					ValuesPush(start);
+					return;
+				}
+				if (value[0] != '"' || value[value.Length - 1] != '"')
+					throw new InvalidOperationException();
+				_stringBuilder.Length = 0;
+				var n = value.Length - 1;
+				for (i = 1; i < n;)
+				{
+					c = _stringBuilder[i++];
+					switch (c)
+					{
+					default:
+						_stringBuilder.Append(c);
+						continue;
+					case '\\':
+						if (i >= n)
+							throw new BadEscapeSequence(lexer);
+						c = value[i++];
+						switch (c)
+						{
+						default:
+							_stringBuilder.Append(c);
+							continue;
+						case 'r':
+							_stringBuilder.Append('\r');
+							continue;
+						case 'n':
+							_stringBuilder.Append('\n');
+							continue;
+						case 't':
+							_stringBuilder.Append('\t');
+							continue;
+						case 'u':
+							if (i + 4 >= n)
+								throw new BadEscapeSequence(lexer);
+							var a = Nibble(value[i++]);
+							var b = Nibble(value[i++]);
+							var x = Nibble(value[i++]);
+							var y = Nibble(value[i++]);
+							c = (char)(y | (x << 4) | (b << 8) | (a << 12));
+							_stringBuilder.Append(c);
+							continue;
+						}
+					}
+				}
+				value = _stringBuilder.ToString();
+				_stringBuilder.Length = 0;
+				ValuesReserve(9);
+				ValuesPush(value);
+				ValuesPush((byte)code);
+				ValuesPush(start);
+				return;
+
+			case OpCode.Number:
+				var style = NumberStyles.Number;
+				if (value.Length > 2 && value[0] == '0' && (value[1] == 'x' || value[1] == 'X'))
+				{
+					style = NumberStyles.HexNumber;
+					value = value.Substring(2, value.Length - 2);
+				}
+				else if (value[0] == '.')
+				{
+					value = "0" + value;
+				}
+				var last = char.ToLower(value[value.Length - 1]);
+				if (last == 'u')
+				{
+					value = value.Substring(0, value.Length - 1);
+					if (uint.TryParse(value, style, Culture, out u))
+					{
+						ValuesReserve(5 + 4);
+						ValuesPush(u);
+						ValuesPush(OpCode.UInt);
+						ValuesPush(start);
+						return;
+					}
+					if (ulong.TryParse(value, style, Culture, out ul))
+					{
+						ValuesReserve(5 + 8);
+						ValuesPush(ul);
+						ValuesPush(OpCode.ULong);
+						ValuesPush(start);
+						return;
+					}
+					throw new InvalidOperationException();
+				}
+				if (last == 'l')
+				{
+					value = value.Substring(0, value.Length - 1);
+					last = char.ToLower(value[value.Length - 1]);
+					if (last == 'u')
+					{
+						value = value.Substring(0, value.Length - 1);
+						ul = ulong.Parse(value, style, Culture);
+						ValuesReserve(5 + 8);
+						ValuesPush(ul);
+						ValuesPush(OpCode.ULong);
+						ValuesPush(start);
+						return;
+					}
+					ll = long.Parse(value, style, Culture);
+					ValuesReserve(5 + 8);
+					ValuesPush(ll);
+					ValuesPush(OpCode.Long);
+					ValuesPush(start);
+					return;
+				}
+				if (last == 'f' && style != NumberStyles.HexNumber)
+				{
+					value = value.Substring(0, value.Length - 1);
+					if (double.TryParse(value, NumberStyles.Float, Culture, out d))
+					{
+						ValuesReserve(5 + 4);
+						ValuesPush((float)d);
+						ValuesPush(OpCode.Float);
+						ValuesPush(start);
+						return;
+					}
+					throw new InvalidOperationException();
+				}
+				if (value.IndexOf('.') < 0)
+				{
+					if (int.TryParse(value, style, Culture, out i))
+					{
+						ValuesReserve(5 + 4);
+						ValuesPush(i);
+						ValuesPush(OpCode.Int);
+						ValuesPush(start);
+						return;
+					}
+					if (long.TryParse(value, style, Culture, out ll))
+					{
+						ValuesReserve(5 + 8);
+						ValuesPush(ll);
+						ValuesPush(OpCode.Long);
+						ValuesPush(start);
+						return;
+					}
+				}
+				d = double.Parse(value, NumberStyles.Float, Culture);
+				ValuesReserve(5 + 8);
+				ValuesPush(d);
+				ValuesPush(OpCode.Double);
+				ValuesPush(start);
+				return;
+			}
+			throw new NotImplementedException();
+		}
+		private StringBuilder _stringBuilder = new StringBuilder();
+		private int Nibble(char value)
+		{
+			var c = (int)value;
+			if (c >= '0')
+			{
+				if (c <= '9')
+					return c - '0';
+				if (c >= 'a')
+					c -= 'a' - 'A';
+				if (c > 'A' && c < 'F')
+					return c - 'A' + 10;
+			}
+			throw new BadNibbleCharacter(lexer);
 		}
 
+
 		/// <summary>
-		/// peek (read but not pop) top integer from value buffer/stack
+		/// Peek (read but not pop) top integer from value buffer/stack
 		/// </summary>
 		protected int TopInt()
-		{
-			return TopInt(ValuesAt);
-		}
+			=> TopInt(ValuesAt);
 
 		/// <summary>
-		/// peek (read but not pop) top integer from value buffer/stack with end at @top
-		/// @top index after the integer
+		/// Peek (read but not pop) top integer from value buffer/stack with end at @top
 		/// </summary>
+		/// <param name="top">Index after the integer</param>
 		protected int TopInt(int top)
 		{
 			Debug.Assert(ValuesAt >= top && top >= 4);
@@ -205,24 +443,29 @@ namespace RedOnion.Script.Parsing
 		}
 
 		internal void ValuesPush(byte value)
-		{
-			Values[ValuesAt++] = value;
-		}
+			=> Values[ValuesAt++] = value;
+		internal void ValuesPush(OpCode value)
+			=> Values[ValuesAt++] = (byte)value;
 
 		internal void ValuesPush(int value)
 		{
-			Values[ValuesAt++] = unchecked((byte)value);
-			Values[ValuesAt++] = unchecked((byte)(value >> 8));
-			Values[ValuesAt++] = unchecked((byte)(value >> 16));
-			Values[ValuesAt++] = unchecked((byte)(value >> 24));
+			Values[ValuesAt++] = (byte)value;
+			Values[ValuesAt++] = (byte)(value >> 8);
+			Values[ValuesAt++] = (byte)(value >> 16);
+			Values[ValuesAt++] = (byte)(value >> 24);
 		}
 
 		internal void ValuesPush(string value)
 		{
-			ValuesPush(StringValuesAt);
-			if (StringValuesAt == StringValues.Length)
-				Array.Resize(ref _stringValues, StringValues.Length << 1);
-			StringValues[StringValuesAt++] = value;
+			if (value.Length == 0)
+				ValuesPush(-1);
+			else
+			{
+				ValuesPush(StringValuesAt);
+				if (StringValuesAt == StringValues.Length)
+					Array.Resize(ref _stringValues, StringValues.Length << 1);
+				StringValues[StringValuesAt++] = value;
+			}
 		}
 
 		internal void ValuesPush(byte[] bytes)
@@ -233,10 +476,10 @@ namespace RedOnion.Script.Parsing
 
 		internal void ValuesPush(uint value)
 		{
-			Values[ValuesAt++] = unchecked((byte)value);
-			Values[ValuesAt++] = unchecked((byte)(value >> 8));
-			Values[ValuesAt++] = unchecked((byte)(value >> 16));
-			Values[ValuesAt++] = unchecked((byte)(value >> 24));
+			Values[ValuesAt++] = (byte)value;
+			Values[ValuesAt++] = (byte)(value >> 8);
+			Values[ValuesAt++] = (byte)(value >> 16);
+			Values[ValuesAt++] = (byte)(value >> 24);
 		}
 
 		internal void ValuesPush(ulong value)
@@ -252,24 +495,19 @@ namespace RedOnion.Script.Parsing
 
 		internal void ValuesPush(short value)
 		{
-			Values[ValuesAt++] = unchecked((byte)value);
-			Values[ValuesAt++] = unchecked((byte)(value >> 8));
+			Values[ValuesAt++] = (byte)value;
+			Values[ValuesAt++] = (byte)(value >> 8);
 		}
 
 		internal void ValuesPush(ushort value)
 		{
-			Values[ValuesAt++] = unchecked((byte)value);
-			Values[ValuesAt++] = unchecked((byte)(value >> 8));
+			Values[ValuesAt++] = (byte)value;
+			Values[ValuesAt++] = (byte)(value >> 8);
 		}
 
 		internal unsafe void ValuesPush(float value)
-		{
-			ValuesPush(*(uint*)&value);
-		}
-
+			=> ValuesPush(*(uint*)&value);
 		internal unsafe void ValuesPush(double value)
-		{
-			ValuesPush(*(ulong*)&value);
-		}
+			=> ValuesPush(*(ulong*)&value);
 	}
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -103,9 +103,9 @@ namespace RedOnion.Script.Execution
 		Value			= 0x0006, // value in setter
 		Implicit		= 0x0007, // implicit value (in case of conditional switch)
 		Exception		= 0x0008, // exception in catch block
-		Default			= 0x0009, // default value	+[len byte, type chars as UTF8 bytes or index to string table]
-		Identifier		= 0x000A, // identifier		+[len byte, chars as UTF8 bytes or index to string table]
-		String			= 0x000B, // string			+[len int/i7e, chars as UTF8 bytes or index to string table]
+		Default			= 0x0009, // default value	+[index to string table]
+		Identifier		= 0x000A, // identifier		+[index to string table]
+		String			= 0x000B, // string			+[index to string table]
 		Char			= 0x010C, // short char		+[byte]
 		WideChar		= 0x020D, // wide char		+[2B char]
 		LongChar		= 0x040E, // long char		+[4B char]

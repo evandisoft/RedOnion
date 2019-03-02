@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Globalization;
 
 namespace RedOnion.Script.Parsing
 {
@@ -6,6 +7,7 @@ namespace RedOnion.Script.Parsing
 	{
 		protected Lexer lexer = new Lexer();
 
+		public CultureInfo Culture { get; set; } = CultureInfo.InvariantCulture;
 		public Option Options { get; set; } = Option.Script | Option.DotThisAfterWhite;
 
 		[Flags]
@@ -124,6 +126,15 @@ namespace RedOnion.Script.Parsing
 			ParseExpression();
 			Rewrite(ValuesAt);
 			ValuesAt = at;
+			return this;
+		}
+
+		/// <summary>
+		/// Parse next word, literal, operator or character on current line
+		/// </summary>
+		protected Parser Next()
+		{
+			lexer.Next();
 			return this;
 		}
 	}

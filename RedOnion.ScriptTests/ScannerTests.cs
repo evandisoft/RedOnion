@@ -1,18 +1,18 @@
 using System;
+using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using RedOnion.Script.Parsing;
 
-namespace Bee.Tests
+namespace RedOnion.ScriptTests
 {
 	[TestClass]
-	public class BeeScannerTests: Scanner
+	public class ScannerTests: Scanner
 	{
-		public void Test(string @string)
-		{
-			Line = @string;
-		}
-		
+		public void Test(string line)
+			=> Line = line;
+
 		[TestMethod]
-		public void SC01_words()
+		public void Scanner_01_Words()
 		{
 			Test("word");
 			Assert.AreEqual("word", Word);
@@ -24,8 +24,10 @@ namespace Bee.Tests
 			Assert.IsTrue(PeekEol);
 			Assert.AreEqual('\n', PeekAt(0));
 			Assert.AreEqual('\0', PeekAt(1));
-			Test("$small_uner");
-			Assert.AreEqual("$small_uner", Word);
+
+			Test("$small_under");
+			Assert.AreEqual("$small_under", Word);
+
 			Test("first second");
 			Assert.AreEqual(Word, "first");
 			Assert.AreEqual(' ', Peek);
@@ -34,9 +36,9 @@ namespace Bee.Tests
 			Assert.AreEqual(NextWord(), "second");
 			Assert.IsTrue(White);
 		}
-		
+
 		[TestMethod]
-		public void SC02_string()
+		public void Scanner_02_String()
 		{
 			Test("\"string\"");
 			Assert.AreEqual('"', Curr);
@@ -45,57 +47,69 @@ namespace Bee.Tests
 			Assert.AreEqual('"', Read());
 			Assert.AreEqual("string\"", Rest());
 			Assert.IsTrue(Normal);
+
 			Test("@\"verbatim\"");
 			Assert.AreEqual("@\"verbatim\"", Rest());
 			Assert.IsTrue(Normal);
+
 			Test("$\"inter\"");
 			Assert.AreEqual("$\"inter\"", Rest());
 			Assert.IsTrue(Normal);
+
 			Test("$@\"inter-verbatim\"");
 			Assert.AreEqual("$@\"inter-verbatim\"", Rest());
 			Assert.IsTrue(Normal);
+
 			Test("\"esc\\\"\"");
 			Assert.AreEqual("\"esc\\\"\"", Rest());
 			Assert.IsTrue(Normal);
+
 			Test("@\"esc\\\"");
 			Assert.AreEqual("@\"esc\\\"", Rest());
 			Assert.IsTrue(Normal);
+
 			Test("\"blah");
-			Assert.IsTrue(Instr);
+			Assert.IsTrue(InString);
 			Assert.AreEqual(5, End);
 			Line = "end\"";
 			Assert.IsTrue(Normal);
 			Assert.AreEqual(4, End);
 		}
-		
+
 		[TestMethod]
-		public void SC03_number()
+		public void Scanner_03_Number()
 		{
 			Test("12345");
 			Assert.AreEqual('1', Curr);
 			Assert.AreEqual('1', Read());
 			Assert.AreEqual('2', Read());
 			Assert.AreEqual("345", Rest());
+
 			Test("0x1AB");
 			Assert.AreEqual('0', Read());
 			Assert.AreEqual('x', Read());
 			Assert.AreEqual("1AB", Rest());
+
 			Test("1.2");
 			Assert.AreEqual("1.2", Rest());
+
 			Test("1.2e+3");
 			Assert.AreEqual("1.2e+3", Rest());
 		}
-		
+
 		[TestMethod]
-		public void SC04_comments()
+		public void Scanner_04_Comments()
 		{
 			Test("first /* comment */ second");
 			Assert.AreEqual(Word, "first");
 			Assert.AreEqual(NextWord(), "second");
+
 			Test("/*");
 			Assert.IsTrue(Comment);
+
 			Test("comment");
 			Assert.IsTrue(Comment);
+
 			Test("*/");
 			Assert.IsTrue(Normal);
 		}

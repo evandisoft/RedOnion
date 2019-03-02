@@ -12,40 +12,40 @@ namespace Bee
 		/// <summary>
 		/// parse type (reference, not declaration/definition)
 		/// </summary>
-		public Parser Type( Flag flags = Flag.None )
+		public Parser Type(Flag flags = Flag.None)
 		{
-			this.Type_( flags );
+			this.Type_(flags);
 			return this;
-		}//Type
+		}
 		
 		[System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Never)]
-		protected virtual void Type_( Flag flags = Flag.None )
+		protected virtual void Type_(Flag flags = Flag.None)
 		{
 			var bottom = OpsAt;
 			var unary = true;
 		next:
 			var code = Opcode;
-			switch( code.Kind() )
+			switch (code.Kind())
 			{
 			case Opkind.Literal:
-				switch( code )
+				switch (code)
 				{
 				case Opcode.Ident:
-					if( !unary )
+					if (!unary)
 					{
 						break;
 					}
-					if( Word.Length > 127 )
+					if (Word.Length > 127)
 					{
-						throw new ParseError( this, "Identifier name too long" );
+						throw new ParseError(this, "Identifier name too long");
 					}
-					if( Word == "object" )
+					if (Word == "object")
 					{
-						Cgen.Push( Opcode.Null );
+						Cgen.Push(Opcode.Null);
 					}
 					else
 					{
-						Cgen.Push( Opcode.Ident, Word );
+						Cgen.Push(Opcode.Ident, Word);
 					}
 					Next();
 					unary = false;
@@ -60,105 +60,106 @@ namespace Bee
 				break;
 			case Opkind.Number:
 			type:
-				if( !unary )
+				if (!unary)
 				{
 					break;
 				}
-				Cgen.Push( code );
+				Cgen.Push(code);
 				Next();
 				unary = false;
 				goto next;
 			case Opkind.Special:
-				switch( code )
+				switch (code)
 				{
 				case Opcode.Dot:
-					if( unary )
+					if (unary)
 					{
 						break;
 					}
-					if( Next().Word == null )
+					if (Next().Word == null)
 					{
-						throw new ParseError( this, "Expected word after '.'" );
+						throw new ParseError(this, "Expected word after '.'");
 					}
-					if( Word.Length > 127 )
+					if (Word.Length > 127)
 					{
-						throw new ParseError( this, "Identifier name too long" );
+						throw new ParseError(this, "Identifier name too long");
 					}
-					Cgen.Push( Opcode.Ident, Word );
-					Cgen.Prepare( Opcode.Dot );
+					Cgen.Push(Opcode.Ident, Word);
+					Cgen.Prepare(Opcode.Dot);
 					Next();
 					unary = false;
 					goto next;
 				case Opcode.Generic:
-					if( unary )
+					if (unary)
 					{
 						break;
 					}
-					if( Next().Curr != ']' )
+					if (Next().Curr != ']')
 					{
-						for( ; ;  )
+						for (;;)
 						{
-							Op( Opcode.Comma );
-							Type( flags & (~Flag.Limit) );
-							if( Curr == ']' )
+							Op(Opcode.Comma);
+							Type(flags & (~Flag.Limit));
+							if (Curr == ']')
 							{
 								break;
 							}
-							if( Curr != ',' )
+							if (Curr != ',')
 							{
-								throw new ParseError( this, "Expected ',' or ']'" );
+								throw new ParseError(this, "Expected ',' or ']'");
 							}
 							Next();
 						}
 					}
-					Cgen.Prepare( Opcode.Generic );
+					Cgen.Prepare(Opcode.Generic);
 					Next();
 					goto next;
 				}
 				break;
 			case Opkind.Meta:
-				if( Curr != '[' )
+				if (Curr != '[')
 				{
 					break;
 				}
-				if( unary )
+				if (unary)
 				{
 					break;
 				}
-				if( Next().Curr != ']' )
+				if (Next().Curr != ']')
 				{
-					for( ; ;  )
+					for (;;)
 					{
-						Op( Opcode.Comma );
-						Expression( flags & (~Flag.Limit) );
-						if( Curr == ']' )
+						Op(Opcode.Comma);
+						Expression(flags & (~Flag.Limit));
+						if (Curr == ']')
 						{
 							break;
 						}
-						if( Curr != ',' )
+						if (Curr != ',')
 						{
-							throw new ParseError( this, "Expected ',' or ']'" );
+							throw new ParseError(this, "Expected ',' or ']'");
 						}
 						Next();
 					}
 				}
-				Cgen.Prepare( Opcode.Array );
+				Cgen.Prepare(Opcode.Array);
 				Next();
 				goto next;
 			}
-			if( unary )
+			if (unary)
 			{
-				if( OpsAt > bottom )
+				if (OpsAt > bottom)
 				{
-					Debug.Assert( false );
-					throw new ParseError( this, "Unexpected state in type recognition (operators on stack when expecting unary)" );
+					Debug.Assert(false);
+					throw new ParseError(this, "Unexpected state in type recognition (operators on stack when expecting unary)");
 				}
-				Cgen.Push( Opcode.Undef );
+				Cgen.Push(Opcode.Undef);
 				return;
 			}
-			while( OpsAt > bottom ){
-				Cgen.Prepare( Pop() );
+			while (OpsAt > bottom)
+			{
+				Cgen.Prepare(Pop());
 			}
-		}//Type_
-	}//Parser
-}//Bee
+		}
+	}
+}

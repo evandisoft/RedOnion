@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -32,7 +32,7 @@ namespace RedOnion.Script.Parsing
 		}
 
 		/// <summary>
-		/// Parse next word, literal, operator or character on this line
+		/// Parse next word, literal, operator or character on current line
 		/// </summary>
 		public new Lexer Next()
 		{
@@ -40,7 +40,7 @@ namespace RedOnion.Script.Parsing
 			return this;
 		}
 		/// <summary>
-		/// Parse next word, literal, operator or character on this line
+		/// Parse next word, literal, operator or character on current line
 		/// </summary>
 		protected override void NextToken()
 		{
