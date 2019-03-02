@@ -91,7 +91,7 @@ namespace Bee
 						throw new InvalidOperationException();
 					}
 					@string = @string.Substring(2, @string.Length - 3);
-					break;
+					goto case Opcode.Ident;
 				}
 				if (@string[0] != '"' || @string[@string.Length - 1] != '"')
 				{

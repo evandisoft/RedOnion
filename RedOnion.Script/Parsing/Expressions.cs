@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Diagnostics;
 using RedOnion.Script.Execution;
 
 namespace RedOnion.Script.Parsing
@@ -13,8 +14,6 @@ namespace RedOnion.Script.Parsing
 		/// </summary>
 		protected virtual void ParseExpression(Flag flags = Flag.None)
 		{
-			/* TODO!!
-
 			var bottom = OperatorAt;
 		unext:
 			var unary = true;
@@ -34,366 +33,299 @@ namespace RedOnion.Script.Parsing
 				if (lexer.Peek == '!')
 				{
 					PushOperator(OpCode.Cast, bottom);
-					lexer.Next().Next();
+					Next().Next();
 					goto unext;
 				}
-				lexer.Next();
+				Next();
 				unary = false;
 				goto next;
 			}
 			switch (kind)
 			{
-			case Opkind.Literal:
+			case OpKind.Literal:	//###################################################### literal
 				switch (code)
 				{
-				default:
-					Debug.Assert((((((code == OpCode.Undef || code == OpCode.Null) || code == OpCode.False) || code == OpCode.True) || code == OpCode.This) || code == OpCode.Base) || code == OpCode.Exception);
+				default:            //---------------------------------------------- null, this, ...
+					Debug.Assert(code == OpCode.Undefined || code == OpCode.Null
+						|| code == OpCode.False || code == OpCode.True
+						|| code == OpCode.This || code == OpCode.Base
+						|| code == OpCode.Exception);
 					if (!unary)
-					{
 						goto autocall;
-					}
-					Cgen.Push(code);
+					Push(code);
 					Next();
 					unary = false;
 					goto next;
-				case OpCode.Default:
-					throw new ParseError(this, "TODO");
-				case OpCode.Number:
-					if (Instr)
-					{
-						throw new ParseError(this, "Unterminated string (or char) literal");
-					}
-					if (Curr == '"')
-					{
+				case OpCode.Default://------------------------------------------------------ default
+					throw new ParseError(lexer, "TODO");
+				case OpCode.Number: //--------------------------------------- number, string or char
+					if (lexer.InString)
+						throw new ParseError(lexer, "Unterminated string (or char) literal");
+					if (lexer.Curr == '"')
 						code = OpCode.String;
-					}
-					else if (Curr == '\'')
-					{
+					else if (lexer.Curr == '\'')
 						code = OpCode.Char;
-					}
 					if (!unary)
-					{
 						goto autocall;
-					}
-					Cgen.Push(code, Rest());
+					Push(code, lexer.Rest());
 					Next();
 					unary = false;
 					goto next;
 				}
-			case Opkind.Assign:
+
+			case OpKind.Assign:		//##################################################### operator
 				CheckUnary(unary, false);
-				Op(code);
+				PushOperator(code);
 				Next();
 				goto unext;
-			case Opkind.Binary:
+			case OpKind.Binary:     //------------------------------------------------------- binary
 				if (code != OpCode.Add && code != OpCode.Sub)
-				{
 					goto binary_check;
-				}
 				if (unary)
 				{
 					code = code == OpCode.Add ? OpCode.Plus : OpCode.Neg;
-					if (Next().OpCode != OpCode.Number)
-					{
+					if (Next().lexer.Code != OpCode.Number)
 						goto unary;
-					}
-					Cgen.Push(OpCode.Number, code.Text() + Rest());
+					Push(OpCode.Number, code.Text() + lexer.Rest());
 					Next();
 					unary = false;
 					goto next;
 				}
-				if (White && (!PeekWhite))
-				{
+				if (lexer.White && !lexer.PeekWhite)
 					goto autocall;
-				}
 				goto binary;
-			case Opkind.Logic:
+			case OpKind.Logic:
 			binary_check:
 				CheckUnary(unary, false);
 			binary:
 				Next();
-				Op(code, bottom);
+				PushOperator(code, bottom);
 				goto unext;
-			case Opkind.Unary:
+			case OpKind.Unary:      //-------------------------------------------------------- unary
 				CheckUnary(unary, true);
 				Next();
 			unary:
-				Op(code);
+				PushOperator(code);
 				goto next;
-			case Opkind.Prepost:
+			case OpKind.PreOrPost:
 				if (unary)
 				{
-					Op(code);
+					PushOperator(code);
 					Next();
 					goto next;
 				}
 				switch (code)
 				{
 				case OpCode.Inc:
-					Op(OpCode.PostInc, bottom);
+					PushOperator(OpCode.PostInc, bottom);
 					Next();
 					goto next;
 				case OpCode.Dec:
-					Op(OpCode.PostDec, bottom);
+					PushOperator(OpCode.PostDec, bottom);
 					Next();
 					goto next;
 				default:
-					throw new ExpectedUnary(this);
+					throw new ExpectedUnary(lexer);
 				}
-			case Opkind.Special:
+
+			case OpKind.Special:	//###################################################### special
 				switch (code)
 				{
 				case OpCode.Create:
 					CheckUnary(unary, true);
 					Next();
-					Op(code);
-					Type(flags);
+					PushOperator(code);
+					ParseType(flags);
 					unary = false;
 					goto next;
 				case OpCode.Dot:
-					if (unary || White)
+					if (unary || lexer.White)
 					{
-						if ((unary && Peek >= '0') && Peek <= '9')
+						if (unary && lexer.Peek >= '0' && lexer.Peek <= '9')
 						{
-							Cgen.Push(OpCode.Number, code.Text() + Next().Rest());
+							Push(OpCode.Number, code.Text() + Next().lexer.Rest());
 							Next();
 							unary = false;
 							goto next;
 						}
-						if (unary || (Opts & Opt.DotThisAfterWhite) != 0)
+						if (unary || (Options & Option.DotThisAfterWhite) != 0)
 						{
 							if ((flags & (Flag.Static | Flag.With)) == Flag.Static)
-							{
-								throw new ParseError(this, "Dot-shortcut for 'this' not allowed in static method");
-							}
+								throw new ParseError(lexer, "Dot-shortcut for 'this' not allowed in static method");
 							if (!unary)
-							{
 								goto autocall;
-							}
-							Cgen.Push((flags & Flag.With) != 0 ? OpCode.Ivalue : OpCode.This);
+							Push((flags & Flag.With) != 0 ? OpCode.Implicit : OpCode.This);
 							unary = false;
 						}
 					}
-					if (Next().Word == null)
+					if (Next().lexer.Word == null)
+						throw new ParseError(lexer, "Expected word after '.'");
+					if (lexer.Word.Length > 127)
+						throw new ParseError(lexer, "Identifier name too long");
+					Push(OpCode.Identifier, lexer.Word);
+					PrepareOperator(OpCode.Dot);
+					if (lexer.Peek == '!')
 					{
-						throw new ParseError(this, "Expected word after '.'");
-					}
-					if (Word.Length > 127)
-					{
-						throw new ParseError(this, "Identifier name too long");
-					}
-					Cgen.Push(OpCode.Ident, Word);
-					Cgen.Prepare(OpCode.Dot);
-					if (Peek == '!')
-					{
-						Op(OpCode.Cast, bottom);
+						PushOperator(OpCode.Cast, bottom);
 						Next().Next();
 						goto unext;
 					}
 					Next();
 					unary = false;
 					goto next;
-				case OpCode.Ternary:
-					while (OpsAt > bottom)
-					{
-						Cgen.Prepare(Pop());
-					}
-					Next().Expression(flags & (~Flag.Limit));
-					if (Eol)
-					{
-						NextLine();
-					}
-					if (Curr != ':')
-					{
-						throw new ParseError(this, "Expected matching ':' for ternary '?'");
-					}
-					Next().Expression(flags);
-					Cgen.Prepare(OpCode.Ternary);
+				case OpCode.Ternary://--------------------------------------------------- ternary ?:
+					while (OperatorAt > bottom)
+						PrepareOperator(PopOperator());
+					Next().ParseExpression(flags &~Flag.LimitedContext);
+					if (lexer.Eol)
+						lexer.NextLine();
+					if (lexer.Curr != ':')
+						throw new ParseError(lexer, "Expected matching ':' for ternary '?'");
+					Next().ParseExpression(flags);
+					PrepareOperator(OpCode.Ternary);
 					unary = false;
 					goto next;
-				case OpCode.Var:
-					if (Next().Word == null)
-					{
-						throw new ParseError(this, "Expected variable name");
-					}
-					if (Word.Length > 127)
-					{
-						throw new ParseError(this, "Variable name too long");
-					}
-					Cgen.Push(OpCode.Ident, Word);
+				case OpCode.Var:	//----------------------------------------- variable declaration
+					if (Next().lexer.Word == null)
+						throw new ParseError(lexer, "Expected variable name");
+					if (lexer.Word.Length > 127)
+						throw new ParseError(lexer, "Variable name too long");
+					Push(OpCode.Identifier, lexer.Word);
 					Next();
-					if (Curr == ':')
-					{
-						if (Next().Word == null)
-						{
-							throw new ParseError(this, "Expected variable type");
-						}
-					}
-					Type(flags);
-					if (OpCode == OpCode.Assign)
-					{
-						Next().Expression(flags);
-					}
+					if (lexer.Curr == ':' && Next().lexer.Word == null)
+						throw new ParseError(lexer, "Expected variable type");
+					ParseType(flags);
+					if (lexer.Code == OpCode.Assign)
+						Next().ParseExpression(flags);
 					else
-					{
-						Cgen.Push(OpCode.Undef);
-					}
-					Cgen.Prepare(OpCode.Var);
+						Push(OpCode.Undefined);
+					PrepareOperator(OpCode.Var);
 					unary = false;
 					goto next;
 				}
 				break;
-			case Opkind.Meta:
+
+			case OpKind.Meta:		//######################################################## other
 				Debug.Assert(code == OpCode.Unknown);
-				switch (Curr)
+				switch (lexer.Curr)
 				{
-				case '(':
-					if (unary || White)
+				case '(':			//------------------------------------------------------------ (
+					if (unary || lexer.White)
 					{
 						if (!unary)
-						{
 							goto autocall;
-						}
-						Next().Expression(flags & (~Flag.Limit));
-						if (Curr != ')')
-						{
-							throw new ParseError(this, "Expected matching ')'");
-						}
+						Next().ParseExpression(flags &~Flag.LimitedContext);
+						if (lexer.Curr != ')')
+							throw new ParseError(lexer, "Expected matching ')'");
 						Next();
 						unary = false;
 						goto next;
 					}
-					if (Next().Curr == ')')
+					if (Next().lexer.Curr == ')')
 					{
-						Cgen.Prepare(OpCode.Ecall);
+						PrepareOperator(OpCode.Call0);
 						Next();
 						unary = false;
 						goto next;
 					}
-					Expression(flags & (~Flag.Limit));
-					if (Curr == ')')
+
+					ParseExpression(flags &~Flag.LimitedContext);
+
+					if (lexer.Curr == ')')
 					{
-						Cgen.Prepare(OpCode.Call);
+						PrepareOperator(OpCode.Call1);
 						Next();
 						unary = false;
 						goto next;
 					}
-					if (Curr != ',')
-					{
-						throw new ParseError(this, "Expected ',' or ')'");
-					}
+					if (lexer.Curr != ',')
+						throw new ParseError(lexer, "Expected ',' or ')'");
 					do
 					{
-						Op(OpCode.Comma);
-						Next().Expression(flags & (~Flag.Limit));
+						PushOperator(OpCode.Comma);
+						Next().ParseExpression(flags &~Flag.LimitedContext);
 					}
-					while (Curr == ',');
-					if (Curr != ')')
-					{
-						throw new ParseError(this, "Expected matching ')'");
-					}
+					while (lexer.Curr == ',');
+					if (lexer.Curr != ')')
+						throw new ParseError(lexer, "Expected matching ')'");
 					Next();
-					Cgen.Prepare(OpCode.Mcall);
+					PrepareOperator(OpCode.CallN);
 					unary = false;
 					goto next;
-				case '[':
+				case '[':			//------------------------------------------------------------ [
 					if (unary)
+						throw new ParseError(lexer, "Unexpected '[' - nothing to index");
+					if (Next().lexer.Curr == ']')
+						throw new ParseError(lexer, "Unexpected ']' - missing index");
+
+					ParseExpression(flags &~Flag.LimitedContext);
+
+					if (lexer.Curr == ']')
 					{
-						if ((Opts & Opt.BracketsAsParens) == 0)
-						{
-							throw new ParseError(this, "Unexpected '[' - nothing to index");
-						}
-						Next().Expression(flags & (~Flag.Limit));
-						if (Curr != ']')
-						{
-							throw new ParseError(this, "Expected matching ']'");
-						}
+						PrepareOperator(OpCode.Index);
 						Next();
 						unary = false;
 						goto next;
 					}
-					if (Next().Curr == ']')
-					{
-						if ((Opts & Opt.BracketsAsParens) == 0)
-						{
-							throw new ParseError(this, "Unexpected '[' - nothing to index");
-						}
-						Cgen.Prepare(OpCode.Ecall);
-						Next();
-						unary = false;
-						goto next;
-					}
-					Expression(flags & (~Flag.Limit));
-					if (Curr == ']')
-					{
-						Cgen.Prepare(OpCode.Index);
-						Next();
-						unary = false;
-						goto next;
-					}
-					if (Curr != ',')
-					{
-						throw new ParseError(this, "Expected ',' or ']'");
-					}
+					if (lexer.Curr != ',')
+						throw new ParseError(lexer, "Expected ',' or ']'");
 					do
 					{
-						Op(OpCode.Comma);
-						Next().Expression(flags & (~Flag.Limit));
+						PushOperator(OpCode.Comma);
+						Next().ParseExpression(flags &~Flag.LimitedContext);
 					}
-					while (Curr == ',');
-					if (Curr != ']')
-					{
-						throw new ParseError(this, "Expected matching ']'");
-					}
+					while (lexer.Curr == ',');
+					if (lexer.Curr != ']')
+						throw new ParseError(lexer, "Expected matching ']'");
 					Next();
-					Cgen.Prepare(OpCode.Mindex);
+					PrepareOperator(OpCode.IndexN);
 					unary = false;
 					goto next;
 				default:
 					goto done;
 				}
+			//################################################################################# TAIL
 			default:
-				if (code.Kind() >= Opkind.Statement)
-				{
+				if (code.Kind() >= OpKind.Statement)
 					goto done;
-				}
 				break;
 			}
-			throw new ParseError(this, "Unrecognised token: {0} / {1}", code, Word ?? Curr.ToString());
+			throw new ParseError(lexer, "Unrecognised token: {0} / {1}",
+				code, lexer.Word ?? lexer.Curr.ToString());
+
 		done:
 			if (unary)
 			{
-				if (Eol)
+				if (lexer.Eol)
 				{
-					NextLine();
+					lexer.NextLine();
 					goto next;
 				}
-				throw new ExpectedBinary(this);
+				throw new ExpectedBinary(lexer);
 			}
-			while (OpsAt > bottom)
-			{
-				Cgen.Prepare(Pop());
-			}
+			while (OperatorAt > bottom)
+				PrepareOperator(PopOperator());
 			return;
+
+		//################################################################################ auto call
 		autocall:
 			Debug.Assert(!unary);
-			Expression(flags);
-			if (Curr != ',')
+			ParseExpression(flags);
+			if (lexer.Curr != ',')
 			{
-				Cgen.Prepare(OpCode.Call);
+				PrepareOperator(OpCode.Call1);
 				unary = false;
 				goto next;
 			}
 			do
 			{
-				Op(OpCode.Comma);
-				Next().Expression(flags);
+				PushOperator(OpCode.Comma);
+				Next().ParseExpression(flags);
 			}
-			while (Curr == ',');
-			Cgen.Prepare(OpCode.Mcall);
+			while (lexer.Curr == ',');
+			PrepareOperator(OpCode.CallN);
 			unary = false;
 			goto next;
-			*/
 		}
 	}
 }
