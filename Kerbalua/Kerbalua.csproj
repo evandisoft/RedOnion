@@ -2,7 +2,7 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <KerbalLibs Condition=" '$(OS)' == 'Windows_NT' And '$(KerbalLibs)' == '' ">C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\KSP_x64_Data\Managed</KerbalLibs>
-	<KerbalLibs Condition=" '$(OS)' != 'Windows_NT' And '$(KerbalLibs)' == '' ">../KerbalLibs</KerbalLibs>
+	<KerbalLibs Condition=" '$(OS)' != 'Windows_NT' And '$(KerbalLibs)' == '' ">KerbalLibs</KerbalLibs>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{F590B1DB-8F33-4986-8383-180952D63CDA}</ProjectGuid>
@@ -29,31 +29,11 @@
     <ConsolePause>false</ConsolePause>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Assembly-CSharp">
-      <HintPath>$(KerbalLibs)\Assembly-CSharp.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Assembly-CSharp-firstpass">
-      <HintPath>$(KerbalLibs)\Assembly-CSharp-firstpass.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="MoonSharp.Interpreter">
       <HintPath>..\packages\MoonSharp.2.0.0.0\lib\net35-client\MoonSharp.Interpreter.dll</HintPath>
     </Reference>
     <Reference Include="Antlr4.Runtime.Standard">
       <HintPath>..\packages\Antlr4.Runtime.Standard.4.7.1.1\lib\net35\Antlr4.Runtime.Standard.dll</HintPath>
-    </Reference>
-    <Reference Include="Assembly-UnityScript">
-      <HintPath>$(KerbalLibs)\Assembly-UnityScript.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Assembly-UnityScript-firstpass">
-      <HintPath>$(KerbalLibs)\Assembly-UnityScript-firstpass.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Boo.Lang">
-      <HintPath>$(KerbalLibs)\Boo.Lang.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="I18N.CJK">
       <HintPath>$(KerbalLibs)\I18N.CJK.dll</HintPath>
@@ -79,22 +59,6 @@
       <HintPath>$(KerbalLibs)\I18N.West.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Ionic.Zip">
-      <HintPath>$(KerbalLibs)\Ionic.Zip.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="KSPAssets">
-      <HintPath>$(KerbalLibs)\KSPAssets.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="KSPTrackIR">
-      <HintPath>$(KerbalLibs)\KSPTrackIR.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Mono.Cecil">
-      <HintPath>$(KerbalLibs)\Mono.Cecil.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="Mono.Security">
       <HintPath>$(KerbalLibs)\Mono.Security.dll</HintPath>
       <Private>False</Private>
@@ -115,29 +79,14 @@
       <HintPath>$(KerbalLibs)\System.Xml.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="UnityEngine.Analytics">
-      <HintPath>$(KerbalLibs)\UnityEngine.Analytics.dll</HintPath>
-      <Private>False</Private>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>..\..\..\..\..\..\programs\KSPDev\KerbaluaDev\KSP_Data\Managed\Assembly-CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="Assembly-CSharp-firstpass">
+      <HintPath>..\..\..\..\..\..\programs\KSPDev\KerbaluaDev\KSP_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine">
-      <HintPath>$(KerbalLibs)\UnityEngine.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="UnityEngine.Networking">
-      <HintPath>$(KerbalLibs)\UnityEngine.Networking.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="UnityEngine.Timeline">
-      <HintPath>$(KerbalLibs)\UnityEngine.Timeline.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="UnityEngine.UI">
-      <HintPath>$(KerbalLibs)\UnityEngine.UI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="UnityScript.Lang">
-      <HintPath>$(KerbalLibs)\UnityScript.Lang.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>..\..\..\..\..\..\programs\KSPDev\KerbaluaDev\KSP_Data\Managed\UnityEngine.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
