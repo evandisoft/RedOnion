@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedOnion.ScriptTests", "Red
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedOnion.ScriptXUnit", "RedOnion.ScriptXUnit\RedOnion.ScriptXUnit.csproj", "{2E3DF5C2-8A38-4A03-86D7-8D463C917E47}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedOnion.ScriptNUnit", "RedOnion.ScriptNUnit\RedOnion.ScriptNUnit.csproj", "{B705F43E-2E55-4309-9399-22608AB4F4B3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{2E3DF5C2-8A38-4A03-86D7-8D463C917E47}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2E3DF5C2-8A38-4A03-86D7-8D463C917E47}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2E3DF5C2-8A38-4A03-86D7-8D463C917E47}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B705F43E-2E55-4309-9399-22608AB4F4B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B705F43E-2E55-4309-9399-22608AB4F4B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B705F43E-2E55-4309-9399-22608AB4F4B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B705F43E-2E55-4309-9399-22608AB4F4B3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
