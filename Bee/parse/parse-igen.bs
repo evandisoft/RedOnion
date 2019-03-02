@@ -1,0 +1,153 @@
+﻿use bee.run, sys: io, text, cols.gen, diag
+pkg bee
+
+def parser partial
+
+	cgen iGenerator get protected
+
+	.ctor cgen iGenerator
+		_cgen = cgen ?? new dummyGenerator
+
+	@@ Callback from parser to generator
+	def iGenerator interface
+
+		push, opcode
+		;; push simple value (this, null, false, ...)
+		push, opcode, string
+		;; push string value (string, identifier)
+
+		prepare, opcode
+		;; prepare top operator (prepare postfix record or expression tree node)
+
+		blockStart int
+		;; start block of statements (make room fore size integer)
+		blockEnd, int, count int
+		;; end block of statements (write size at proper position)
+		;; @count number of statements in the block
+
+		exprStart int
+		;; start of full expression
+		exprEnd, int
+		;; end of full expression (rewrite and remove)
+
+		typeStart int
+		;; start of type reference
+		typeEnd, int
+		;; end of type reference (rewrite and remove)
+
+		write int, opcode
+		;; start statement (write the code)
+		write, opcode, int
+		;; change statement (patch do-until, for-in)
+		ident, string
+		;; write identifier (variable/type/namesapce) name
+		ident, opcode, string
+		;; write statement with identifier (variable/type/namesapce) name
+		;; (should most often be same as `write opcode; ident string`)
+
+	//----------------------------------------------------------------------------------------------
+
+		classStart int, name string
+		;; start of type definition (class, struct, enum, interface)
+		classBody int, int, name string, opcode, gtnum int, bcnum int, tflag
+		;; end of type header, start of body (methods, properties, variables)
+		classEnd, int, name string
+		;; end of type definition (class, struct, enum, interface)
+
+		fieldStart int, name string
+		;; start of field
+		fieldEnd, int, name string, opcode, tflag
+		;; end of field
+
+		funcStart int, fname string
+		;; start of function or method
+		funcTypeEnd int, int, fname string
+		;; end of function type, start of argument/parameter list
+		funcArg int, int, fname string, index int, aname string
+		;; add argument/parameter to function/method
+		funcArgDef int, fn int, arg int, fname string, index int, aname string
+		;; finish type, start default value
+		funcArgEnd, fn int, arg int, fname string, index int, aname string
+		;; finish argument/parameter
+		funcBody int, int, fname string, argc int, tflag
+		;; end of function header (arguments), start of body (statements)
+		funcEnd, int, fname string
+		;; end of function or method
+
+		func2prop int, int, pname string
+		;; transition from function to property (after calling funcBody)		
+		propFieldStart int, int, pname string
+		;; start of field
+		propFieldEnd, pm int, int, pname string
+		;; end of field
+		propFuncStart int, int, pname string, kind opcode
+		;; start of function or method
+		propFuncBody int, pm int, int, pname string, kind opcode, tflag
+		;; end of function header (arguments), start of body (statements)
+		propFuncEnd, pm int, int, pname string, kind opcode
+		;; end of function or method
+		propEnd, int, pname string
+		;; end of property
+		
+	@@ Dummy generator (if parsing only is needed)
+	def dummyGenerator iGenerator
+
+		push, opcode
+		push, opcode, string
+
+		prepare, opcode
+
+		blockStart int
+			return 0
+		blockEnd, int, count int
+
+		exprStart int
+			return 0
+		exprEnd, int
+
+		typeStart int
+			return 0
+		typeEnd, int
+
+		write int, opcode
+			return 0
+		write, opcode, int
+		ident, string
+		ident, opcode, string
+
+		classStart int, name string
+			return 0
+		classBody int, int, name string, opcode, gtnum int, bcnum int, tflag
+			return 0
+		classEnd, int, name string
+
+		fieldStart int, name string
+			return 0
+		fieldEnd, int, name string, opcode, tflag
+
+		funcStart int, fname string
+			return 0
+		funcTypeEnd int, int, fname string
+			return 0
+		funcArg int, int, fname string, index int, aname string
+			return 0
+		funcArgDef int, fn int, arg int, fname string, index int, aname string
+			return 0
+		funcArgEnd, fn int, arg int, fname string, index int, aname string
+		funcBody int, int, fname string, argc int, tflag
+			return 0
+		funcEnd, int, fname string
+
+		func2prop int, int, pname string
+			return 0
+
+		propFieldStart int, int, pname string
+			return 0
+		propFieldEnd, pm int, int, pname string
+
+		propFuncStart int, int, pname string, kind opcode
+			return 0
+		propFuncBody int, pm int, int, pname string, kind opcode, tflag
+			return 0
+		propFuncEnd, pm int, int, pname string, kind opcode
+		propEnd, int, pname string

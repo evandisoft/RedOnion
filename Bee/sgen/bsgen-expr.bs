@@ -1,0 +1,190 @@
+﻿use bee.run, sys: text, lang, cols.gen, diag
+pkg bee
+
+def bsGenerator partial
+protected:
+
+	literal, op opcode, code byte[], at ref int override
+		if op < opcode.ident
+			write op.text()
+			return
+		if op == opcode.ident || op == opcode.number
+			var n = code[at++]
+			write encoding.UTF8.getString code, at, n
+			at += n
+			return
+		if op == opcode.string
+			var n = cint code, ref at
+			write encoding.UTF8.getString code, at, n
+			at += n
+			return
+		raise invalidOperationException()
+
+	binary, op opcode, code byte[], at ref int override
+		var paren = parens
+		if paren; write '('
+
+		if op == opcode.cast
+			typeref code, ref at
+			write "! "
+			expression code, ref at
+			if paren; write ')'
+			return
+
+		expression code, ref at
+		write ' '
+		write op.text()
+		write ' '
+		if op == opcode.logicAnd || op == opcode.logicOr
+			at += 4 // skip size of second argument for logic operators
+		expression code, ref at
+		if paren; write ')'
+
+	unary, op opcode, code byte[], at ref int override
+		var paren = parens
+		if paren; write '('
+		var text = op.text()
+		var post = op.postfix()
+		if !post
+			write text
+			if text.length > 2
+				write ' '
+		expression code, ref at
+		if post
+			write text
+		if paren; write ')'
+
+//----------------------------------------------------------------------------------------------
+
+	special, op opcode, code byte[], at ref int override
+		var paren = parens
+		var create = false
+	next:
+		switch op
+		case opcode.create
+			create = true
+			write "new "
+			op = (opcode! code[at]).extend()
+			if op.kind() == opkind.special &&
+			  (byte! op) < (byte! opcode.generic)
+				at++
+				goto next
+			goto case opcode.ecall
+		case opcode.ecall
+			if create
+				if code[at] == (byte! opcode.array)
+					typeref code, ref at
+					return // no ()
+				typeref code, ref at
+			else expression code, ref at
+			write "()"
+			return
+		case opcode.call
+			if create; typeref code, ref at
+			else expression code, ref at
+			write paren ? '(' : ' '
+			expression code, ref at
+			if paren; write ')'
+			return
+		case opcode.call2
+			if create; typeref code, ref at
+			else expression code, ref at
+			write paren ? '(' : ' '
+			expression code, ref at
+			write ", "
+			expression code, ref at
+			if paren; write ')'
+			return
+		case opcode.mcall
+			var mcn = int! code[at++] - 1
+			if mcn < 2; raise invalidOperationException()
+			if create; typeref code, ref at
+			else expression code, ref at
+			write paren ? '(' : ' '
+			expression code, ref at
+			while --mcn > 0
+				write ", "
+				expression code, ref at
+			if paren; write ')'
+			return
+
+		case opcode.index
+			expression code, ref at
+			write '['
+			current = 0
+			expression code, ref at
+			current = op
+			write ']'
+			return
+		case opcode.mindex
+			mcn = int! code[at++] - 1
+			if mcn < 2; raise invalidOperationException()
+			expression code, ref at
+			write '['
+			expression code, ref at
+			while --mcn > 0
+				write ", "
+				expression code, ref at
+			write ']'
+			return
+
+		case opcode.var
+			var n = code[at++]
+			var s = encoding.UTF8.getString code, at, n
+			at += n
+			write "var "
+			write s
+			if code[at] == 0; at++
+			else
+				write ' ' // or ':'
+				typeref code, ref at
+			if code [at] == 0; at++
+			else
+				write " = "
+				expression code, ref at
+			return
+		case opcode.dot
+			expression code, ref at
+			write '.'
+			n = code[at++]
+			write encoding.UTF8.getString code, at, n
+			at += n
+			return
+
+		case opcode.ternary
+			if paren; write '('
+			expression code, ref at
+			write " ? "
+			at += 4
+			current = 0
+			expression code, ref at
+			write " : "
+			at += 4
+			expression code, ref at
+			current = op
+			if paren; write ')'
+			return
+
+		raise notImplementedException()
+			
+//----------------------------------------------------------------------------------------------
+protected:
+
+	parens bool virtual get
+		var inside	= .inside
+		if (byte! inside) >= 0x80; return false
+		var op		= .current
+		if inside.prior() <= opcode.assign.prior()
+			return inside.kind() == opkind.special && (
+			  op.prior() <= opcode.assign.prior() ||
+			  inside == opcode.dot)
+		return op.prior() < inside.prior() ||
+		  // x | 1 << 2  =>  x | (1 << 2)
+		  op == opcode.shiftLeft || op == opcode.shiftLeft ||
+		  // 3 * x & 3 << 4 + y  =>  (3 * (x & 3)) << (4 + y)
+		  inside == opcode.shiftLeft || inside == opcode.shiftLeft ||
+		  // 1 + 2 | 3 * 4 << 1  =>  (1 + 2) | ((3 * 4) << 1)
+		  inside == opcode.bitOr ||
+		  // 3 * x & 7  =>  3 * (x & 7)
+		  (inside.prior() == opcode.mul.prior() &&
+		  (op == opcode.bitAnd || op == opcode.bitXor))

@@ -1,0 +1,438 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{7FBCB2AD-D2DF-4271-B612-17E6F6A1AC12}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Bee</RootNamespace>
+    <AssemblyName>Bee</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>Bee.Program</StartupObject>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="code\code-bits.cs" />
+    <Compile Include="code\code-gen.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>code-gen.bs</DependentUpon>
+    </Compile>
+    <Compile Include="code\code-main.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>code-main.bs</DependentUpon>
+    </Compile>
+    <Compile Include="code\code-parse.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>code-parse.bs</DependentUpon>
+    </Compile>
+    <Compile Include="code\code-press.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>code-press.bs</DependentUpon>
+    </Compile>
+    <Compile Include="parse\parse-class.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>parse-class.bs</DependentUpon>
+    </Compile>
+    <Compile Include="parse\parse-code.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>parse-code.bs</DependentUpon>
+    </Compile>
+    <Compile Include="parse\parse-igen.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>parse-igen.bs</DependentUpon>
+    </Compile>
+    <Compile Include="run\ecma262\ecma262-common.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ecma262-common.bs</DependentUpon>
+    </Compile>
+    <Compile Include="run\ecma262\ecma262-func.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ecma262-func.bs</DependentUpon>
+    </Compile>
+    <Compile Include="run\ecma262\ecma262-object.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ecma262-object.bs</DependentUpon>
+    </Compile>
+    <Compile Include="run\ecma262\ecma262-root.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ecma262-root.bs</DependentUpon>
+    </Compile>
+    <Compile Include="run\ecma262\ecma262-string.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ecma262-string.bs</DependentUpon>
+    </Compile>
+    <Compile Include="parse\error.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>error.bs</DependentUpon>
+    </Compile>
+    <Compile Include="parse\lexer.cs">
+      <DependentUpon>lexer.bs</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="run\opcode.cs">
+      <DependentUpon>opcode.bs</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="code\code-expr.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>code-expr.bs</DependentUpon>
+    </Compile>
+    <Compile Include="code\code-vals.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>code-vals.bs</DependentUpon>
+    </Compile>
+    <Compile Include="main.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>main.bs</DependentUpon>
+    </Compile>
+    <Compile Include="parse\parse-expr.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>parse-expr.bs</DependentUpon>
+    </Compile>
+    <Compile Include="parse\parse-ops.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>parse-ops.bs</DependentUpon>
+    </Compile>
+    <Compile Include="parse\parse-main.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>parse-main.bs</DependentUpon>
+    </Compile>
+    <Compile Include="parse\parse-type.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>parse-type.bs</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="parse\scanner.cs">
+      <DependentUpon>scanner.bs</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="run\abstract.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>abstract.bs</DependentUpon>
+    </Compile>
+    <Compile Include="run\engine.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>engine.bs</DependentUpon>
+    </Compile>
+    <Compile Include="run\object.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>object.bs</DependentUpon>
+    </Compile>
+    <Compile Include="run\run-code.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>run-code.bs</DependentUpon>
+    </Compile>
+    <Compile Include="run\run-expr.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>run-expr.bs</DependentUpon>
+    </Compile>
+    <Compile Include="run\value-binary.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>value-binary.bs</DependentUpon>
+    </Compile>
+    <Compile Include="run\value-convert.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>value-convert.bs</DependentUpon>
+    </Compile>
+    <Compile Include="run\value-unary.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>value-unary.bs</DependentUpon>
+    </Compile>
+    <Compile Include="run\value.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>value.bs</DependentUpon>
+    </Compile>
+    <Compile Include="sgen\bsgen-code.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>bsgen-code.bs</DependentUpon>
+    </Compile>
+    <Compile Include="sgen\bsgen-expr.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>bsgen-expr.bs</DependentUpon>
+    </Compile>
+    <Compile Include="sgen\bsgen-main.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>bsgen-main.bs</DependentUpon>
+    </Compile>
+    <Compile Include="sgen\bsgen-other.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>bsgen-other.bs</DependentUpon>
+    </Compile>
+    <Compile Include="sgen\csgen\csgen-code.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>csgen-code.bs</DependentUpon>
+    </Compile>
+    <Compile Include="sgen\csgen\csgen-expr.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>csgen-expr.bs</DependentUpon>
+    </Compile>
+    <Compile Include="sgen\csgen\csgen-main.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>csgen-main.bs</DependentUpon>
+    </Compile>
+    <Compile Include="sgen\csgen\csgen-other.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>csgen-other.bs</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\bee-arch.dgml">
+      <Link>doc\bee-arch.dgml</Link>
+    </None>
+    <None Include="..\README.md">
+      <Link>doc\README.md</Link>
+    </None>
+    <None Include="App.config" />
+    <None Include="code\code-gen.bs">
+      <Generator>CsFromBsGenerator</Generator>
+      <LastGenOutput>code-gen.cs</LastGenOutput>
+    </None>
+    <None Include="code\code-main.bs">
+      <Generator>CsFromBsGenerator</Generator>
+      <LastGenOutput>code-main.cs</LastGenOutput>
+    </None>
+    <None Include="code\code-parse.bs">
+      <Generator>CsFromBsGenerator</Generator>
+      <LastGenOutput>code-parse.cs</LastGenOutput>
+    </None>
+    <None Include="code\code-press.bs">
+      <Generator>CsFromBsGenerator</Generator>
+      <LastGenOutput>code-press.cs</LastGenOutput>
+    </None>
+    <None Include="doc\generator.cd" />
+    <None Include="parse\parse-class.bs">
+      <Generator>CsFromBsGenerator</Generator>
+      <LastGenOutput>parse-class.cs</LastGenOutput>
+    </None>
+    <None Include="parse\parse-code.bs">
+      <Generator>CsFromBsGenerator</Generator>
+      <LastGenOutput>parse-code.cs</LastGenOutput>
+    </None>
+    <None Include="parse\parse-igen.bs">
+      <Generator>CsFromBsGenerator</Generator>
+      <LastGenOutput>parse-igen.cs</LastGenOutput>
+    </None>
+    <None Include="run\ecma262\ecma262-common.bs">
+      <Generator>CsFromBsGenerator</Generator>
+      <LastGenOutput>ecma262-common.cs</LastGenOutput>
+    </None>
+    <None Include="run\ecma262\ecma262-func.bs">
+      <Generator>CsFromBsGenerator</Generator>
+      <LastGenOutput>ecma262-func.cs</LastGenOutput>
+    </None>
+    <None Include="run\ecma262\ecma262-object.bs">
+      <Generator>CsFromBsGenerator</Generator>
+      <LastGenOutput>ecma262-object.cs</LastGenOutput>
+    </None>
+    <None Include="run\ecma262\ecma262-root.bs">
+      <Generator>CsFromBsGenerator</Generator>
+      <LastGenOutput>ecma262-root.cs</LastGenOutput>
+    </None>
+    <None Include="run\ecma262\ecma262-string.bs">
+      <Generator>CsFromBsGenerator</Generator>
+      <LastGenOutput>ecma262-string.cs</LastGenOutput>
+    </None>
+    <None Include="parse\error.bs">
+      <Generator>CsFromBsGenerator</Generator>
+      <LastGenOutput>error.cs</LastGenOutput>
+    </None>
+    <None Include="parse\lexer.bs">
+      <Generator>CsFromBsGenerator</Generator>
+      <LastGenOutput>lexer.cs</LastGenOutput>
+    </None>
+    <None Include="run\opcode.bs">
+      <Generator>CsFromBsGenerator</Generator>
+      <LastGenOutput>opcode.cs</LastGenOutput>
+    </None>
+    <None Include="code\code-expr.bs">
+      <Generator>CsFromBsGenerator</Generator>
+      <LastGenOutput>code-expr.cs</LastGenOutput>
+    </None>
+    <None Include="code\code-vals.bs">
+      <Generator>CsFromBsGenerator</Generator>
+      <LastGenOutput>code-vals.cs</LastGenOutput>
+    </None>
+    <None Include="main.bs">
+      <Generator>CsFromBsGenerator</Generator>
+      <LastGenOutput>main.cs</LastGenOutput>
+    </None>
+    <None Include="parse\parse-expr.bs">
+      <Generator>CsFromBsGenerator</Generator>
+      <LastGenOutput>parse-expr.cs</LastGenOutput>
+    </None>
+    <None Include="parse\parse-ops.bs">
+      <Generator>CsFromBsGenerator</Generator>
+      <LastGenOutput>parse-ops.cs</LastGenOutput>
+    </None>
+    <None Include="parse\parse-main.bs">
+      <Generator>CsFromBsGenerator</Generator>
+      <LastGenOutput>parse-main.cs</LastGenOutput>
+    </None>
+    <None Include="parse\parse-type.bs">
+      <Generator>CsFromBsGenerator</Generator>
+      <LastGenOutput>parse-type.cs</LastGenOutput>
+    </None>
+    <None Include="parse\scanner.bs">
+      <Generator>CsFromBsGenerator</Generator>
+      <LastGenOutput>scanner.cs</LastGenOutput>
+    </None>
+    <None Include="run\abstract.bs">
+      <Generator>CsFromBsGenerator</Generator>
+      <LastGenOutput>abstract.cs</LastGenOutput>
+    </None>
+    <None Include="run\engine.bs">
+      <Generator>CsFromBsGenerator</Generator>
+      <LastGenOutput>engine.cs</LastGenOutput>
+    </None>
+    <None Include="run\object.bs">
+      <Generator>CsFromBsGenerator</Generator>
+      <LastGenOutput>object.cs</LastGenOutput>
+    </None>
+    <None Include="run\run-code.bs">
+      <Generator>CsFromBsGenerator</Generator>
+      <LastGenOutput>run-code.cs</LastGenOutput>
+    </None>
+    <None Include="run\run-expr.bs">
+      <Generator>CsFromBsGenerator</Generator>
+      <LastGenOutput>run-expr.cs</LastGenOutput>
+    </None>
+    <None Include="run\value-binary.bs">
+      <Generator>CsFromBsGenerator</Generator>
+      <LastGenOutput>value-binary.cs</LastGenOutput>
+    </None>
+    <None Include="run\value-convert.bs">
+      <Generator>CsFromBsGenerator</Generator>
+      <LastGenOutput>value-convert.cs</LastGenOutput>
+    </None>
+    <None Include="run\value-unary.bs">
+      <Generator>CsFromBsGenerator</Generator>
+      <LastGenOutput>value-unary.cs</LastGenOutput>
+    </None>
+    <None Include="run\value.bs">
+      <Generator>CsFromBsGenerator</Generator>
+      <LastGenOutput>value.cs</LastGenOutput>
+    </None>
+    <None Include="sgen\bsgen-code.bs">
+      <Generator>CsFromBsGenerator</Generator>
+      <LastGenOutput>bsgen-code.cs</LastGenOutput>
+    </None>
+    <None Include="sgen\bsgen-expr.bs">
+      <Generator>CsFromBsGenerator</Generator>
+      <LastGenOutput>bsgen-expr.cs</LastGenOutput>
+    </None>
+    <None Include="sgen\bsgen-main.bs">
+      <Generator>CsFromBsGenerator</Generator>
+      <LastGenOutput>bsgen-main.cs</LastGenOutput>
+    </None>
+    <None Include="sgen\bsgen-other.bs">
+      <Generator>CsFromBsGenerator</Generator>
+      <LastGenOutput>bsgen-other.cs</LastGenOutput>
+    </None>
+    <None Include="sgen\csgen\csgen-code.bs">
+      <Generator>CsFromBsGenerator</Generator>
+      <LastGenOutput>csgen-code.cs</LastGenOutput>
+    </None>
+    <None Include="sgen\csgen\csgen-expr.bs">
+      <Generator>CsFromBsGenerator</Generator>
+      <LastGenOutput>csgen-expr.cs</LastGenOutput>
+    </None>
+    <None Include="sgen\csgen\csgen-main.bs">
+      <Generator>CsFromBsGenerator</Generator>
+      <LastGenOutput>csgen-main.cs</LastGenOutput>
+    </None>
+    <None Include="sgen\csgen\csgen-other.bs">
+      <Generator>CsFromBsGenerator</Generator>
+      <LastGenOutput>csgen-other.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

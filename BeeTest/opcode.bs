@@ -1,0 +1,73 @@
+use bee.run, ms.vs.testTools.unitTesting, sys: refl, linq
+pkg bee.tests
+
+def beeOpcodeTests
+; testClass
+	
+	OC01_extend
+	; testMethod
+		assert.areEqual opcode.undef,	opcode! 0
+		assert.areEqual opcode.undef,	(opcode! 0).extend()
+		assert.areEqual opcode.byte,	(opcode! opcode.byte.code()).extend()
+		assert.areEqual opcode.double,	(opcode! opcode.double.code()).extend()
+		assert.areEqual opcode.create,	(opcode! opcode.create.code()).extend()
+		assert.areEqual opcode.assign,	(opcode! opcode.assign.code()).extend()
+		assert.areEqual opcode.bitOr,	(opcode! opcode.bitOr.code()).extend()
+		assert.areEqual opcode.bitXor,	(opcode! opcode.bitXor.code()).extend()
+		assert.areEqual opcode.bitAnd,	(opcode! opcode.bitAnd.code()).extend()
+		assert.areEqual opcode.add,		(opcode! opcode.add.code()).extend()
+		assert.areEqual opcode.mul,		(opcode! opcode.mul.code()).extend()
+		assert.areEqual opcode.logicOr,	(opcode! opcode.logicOr.code()).extend()
+		assert.areEqual opcode.logicAnd,(opcode! opcode.logicAnd.code()).extend()
+		assert.areEqual opcode.plus,	(opcode! opcode.plus.code()).extend()
+		assert.areEqual opcode.neg,		(opcode! opcode.neg.code()).extend()
+		assert.areEqual opcode.postInc,	(opcode! opcode.postInc.code()).extend()
+
+	OC02_text
+	; testMethod
+		assert.areEqual "undefined", opcode.undef.text()
+		assert.areEqual "=",		opcode.assign.text()
+		assert.areEqual "*",		opcode.mul.text()
+		assert.areEqual "+",		opcode.plus.text()
+		assert.areEqual "for",		opcode.for.text()
+		assert.areEqual "if",		opcode.if.text()
+		assert.areEqual "else",		opcode.else.text()
+		assert.areEqual "public",	opcode.public.text()
+		assert.areEqual "virtual",	opcode.virtual.text()
+		assert.areEqual "class",	opcode.class.text()
+		assert.areEqual "interface", opcode.face.text()
+		assert.isNull	(opcode! 0xFFFF).text()
+
+	OC03_priority
+	; testMethod
+		assert.isTrue opcode.mul.prior() > opcode.add.prior()
+		assert.isTrue opcode.sub.prior() > opcode.shiftRight.prior()
+		assert.isTrue opcode.as.prior() > opcode.equals.prior()
+		assert.isTrue opcode.logicAnd.prior() > opcode.logicOr.prior()
+		assert.isTrue opcode.less.prior() > opcode.differ.prior()
+
+		assert.isTrue opcode.bitOr.prior() > opcode.equals.prior()
+		assert.isTrue opcode.bitOr.prior() < opcode.shiftLeft.prior()
+		assert.isTrue opcode.bitAnd.prior() > opcode.mul.prior()
+
+		assert.isTrue opcode.bitAnd.cprior() < opcode.equals.cprior()
+		assert.isTrue opcode.bitOr.cprior() < opcode.bitAnd.cprior()
+
+	OC04_reflection
+	; testMethod
+		var flags = true
+		var prev = opcode.undef
+		foreach var fi fieldInfo in (typeof opcode).getFields().orderBy(def x: return x.metadataToken)
+			if !fi.isStatic; continue
+			var op = opcode! fi.getValue null
+			if flags
+				if op != opcode.undef
+					continue
+				flags = false
+			if (byte! op) != (byte! prev)
+				assert.areEqual op.extend(), op,
+					"Op: {0:X4} - extend failed", ushort! op
+				if (byte! op) >= 0x80 && (byte! op) != (byte! prev)
+					assert.isTrue (byte! op) == (ushort! op),
+						"Op: {0:X4} - nonzero high part", ushort! op
+			prev = op

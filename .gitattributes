@@ -1,0 +1,9 @@
+*			text=auto
+*.cs		text
+*.csproj	text
+*.xaml		text
+*.sh		eol=lf
+*.sln		eol=crlf
+*.cmd		eol=crlf
+*.bat		eol=crlf
+*.iss		eol=crlf

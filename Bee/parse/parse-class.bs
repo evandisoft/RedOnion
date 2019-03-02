@@ -1,0 +1,345 @@
+﻿use bee.run, sys: io, text, cols.gen, diag
+pkg bee
+
+def parser partial
+protected:
+
+	apply bool, ref flags tflag, code opcode static
+		if code.kind() == opkind.access
+			if code == opcode.internal; flags |= tflag.internal
+			else flags = (tflag! (byte! code)&3) | flags &~ (tflag! 3)
+			return true
+		if code.kind() == opkind.scope
+			if (code == opcode.readonly && flags.scope() == tflag.static) ||
+			   (code == opcode.static && flags.scope() == tflag.readonly)
+				flags = tflag.rostatic | flags &~ tflag.scope
+			else
+				flags = (tflag! (byte! code)&7 << 4) | flags &~ tflag.scope
+			return true
+		if code == opcode.partial
+			flags |= tflag.partial
+			return true
+		if code == opcode.unsafe
+			flags |= tflag.unsafe
+			return true
+		return false
+
+//--------------------------------------------------------------------------------------------------
+
+	var classMark  int
+	var className  string
+	var classType  opcode
+	var classFlags tflag
+
+	classes bool, flags flag, lflags tflag = tflag.none virtual
+		if word == null || indent < pindent
+			return false
+		var was = false
+		var one = flags & flag.single != 0
+		flags &=~ flag.single
+		var prevMark  = classMark
+		var prevName  = className
+		var prevType  = classType
+		var prevFlags = classFlags
+		var saved = new savedAt this
+		do
+			saved.at	= at
+			pindent		= indent
+
+			var name	= word
+			var type	= opcode.undef
+			var tflags	= lflags
+			if (byte! opcode) == (byte! opcode.class) || opcode == opcode.face ||
+			  opcode == opcode.struct || opcode == opcode.enum
+			//	def/define or class-type (class, struct, enum, interface)
+				type = opcode
+				name = null
+			else if opcode != opcode.const && opcode != opcode.readonly &&
+			  apply ref tflags, opcode
+				name = null
+			else if opcode != opcode.ident
+			//	some keyword we don't like (e.g. `var`)
+				break // did not call @next, no need to revert
+			while next(name == null).curr == ',' || curr == ':' && type != 0
+			if word == null
+			//	TODO: generics
+				if saved.pi >= 0 && type != 0
+				//	already inside some class, we can be more strict (`def:` or `class=` is bad)
+					raise parseError this, "Expected word after '{0}'", name
+			//	revert (start of script/main, e.g. `x = 1`)
+				goto revert
+			for; type == 0; next(tflags != 0)
+				if indent < pindent
+					raise parseError this, "Wrong indentation"
+				if 	curr == ',' && tflags != 0
+					continue
+				if opcode == opcode.class || opcode == opcode.face ||
+					opcode == opcode.struct || opcode == opcode.enum
+					type = opcode
+					next()
+					break
+				if !apply ref tflags, opcode
+					if tflags != 0
+						raise parseError this, "Unexpected input in class declaration"
+					goto revert
+
+		//	no revert after this point, but make sure we know the name first
+			if name == null
+				while eol || curr == ',' || curr == ':'
+					next true
+					if indent < pindent
+						raise parseError this, "Wrong indentation"
+				if word == null
+					raise parseError this, "Unexpected input in class declaration"
+				name = word
+				next()
+		//	now we can finally start the class declaration
+			var mark = classMark = cgen.classStart className = name
+			var bcnum = 0
+			for var line = false;; next(line)
+				if indent < pindent
+					raise parseError this, "Wrong indentation"
+				if curr == ',' || curr == ':'
+					if eol && curr == ':'; break
+					line = true
+					continue
+				line = false
+				if !apply ref tflags, opcode
+					if word == null
+						break
+					if opcode == opcode.class || opcode == opcode.face ||
+					  opcode == opcode.struct || opcode == opcode.enum
+						if type != 0 && type != opcode.def && type != opcode.define
+							raise parseError this, "More than one class type"
+						type = opcode
+					else
+						fullType flags
+						bcnum++
+			if type == opcode.def || type == opcode.define
+				type = opcode.class
+			classType = type
+			classFlags = tflags
+			classMark = mark = cgen.classBody mark, name, type, 0, bcnum, tflags
+			members name, flags
+			cgen.classEnd mark, name
+		while indent > saved.pi && !one
+		pindent = saved.pi
+	finish:
+		classMark  = prevMark
+		className  = prevName
+		classType  = prevType
+		classFlags = prevFlags
+		return was
+	revert:
+		revert saved
+		goto finish
+
+//##################################################################################################
+
+	var memberMark  int
+	var memberName  string
+	var memberType	opcode
+	var memberFlags tflag
+
+	members bool, className string, flags flag virtual
+		if !eol
+			raise parseError this, "Unexpected input in class declaration"
+		if nextLine().indent < pindent
+			return false
+		if classFlags.scope() == tflag.static
+			flags |= flag.static
+		var was = false
+		var one = flags & flag.single != 0
+		flags &=~ flag.single
+		var lflags = tflag.none	// access flags by section label
+		var prevMark  = memberMark
+		var prevName  = memberName
+		var prevType  = memberType
+		var prevFlags = memberFlags
+		var saved = new savedAt this
+		do
+			saved.at	= at
+			pindent		= indent
+
+			var tflags = tflag.none
+			var isvar = false
+			while apply ref tflags, opcode
+				if opcode == opcode.readonly || opcode == opcode.const
+					isvar = true
+				next isvar
+			if !isvar
+				if curr == ':'
+				//	access label (e.g. `public:` or `protected internal:`)
+					if tflags == tflag.none
+						raise parseError this, "Unexpected ':' in class body"
+					next()
+					lflags = tflags
+					continue
+				if (byte! opcode) == (byte! opcode.class) || opcode == opcode.face ||
+				  opcode == opcode.struct || opcode == opcode.enum
+					revert saved // we could possible use some flag for classes() instead
+					if !classes flags, lflags
+						raise parseError this, "Expected class declaration"
+					was = true
+					continue
+			if tflags == tflag.none
+				tflags = lflags
+			else
+				if tflags.access() == tflag.none
+					tflags = (tflags &~tflag.access) | lflags.access()
+				if tflags.scope() == tflag.none
+					tflags = (tflags &~tflag.scope)  | lflags.scope()
+			var mark int
+			var name = word
+
+		//	fields ---------------------------------------------------------------------------------
+
+			if isvar || opcode == opcode.var || opcode == opcode.event
+
+				var evt = !isvar && opcode == opcode.event
+				if !isvar
+					next true
+					while apply ref tflags, opcode
+						next true
+				name = word
+				if name == null
+					raise parseError this, "Expected field name"
+				memberFlags = tflags
+				memberMark = mark = cgen.fieldStart name
+				next()
+				while apply ref tflags, opcode
+					next()
+				optType flags
+				optExpr flags
+				while apply ref tflags, opcode
+					next()
+				cgen.fieldEnd mark, name, evt ? opcode.event : opcode.field, tflags
+
+				if !eof
+					if !eol
+						raise parseError this, "Unexpected input in class body"
+					nextLine()
+
+		//	methods and properties -----------------------------------------------------------------
+			else
+
+				if curr == '.'
+					if next().word == null ||
+					  (word != "ctor" && word != "dtor" &&
+					   word != "new" && word != "create" && word != "init")
+						raise parseError this, "Expected 'ctor' or 'new' after '.'"
+					name = "." + word
+				if name == null
+				//TODO: operators (e.g. `+ this, rhs this`) and .ctor/.new
+					raise parseError this, "Unexpected input in class body"
+				memberMark = cgen.funcStart name
+				next()
+				while apply ref tflags, opcode
+					next()
+				optType flags
+				mark = cgen.funcTypeEnd memberMark, name
+				while apply ref tflags, opcode
+					next()
+				var argc = 0
+				var paren = curr == '('
+				if paren || curr == ','; next true
+				while (paren || !eol) && !eof
+					if paren && curr == ')'
+						next()
+						break
+					if word == null
+						raise parseError this, "Expected argument name"
+					if !paren && apply ref tflags, opcode
+						next()
+						while apply ref tflags, opcode
+							next()
+						break
+					//TODO: if 'get'/'set'/'=>' cgen.func2prop transition
+					var argn = word
+					var amrk = cgen.funcArg mark, name, argc, argn
+					next()
+					optType flags
+					amrk = cgen.funcArgDef mark, amrk, name, argc, argn
+					optExpr flags
+					cgen.funcArgEnd mark, amrk, name, argc++, argn
+					if curr == ','; next true
+				while apply ref tflags, opcode
+					next()
+				memberFlags = tflags
+				mark = cgen.funcBody memberMark, name, argc, tflags
+				block flags | flag.nosize | flag.member
+				if memberType == opcode.prop; cgen.propEnd mark, name
+				else cgen.funcEnd mark, name
+
+		while !eof && indent > saved.pi && !one
+		pindent = saved.pi
+		memberMark  = prevMark
+		memberName  = prevName
+		memberType  = prevType
+		memberFlags = prevFlags
+		return was
+			
+//##################################################################################################
+
+//	called from members() through block()
+//	when first 'statement' starts with get/set/add/remove or access modifier
+	property bool, flags flag virtual
+		var code = opcode
+		var saved = new savedAt this
+		var tflags = memberFlags
+		if !next().eol && code.tflag() == 0 &&
+		  (curr != '.' || next().opcode.tflag() == 0)
+		//	neither 'get\n' or 'set public' or 'add.private' => revert, it is a statement
+			revert saved
+			return false
+
+		if code.code() != opcode.prop.code(); for
+			if !apply ref tflags, opcode
+				raise parseError this, "Expected access modifier after property accessor"
+			if !next().eol; break
+			if curr == '.'; next()
+		if !eol
+			if opcode.code() != opcode.prop.code()
+				raise parseError this, "Expected property accessor after access modifier"
+			code = opcode
+			while !next().eol
+				if curr == '.'; next()
+				if !apply ref tflags, opcode
+					raise parseError this, "Expected access modifier after property accessor"
+		var pmrk = cgen.func2prop memberMark, memberName
+		saved.at = at
+		pindent	 = indent
+		memberMark = cgen.propFuncStart pmrk, memberName, memberType = code
+		var mark = cgen.propFuncBody pmrk, memberMark, memberName, code, tflags
+		block flags | flag.nosize
+		cgen.propFuncEnd pmrk, mark, memberName, code
+
+		while !eof && indent > saved.pi
+			saved.at = at
+			code = opcode
+			tflags = memberFlags
+			if !next().eol && code.tflag() == 0 &&
+			  (curr != '.' || next().opcode.tflag() == 0)
+				raise parseError this, "Expected property accessor"
+			if code.code() != opcode.prop.code(); for
+				if !apply ref tflags, opcode
+					raise parseError this, "Expected access modifier after property accessor"
+				if !next().eol; break
+				if curr == '.'; next()
+			if !eol
+				if opcode.code() != opcode.prop.code()
+					raise parseError this, "Expected property accessor after access modifier"
+				code = opcode
+				while !next().eol
+					if curr == '.'; next()
+					if !apply ref tflags, opcode
+						raise parseError this, "Expected access modifier after property accessor"
+			memberMark = cgen.propFuncStart pmrk, memberName, memberType = code
+			mark = cgen.propFuncBody pmrk, memberMark, memberName, code, tflags
+			block flags | flag.nosize
+			cgen.propFuncEnd pmrk, mark, memberName, code
+
+		pindent = saved.pi
+	//	cgen.propEnd called in members() instead of cgen.funcEnd
+		memberType = opcode.prop
+		return true

@@ -1,0 +1,291 @@
+﻿use bee.run, sys: io, text, cols.gen, diag
+pkg bee
+
+def parser partial
+protected:
+
+	fullExpr, flags flag
+		var mark = cgen.exprStart()
+		if flags & flag.noexpr == 0 || !noexpr flags
+			expression flags &~ flag.noexpr
+		cgen.exprEnd mark
+
+	optExpr this, flags flag
+	;; optional expression
+		var mark = cgen.exprStart()
+		if curr == '=' || curr == ':'
+			next(true)
+		else if noexpr flags
+			goto skip
+		expression flags &~ flag.noexpr
+	skip:
+		cgen.exprEnd mark
+
+	fullType, flags flag
+		var mark = cgen.typeStart()
+		type flags
+		cgen.typeEnd mark
+
+	optType this, flags flag
+	;; optional type reference
+		if opts & (opt.typed|opt.untyped) == opt.untyped
+			return
+		var mark = cgen.typeStart()
+		if curr == ':'
+			if next(true).word == null
+				raise parseError this, "Expected type reference"
+		else if opts & (opt.typed|opt.untyped) == (opt.typed|opt.untyped)
+			goto skip
+		type flags
+	skip:
+		cgen.typeEnd mark
+
+	noexpr bool, flags flag virtual
+	;; true if there is no expression at current position
+	;; (curr == ';' || eol || opcode.kind() >= opkind.statement)
+		return curr == ';' || eol || opcode.kind() >= opkind.statement
+
+//==================================================================================================
+
+	block bool, flags flag virtual
+
+	/*	TODO:
+		use pindent as in @classes, consider this:
+
+		if (some very long
+			  and whatever indented expression)
+			statement with lower indentation than previous line
+		*/
+		var ind = indent
+		if ind == 0 && first
+			ind = -1 // for scripts (and main code)
+		var nosize = flags & flag.nosize != 0
+		var member = flags & flag.member != 0
+		flags &=~(flag.nosize|flag.member)
+		var block = nosize ? 0 : cgen.blockStart()
+		var count = 0
+		while !eof
+			while indent >= ind && peek == ':' && opcode == opcode.ident
+				label flags
+				count++
+			if first && indent <= ind
+				break
+			if eol
+				nextLine()
+				if count == 0 && member && (
+				  opcode.code() == opcode.prop.code() || opcode.tflag() != 0) &&
+				  property flags // block() called from members() after func/prop header
+					break
+				continue
+			while curr == ';' do next()
+			if opcode == opcode.catch || opcode == opcode.finally ||
+				opcode == opcode.case || opcode == opcode.default
+				break
+			if flags & flag.wasdo != 0 && (opcode == opcode.while || opcode == opcode.until)
+				break
+			if flags & flag.wasif != 0 && opcode == opcode.else
+				break
+			statement flags
+			count++
+		if !nosize
+			cgen.blockEnd block, count
+		return count > 0
+
+	label, flags flag virtual
+		if word.length > 127
+			raise parseError this, "Label too long"
+		cgen.write opcode
+		cgen.ident word
+		next().next()
+		
+	statement, flags flag virtual
+		var mark int
+		switch opcode
+		default
+			if word != null && peek == ':'
+				label flags
+				return
+			fullExpr flags
+			return
+		case opcode.goto
+			next()
+			if opcode == opcode.case
+				cgen.write opcode.cgoto
+				next().fullExpr flags | flag.limit
+				return
+			if word == null
+				raise parseError this, "Expected label after goto (or case)"
+			if word.length > 127
+				raise parseError this, "Label too long"
+			cgen.write opcode.goto
+			cgen.ident word
+			return
+		case opcode.return
+			cgen.write opcode
+			next().fullExpr flags | flag.noexpr
+			return
+		case opcode.raise
+			cgen.write opcode
+			next().fullExpr flags | flag.noexpr
+			return
+		case opcode.break
+		case opcode.continue
+			cgen.write opcode
+			next()
+			return
+	//----------------------------------------------------------------------------------------------
+		case opcode.if
+		case opcode.unless
+			cgen.write opcode
+			next().fullExpr flags | flag.limit
+			if curr == ';' || curr == ':' || opcode == opcode.then; next()
+			block flags | flag.wasif
+			if opcode == opcode.else
+				cgen.write opcode
+				if next().curr == ':'; next()
+				block flags
+			return
+		case opcode.else
+			raise parseError this, "Unexpected 'else'"
+		case opcode.while
+		case opcode.until
+			cgen.write opcode
+			next().fullExpr flags | flag.limit
+			if curr == ';' || curr == ':' || opcode == opcode.do; next()
+			block flags
+			return
+		case opcode.do
+			var doat = cgen.write opcode
+			next()
+			block flags | flag.wasdo
+			if opcode != opcode.while
+				if opcode != opcode.until
+					//maybe we could patch it to opcode.block instead
+					raise parseError this, "Expected 'while' or 'until' for 'do'"
+				cgen.write opcode.dountil, doat
+			next().fullExpr flags
+			return
+		case opcode.for
+			var forat = cgen.write opcode
+			next()
+			fullExpr flags | flag.limit | flag.noexpr
+			if curr == ':' || opcode == opcode.in
+				cgen.write opcode.foreach, forat
+				next()
+				goto for_in
+			if curr == ';'
+				next()
+			fullExpr flags | flag.limit | flag.noexpr
+			if curr == ';'
+				next()
+			if noexpr flags
+				cgen.blockEnd cgen.blockStart(), 0
+			else
+				mark = cgen.blockStart()
+				fullExpr flags | flag.limit
+				cgen.blockEnd mark, 1
+			if curr == ';'
+				next()
+			block flags
+			return
+		case opcode.foreach
+			cgen.write opcode
+			next()
+			fullExpr flags | flag.limit | flag.noexpr
+			if curr == ':' || opcode == opcode.in
+				next()
+		for_in:
+			fullExpr flags | flag.limit | flag.noexpr
+			if curr == ';'
+				next()
+			block flags
+			return
+		case opcode.try
+			cgen.write opcode.catch
+			next().block flags
+			mark = cgen.blockStart()
+			var count = 0
+			while opcode == opcode.catch
+				next()
+				cgen.ident "" //TODO
+				fullType flags //TODO: noexpr() -> like else
+				if curr == ';' || curr == ':'; next()
+				block flags
+				count++
+			if opcode == opcode.else
+				if curr == ';' || curr == ':'; next()
+				block flags
+				count++
+			cgen.blockEnd mark, count
+			if opcode != opcode.finally
+				cgen.blockEnd cgen.blockStart(), 0
+			else
+				next()
+				if curr == ';' || curr == ':'; next()
+				block flags
+			return
+		case opcode.switch
+			cgen.write opcode.switch
+			next().fullExpr flags | flag.limit
+			if curr == ';' || curr == ':'; next()
+			mark = cgen.blockStart()
+			count = 0
+			for
+				if opcode == opcode.case
+					next().fullExpr flags | flag.limit
+					if curr == ';' || curr == ':'; next()
+					block flags
+					count++
+					continue
+				if opcode == opcode.default
+					next()
+					cgen.write opcode.undef
+					if curr == ';' || curr == ':'; next()
+					block flags
+					count++
+					continue
+				break
+			cgen.blockEnd mark, count
+			return
+	//----------------------------------------------------------------------------------------------
+		case opcode.func
+			if opts & opt.script == 0
+				goto default
+		//	default:
+		//	function name[:][type][, param[:][type][, ...]]
+		//	function name[:][type](param[:][type][, ...]]) ...TODO: post type (ActionScript)
+		//	untyped:
+		//	function name[[,]param[[,]...]]
+		//	function name([param[[,]...]])
+		//	typed:
+		//	function name[:]type[[,] param[:]type[[,] ...]]
+		//	typed|untyped:
+		//	function name[:type][[,] param[:type][[,] ...]]
+			if next().word == null
+				raise parseError this, "Expected function name"
+			var fname = word
+			mark = cgen.funcStart fname
+			next()
+			optType flags
+			mark = cgen.funcTypeEnd mark, fname
+			var argc = 0
+			var paren = curr == '('
+			if paren || curr == ','; next true
+			while (paren || !eol) && !eof
+				if word == null
+					raise parseError this, "Expected argument name"
+				var argn = word
+				var argm = cgen.funcArg mark, fname, argc, argn
+				next()
+				optType flags
+				argm = cgen.funcArgDef mark, argm, fname, argc, argn
+				optExpr flags
+				cgen.funcArgEnd mark, argm, fname, argc++, argn
+				if paren && curr == ')'
+					next()
+					break
+				if curr == ','; next true
+			mark = cgen.funcBody mark, fname, argc, tflag.none
+			block flags | flag.nosize
+			cgen.funcEnd mark, fname
+			return

@@ -1,0 +1,235 @@
+﻿use sys: text, lang, cols.gen, diag, run.i
+pkg bee.run
+
+def vtype enum
+	@alias "undefined"
+	undef		= 0x0000 @@ undefined value
+	object		= 0x0001 @@ engine object (ptr is iObject)
+	create		= 0x0002 @@ lazy-create object (ptr is create) - in ptr.ro only
+	@alias "property"
+	prop		= 0x0003 @@ property (ptr is iProp) - in ptr.ro only
+	@alias "reference"
+	ident		= 0x0008 @@ identifier / property reference (in str, ptr is iProps)
+
+	byte		= 0x0110 @@ u8
+	ushort		= 0x0211 @@ u16
+	uint		= 0x0412 @@ u32
+	ulong		= 0x0813 @@ u64
+	sbyte		= 0x4114 @@ s8
+	short		= 0x4215 @@ s16
+	int			= 0x4416 @@ s32
+	long		= 0x4817 @@ s64
+	float		= 0xC418 @@ f32
+	double		= 0xC819 @@ f64
+	bool		= 0x011B @@ u1
+
+	string		= 0x0029 @@ string
+	char		= 0x023A @@ char
+
+	fStr		= 0x0020 @@ is string or char
+	fNum		= 0x0010 @@ is number
+	f64			= 0x1800 @@ is 64bit or more
+	fFp			= 0x8000 @@ floating point
+	fSig		= 0x4000 @@ signed
+	mSz			= 0x3F00 @@ number size mask
+
+//--------------------------------------------------------------------------------------------------
+
+def vdata struct internal
+; structLayout layoutKind.explicit
+public:
+	var long	long	@fieldOffset 0
+	var double	double	@fieldOffset 0
+
+	bool	=> .long != 0
+	char	=> char!	.long
+	byte	=> byte!	.long
+	ushort	=> ushort!	.long
+	uint	=> uint!	.long
+	ulong	=> ulong!	.long
+	sbyte	=> sbyte!	.long
+	short	=> short!	.long
+	int		=> int!		.long
+	float	=> float!	.double
+
+//##################################################################################################
+
+def value struct partial
+; debuggerDisplay "{Vt}; Ptr: {Ptr}; Str: {Str}; Long: {Dta.Long}; Double: {Dta.Double}"
+private:
+	var vt	vtype
+internal:
+	var ptr	object
+	var str	string
+	var dta	vdata
+
+	.ctor vtype
+		vt	= vtype
+		ptr	= null
+		str	= null
+		dta	= new vdata
+	.ctor vtype, object
+		vt	= vtype
+		ptr	= object
+		str	= null
+		dta	= new vdata
+	.ctor vtype, object, string
+		vt	= vtype
+		ptr	= object
+		str	= string
+		dta	= new vdata
+	.ctor vtype, long
+		vt	= vtype
+		ptr	= null
+		str	= null
+		dta	= new vdata
+		dta.long = long
+	.ctor vtype, double
+		vt	= vtype
+		ptr	= null
+		str	= null
+		dta	= new vdata
+		dta.double = double
+
+//----------------------------------------------------------------------------------------------
+public:
+	.ctor value
+		vt	= value.vt
+		ptr	= value.ptr
+		str	= value.str
+		dta = value.dta
+
+	.ctor obj iObject
+		vt	= vtype.object
+		ptr	= obj
+		str	= null
+		dta	= new vdata
+
+	.ctor prop iProp
+		vt	= vtype.prop
+		ptr	= prop
+		str = null
+		dta = new vdata
+
+	.ctor obj iProps, string
+		vt	= vtype.ident
+		ptr	= obj
+		str = string
+		dta = new vdata
+
+	implicit value string static
+		return new value string
+	.ctor string
+		vt	= vtype.string
+		ptr	= null
+		str	= string
+		dta	= new vdata
+
+	implicit value char static
+		return new value char
+	.ctor char
+		vt	= vtype.char
+		ptr	= null
+		str	= null
+		dta	= new vdata
+		dta.long = char
+
+	implicit value bool static
+		return new value bool
+	.ctor bool
+		vt	= vtype.bool
+		ptr	= null
+		str	= null
+		dta	= new vdata
+		dta.long = bool ? 1 : 0
+
+	implicit value byte static
+		return new value byte
+	.ctor byte
+		vt	= vtype.byte
+		ptr	= null
+		str	= null
+		dta	= new vdata
+		dta.long = byte
+
+	implicit value ushort static
+		return new value ushort
+	.ctor ushort
+		vt	= vtype.ushort
+		ptr	= null
+		str	= null
+		dta	= new vdata
+		dta.long = ushort
+
+	implicit value uint static
+		return new value uint
+	.ctor uint
+		vt	= vtype.uint
+		ptr	= null
+		str	= null
+		dta	= new vdata
+		dta.long = uint
+
+	implicit value ulong static
+		return new value ulong
+	.ctor ulong
+		vt	= vtype.ulong
+		ptr	= null
+		str	= null
+		dta	= new vdata
+		dta.long = long! ulong
+
+	implicit value sbyte static
+		return new value sbyte
+	.ctor sbyte
+		vt	= vtype.sbyte
+		ptr	= null
+		str	= null
+		dta	= new vdata
+		dta.long = sbyte
+
+	implicit value short static
+		return new value short
+	.ctor short
+		vt	= vtype.short
+		ptr	= null
+		str	= null
+		dta	= new vdata
+		dta.long = short
+
+	implicit value int static
+		return new value int
+	.ctor int
+		vt	= vtype.int
+		ptr	= null
+		str	= null
+		dta	= new vdata
+		dta.long = int
+
+	implicit value long static
+		return new value long
+	.ctor long
+		vt	= vtype.long
+		ptr	= null
+		str	= null
+		dta	= new vdata
+		dta.long = long
+
+	implicit value float static
+		return new value float
+	.ctor float
+		vt	= vtype.float
+		ptr	= null
+		str	= null
+		dta	= new vdata
+		dta.double = float
+
+	implicit value double static
+		return new value double
+	.ctor double
+		vt	= vtype.double
+		ptr	= null
+		str	= null
+		dta	= new vdata
+		dta.double = double
+

@@ -1,0 +1,47 @@
+﻿use sys: text, lang, cols.gen, diag
+pkg bee.run.ecma262
+
+def stringFun obj
+;; string function (used to create new string objects)
+
+	prototype stringObj get
+	;; prototype of all string objects
+
+	.ctor engine, baseClass iObject, prototype stringObj
+		base engine, baseClass, new props "prototype", prototype
+		_prototype = prototype
+
+	call value, self iObject, argc int override
+		return argc == 0 ? new value "" : new value (arg argc).string
+
+	create iObject, argc int override
+		return new stringObj engine, prototype, argc == 0 ? "" : (arg argc).string
+
+@@ string object (string box)
+def stringObj obj
+; debuggerDisplay "{GetType().Name}: {_string}"
+
+	string get set.protected
+	;; boxed value
+	value override => new value .string
+
+	.ctor engine, baseClass iObject
+	;; create string.prototype
+		base engine, baseClass
+		.string = ""
+
+	.ctor engine, baseClass stringObj, string
+	;; create new string object boxing the string
+		base engine, baseClass, stdprops
+		.string = string
+
+	stdprops static get = new props
+	.ctor static
+		stdprops.set "length", new stringLength
+
+	def stringLength iProp
+		get value, obj iObject
+			return new value (stringObj! obj).string.length
+		set bool, obj iObject, value
+			return false
+		
