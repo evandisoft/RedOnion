@@ -3,7 +3,7 @@
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <KerbalLibs Condition=" '$(OS)' == 'Windows_NT' And '$(KerbalLibs)' == '' ">C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\KSP_x64_Data\Managed</KerbalLibs>
-	<KerbalLibs Condition=" '$(OS)' != 'Windows_NT' And '$(KerbalLibs)' == '' ">KerbalLibs</KerbalLibs>
+	<KerbalLibs Condition=" '$(OS)' != 'Windows_NT' And '$(KerbalLibs)' == '' ">..\..\..\..\..\..\programs\KSPDev\KerbaluaDev\KSP_Data\Managed</KerbalLibs>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{3A40C452-1B11-4769-9D6B-FD318F2CB514}</ProjectGuid>
@@ -48,18 +48,6 @@
     </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>$(KerbalLibs)\UnityEngine.UI.dll</HintPath>
-    </Reference>
-    <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\..\..\..\..\programs\KSPDev\KerbaluaDev\KSP_Data\Managed\Assembly-CSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="Assembly-CSharp-firstpass">
-      <HintPath>..\..\..\..\..\..\programs\KSPDev\KerbaluaDev\KSP_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine">
-      <HintPath>..\..\..\..\..\..\programs\KSPDev\KerbaluaDev\KSP_Data\Managed\UnityEngine.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.UI">
-      <HintPath>..\..\..\..\..\..\programs\KSPDev\KerbaluaDev\KSP_Data\Managed\UnityEngine.UI.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
