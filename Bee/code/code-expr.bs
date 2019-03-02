@@ -1,0 +1,72 @@
+use bee.run, sys: text, lang, cols.gen, diag
+pkg bee
+
+def pseudoGenerator parser.iGenerator partial
+
+	parser.iGenerator.prepare, op opcode
+	;; prepare top operator (prepare postfix record or expression tree node)
+		
+		debug.assert op.kind() <= opkind.prepost && op.kind() >= opkind.special
+
+		if op.binary()
+			goto binary
+		if op.ternary()
+			goto ternary
+		if op.multi()
+			goto multi
+
+		debug.assert op.unary()
+		//unary:	[arg][start]
+		//  --->	[arg][op][start]	(start position is not needed for argument of unary operation)
+		var start = popInt()
+		vneed 1
+		vpush byte! op
+		vpush start
+		return
+
+	binary:
+		//binary:	[larg][lstart][rarg][rstart]
+		//	--->	[larg][lstart][rarg][rstart][op][lstart]
+		var rstart = topInt()
+		var lstart = topInt rstart
+		vneed 5
+		vpush op.code()
+		vpush lstart
+		return
+
+	ternary:
+		//ternary:	[cond][cstart][true][tstart][false][fstart]
+		//	--->	[cond][cstart][true][tstart][false][fstart][op][cstart]
+		var fstart = topInt()
+		var tstart = topInt fstart
+		var cstart = topInt tstart
+		vneed 5
+		vpush op.code()
+		vpush cstart
+		return
+
+	multi:
+		//multi:	[fn][start][arg0][start0]...[argN][startN]
+		//	+ops:							[comma]
+		//	--->	[fn][start][arg0][start0]...[argN][startN][N+2][op][start]
+		debug.assert op == opcode.mcall || op == opcode.mindex ||
+		  op == opcode.array || op == opcode.generic
+		var mstart = topInt()
+		var n = 1
+		if op == opcode.mcall || op == opcode.mindex
+			n++
+			mstart = topInt mstart
+		while parser.opsAt > 0 && parser.top() == opcode.comma
+			parser.pop(); n++; mstart = topInt mstart
+		if n > 127
+			raise parseError parser, "Too many arguments"
+		if n == 3 && op == opcode.mcall
+			vneed 5
+			vpush byte! opcode.call2
+			vpush mstart
+			return
+		vneed 6
+		vpush byte! n
+		vpush op.code()
+		vpush mstart
+		return

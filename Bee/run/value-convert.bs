@@ -1,0 +1,205 @@
+﻿use sys: text, lang, cols.gen, diag, run.i
+pkg bee.run
+
+def value struct partial
+
+	native object get
+	;; get native object (string, int, ...)
+		switch vt
+		default
+			return null
+		case vtype.object
+			return ptr == null ? null : (iObject! ptr).value.native
+		case vtype.ident
+			return (iProps! ptr).get(str).native
+		case vtype.string
+			return str
+		case vtype.char
+			return dta.char
+		case vtype.bool
+			return dta.bool
+		case vtype.byte
+			return dta.byte
+		case vtype.ushort
+			return dta.ushort
+		case vtype.uint
+			return dta.uint
+		case vtype.ulong
+			return dta.ulong
+		case vtype.sbyte
+			return dta.sbyte
+		case vtype.short
+			return dta.short
+		case vtype.int
+			return dta.int
+		case vtype.long
+			return dta.long
+		case vtype.float
+			return dta.float
+		case vtype.double
+			return dta.double
+
+	rvalue value => vt == vtype.ident ? (iProps! ptr).get str : this
+	;; get right-value (unassignable, dereferenced)
+	refobj iObject => vt == vtype.ident ? ptr as iObject : vt == vtype.object ? iObject! ptr : null
+	;; get referenced object (if object or reference; null otherwise)
+	// needed to implement e.g. opcode.call in custom engine (to get self/this for the call)
+
+	@@ set the value for references
+	set, value
+		if vt == vtype.ident
+			(iProps! ptr).set str, value.vt == vtype.ident ?
+				(iProps! value.ptr).get value.str : value
+
+	@@ helper for compound assignment operators and increment/decrement
+	@@ (gets @rvalue, sets value if reference - uses @set method)
+	self value => return rvalue
+		set
+			set value
+
+	number value get
+	;; convert to number (numeric value) if something else
+	;; @note undefined (vtype.undef) is also valid result (e.g. for empty string)
+		switch vt
+		default
+			return new value
+		case vtype.object
+			return ptr == null ? new value : (iObject! ptr).value.number
+		case vtype.ident
+			return (iProps! ptr).get(str).number
+		case vtype.string
+			if str == ""; return new value
+			return .double //TODO: guess type, return undefined if not parsed
+		case vtype.char
+			return .ushort
+		case vtype.bool
+			return .byte
+		case vtype.byte
+		case vtype.ushort
+		case vtype.uint
+		case vtype.ulong
+		case vtype.sbyte
+		case vtype.short
+		case vtype.int
+		case vtype.long
+		case vtype.float
+		case vtype.double
+			return this
+
+//----------------------------------------------------------------------------------------------
+
+	var culture cultureInfo static public = cultureInfo.invariantCulture
+	;; culture settings for formatting (invariant by default)
+
+	implicit string value static
+		return value.toString()
+	string => toString()
+	toString string override
+		switch vt
+		default
+			return "undefined"
+		case vtype.object
+			return ptr == null ? "null" : (iObject! ptr).value.string
+		case vtype.ident
+			return (iProps! ptr).get(str).string
+		case vtype.string
+			return str
+		case vtype.char
+			return dta.char.	toString culture
+		case vtype.bool
+			return dta.bool ? "true" : "false"
+		case vtype.byte
+			return dta.byte.	toString culture
+		case vtype.ushort
+			return dta.ushort.	toString culture
+		case vtype.uint
+			return dta.uint.	toString culture
+		case vtype.ulong
+			return dta.ulong.	toString culture
+		case vtype.sbyte
+			return dta.sbyte.	toString culture
+		case vtype.short
+			return dta.short.	toString culture
+		case vtype.int
+			return dta.int.		toString culture
+		case vtype.long
+			return dta.long.	toString culture
+		case vtype.float
+			return dta.float.	toString culture
+		case vtype.double
+			return dta.double.	toString culture
+
+//----------------------------------------------------------------------------------------------
+
+	type	vtype => vt
+	isstr	=> vt & vtype.fNum != 0
+	isnum	=> vt & vtype.fNum != 0
+	is64	=> vt & vtype.f64 != 0
+	numsz	=> byte! (ushort! vt & vtype.mSz) >> 8
+	signed	=> vt & vtype.fSig != 0
+	isfp	=> vt & vtype.fFp != 0
+	isnan	=> vt & vtype.fFp != 0 && double.isNaN dta.double
+
+	implicit bool value static
+		return value.bool
+	bool bool => isnum ? isfp ?
+			dta.double != 0 && !double.isNaN dta.double :
+			dta.long != 0 :
+			vt == vtype.object ? ptr != null :
+			vt == vtype.string ? ptr != null && (string! ptr).length > 0 :
+			vt == vtype.ident ? (iProps! ptr).get(str).bool :
+			false
+
+	implicit char value static
+		return value.char
+	char char get
+		if vt == vtype.string
+			var s = ptr as string
+			return s == null || s.length == 0 ? '\0' : s[0]
+		return isnum ? isfp ? char! dta.double : char! dta.long :
+ 			vt == vtype.ident ? (iProps! ptr).get(str).char : '\0'
+
+	implicit double value static
+		return value.double
+	double double get
+		if vt == vtype.string
+			var v double
+			if ptr != null && $double.tryParse string! ptr,
+				numberStyles.float, cultureInfo.invariantCulture, out v
+				return v
+			return double.NaN
+		return isnum ? isfp ? dta.double : dta.long :
+			vt == vtype.ident ? (iProps! ptr).get(str).double : double.NaN
+
+	implicit long value static
+		return value.long
+	long long get
+		if vt == vtype.string
+			var v long
+			if ptr != null && $long.tryParse string! ptr,
+				numberStyles.number, cultureInfo.invariantCulture, out v
+				return v
+			return 0
+		return isnum ? isfp ? long! dta.double : dta.long :
+			vt == vtype.ident ? (iProps! ptr).get(str).long : 0
+
+	implicit ulong value static
+		return value.ulong
+	ulong ulong get
+		if vt == vtype.string
+			var v ulong
+			if ptr != null && $ulong.tryParse string! ptr,
+				numberStyles.number, cultureInfo.invariantCulture, out v
+				return v
+			return 0
+		return isnum ? isfp ? ulong! dta.double : ulong! dta.long :
+			vt == vtype.ident ? (iProps! ptr).get(str).ulong : 0
+
+	float	=> float!	.double
+	int		=> int!		.long
+	uint	=> uint!	.ulong
+	short	=> short!	.long
+	ushort	=> ushort!	.ulong
+	sbyte	=> sbyte!	.long
+	byte	=> byte!	.ulong
+

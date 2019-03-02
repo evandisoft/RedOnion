@@ -1,0 +1,39 @@
+﻿use sys: text, lang, cols.gen, diag
+pkg bee.run.ecma262
+
+def numberFun obj
+;; number function (used to create new number objects)
+
+	prototype numberObj get
+	;; prototype of all number objects
+
+	.ctor engine, baseClass obj, prototype numberObj
+		base engine, baseClass, new props "prototype", prototype
+		_prototype = prototype
+
+	call value, self iObject, argc int override
+		return argc == 0 ? new value : (arg argc).number
+
+	create iObject, argc int override
+		return new numberObj engine, prototype, argc == 0 ? new value : (arg argc).number
+
+@@ number object (value box)
+def numberObj obj
+; debuggerDisplay "{GetType().Name}: {_number}"
+
+
+	number value get set.protected
+	;; boxed value
+	value override => return .number
+
+	.ctor engine, baseClass iObject
+	;; create number.prototype
+		base engine, baseClass
+
+	.ctor engine, baseClass numberObj, value
+	;; create new number object boxing the value
+		base engine, baseClass, stdprops
+		.number = value
+
+	stdprops static get = new props
+	

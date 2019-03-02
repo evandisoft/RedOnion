@@ -1,0 +1,308 @@
+use bee.run, sys: io, cols.gen, diag
+pkg bee
+
+def lexer scanner
+; debuggerDisplay "{_lnum}:{_at}: {_opcode}; {_curr}; {_word}; {_line}"
+
+	opcode get set.protected
+
+	wordcode opcode, word string static
+		var code opcode
+		if !words.tryGetValue word, out code
+			code = opcode.ident
+		return code
+
+	wordcode this virtual protected
+		var code = wordcode word
+		if code == opcode.as && peek == '!'
+			code = opcode.ascast
+			end++; word += '!'
+		opcode = code
+
+	next this override
+	;; parse next word, literal, operator or character on this line
+		base.next()
+		if word != null
+			wordcode()
+			return
+		switch curr
+		case '0'
+		case '1'
+		case '2'
+		case '3'
+		case '4'
+		case '5'
+		case '6'
+		case '7'
+		case '8'
+		case '9'
+		case '"'	// parser will switch that to string/char
+		case '\''	// here 'number' actually means literal
+			opcode = opcode.number
+			return
+		case '.'
+			if peek == '['
+				end++
+				opcode = opcode.generic
+				return
+			opcode = opcode.dot
+			return
+		case '?'
+			if peek == '?'
+				end++
+				opcode = opcode.nullcol
+				return
+			if peek == '.'
+				end++
+				opcode = opcode.nulldot
+				if peek == '('
+					end++
+					opcode = opcode.nullcall
+				return
+			opcode = opcode.ternary
+			return
+		case '='
+			if peek == '>'
+				end++
+				opcode = opcode.lambda
+				return
+			if peek == '='
+				end++
+				opcode = opcode.equals
+				return
+			opcode = opcode.assign
+			return
+		case '|'
+			if peek == '='
+				end++
+				opcode = opcode.orAssign
+				return
+			if peek == '|'
+				end++
+				opcode = opcode.logicOr
+				return
+			opcode = opcode.bitOr
+			return
+		case '^'
+			if peek == '='
+				end++
+				opcode = opcode.xorAssign
+				return
+			opcode = opcode.bitXor
+			return
+		case '&'
+			if peek == '='
+				end++
+				opcode = opcode.andAssign
+				return
+			if peek == '&'
+				end++
+				opcode = opcode.logicAnd
+				return
+			opcode = opcode.bitAnd
+			return
+		case '<'
+			if peek == '<'
+				end++
+				if peek == '='
+					end++
+					opcode = opcode.lshAssign
+					return
+				opcode = opcode.shiftLeft
+				return
+			if peek == '='
+				end++
+				opcode = opcode.lesseq
+				return
+			opcode = opcode.less
+			return
+		case '>'
+			if peek == '>'
+				end++
+				if peek == '='
+					end++
+					opcode = opcode.rshAssign
+					return
+				opcode = opcode.shiftRight
+				return
+			if peek == '='
+				end++
+				opcode = opcode.moreeq
+				return
+			opcode = opcode.more
+			return
+		case '+'
+			if peek == '='
+				end++
+				opcode = opcode.addAssign
+				return
+			if peek == '+'
+				end++
+				opcode = opcode.inc
+				return
+			opcode = opcode.add
+			return
+		case '-'
+			if peek == '='
+				end++
+				opcode = opcode.subAssign
+				return
+			if peek == '-'
+				end++
+				opcode = opcode.dec
+				return
+			opcode = opcode.sub
+			return
+		case '*'
+			if peek == '='
+				end++
+				opcode = opcode.mulAssign
+				return
+			if peek == '*'
+				end++
+				opcode = opcode.power
+				return
+			opcode = opcode.mul
+			return
+		case '/'
+			if peek == '='
+				end++
+				opcode = opcode.divAssign
+				return
+			opcode = opcode.div
+			return
+		case '%'
+			if peek == '='
+				end++
+				opcode = opcode.modAssign
+				return
+			opcode = opcode.mod
+			return
+		case '!'
+			if peek == '='
+				end++
+				opcode = opcode.differ
+				return
+			opcode = opcode.not
+			return
+		case '~'
+			opcode = opcode.flip
+			return
+		opcode = opcode.unknown
+
+static:
+	var words internal = new dictionary.[string,opcode]
+	.ctor
+		words.add "undefined",	opcode.undef
+		words.add "null",		opcode.null
+		words.add "nullptr",	opcode.null
+		words.add "false",		opcode.false
+		words.add "true",		opcode.true
+		words.add "this",		opcode.this
+		words.add "self",		opcode.self
+		words.add "base",		opcode.base
+		words.add "super",		opcode.base
+		words.add "exception",	opcode.exception
+
+		words.add "object",		opcode.object
+		words.add "string",		opcode.string
+		words.add "char",		opcode.char
+		words.add "byte",		opcode.byte
+		words.add "ushort",		opcode.ushort
+		words.add "uint",		opcode.uint
+		words.add "ulong",		opcode.ulong
+		words.add "sbyte",		opcode.sbyte
+		words.add "short",		opcode.short
+		words.add "int",		opcode.int
+		words.add "long",		opcode.long
+		words.add "float",		opcode.float
+		words.add "double",		opcode.double
+		words.add "ldouble",	opcode.ldouble
+		words.add "decimal",	opcode.decimal
+		words.add "quad",		opcode.quad
+		words.add "hyper",		opcode.hyper
+		words.add "bool",		opcode.bool
+		words.add "boolean",	opcode.bool
+
+		words.add "new",		opcode.create
+		words.add "delete",		opcode.delete
+		words.add "ref",		opcode.ref
+		words.add "out",		opcode.out
+		words.add "is",			opcode.is
+		words.add "as",			opcode.as
+		words.add "typeof",		opcode.typeof
+		words.add "nameof",		opcode.nameof
+		words.add "await",		opcode.await
+
+		words.add "var",		opcode.var
+		words.add "for",		opcode.for
+		words.add "foreach",	opcode.foreach
+		words.add "in",			opcode.in
+		words.add "while",		opcode.while
+		words.add "do",			opcode.do
+		words.add "until",		opcode.until
+		words.add "if",			opcode.if
+		words.add "then",		opcode.then
+		words.add "else",		opcode.else
+		words.add "with",		opcode.with
+		words.add "return",		opcode.return
+		words.add "throw",		opcode.raise
+		words.add "raise",		opcode.raise
+		words.add "break",		opcode.break
+		words.add "continue",	opcode.continue
+		words.add "switch",		opcode.switch
+		words.add "case",		opcode.case
+		words.add "goto",		opcode.goto
+		words.add "try",		opcode.try
+		words.add "catch",		opcode.catch
+		words.add "finally",	opcode.finally
+		words.add "using",		opcode.using
+		words.add "from",		opcode.from
+		words.add "select",		opcode.select
+		words.add "orderby",	opcode.orderby
+
+	//	access
+		words.add "public",		opcode.public
+		words.add "private",	opcode.private
+		words.add "protected",	opcode.protected
+		words.add "internal",	opcode.internal
+	//	scope
+		words.add "final",		opcode.final
+		words.add "sealed",		opcode.final
+		words.add "virtual",	opcode.virtual
+		words.add "abstract",	opcode.abstract
+		words.add "override",	opcode.override
+		words.add "readonly",	opcode.readonly
+		words.add "const",		opcode.const
+		words.add "static",		opcode.static
+	//	mods
+		words.add "partial",	opcode.partial
+		words.add "unsafe",		opcode.unsafe
+		words.add "async",		opcode.async
+	//	model
+		words.add "import",		opcode.import
+		words.add "include",	opcode.include
+		words.add "use",		opcode.use
+
+		words.add "namespace",	opcode.space
+		words.add "package",	opcode.package
+		words.add "pkg",		opcode.pkg
+
+		words.add "class",		opcode.class
+		words.add "def",		opcode.def
+		words.add "define",		opcode.define
+
+		words.add "struct",		opcode.struct
+		words.add "enum",		opcode.enum
+		words.add "interface",	opcode.face
+		words.add "delegate",	opcode.delegate
+		words.add "where",		opcode.where
+		words.add "function",	opcode.func // script only
+
+		words.add "event",		opcode.event
+		words.add "get",		opcode.get
+		words.add "set",		opcode.set
+		words.add "add",		opcode.combine
+		words.add "combine",	opcode.combine
+		words.add "remove",		opcode.remove
+

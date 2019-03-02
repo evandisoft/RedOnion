@@ -1,0 +1,32 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kerbalua", "Kerbalua\Kerbalua.csproj", "{F590B1DB-8F33-4986-8383-180952D63CDA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KerbaluaTester", "KerbaluaTester\KerbaluaTester.csproj", "{BC3886B0-43AA-43A4-A5A2-F62185C53F6B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KerbaluaParserTester", "KerbaluaParserTester\KerbaluaParserTester.csproj", "{910D0CF0-3517-4D47-9A3C-F451C3B6A8FF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F590B1DB-8F33-4986-8383-180952D63CDA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F590B1DB-8F33-4986-8383-180952D63CDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F590B1DB-8F33-4986-8383-180952D63CDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F590B1DB-8F33-4986-8383-180952D63CDA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BC3886B0-43AA-43A4-A5A2-F62185C53F6B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BC3886B0-43AA-43A4-A5A2-F62185C53F6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BC3886B0-43AA-43A4-A5A2-F62185C53F6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BC3886B0-43AA-43A4-A5A2-F62185C53F6B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{910D0CF0-3517-4D47-9A3C-F451C3B6A8FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{910D0CF0-3517-4D47-9A3C-F451C3B6A8FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{910D0CF0-3517-4D47-9A3C-F451C3B6A8FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{910D0CF0-3517-4D47-9A3C-F451C3B6A8FF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		outputpath = ../../programs/KSPDev/KerbaluaDev/GameData/Kerbalua/Plugins
+	EndGlobalSection
+EndGlobal

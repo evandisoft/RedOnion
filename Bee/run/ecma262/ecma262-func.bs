@@ -1,0 +1,110 @@
+﻿use sys: text, lang, cols.gen, diag, linq
+pkg bee.run.ecma262
+
+def functionFun obj
+;; string function (used to create new string objects)
+
+	prototype functionObj get
+	;; prototype of all function objects
+
+	.ctor engine, baseClass iObject, prototype functionObj
+		base engine, baseClass, new props "prototype", prototype
+		_prototype = prototype
+
+	call value, self iObject, argc int override
+		return new value create argc
+	create iObject, argc int override
+		if argc == 0; return null
+		var arglist string = null
+		for var i = 0; i < argc-1; i++
+			if arglist == null; arglist = (arg argc, i).string
+			else arglist += ", " + (arg argc, i).string
+		var args list.[engine.argInfo] = null
+		if arglist != null
+			var scanner = new scanner
+			scanner.line = arglist
+			for
+				if scanner.word == null; return null
+				if args == null; args = new list.[engine.argInfo]
+				args.add new engine.argInfo { name = scanner.word, type = -1, value = -1 }
+				if scanner.next().eol; scanner.nextLine()
+				if scanner.eof; break
+				if scanner.curr != ','; return null
+				if scanner.next().eol; scanner.nextLine()
+				if scanner.eof; break
+		var body = (arg argc, argc-1).string
+		var code = engine.compile body
+		return new functionObj engine, prototype,
+			code, 0, code.length, -1, args?.toArray(),
+			engine.opts & engine.opt.funcText == 0 ? null :
+			"function anonymous(" +
+			(args == null ? "" : string.join ", ", args.select def x: x.name) +
+			") {\n" + body + "\n}"
+
+@@ function object (callable, can construct)
+def functionObj obj
+; debuggerDisplay "{GetType().Name}: {_string}"
+
+	code byte[] get set.protected
+	;; shared code
+	codeAt int get set.protected
+	;; function code position
+	codeSize int get set.protected
+	;; function code size
+	typeAt int get set.protected
+	;; function type code position
+	arglist string get set.protected
+	;; comma-separated list of argument names
+	args engine.argInfo[] get set protected 
+	;; array of argument names and values (will be null if empty)
+	string get set.protected
+	;; full function code as string
+	value override => new value .string
+	;; get function code as string (if enabled in engine options - opt.funcText)
+	scope iObject get set.protected
+	;; private variables/fields
+
+	@@ create function.prototype
+	.ctor engine, baseClass obj
+		base engine, baseClass
+
+	@@ create new function object
+	.ctor engine, baseClass functionObj, code byte[], codeAt int, codeSize int, typeAt int, args engine.argInfo[], string = null, scope iObject = null
+		base engine, baseClass, stdprops
+		.code		= code
+		.codeAt		= codeAt
+		.codeSize	= codeSize
+		.typeAt		= typeAt
+		.args		= args
+		.arglist	= args == null ? "" : String.join ", ", args.select def x: x.name
+		.string		= string ?? "function"
+		.scope		= scope
+
+	call value, self iObject, argc int override
+		createContext self
+		var args = ctx.vars.baseClass
+		if this.args != null
+			for var i = 0; i < this.args.length; i++
+			//TODO: cast/convert to argument type
+				args.set this.args[i].name, i < argc ?
+				arg argc, i :
+				this.args[i].value < 0 ? new value :
+				engine.expression(code, this.args[i].value).result
+		engine.eval code, codeAt, codeSize
+		return destroyContext()
+
+	create iObject, argc int override
+		var it = new obj engine, engine.box get "prototype"
+		createContext it
+		var args = ctx.vars.baseClass
+		if this.args != null
+			for var i = 0; i < this.args.length; i++
+				args.set this.args[i].name, i < argc ?
+				arg argc, i :
+				this.args[i].value < 0 ? new value :
+				engine.expression(code, this.args[i].value).result
+		engine.eval code, codeAt, codeSize
+		destroyContext()
+		return it
+
+	stdprops static get = new props

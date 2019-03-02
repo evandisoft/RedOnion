@@ -1,0 +1,148 @@
+﻿use sys: text, lang, cols.gen, diag, run.i
+pkg bee.run
+
+def value struct partial
+
+	operator ! value, value static
+		return !value.bool
+
+	operator + value, value static
+	again:
+		if value.isnum; return value
+		if value.vt == vtype.ident
+			value = (iProps! value.ptr).get value.str
+			goto again
+		return new value
+
+	operator - value, value static
+	again:
+		switch value.vt
+		default
+			return new value
+		case vtype.ident
+			value = (iProps! value.ptr).get value.str
+			goto again
+		case vtype.char
+			return new value -value.dta.char
+		case vtype.bool
+			return new value value.dta.bool ? -1 : 0
+		case vtype.byte
+			return new value -value.dta.byte
+		case vtype.ushort
+			return new value -value.dta.ushort
+		case vtype.uint
+			return new value -value.dta.uint
+		case vtype.ulong
+			return new value -value.dta.ulong
+		case vtype.sbyte
+			return new value -value.dta.sbyte
+		case vtype.short
+			return new value -value.dta.short
+		case vtype.int
+			return new value -value.dta.int
+		case vtype.long
+			return new value -value.dta.long
+		case vtype.float
+			return new value -value.dta.float
+		case vtype.double
+			return new value -value.dta.double
+
+	operator ~ value, value static
+	again:
+		switch value.vt
+		default
+			return new value
+		case vtype.ident
+			value = (iProps! value.ptr).get value.str
+			goto again
+		case vtype.char
+			return new value ~value.dta.char
+		case vtype.bool
+			return new value !value.dta.bool
+		case vtype.byte
+			return new value ~value.dta.byte
+		case vtype.ushort
+			return new value ~value.dta.ushort
+		case vtype.uint
+			return new value ~value.dta.uint
+		case vtype.ulong
+			return new value ~value.dta.ulong
+		case vtype.sbyte
+			return new value ~value.dta.sbyte
+		case vtype.short
+			return new value ~value.dta.short
+		case vtype.int
+			return new value ~value.dta.int
+		case vtype.long
+			return new value ~value.dta.long
+	//	~~x should work like math.floor
+		case vtype.float
+			return new value ~long! value.dta.float
+		case vtype.double
+			return new value ~long! value.dta.double
+
+	operator ++ value, value static
+	again:
+		switch value.vt
+		default
+			return new value
+		case vtype.ident
+			value = (iProps! value.ptr).get value.str
+			goto again
+		case vtype.char
+			return new value char!		value.dta.char		+ 1
+		case vtype.bool
+			return new value true
+		case vtype.byte
+			return new value byte!		value.dta.byte		+ 1u
+		case vtype.ushort
+			return new value ushort!	value.dta.ushort	+ 1u
+		case vtype.uint
+			return new value			value.dta.uint		+ 1u
+		case vtype.ulong
+			return new value			value.dta.ulong		+ 1u
+		case vtype.sbyte
+			return new value sbyte!		value.dta.sbyte		+ 1
+		case vtype.short
+			return new value short!		value.dta.short		+ 1
+		case vtype.int
+			return new value			value.dta.int		+ 1
+		case vtype.long
+			return new value			value.dta.long		+ 1
+		case vtype.float
+			return new value			value.dta.float		+ 1f
+		case vtype.double
+			return new value			value.dta.double	+ 1.0
+
+	operator -- value, value static
+	again:
+		switch value.vt
+		default
+			return new value
+		case vtype.ident
+			value = (iProps! value.ptr).get value.str
+			goto again
+		case vtype.char
+			return new value char!		value.dta.char		- 1
+		case vtype.bool
+			return new value false
+		case vtype.byte
+			return new value byte!		value.dta.byte		- 1u
+		case vtype.ushort
+			return new value ushort!	value.dta.ushort	- 1u
+		case vtype.uint
+			return new value			value.dta.uint		- 1u
+		case vtype.ulong
+			return new value			value.dta.ulong		- 1u
+		case vtype.sbyte
+			return new value sbyte!		value.dta.sbyte		- 1
+		case vtype.short
+			return new value short!		value.dta.short		- 1
+		case vtype.int
+			return new value			value.dta.int		- 1
+		case vtype.long
+			return new value			value.dta.long		- 1
+		case vtype.float
+			return new value			value.dta.float		- 1f
+		case vtype.double
+			return new value			value.dta.double	- 1.0

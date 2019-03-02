@@ -1,0 +1,141 @@
+﻿use sys: text, lang, cols.gen, diag
+pkg bee.run
+
+@@ base class for both runtime engine and source generators
+def abstractEngine abstract
+; debuggerDisplay "{Current} inside {Inside}"
+
+	exit opcode get set.protected
+	;; exit code (of last statement, code block or whole program)
+
+	@alias "exec"
+	eval this, code byte[]
+	;; run script
+		eval code, 0, code.length
+	@alias "exec"
+	eval this, code byte[], at int, size int virtual
+	;; run script
+		exit = 0
+		var end = at + size
+		while at < end
+			process code, ref at
+			if exit != 0
+				break
+
+	expression this, code byte[]
+	;; evaluate expression
+		expression code, 0
+	expression this, code byte[], at int virtual
+	;; evaluate expression
+		current	= 0
+		inside	= 0
+		expression code, ref at
+
+protected:
+
+	var current	opcode @@ code of current operation
+	var inside	opcode @@ hint for source generator, unused in real engine
+
+	literal,	op opcode, code byte[], at ref int abstract
+	binary,		op opcode, code byte[], at ref int abstract
+	unary,		op opcode, code byte[], at ref int abstract
+	special,	op opcode, code byte[], at ref int abstract
+
+	statement,	op opcode, code byte[], at ref int abstract
+	other,		op opcode, code byte[], at ref int abstract
+
+//--------------------------------------------------------------------------------------------------
+
+	block this, code byte[], at ref int virtual
+		exit = 0
+		var size = cint code, ref at
+		var end = at + size
+		while at < end
+			process code, ref at
+			if exit != 0
+				break
+		at = end
+
+//--------------------------------------------------------------------------------------------------
+	
+	process this, code byte[], at ref int virtual
+		var op = code[at]
+		if op < byte! opkind.statement
+			expression code, ref at
+			return
+		at++
+		var prev = inside
+		inside = current
+		current = opcode! op
+		if op < byte! opkind.access
+			statement current, code, ref at
+		else other current, code, ref at
+		current = inside
+		inside = prev
+
+//--------------------------------------------------------------------------------------------------
+
+	expression this, code byte[], at ref int virtual
+		var prev = inside
+		inside = current
+		var op = (opcode! code[at++]).extend()
+		current = op
+		var kind = op.kind()
+		switch kind
+		case opkind.literal
+		case opkind.number
+			literal op, code, ref at
+			break
+		case opkind.special
+			special op, code, ref at
+			break
+		default:
+			if kind >= opkind.statement
+				raise invalidOperationException()
+			if op.binary()
+				binary op, code, ref at
+				break
+			if op.unary()
+				unary op, code, ref at
+				break
+			special op, code, ref at
+			break
+		current = inside
+		inside = prev
+
+//--------------------------------------------------------------------------------------------------
+protected:
+
+	cint int, code byte[], at ref int
+		var v = bits.int code, at
+		at += 4; return v
+	clong long, code byte[], at ref int
+		var v = bits.long code, at
+		at += 8; return v
+	cshort short, code byte[], at ref int
+		var v = bits.short code, at
+		at += 2; return v
+
+	cuint uint, code byte[], at ref int
+		var v = bits.uint code, at
+		at += 4; return v
+	culong ulong, code byte[], at ref int
+		var v = bits.ulong code, at
+		at += 8; return v
+	cushort ushort, code byte[], at ref int
+		var v = bits.ushort code, at
+		at += 2; return v
+
+	cfloat float, code byte[], at ref int
+		var v = bits.float code, at
+		at += 4; return v
+	cdouble double, code byte[], at ref int
+		var v = bits.double code, at
+		at += 8; return v
+
+	cident string, code byte[], at ref int
+		var x = at
+		var n = code[x++]
+		var s = encoding.UTF8.getString code, x, n
+		at = x + n
+		return s

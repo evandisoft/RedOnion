@@ -1,0 +1,115 @@
+﻿use bee.run, sys: text, lang, cols.gen, diag
+pkg bee
+
+def bsGenerator partial
+protected:
+
+	block this, code byte[], at ref int override
+		var n = current.kind() >= opkind.model ? 0 : cint code, ref at
+		var size = cint code, ref at
+		if size == 0; return
+		var end = at + size
+		var elseif = false
+		if n == 1 && current == opcode.else && code[at] == byte! opcode.if
+			write ' '
+			elseif = true
+		else
+			indent++
+			line()
+		for
+			process code, ref at
+			if at >= end
+				break
+			line()
+		at = end
+		if !elseif
+			indent--
+
+	statement, op opcode, code byte[], at ref int override
+		switch op
+		default
+			raise notImplementedException()
+
+		case opcode.return
+			if code[at] == 0
+				at++
+				write "return"
+				return
+			write "return "
+			expression code, ref at
+			return
+		case opcode.raise
+			if code[at] == 0
+				at++
+				write "throw" // use throw when you (already) have instance, somehow
+			write code[at] == (byte! opcode.create) ?
+				"throw " : "raise " // throw new exception, raise error
+			expression code, ref at
+			return
+
+		case opcode.break
+			write "break"
+			return
+		case opcode.continue
+			write "continue"
+			return
+
+	//----------------------------------------------------------------------------------------------
+
+		case opcode.for
+			if code[at] == 0
+				++at
+				write "for"
+			else
+				write "for "
+				expression code, ref at
+			var notest = code[at] == 0
+			if notest; ++at
+			else
+				write "; "
+				expression code, ref at
+			at += 4
+			var nolast = 0 == cint code, ref at
+			if nolast
+				if !notest; write "; "
+			else
+				write "; "
+				expression code, ref at
+			block code, ref at
+			return
+		case opcode.foreach
+			write "for "
+			expression code, ref at
+			write " in "
+			expression code, ref at
+			block code, ref at
+			return
+
+		case opcode.while
+		case opcode.until
+			write op == opcode.while ? "while " : "until "
+			expression code, ref at
+			block code, ref at
+			return
+		case opcode.do
+		case opcode.dountil
+			write "do"
+			block code, ref at
+			line()
+			write op == opcode.do ? "while " : "until "
+			expression code, ref at
+			return
+
+		case opcode.if
+			write "if "
+			expression code, ref at
+			block code, ref at
+			if at >= code.length || code[at] != byte! opcode.else
+				return
+			current = opcode.else
+			at++
+			line()
+			write "else"
+			block code, ref at
+			return
+		

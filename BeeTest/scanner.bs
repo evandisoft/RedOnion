@@ -1,0 +1,105 @@
+﻿use sys, ms.vs.testTools.unitTesting
+pkg bee.tests
+
+def beeScannerTests scanner
+; testClass
+
+	test, string
+		line = string
+
+	SC01_words
+	; testMethod
+		test "word"
+		assert.areEqual "word", word
+		assert.areEqual 0, at
+		assert.areEqual 4, end
+		assert.areEqual 'w', charAt 0
+		assert.areEqual 'd', charAt 3
+		assert.isTrue	white
+		assert.isTrue	peekEol
+		assert.areEqual '\n', peekAt 0
+		assert.areEqual '\0', peekAt 1
+
+		test "$small_uner"
+		assert.areEqual	"$small_uner", word
+
+		test "first second"
+		assert.areEqual word, "first"
+		assert.areEqual ' ', peek
+		assert.areEqual 's', peekAt 1
+		assert.isTrue	white
+		assert.areEqual nextWord(), "second"
+		assert.isTrue	white
+
+	SC02_string
+	; testMethod
+		test "\"string\""
+		assert.areEqual '"', curr
+		assert.areEqual 0, at
+		assert.areEqual 8, end
+		assert.areEqual '"', read()
+		assert.areEqual "string\"", rest()
+		assert.isTrue	normal
+
+		test "@\"verbatim\""
+		assert.areEqual "@\"verbatim\"", rest()
+		assert.isTrue	normal
+
+		test "$\"inter\""
+		assert.areEqual "$\"inter\"", rest()
+		assert.isTrue	normal
+
+		test "$@\"inter-verbatim\""
+		assert.areEqual "$@\"inter-verbatim\"", rest()
+		assert.isTrue	normal
+
+		test "\"esc\\\"\""
+		assert.areEqual "\"esc\\\"\"", rest()
+		assert.isTrue	normal
+
+		test "@\"esc\\\""
+		assert.areEqual "@\"esc\\\"", rest()
+		assert.isTrue	normal
+
+		test "\"blah"
+		assert.isTrue	instr
+		assert.areEqual 5, end
+		line = "end\"";
+		assert.isTrue	normal
+		assert.areEqual 4, end
+
+	SC03_number
+	; testMethod
+		test "12345"
+		assert.areEqual '1', curr
+		assert.areEqual '1', read()
+		assert.areEqual '2', read()
+		assert.areEqual "345", rest()
+
+		test "0x1AB"
+		assert.areEqual '0', read()
+		assert.areEqual 'x', read()
+		assert.areEqual "1AB", rest()
+
+		test "1.2"
+		assert.areEqual "1.2", rest()
+
+	//	removed: we better leave that for parser (consider x.1 or <x>.1)
+	//	test ".3"
+	//	assert.areEqual ".3", rest()
+
+		test "1.2e+3"
+		assert.areEqual "1.2e+3", rest()
+
+	SC04_comments
+	; testMethod
+		test "first /* comment */ second"
+		assert.areEqual word, "first"
+		assert.areEqual nextWord(), "second"
+
+		test "/*"
+		assert.isTrue	comment
+		test "comment"
+		assert.isTrue	comment
+		test "*/"
+		assert.isTrue	normal

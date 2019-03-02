@@ -1,0 +1,167 @@
+﻿use ms.vs.testTools.unitTesting, sys: text
+pkg bee.tests
+
+def beeFullSourceGeneratorTestsBase beeSourceGeneratorTestsBase
+
+	var nlchars static readonly = new char[] { '\r', '\n' }
+	display string, string
+		return "\n" + (String.join "¶\n",
+			string.split nlchars, stringSplitOptions.removeEmptyEntries) + "\n"
+
+	test, string, cs string = null, bs string = null, opts parser.opt = parser.opt.none new
+		var bsg string
+		var csg string
+		var step = "Parse"
+		parser.opts = opts
+		try
+			unit string
+			step = "BsGen"
+			bsg = bsgen.eval(code, 0, codeAt).toString()
+			step = "CsGen"
+			csg = csgen.eval(code, 0, codeAt).toString()
+		catch e exception
+			raise exception String.format("{0} in {1}: {2}; IN: <{3}>",
+				e.getType().toString(), step, e.Message, string), e
+		bs = display bs ?? string
+		cs = display cs ?? string
+		bsg = display bsg
+		csg = display csg
+		assert.areEqual	bs, bsg,
+			"\n--- B# ---\nIN:\n{0}\nC#:{1}\nCode: {2}", string, csg, this
+		assert.areEqual	cs, csg,
+			"\n--- C# ---\nIN:\n{0}\nB#:{1}\nCode: {2}", string, bsg, this
+
+def beeSourceGeneratorTests beeFullSourceGeneratorTestsBase
+; testClass
+
+	GC01_for
+	; testMethod
+
+		test \
+			"for var i = 0; i < n; i++; x += i",
+		//C#
+			"for (var i = 0; i < n; i++)\n" +
+			"{\n" +
+			"	x += i;\n" +
+			"}",
+		//B#
+			"for var i = 0; i < n; i++\n" +
+			"	x += i"
+
+	GC02_while
+	; testMethod
+
+		test \
+			"while true; break",
+		//C#
+			"while (true)\n" +
+			"{\n" +
+			"	break;\n" +
+			"}",
+		//B#
+			"while true\n" +
+			"	break"
+
+	GC03_dowhile
+	; testMethod
+		test \
+			"do x = false; while x\n",
+		//C#
+			"do\n" +
+			"{\n" +
+			"	x = false;\n" +
+			"}\n" +
+			"while (x);",
+		//B#
+			"do\n" +
+			"	x = false\n" +
+			"while x"
+
+	GC04_ifelse
+	; testMethod
+
+		test \
+			"if false; continue; else return",
+		//C#
+			"if (false)\n" +
+			"{\n" +
+			"	continue;\n" +
+			"}\n" +
+			"else\n" +
+			"{\n" +
+			"	return;\n" +
+			"}",
+		//B#
+			"if false\n" +
+			"	continue\n" +
+			"else\n" +
+			"	return"
+
+	GC05_elseif
+	; testMethod
+
+		test \
+			"if false; continue\n" +
+			"else if true; return\n" +
+			"else break",
+		//C#
+			"if (false)\n" +
+			"{\n" +
+			"	continue;\n" +
+			"}\n" +
+			"else if (true)\n" +
+			"{\n" +
+			"	return;\n" +
+			"}\n" +
+			"else\n" +
+			"{\n" +
+			"	break;\n" +
+			"}",
+		//B#
+			"if false\n" +
+			"	continue\n" +
+			"else if true\n" +
+			"	return\n" +
+			"else\n" +
+			"	break"
+
+	GC06_nested
+	; testMethod
+
+		test \
+			"if true; for\n" +
+			"	do x = false; while x",
+		//C#
+			"if (true)\n" +
+			"{\n" +
+			"	for (;;)\n" +
+			"	{\n" +
+			"		do\n" +
+			"		{\n" +
+			"			x = false;\n" +
+			"		}\n" +
+			"		while (x);\n" +
+			"	}\n" +
+			"}",
+		//B#
+			"if true\n" +
+			"	for\n" +
+			"		do\n" +
+			"			x = false\n" +
+			"		while x"
+
+	GC07_array
+	; testMethod
+		test \
+			"var a = new byte[]\n" +
+			"for e in a; print e",
+		//C#
+			"var a = new byte[];\n" +
+			"foreach (var e in a)\n" +
+			"{\n" +
+			"	print(e);\n" +
+			"}",
+		//B#
+			"var a = new byte[]\n" +
+			"for e in a\n" +
+			"	print e"

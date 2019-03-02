@@ -1,0 +1,97 @@
+﻿use bee.run, sys: io, text, cols.gen, diag
+pkg bee
+
+def parser partial
+
+	type this, flags flag = flag.none virtual
+	;; parse type (reference, not declaration/definition)
+	// NOTE: this is very reduced version of @expression
+		
+		var bottom = opsAt
+		//^ cannot pop operators bellow this level (they belong to the caller, not us)
+		var unary = true
+		//^ see @expression for details, but here it indicates that nothing was actually parsed
+	next:
+		var code = opcode
+		switch code.kind()
+		case opkind.literal		//========================================================== literal
+			switch code
+			case opcode.ident	//------------------------------------------------------- identifier
+				if !unary; break
+				if word.length > 127
+					raise parseError this, "Identifier name too long"
+				if word == "object"
+					cgen.push opcode.null
+				else cgen.push opcode.ident, word
+				next()
+				unary = false
+				goto next
+			case opcode.object	//--------------------------------------------- object, string, char
+			case opcode.string
+			case opcode.char
+			case opcode.wchar
+			case opcode.lchar
+				goto type
+			break
+		case opkind.number		//----------------------------------------------- bool / number type
+		type:
+			if !unary; break
+			cgen.push code
+			next()
+			unary = false
+			goto next
+		case opkind.special		//========================================================== special
+			switch code
+			case opcode.dot
+				if unary; break
+				if next().word == null
+					raise parseError this, "Expected word after '.'"
+				if word.length > 127
+					raise parseError this, "Identifier name too long"
+				cgen.push opcode.ident, word
+				cgen.prepare opcode.dot
+				next()
+				unary = false
+				goto next
+			case opcode.generic
+				if unary; break // maybe throw, but we leave it here for possible future extensions
+				if next().curr != ']'; for
+					op opcode.comma
+					type flags &~flag.limit
+					if curr == ']'
+						break
+					if curr != ','
+						raise parseError this, "Expected ',' or ']'"
+					next()
+				cgen.prepare opcode.generic
+				next()
+				goto next
+			break
+		case opkind.meta
+			if curr != '['; break
+			if unary; break // maybe throw, but that can be used for other purposes in the future
+			if next().curr != ']'; for
+				op opcode.comma
+				expression flags &~flag.limit
+				if curr == ']'
+					break
+				if curr != ','
+					raise parseError this, "Expected ',' or ']'"
+				next()
+			cgen.prepare opcode.array
+			next()
+			goto next
+
+	//######################################################################################### TAIL
+
+		if unary
+		//	this means that we didn't parse anything
+			if opsAt > bottom
+				debug.assert false // this just should not happen
+				raise parseError this, "Unexpected state in type recognition (operators on stack when expecting unary)"
+			cgen.push opcode.undef
+			return
+
+		while opsAt > bottom
+		//	post-process arrays, references, pointers (unary operators)
+			cgen.prepare pop()

@@ -1,0 +1,229 @@
+﻿use sys: text, lang, cols.gen, diag
+pkg bee.run
+
+@alias "iProperty"
+def iProp interface
+;; property interface (single property with custom access methods)
+;; @note can only be hosted in read-only properties (not in dynamic)
+
+	get value, iObject
+	;; get value of this property
+	set bool, iObject, value
+	;; set value of this property
+	;; @return false if not set (e.g. read-only)
+
+@alias "iProperties"
+def iProps interface
+;; properties interface (collection of properties)
+
+	has bool, string
+	;; test the existence of the property with provided name
+	get value, string
+	;; get the value of specified property
+	get bool, string, out value
+	;; test and get value (has&get joined in *tryGet*)
+	set bool, string, value
+	;; set the vakye of specified property
+	del bool, string
+	;; delete the specified property
+	reset
+	;; reset (clear) the properties
+
+@alias "properties"
+def props dictionary.[string,value] iProps
+;; default property collection implementation
+
+	has bool, string
+		return containsKey string.toLower()
+	get value, string
+		var value
+		tryGetValue string.toLower(), out value
+		return value
+	get bool, string, out value
+		return tryGetValue string.toLower(), out value
+	set bool, string, value
+		string = string.toLower()
+		this[string] = value
+		return true
+	set bool, string, prop iProp
+		string = string.toLower()
+		this[string] = new value prop
+		return true
+	del bool, string
+		return remove string
+	reset
+		clear()
+
+	@@ create empty
+	.ctor
+	@@ create with one property
+	.ctor string, value
+		.set string, value
+	@@ create with one object-reference property (usually "prototype")
+	.ctor string, obj iObject
+		.set string, new value obj
+
+def iObject interface iProps
+
+	engine get
+	;; engine this object belongs to
+	baseClass iObject get
+	;; base class (to search properties in this object next)
+	baseProps iProps get
+	;; basic properties - not enumerable, not writable unless iProp with set returning true
+	moreProps iProps get
+	;; added properties - enumerable and writable (unless same exist in baseProps)
+	value value get
+	;; contained value (if any)
+
+	@@ find the object containing the property
+	which iObject, string
+
+	@@ execute regular function call
+	@@ @self the object to call it on (as method if not null)
+	@@ @argc number of arguments (pass to @arg method)
+	@@ @return the result
+	call value, self iObject, argc int
+			
+	@@ execute constructor ('new' used)
+	@@ @argc number of arguments (pass to @arg method)
+	@@ @return the new object (or null if not supported)
+	create iObject, argc int
+
+	@@ get propertu/value (reference) at the indexes
+	@@ @note default treats x[y, z] as x[y][z], but redirecting to @call may be valid as well
+	index value, self iObject, argc int
+
+//##################################################################################################
+// NOTE: we do not support non-enumerable dynamic properties for now
+// ..... but they could be implemented using custom iProp added to baseProps
+
+def obj iObject
+; debuggerDisplay "{GetType().Name}"
+
+	engine get
+	;; engine this object belongs to
+	baseClass iObject get
+	;; base class (to search properties in this object next)
+	baseProps iProps get set.protected
+	;; basic properties - not enumerable, not writable unless iProp with set returning true
+	moreProps iProps get set.protected
+	;; added properties - enumerable and writable (unless same exist in baseProps)
+	value value get virtual
+		return new value "[internal]"
+
+	@@ create empty object with no base class
+	.ctor engine
+		_engine	= engine
+	@@ create empty object with base class
+	.ctor engine, baseClass iObject
+		_engine	= engine
+		_baseClass = baseClass
+	@@ create object with prototype and some base properties
+	.ctor engine, baseClass iObject, baseProps iProps
+		_engine	= engine
+		_baseClass = baseClass
+		_baseProps = baseProps
+	@@ create object with prototype, some base properties and more properties
+	.ctor engine, baseClass iObject, baseProps iProps, moreProps iProps
+		_engine	= engine
+		_baseClass = baseClass
+		_baseProps = baseProps
+		_moreProps = moreProps
+
+	has bool, string
+		return null != which string
+
+	which iObject, string virtual
+		var props iProps
+		for var obj iObject = this
+			props = obj.baseProps
+			if props != null && props.has string; return obj
+			props = obj.moreProps
+			if props != null && props.has string; return obj
+			if (obj = obj.baseClass) == null; return null
+
+	get value, string
+		var value value
+		get string, out value
+		return value
+	get bool, string, out value virtual
+		value = new value
+		var props iProps
+		var obj iObject = this
+		for 
+			props = obj.baseProps
+			if props != null && props.get string, out value
+				break
+			props = obj.moreProps
+			if props != null && props.get string, out value
+				break
+			if (obj = obj.baseClass) == null
+				return false
+		if value.type == vtype.create
+			value = new value (create! value.ptr) engine
+			props.set string, value
+		else if value.type == vtype.prop
+			value = (iProp! value.ptr).get obj
+		return true
+
+	set bool, string, value virtual
+		var props iProps
+		var query value
+		for var obj iObject = this
+			props = obj.baseProps
+			if props != null && props.get string, out query
+				if query.type == vtype.prop
+					(iProp! query.ptr).set obj, value
+					return true
+				if obj == this
+					return false // immutable = not-overridable here
+				break
+			props = obj.moreProps
+			if props != null && props.get string, out query
+				break
+			if (obj = obj.baseClass) == null
+				break
+		if moreProps == null; moreProps = new props
+		return moreProps.set string, value
+
+	del bool, string
+		return moreProps == null ? false : moreProps.del string
+
+	reset virtual
+		moreProps = null
+
+	call value, self iObject, argc int virtual
+		return new value
+			
+	create iObject, argc int virtual
+		return null
+
+	index value, self iObject, argc int virtual
+		switch argc
+		case 0
+			return new value
+		case 1
+			return new value this, (arg argc, 0).string
+		default
+			self = engine.box new value this, (arg argc, 0).string
+			return self.index this, argc - 1
+
+protected:
+	@@ get n-th argument (for call/create implementation)
+	arg value, argc int, int = 0
+		return engine.args.arg argc, int
+	@@ activation context
+	ctx engine.context => engine.ctx
+	@@ create new activation context
+	createContext
+		engine.createContext ctx.self
+	@@ create new activation context
+	createContext, self iObject
+		engine.createContext self
+	@@ create new activation context
+	createContext, self iObject, scope iObject
+		engine.createContext self, scope
+	@@ destroy activation context
+	destroyContext value
+		return engine.destroyContext()

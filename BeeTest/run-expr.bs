@@ -1,0 +1,100 @@
+﻿use ms.vs.testTools.unitTesting, sys: text
+pkg bee.run.tests
+
+def beeExpressionRunTestsBase engine
+
+	test, string
+		try
+			eval string
+		catch e exception
+			raise exception String.format("{0} in Eval: {1}; IN: <{2}>",
+				e.getType().toString(), e.Message, string), e
+	test, object, string
+		test string
+		assert.areEqual object, result.native, "Test: <{0}>", string
+
+def beeExpressionRunTests beeExpressionRunTestsBase
+; testClass
+
+	RX01_simple
+	; testMethod
+
+		test "bee",		"\"bee\""		// string
+		test 1,			"1"				// integer
+		test 3.14,		"3.14"			// double
+		test 5.5f,		"5.5f"			// float
+		test 10,		"0xA"			// hex integer
+		test -7,		"-7"			// should be parsed as true -7, not as -(7)
+		test 0.1,		".1"			// this did not work in old B#/FiLang
+		test 7u,		"7u"			// unsigned integer
+
+	RX02_addmul
+	; testMethod
+
+		test 3,			"1+2"			// simple +
+		test 12,		"3*4"			// simple *
+		test 1.1,		"1+0.1"			// double vs. int
+		test 7,			"1+2*3"			// operator priority
+		test 8.5,		"1+2.5*3"		// mixed double and ints
+		test long! 2,	"1+1u"			// signed + unsigned integer
+		test ulong! 2,	"1u+1"			// unsigned + signed integer
+
+	RX03_divnan
+	; testMethod
+
+		test 12/5,		"12/5"			// integer division
+		test 12f/5,		"12f/5"			// float division
+		test null,		"0/0"			// undefined (althought notes were found that JScript 0 is 0.0)
+		test double.NaN, "0/.0"			// division by zero in float/double is NaN
+
+	RX04_vars
+	; testMethod
+
+		test 10,		"x = 2*3+4"		// assign
+		test 10,		"x"				// test
+		test "x10",		"\"x\" + x"		// string + integer
+		test 10,		"x++"			// post-increment
+		test 12,		"++x"			// pre-increment
+
+	RX05_props
+	; testMethod
+
+		test "obj = new object"			// object creation
+		assert.areEqual	vtype.object, result.type, "not object type"
+		assert.isNotNull result.refobj
+
+		test "obj.x = 3.14"				// assign property (moreProps)
+		test 3.14,		"obj.x"			// test property
+
+		test "obj.s = \"xyz\""
+		test "xyz",		"obj.s"
+		test 3,			"obj.s.length"	// test internal property (baseProps)
+
+	//	obj.s needs to be boxed first, but changes are lost
+	//	this could later be detected by parser (but must not produce error in engine)
+		test 3.14,		"obj.s.bad = obj.x"
+		test null,		"obj.s.bad"		// was assigned to boxed value and now lost
+
+		test "s = new string \"hello\""	// box
+		test "s.e = 2.7"				// preserved as s is boxed, not native string
+		test 2.7,		"s.e"			// test it (moreProps)
+		test 5,			"s.length"		// internal property (baseProps)
+
+	//	indexing is the same as accessing properties in ecma262
+		test 2.7,	"s[\"e\"]"			// dynamic property  (moreProps)
+		test 5,		"s[\"length\"]"		// internal property (baseProps)
+		test 3, "obj[\"s\"][\"length\"]"// exactly the reason we have to box (pass obj.s.bad test)
+		test 3, "obj[\"s\", \"length\"]"// multi-indexing should work as above
+
+	RX06_compare
+	; testMethod
+
+		test true,		"1 < 2"			// integers
+		test true,		"1 > .1"		// integer vs. double - less
+		test true,		"1 == 1.0"		// integer vs. double - equal
+
+	RX07_ternary
+
+		test true,		"true ? true : false"
+		test false,		"false ? true : false"
+		test 2,			"0 != 0 ? 1 : 2"

@@ -1,0 +1,111 @@
+﻿use ms.vs.testTools.unitTesting, sys: text
+pkg bee.tests
+
+def beeSourceGeneratorTestsBase pseudoGenerator
+
+	var bsgen protected = new bsGenerator
+	var csgen protected = new csGenerator
+		aliasing = csGenerator.alias.none
+
+	toString string override
+		if codeAt == 0
+			return "empty"
+		var sb = new stringBuilder
+		var i = 0
+		while i < codeAt && i < 32
+			sb.appendFormat "{0:X2}", code[i++]
+		if i < codeAt
+			sb.append "..."
+		return sb.toString()
+
+	test, string, cs string = null, bs string = null, opts parser.opt = parser.opt.none
+		var bsg string
+		var csg string
+		var step = "Parse"
+		parser.opts = opts
+		try
+			reset().expression string
+			step = "BsGen"
+			bsg = bsgen.reset().expression(code).toString()
+			step = "CsGen"
+			csg = csgen.reset().expression(code).toString()
+		catch e exception
+			raise exception String.format("{0} in {1}: {2}; IN: <{3}>",
+				e.getType().toString(), step, e.Message, string), e
+		assert.areEqual	bs ?? string, bsg,
+			"B#; IN: <{0}>; C#: <{1}>; Code: {2}", string, csg, this
+		assert.areEqual	cs ?? string, csg,
+			"C#; IN: <{0}>; B#: <{1}>; Code: {2}", string, bsg, this
+
+def beeExpressionSrcGenTests beeSourceGeneratorTestsBase
+; testClass
+
+	GX01_addmul
+	; testMethod
+		test "1 + 2"
+		test "1 + 2 + 3"
+		test "2 * 3 + 1"
+		test "(1 + 2) * 3"
+		test "1 + 2 * (3 + 4 + 5) * 6 + 7"
+
+	GX02_logic
+	; testMethod
+		test "true && false"
+		test "x && y && z"
+		test "x || y && z"
+		test "(x || y) && z"
+
+	GX03_ternary
+	; testMethod
+		test "true ? true : false"
+		test "x ? a + 1 : n * 2"
+		test "x == y ? a : b"
+		test "(x = y) ? a : b"
+
+	GX04_binary
+	; testMethod
+
+	//	changed priority
+		test "x & 1 != 0", "(x & 1) != 0"
+		test "x | 1 == 3", "(x | 1) == 3"
+		test "x ^ y <= z", "(x ^ y) <= z"
+	//	may be confusing, force parens in generator
+		test "x | 1 << 2",		"x | (1 << 2)",			"x | (1 << 2)"
+		test "x ^ 1 << 2",		"(x ^ 1) << 2",			"(x ^ 1) << 2"
+		test "x & 7 + 3 << 8",	"((x & 7) + 3) << 8",	"(x & 7 + 3) << 8"
+		test "3 * x & 3 << 4 + y", "(3 * (x & 3)) << (4 + y)", "(3 * (x & 3)) << (4 + y)"
+		test "1 + 2 | 3 * 4 << 1", "(1 + 2) | ((3 * 4) << 1)", "(1 + 2) | ((3 * 4) << 1)"
+
+	GX05_funcs
+	; testMethod
+		test "f()"			//	C#						B# (generated)
+		test "f x",				"f(x)"				//	same as input
+		test "f(g x)",			"f(g(x))",				"f g(x)"
+		test "f g x, y",		"f(g(x, y))",			"f g(x, y)"
+		test "f g(x), h y",		"f(g(x), h(y))",		"f g(x), h(y)"
+		test "f (g x,y),z,h()", "f(g(x, y), z, h())",	"f g(x, y), z, h()"
+
+		test "f -g(x)",			"f(-g(x))",				"f -g(x)"
+		test "f -g x",			"f(-g(x))",				"f -g(x)"
+
+	GX06_dot_idx
+	; testMethod
+		test "base.x"
+		test ".x", "this.x", "this.x"
+		test "x .y", "x.y", "x.y" // default options
+		test "f .y", "f(this.y)", "f this.y", parser.opt.dotThisAfterWhite
+		test "(x + y).toString()"
+		test "a[i + 1] = 0"
+		test "v = (x += y)[i, j + 1]"
+
+	//	brackets used as parens, but watch whitespace, it is different
+		test "f[] * [3 + 4]",	"f() * (3 + 4)",		"f() * (3 + 4)",	parser.opt.bracketsAsParens
+		test "g f [x], y",		"g(f[x], y)",			"g f[x], y",		parser.opt.bracketsAsParens
+
+	GX07_cast
+	; testMethod
+		test "byte! x",			"(byte)x"
+		test "byte! x + y",		"(byte)(x + y)"
+		test "some.type! obj",	"(some.type)obj"
+		test "obj.prop as some.type"
+		test "obj as! type",	"(type)obj"

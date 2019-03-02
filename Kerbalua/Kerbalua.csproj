@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <KerbalLibs Condition=" '$(OS)' == 'Windows_NT' And '$(KerbalLibs)' == '' ">C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\KSP_x64_Data\Managed</KerbalLibs>
+	<KerbalLibs Condition=" '$(OS)' != 'Windows_NT' And '$(KerbalLibs)' == '' ">../KerbalLibs</KerbalLibs>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{F590B1DB-8F33-4986-8383-180952D63CDA}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Kerbalua</RootNamespace>
+    <AssemblyName>Kerbalua</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>GameData\Kerbalua\Plugins</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <Optimize>true</Optimize>
+    <OutputPath>GameData\Kerbalua\Plugins</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>$(KerbalLibs)\Assembly-CSharp.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Assembly-CSharp-firstpass">
+      <HintPath>$(KerbalLibs)\Assembly-CSharp-firstpass.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="MoonSharp.Interpreter">
+      <HintPath>..\packages\MoonSharp.2.0.0.0\lib\net35-client\MoonSharp.Interpreter.dll</HintPath>
+    </Reference>
+    <Reference Include="Antlr4.Runtime.Standard">
+      <HintPath>..\packages\Antlr4.Runtime.Standard.4.7.1.1\lib\net35\Antlr4.Runtime.Standard.dll</HintPath>
+    </Reference>
+    <Reference Include="Assembly-UnityScript">
+      <HintPath>$(KerbalLibs)\Assembly-UnityScript.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Assembly-UnityScript-firstpass">
+      <HintPath>$(KerbalLibs)\Assembly-UnityScript-firstpass.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Boo.Lang">
+      <HintPath>$(KerbalLibs)\Boo.Lang.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="I18N.CJK">
+      <HintPath>$(KerbalLibs)\I18N.CJK.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="I18N">
+      <HintPath>$(KerbalLibs)\I18N.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="I18N.MidEast">
+      <HintPath>$(KerbalLibs)\I18N.MidEast.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="I18N.Other">
+      <HintPath>$(KerbalLibs)\I18N.Other.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="I18N.Rare">
+      <HintPath>$(KerbalLibs)\I18N.Rare.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="I18N.West">
+      <HintPath>$(KerbalLibs)\I18N.West.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Ionic.Zip">
+      <HintPath>$(KerbalLibs)\Ionic.Zip.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="KSPAssets">
+      <HintPath>$(KerbalLibs)\KSPAssets.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="KSPTrackIR">
+      <HintPath>$(KerbalLibs)\KSPTrackIR.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Mono.Cecil">
+      <HintPath>$(KerbalLibs)\Mono.Cecil.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Mono.Security">
+      <HintPath>$(KerbalLibs)\Mono.Security.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="mscorlib">
+      <HintPath>$(KerbalLibs)\mscorlib.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Core">
+      <HintPath>$(KerbalLibs)\System.Core.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System">
+      <HintPath>$(KerbalLibs)\System.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Xml">
+      <HintPath>$(KerbalLibs)\System.Xml.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.Analytics">
+      <HintPath>$(KerbalLibs)\UnityEngine.Analytics.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>$(KerbalLibs)\UnityEngine.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.Networking">
+      <HintPath>$(KerbalLibs)\UnityEngine.Networking.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.Timeline">
+      <HintPath>$(KerbalLibs)\UnityEngine.Timeline.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>$(KerbalLibs)\UnityEngine.UI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityScript.Lang">
+      <HintPath>$(KerbalLibs)\UnityScript.Lang.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Kerbalua\Main\KerbaluaMain.cs" />
+    <Compile Include="Kerbalua\Other\SimpleScript.cs" />
+    <Compile Include="Kerbalua\Other\Trie.cs" />
+    <Compile Include="Kerbalua\Gui\KerbaluaRepl.cs" />
+    <Compile Include="Kerbalua\Utility\prin.cs" />
+    <Compile Include="Kerbalua\Utility\QueueLogger.cs" />
+    <Compile Include="Kerbalua\Gui\TextArea.cs" />
+    <Compile Include="Kerbalua\Gui\InputBox.cs" />
+    <Compile Include="Kerbalua\Completion\AllCompletion.cs" />
+    <Compile Include="Kerbalua\Completion\CompletionParser.cs" />
+    <Compile Include="Kerbalua\Completion\CompletionParser2.cs" />
+    <Compile Include="Kerbalua\Completion\Grammar\LuaCompletion2BaseListener.cs" />
+    <Compile Include="Kerbalua\Completion\Grammar\LuaCompletion2Lexer.cs" />
+    <Compile Include="Kerbalua\Completion\Grammar\LuaCompletion2Listener.cs" />
+    <Compile Include="Kerbalua\Completion\Grammar\LuaCompletion2Parser.cs" />
+    <Compile Include="Kerbalua\Completion\Grammar\LuaCompletionBaseListener.cs" />
+    <Compile Include="Kerbalua\Completion\Grammar\LuaCompletionLexer.cs" />
+    <Compile Include="Kerbalua\Completion\Grammar\LuaCompletionListener.cs" />
+    <Compile Include="Kerbalua\Completion\Grammar\LuaCompletionParser.cs" />
+    <Compile Include="Kerbalua\Completion\LastVarExtracter.cs" />
+    <Compile Include="Kerbalua\Completion\TableCompletion.cs" />
+    <Compile Include="Kerbalua\Completion\UserDataCompletion.cs" />
+    <Compile Include="Kerbalua\Gui\Scroller.cs" />
+    <Compile Include="Kerbalua\Gui\GuiElement.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+    <None Include="Kerbalua\Completion\Grammar\.antlr\LuaCompletion2.interp" />
+    <None Include="Kerbalua\Completion\Grammar\.antlr\LuaCompletion2.tokens" />
+    <None Include="Kerbalua\Completion\Grammar\.antlr\LuaCompletion2Lexer.interp" />
+    <None Include="Kerbalua\Completion\Grammar\.antlr\LuaCompletion2Lexer.java" />
+    <None Include="Kerbalua\Completion\Grammar\.antlr\LuaCompletion2Lexer.tokens" />
+    <None Include="Kerbalua\Completion\Grammar\.antlr\LuaCompletion2Parser.java" />
+    <None Include="Kerbalua\Completion\Grammar\antlr-4.7.1-complete.jar" />
+    <None Include="Kerbalua\Completion\Grammar\LuaCompletion.g4" />
+    <None Include="Kerbalua\Completion\Grammar\LuaCompletion.interp" />
+    <None Include="Kerbalua\Completion\Grammar\LuaCompletion.tokens" />
+    <None Include="Kerbalua\Completion\Grammar\LuaCompletion2.g4" />
+    <None Include="Kerbalua\Completion\Grammar\LuaCompletion2.interp" />
+    <None Include="Kerbalua\Completion\Grammar\LuaCompletion2.tokens" />
+    <None Include="Kerbalua\Completion\Grammar\LuaCompletion2Lexer.interp" />
+    <None Include="Kerbalua\Completion\Grammar\LuaCompletion2Lexer.tokens" />
+    <None Include="Kerbalua\Completion\Grammar\LuaCompletionLexer.interp" />
+    <None Include="Kerbalua\Completion\Grammar\LuaCompletionLexer.tokens" />
+    <None Include="Kerbalua\Completion\Grammar\regenerate.sh" />
+    <None Include="Kerbalua\Completion\UserDataCompletion.cs.old" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Kerbalua\" />
+    <Folder Include="Kerbalua\Main\" />
+    <Folder Include="Kerbalua\Other\" />
+    <Folder Include="Kerbalua\Gui\" />
+    <Folder Include="Kerbalua\Utility\" />
+    <Folder Include="Kerbalua\Completion\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ProjectExtensions>
+    <MonoDevelop>
+      <Properties>
+        <Policies>
+          <DotNetNamingPolicy ResourceNamePolicy="FileFormatDefault" DirectoryNamespaceAssociation="Hierarchical" />
+        </Policies>
+      </Properties>
+    </MonoDevelop>
+  </ProjectExtensions>
+</Project>

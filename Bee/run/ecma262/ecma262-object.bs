@@ -1,0 +1,21 @@
+﻿use sys: text, lang, cols.gen
+pkg bee.run.ecma262
+
+def objectFun obj
+;; object function (used to create new objects)
+
+	prototype iObject get
+	;; prototype of all objects
+	root engine.iRoot get
+
+	.ctor engine, baseClass iObject, prototype iObject, root engine.iRoot
+		base engine, baseClass, new props "prototype", prototype
+		_prototype = prototype
+		_root = root
+	
+	call value, self iObject, argc int override
+		return new value create argc
+	create iObject, argc int override
+		if argc == 0
+			return new obj engine, prototype
+		return root.box arg argc
