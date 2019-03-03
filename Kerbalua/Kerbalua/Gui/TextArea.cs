@@ -1,17 +1,13 @@
-﻿using System;
+using System;
 using UnityEngine;
 
 namespace Kerbalua.Gui {
-    public class TextArea {
+	public class TextArea {
 		public GUIContent content = new GUIContent("");
 
-		public void Render(Rect rect, GUIStyle style = null)
+		public void Render(Rect rect)
 		{
-			if (style == null) {
-				content.text = GUI.TextArea(rect, content.text);
-			} else {
-				content.text = GUI.TextArea(rect, content.text, style);
-			}
+			content.text = GUI.TextArea(rect, content.text);
 		}
 	}
 }

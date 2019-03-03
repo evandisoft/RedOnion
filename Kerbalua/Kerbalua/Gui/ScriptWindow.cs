@@ -14,20 +14,20 @@ namespace Kerbalua.Gui {
 		public CompletionBox completionBox = new CompletionBox();
 		public SimpleScript script;
 		int windowID = 0;
-		Rect replRect= new Rect(500, 100, 400, 500);
+		Rect replRect;
 
 		public ScriptWindow(SimpleScript script,Rect replRect)
 		{
 			this.script = script;
 			this.replRect = replRect;
+			Complete(false);
 		}
 
 		public void Render()
 		{
 			replRect = GUI.Window(windowID, replRect, ReplWindow, "kerbalua REPL");
-
-			editor.Render(new Rect(0, 0, replRect.width, replRect.height));
-			completionBox.Render(new Rect(0, 0, replRect.width, replRect.height));
+			editor.Render(new Rect(replRect.x-replRect.width, replRect.y, replRect.width, replRect.height));
+			completionBox.Render(new Rect(replRect.x+replRect.width, replRect.y, replRect.width, replRect.height));
 		}
 
 		void ReplWindow(int id)
@@ -61,6 +61,7 @@ namespace Kerbalua.Gui {
 					break;
 				case KeyCode.Tab:
 					Complete(true);
+					repl.outputBox.ResetScroll();
 					break;
 				default:
 					char ch = event1.character;
@@ -75,6 +76,7 @@ namespace Kerbalua.Gui {
 					repl.outputBox.content.text = repl.outputBox.content.text.Substring(diff);
 				}
 				Complete(false);
+				repl.outputBox.ResetScroll();
 				event1.Use();
 			}
 

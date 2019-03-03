@@ -8,7 +8,7 @@ using Kerbalua.Completion;
 using Kerbalua;
 
 namespace Kerbalua.Gui {
-    public class KerbaluaRepl {
+    public class KerbaluaReplOld {
         int maxOutputBytes = 80000;
         SimpleScript script;
 
@@ -38,7 +38,7 @@ namespace Kerbalua.Gui {
             }
         }
 
-        public KerbaluaRepl(KerbaluaMain.KSPRaw kspApi)
+        public KerbaluaReplOld(KerbaluaMain.KSPRaw kspApi)
         {
             this.kspApi = kspApi;
             script = new SimpleScript(CoreModules.Preset_Complete);
@@ -61,7 +61,7 @@ namespace Kerbalua.Gui {
             if (!guiActive) return;
 
             try {
-                replRect = GUI.Window(windowID, replRect, ScriptWindow, "kerbalua REPL");
+                //replRect = GUI.Window(windowID, replRect, ScriptWindow, "kerbalua REPL");
                 CompletionBox();
                 inputChanged = false;
             } catch (Exception e) {
@@ -148,13 +148,13 @@ namespace Kerbalua.Gui {
                 e.Use();
             }
 
-            if (Mouse.Left.GetClick() || Mouse.Right.GetClick()) {
-                if (replRect.Contains(new Vector2(e.mousePosition.x + 100, e.mousePosition.y + 100))) {
-                    InputLockManager.SetControlLock(ControlTypes.KEYBOARDINPUT, "kerbalua");
-                } else {
-                    InputLockManager.ClearControlLocks();
-                }
-            }
+            //if (Mouse.Left.GetClick() || Mouse.Right.GetClick()) {
+            //    if (replRect.Contains(new Vector2(e.mousePosition.x + 100, e.mousePosition.y + 100))) {
+            //        InputLockManager.SetControlLock(ControlTypes.KEYBOARDINPUT, "kerbalua");
+            //    } else {
+            //        InputLockManager.ClearControlLocks();
+            //    }
+            //}
         }
 
         void InputBox(Rect rect)
@@ -227,11 +227,11 @@ namespace Kerbalua.Gui {
             }
 
             completionRect.height = outputStyle.CalcSize(completionContent).y;
-            completionRect.y = replRect.y;
-            completionRect.x = replRect.x + replRect.width;
-            if (completionContent.text.Length > 0) {
-                completionContent.text = GUI.TextArea(completionRect, completionContent.text);
-            }
+            ////completionRect.y = replRect.y;
+            ////completionRect.x = replRect.x + replRect.width;
+            ////if (completionContent.text.Length > 0) {
+            //    completionContent.text = GUI.TextArea(completionRect, completionContent.text);
+            //}
         }
     }
 

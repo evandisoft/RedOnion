@@ -73,7 +73,6 @@
     <Compile Include="Kerbalua\Gui\KerbaluaRepl.cs" />
     <Compile Include="Kerbalua\Utility\prin.cs" />
     <Compile Include="Kerbalua\Utility\QueueLogger.cs" />
-    <Compile Include="Kerbalua\Gui\TextArea.cs" />
     <Compile Include="Kerbalua\Gui\InputBox.cs" />
     <Compile Include="Kerbalua\Completion\AllCompletion.cs" />
     <Compile Include="Kerbalua\Completion\CompletionParser.cs" />
@@ -89,13 +88,13 @@
     <Compile Include="Kerbalua\Completion\LastVarExtracter.cs" />
     <Compile Include="Kerbalua\Completion\TableCompletion.cs" />
     <Compile Include="Kerbalua\Completion\UserDataCompletion.cs" />
-    <Compile Include="Kerbalua\Gui\Scroller.cs" />
-    <Compile Include="Kerbalua\Gui\GuiElement.cs" />
     <Compile Include="Kerbalua\Gui\ScriptWindow.cs" />
     <Compile Include="Kerbalua\Gui\Repl.cs" />
     <Compile Include="Kerbalua\Gui\Editor.cs" />
     <Compile Include="Kerbalua\Gui\OutputBox.cs" />
     <Compile Include="Kerbalua\Gui\CompletionBox.cs" />
+    <Compile Include="Kerbalua\Gui\KerbaluaReplOld.cs" />
+    <Compile Include="Kerbalua\Gui\TextArea.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -118,7 +117,6 @@
     <None Include="Kerbalua\Completion\Grammar\LuaCompletionLexer.tokens" />
     <None Include="Kerbalua\Completion\Grammar\regenerate.sh" />
     <None Include="Kerbalua\Completion\UserDataCompletion.cs.old" />
-    <None Include="Kerbalua\Gui\KerbaluaRepl.cs.old" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Kerbalua\" />

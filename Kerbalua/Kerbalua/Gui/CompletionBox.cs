@@ -10,7 +10,7 @@ namespace Kerbalua.Gui {
 		public void Render(Rect rect)
 		{
 			GUIStyle style = new GUIStyle(GUI.skin.textArea);
-			
+			content.text = GUI.TextArea(rect, content.text);
 		}
 	}
 }

@@ -50,7 +50,7 @@ namespace Kerbalua.Gui {
 			script.Options.DebugPrint = Print;
 			InputLockManager.ClearControlLocks();
 
-			scriptWindow = new ScriptWindow(script, new Rect(100, 100, 700, 500));
+			scriptWindow = new ScriptWindow(script, new Rect(500, 100, 400, 500));
 		}
 
 		public void Print(string str)
