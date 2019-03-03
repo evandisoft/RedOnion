@@ -18,17 +18,6 @@ namespace RedOnion.Script.Parsing
 		/// </summary>
 		protected int ValuesAt { get; set; }
 
-		/// <summary>
-		/// Push simple value (this, null, false, ...)
-		/// </summary>
-		protected void Push(OpCode OpCode)
-		{
-			var start = ValuesAt;
-			ValuesReserve(5);
-			ValuesPush((byte)OpCode);
-			ValuesPush(start);
-		}
-
 		private string[] _stringValues = new string[64];
 		/// <summary>
 		/// Strings associated with value buffer/stack
@@ -40,9 +29,20 @@ namespace RedOnion.Script.Parsing
 		protected int StringValuesAt { get; set; }
 
 		/// <summary>
-		/// push string value (string, identifier)
+		/// Push simple value (this, null, false, ...)
 		/// </summary>
-		void Push(OpCode code, string value)
+		protected void Push(OpCode OpCode)
+		{
+			var start = ValuesAt;
+			ValuesReserve(5);
+			ValuesPush((byte)OpCode);
+			ValuesPush(start);
+		}
+
+		/// <summary>
+		/// Push string value (string, identifier)
+		/// </summary>
+		protected void Push(OpCode code, string value)
 		{
 			var start = ValuesAt;
 			int i;

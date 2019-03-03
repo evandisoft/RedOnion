@@ -10,6 +10,47 @@ namespace RedOnion.Script.Parsing
 	partial class Parser
 	{
 		/// <summary>
+		/// Stored state of values (top markers)
+		/// </summary>
+		protected struct ValuesState
+		{
+			public int ValuesAt { get; }
+			public int StringValuesAt { get; }
+			public ValuesState(int valuesAt, int stringValuesAt)
+			{
+				ValuesAt = valuesAt;
+				StringValuesAt = stringValuesAt;
+			}
+		}
+
+		/// <summary>
+		/// Start expression parsing and save state of values
+		/// </summary>
+		/// <returns>Current state of values</returns>
+		protected ValuesState StartExpression()
+			=> new ValuesState(ValuesAt, StringValuesAt);
+
+		/// <summary>
+		/// Finish expression parsing and restore state of values
+		/// </summary>
+		/// <param name="state">Stored state of values from StartExpression()</param>
+		/// <returns>True if there was any expression</returns>
+		protected bool FinishExpression(ValuesState state)
+		{
+			if (state.ValuesAt >= ValuesAt)
+			{
+				Debug.Assert(state.ValuesAt == ValuesAt);
+				Debug.Assert(state.StringValuesAt == StringValuesAt);
+				Write(OpCode.Undefined);
+				return false;
+			}
+			Rewrite(ValuesAt);
+			ValuesAt = state.ValuesAt;
+			StringValuesAt = state.StringValuesAt;
+			return true;
+		}
+
+		/// <summary>
 		/// Parse expression
 		/// </summary>
 		protected virtual void ParseExpression(Flag flags = Flag.None)
@@ -192,7 +233,8 @@ namespace RedOnion.Script.Parsing
 						throw new ParseError(lexer, "Variable name too long");
 					Push(OpCode.Identifier, lexer.Word);
 					Next();
-					if (lexer.Curr == ':' && Next().lexer.Word == null)
+					if ((lexer.Curr == ':' || lexer.Code == OpCode.As)
+						&& Next().lexer.Word == null)
 						throw new ParseError(lexer, "Expected variable type");
 					ParseType(flags);
 					if (lexer.Code == OpCode.Assign)

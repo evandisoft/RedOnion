@@ -67,7 +67,7 @@ namespace RedOnion.Script.Parsing
 			/// </summary>
 			LimitedContext = 1 << 0,
 			/// <summary>
-			/// Allow empty/no expression/type (used in fullexpr and fulltype)
+			/// Allow empty/no expression/type (used in FullExpression and FullType)
 			/// </summary>
 			NoExpression = 1 << 1,
 			/// <summary>
@@ -114,8 +114,12 @@ namespace RedOnion.Script.Parsing
 			ValuesAt = 0;
 			StringValuesAt = 0;
 			Array.Clear(StringValues, 0, StringValues.Length);
+			LabelTable?.Clear();
+			GotoTable?.Clear();
 			return this;
 		}
+
+		/*	TEMPORARILY DISABLED FOR EASIER REWRITE
 
 		/// <summary>
 		/// Compile expression at parser position to code buffer
@@ -128,6 +132,7 @@ namespace RedOnion.Script.Parsing
 			ValuesAt = at;
 			return this;
 		}
+		*/
 
 		/// <summary>
 		/// Parse next word, literal, operator or character on current line
@@ -135,6 +140,14 @@ namespace RedOnion.Script.Parsing
 		protected Parser Next()
 		{
 			lexer.Next();
+			return this;
+		}
+		/// <summary>
+		/// Parse next word, literal or character on this or next (non-empty) line
+		/// </summary>
+		protected Parser Next(bool line, bool skipEmpty = true)
+		{
+			lexer.Next(line, skipEmpty);
 			return this;
 		}
 	}

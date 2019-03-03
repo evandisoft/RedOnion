@@ -18,6 +18,11 @@ using RedOnion.Script.Execution;
 //	f (g x, y), z, h()
 //	++x--
 //	"string" + 'c'
+//	var x
+//	var x int
+//	var a:byte[]
+//	var a = new byte[n]
+//	var a as list.[byte]
 
 namespace RedOnion.ScriptTests
 {
@@ -378,8 +383,8 @@ namespace RedOnion.ScriptTests
 			ValueCheck	(28, OpCode.Identifier);
 			ValueTopMark(33, 24);
 			ValueCheck	(33, OpCode.Dot);
-			ValueTopMark(38, 19); // base.field
-			ValueCheck	(38, (byte)4); // number of arguments
+			ValueTopMark(38, 19);		// base.field
+			ValueCheck	(38, (byte)4);	// number of arguments
 			ValueCheck	(39, OpCode.CallN);
 			ValueFinal	(44);
 
@@ -412,15 +417,15 @@ namespace RedOnion.ScriptTests
 			ValueCheck	(22, OpCode.Identifier);
 			ValueTopMark(27, 18);
 			ValueCheck	(27, OpCode.Call1);
-			ValueTopMark(32, 9); // g(x)
+			ValueTopMark(32, 9);		// g(x)
 			ValueCheck	(32, 3, "h");
 			ValueCheck	(36, OpCode.Identifier);
 			ValueTopMark(41, 32);
-			ValueCheck	(41, 4, "x"); // value-strings have duplicits
+			ValueCheck	(41, 4, "x");	// value-strings have duplicits
 			ValueCheck	(45, OpCode.Identifier);
 			ValueTopMark(50, 41);
 			ValueCheck	(50, OpCode.Call1);
-			ValueTopMark(55, 32); // h x
+			ValueTopMark(55, 32);		// h x
 			ValueCheck	(55, OpCode.Call2);
 			ValueFinal	(60);
 
@@ -556,9 +561,132 @@ namespace RedOnion.ScriptTests
 
 			CodeCheck( 0, OpCode.Var);
 			CodeCheck( 1, 0, "x");
-			CodeCheck( 5, OpCode.Undefined);
-			CodeCheck( 6, OpCode.Undefined);
+			CodeCheck( 5, OpCode.Undefined);	// type
+			CodeCheck( 6, OpCode.Undefined);	// no initializer
 			CodeCheck( 7);
+		}
+
+		[Test]
+		public void ParseExpression_13_TypedVariable()
+		{
+			Test("var x int"); // pure style
+
+			ValueCheck	( 0, 0, "x");
+			ValueCheck	( 4, OpCode.Identifier);
+			ValueTopMark( 9, 0);
+			ValueCheck	( 9, OpCode.Int);
+			ValueTopMark(14, 9);
+			ValueCheck	(14, OpCode.Undefined);
+			ValueTopMark(19, 14);
+			ValueCheck	(19, OpCode.Var);
+			ValueFinal	(24);
+
+			Rewrite(ValuesAt);
+
+			CodeCheck( 0, OpCode.Var);
+			CodeCheck( 1, 0, "x");
+			CodeCheck( 5, OpCode.Int);			// type
+			CodeCheck( 6, OpCode.Undefined);	// no initializer
+			CodeCheck( 7);
+		}
+
+		[Test]
+		public void ParseExpression_14_ArrayVariable()
+		{
+			Test("var a:byte[]"); // ActionScript
+
+			ValueCheck	( 0, 0, "a");
+			ValueCheck	( 4, OpCode.Identifier);
+			ValueTopMark( 9, 0);
+			ValueCheck	( 9, OpCode.Byte);
+			ValueTopMark(14, 9);
+			ValueCheck	(14, (byte)1);			// dimensions
+			ValueCheck	(15, OpCode.Array);
+			ValueTopMark(20, 9);				// byte[]
+			ValueCheck	(20, OpCode.Undefined);	// no initializer
+			ValueTopMark(25, 20);
+			ValueCheck	(25, OpCode.Var);
+			ValueFinal	(30);
+
+			Rewrite(ValuesAt);
+
+			CodeCheck( 0, OpCode.Var);
+			CodeCheck( 1, 0, "a");
+			CodeCheck( 5, OpCode.Array);
+			CodeCheck( 6, (byte)1);				// dimensions
+			CodeCheck( 7, OpCode.Byte);			// byte[]
+			CodeCheck( 8, OpCode.Undefined);	// no initializer
+			CodeCheck( 9);
+		}
+
+		[Test]
+		public void ParseExpression_15_CreateArray()
+		{
+			Test("var a = new byte[n]");
+
+			ValueCheck	( 0, 0, "a");
+			ValueCheck	( 4, OpCode.Identifier);
+			ValueTopMark( 9, 0);
+			ValueCheck	( 9, OpCode.Undefined);
+			ValueTopMark(14, 9);
+			ValueCheck	(14, OpCode.Byte);
+			ValueTopMark(19, 14);
+			ValueCheck	(19, 1, "n");
+			ValueCheck	(23, OpCode.Identifier);
+			ValueTopMark(28, 19);
+			ValueCheck	(28, (byte)2);			// two arguments to new[] - type and size
+			ValueCheck	(29, OpCode.Array);
+			ValueCheck	(30, OpCode.Create);
+			ValueTopMark(35, 14);				// new byte[n]
+			ValueCheck	(35, OpCode.Var);
+			ValueFinal	(40);
+
+			Rewrite(ValuesAt);
+
+			CodeCheck( 0, OpCode.Var);
+			CodeCheck( 1, 0, "a");
+			CodeCheck( 5, OpCode.Undefined);	// auto-type
+			CodeCheck( 6, OpCode.Create);
+			CodeCheck( 7, OpCode.Array);
+			CodeCheck( 8, (byte)2);				// two arguments to new[] - type and size
+			CodeCheck( 9, OpCode.Byte);
+			CodeCheck(10, OpCode.Identifier);
+			CodeCheck(11, 1, "n");
+			CodeCheck(15);
+		}
+
+		[Test]
+		public void ParseExpression_16_GenericType()
+		{
+			Test("var a as list.[byte]"); // Boo/Python type-spec (var x as type)
+
+			ValueCheck	( 0, 0, "a");
+			ValueCheck	( 4, OpCode.Identifier);
+			ValueTopMark( 9, 0);
+			ValueCheck	( 9, 1, "list");
+			ValueCheck	(13, OpCode.Identifier);
+			ValueTopMark(18, 9);
+			ValueCheck	(18, OpCode.Byte);
+			ValueTopMark(23, 18);
+			ValueCheck	(23, (byte)2);			// two arguments/types to generic
+			ValueCheck	(24, OpCode.Generic);
+			ValueTopMark(29, 9);
+			ValueCheck	(29, OpCode.Undefined);
+			ValueTopMark(34, 29);
+			ValueCheck	(34, OpCode.Var);
+			ValueFinal	(39);
+
+			Rewrite(ValuesAt);
+
+			CodeCheck( 0, OpCode.Var);
+			CodeCheck( 1, 0, "a");
+			CodeCheck( 5, OpCode.Generic);
+			CodeCheck( 6, (byte)2);				// two arguments/types to generic
+			CodeCheck( 7, OpCode.Identifier);
+			CodeCheck( 8, 1, "list");
+			CodeCheck(12, OpCode.Byte);
+			CodeCheck(13, OpCode.Undefined);
+			CodeCheck(14);
 		}
 	}
 }

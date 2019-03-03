@@ -37,12 +37,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Execution\OpCode.cs" />
+    <Compile Include="Parsing\Classes.cs" />
     <Compile Include="Parsing\Code.cs" />
     <Compile Include="Parsing\Expressions.cs" />
     <Compile Include="Parsing\Lexer.cs" />
     <Compile Include="Parsing\Operators.cs" />
     <Compile Include="Parsing\ParseError.cs" />
     <Compile Include="Parsing\Parser.cs" />
+    <Compile Include="Parsing\Statements.cs" />
     <Compile Include="Parsing\Types.cs" />
     <Compile Include="Parsing\Values.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

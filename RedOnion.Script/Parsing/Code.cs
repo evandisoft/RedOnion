@@ -75,6 +75,16 @@ namespace RedOnion.Script.Parsing
 			Reserve(1);
 			Code[CodeAt++] = value;
 		}
+		/// <summary>
+		/// Write instruction to code buffer
+		/// </summary>
+		protected int Write(OpCode value)
+		{
+			var at = CodeAt;
+			Reserve(1);
+			Code[CodeAt++] = value.Code();
+			return at;
+		}
 
 		/// <summary>
 		/// Write single byte to code buffer at specified position
