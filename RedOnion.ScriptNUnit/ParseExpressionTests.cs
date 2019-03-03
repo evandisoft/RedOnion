@@ -28,99 +28,99 @@ namespace RedOnion.ScriptTests
 			=> BitConverter.ToDouble(Values, at);
 
 		public void CodeCheck(int at)
-			=> Assert.AreEqual(at, CodeAt);
+			=> Assert.AreEqual(at, CodeAt, "CodeAt");
 		public void CodeCheck(int at, OpCode value)
 			=> CodeCheck(at, (byte)value);
 
 		public void CodeCheck(int at, byte value)
 		{
-			Assert.True(at <= CodeAt-1);
-			Assert.AreEqual(value, Code[at]);
+			Assert.IsTrue(at <= CodeAt-1, "Code: {0} > {1}", at, CodeAt-1);
+			Assert.AreEqual(value, Code[at], "Code[{0}] = 0x{1:X2} ! 0x{2:X2}", at, Code[at], value);
 		}
 		public void CodeCheck(int at, int value)
 		{
-			Assert.True(at <= CodeAt-4);
-			Assert.AreEqual(value, CodeInt(at));
+			Assert.IsTrue(at <= CodeAt-4, "Code: {0} > {1}", at, CodeAt-4);
+			Assert.AreEqual(value, CodeInt(at), "CodeInt({0})", at);
 		}
 		public void CodeCheck(int at, float value)
 		{
-			Assert.True(at <= CodeAt-4);
-			Assert.AreEqual(value, CodeFloat(at));
+			Assert.IsTrue(at <= CodeAt-4, "Code: {0} > {1}", at, CodeAt-4);
+			Assert.AreEqual(value, CodeFloat(at), "CodeFloat({0})", at);
 		}
 		public void CodeCheck(int at, long value)
 		{
-			Assert.True(at <= CodeAt-8);
-			Assert.AreEqual(value, CodeLong(at));
+			Assert.IsTrue(at <= CodeAt-8, "Code: {0} > {1}", at, CodeAt-8);
+			Assert.AreEqual(value, CodeLong(at), "CodeLong({0})", at);
 		}
 		public void CodeCheck(int at, double value)
 		{
-			Assert.True(at <= CodeAt-8);
-			Assert.AreEqual(value, CodeDouble(at));
+			Assert.IsTrue(at <= CodeAt-8, "Code: {0} > {1}", at, CodeAt-8);
+			Assert.AreEqual(value, CodeDouble(at), "CodeDouble({0})", at);
 		}
 		public void CodeCheck(int at, int index, string value)
 		{
-			Assert.True(at <= CodeAt-4);
-			Assert.AreEqual(index, CodeInt(at));
+			Assert.IsTrue(at <= CodeAt-4, "Code: {0} > {1}", at, CodeAt-4);
+			Assert.AreEqual(index, CodeInt(at), "CodeInt({0})", at);
 			if (index == -1)
-				Assert.True(value.Length == 0, "Empty string");
+				Assert.IsTrue(value.Length == 0, "Empty string");
 			else
 			{
-				Assert.True(index < StringsAt);
-				Assert.AreEqual(value, Strings[index]);
+				Assert.IsTrue(index < StringsAt, "Strings: {0} >= {1}", index, StringsAt);
+				Assert.AreEqual(value, Strings[index], "Strings[{0}]", index);
 			}
 		}
 
 		public void ValueCheck(int at, byte value)
 		{
-			Assert.True(at <= ValuesAt-1);
-			Assert.AreEqual(value, Values[at]);
+			Assert.IsTrue(at <= ValuesAt-1, "Values: {0} > {1}", at, ValuesAt-1);
+			Assert.AreEqual(value, Values[at], "Values[{0}] = 0x{1:X2} ! 0x{2:X2}", at, Values[at], value);
 		}
 		public void ValueCheck(int at, int value)
 		{
-			Assert.True(at <= ValuesAt-4);
-			Assert.AreEqual(value, ValueInt(at));
+			Assert.IsTrue(at <= ValuesAt-4, "Values: {0} > {1}", at, ValuesAt-4);
+			Assert.AreEqual(value, ValueInt(at), "ValueInt({0})", at);
 		}
 		public void ValueCheck(int at, float value)
 		{
-			Assert.True(at <= ValuesAt-4);
-			Assert.AreEqual(value, ValueFloat(at));
+			Assert.IsTrue(at <= ValuesAt-4, "Values: {0} > {1}", at, ValuesAt-4);
+			Assert.AreEqual(value, ValueFloat(at), "ValueFloat({0})", at);
 		}
 		public void ValueCheck(int at, long value)
 		{
-			Assert.True(at <= ValuesAt-8);
-			Assert.AreEqual(value, ValueLong(at));
+			Assert.IsTrue(at <= ValuesAt-8, "Values: {0} > {1}", at, ValuesAt-8);
+			Assert.AreEqual(value, ValueLong(at), "ValueLong({0})", at);
 		}
 		public void ValueCheck(int at, double value)
 		{
-			Assert.True(at <= ValuesAt-8);
-			Assert.AreEqual(value, ValueDouble(at));
+			Assert.IsTrue(at <= ValuesAt-8, "Values: {0} > {1}", at, ValuesAt-8);
+			Assert.AreEqual(value, ValueDouble(at), "ValueDouble({0})", at);
 		}
 
 		public void ValueTopMark(int at, int value)
 		{
-			Assert.True(at < ValuesAt);
-			Assert.AreEqual(value, TopInt(at));
+			Assert.IsTrue(at < ValuesAt, "Values: {0} >= {1}", at, ValuesAt);
+			Assert.AreEqual(value, TopInt(at), "ValueTopMark {0}", at);
 		}
 		public void ValueTopMark(int value)
 		{
-			Assert.AreEqual(value, TopInt());
+			Assert.AreEqual(value, TopInt(), "ValueTopMark");
 		}
 		public void ValueFinal(int value)
 		{
-			Assert.AreEqual(value, ValuesAt);
+			Assert.AreEqual(value, ValuesAt, "ValuesAt");
 			ValueTopMark(0);
 		}
 
 		public void ValueCheck(int at, int index, string value)
 		{
-			Assert.True(at <= ValuesAt-4, "Values: {0} > {1}");
-			Assert.AreEqual(index, ValueInt(at));
+			Assert.IsTrue(at <= ValuesAt-4, "Values: {0} > {1}", at, ValuesAt-4);
+			Assert.AreEqual(index, ValueInt(at), "ValueInt({0})", at);
 			if (index == -1)
-				Assert.True(value.Length == 0);
+				Assert.IsTrue(value.Length == 0, "Empty string");
 			else
 			{
-				Assert.True(index < StringValuesAt);
-				Assert.AreEqual(value, StringValues[index]);
+				Assert.IsTrue(index < StringValuesAt, "StringValues: {0} >= {1}", index, StringValuesAt);
+				Assert.AreEqual(value, StringValues[index], "StringValues[{0}]", index);
 			}
 		}
 		public void ValueCheck(int at, OpCode value)
