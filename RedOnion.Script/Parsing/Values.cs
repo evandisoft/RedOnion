@@ -133,7 +133,7 @@ namespace RedOnion.Script.Parsing
 				var n = value.Length - 1;
 				for (i = 1; i < n;)
 				{
-					c = _stringBuilder[i++];
+					c = value[i++];
 					switch (c)
 					{
 					default:

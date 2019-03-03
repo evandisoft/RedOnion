@@ -208,6 +208,15 @@ namespace RedOnion.Script.Parsing
 			var index = TopInt(top);
 			Write(index == -1 ? "" : StringValues[index]);
 		}
+		/// <summary>
+		/// Copy string literal or identifier from vals to code buffer
+		/// </summary>
+		protected void CopyString(int top, int start)
+		{
+			Debug.Assert(top - start == 4);
+			var index = TopInt(top);
+			Write(index == -1 ? "" : StringValues[index]);
+		}
 
 		/// <summary>
 		/// Copy block from parsed values to code buffer
@@ -256,7 +265,9 @@ namespace RedOnion.Script.Parsing
 			}
 			if (op.Binary())
 			{
+				// first/left argument
 				Rewrite(TopInt(top), type || create);
+				// second/right argument
 				if (op == OpCode.Dot)
 				{
 					start = TopInt(top);
@@ -264,51 +275,58 @@ namespace RedOnion.Script.Parsing
 					op = ((OpCode)Values[--top]).Extend();
 					if (op != OpCode.Identifier)
 						throw new InvalidOperationException();
-					var len = top - start;
-					if (len > 127)
-						throw new InvalidOperationException("Identifier too long");
-					Reserve(1 + len);
-					Code[CodeAt++] = (byte)len;
-					Array.Copy(Values, start, Code, CodeAt, len);
-					CodeAt += len;
+					CopyString(top, start);
 					return;
 				}
 				if (op != OpCode.LogicAnd && op != OpCode.LogicOr)
 					goto full;
+				// prepare slot for size of second argument
 				var second = CodeAt;
 				Write(0);
 				Rewrite(top);
+				// update size of second argument (for skipping)
 				Write(CodeAt - second - 4, second);
 				return;
 			}
 			if (op.Ternary())
 			{
+				// top of middle/second argument
 				var mtop = TopInt(top);
+
 				if (op == OpCode.Var)
 				{
 					Debug.Assert(!create);
-					var varat = --CodeAt;
+					var varat = --CodeAt; // remove our OpCode.Var
 					Rewrite(TopInt(mtop));
-					Code[varat] = unchecked((byte)OpCode.Var);
+					Code[varat] = OpCode.Var.Code(); // rewrite OpCode.Identifier with OpCode.Var
 					Rewrite(mtop, true);
 					goto full;
 				}
+
+				// rewrite first argument (condition, method or variable)
 				Rewrite(TopInt(mtop), type || create);
 				if (op == OpCode.Ternary)
 				{
+					// prepare slot for size of second argument (if true)
 					var second = CodeAt;
 					Write(0);
 					Rewrite(mtop);
+					// update size of second argument (for skipping)
 					Write(CodeAt - second - 4, second);
+					// prepare slot for size of third argument (if false)
 					var third = CodeAt;
 					Write(0);
 					Rewrite(top);
+					// update size of third argument (for skipping)
 					Write(CodeAt - third - 4, third);
 					return;
 				}
+				// rewrite second argument (first for method - call2)
 				Rewrite(mtop);
+				// rewrite third argument (second for method - call2)
 				goto full;
 			}
+
 			switch (op)
 			{
 			case OpCode.Array:
