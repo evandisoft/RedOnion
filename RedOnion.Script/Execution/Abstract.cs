@@ -231,7 +231,7 @@ namespace RedOnion.Script
 			return v;
 		}
 
-		protected ushort Cushort(ref int at)
+		protected ushort CodeUShort(ref int at)
 		{
 			var v = BitConverter.ToUInt16(Code, at);
 			at += 2;

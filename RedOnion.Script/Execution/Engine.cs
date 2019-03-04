@@ -15,14 +15,14 @@ namespace RedOnion.Script
 		public enum Option
 		{
 			None = 0,
-			BlockScope = 1 << 0,
-			FuncText = 1 << 1,
+			BlockScope	= 1 << 0,
+			FuncText	= 1 << 1,
 		}
 
 		/// <summary>
 		/// Engine options
 		/// </summary>
-		public Option Options { get; set; }
+		public Option Options { get; set; } = Option.BlockScope;
 
 		public struct ArgInfo
 		{
@@ -65,7 +65,7 @@ namespace RedOnion.Script
 		public IRoot Root { get; set; }
 
 		private static Parser.Option DefaultParserOptions =
-			Parsing.Parser.Option.Script | Parsing.Parser.Option.Untyped | Parsing.Parser.Option.Typed;
+			Parser.Option.Script | Parser.Option.Untyped | Parser.Option.Typed;
 
 		public Engine()
 		{
@@ -77,21 +77,21 @@ namespace RedOnion.Script
 		public Engine(IRoot root)
 		{
 			Parser = new Parser(DefaultParserOptions);
-			this.Root = root;
+			Root = root;
 			Ctx = new Context(this);
 		}
 
 		public Engine(IRoot root, Parser.Option opt)
 		{
 			Parser = new Parser(opt);
-			this.Root = root;
+			Root = root;
 			Ctx = new Context(this);
 		}
 
 		public Engine(IRoot root, Parser.Option opton, Parser.Option optoff)
 		{
 			Parser = new Parser(opton, optoff);
-			this.Root = root;
+			Root = root;
 			Ctx = new Context(this);
 		}
 
@@ -276,11 +276,8 @@ namespace RedOnion.Script
 				=> Vars.Set(name, value);
 			public bool Delete(string name)
 				=> Vars.Delete(name);
-
 			public void Reset()
-			{
-				Vars.Reset();
-			}
+				=> Vars.Reset();
 		}
 
 		/// <summary>

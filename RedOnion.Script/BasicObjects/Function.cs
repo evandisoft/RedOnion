@@ -152,7 +152,7 @@ namespace RedOnion.Script.BasicObjects
 
 		public override Value Call(IObject self, int argc)
 		{
-			CreateContext(self);
+			CreateContext(self, Scope);
 			var args = Ctx.Vars.BaseClass;
 			if (Args != null)
 			{
@@ -171,7 +171,7 @@ namespace RedOnion.Script.BasicObjects
 		public override IObject Create(int argc)
 		{
 			var it = new BasicObject(Engine, Engine.Box(Get("prototype")));
-			CreateContext(it);
+			CreateContext(it, Scope);
 			var args = Ctx.Vars.BaseClass;
 			if (this.Args != null)
 			{

@@ -69,7 +69,7 @@ namespace RedOnion.Script
 				Value = Code[at++];
 				return;
 			case OpCode.UShort:
-				Value = Cushort(ref at);
+				Value = CodeUShort(ref at);
 				return;
 			case OpCode.UInt:
 				Value = CodeUInt(ref at);
@@ -272,13 +272,13 @@ namespace RedOnion.Script
 				left.Set(Value);
 				return;
 			case OpCode.OrAssign:
-				left.Set(Value = (left | Value));
+				left.Set(Value = left | Value);
 				return;
 			case OpCode.XorAssign:
-				left.Set(Value = (left ^ Value));
+				left.Set(Value = left ^ Value);
 				return;
 			case OpCode.AndAssign:
-				left.Set(Value = (left & Value));
+				left.Set(Value = left & Value);
 				return;
 			case OpCode.LshAssign:
 				left.Set(Value = left.ShiftLeft(Value));
@@ -287,19 +287,19 @@ namespace RedOnion.Script
 				left.Set(Value = left.ShiftRight(Value));
 				return;
 			case OpCode.AddAssign:
-				left.Set(Value = (left + Value));
+				left.Set(Value = left + Value);
 				return;
 			case OpCode.SubAssign:
-				left.Set(Value = (left - Value));
+				left.Set(Value = left - Value);
 				return;
 			case OpCode.MulAssign:
-				left.Set(Value = (left * Value));
+				left.Set(Value = left * Value);
 				return;
 			case OpCode.DivAssign:
-				left.Set(Value = (left / Value));
+				left.Set(Value = left / Value);
 				return;
 			case OpCode.ModAssign:
-				left.Set(Value = (left % Value));
+				left.Set(Value = left % Value);
 				return;
 			case OpCode.BitOr:
 				Value = left | Value;

@@ -93,7 +93,7 @@ namespace RedOnion.Script
 		/// Test and get value
 		/// </summary>
 		public bool Get(string name, out Value value)
-			=> TryGetValue(name.ToLower(), out value);
+			=> TryGetValue(name, out value);
 
 		/// <summary>
 		/// Set the value of specified property
@@ -172,7 +172,7 @@ namespace RedOnion.Script
 		/// <summary>
 		/// Find the object containing the property
 		/// </summary>
-		IObject Which(string @string);
+		IObject Which(string name);
 
 		/// <summary>
 		/// Execute regular function call

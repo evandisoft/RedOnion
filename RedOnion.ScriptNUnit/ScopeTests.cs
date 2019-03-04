@@ -8,10 +8,10 @@ namespace RedOnion.ScriptNUnit
 	[TestFixture]
 	public class ScopeTests: StatementTestsBase
 	{
-		[TearDown]
-		public void Cleanup()
+		[SetUp]
+		public void SetUp()
 		{
-			Options = Option.None;
+			Options = Option.BlockScope;
 		}
 
 		[Test]
@@ -22,6 +22,8 @@ namespace RedOnion.ScriptNUnit
 				"function f\r\n" +
 				"	return x\r\n" +
 				"f()");
+
+			// this = global here
 			Test(1,
 				"var x = 1\r\n" +
 				"function f\r\n" +
@@ -72,6 +74,7 @@ namespace RedOnion.ScriptNUnit
 				"		var x = 2\r\n" +
 				"	return x\r\n" +
 				"f()";
+			Options = Option.None;
 			Test(2, s);
 			Options = Option.BlockScope;
 			Test(1, s);
@@ -84,10 +87,19 @@ namespace RedOnion.ScriptNUnit
 				"var x = 1\r\n" +
 				"function f\r\n" +
 				"	var x = 2\r\n" +
-				"	functon g\r\n" +
+				"	function g\r\n" +
 				"		return x\r\n" +
 				"	return g()\r\n" +
 				"f()");
+
+			Test(2,
+				"var x = 1\r\n" +
+				"function f\r\n" +
+				"	var x = 2\r\n" +
+				"	function g\r\n" +
+				"		return x\r\n" +
+				"	return g\r\n" +
+				"f()()");
 		}
 
 		[Test]

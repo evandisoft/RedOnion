@@ -40,14 +40,14 @@ namespace RedOnion.Script.BasicObjects
 		public override Value Value => new Value(String);
 
 		/// <summary>
-		/// create string.prototype
+		/// Create String.prototype
 		/// </summary>
 		public StringObj(Engine engine, IObject baseClass)
 			: base(engine, baseClass)
 			=> String = "";
 
 		/// <summary>
-		/// create new string object boxing the string
+		/// Create new string object boxing the string
 		/// </summary>
 		public StringObj(Engine engine, StringObj baseClass, string value)
 			: base(engine, baseClass, StdProps)
