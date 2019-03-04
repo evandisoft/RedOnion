@@ -382,7 +382,7 @@ namespace RedOnion.Script
 				++Value.Self;
 				return;
 			case OpCode.Dec:
-				++Value.Self;
+				--Value.Self;
 				return;
 			}
 			throw new NotImplementedException();
