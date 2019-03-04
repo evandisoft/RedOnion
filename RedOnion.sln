@@ -3,10 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.168
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bee", "Bee\Bee.csproj", "{7FBCB2AD-D2DF-4271-B612-17E6F6A1AC12}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BeeTest", "BeeTest\BeeTest.csproj", "{0F14F718-CAC6-448B-84B9-74A9788A096C}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedOnion", "RedOnion\RedOnion.csproj", "{3A40C452-1B11-4769-9D6B-FD318F2CB514}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedOnion.UI", "RedOnion.UI\RedOnion.UI.csproj", "{034C16AB-D16E-4AFE-9837-812499EE2F3D}"
@@ -21,14 +17,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{7FBCB2AD-D2DF-4271-B612-17E6F6A1AC12}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7FBCB2AD-D2DF-4271-B612-17E6F6A1AC12}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7FBCB2AD-D2DF-4271-B612-17E6F6A1AC12}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7FBCB2AD-D2DF-4271-B612-17E6F6A1AC12}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0F14F718-CAC6-448B-84B9-74A9788A096C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0F14F718-CAC6-448B-84B9-74A9788A096C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0F14F718-CAC6-448B-84B9-74A9788A096C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0F14F718-CAC6-448B-84B9-74A9788A096C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3A40C452-1B11-4769-9D6B-FD318F2CB514}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3A40C452-1B11-4769-9D6B-FD318F2CB514}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3A40C452-1B11-4769-9D6B-FD318F2CB514}.Release|Any CPU.ActiveCfg = Release|Any CPU

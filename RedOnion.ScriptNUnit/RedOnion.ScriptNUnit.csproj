@@ -34,10 +34,13 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ExpressionTests.cs" />
     <Compile Include="OpCodeTests.cs" />
     <Compile Include="ParseExpressionTests.cs" />
     <Compile Include="ParseStatementsTests.cs" />
     <Compile Include="ScannerTests.cs" />
+    <Compile Include="ScopeTests.cs" />
+    <Compile Include="StatementTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RedOnion.Script\RedOnion.Script.csproj">

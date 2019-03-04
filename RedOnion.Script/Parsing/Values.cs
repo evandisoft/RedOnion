@@ -2,7 +2,6 @@ using System;
 using System.Diagnostics;
 using System.Text;
 using System.Globalization;
-using RedOnion.Script.Execution;
 
 namespace RedOnion.Script.Parsing
 {

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Diagnostics;
-using RedOnion.Script.Execution;
 
 namespace RedOnion.Script.Parsing
 {

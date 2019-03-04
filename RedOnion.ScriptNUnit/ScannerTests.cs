@@ -3,7 +3,7 @@ using System.Linq;
 using NUnit.Framework;
 using RedOnion.Script.Parsing;
 
-namespace RedOnion.ScriptTests
+namespace RedOnion.ScriptNUnit
 {
 	[TestFixture]
 	public class ScannerTests: Scanner

@@ -1,6 +1,5 @@
-﻿using System;
+using System;
 using System.Diagnostics;
-using RedOnion.Script.Execution;
 
 namespace RedOnion.Script.Parsing
 {

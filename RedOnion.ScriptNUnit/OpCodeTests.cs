@@ -2,9 +2,9 @@ using System;
 using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
-using RedOnion.Script.Execution;
+using RedOnion.Script;
 
-namespace RedOnion.ScriptTests
+namespace RedOnion.ScriptNUnit
 {
 	[TestFixture]
 	public class OpCodeTests

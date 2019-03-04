@@ -1,7 +1,6 @@
 using System;
 using System.Globalization;
 using System.IO;
-using RedOnion.Script.Execution;
 
 namespace RedOnion.Script.Parsing
 {
@@ -11,6 +10,10 @@ namespace RedOnion.Script.Parsing
 
 		public CultureInfo Culture { get; set; } = CultureInfo.InvariantCulture;
 		public Option Options { get; set; } = Option.Script | Option.DotThisAfterWhite;
+
+		public Parser() { }
+		public Parser(Option opts) => Options = opts;
+		public Parser(Option opton, Option optoff) => Options = (Options | opton) &~ optoff;
 
 		[Flags]
 		public enum Option : uint
@@ -139,10 +142,10 @@ namespace RedOnion.Script.Parsing
 		/// <summary>
 		/// Compile full source file / script from string
 		/// </summary>
-		public Parser Unit(string value)
+		public Parser Unit(string source)
 		{
 			Reset();
-			lexer.Reader = new StringReader(value);
+			lexer.Reader = new StringReader(source);
 			Unit();
 			lexer.Reader = null;
 			return this;

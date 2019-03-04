@@ -1,8 +1,7 @@
 using System;
 using System.Linq;
 using NUnit.Framework;
-using RedOnion.Script.Parsing;
-using RedOnion.Script.Execution;
+using RedOnion.Script;
 
 // return
 // return a && b
@@ -23,7 +22,7 @@ using RedOnion.Script.Execution;
 // try it(); catch: print exception; finally: fin()
 // switch x: case 0: break; case 1: return; default: continue
 
-namespace RedOnion.ScriptTests
+namespace RedOnion.ScriptNUnit
 {
 	[TestFixture]
 	public class ParseStatementsTests : ParseTestsBase
@@ -243,14 +242,14 @@ namespace RedOnion.ScriptTests
 			CodeCheck( 0, OpCode.Switch);
 			CodeCheck( 1, OpCode.Identifier);
 			CodeCheck( 2, 0, "x");
-			//CodeCheck( 6, 27); // size of all case-blocks
+			CodeCheck( 6, 27); // size of all case-blocks
 			CodeCheck(10, OpCode.Int);
 			CodeCheck(11, 0); // case 0
 			CodeCheck(15, 1); // case 0 block size
 			CodeCheck(19, OpCode.Break);
 			CodeCheck(20, OpCode.Int);
 			CodeCheck(21, 1); // case 1
-			//CodeCheck(25, 2); // case 1 block size
+			CodeCheck(25, 2); // case 1 block size
 			CodeCheck(29, OpCode.Return);
 			CodeCheck(30, OpCode.Undefined);
 			CodeCheck(31, OpCode.Undefined); // default

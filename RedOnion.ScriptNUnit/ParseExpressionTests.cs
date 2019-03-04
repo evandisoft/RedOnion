@@ -1,8 +1,8 @@
 using System;
 using System.Linq;
 using NUnit.Framework;
+using RedOnion.Script;
 using RedOnion.Script.Parsing;
-using RedOnion.Script.Execution;
 
 //	x + 1
 //	1u + x * 3f
@@ -24,7 +24,7 @@ using RedOnion.Script.Execution;
 //	var a = new byte[n]
 //	var a as list.[byte]
 
-namespace RedOnion.ScriptTests
+namespace RedOnion.ScriptNUnit
 {
 	public class ParseTestsBase : Parser
 	{
