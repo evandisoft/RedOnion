@@ -1,5 +1,7 @@
 using System;
 using System.Globalization;
+using System.IO;
+using RedOnion.Script.Execution;
 
 namespace RedOnion.Script.Parsing
 {
@@ -116,23 +118,35 @@ namespace RedOnion.Script.Parsing
 			Array.Clear(StringValues, 0, StringValues.Length);
 			LabelTable?.Clear();
 			GotoTable?.Clear();
+			ParentIndent = -1;
 			return this;
 		}
-
-		/*	TEMPORARILY DISABLED FOR EASIER REWRITE
 
 		/// <summary>
-		/// Compile expression at parser position to code buffer
+		/// Compile provided expression to code buffer
 		/// </summary>
-		public Parser Expression()
+		public Parser Expression(string value)
 		{
-			var at = ValuesAt;
+			Reset();
+			lexer.Reader = new StringReader(value);
+			var state = StartExpression();
 			ParseExpression();
-			Rewrite(ValuesAt);
-			ValuesAt = at;
+			FinishExpression(state);
+			lexer.Reader = null;
 			return this;
 		}
-		*/
+
+		/// <summary>
+		/// Compile full source file / script from string
+		/// </summary>
+		public Parser Unit(string value)
+		{
+			Reset();
+			lexer.Reader = new StringReader(value);
+			Unit();
+			lexer.Reader = null;
+			return this;
+		}
 
 		/// <summary>
 		/// Parse next word, literal, operator or character on current line
@@ -149,6 +163,110 @@ namespace RedOnion.Script.Parsing
 		{
 			lexer.Next(line, skipEmpty);
 			return this;
+		}
+
+		/// <summary>
+		/// Parent indentation (childs must have higher except labels that can have same)
+		/// </summary>
+		protected int ParentIndent = -1;
+
+		/// <summary>
+		/// Parse compilation unit (full source file / script)
+		/// from the reader or line already set on lexer
+		/// </summary>
+		protected virtual void Unit()
+		{
+			ParentIndent = -1;
+			Imports(Flag.None);
+			do
+			{
+				while (lexer.Code.Code() == OpCode.Namespace.Code())
+				{
+					var opword = lexer.Word;
+					var ns = Next(true).lexer.Word;
+					if (ns == null)
+						throw new ParseError(lexer, "Expected namespace or type name after '{0}'", opword);
+					while (Next().lexer.Code == OpCode.Dot)
+					{
+						if (Next(true).lexer.Word == null)
+							throw new ParseError(lexer, "Expected namespace or type name after '.'");
+						ns += "." + lexer.Word;
+					}
+					Write(OpCode.Namespace, ns);
+				}
+			}
+			while (ParseClasses(Flag.None));
+			ParseBlock(Flag.NoSize);
+		}
+
+		/// <summary>
+		/// Parse imports
+		/// </summary>
+		protected virtual bool Imports(Flag flags)
+		{
+			// note: only 'import' now supported ('use' is too short and 'using' is statement)
+			// warn: make sure the condition at the end is the same!
+			if (lexer.Code != OpCode.Import)
+				return false;
+			do
+			{
+				var opword = lexer.Word;
+				var ns = Next(true).lexer.Word;
+				if (ns == null)
+					throw new ParseError(lexer, "Expected namespace or type name after '{0}'", opword);
+				string ns2 = null;
+				for (;;)
+				{
+					while (Next().lexer.Code == OpCode.Dot)
+					{
+						if (Next(true).lexer.Word == null)
+							throw new ParseError(lexer, "Expected namespace or type name after '.'");
+						ns += "." + lexer.Word;
+					}
+					Write(OpCode.Import, ns);
+
+					// import system: io, text => import system; import system.io; import system.text
+					while (lexer.Curr == ':')
+					{
+						if (Next(true).lexer.Word == null)
+						{
+							if (lexer.Eol)
+								break;
+							throw new ParseError(lexer, "Expected namespace or type name after ':'");
+						}
+						ns2 = ns;
+						ns = ns + "." + lexer.Word;
+						while (Next().lexer.Code == OpCode.Dot)
+						{
+							if (Next(true).lexer.Word == null)
+								throw new ParseError(lexer, "Expected namespace or type name after '.'");
+							ns += "." + lexer.Word;
+						}
+						Write(OpCode.Import, ns);
+					}
+					if (lexer.Curr != ',')
+						break;
+					do Next(true); while (lexer.Curr == ',');
+					if (lexer.Word == null)
+					{
+						if (lexer.Eol)
+							break;
+						throw new ParseError(lexer, "Expected namespace or type name after ','");
+					}
+					ns = ns2 == null ? lexer.Word : ns2 + "." + lexer.Word;
+				}
+				if (lexer.Curr == ';')
+				{
+					do Next(); while (lexer.Curr == ';');
+					if (!lexer.Eol)
+						continue;
+				}
+				if (!lexer.Eol)
+					throw new ParseError(lexer, "Expected end of line after import(s)");
+				lexer.NextLine();
+			}
+			while (lexer.Code == OpCode.Import);
+			return true;
 		}
 	}
 }

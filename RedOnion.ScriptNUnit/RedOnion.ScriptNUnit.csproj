@@ -36,6 +36,7 @@
   <ItemGroup>
     <Compile Include="OpCodeTests.cs" />
     <Compile Include="ParseExpressionTests.cs" />
+    <Compile Include="ParseStatementsTests.cs" />
     <Compile Include="ScannerTests.cs" />
   </ItemGroup>
   <ItemGroup>

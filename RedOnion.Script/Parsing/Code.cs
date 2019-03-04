@@ -16,11 +16,7 @@ namespace RedOnion.Script.Parsing
 		/// <summary>
 		/// Buffer for final code (statements and expressions)
 		/// </summary>
-		public byte[] Code
-		{
-			get => _code;
-			private set => _code = value;
-		}
+		public byte[] Code => _code;
 		/// <summary>
 		/// Write position (top) for code buffer
 		/// </summary>

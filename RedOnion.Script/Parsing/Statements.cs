@@ -241,6 +241,7 @@ namespace RedOnion.Script.Parsing
 				return;
 			case OpCode.Else:
 				throw new ParseError(lexer, "Unexpected 'else'");
+
 			case OpCode.While:
 			case OpCode.Until:
 				Write(lexer.Code);
@@ -261,6 +262,7 @@ namespace RedOnion.Script.Parsing
 				}
 				Next().FullExpression(flags);
 				return;
+
 			case OpCode.For:
 				var forat = Write(lexer.Code);
 				Next();
@@ -301,6 +303,7 @@ namespace RedOnion.Script.Parsing
 					Next();
 				ParseBlock(flags);
 				return;
+
 			case OpCode.Try:
 				Write(lexer.Code);
 				Next().ParseBlock(flags);
@@ -332,6 +335,7 @@ namespace RedOnion.Script.Parsing
 					ParseBlock(flags);
 				}
 				return;
+
 			case OpCode.Switch:
 				Write(lexer.Code);
 				Next().FullExpression(flags | Flag.LimitedContext);
