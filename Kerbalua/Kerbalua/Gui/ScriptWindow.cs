@@ -44,7 +44,7 @@ namespace Kerbalua.Gui {
 		}
 
 		/// <summary>
-		/// This updates rects for boxes that are not inside the main window, so that when the
+		/// This updates rects for boxes that are not inside the main window that I want near the main window, so that when the
 		/// main window is moved these boxes stay in the specified position relative to the window.
 		/// </summary>
 		/// <param name="rect">Rect.</param>
