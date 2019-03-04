@@ -37,6 +37,9 @@ namespace Kerbalua.Gui {
 			editorRect = new Rect(0, 0, replRect.width, mainWindowRect.height);
 			completionBoxRect = new Rect(0, 0, replRect.width, mainWindowRect.height);
 
+			buttonBar.buttons.Add(new Button("<<", () => editorVisible = !editorVisible));
+			buttonBar.buttons.Add(new Button(">>", () => replVisible = !replVisible));
+
 			Complete(false);
 		}
 
@@ -55,6 +58,12 @@ namespace Kerbalua.Gui {
 
 		public void Render()
 		{
+			if (replVisible) {
+				mainWindowRect.width = buttonBarRect.width + replRect.width;
+			} else {
+				mainWindowRect.width = buttonBarRect.width;
+			}
+
 			mainWindowRect = GUI.Window(windowID, mainWindowRect, MainWindow, "Lua Dev");
 			if (editorVisible) {
 				editorRect=UpdateBoxPositionWithWindow(editorRect, -editorRect.width);
