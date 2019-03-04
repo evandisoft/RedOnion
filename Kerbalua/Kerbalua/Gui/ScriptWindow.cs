@@ -43,7 +43,7 @@ namespace Kerbalua.Gui {
 			buttonBar.buttons.Add(new Button("<<", () => editorVisible = !editorVisible));
 			buttonBar.buttons.Add(new Button(">>", () => replVisible = !replVisible));
 			buttonBar.buttons.Add(new Button("Evaluate", () => {
-				DynValue result=script.DoString(editor.editingArea.content.text);
+				Evaluate(editor.editingArea.content.text);
 			}));
 
 			Complete(false);
@@ -101,6 +101,25 @@ namespace Kerbalua.Gui {
 					inputIsLocked = false;
 					InputLockManager.ClearControlLocks();
 				}
+			}
+		}
+
+		public void Evaluate(string text)
+		{
+			DynValue result = new DynValue();
+			try {
+				result = script.DoString(text);
+				repl.outputBox.content.text += Environment.NewLine;
+				if (result.UserData == null) {
+					repl.outputBox.content.text += result;
+				} else {
+					repl.outputBox.content.text += result.UserData.Object;
+					if (result.UserData.Object == null) {
+						repl.outputBox.content.text += " (" + result.UserData.Object.GetType() + ")";
+					}
+				}
+			} catch (Exception exception) {
+				Debug.Log(exception);
 			}
 		}
 
@@ -210,25 +229,10 @@ namespace Kerbalua.Gui {
 			}
 
 			if (repl.inputBox.content.text.EndsWith(Environment.NewLine + Environment.NewLine)) {
-				DynValue result = new DynValue();
-				try {
-					result = script.DoString(repl.inputBox.content.text);
-					repl.outputBox.content.text += Environment.NewLine;
-					if (result.UserData == null) {
-						repl.outputBox.content.text += result;
-					} else {
-						repl.outputBox.content.text += result.UserData.Object;
-						if (result.UserData.Object == null) {
-							repl.outputBox.content.text += " (" + result.UserData.Object.GetType() + ")";
-						}
-					}
-				} catch (Exception exception) {
-					Debug.Log(exception);
-				}
+				Evaluate(repl.inputBox.content.text);
 				repl.inputBox.content.text = "";
 				repl.inputBox.cursorPos = 0;
 				completionBox.content.text = "";
-
 			}
 		}
 	}
