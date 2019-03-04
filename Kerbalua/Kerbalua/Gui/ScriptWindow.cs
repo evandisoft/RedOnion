@@ -6,35 +6,77 @@ using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
 
 namespace Kerbalua.Gui {
-	public partial class ScriptWindow {
+	public class ScriptWindow {
 		const int maxOutputBytes = 80000;
 
 		public Editor editor = new Editor();
 		public Repl repl = new Repl();
 		public CompletionBox completionBox = new CompletionBox();
+		public ButtonBar buttonBar = new ButtonBar();
+
 		public SimpleScript script;
 		int windowID = 0;
-		Rect replRect;
+		Rect mainWindowRect;
+		bool editorVisible = true;
+		bool replVisible = true;
 
-		public ScriptWindow(SimpleScript script,Rect replRect)
+		Rect buttonBarRect;
+		Rect replRect;
+		Rect completionBoxRect;
+		Rect editorRect;
+
+		const float titleHeight = 20;
+
+		public ScriptWindow(SimpleScript script,Rect mainWindowRect)
 		{
 			this.script = script;
-			this.replRect = replRect;
+			this.mainWindowRect = mainWindowRect;
+
+			buttonBarRect = new Rect(0, titleHeight, 100, mainWindowRect.height-titleHeight);
+			replRect = new Rect(buttonBarRect.width, titleHeight, mainWindowRect.width - buttonBarRect.width, mainWindowRect.height-titleHeight);
+			editorRect = new Rect(0, 0, replRect.width, mainWindowRect.height);
+			completionBoxRect = new Rect(0, 0, replRect.width, mainWindowRect.height);
+
 			Complete(false);
+		}
+
+		/// <summary>
+		/// This updates rects for boxes that are not inside the main window, so that when the
+		/// main window is moved these boxes stay in the specified position relative to the window.
+		/// </summary>
+		/// <param name="rect">Rect.</param>
+		/// <param name="xOffset">X offset.</param>
+		public Rect UpdateBoxPositionWithWindow(Rect rect,float xOffset,float yOffset=0)
+		{
+			rect.x = mainWindowRect.x + xOffset;
+			rect.y = mainWindowRect.y + yOffset;
+			return rect;
 		}
 
 		public void Render()
 		{
-			replRect = GUI.Window(windowID, replRect, ReplWindow, "kerbalua REPL");
-			editor.Render(new Rect(replRect.x-replRect.width, replRect.y, replRect.width, replRect.height));
-			completionBox.Render(new Rect(replRect.x+replRect.width, replRect.y, replRect.width, replRect.height));
+			mainWindowRect = GUI.Window(windowID, mainWindowRect, MainWindow, "Lua Dev");
+			if (editorVisible) {
+				editorRect=UpdateBoxPositionWithWindow(editorRect, -editorRect.width);
+				editor.Render(editorRect);
+			}
+
+			if (replVisible) {
+				completionBoxRect=UpdateBoxPositionWithWindow(completionBoxRect, mainWindowRect.width);
+				completionBox.Render(completionBoxRect);
+			}
 		}
 
-		void ReplWindow(int id)
+		void MainWindow(int id)
 		{
-			GUI.DragWindow(new Rect(0, 0, replRect.width, 20));
-			repl.Render(replRect);
-			HandleInput(replRect);
+			GUI.DragWindow(new Rect(0, 0, mainWindowRect.width, titleHeight));
+
+			if (replVisible) {
+				repl.Render(replRect);
+			}
+
+			buttonBar.Render(buttonBarRect);
+			HandleInput();
 		}
 
 		void Complete(bool completing)
@@ -43,7 +85,7 @@ namespace Kerbalua.Gui {
 			repl.inputBox.cursorPos = newCursorPos;
 		}
 
-		void HandleInput(Rect rect)
+		void HandleInput()
 		{
 			Event event1 = Event.current;
 			if (event1.type == EventType.KeyDown) {
@@ -81,7 +123,7 @@ namespace Kerbalua.Gui {
 			}
 
 			if (Mouse.Left.GetClick() || Mouse.Right.GetClick()) {
-				if (rect.Contains(new Vector2(event1.mousePosition.x + 100, event1.mousePosition.y + 100))) {
+				if (new Rect(0,0,mainWindowRect.width,mainWindowRect.height).Contains(new Vector2(event1.mousePosition.x, event1.mousePosition.y))) {
 					InputLockManager.SetControlLock(ControlTypes.KEYBOARDINPUT, "kerbalua");
 				} else {
 					InputLockManager.ClearControlLocks();

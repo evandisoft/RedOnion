@@ -13,8 +13,6 @@ namespace Kerbalua.Gui {
 				alignment = TextAnchor.LowerLeft
 			};
 
-
-
 			float outputHeight = outputStyle.CalcHeight(content, rect.width);
 			Rect outputContentRect = new Rect(rect);
 			outputContentRect.height = Math.Max(outputHeight, rect.height);

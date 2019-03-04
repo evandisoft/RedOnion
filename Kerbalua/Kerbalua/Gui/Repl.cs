@@ -11,6 +11,8 @@ namespace Kerbalua.Gui {
 				alignment = TextAnchor.LowerLeft
 			};
 
+			GUI.BeginGroup(rect);
+
 			float inputHeight = outputStyle.CalcHeight(inputBox.content, rect.width);
 			float inputStart = rect.height - inputHeight;
 
@@ -19,6 +21,8 @@ namespace Kerbalua.Gui {
 
 			inputBox.Render(inputRect);
 			outputBox.Render(outputRect);
+
+			GUI.EndGroup();
 		}
 	}
 }
