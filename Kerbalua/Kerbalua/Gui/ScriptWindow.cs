@@ -28,6 +28,8 @@ namespace Kerbalua.Gui {
 
 		const float titleHeight = 20;
 
+		bool inputIsLocked;
+
 		public ScriptWindow(SimpleScript script,Rect mainWindowRect)
 		{
 			this.script = script;
@@ -45,11 +47,14 @@ namespace Kerbalua.Gui {
 		}
 
 		/// <summary>
-		/// This updates rects for boxes that are not inside the main window that I want near the main window, so that when the
-		/// main window is moved these boxes stay in the specified position relative to the window.
+		/// This updates Rects for boxes that are not inside the main window 
+		/// that I want near the main window, so that when the main window is 
+		/// moved these boxes stay in the specified position relative to the 
+		/// window.
 		/// </summary>
-		/// <param name="rect">Rect.</param>
-		/// <param name="xOffset">X offset.</param>
+		/// <param name="rect">The Rect to be updated.</param>
+		/// <param name="xOffset">The desired xOffset from the main window.</param>
+		/// <param name="yOffset">The desired yOffset from the main window.</param>
 		public Rect UpdateBoxPositionWithWindow(Rect rect,float xOffset,float yOffset=0)
 		{
 			rect.x = mainWindowRect.x + xOffset;
@@ -57,15 +62,49 @@ namespace Kerbalua.Gui {
 			return rect;
 		}
 
+		/// <summary>
+		/// Returns the rectangle covering the entire area of the editor/repl/completion
+		/// </summary>
+		public Rect getTotalArea()
+		{
+			Rect totalArea = new Rect();
+			totalArea.x = mainWindowRect.x;
+			totalArea.y = mainWindowRect.y;
+			totalArea.height = mainWindowRect.height;
+			totalArea.width = mainWindowRect.width;
+
+			if (editorVisible) {
+				totalArea.width += editorRect.width;
+				totalArea.x -= editorRect.width;
+			}
+			if (replVisible) {
+				totalArea.width += completionBoxRect.width;
+			}
+
+			return totalArea;
+		}
+
 		public void Render()
 		{
+			if (getTotalArea().Contains(Event.current.mousePosition)) {
+				if (!inputIsLocked) {
+					inputIsLocked = true;
+					InputLockManager.SetControlLock(ControlTypes.KEYBOARDINPUT, "kerbalua");
+				}
+			} else {
+				if (inputIsLocked) {
+					inputIsLocked = false;
+					InputLockManager.ClearControlLocks();
+				}
+			}
+
 			if (replVisible) {
 				mainWindowRect.width = buttonBarRect.width + replRect.width;
 			} else {
 				mainWindowRect.width = buttonBarRect.width;
 			}
 
-			mainWindowRect = GUI.Window(windowID, mainWindowRect, MainWindow, "Lua Dev");
+			mainWindowRect = GUI.Window(windowID, mainWindowRect, MainWindow, "Live Dev");
 			if (editorVisible) {
 				editorRect=UpdateBoxPositionWithWindow(editorRect, -editorRect.width);
 				editor.Render(editorRect);
@@ -77,6 +116,14 @@ namespace Kerbalua.Gui {
 			}
 		}
 
+		/// <summary>
+		/// To make input handling simpler, only the repl and button bar are in
+		/// the main window. The other boxes are updated to always be beside this window.
+		/// 
+		/// This design decision may be reviewed in the future with a better understanding
+		/// of IMGUI.
+		/// </summary>
+		/// <param name="id">Identifier.</param>
 		void MainWindow(int id)
 		{
 			GUI.DragWindow(new Rect(0, 0, mainWindowRect.width, titleHeight));
@@ -130,14 +177,6 @@ namespace Kerbalua.Gui {
 				Complete(false);
 				repl.outputBox.ResetScroll();
 				event1.Use();
-			}
-
-			if (Mouse.Left.GetClick() || Mouse.Right.GetClick()) {
-				if (new Rect(0,0,mainWindowRect.width,mainWindowRect.height).Contains(new Vector2(event1.mousePosition.x, event1.mousePosition.y))) {
-					InputLockManager.SetControlLock(ControlTypes.KEYBOARDINPUT, "kerbalua");
-				} else {
-					InputLockManager.ClearControlLocks();
-				}
 			}
 
 			if (repl.inputBox.content.text.EndsWith(Environment.NewLine + Environment.NewLine)) {

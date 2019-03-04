@@ -12,16 +12,16 @@ namespace Kerbalua.Gui {
 			};
 
 			GUI.BeginGroup(rect);
+			{
+				float inputHeight = outputStyle.CalcHeight(inputBox.content, rect.width);
+				float inputStart = rect.height - inputHeight;
 
-			float inputHeight = outputStyle.CalcHeight(inputBox.content, rect.width);
-			float inputStart = rect.height - inputHeight;
+				Rect outputRect = new Rect(0, 0, rect.width, inputStart);
+				Rect inputRect = new Rect(0, inputStart, rect.width, inputHeight);
 
-			Rect outputRect = new Rect(0, 0, rect.width, inputStart);
-			Rect inputRect = new Rect(0, inputStart, rect.width, inputHeight);
-
-			inputBox.Render(inputRect);
-			outputBox.Render(outputRect);
-
+				inputBox.Render(inputRect);
+				outputBox.Render(outputRect);
+			}
 			GUI.EndGroup();
 		}
 	}
