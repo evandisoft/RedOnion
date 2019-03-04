@@ -96,6 +96,8 @@
     <Compile Include="Kerbalua\Gui\TextArea.cs" />
     <Compile Include="Kerbalua\Gui\ButtonBar.cs" />
     <Compile Include="Kerbalua\Gui\Button.cs" />
+    <Compile Include="Kerbalua\Gui\IRectRender.cs" />
+    <Compile Include="Kerbalua\Gui\ScrollableArea.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

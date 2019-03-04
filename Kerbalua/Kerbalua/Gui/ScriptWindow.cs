@@ -17,6 +17,7 @@ namespace Kerbalua.Gui {
 		public SimpleScript script;
 
 		const int windowID = 0;
+		const int modalID = 1;
 		Rect mainWindowRect;
 		bool editorVisible;
 		bool replVisible = true;
@@ -25,6 +26,8 @@ namespace Kerbalua.Gui {
 		Rect replRect;
 		Rect completionBoxRect;
 		Rect editorRect;
+
+		Rect SaveLoadRect;
 
 		const float titleHeight = 20;
 
@@ -45,9 +48,16 @@ namespace Kerbalua.Gui {
 			buttonBar.buttons.Add(new Button("Evaluate", () => {
 				Evaluate(editor.editingArea.content.text);
 			}));
+			buttonBar.buttons.Add(new Button("Save", () => {
+
+			}));
+			buttonBar.buttons.Add(new Button("Load", () => {
+
+			}));
 
 			Complete(false);
 		}
+
 
 		/// <summary>
 		/// This updates Rects for boxes that are not inside the main window 
@@ -91,13 +101,11 @@ namespace Kerbalua.Gui {
 		{
 			if (getTotalArea().Contains(Mouse.screenPos)) {
 				if (!inputIsLocked) {
-					//Debug.Log($"{getTotalArea()},{Mouse.screenPos},Locking");
 					inputIsLocked = true;
 					InputLockManager.SetControlLock(ControlTypes.KEYBOARDINPUT, "kerbalua");
 				}
 			} else {
 				if (inputIsLocked) {
-					//Debug.Log($"{getTotalArea()},{Mouse.screenPos},Unlocking");
 					inputIsLocked = false;
 					InputLockManager.ClearControlLocks();
 				}

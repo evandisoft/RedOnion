@@ -16,7 +16,7 @@ namespace Kerbalua.Gui {
 			float outputHeight = outputStyle.CalcHeight(content, rect.width);
 			Rect outputContentRect = new Rect(rect);
 			outputContentRect.height = Math.Max(outputHeight, rect.height);
-
+            
 			scrollPos = GUI.BeginScrollView(rect, scrollPos, outputContentRect);
 			{
 				content.text = GUI.TextArea(outputContentRect, content.text, outputStyle);
