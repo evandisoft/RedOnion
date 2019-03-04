@@ -18,7 +18,7 @@ namespace Kerbalua.Gui {
 
 		const int windowID = 0;
 		Rect mainWindowRect;
-		bool editorVisible = true;
+		bool editorVisible;
 		bool replVisible = true;
 
 		Rect buttonBarRect;
@@ -38,10 +38,13 @@ namespace Kerbalua.Gui {
 			buttonBarRect = new Rect(0, titleHeight, 100, mainWindowRect.height-titleHeight);
 			replRect = new Rect(buttonBarRect.width, titleHeight, mainWindowRect.width - buttonBarRect.width, mainWindowRect.height-titleHeight);
 			editorRect = new Rect(0, 0, replRect.width, mainWindowRect.height);
-			completionBoxRect = new Rect(0, 0, replRect.width, mainWindowRect.height);
+			completionBoxRect = new Rect(0, 0, 150, mainWindowRect.height);
 
 			buttonBar.buttons.Add(new Button("<<", () => editorVisible = !editorVisible));
 			buttonBar.buttons.Add(new Button(">>", () => replVisible = !replVisible));
+			buttonBar.buttons.Add(new Button("Evaluate", () => {
+				DynValue result=script.DoString(editor.editingArea.content.text);
+			}));
 
 			Complete(false);
 		}
@@ -88,26 +91,27 @@ namespace Kerbalua.Gui {
 		{
 			if (getTotalArea().Contains(Mouse.screenPos)) {
 				if (!inputIsLocked) {
-					Debug.Log($"{getTotalArea()},{Mouse.screenPos},Locking");
+					//Debug.Log($"{getTotalArea()},{Mouse.screenPos},Locking");
 					inputIsLocked = true;
 					InputLockManager.SetControlLock(ControlTypes.KEYBOARDINPUT, "kerbalua");
 				}
 			} else {
 				if (inputIsLocked) {
-					Debug.Log($"{getTotalArea()},{Mouse.screenPos},Unlocking");
+					//Debug.Log($"{getTotalArea()},{Mouse.screenPos},Unlocking");
 					inputIsLocked = false;
 					InputLockManager.ClearControlLocks();
 				}
 			}
 		}
 
-		bool previousEventIsScrollWheel;
 		public void Render()
 		{
 			SetOrReleaseInputLock();
 
 			// Manually handling scrolling because there is a coordinate issue
-			// with the default method.
+			// with the default method. The system measures the mouse vertical
+			// position from the bottom instead of the top of the screen for scrolling
+			// purposes for whatever bizarre reason.
 			if (Event.current.isScrollWheel) {
 				float delta = 0;
 				if(Input.GetAxis("Mouse ScrollWheel")>0) {

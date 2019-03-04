@@ -10,7 +10,9 @@ namespace Kerbalua.Gui {
 		{
 			GUIStyle style = new GUIStyle(GUI.skin.textArea);
 			Rect completionContentRect = rect;
-			completionContentRect.height = Mathf.Max(rect.height, style.CalcHeight(content, rect.width));
+			Vector2 contentSize = style.CalcSize(content);
+			completionContentRect.height = Mathf.Max(rect.height, contentSize.y);
+			completionContentRect.width = Mathf.Max(rect.width, contentSize.x);
 
 			scrollPos = GUI.BeginScrollView(rect, scrollPos, completionContentRect);
 			{
