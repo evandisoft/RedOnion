@@ -76,6 +76,8 @@ namespace RedOnion.ScriptNUnit
 			Test("x10",		"\"x\" + x");   // string + integer
 			Test(10,		"x++");         // post-increment
 			Test(12,		"++x");         // pre-increment
+			Test(12, "x--");         // post-decrement
+			Test(10, "--x");         // pre-decrement
 		}
 
 		[Test]
