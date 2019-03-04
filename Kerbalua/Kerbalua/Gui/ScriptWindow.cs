@@ -11,11 +11,12 @@ namespace Kerbalua.Gui {
 
 		public Editor editor = new Editor();
 		public Repl repl = new Repl();
+
 		public CompletionBox completionBox = new CompletionBox();
 		public ButtonBar buttonBar = new ButtonBar();
-
 		public SimpleScript script;
-		int windowID = 0;
+
+		const int windowID = 0;
 		Rect mainWindowRect;
 		bool editorVisible = true;
 		bool replVisible = true;

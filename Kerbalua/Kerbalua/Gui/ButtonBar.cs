@@ -9,24 +9,23 @@ namespace Kerbalua.Gui {
 		public void Render(Rect rect,bool vertical=true)
 		{
 			GUILayout.BeginArea(rect);
+			{
+				if (vertical) {
+					GUILayout.BeginVertical();
+				} else {
+					GUILayout.BeginHorizontal();
+				}
 
-			if (vertical) {
-				GUILayout.BeginVertical();
-			} else {
-				GUILayout.BeginHorizontal();
+				foreach (var button in buttons) {
+					button.Render();
+				}
+
+				if (vertical) {
+					GUILayout.EndVertical();
+				} else {
+					GUILayout.EndHorizontal();
+				}
 			}
-
-
-			foreach (var button in buttons) {
-				button.Render();
-			}
-
-			if (vertical) {
-				GUILayout.EndVertical();
-			} else {
-				GUILayout.EndHorizontal();
-			}
-
 			GUILayout.EndArea();
 		}
 	}

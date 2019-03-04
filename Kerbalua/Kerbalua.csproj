@@ -93,7 +93,6 @@
     <Compile Include="Kerbalua\Gui\Editor.cs" />
     <Compile Include="Kerbalua\Gui\OutputBox.cs" />
     <Compile Include="Kerbalua\Gui\CompletionBox.cs" />
-    <Compile Include="Kerbalua\Gui\KerbaluaReplOld.cs" />
     <Compile Include="Kerbalua\Gui\TextArea.cs" />
     <Compile Include="Kerbalua\Gui\ButtonBar.cs" />
     <Compile Include="Kerbalua\Gui\Button.cs" />

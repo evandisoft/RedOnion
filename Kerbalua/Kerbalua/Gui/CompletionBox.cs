@@ -1,7 +1,4 @@
-using System;
 using UnityEngine;
-using Kerbalua.Completion;
-using Kerbalua.Other;
 
 namespace Kerbalua.Gui {
 	public class CompletionBox {

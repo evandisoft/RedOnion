@@ -5,7 +5,7 @@ namespace Kerbalua.Gui {
 	public class OutputBox {
 		public GUIContent content = new GUIContent("");
 		public Vector2 scrollPos = new Vector2();
-		bool resetScroll = false;
+		bool resetScroll;
 
 		public void Render(Rect rect)
 		{

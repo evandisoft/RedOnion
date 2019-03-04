@@ -1,20 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using UnityEngine;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
 using Kerbalua.Other;
 using Kerbalua.Completion;
-using Kerbalua;
 
 namespace Kerbalua.Gui {
     public class KerbaluaReplOld {
         int maxOutputBytes = 80000;
         SimpleScript script;
 
-
-
-        KerbaluaMain.KSPRaw kspApi;
+		KerbaluaMain.KSPRaw kspApi;
 
         public class FlightControl {
             Vessel vessel;
