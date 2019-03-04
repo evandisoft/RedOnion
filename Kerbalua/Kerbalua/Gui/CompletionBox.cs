@@ -4,6 +4,7 @@ namespace Kerbalua.Gui {
 	public class CompletionBox {
 		public GUIContent content = new GUIContent("");
 		public Vector2 scrollPos = new Vector2();
+		bool resetScroll;
 
 		public void Render(Rect rect)
 		{
@@ -14,8 +15,18 @@ namespace Kerbalua.Gui {
 			scrollPos = GUI.BeginScrollView(rect, scrollPos, completionContentRect);
 			{
 				content.text = GUI.TextArea(completionContentRect, content.text);
+
+				if (resetScroll) {
+					scrollPos.y = rect.height;
+					resetScroll = false;
+				}
 			}
 			GUI.EndScrollView();
+		}
+
+		public void ResetScroll()
+		{
+			resetScroll = true;
 		}
 	}
 }

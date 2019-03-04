@@ -84,18 +84,44 @@ namespace Kerbalua.Gui {
 			return totalArea;
 		}
 
-		public void Render()
+		public void SetOrReleaseInputLock()
 		{
-			if (getTotalArea().Contains(Event.current.mousePosition)) {
+			if (getTotalArea().Contains(Mouse.screenPos)) {
 				if (!inputIsLocked) {
+					Debug.Log($"{getTotalArea()},{Mouse.screenPos},Locking");
 					inputIsLocked = true;
 					InputLockManager.SetControlLock(ControlTypes.KEYBOARDINPUT, "kerbalua");
 				}
 			} else {
 				if (inputIsLocked) {
+					Debug.Log($"{getTotalArea()},{Mouse.screenPos},Unlocking");
 					inputIsLocked = false;
 					InputLockManager.ClearControlLocks();
 				}
+			}
+		}
+
+		bool previousEventIsScrollWheel;
+		public void Render()
+		{
+			SetOrReleaseInputLock();
+
+			// Manually handling scrolling because there is a coordinate issue
+			// with the default method.
+			if (Event.current.isScrollWheel) {
+				float delta = 0;
+				if(Input.GetAxis("Mouse ScrollWheel")>0) {
+					delta = -1;
+				} else {
+					delta = 1;
+				}
+
+				if (mainWindowRect.Contains(Mouse.screenPos)) {
+					repl.outputBox.scrollPos.y += 20*delta;
+				} else if(completionBoxRect.Contains(Mouse.screenPos)) {
+					completionBox.scrollPos.y += 20 * delta;
+				}
+				Event.current.Use();
 			}
 
 			if (replVisible) {

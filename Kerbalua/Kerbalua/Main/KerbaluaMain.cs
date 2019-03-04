@@ -88,7 +88,8 @@ namespace Kerbalua
 
         public void OnGUI()
         {
-            repl.Render(guiActive);
+
+			repl.Render(guiActive);
         }
     }
 }
