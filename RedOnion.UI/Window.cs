@@ -1,4 +1,4 @@
-﻿using KSP.UI;
+using KSP.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,9 +9,11 @@ using UnityEngine.UI;
 using UnityEngine.Events;
 using System.Reflection;
 
+using UUI = UnityEngine.UI;
+
 namespace RedOnion.UI
 {
-	public class Window : IDisposable
+	public class Window : Element, IDisposable
 	{
 		public struct Defaults
 		{
@@ -27,49 +29,37 @@ namespace RedOnion.UI
 		}
 		public static Defaults Default = new Defaults
 		{
-			Position = new Vector2(40f, 40f),
-			Size = new Vector2(400, 200),
-			FrameWidth = 4f,
-			CloseButtonSize = new Vector2(50f, 17f),
+			Position = new Vector2(40, 40),
+			Size = new Vector2(400, 300),
+			FrameWidth = 4,
+			CloseButtonSize = new Vector2(17, 17),
 			CloseButtonIcon = LoadIcon(13, 13, "CloseButtonIcon.png")
 		};
-		public static Texture2D LoadIcon(int width, int height, string path)
-		{
-			var icon = new Texture2D(width, height, TextureFormat.BGRA32, false);
-			path = Path.Combine(Path.Combine(
-				Path.GetDirectoryName(Assembly.GetCallingAssembly().Location), "Resources"),
-				path);
-			if (!File.Exists(path))
-				Debug.Log("[RedOnion] Window.LoadIcon: File not found - " + path);
-			else
-				icon.LoadImage(File.ReadAllBytes(path));
-			return icon;
-		}
 
 		protected GameObject FrameObject { get; private set; }
 		protected RectTransform FrameRect { get; private set; }
-		protected UnityEngine.UI.Image FrameImage { get; private set; }
+		protected UUI.Image FrameImage { get; private set; }
 
 		protected GameObject TitleObject { get; private set; }
 		protected RectTransform TitleRect { get; private set; }
-		protected UnityEngine.UI.Text TitleText { get; private set; }
+		protected UUI.Text TitleText { get; private set; }
 
 		protected GameObject CloseObject { get; private set; }
 		protected RectTransform CloseRect { get; private set; }
-		protected UnityEngine.UI.Button CloseButton { get; private set; }
+		protected UUI.Button CloseButton { get; private set; }
+		protected UUI.Text CloseButtonText { get; private set; }
 
 		public Window()
 		{
 
 			// main frame
 			FrameObject = DefaultControls.CreatePanel(Default.Frame);
-			
 			FrameObject.transform.SetParent(UIMasterController.Instance.appCanvas.transform);
 			// anchoring: top-left
 			FrameRect = FrameObject.GetComponent<RectTransform>();
-			FrameRect.anchorMin = new Vector2(0f, 1f);
-			FrameRect.anchorMax = new Vector2(0f, 1f);
-			FrameRect.pivot = new Vector2(0f, 1f);
+			FrameRect.anchorMin = new Vector2(0, 1);
+			FrameRect.anchorMax = new Vector2(0, 1);
+			FrameRect.pivot = new Vector2(0, 1);
 			// position
 			Position = Default.Position;
 			Size = Default.Size;
@@ -82,9 +72,9 @@ namespace RedOnion.UI
 			TitleObject.transform.SetParent(FrameObject.transform, false);
 			// anchoring: top-left-right
 			TitleRect = TitleObject.GetComponent<RectTransform>();
-			TitleRect.anchorMin = new Vector2(0f, 1f);
-			TitleRect.anchorMax = new Vector2(1f, 1f);
-			TitleRect.pivot = new Vector2(0f, 1f);
+			TitleRect.anchorMin = new Vector2(0, 1);
+			TitleRect.anchorMax = new Vector2(1, 1);
+			TitleRect.pivot = new Vector2(0, 1);
 			// position
 			TitleRect.anchoredPosition = new Vector3(Default.FrameWidth, -Default.FrameWidth);
 			TitleRect.sizeDelta = new Vector2(-Default.CloseButtonSize.x - Default.FrameWidth, Default.CloseButtonSize.y);
@@ -98,18 +88,20 @@ namespace RedOnion.UI
 			// close button
 			CloseObject = DefaultControls.CreateButton(Default.Close);
 			CloseObject.transform.SetParent(FrameObject.transform, false);
-			CloseObject.GetComponentInChildren<Text>().text = "Close";
 			// anchoring: top-right
 			CloseRect = CloseObject.GetComponent<RectTransform>();
-			CloseRect.anchorMin = new Vector2(1f, 1f);
-			CloseRect.anchorMax = new Vector2(1f, 1f);
-			CloseRect.pivot = new Vector2(1f, 1f);
+			CloseRect.anchorMin = new Vector2(1, 1);
+			CloseRect.anchorMax = new Vector2(1, 1);
+			CloseRect.pivot = new Vector2(1, 1);
 			// position
 			CloseRect.anchoredPosition = new Vector3(-Default.FrameWidth, -Default.FrameWidth);
 			CloseRect.sizeDelta = new Vector2(Default.CloseButtonSize.x, Default.CloseButtonSize.y);
 			// button component
 			CloseButton = CloseObject.GetComponent<UnityEngine.UI.Button>();
 			CloseButton.onClick.AddListener(Close);
+			// button text
+			CloseButtonText = CloseObject.GetComponentInChildren<Text>();
+			CloseButtonText.text = "";
 		}
 
 		public void Dispose()

@@ -23,6 +23,7 @@ using RedOnion.Script.Parsing;
 //	var a:byte[]
 //	var a = new byte[n]
 //	var a as list.[byte]
+//	f -x
 
 namespace RedOnion.ScriptNUnit
 {
@@ -293,6 +294,20 @@ namespace RedOnion.ScriptNUnit
 			ParseExpression_05_CallWithUnary();
 		}
 
+		[Test]
+		public void ParseExpression_05_CallWithUnary_v3()
+		{
+			Test("abs(-x)");
+			ParseExpression_05_CallWithUnary2();
+		}
+
+		[Test]
+		public void ParseExpression_05_CallWithUnary_v4()
+		{
+			Test("abs -x");
+			ParseExpression_05_CallWithUnary2();
+		}
+
 		public void ParseExpression_05_CallWithUnary()
 		{
 			ValueCheck	( 0, 0, "abs");
@@ -312,6 +327,28 @@ namespace RedOnion.ScriptNUnit
 			CodeCheck( 6, OpCode.Int);
 			CodeCheck( 7, -1);
 			CodeCheck(11);
+		}
+		public void ParseExpression_05_CallWithUnary2()
+		{
+			ValueCheck	( 0, 0, "abs");
+			ValueCheck	( 4, OpCode.Identifier);
+			ValueTopMark( 9, 0);
+			ValueCheck	( 9, 1, "x");
+			ValueCheck	(13, OpCode.Identifier);
+			ValueCheck	(14, OpCode.Neg);
+			ValueTopMark(19, 9);
+			ValueCheck	(19, OpCode.Call1);
+			ValueFinal	(24);
+
+			Rewrite(ValuesAt);
+
+			CodeCheck( 0, OpCode.Call1);
+			CodeCheck( 1, OpCode.Identifier);
+			CodeCheck( 2, 0, "abs");
+			CodeCheck( 6, OpCode.Neg);
+			CodeCheck( 7, OpCode.Identifier);
+			CodeCheck( 8, 1, "x");
+			CodeCheck(12);
 		}
 
 		[Test]
