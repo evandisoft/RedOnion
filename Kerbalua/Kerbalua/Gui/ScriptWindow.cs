@@ -2,6 +2,7 @@ using UnityEngine;
 using Kerbalua.Other;
 using Kerbalua.Completion;
 using System;
+using System.IO;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
 
@@ -14,25 +15,48 @@ namespace Kerbalua.Gui {
 		public Repl repl = new Repl();
 
 		public CompletionBox completionBox = new CompletionBox();
-		public ButtonBar buttonBar = new ButtonBar();
+		public AutoLayoutBox buttonBar = new AutoLayoutBox();
 		public SimpleScript script;
 
 		const int windowID = 0;
 		const int modalID = 1;
 		Rect mainWindowRect;
-		bool editorVisible;
+		bool editorVisible = true;
 		bool replVisible = true;
 
 		Rect buttonBarRect;
 		Rect replRect;
 		Rect completionBoxRect;
 		Rect editorRect;
+		TextArea filenameInput=new TextArea();
 
 		Rect SaveLoadRect;
 
 		const float titleHeight = 20;
 
 		bool inputIsLocked;
+
+		string baseFolderPath = "scripts";
+
+		string CreateFullPath(string filename)
+		{
+			if (filename == "") {
+				filename = "untitled";
+				filenameInput.content.text = "untitled";
+			}
+			return baseFolderPath + "/" + filename + ".lua";
+		}
+		void SaveFile(string filename)
+		{
+			Directory.CreateDirectory(baseFolderPath);
+			File.WriteAllText(CreateFullPath(filename), editor.content.text);
+		}
+
+		void LoadFile(string filename)
+		{
+			Directory.CreateDirectory(baseFolderPath);
+			editor.content.text=File.ReadAllText(CreateFullPath(filename));
+		}
 
 		public ScriptWindow(SimpleScript script,Rect mainWindowRect)
 		{
@@ -44,17 +68,20 @@ namespace Kerbalua.Gui {
 			editorRect = new Rect(0, 0, replRect.width, mainWindowRect.height);
 			completionBoxRect = new Rect(0, 0, 150, mainWindowRect.height);
 
-			buttonBar.buttons.Add(new Button("<<", () => editorVisible = !editorVisible));
-			buttonBar.buttons.Add(new Button(">>", () => replVisible = !replVisible));
-			buttonBar.buttons.Add(new Button("Evaluate", () => {
+			buttonBar.renderables.Add(new Button("<<", () => editorVisible = !editorVisible));
+			buttonBar.renderables.Add(new Button(">>", () => replVisible = !replVisible));
+			buttonBar.renderables.Add(filenameInput);
+			buttonBar.renderables.Add(new Button("Save", () => {
+				SaveFile(filenameInput.content.text);
+			}));
+			buttonBar.renderables.Add(new Button("Load", () => {
+				LoadFile(filenameInput.content.text);
+			}));
+			buttonBar.renderables.Add(new Button("Evaluate", () => {
 				Evaluate(editor.content.text);
 			}));
-			buttonBar.buttons.Add(new Button("Save", () => {
 
-			}));
-			buttonBar.buttons.Add(new Button("Load", () => {
 
-			}));
 
 			Complete(false);
 		}
@@ -165,13 +192,13 @@ namespace Kerbalua.Gui {
 		void MainWindow(int id)
 		{
 			GUI.DragWindow(new Rect(0, 0, mainWindowRect.width, titleHeight));
-
+			buttonBar.Render(buttonBarRect);
 			HandleInput();
 			if (replVisible) {
 				repl.Render(replRect);
 			}
 
-			buttonBar.Render(buttonBarRect);
+
 
 		}
 

@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 
 namespace Kerbalua.Gui {
-	public class Button {
+	public class Button:ILayoutRenderer {
 		public GUIContent content = new GUIContent("");
 		public Action action;
 

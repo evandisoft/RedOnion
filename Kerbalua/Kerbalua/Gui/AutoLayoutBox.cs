@@ -3,8 +3,8 @@ using UnityEngine;
 using System.Collections.Generic;
 
 namespace Kerbalua.Gui {
-	public class ButtonBar {
-		public List<Button> buttons = new List<Button>();
+	public class AutoLayoutBox {
+		public List<ILayoutRenderer> renderables = new List<ILayoutRenderer>();
 
 		public void Render(Rect rect,bool vertical=true)
 		{
@@ -16,7 +16,7 @@ namespace Kerbalua.Gui {
 					GUILayout.BeginHorizontal();
 				}
 
-				foreach (var button in buttons) {
+				foreach (var button in renderables) {
 					button.Render();
 				}
 

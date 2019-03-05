@@ -94,10 +94,11 @@
     <Compile Include="Kerbalua\Gui\OutputBox.cs" />
     <Compile Include="Kerbalua\Gui\CompletionBox.cs" />
     <Compile Include="Kerbalua\Gui\TextArea.cs" />
-    <Compile Include="Kerbalua\Gui\ButtonBar.cs" />
+    <Compile Include="Kerbalua\Gui\AutoLayoutBox.cs" />
     <Compile Include="Kerbalua\Gui\Button.cs" />
     <Compile Include="Kerbalua\Gui\ScrollableTextArea.cs" />
     <Compile Include="Kerbalua\Gui\GUIUtil.cs" />
+    <Compile Include="Kerbalua\Gui\ILayoutRenderer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
