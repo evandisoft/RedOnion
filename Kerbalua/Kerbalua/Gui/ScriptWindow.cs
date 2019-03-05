@@ -166,12 +166,13 @@ namespace Kerbalua.Gui {
 		{
 			GUI.DragWindow(new Rect(0, 0, mainWindowRect.width, titleHeight));
 
+			HandleInput();
 			if (replVisible) {
 				repl.Render(replRect);
 			}
 
 			buttonBar.Render(buttonBarRect);
-			HandleInput();
+
 		}
 
 		void Complete(bool completing)
