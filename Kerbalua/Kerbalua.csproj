@@ -90,7 +90,6 @@
     <Compile Include="Kerbalua\Completion\UserDataCompletion.cs" />
     <Compile Include="Kerbalua\Gui\ScriptWindow.cs" />
     <Compile Include="Kerbalua\Gui\Repl.cs" />
-    <Compile Include="Kerbalua\Gui\Editor.cs" />
     <Compile Include="Kerbalua\Gui\OutputBox.cs" />
     <Compile Include="Kerbalua\Gui\CompletionBox.cs" />
     <Compile Include="Kerbalua\Gui\TextArea.cs" />
@@ -99,6 +98,10 @@
     <Compile Include="Kerbalua\Gui\ScrollableTextArea.cs" />
     <Compile Include="Kerbalua\Gui\GUIUtil.cs" />
     <Compile Include="Kerbalua\Gui\ILayoutRenderer.cs" />
+    <Compile Include="Kerbalua\Gui\Editor.cs" />
+    <Compile Include="Kerbalua\Gui\EditorOld.cs" />
+    <Compile Include="Kerbalua\Gui\UIELement.cs" />
+    <Compile Include="Kerbalua\Gui\EditingArea.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
