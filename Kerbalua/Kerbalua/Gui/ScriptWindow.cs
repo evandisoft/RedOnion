@@ -136,25 +136,8 @@ namespace Kerbalua.Gui {
 		{
 			SetOrReleaseInputLock();
 
-			// Manually handling scrolling because there is a coordinate issue
-			// with the default method. The system measures the mouse vertical
-			// position from the bottom instead of the top of the screen for scrolling
-			// purposes for whatever bizarre reason.
-			if (Event.current.isScrollWheel) {
-				float delta = 0;
-				if(Input.GetAxis("Mouse ScrollWheel")>0) {
-					delta = -1;
-				} else {
-					delta = 1;
-				}
-
-				if (mainWindowRect.Contains(Mouse.screenPos)) {
-					repl.outputBox.scrollPos.y += 20*delta;
-				} else if(completionBoxRect.Contains(Mouse.screenPos)) {
-					completionBox.scrollPos.y += 20 * delta;
-				}
-				Event.current.Use();
-			}
+			// Some mousepositions in events are off
+			Event.current.mousePosition = Mouse.screenPos;
 
 			if (replVisible) {
 				mainWindowRect.width = buttonBarRect.width + replRect.width;

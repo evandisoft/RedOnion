@@ -8,12 +8,29 @@ namespace Kerbalua.Gui {
 
 		public override void Render(Rect rect,GUIStyle style=null)
 		{
+			// Manually handling scrolling because there is a coordinate issue
+			// with the default method. The system measures the mouse vertical
+			// position from the bottom instead of the top of the screen for scrolling
+			// purposes for whatever bizarre reason.
+			if (Event.current.isScrollWheel) {
+				float delta = 0;
+				if (Input.GetAxis("Mouse ScrollWheel") > 0) {
+					delta = -1;
+				} else {
+					delta = 1;
+				}
+
+				Debug.Log($"{Event.current.type},{Event.current.mousePosition},{rect}");
+
+				Event.current.Use();
+			}
+
 			if (style == null) {
 				style = new GUIStyle(GUI.skin.textArea);
 			}
 
 			Vector2 contentSize=style.CalcSize(content);
-			Rect outputContentRect = new Rect(0, 0, rect.width, rect.height);
+			Rect outputContentRect = new Rect(0, 0, contentSize.x, contentSize.y);
 
 			scrollPos = GUI.BeginScrollView(rect, scrollPos, outputContentRect);
 			{
