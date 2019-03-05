@@ -47,7 +47,7 @@ namespace Kerbalua.Gui {
 			buttonBar.buttons.Add(new Button("<<", () => editorVisible = !editorVisible));
 			buttonBar.buttons.Add(new Button(">>", () => replVisible = !replVisible));
 			buttonBar.buttons.Add(new Button("Evaluate", () => {
-				Evaluate(editor.editingArea.content.text);
+				Evaluate(editor.content.text);
 			}));
 			buttonBar.buttons.Add(new Button("Save", () => {
 

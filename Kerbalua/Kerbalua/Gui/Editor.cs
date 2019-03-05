@@ -1,12 +1,7 @@
 ﻿using UnityEngine;
 
 namespace Kerbalua.Gui {
-    public class Editor {
-        public TextArea editingArea = new TextArea();
+    public class Editor:ScrollableTextArea {
 
-        public void Render(Rect rect)
-        {
-            editingArea.Render(rect);
-        }
     }
 }
