@@ -136,9 +136,6 @@ namespace Kerbalua.Gui {
 		{
 			SetOrReleaseInputLock();
 
-			// Some mousepositions in events are off
-			Event.current.mousePosition = Mouse.screenPos;
-
 			if (replVisible) {
 				mainWindowRect.width = buttonBarRect.width + replRect.width;
 			} else {
