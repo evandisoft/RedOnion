@@ -28,9 +28,9 @@ namespace RedOnion.UI
 		public static Defaults Default = new Defaults
 		{
 			Position = new Vector2(40f, 40f),
-			Size = new Vector2(160, 200),
+			Size = new Vector2(400, 200),
 			FrameWidth = 4f,
-			CloseButtonSize = new Vector2(17f, 17f),
+			CloseButtonSize = new Vector2(50f, 17f),
 			CloseButtonIcon = LoadIcon(13, 13, "CloseButtonIcon.png")
 		};
 		public static Texture2D LoadIcon(int width, int height, string path)
@@ -60,8 +60,10 @@ namespace RedOnion.UI
 
 		public Window()
 		{
+
 			// main frame
 			FrameObject = DefaultControls.CreatePanel(Default.Frame);
+			
 			FrameObject.transform.SetParent(UIMasterController.Instance.appCanvas.transform);
 			// anchoring: top-left
 			FrameRect = FrameObject.GetComponent<RectTransform>();
@@ -96,6 +98,7 @@ namespace RedOnion.UI
 			// close button
 			CloseObject = DefaultControls.CreateButton(Default.Close);
 			CloseObject.transform.SetParent(FrameObject.transform, false);
+			CloseObject.GetComponentInChildren<Text>().text = "Close";
 			// anchoring: top-right
 			CloseRect = CloseObject.GetComponent<RectTransform>();
 			CloseRect.anchorMin = new Vector2(1f, 1f);
