@@ -34,29 +34,29 @@ namespace RedOnion.Script
 				value = ((IProperties)value.ptr).Get(value.str);
 				goto again;
 			case ValueKind.Char:
-				return new Value() - value.data.Char;
+				return new Value((char)0) - value.data.Char;
 			case ValueKind.Bool:
 				return new Value(value.data.Bool ? -1 : 0);
 			case ValueKind.Byte:
-				return new Value() - value.data.Byte;
+				return new Value((byte)0) - value.data.Byte;
 			case ValueKind.UShort:
-				return new Value() - value.data.UShort;
+				return new Value((ushort)0) - value.data.UShort;
 			case ValueKind.UInt:
-				return new Value() - value.data.UInt;
+				return new Value((uint)0) - value.data.UInt;
 			case ValueKind.ULong:
-				return new Value() - value.data.ULong;
+				return new Value((ulong)0) - value.data.ULong;
 			case ValueKind.SByte:
-				return new Value() - value.data.SByte;
+				return new Value((sbyte)0) - value.data.SByte;
 			case ValueKind.Short:
-				return new Value() - value.data.Short;
+				return new Value((short)0) - value.data.Short;
 			case ValueKind.Int:
-				return new Value() - value.data.Int;
+				return new Value((int)0) - value.data.Int;
 			case ValueKind.Long:
-				return new Value() - value.data.Long;
+				return new Value((long)0) - value.data.Long;
 			case ValueKind.Float:
-				return new Value() - value.data.Float;
+				return new Value((float)0) - value.data.Float;
 			case ValueKind.Double:
-				return new Value() - value.data.Double;
+				return new Value((double)0) - value.data.Double;
 			}
 		}
 

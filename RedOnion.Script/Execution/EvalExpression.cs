@@ -359,7 +359,7 @@ namespace RedOnion.Script
 			switch (op)
 			{
 			case OpCode.Plus:
-				Value = -Value;
+				Value = +Value;
 				return;
 			case OpCode.Neg:
 				Value = -Value;
