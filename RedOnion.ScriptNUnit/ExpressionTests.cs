@@ -38,7 +38,8 @@ namespace RedOnion.ScriptNUnit
 			Test(3.14,		"3.14");        // double
 			Test(5.5f,		"5.5f");        // float
 			Test(10,		"0xA");         // hex integer
-			Test(-7,		"-7");			// should be parsed as true -7, not as -(7)
+			Test(-7,		"-7");          // should be parsed as true -7, not as -(7)
+			Test(7,         "+7");          // unary plus
 			Test(0.1,		".1");			// hope this won't cause problems
 			Test(7u,		"7u");          // unsigned integer
 		}
@@ -76,6 +77,10 @@ namespace RedOnion.ScriptNUnit
 			Test("x10",		"\"x\" + x");   // string + integer
 			Test(10,		"x++");         // post-increment
 			Test(12,		"++x");         // pre-increment
+			Test(12,        "x--");         // post-decrement
+			Test(10,        "--x");         // pre-decrement
+			Test(-10,        "-x");         // unary minus
+			Test(10,         "+x");         // unary plus
 		}
 
 		[Test]
