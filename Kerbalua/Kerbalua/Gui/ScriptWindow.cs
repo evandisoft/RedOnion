@@ -63,6 +63,8 @@ namespace Kerbalua.Gui {
 			this.script = script;
 			this.mainWindowRect = mainWindowRect;
 
+			filenameInput.content.text = "untitled";
+
 			buttonBarRect = new Rect(0, titleHeight, 100, mainWindowRect.height-titleHeight);
 			replRect = new Rect(buttonBarRect.width, titleHeight, mainWindowRect.width - buttonBarRect.width, mainWindowRect.height-titleHeight);
 			editorRect = new Rect(0, 0, replRect.width, mainWindowRect.height);
@@ -80,8 +82,6 @@ namespace Kerbalua.Gui {
 			buttonBar.renderables.Add(new Button("Evaluate", () => {
 				Evaluate(editor.content.text);
 			}));
-
-
 
 			Complete(false);
 		}
