@@ -80,7 +80,7 @@ namespace RedOnion.ScriptNUnit
 			Test(12,        "x--");         // post-decrement
 			Test(10,        "--x");         // pre-decrement
 			Test(-10,        "-x");         // unary minus
-			Test(10,         "+x");         // unary pluse
+			Test(10,         "+x");         // unary plus
 		}
 
 		[Test]
