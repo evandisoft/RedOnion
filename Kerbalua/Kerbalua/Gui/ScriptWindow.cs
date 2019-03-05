@@ -8,6 +8,7 @@ using MoonSharp.Interpreter.Interop;
 namespace Kerbalua.Gui {
 	public class ScriptWindow {
 		const int maxOutputBytes = 80000;
+		public string Title = "Live Code";
 
 		public Editor editor = new Editor();
 		public Repl repl = new Repl();
@@ -161,7 +162,7 @@ namespace Kerbalua.Gui {
 				mainWindowRect.width = buttonBarRect.width;
 			}
 
-			mainWindowRect = GUI.Window(windowID, mainWindowRect, MainWindow, "Live Dev");
+			mainWindowRect = GUI.Window(windowID, mainWindowRect, MainWindow, Title);
 			if (editorVisible) {
 				editorRect=UpdateBoxPositionWithWindow(editorRect, -editorRect.width);
 				editor.Render(editorRect);

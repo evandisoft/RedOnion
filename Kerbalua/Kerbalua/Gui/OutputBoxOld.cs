@@ -2,7 +2,7 @@
 using UnityEngine;
 
 namespace Kerbalua.Gui {
-	public class OutputBox {
+	public class OutputBoxOld {
 		public GUIContent content = new GUIContent("");
 		public Vector2 scrollPos = new Vector2();
 		bool resetScroll;
