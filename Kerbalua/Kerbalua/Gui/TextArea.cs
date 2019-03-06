@@ -7,13 +7,12 @@ namespace Kerbalua.Gui {
 
 		public virtual void Render(Rect rect,GUIStyle style=null)
 		{
-
+			SetNextControlAsMainControl();
 			if (style != null) {
 				content.text = GUI.TextArea(rect, content.text,style);
 			} else {
 				content.text = GUI.TextArea(rect, content.text);
 			}
-
 		}
 
 		public void Render()

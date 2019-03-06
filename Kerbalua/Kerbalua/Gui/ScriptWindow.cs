@@ -16,7 +16,7 @@ namespace Kerbalua.Gui {
 
 		public CompletionBox completionBox = new CompletionBox();
 		public AutoLayoutBox buttonBar = new AutoLayoutBox();
-		public SimpleScript script;
+		public SimpleScript scriptEngine;
 
 		const int windowID = 0;
 		const int modalID = 1;
@@ -28,7 +28,7 @@ namespace Kerbalua.Gui {
 		Rect replRect;
 		Rect completionBoxRect;
 		Rect editorRect;
-		TextArea filenameInput=new TextArea();
+		TextArea scriptNameInput=new TextArea();
 
 		Rect SaveLoadRect;
 
@@ -38,32 +38,34 @@ namespace Kerbalua.Gui {
 
 		string baseFolderPath = "scripts";
 
-		string CreateFullPath(string filename)
+		string CreateFullPath(string scriptName)
 		{
-			if (filename == "") {
-				filename = "untitled";
-				filenameInput.content.text = "untitled";
+			if (scriptName == "") {
+				scriptName = "untitled";
+				scriptNameInput.content.text = "untitled";
 			}
-			return baseFolderPath + "/" + filename + ".lua";
-		}
-		void SaveFile(string filename)
-		{
-			Directory.CreateDirectory(baseFolderPath);
-			File.WriteAllText(CreateFullPath(filename), editor.content.text);
+
+			return baseFolderPath + "/" + scriptName + ".lua";
 		}
 
-		void LoadFile(string filename)
+		void SaveScript(string scriptName)
 		{
 			Directory.CreateDirectory(baseFolderPath);
-			editor.content.text=File.ReadAllText(CreateFullPath(filename));
+			File.WriteAllText(CreateFullPath(scriptName), editor.content.text);
 		}
 
-		public ScriptWindow(SimpleScript script,Rect mainWindowRect)
+		void LoadScript(string scriptName)
 		{
-			this.script = script;
+			Directory.CreateDirectory(baseFolderPath);
+			editor.content.text=File.ReadAllText(CreateFullPath(scriptName));
+		}
+
+		public ScriptWindow(SimpleScript scriptEngine,Rect mainWindowRect)
+		{
+			this.scriptEngine = scriptEngine;
 			this.mainWindowRect = mainWindowRect;
 
-			filenameInput.content.text = "untitled";
+			scriptNameInput.content.text = "untitled";
 
 			buttonBarRect = new Rect(0, titleHeight, 100, mainWindowRect.height-titleHeight);
 			replRect = new Rect(buttonBarRect.width, titleHeight, mainWindowRect.width - buttonBarRect.width, mainWindowRect.height-titleHeight);
@@ -72,20 +74,25 @@ namespace Kerbalua.Gui {
 
 			buttonBar.renderables.Add(new Button("<<", () => editorVisible = !editorVisible));
 			buttonBar.renderables.Add(new Button(">>", () => replVisible = !replVisible));
-			buttonBar.renderables.Add(filenameInput);
+			buttonBar.renderables.Add(scriptNameInput);
 			buttonBar.renderables.Add(new Button("Save", () => {
-				SaveFile(filenameInput.content.text);
+				SaveScript(scriptNameInput.content.text);
 			}));
 			buttonBar.renderables.Add(new Button("Load", () => {
-				LoadFile(filenameInput.content.text);
+				LoadScript(scriptNameInput.content.text);
 			}));
 			buttonBar.renderables.Add(new Button("Evaluate", () => {
 				Evaluate(editor.content.text);
 			}));
 
-			Complete(false);
+			//Complete(false);
 		}
 
+		//void Complete(bool completing)
+		//{
+		//	AllCompletion.Complete(script.Globals, repl.inputBox.content, completionBox.content, repl.inputBox.cursorPos, completing, out int newCursorPos);
+		//	repl.inputBox.cursorPos = newCursorPos;
+		//}
 
 		/// <summary>
 		/// This updates Rects for boxes that are not inside the main window 
@@ -106,7 +113,7 @@ namespace Kerbalua.Gui {
 		/// <summary>
 		/// Returns the rectangle covering the entire area of the editor/repl/completion
 		/// </summary>
-		public Rect getTotalArea()
+		public Rect GetTotalArea()
 		{
 			Rect totalArea = new Rect();
 			totalArea.x = mainWindowRect.x;
@@ -127,7 +134,7 @@ namespace Kerbalua.Gui {
 
 		public void SetOrReleaseInputLock()
 		{
-			if (getTotalArea().Contains(Mouse.screenPos)) {
+			if (GetTotalArea().Contains(Mouse.screenPos)) {
 				if (!inputIsLocked) {
 					inputIsLocked = true;
 					InputLockManager.SetControlLock(ControlTypes.KEYBOARDINPUT, "kerbalua");
@@ -144,7 +151,7 @@ namespace Kerbalua.Gui {
 		{
 			DynValue result = new DynValue();
 			try {
-				result = script.DoString(text);
+				result = scriptEngine.DoString(text);
 				repl.outputBox.content.text += Environment.NewLine;
 				if (result.UserData == null) {
 					repl.outputBox.content.text += result;
@@ -169,14 +176,21 @@ namespace Kerbalua.Gui {
 				mainWindowRect.width = buttonBarRect.width;
 			}
 
+
 			mainWindowRect = GUI.Window(windowID, mainWindowRect, MainWindow, Title);
+
+
 			if (editorVisible) {
 				editorRect=UpdateBoxPositionWithWindow(editorRect, -editorRect.width);
 				editor.Render(editorRect);
 			}
 
 			if (replVisible) {
-				completionBoxRect=UpdateBoxPositionWithWindow(completionBoxRect, mainWindowRect.width);
+				if (GUI.GetNameOfFocusedControl() == completionBox.ControlName) {
+					GUI.FocusControl(repl.inputBox.ControlName);
+				}
+
+				completionBoxRect =UpdateBoxPositionWithWindow(completionBoxRect, mainWindowRect.width);
 				completionBox.Render(completionBoxRect);
 			}
 		}
@@ -193,64 +207,68 @@ namespace Kerbalua.Gui {
 		{
 			GUI.DragWindow(new Rect(0, 0, mainWindowRect.width, titleHeight));
 			buttonBar.Render(buttonBarRect);
-			HandleInput();
+
 			if (replVisible) {
+				if(repl.outputBox.HasFocus()) {
+					repl.inputBox.GrabFocus();
+				}
+
+				if(repl.inputBox.HasFocus()) {
+
+				}
+
 				repl.Render(replRect);
-			}
 
-
-
-		}
-
-		void Complete(bool completing)
-		{
-			AllCompletion.Complete(script.Globals, repl.inputBox.content, completionBox.content, repl.inputBox.cursorPos, completing, out int newCursorPos);
-			repl.inputBox.cursorPos = newCursorPos;
-		}
-
-		void HandleInput()
-		{
-			Event event1 = Event.current;
-			if (event1.type == EventType.KeyDown) {
-				switch (event1.keyCode) {
-				case KeyCode.Backspace:
-					int curlen = repl.inputBox.content.text.Length;
-					if (curlen > 0) {
-						repl.inputBox.content.text = repl.inputBox.content.text.Substring(0, curlen - 1);
-						repl.inputBox.cursorPos -= 1;
-					}
-					break;
-				case KeyCode.Return:
-					repl.inputBox.content.text += event1.character;
-					repl.inputBox.cursorPos += 1;
-					break;
-				case KeyCode.Tab:
-					Complete(true);
-					repl.outputBox.ResetScroll();
-					break;
-				default:
-					char ch = event1.character;
-					if (!char.IsControl(ch)) {
-						repl.inputBox.content.text += event1.character;
-						repl.inputBox.cursorPos += 1;
-					}
-					break;
+				if (repl.inputBox.content.text.EndsWith(Environment.NewLine + Environment.NewLine)) {
+					Evaluate(repl.inputBox.content.text);
+					repl.inputBox.content.text = "";
+					completionBox.content.text = "";
 				}
-				int diff = repl.outputBox.content.text.Length - maxOutputBytes;
-				if (diff > 0) {
-					repl.outputBox.content.text = repl.outputBox.content.text.Substring(diff);
-				}
-				Complete(false);
-				repl.outputBox.ResetScroll();
-				event1.Use();
-			}
-
-			if (repl.inputBox.content.text.EndsWith(Environment.NewLine + Environment.NewLine)) {
-				Evaluate(repl.inputBox.content.text);
-				repl.inputBox.content.text = "";
-				repl.inputBox.cursorPos = 0;
-				completionBox.content.text = "";
 			}
 		}
+
+		//void HandleInput()
+		//{
+		//	Event event1 = Event.current;
+		//	if (event1.type == EventType.KeyDown) {
+		//		switch (event1.keyCode) {
+		//		case KeyCode.Backspace:
+		//			int curlen = repl.inputBox.content.text.Length;
+		//			if (curlen > 0) {
+		//				repl.inputBox.content.text = repl.inputBox.content.text.Substring(0, curlen - 1);
+		//				repl.inputBox.cursorPos -= 1;
+		//			}
+		//			break;
+		//		case KeyCode.Return:
+		//			repl.inputBox.content.text += event1.character;
+		//			repl.inputBox.cursorPos += 1;
+		//			break;
+		//		case KeyCode.Tab:
+		//			Complete(true);
+		//			repl.outputBox.ResetScroll();
+		//			break;
+		//		default:
+		//			char ch = event1.character;
+		//			if (!char.IsControl(ch)) {
+		//				repl.inputBox.content.text += event1.character;
+		//				repl.inputBox.cursorPos += 1;
+		//			}
+		//			break;
+		//		}
+		//		int diff = repl.outputBox.content.text.Length - maxOutputBytes;
+		//		if (diff > 0) {
+		//			repl.outputBox.content.text = repl.outputBox.content.text.Substring(diff);
+		//		}
+		//		Complete(false);
+		//		repl.outputBox.ResetScroll();
+		//		event1.Use();
+		//	}
+
+
+		//}
+		//void Complete(bool completing)
+		//{
+		//	AllCompletion.Complete(script.Globals, repl.inputBox.content, completionBox.content, repl.inputBox.cursorPos, completing, out int newCursorPos);
+		//}
 	}
 }

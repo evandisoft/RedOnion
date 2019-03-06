@@ -12,7 +12,7 @@ namespace Kerbalua.Gui {
 				style = new GUIStyle(GUI.skin.textArea);
 			}
 
-			if (GUI.GetNameOfFocusedControl() == ControlName) {
+			if (HasFocus()) {
 				int id = GUIUtility.keyboardControl;
 				TextEditor editor = (TextEditor)GUIUtility.GetStateObject(typeof(TextEditor), id);
 				//Debug.Log(ControlName+","+inc++);
@@ -21,13 +21,20 @@ namespace Kerbalua.Gui {
 				content.text = editor.text;
 			}
 
-			GUI.SetNextControlName(ControlName);
 			base.Render(rect, style);
-
 
 		}
 
-		void HandleInput(TextEditor editor)
+		/// <summary>
+		/// Preprocesses input prior to allowing input events to get to the
+		/// GUI.TextArea control. Intercepts and consumes input events that
+		/// need to be handled differently from the default (like 'tab')
+		/// 
+		/// Can be overridden by subclasses to process/intercept input and handle some things
+		/// a different way than is handled here.
+		/// </summary>
+		/// <param name="editor">Editor.</param>
+		protected virtual void HandleInput(TextEditor editor)
 		{
 			Event event1 = Event.current;
 			if (event1.type == EventType.KeyDown) {
@@ -48,6 +55,10 @@ namespace Kerbalua.Gui {
 			}
 		}
 
+		/// <summary>
+		/// Adds one level of indentation
+		/// </summary>
+		/// <param name="editor">Editor.</param>
 		void Indent(TextEditor editor)
 		{
 			int startingSpaces = StartingSpaces(editor);
@@ -63,6 +74,10 @@ namespace Kerbalua.Gui {
 			editor.selectIndex = prevCursorIndex;
 		}
 
+		/// <summary>
+		/// Removes one level of indentation
+		/// </summary>
+		/// <param name="editor">Editor.</param>
 		void Unindent(TextEditor editor)
 		{
 			int startingSpaces = StartingSpaces(editor);
@@ -87,6 +102,12 @@ namespace Kerbalua.Gui {
 			editor.selectIndex = prevCursorIndex;
 		}
 
+		/// <summary>
+		/// Returns the number of characters from the start
+		/// of the line to the cursor
+		/// </summary>
+		/// <returns>The from line start.</returns>
+		/// <param name="editor">Editor.</param>
 		int CharsFromLineStart(TextEditor editor)
 		{
 			int prevCursorIndex = editor.cursorIndex;
@@ -103,6 +124,11 @@ namespace Kerbalua.Gui {
 			return chars;
 		}
 
+		/// <summary>
+		/// Gets number of starting spaces on the current line
+		/// </summary>
+		/// <returns>The spaces.</returns>
+		/// <param name="editor">Editor.</param>
 		int StartingSpaces(TextEditor editor)
 		{
 			string currentLine=CurrentLine(editor);
@@ -118,6 +144,11 @@ namespace Kerbalua.Gui {
 			return i;
 		}
 
+		/// <summary>
+		/// Returns the text on the current line
+		/// </summary>
+		/// <returns>The line.</returns>
+		/// <param name="editor">Editor.</param>
 		string CurrentLine(TextEditor editor)
 		{
 			int prevCursorIndex = editor.cursorIndex;
