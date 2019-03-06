@@ -28,10 +28,10 @@ namespace RedOnion.Script.BasicObjects
 			var fun = new FunctionObj(engine, obj);
 			var str = new StringObj(engine, obj);
 			var num = new NumberObj(engine, obj);
-			BaseProps.Set("function", new Value(Function = new FunctionFun(engine, fun, fun)));
-			BaseProps.Set("object", new Value(Object = new ObjectFun(engine, fun, obj, this)));
-			BaseProps.Set("string", new Value(String = new StringFun(engine, fun, str)));
-			BaseProps.Set("number", new Value(Number = new NumberFun(engine, fun, num)));
+			BaseProps.Set("Function", new Value(Function = new FunctionFun(engine, fun, fun)));
+			BaseProps.Set("Object", new Value(Object = new ObjectFun(engine, fun, obj, this)));
+			BaseProps.Set("String", new Value(String = new StringFun(engine, fun, str)));
+			BaseProps.Set("Number", new Value(Number = new NumberFun(engine, fun, num)));
 		}
 
 		public IObject Box(Value value)

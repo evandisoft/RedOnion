@@ -48,7 +48,12 @@ namespace RedOnion
 
 			button = ApplicationLauncher.Instance.AddModApplication(
 				Open, Close, null, null, null, null,
-				ApplicationLauncher.AppScenes.SPACECENTER,
+				ApplicationLauncher.AppScenes.SPACECENTER
+				| ApplicationLauncher.AppScenes.FLIGHT
+				| ApplicationLauncher.AppScenes.MAPVIEW
+				| ApplicationLauncher.AppScenes.VAB
+				| ApplicationLauncher.AppScenes.SPH
+				| ApplicationLauncher.AppScenes.TRACKSTATION,
 				icon);
 			GameEvents.onGUIApplicationLauncherUnreadifying.Add(RemoveButton);
 			adder = null;

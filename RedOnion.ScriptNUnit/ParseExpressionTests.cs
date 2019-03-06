@@ -10,6 +10,8 @@ using RedOnion.Script.Parsing;
 //	cond ? true : false
 //	abs(-1)
 //	abs -1
+//	abs(-x)
+//	abs -x
 //	fn(x,y)
 //	fn x,y
 //	fn(null, this, base.field)
@@ -23,7 +25,6 @@ using RedOnion.Script.Parsing;
 //	var a:byte[]
 //	var a = new byte[n]
 //	var a as list.[byte]
-//	f -x
 
 namespace RedOnion.ScriptNUnit
 {

@@ -45,7 +45,9 @@ namespace RedOnion.ScriptNUnit
 		[Test]
 		public void Statement_04_FunctionFromStr()
 		{
-			Test("sum1 = function \"a,b\", \"return a+b\"");
+			// lowercase `function` may mean delegate or lambda
+			// => either `Function` or `new function` for this
+			Test("sum1 = Function \"a,b\", \"return a+b\"");
 			Test(3, "sum1 1,2");
 		}
 

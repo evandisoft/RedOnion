@@ -1,9 +1,6 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 using UnityEngine;
 using Ionic.Zip;
 
@@ -15,7 +12,10 @@ namespace RedOnion.UI
 			ResourceZipFilesCache = new Dictionary<string, ZipFile>();
 		private static MemoryStream ResourceStream(Assembly asm, string path)
 		{
-			var zipPath = Path.GetFileNameWithoutExtension(asm.Location) + ".zip";
+			var zipPath = asm.Location;
+			var lastDot = zipPath.LastIndexOf('.');
+			if (lastDot >= 0) zipPath = zipPath.Substring(0, lastDot);
+			zipPath = zipPath + ".zip";
 			if (!ResourceZipFilesCache.TryGetValue(zipPath, out var zip))
 			{
 				if (!File.Exists(zipPath))
@@ -23,8 +23,8 @@ namespace RedOnion.UI
 					Debug.Log("[RedOnion] File does not exist: " + zipPath);
 					return null;
 				}
-				zip = ZipFile.Read(path);
-				ResourceZipFilesCache[path] = zip;
+				zip = ZipFile.Read(zipPath);
+				ResourceZipFilesCache[zipPath] = zip;
 			}
 			var entry = zip[path];
 			if (entry == null)
