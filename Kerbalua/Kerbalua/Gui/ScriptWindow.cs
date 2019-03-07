@@ -38,6 +38,9 @@ namespace Kerbalua.Gui {
 
 		string baseFolderPath = "scripts";
 
+		bool editorChanged;
+		bool inputBoxChanged;
+
 		string CreateFullPath(string scriptName)
 		{
 			if (scriptName == "") {
@@ -181,8 +184,15 @@ namespace Kerbalua.Gui {
 
 
 			if (editorVisible) {
-				editorRect=UpdateBoxPositionWithWindow(editorRect, -editorRect.width);
+				HandleEditorInput();
+
+				editorRect =UpdateBoxPositionWithWindow(editorRect, -editorRect.width);
 				editor.Render(editorRect);
+
+				if (editorChanged) {
+					AllCompletion.Complete(scriptEngine.Globals, editor, completionBox.content, false);
+					editorChanged = false;
+				}
 			}
 
 			if (replVisible) {
@@ -213,62 +223,87 @@ namespace Kerbalua.Gui {
 					repl.inputBox.GrabFocus();
 				}
 
-				if(repl.inputBox.HasFocus()) {
-
-				}
+				HandleReplInput();
 
 				repl.Render(replRect);
 
-				if (repl.inputBox.content.text.EndsWith(Environment.NewLine + Environment.NewLine)) {
-					Evaluate(repl.inputBox.content.text);
-					repl.inputBox.content.text = "";
-					completionBox.content.text = "";
+				if (inputBoxChanged) {
+					AllCompletion.Complete(scriptEngine.Globals, repl.inputBox, completionBox.content, false);
+					inputBoxChanged = false;
 				}
 			}
 		}
 
-		//void HandleInput()
-		//{
-		//	Event event1 = Event.current;
-		//	if (event1.type == EventType.KeyDown) {
-		//		switch (event1.keyCode) {
-		//		case KeyCode.Backspace:
-		//			int curlen = repl.inputBox.content.text.Length;
-		//			if (curlen > 0) {
-		//				repl.inputBox.content.text = repl.inputBox.content.text.Substring(0, curlen - 1);
-		//				repl.inputBox.cursorPos -= 1;
-		//			}
-		//			break;
-		//		case KeyCode.Return:
-		//			repl.inputBox.content.text += event1.character;
-		//			repl.inputBox.cursorPos += 1;
-		//			break;
-		//		case KeyCode.Tab:
-		//			Complete(true);
-		//			repl.outputBox.ResetScroll();
-		//			break;
-		//		default:
-		//			char ch = event1.character;
-		//			if (!char.IsControl(ch)) {
-		//				repl.inputBox.content.text += event1.character;
-		//				repl.inputBox.cursorPos += 1;
-		//			}
-		//			break;
-		//		}
-		//		int diff = repl.outputBox.content.text.Length - maxOutputBytes;
-		//		if (diff > 0) {
-		//			repl.outputBox.content.text = repl.outputBox.content.text.Substring(diff);
-		//		}
-		//		Complete(false);
-		//		repl.outputBox.ResetScroll();
-		//		event1.Use();
-		//	}
+		void HandleEditorInput()
+		{
+			if (editor.HasFocus()) {
+				Event event1 = Event.current;
+				if (event1.type == EventType.KeyDown) {
+					switch (event1.keyCode) {
+					case KeyCode.Space:
+						if (event1.shift) {
+							AllCompletion.Complete(scriptEngine.Globals, editor, completionBox.content, true);
+							event1.Use();
+						}
+						break;
+					case KeyCode.E:
+						if (event1.control) {
+							Evaluate(editor.content.text);
+							event1.Use();
+						}
+						break;
+					}
+					int diff = repl.outputBox.content.text.Length - maxOutputBytes;
+					if (diff > 0) {
+						repl.outputBox.content.text = repl.outputBox.content.text.Substring(diff);
+					}
 
+					editorChanged = true;
+				}
+			}
+		}
 
-		//}
-		//void Complete(bool completing)
-		//{
-		//	AllCompletion.Complete(script.Globals, repl.inputBox.content, completionBox.content, repl.inputBox.cursorPos, completing, out int newCursorPos);
-		//}
+		void HandleReplInput()
+		{
+			if (repl.inputBox.HasFocus()) {
+				Event event1 = Event.current;
+				if (event1.type == EventType.KeyDown) {
+					switch (event1.keyCode) {
+					case KeyCode.Space:
+						if (event1.shift) {
+							AllCompletion.Complete(scriptEngine.Globals, repl.inputBox, completionBox.content, true);
+							repl.outputBox.ResetScroll();
+							event1.Use();
+						}
+						break;
+					case KeyCode.E:
+						if (event1.control) {
+							Evaluate(repl.inputBox.content.text);
+							repl.inputBox.content.text = "";
+							completionBox.content.text = "";
+							event1.Use();
+						}
+						break;
+					case KeyCode.Return:
+						if (!event1.shift) {
+							Evaluate(repl.inputBox.content.text);
+							repl.inputBox.content.text = "";
+							completionBox.content.text = "";
+							event1.Use();
+						}
+						break;
+					
+					}
+					int diff = repl.outputBox.content.text.Length - maxOutputBytes;
+					if (diff > 0) {
+						repl.outputBox.content.text = repl.outputBox.content.text.Substring(diff);
+					}
+
+					repl.outputBox.ResetScroll();
+
+					inputBoxChanged = true;
+				}
+			}
+		}
 	}
 }

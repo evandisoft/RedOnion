@@ -4,7 +4,11 @@ using UnityEngine;
 namespace Kerbalua.Gui {
 	public class EditingArea:ScrollableTextArea {
 		int inc = 0;
+		public int cursorIndex = 0;
+		public int selectIndex = 0;
 		const int spacesPerTab = 4;
+
+
 
 		public override void Render(Rect rect, GUIStyle style = null)
 		{
@@ -12,17 +16,25 @@ namespace Kerbalua.Gui {
 				style = new GUIStyle(GUI.skin.textArea);
 			}
 
+			TextEditor editor;
 			if (HasFocus()) {
 				int id = GUIUtility.keyboardControl;
-				TextEditor editor = (TextEditor)GUIUtility.GetStateObject(typeof(TextEditor), id);
+				editor = (TextEditor)GUIUtility.GetStateObject(typeof(TextEditor), id);
 				//Debug.Log(ControlName+","+inc++);
-
+				editor.text = content.text;
+				editor.cursorIndex = cursorIndex;
+				editor.selectIndex = selectIndex;
 				HandleInput(editor);
+
 				content.text = editor.text;
+
+				base.Render(rect, style);
+
+				cursorIndex = editor.cursorIndex;
+				selectIndex = editor.selectIndex;
+			} else {
+				base.Render(rect, style);
 			}
-
-			base.Render(rect, style);
-
 		}
 
 		/// <summary>

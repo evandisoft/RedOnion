@@ -19,6 +19,7 @@ namespace Kerbalua.Gui {
 		/// <summary>
 		/// Assigns the next control the unique name generated in ControlName.
 		/// This is used as the relevant control for HasFocus() and TakeFocus()
+		/// Must be called within a Render.
 		/// </summary>
 		protected void SetNextControlAsMainControl()
 		{
@@ -27,6 +28,7 @@ namespace Kerbalua.Gui {
 
 		/// <summary>
 		/// Returns true if this control has focus.
+		/// Must be called within a Render.
 		/// </summary>
 		public bool HasFocus()
 		{
@@ -35,6 +37,7 @@ namespace Kerbalua.Gui {
 
 		/// <summary>
 		/// Make the main control for this element grab the focus.
+		/// Must be called within a Render.
 		/// </summary>
 		public void GrabFocus()
 		{
