@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.IO;
 using UnityEngine;
@@ -6,7 +6,7 @@ using KSP.UI.Screens;
 
 namespace RedOnion
 {
-	[KSPAddon(KSPAddon.Startup.SpaceCentre, false)]
+	[KSPAddon(KSPAddon.Startup.AllGameScenes, false)]
 	public class Launcher : MonoBehaviour
 	{
 		public static Launcher Instance { get; private set; }
@@ -19,7 +19,11 @@ namespace RedOnion
 		{
 			if (Instance == null)
 				Instance = this;
-			else Destroy(gameObject);
+			else
+			{
+				Debug.Log("RedOnion.Launcher.Awake: Instance already exists", gameObject);
+				Destroy(this);
+			}
 		}
 
 		private void Start()
@@ -44,7 +48,12 @@ namespace RedOnion
 
 			button = ApplicationLauncher.Instance.AddModApplication(
 				Open, Close, null, null, null, null,
-				ApplicationLauncher.AppScenes.SPACECENTER,
+				ApplicationLauncher.AppScenes.SPACECENTER
+				| ApplicationLauncher.AppScenes.FLIGHT
+				| ApplicationLauncher.AppScenes.MAPVIEW
+				| ApplicationLauncher.AppScenes.VAB
+				| ApplicationLauncher.AppScenes.SPH
+				| ApplicationLauncher.AppScenes.TRACKSTATION,
 				icon);
 			GameEvents.onGUIApplicationLauncherUnreadifying.Add(RemoveButton);
 			adder = null;
