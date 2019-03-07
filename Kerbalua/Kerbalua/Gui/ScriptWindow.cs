@@ -205,6 +205,8 @@ namespace Kerbalua.Gui {
 
 		public void Render()
 		{
+
+
 			SetOrReleaseInputLock();
 
 			if (replVisible) {
@@ -237,6 +239,8 @@ namespace Kerbalua.Gui {
 				completionBoxRect =UpdateBoxPositionWithWindow(completionBoxRect, mainWindowRect.width);
 				completionBox.Render(completionBoxRect);
 			}
+
+
 		}
 
 		/// <summary>
