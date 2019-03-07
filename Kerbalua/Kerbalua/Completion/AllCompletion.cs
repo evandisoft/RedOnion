@@ -77,7 +77,7 @@ namespace Kerbalua.Completion {
         {
             string basePart, completionPart, endPart;
             SplitInput(inputArea.content.text, inputArea.cursorIndex, out basePart, out completionPart, out endPart);
-			Debug.Log(inputArea.content.text+","+basePart + "," + completionPart + "," + endPart);
+			//Debug.Log(inputArea.content.text+","+basePart + "," + completionPart + "," + endPart);
 
             var correctTokens = LastVarExtracter.Parse(basePart+completionPart);
 	
@@ -121,13 +121,13 @@ namespace Kerbalua.Completion {
                     inputArea.content.text = basePart + completions[0] + endPart;
                     inputArea.cursorIndex= basePart.Length + completions[0].Length;
 					inputArea.selectIndex = inputArea.cursorIndex;
-					Debug.Log("completing " + completions.Count);
+					//Debug.Log("completing " + completions.Count);
                 } else {
 					completionBoxContent.text = "";
 					foreach (var completion in completions) {
                         completionBoxContent.text += completion + Environment.NewLine;
                     }
-					Debug.Log("not completing "+completions.Count);
+					//Debug.Log("not completing "+completions.Count);
                 }
 
             } else {
