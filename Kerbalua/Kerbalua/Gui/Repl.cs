@@ -7,19 +7,20 @@ namespace Kerbalua.Gui {
 
 		public void Render(Rect rect)
 		{
-			GUIStyle outputStyle = new GUIStyle(GUI.skin.textArea) {
-				alignment = TextAnchor.LowerLeft
+			GUIStyle inputStyle = new GUIStyle(GUI.skin.textArea) {
+				//font = GUIUtil.GetMonoSpaceFont()
 			};
 
 			GUI.BeginGroup(rect);
 			{
-				float inputHeight = outputStyle.CalcHeight(inputBox.content, rect.width);
+				float inputHeight = inputStyle.CalcHeight(inputBox.content, rect.width);
+			 
 				float inputStart = rect.height - inputHeight;
 
 				Rect outputRect = new Rect(0, 0, rect.width, inputStart);
 				Rect inputRect = new Rect(0, inputStart, rect.width, inputHeight);
 
-				inputBox.Render(inputRect);
+				inputBox.Render(inputRect,inputStyle);
 				outputBox.Render(outputRect);
 			}
 			GUI.EndGroup();

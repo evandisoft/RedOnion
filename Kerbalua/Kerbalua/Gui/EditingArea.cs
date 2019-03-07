@@ -8,23 +8,12 @@ namespace Kerbalua.Gui {
 		public int cursorIndex = 0;
 		public int selectIndex = 0;
 		const int spacesPerTab = 4;
-		Font font;
-
-		public EditingArea()
-		{
-			string[] fonts = Font.GetOSInstalledFontNames();
-			foreach (var fontName in fonts) {
-				if (fontName.Contains("Mono")) {
-					font = Font.CreateDynamicFontFromOSFont(fontName, 12);
-				}
-			}
-		}
 
 		public override void Render(Rect rect, GUIStyle style = null)
 		{
 			if (style == null) {
 				style = new GUIStyle(GUI.skin.textArea);
-				style.font = font;
+				style.font = GUIUtil.GetMonoSpaceFont();
 			}
 
 			TextEditor editor;
