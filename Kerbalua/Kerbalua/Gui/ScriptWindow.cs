@@ -55,7 +55,13 @@ namespace Kerbalua.Gui {
 				scriptNameInput.content.text = scriptName;
 			}
 
-			return baseFolderPath + "/" + scriptName;
+			string fullPath=baseFolderPath + "/" + scriptName;
+
+			if (!File.Exists(fullPath)) {
+				File.WriteAllText(fullPath, "");
+			}
+
+			return fullPath;
 		}
 
 		void SaveScript(string scriptName)
@@ -85,6 +91,7 @@ namespace Kerbalua.Gui {
 			this.mainWindowRect = mainWindowRect;
 
 			scriptNameInput.content.text = defaultScriptFilename;
+			LoadScript(scriptNameInput.content.text);
 
 			buttonBarRect = new Rect(0, titleHeight, 100, mainWindowRect.height-titleHeight);
 			replRect = new Rect(buttonBarRect.width, titleHeight, mainWindowRect.width - buttonBarRect.width, mainWindowRect.height-titleHeight);
