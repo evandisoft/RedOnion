@@ -10,15 +10,15 @@ using Kerbalua.Gui;
 namespace Kerbalua.Completion {
     public class AllCompletion {
         public static void Main(string[] args){
-            var script = new SimpleScript(CoreModules.Preset_Default);
+            var script = new MoonSharpReplEvaluator(CoreModules.Preset_Default);
             UserData.RegistrationPolicy = InteropRegistrationPolicy.Automatic;
-            script.Globals["Adf"] = new Adf();
+            //script.Globals["Adf"] = new Adf();
             var data = "return adf.asdf().blah[Adf.asdf().blah[Adf.adfs[3]().";
             var data2 = "a";
             var tokens = LastVarExtracter.Parse(data);
             prin.tlist(tokens);
-            var completions = UserDataCompletion.Complete(script.Globals, tokens);
-            prin.tall("Completions are ",completions);
+            //var completions = UserDataCompletion.Complete(script.Globals, tokens);
+            //prin.tall("Completions are ",completions);
         }
         Action<string> messageTarget;
 

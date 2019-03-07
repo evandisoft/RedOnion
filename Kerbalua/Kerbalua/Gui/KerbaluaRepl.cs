@@ -9,7 +9,7 @@ using Kerbalua;
 
 namespace Kerbalua.Gui {
 	public class KerbaluaRepl {
-		SimpleScript scriptEngine;
+		MoonSharpReplEvaluator scriptEngine;
 
 		KerbaluaMain.KSPRaw kspApi;
 		ScriptWindow scriptWindow;
@@ -18,14 +18,14 @@ namespace Kerbalua.Gui {
 		public class FlightControl {
 			Vessel vessel;
 			DynValue callback;
-			SimpleScript script;
+			MoonSharpReplEvaluator script;
 
 			void FlightCallback(FlightCtrlState st)
 			{
-				script.Call(callback, st);
+				//script.Call(callback, st);
 			}
 
-			public FlightControl(Vessel vessel, SimpleScript script)
+			public FlightControl(Vessel vessel, MoonSharpReplEvaluator script)
 			{
 				this.vessel = vessel;
 				this.script = script;
@@ -41,16 +41,16 @@ namespace Kerbalua.Gui {
 		public KerbaluaRepl(KerbaluaMain.KSPRaw kspApi)
 		{
 			this.kspApi = kspApi;
-			scriptEngine = new SimpleScript(CoreModules.Preset_Complete);
+			scriptEngine = new MoonSharpReplEvaluator(CoreModules.Preset_Complete);
 			UserData.RegistrationPolicy = InteropRegistrationPolicy.Automatic;
 
-			scriptEngine.Globals["ksp"] = kspApi;
-			scriptEngine.Globals["flight"] = new FlightControl(FlightGlobals.ActiveVessel, scriptEngine);
+			//scriptEngine.Globals["ksp"] = kspApi;
+			//scriptEngine.Globals["flight"] = new FlightControl(FlightGlobals.ActiveVessel, scriptEngine);
 
-			scriptEngine.Options.DebugPrint = Print;
+			//scriptEngine.Options.DebugPrint = Print;
 			InputLockManager.ClearControlLocks();
 
-			scriptWindow = new ScriptWindow(scriptEngine, new Rect(500, 100, 400, 500));
+			scriptWindow = new ScriptWindow(new Rect(500, 100, 400, 500));
 		}
 
 		public void Print(string str)
