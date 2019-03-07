@@ -119,7 +119,6 @@ namespace Kerbalua.Gui {
 						event1.Use();
 					}
 					break;
-				
 				case KeyCode.M:
 					if (event1.control) {
 						int toMove;
@@ -228,7 +227,7 @@ namespace Kerbalua.Gui {
 			if (charsToMove == 0) {
 				charsToMove = spacesPerTab;
 			}
-			Debug.Log("Chars to move is " + charsToMove);
+			//Debug.Log("Chars to move is " + charsToMove);
 
 			editor.cursorIndex = prevCursorIndex;
 			editor.selectIndex = prevSelectIndex;
@@ -255,7 +254,7 @@ namespace Kerbalua.Gui {
 			if (charsToMove == 0) {
 				charsToMove = spacesPerTab;
 			}
-			Debug.Log("Chars to move is " + charsToMove);
+			//Debug.Log("Chars to move is " + charsToMove);
 
 			editor.cursorIndex = prevCursorIndex;
 			editor.selectIndex = prevSelectIndex;
