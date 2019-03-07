@@ -34,12 +34,12 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BasicObjects\Function.cs" />
     <Compile Include="BasicObjects\Number.cs" />
     <Compile Include="BasicObjects\Object.cs" />
+    <Compile Include="BasicObjects\SimpleObject.cs" />
     <Compile Include="BasicObjects\Root.cs" />
     <Compile Include="BasicObjects\String.cs" />
     <Compile Include="Execution\ExecStatement.cs" />
