@@ -21,5 +21,19 @@ namespace Kerbalua.Gui {
 			//Debug.Log($"{absoluteRect.Contains(Mouse.screenPos)},{Mouse.screenPos},{absoluteRect}");
 			return absoluteRect.Contains(Mouse.screenPos);
 		}
+
+		static Font monoSpaceFont = null;
+		static public Font GetMonoSpaceFont()
+		{
+			if (monoSpaceFont == null) {
+				string[] fonts = Font.GetOSInstalledFontNames();
+				foreach (var fontName in fonts) {
+					if (fontName.Contains("Mono")) {
+						monoSpaceFont = Font.CreateDynamicFontFromOSFont(fontName, 12);
+					}
+				}
+			}
+			return monoSpaceFont;
+		}
 	}
 }

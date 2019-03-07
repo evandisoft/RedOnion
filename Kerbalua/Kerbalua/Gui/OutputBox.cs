@@ -6,7 +6,8 @@ namespace Kerbalua.Gui {
 		public override void Render(Rect rect, GUIStyle style = null)
 		{
 			GUIStyle outputStyle = new GUIStyle(GUI.skin.textArea) {
-				alignment = TextAnchor.LowerLeft
+				alignment = TextAnchor.LowerLeft,
+				//font = GUIUtil.GetMonoSpaceFont()
 			};
 
 			base.Render(rect, outputStyle);

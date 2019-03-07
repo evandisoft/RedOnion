@@ -69,7 +69,7 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Kerbalua\Main\KerbaluaMain.cs" />
-    <Compile Include="Kerbalua\Other\SimpleScript.cs" />
+    <Compile Include="Kerbalua\Other\MoonSharpReplEvaluator.cs" />
     <Compile Include="Kerbalua\Other\Trie.cs" />
     <Compile Include="Kerbalua\Gui\KerbaluaRepl.cs" />
     <Compile Include="Kerbalua\Utility\prin.cs" />
@@ -102,6 +102,9 @@
     <Compile Include="Kerbalua\Gui\Editor.cs" />
     <Compile Include="Kerbalua\Gui\UIElement.cs" />
     <Compile Include="Kerbalua\Gui\EditingArea.cs" />
+    <Compile Include="Kerbalua\Other\ReplEvaluator.cs" />
+    <Compile Include="Kerbalua\Other\RedOnionReplEvaluator.cs" />
+    <Compile Include="Kerbalua\Other\SimpleScript.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -132,6 +135,12 @@
     <Folder Include="Kerbalua\Gui\" />
     <Folder Include="Kerbalua\Utility\" />
     <Folder Include="Kerbalua\Completion\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\RedOnion.Script\RedOnion.Script.csproj">
+      <Project>{0D0A04F3-0A82-49CD-8178-7640ACE88BFF}</Project>
+      <Name>RedOnion.Script</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>

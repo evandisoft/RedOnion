@@ -1,10 +1,12 @@
 using UnityEngine;
 using Kerbalua.Other;
 using Kerbalua.Completion;
+using System.Collections.Generic;
 using System;
 using System.IO;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
+using RedOnion.Script;
 
 namespace Kerbalua.Gui {
 	public class ScriptWindow {
@@ -15,8 +17,9 @@ namespace Kerbalua.Gui {
 		public Repl repl = new Repl();
 
 		public CompletionBox completionBox = new CompletionBox();
-		public AutoLayoutBox buttonBar = new AutoLayoutBox();
-		public SimpleScript scriptEngine;
+		public AutoLayoutBox widgetBar = new AutoLayoutBox();
+		public ReplEvaluator currentReplEvaluator;
+		public Dictionary<string,ReplEvaluator> replEvaluators = new Dictionary<string,ReplEvaluator>();
 
 		const int windowID = 0;
 		const int modalID = 1;
@@ -29,8 +32,12 @@ namespace Kerbalua.Gui {
 		Rect completionBoxRect;
 		Rect editorRect;
 		TextArea scriptNameInput=new TextArea();
+		// Should be a label but I haven't made a label yet.
+		TextArea replEvaluatorLabel = new TextArea();
 
 		Rect SaveLoadRect;
+
+		public string saveLoadFilename = "untitled.b";
 
 		const float titleHeight = 20;
 
@@ -41,53 +48,80 @@ namespace Kerbalua.Gui {
 		bool editorChanged;
 		bool inputBoxChanged;
 
+		const string defaultScriptFilename = "untitled.b";
+
 		string CreateFullPath(string scriptName)
 		{
 			if (scriptName == "") {
-				scriptName = "untitled";
-				scriptNameInput.content.text = "untitled";
+				scriptName = defaultScriptFilename;
+				scriptNameInput.content.text = scriptName;
+				saveLoadFilename = defaultScriptFilename;
 			}
 
-			return baseFolderPath + "/" + scriptName + ".lua";
+			string fullPath=baseFolderPath + "/" + scriptName;
+
+			if (!File.Exists(fullPath)) {
+				File.WriteAllText(fullPath, "");
+			}
+
+			return fullPath;
 		}
 
 		void SaveScript(string scriptName)
 		{
 			Directory.CreateDirectory(baseFolderPath);
 			File.WriteAllText(CreateFullPath(scriptName), editor.content.text);
+			saveLoadFilename = scriptName;
 		}
 
 		void LoadScript(string scriptName)
 		{
 			Directory.CreateDirectory(baseFolderPath);
 			editor.content.text=File.ReadAllText(CreateFullPath(scriptName));
+			saveLoadFilename = scriptName;
 		}
 
-		public ScriptWindow(SimpleScript scriptEngine,Rect mainWindowRect)
+		public void SetCurrentEvaluator(string evaluatorName)
 		{
-			this.scriptEngine = scriptEngine;
+			currentReplEvaluator = replEvaluators[evaluatorName];
+			replEvaluatorLabel.content.text = evaluatorName;
+		}
+
+		public ScriptWindow(Rect mainWindowRect)
+		{
+			replEvaluators["RedOnion"] = new RedOnionReplEvaluator(new Engine());
+			replEvaluators["MoonSharp"] = new MoonSharpReplEvaluator(CoreModules.Preset_Complete);
+			SetCurrentEvaluator("RedOnion");
+
 			this.mainWindowRect = mainWindowRect;
 
-			scriptNameInput.content.text = "untitled";
+			scriptNameInput.content.text = saveLoadFilename;
+			LoadScript(scriptNameInput.content.text);
 
 			buttonBarRect = new Rect(0, titleHeight, 100, mainWindowRect.height-titleHeight);
 			replRect = new Rect(buttonBarRect.width, titleHeight, mainWindowRect.width - buttonBarRect.width, mainWindowRect.height-titleHeight);
 			editorRect = new Rect(0, 0, replRect.width, mainWindowRect.height);
 			completionBoxRect = new Rect(0, 0, 150, mainWindowRect.height);
 
-			buttonBar.renderables.Add(new Button("<<", () => editorVisible = !editorVisible));
-			buttonBar.renderables.Add(new Button(">>", () => replVisible = !replVisible));
-			buttonBar.renderables.Add(scriptNameInput);
-			buttonBar.renderables.Add(new Button("Save", () => {
+			widgetBar.renderables.Add(new Button("<<", () => editorVisible = !editorVisible));
+			widgetBar.renderables.Add(new Button(">>", () => replVisible = !replVisible));
+			widgetBar.renderables.Add(scriptNameInput);
+			widgetBar.renderables.Add(new Button("Save", () => {
 				SaveScript(scriptNameInput.content.text);
 			}));
-			buttonBar.renderables.Add(new Button("Load", () => {
+			widgetBar.renderables.Add(new Button("Load", () => {
 				LoadScript(scriptNameInput.content.text);
 			}));
-			buttonBar.renderables.Add(new Button("Evaluate", () => {
-				Evaluate(editor.content.text);
+			widgetBar.renderables.Add(new Button("Evaluate", () => {
+				repl.outputBox.content.text+=currentReplEvaluator.Evaluate(editor.content.text);
 			}));
 
+			foreach(var evaluatorName in replEvaluators.Keys) {
+				widgetBar.renderables.Add(new Button(evaluatorName, () => {
+					SetCurrentEvaluator(evaluatorName);
+				}));
+			}
+			widgetBar.renderables.Add(replEvaluatorLabel);
 			//Complete(false);
 		}
 
@@ -150,27 +184,29 @@ namespace Kerbalua.Gui {
 			}
 		}
 
-		public void Evaluate(string text)
-		{
-			DynValue result = new DynValue();
-			try {
-				result = scriptEngine.DoString(text);
-				repl.outputBox.content.text += Environment.NewLine;
-				if (result.UserData == null) {
-					repl.outputBox.content.text += result;
-				} else {
-					repl.outputBox.content.text += result.UserData.Object;
-					if (result.UserData.Object == null) {
-						repl.outputBox.content.text += " (" + result.UserData.Object.GetType() + ")";
-					}
-				}
-			} catch (Exception exception) {
-				Debug.Log(exception);
-			}
-		}
+		//public void Evaluate(string text)
+		//{
+		//	DynValue result = new DynValue();
+		//	try {
+		//		result = replEvaluator.DoString(text);
+		//		repl.outputBox.content.text += Environment.NewLine;
+		//		if (result.UserData == null) {
+		//			repl.outputBox.content.text += result;
+		//		} else {
+		//			repl.outputBox.content.text += result.UserData.Object;
+		//			if (result.UserData.Object == null) {
+		//				repl.outputBox.content.text += " (" + result.UserData.Object.GetType() + ")";
+		//			}
+		//		}
+		//	} catch (Exception exception) {
+		//		Debug.Log(exception);
+		//	}
+		//}
 
 		public void Render()
 		{
+
+
 			SetOrReleaseInputLock();
 
 			if (replVisible) {
@@ -190,7 +226,7 @@ namespace Kerbalua.Gui {
 				editor.Render(editorRect);
 
 				if (editorChanged) {
-					AllCompletion.Complete(scriptEngine.Globals, editor, completionBox.content, false);
+					//AllCompletion.Complete(replEvaluator.Globals, editor, completionBox.content, false);
 					editorChanged = false;
 				}
 			}
@@ -203,6 +239,8 @@ namespace Kerbalua.Gui {
 				completionBoxRect =UpdateBoxPositionWithWindow(completionBoxRect, mainWindowRect.width);
 				completionBox.Render(completionBoxRect);
 			}
+
+
 		}
 
 		/// <summary>
@@ -216,7 +254,7 @@ namespace Kerbalua.Gui {
 		void MainWindow(int id)
 		{
 			GUI.DragWindow(new Rect(0, 0, mainWindowRect.width, titleHeight));
-			buttonBar.Render(buttonBarRect);
+			widgetBar.Render(buttonBarRect);
 
 			if (replVisible) {
 				if(repl.outputBox.HasFocus()) {
@@ -228,7 +266,7 @@ namespace Kerbalua.Gui {
 				repl.Render(replRect);
 
 				if (inputBoxChanged) {
-					AllCompletion.Complete(scriptEngine.Globals, repl.inputBox, completionBox.content, false);
+					//AllCompletion.Complete(replEvaluator.Globals, repl.inputBox, completionBox.content, false);
 					inputBoxChanged = false;
 				}
 			}
@@ -242,13 +280,25 @@ namespace Kerbalua.Gui {
 					switch (event1.keyCode) {
 					case KeyCode.Space:
 						if (event1.shift) {
-							AllCompletion.Complete(scriptEngine.Globals, editor, completionBox.content, true);
+							//AllCompletion.Complete(replEvaluator.Globals, editor, completionBox.content, true);
 							event1.Use();
 						}
 						break;
 					case KeyCode.E:
 						if (event1.control) {
-							Evaluate(editor.content.text);
+							repl.outputBox.content.text += currentReplEvaluator.Evaluate(editor.content.text);
+							event1.Use();
+						}
+						break;
+					case KeyCode.D:
+						if (event1.control) {
+							LoadScript(scriptNameInput.content.text);
+							event1.Use();
+						}
+						break;
+					case KeyCode.S:
+						if (event1.control) {
+							SaveScript(scriptNameInput.content.text);
 							event1.Use();
 						}
 						break;
@@ -271,22 +321,20 @@ namespace Kerbalua.Gui {
 					switch (event1.keyCode) {
 					case KeyCode.Space:
 						if (event1.shift) {
-							AllCompletion.Complete(scriptEngine.Globals, repl.inputBox, completionBox.content, true);
+							//AllCompletion.Complete(replEvaluator.Globals, repl.inputBox, completionBox.content, true);
 							repl.outputBox.ResetScroll();
 							event1.Use();
 						}
 						break;
 					case KeyCode.E:
 						if (event1.control) {
-							Evaluate(repl.inputBox.content.text);
-							repl.inputBox.content.text = "";
-							completionBox.content.text = "";
+							repl.outputBox.content.text += currentReplEvaluator.Evaluate(repl.inputBox.content.text);
 							event1.Use();
 						}
 						break;
 					case KeyCode.Return:
 						if (!event1.shift) {
-							Evaluate(repl.inputBox.content.text);
+							repl.outputBox.content.text += currentReplEvaluator.Evaluate(repl.inputBox.content.text);
 							repl.inputBox.content.text = "";
 							completionBox.content.text = "";
 							event1.Use();
