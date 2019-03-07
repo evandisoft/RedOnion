@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using System.Collections.Generic;
 
 namespace Kerbalua.Gui {
 	public class EditingArea:ScrollableTextArea {
@@ -7,8 +8,6 @@ namespace Kerbalua.Gui {
 		public int cursorIndex = 0;
 		public int selectIndex = 0;
 		const int spacesPerTab = 4;
-
-
 
 		public override void Render(Rect rect, GUIStyle style = null)
 		{
@@ -25,7 +24,7 @@ namespace Kerbalua.Gui {
 				editor.cursorIndex = cursorIndex;
 				editor.selectIndex = selectIndex;
 				HandleInput(editor);
-
+				
 				content.text = editor.text;
 
 				base.Render(rect, style);
@@ -35,6 +34,15 @@ namespace Kerbalua.Gui {
 			} else {
 				base.Render(rect, style);
 			}
+		}
+
+		bool EventWillModifyEditor(Event event1)
+		{
+			return !(
+				event1.keyCode == KeyCode.LeftShift ||
+				event1.keyCode == KeyCode.LeftControl ||
+				event1.keyCode == KeyCode.LeftAlt
+				);
 		}
 
 		/// <summary>
@@ -49,14 +57,18 @@ namespace Kerbalua.Gui {
 		protected virtual void HandleInput(TextEditor editor)
 		{
 			Event event1 = Event.current;
+			// Doesn't seem to work
+			//if (EventWillModifyEditor(event1)) {
+			//	editor.SaveBackup();
+			//}
+
 			if (event1.type == EventType.KeyDown) {
 				switch (event1.keyCode) {
 				case KeyCode.Tab:
 					//Debug.Log(event1.keyCode);
 					if (event1.control) {
 						IndentToPreviousLine(editor);
-					}
-					else if (event1.shift) {
+					} else if (event1.shift) {
 						Unindent(editor);
 						//Debug.Log("Unindent");
 					} else {
@@ -64,9 +76,9 @@ namespace Kerbalua.Gui {
 						//Debug.Log("Indent");
 					}
 
-					event1.Use();	
+					event1.Use();
 					break;
-				case KeyCode.H:
+				case KeyCode.J:
 					if (event1.control) {
 						if (event1.shift) {
 							editor.SelectLeft();
@@ -76,7 +88,27 @@ namespace Kerbalua.Gui {
 						event1.Use();
 					}
 					break;
+				case KeyCode.K:
+					if (event1.control) {
+						if (event1.shift) {
+							editor.SelectDown();
+						} else {
+							editor.MoveDown();
+						}
+						event1.Use();
+					}
+					break;
 				case KeyCode.L:
+					if (event1.control) {
+						if (event1.shift) {
+							editor.SelectUp();
+						} else {
+							editor.MoveUp();
+						}
+						event1.Use();
+					}
+					break;
+				case KeyCode.Semicolon:
 					if (event1.control) {
 						if (event1.shift) {
 							editor.SelectRight();
@@ -87,25 +119,66 @@ namespace Kerbalua.Gui {
 						event1.Use();
 					}
 					break;
-				case KeyCode.J:
+				
+				case KeyCode.M:
 					if (event1.control) {
+						int toMove;
 						if (event1.shift) {
-							editor.SelectDown();
+							toMove = NextTabLeft(editor, selectIndex);
+							for (int i = 0;i < toMove;i++) {
+								editor.SelectLeft();
+							}
 						} else {
-							editor.MoveDown();
+							toMove = NextTabLeft(editor, cursorIndex);
+							for (int i = 0;i < toMove;i++) {
+								editor.MoveLeft();
+							}
 						}
 						event1.Use();
 					}
 					break;
-				case KeyCode.K:
+				case KeyCode.Comma:
 					if (event1.control) {
 						if (event1.shift) {
-							editor.SelectUp();
+							for (int i = 0;i < 4;i++) {
+								editor.SelectDown();
+							}
+						} else {
+							for (int i = 0;i < 4;i++) {
+								editor.MoveDown();
+							}
 						}
-						else{
-							editor.MoveUp();
+						event1.Use();
+					}
+					break;
+				case KeyCode.Period:
+					if (event1.control) {
+						if (event1.shift) {
+							for (int i = 0;i < 4;i++) {
+								editor.SelectUp();
+							}
+						} else {
+							for (int i = 0;i < 4;i++) {
+								editor.MoveUp();
+							}
 						}
-
+						event1.Use();
+					}
+					break;
+				case KeyCode.Slash:
+					if (event1.control) {
+						int toMove;
+						if (event1.shift) {
+							toMove = NextTabRight(editor, editor.selectIndex);
+							for (int i = 0;i < toMove;i++) {
+								editor.SelectRight();
+							}
+						} else {
+							toMove = NextTabRight(editor, editor.cursorIndex);
+							for (int i = 0;i < toMove;i++) {
+								editor.MoveRight();
+							}
+						}
 						event1.Use();
 					}
 					break;
@@ -121,6 +194,13 @@ namespace Kerbalua.Gui {
 					}
 
 					break;
+				//case KeyCode.U:
+				//if (event1.control) {
+				// Doesn't seem to work
+				//	editor.Undo();
+				//	event1.Use();
+				//}
+				//break;
 				case KeyCode.Return:
 					editor.ReplaceSelection(Environment.NewLine);
 					IndentToPreviousLine(editor);
@@ -128,6 +208,59 @@ namespace Kerbalua.Gui {
 					break;
 				}
 			}
+		}
+
+
+		int NextTabLeft(TextEditor editor,int fromIndex)
+		{
+			int prevCursorIndex = editor.cursorIndex;
+			int prevSelectIndex = editor.selectIndex;
+
+			editor.cursorIndex = fromIndex;
+			int charsFromStart = CharsFromLineStart(editor);
+
+			// Don't spill over to next line
+			if (charsFromStart == 0) {
+				return 0;
+			}
+
+			int charsToMove = charsFromStart % spacesPerTab;
+			if (charsToMove == 0) {
+				charsToMove = spacesPerTab;
+			}
+			Debug.Log("Chars to move is " + charsToMove);
+
+			editor.cursorIndex = prevCursorIndex;
+			editor.selectIndex = prevSelectIndex;
+
+			return charsToMove;
+		}
+
+		int NextTabRight(TextEditor editor, int fromIndex)
+		{
+			int prevCursorIndex = editor.cursorIndex;
+			int prevSelectIndex = editor.selectIndex;
+
+			editor.cursorIndex = fromIndex;
+			int charsFromStart = CharsFromLineStart(editor);
+
+
+			// Don't run over to next line
+			int charsFromEnd = CharsFromLineEnd(editor);
+			if (charsFromEnd < spacesPerTab) {
+				return charsFromEnd;
+			}
+
+			int charsToMove = spacesPerTab - charsFromStart % spacesPerTab;
+			if (charsToMove == 0) {
+				charsToMove = spacesPerTab;
+			}
+			Debug.Log("Chars to move is " + charsToMove);
+
+			editor.cursorIndex = prevCursorIndex;
+			editor.selectIndex = prevSelectIndex;
+
+			return charsToMove;
 		}
 
 		void InsertLineBefore(TextEditor editor)
@@ -241,6 +374,21 @@ namespace Kerbalua.Gui {
 			int startIndex = editor.cursorIndex;
 
 			int chars = prevCursorIndex - startIndex;
+
+			//Debug.Log("chars from line start is " + chars);
+
+			MoveToIndex(editor, prevCursorIndex);
+			
+			return chars;
+		}
+
+		int CharsFromLineEnd(TextEditor editor)
+		{
+			int prevCursorIndex = editor.cursorIndex;
+			editor.MoveLineEnd();
+			int endIndex = editor.cursorIndex;
+
+			int chars = endIndex-prevCursorIndex;
 
 			//Debug.Log("chars from line start is " + chars);
 

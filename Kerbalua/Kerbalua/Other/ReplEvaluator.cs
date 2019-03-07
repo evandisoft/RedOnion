@@ -9,7 +9,7 @@ namespace Kerbalua.Other {
 		/// <summary>
 		/// Evaluate the source and return the result of that evaluation.
 		/// </summary>
-		/// <returns>The result of evaluating the source string.</returns>
+		/// <returns>A toString of the result of evaluating the source string.</returns>
 		/// <param name="source">The source string to be evaluated.</param>
 		public abstract string Evaluate(string source);
 	}
