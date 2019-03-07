@@ -137,10 +137,6 @@
     <Folder Include="Kerbalua\Completion\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\RedOnion\RedOnion.csproj">
-      <Project>{3A40C452-1B11-4769-9D6B-FD318F2CB514}</Project>
-      <Name>RedOnion</Name>
-    </ProjectReference>
     <ProjectReference Include="..\RedOnion.Script\RedOnion.Script.csproj">
       <Project>{0D0A04F3-0A82-49CD-8178-7640ACE88BFF}</Project>
       <Name>RedOnion.Script</Name>

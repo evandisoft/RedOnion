@@ -2,7 +2,8 @@ using System;
 namespace Kerbalua.Other {
 	/// <summary>
 	/// Subclasses of this class implement a function, Evaluate, that evaluates
-	/// a string and returns a toString result of that string.
+	/// a string (source) and returns a toString of the result of evaluating
+	/// source.
 	/// </summary>
 	public abstract class ReplEvaluator {
 		/// <summary>
