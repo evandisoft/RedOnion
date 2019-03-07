@@ -12,7 +12,7 @@ namespace Kerbalua.Gui {
 		MoonSharpReplEvaluator scriptEngine;
 
 		KerbaluaMain.KSPRaw kspApi;
-		ScriptWindow scriptWindow;
+		public ScriptWindow scriptWindow;
 
 
 		public class FlightControl {

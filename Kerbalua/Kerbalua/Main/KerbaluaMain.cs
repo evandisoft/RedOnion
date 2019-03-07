@@ -74,7 +74,18 @@ namespace Kerbalua
             repl = new KerbaluaRepl(new KSPRaw());
         }
 
-        void LocalToggleGui()
+		// Doesn't seem to work
+		//public void OnSave(ConfigNode node)
+		//{
+		//	node.AddValue("saveLoadFilename", repl.scriptWindow.saveLoadFilename);
+		//}
+
+		//public void OnLoad(ConfigNode node)
+		//{
+		//	repl.scriptWindow.saveLoadFilename = node.GetValue("saveLoadFilename");
+		//}
+
+		void LocalToggleGui()
         {
             //if (guiActive) {
             //    InputLockManager.ClearControlLocks();

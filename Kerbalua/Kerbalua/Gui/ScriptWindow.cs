@@ -37,6 +37,8 @@ namespace Kerbalua.Gui {
 
 		Rect SaveLoadRect;
 
+		public string saveLoadFilename = "untitled.b";
+
 		const float titleHeight = 20;
 
 		bool inputIsLocked;
@@ -53,6 +55,7 @@ namespace Kerbalua.Gui {
 			if (scriptName == "") {
 				scriptName = defaultScriptFilename;
 				scriptNameInput.content.text = scriptName;
+				saveLoadFilename = defaultScriptFilename;
 			}
 
 			string fullPath=baseFolderPath + "/" + scriptName;
@@ -68,12 +71,14 @@ namespace Kerbalua.Gui {
 		{
 			Directory.CreateDirectory(baseFolderPath);
 			File.WriteAllText(CreateFullPath(scriptName), editor.content.text);
+			saveLoadFilename = scriptName;
 		}
 
 		void LoadScript(string scriptName)
 		{
 			Directory.CreateDirectory(baseFolderPath);
 			editor.content.text=File.ReadAllText(CreateFullPath(scriptName));
+			saveLoadFilename = scriptName;
 		}
 
 		public void SetCurrentEvaluator(string evaluatorName)
@@ -90,7 +95,7 @@ namespace Kerbalua.Gui {
 
 			this.mainWindowRect = mainWindowRect;
 
-			scriptNameInput.content.text = defaultScriptFilename;
+			scriptNameInput.content.text = saveLoadFilename;
 			LoadScript(scriptNameInput.content.text);
 
 			buttonBarRect = new Rect(0, titleHeight, 100, mainWindowRect.height-titleHeight);
