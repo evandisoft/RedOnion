@@ -272,6 +272,18 @@ namespace Kerbalua.Gui {
 							event1.Use();
 						}
 						break;
+					case KeyCode.L:
+						if (event1.control) {
+							LoadScript(scriptNameInput.content.text);
+							event1.Use();
+						}
+						break;
+					case KeyCode.S:
+						if (event1.control) {
+							SaveScript(scriptNameInput.content.text);
+							event1.Use();
+						}
+						break;
 					}
 					int diff = repl.outputBox.content.text.Length - maxOutputBytes;
 					if (diff > 0) {
