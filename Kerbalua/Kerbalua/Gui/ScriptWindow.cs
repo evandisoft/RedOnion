@@ -274,7 +274,7 @@ namespace Kerbalua.Gui {
 							event1.Use();
 						}
 						break;
-					case KeyCode.L:
+					case KeyCode.D:
 						if (event1.control) {
 							LoadScript(scriptNameInput.content.text);
 							event1.Use();

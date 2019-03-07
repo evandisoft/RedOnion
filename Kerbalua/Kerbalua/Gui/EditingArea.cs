@@ -53,7 +53,10 @@ namespace Kerbalua.Gui {
 				switch (event1.keyCode) {
 				case KeyCode.Tab:
 					//Debug.Log(event1.keyCode);
-					if (event1.shift) {
+					if (event1.control) {
+						IndentToPreviousLine(editor);
+					}
+					else if (event1.shift) {
 						Unindent(editor);
 						//Debug.Log("Unindent");
 					} else {
@@ -63,8 +66,92 @@ namespace Kerbalua.Gui {
 
 					event1.Use();	
 					break;
+				case KeyCode.H:
+					if (event1.control) {
+						editor.MoveLeft();
+						event1.Use();
+					}
+					break;
+				case KeyCode.L:
+					if (event1.control) {
+						editor.MoveRight();
+						event1.Use();
+					}
+					break;
+				case KeyCode.J:
+					if (event1.control) {
+						editor.MoveDown();
+						event1.Use();
+					}
+					break;
+				case KeyCode.K:
+					if (event1.control) {
+						editor.MoveUp();
+						event1.Use();
+					}
+					break;
+				case KeyCode.O:
+					if (event1.control) {
+						if (event1.shift) {
+							InsertLineBefore(editor);
+						} else {
+							InsertLineAfter(editor);
+						}
+						IndentToPreviousLine(editor);
+						event1.Use();
+					}
+
+					break;
+				case KeyCode.Return:
+					editor.ReplaceSelection(Environment.NewLine);
+					IndentToPreviousLine(editor);
+					event1.Use();
+					break;
 				}
 			}
+		}
+
+		void InsertLineBefore(TextEditor editor)
+		{
+			editor.MoveLineStart();
+			editor.ReplaceSelection(Environment.NewLine);
+			editor.MoveLeft();
+		}
+
+		void InsertLineAfter(TextEditor editor)
+		{
+			editor.MoveLineEnd();
+			editor.ReplaceSelection(Environment.NewLine);
+		}
+
+		void IndentToPreviousLine(TextEditor editor)
+		{
+			RemoveIndentation(editor);
+			int currentIndex = editor.cursorIndex;
+			editor.MoveUp();
+			int indentation = StartingSpaces(editor);
+			editor.MoveDown();
+			editor.MoveLineStart();
+
+			for(int i=0; i<indentation; i++) {
+				editor.Insert(' ');
+			}
+
+			int newIndex = currentIndex + indentation;
+
+			MoveToIndex(editor, newIndex);
+		}
+
+		void RemoveIndentation(TextEditor editor)
+		{
+			int indentation = StartingSpaces(editor);
+			int newIndex = Math.Max(editor.cursorIndex-indentation,0);
+			editor.MoveLineStart();
+			for(int i = 0;i < indentation;i++) {
+				editor.Delete();
+			}
+
+			MoveToIndex(editor, newIndex);
 		}
 
 		/// <summary>
@@ -82,8 +169,8 @@ namespace Kerbalua.Gui {
 			for (int i = 0;i < charsNeeded;i++) {
 				editor.Insert(' ');
 			}
-			editor.cursorIndex = prevCursorIndex;
-			editor.selectIndex = prevCursorIndex;
+
+			MoveToIndex(editor, prevCursorIndex);
 		}
 
 		/// <summary>
@@ -105,13 +192,21 @@ namespace Kerbalua.Gui {
 
 			//Debug.Log("charsToDelete " + charsToDelete);
 
-			int prevCursorIndex = editor.cursorIndex-spacesPerTab;
+			int prevCursorIndex = editor.cursorIndex;
 			editor.MoveLineStart();
+			int lineStartIndex = editor.cursorIndex;
+			int newIndex = Math.Max(lineStartIndex, prevCursorIndex - charsToDelete);
+
 			for (int i = 0;i < charsToDelete;i++) {
 				editor.Delete();
 			}
-			editor.cursorIndex = prevCursorIndex;
-			editor.selectIndex = prevCursorIndex;
+			MoveToIndex(editor, newIndex);
+		}
+
+		void MoveToIndex(TextEditor editor,int index)
+		{
+			editor.cursorIndex = index;
+			editor.selectIndex = index;
 		}
 
 		/// <summary>
@@ -130,8 +225,7 @@ namespace Kerbalua.Gui {
 
 			//Debug.Log("chars from line start is " + chars);
 
-			editor.cursorIndex = prevCursorIndex;
-			editor.selectIndex = prevCursorIndex;
+			MoveToIndex(editor, prevCursorIndex);
 
 			return chars;
 		}
@@ -148,6 +242,8 @@ namespace Kerbalua.Gui {
 			foreach(char c in currentLine) {
 				if(c==' ') {
 					i++;
+				} else {
+					break;
 				}
 			}
 
@@ -172,8 +268,7 @@ namespace Kerbalua.Gui {
 
 			//Debug.Log("The Line is " + currentLine);
 
-			editor.cursorIndex = prevCursorIndex;
-			editor.selectIndex = prevCursorIndex;
+			MoveToIndex(editor, prevCursorIndex);
 
 			return currentLine;
 		}
