@@ -68,25 +68,44 @@ namespace Kerbalua.Gui {
 					break;
 				case KeyCode.H:
 					if (event1.control) {
-						editor.MoveLeft();
+						if (event1.shift) {
+							editor.SelectLeft();
+						} else {
+							editor.MoveLeft();
+						}
 						event1.Use();
 					}
 					break;
 				case KeyCode.L:
 					if (event1.control) {
-						editor.MoveRight();
+						if (event1.shift) {
+							editor.SelectRight();
+						} else {
+							editor.MoveRight();
+						}
+
 						event1.Use();
 					}
 					break;
 				case KeyCode.J:
 					if (event1.control) {
-						editor.MoveDown();
+						if (event1.shift) {
+							editor.SelectDown();
+						} else {
+							editor.MoveDown();
+						}
 						event1.Use();
 					}
 					break;
 				case KeyCode.K:
 					if (event1.control) {
-						editor.MoveUp();
+						if (event1.shift) {
+							editor.SelectUp();
+						}
+						else{
+							editor.MoveUp();
+						}
+
 						event1.Use();
 					}
 					break;
