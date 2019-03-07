@@ -46,14 +46,16 @@ namespace Kerbalua.Gui {
 		bool editorChanged;
 		bool inputBoxChanged;
 
+		const string defaultScriptFilename = "untitled.b";
+
 		string CreateFullPath(string scriptName)
 		{
 			if (scriptName == "") {
-				scriptName = "untitled";
-				scriptNameInput.content.text = "untitled";
+				scriptName = defaultScriptFilename;
+				scriptNameInput.content.text = scriptName;
 			}
 
-			return baseFolderPath + "/" + scriptName + ".lua";
+			return baseFolderPath + "/" + scriptName;
 		}
 
 		void SaveScript(string scriptName)
@@ -82,7 +84,7 @@ namespace Kerbalua.Gui {
 
 			this.mainWindowRect = mainWindowRect;
 
-			scriptNameInput.content.text = "untitled";
+			scriptNameInput.content.text = defaultScriptFilename;
 
 			buttonBarRect = new Rect(0, titleHeight, 100, mainWindowRect.height-titleHeight);
 			replRect = new Rect(buttonBarRect.width, titleHeight, mainWindowRect.width - buttonBarRect.width, mainWindowRect.height-titleHeight);
@@ -311,8 +313,6 @@ namespace Kerbalua.Gui {
 					case KeyCode.E:
 						if (event1.control) {
 							repl.outputBox.content.text += currentReplEvaluator.Evaluate(repl.inputBox.content.text);
-							repl.inputBox.content.text = "";
-							completionBox.content.text = "";
 							event1.Use();
 						}
 						break;
