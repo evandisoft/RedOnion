@@ -99,8 +99,7 @@
     <Compile Include="Kerbalua\Gui\GUIUtil.cs" />
     <Compile Include="Kerbalua\Gui\ILayoutRenderer.cs" />
     <Compile Include="Kerbalua\Gui\Editor.cs" />
-    <Compile Include="Kerbalua\Gui\EditorOld.cs" />
-    <Compile Include="Kerbalua\Gui\UIELement.cs" />
+    <Compile Include="Kerbalua\Gui\UIElement.cs" />
     <Compile Include="Kerbalua\Gui\EditingArea.cs" />
   </ItemGroup>
   <ItemGroup>

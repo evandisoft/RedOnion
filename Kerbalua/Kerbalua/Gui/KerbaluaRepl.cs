@@ -9,7 +9,7 @@ using Kerbalua;
 
 namespace Kerbalua.Gui {
 	public class KerbaluaRepl {
-		SimpleScript script;
+		SimpleScript scriptEngine;
 
 		KerbaluaMain.KSPRaw kspApi;
 		ScriptWindow scriptWindow;
@@ -41,16 +41,16 @@ namespace Kerbalua.Gui {
 		public KerbaluaRepl(KerbaluaMain.KSPRaw kspApi)
 		{
 			this.kspApi = kspApi;
-			script = new SimpleScript(CoreModules.Preset_Complete);
+			scriptEngine = new SimpleScript(CoreModules.Preset_Complete);
 			UserData.RegistrationPolicy = InteropRegistrationPolicy.Automatic;
 
-			script.Globals["ksp"] = kspApi;
-			script.Globals["flight"] = new FlightControl(FlightGlobals.ActiveVessel, script);
+			scriptEngine.Globals["ksp"] = kspApi;
+			scriptEngine.Globals["flight"] = new FlightControl(FlightGlobals.ActiveVessel, scriptEngine);
 
-			script.Options.DebugPrint = Print;
+			scriptEngine.Options.DebugPrint = Print;
 			InputLockManager.ClearControlLocks();
 
-			scriptWindow = new ScriptWindow(script, new Rect(500, 100, 400, 500));
+			scriptWindow = new ScriptWindow(scriptEngine, new Rect(500, 100, 400, 500));
 		}
 
 		public void Print(string str)

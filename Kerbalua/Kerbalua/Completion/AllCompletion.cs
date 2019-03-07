@@ -5,6 +5,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using Kerbalua.Other;
 using Kerbalua.Utility;
+using Kerbalua.Gui;
 
 namespace Kerbalua.Completion {
     public class AllCompletion {
@@ -67,19 +68,19 @@ namespace Kerbalua.Completion {
         }
 
 
-        public static void Complete(
-            Table globals,
-            GUIContent inputContent,
-            GUIContent completionContent,
-            int cursorPos,
-            bool completing,
-            out int newCursorPos
+		public static void Complete(
+			Table globals,
+			EditingArea inputArea,
+			GUIContent completionBoxContent,
+			bool completing
         )
         {
             string basePart, completionPart, endPart;
-            SplitInput(inputContent.text, cursorPos, out basePart, out completionPart, out endPart);
+            SplitInput(inputArea.content.text, inputArea.cursorIndex, out basePart, out completionPart, out endPart);
+			Debug.Log(inputArea.content.text+","+basePart + "," + completionPart + "," + endPart);
 
             var correctTokens = LastVarExtracter.Parse(basePart+completionPart);
+	
 
             List<string> completions = new List<string>();
             if (correctTokens.Count > 0) {
@@ -115,20 +116,22 @@ namespace Kerbalua.Completion {
             }
             completions.Sort();
 
-            newCursorPos = cursorPos;
             if (completions.Count > 0) {
-                completionContent.text = "";
                 if (completing) {
-                    inputContent.text = basePart + completions[0] + endPart;
-                    newCursorPos= basePart.Length + completions[0].Length;
+                    inputArea.content.text = basePart + completions[0] + endPart;
+                    inputArea.cursorIndex= basePart.Length + completions[0].Length;
+					inputArea.selectIndex = inputArea.cursorIndex;
+					Debug.Log("completing " + completions.Count);
                 } else {
-                    foreach (var completion in completions) {
-                        completionContent.text += completion + Environment.NewLine;
+					completionBoxContent.text = "";
+					foreach (var completion in completions) {
+                        completionBoxContent.text += completion + Environment.NewLine;
                     }
+					Debug.Log("not completing "+completions.Count);
                 }
 
             } else {
-                completionContent.text = "";
+                completionBoxContent.text = "";
             }
         }
     }
