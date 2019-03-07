@@ -13,7 +13,7 @@ namespace RedOnion.Script
 		Object		= 0x0001,// Engine object (ptr is IObject)
 		Create		= 0x0002,// Lazy-create object (ptr is Create) - in ptr.ro only
 		Property	= 0x0003,// Property (ptr is iProp) - in ptr.ro only
-		Reference	= 0x0008,// Identifier / property reference (in str, ptr is iProps)
+		Reference	= 0x0008,// Identifier / property reference (in str, ptr is IProperties)
 		Byte		= 0x0110,// 8 bit unsigned
 		UShort		= 0x0211,// 16 bit unsigned
 		UInt		= 0x0412,// 32 bit unsigned

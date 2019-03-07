@@ -5,6 +5,10 @@ using System.Text;
 
 namespace RedOnion.Script.BasicObjects
 {
+	/// <summary>
+	/// Simple implementation if IObject
+	/// suitable for custom objects
+	/// </summary>
 	public class SimpleObject : IObject
 	{
 		/// <summary>
@@ -31,7 +35,7 @@ namespace RedOnion.Script.BasicObjects
 			=> new Value("[internal]");
 
 		/// <summary>
-		/// Create object with prototype and some base properties
+		/// Create object with some base properties
 		/// </summary>
 		public SimpleObject(Engine engine, IProperties properties)
 		{
@@ -53,6 +57,11 @@ namespace RedOnion.Script.BasicObjects
 
 		public virtual bool Get(string name, out Value value)
 		{
+			if (BaseProps == null)
+			{
+				value = new Value();
+				return false;
+			}
 			if (!BaseProps.Get(name, out value))
 				return false;
 			if (value.Type == ValueKind.Create)
@@ -69,7 +78,9 @@ namespace RedOnion.Script.BasicObjects
 
 		public virtual bool Set(string name, Value value)
 		{
-			if (!BaseProps.Get(name, out var query))
+			if (BaseProps == null)
+				return false;
+			if (BaseProps.Get(name, out var query))
 				return false;
 			if (query.Type != ValueKind.Property)
 				return false;
