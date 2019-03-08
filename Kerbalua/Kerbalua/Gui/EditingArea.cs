@@ -208,14 +208,14 @@ namespace Kerbalua.Gui {
 					GUIUtil.ConsumeAndMarkNextCharEvent(event1);
 					break;
 				}
-				if (event1.type == EventType.Used)
-				{
-					Debug.Log(event1 + " was used");
-				}
-				else
-				{
-					Debug.Log(event1 + " was not used");
-				}
+				//if (event1.type == EventType.Used)
+				//{
+				//	Debug.Log(event1 + " was used");
+				//}
+				//else
+				//{
+				//	Debug.Log(event1 + " was not used");
+				//}
 
 
 			}

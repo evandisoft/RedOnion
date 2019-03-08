@@ -9,12 +9,14 @@ namespace Kerbalua.Other {
 		public RedOnionReplEvaluator(Engine engine)
 		{
 			this.engine = engine;
+			engine.ExecutionCountdown = 10000;
 		}
 
 		public override string Evaluate(string source)
 		{
 			string output = "";
 			try {
+				//Debug.Log("Running statement with Execution Countdown at " + engine.ExecutionCountdown);
 				engine.Execute(source);
 				Value result = engine.Result;
 				output = "\n";
