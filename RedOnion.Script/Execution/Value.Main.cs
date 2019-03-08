@@ -7,12 +7,13 @@ using System.Text;
 
 namespace RedOnion.Script
 {
+	//todo: try matching this with System.TypeCode
 	public enum ValueKind
 	{
 		Undefined	= 0x0000,// Undefined value
 		Object		= 0x0001,// Engine object (ptr is IObject)
-		Create		= 0x0002,// Lazy-create object (ptr is Create) - in ptr.ro only
-		Property	= 0x0003,// Property (ptr is iProp) - in ptr.ro only
+		Create		= 0x0002,// Lazy-create object (ptr is Create) - in BaseProps only
+		Property	= 0x0003,// Property (ptr is IProperty) - in BaseProps only
 		Reference	= 0x0008,// Identifier / property reference (in str, ptr is IProperties)
 		Byte		= 0x0110,// 8 bit unsigned
 		UShort		= 0x0211,// 16 bit unsigned
@@ -25,11 +26,11 @@ namespace RedOnion.Script
 		Float		= 0xC418,// f32
 		Double		= 0xC819,// f64
 		Bool		= 0x011B,// u1
-		String		= 0x0029,// string
-		Char		= 0x023A,// char
+		Char		= 0x023C,// char (marked as both number and string)
+		String		= 0x002A,// string
 
 		fStr		= 0x0020,// is string or char
-		fNum		= 0x0010,// is number
+		fNum		= 0x0010,// is number (primitive type - includes char and bool)
 		f64			= 0x1800,// is 64bit or more
 		fFp			= 0x8000,// floating point
 		fSig		= 0x4000,// signed

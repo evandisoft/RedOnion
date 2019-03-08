@@ -7,10 +7,11 @@ namespace RedOnion.ScriptNUnit
 {
 	public class EngineTestsBase : Engine
 	{
-		public void Test(string script)
+		public void Test(string script, int countdown = 100)
 		{
 			try
 			{
+				ExecutionCountdown = countdown;
 				Execute(script);
 			}
 			catch (Exception e)

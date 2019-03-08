@@ -10,7 +10,7 @@ namespace RedOnion.ScriptNUnit
 	[TestFixture]
 	public class ExecutionCountdownTests : EngineTestsBase
 	{
-		public new void Test(string script)
+		public void Test(string script)
 		{
 			try
 			{

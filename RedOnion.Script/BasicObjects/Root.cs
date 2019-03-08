@@ -7,31 +7,63 @@ namespace RedOnion.Script.BasicObjects
 {
 	public class Root : BasicObject, Engine.IRoot
 	{
-		public Value Undefined { get; }
-		public Value Null { get; }
-		public Value NaN { get; }
-		public Value Infinity { get; }
+		public static Value Undefined { get; } = new Value();
+		public static Value Null { get; } = new Value(ValueKind.Object, null);
+		public static Value NaN { get; } = new Value(double.NaN);
+		public static Value Infinity { get; } = new Value(double.PositiveInfinity);
+
 		public FunctionFun Function { get; }
 		public ObjectFun Object { get; }
 		public StringFun String { get; }
 		public NumberFun Number { get; }
 
+		public Dictionary<Type, IObject>
+			TypeMap { get; } = new Dictionary<Type, IObject>();
+		public IObject this[Type type]
+		{
+			get
+			{
+				if (TypeMap.TryGetValue(type, out var value))
+					return value;
+				value = new ReflectedObjects.ReflectedType(Engine, type);
+				TypeMap[type] = value;
+				return value;
+			}
+			set => TypeMap[type] = value;
+		}
+
 		public Root(Engine engine)
 			: base(engine, null, new Properties(), new Properties())
 		{
-			BaseProps.Set("undefined", Undefined = new Value());
-			BaseProps.Set("null", Null = new Value(ValueKind.Object, null));
-			BaseProps.Set("nan", NaN = new Value(double.NaN));
-			BaseProps.Set("infinity", Infinity = new Value(double.PositiveInfinity));
-			MoreProps.Set("inf", Infinity);
 			var obj = new BasicObject(engine);
 			var fun = new FunctionObj(engine, obj);
 			var str = new StringObj(engine, obj);
 			var num = new NumberObj(engine, obj);
-			BaseProps.Set("Function", new Value(Function = new FunctionFun(engine, fun, fun)));
-			BaseProps.Set("Object", new Value(Object = new ObjectFun(engine, fun, obj, this)));
-			BaseProps.Set("String", new Value(String = new StringFun(engine, fun, str)));
-			BaseProps.Set("Number", new Value(Number = new NumberFun(engine, fun, num)));
+			Function = new FunctionFun(engine, fun, fun);
+			Object = new ObjectFun(engine, fun, obj, this);
+			String = new StringFun(engine, fun, str);
+			Number = new NumberFun(engine, fun, num);
+			Fill();
+		}
+
+		public override void Reset()
+		{
+			BaseProps.Reset();
+			MoreProps.Reset();
+			TypeMap.Clear();
+		}
+
+		protected virtual void Fill()
+		{
+			BaseProps.Set("undefined", Undefined);
+			BaseProps.Set("null", Null);
+			BaseProps.Set("nan", NaN);
+			BaseProps.Set("infinity", Infinity);
+			MoreProps.Set("inf", Infinity);
+			BaseProps.Set("Function", new Value(Function));
+			BaseProps.Set("Object", new Value(Object));
+			BaseProps.Set("String", new Value(String));
+			BaseProps.Set("Number", new Value(Number));
 		}
 
 		public IObject Box(Value value)

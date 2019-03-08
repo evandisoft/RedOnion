@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 
 //TODO: Use FastMember or Reflection.Emit
@@ -10,44 +11,44 @@ namespace RedOnion.Script.ReflectedObjects
 		/// <summary>
 		/// Reflected type this object represents
 		/// </summary>
-		public Type Class { get; }
+		public Type Type { get; }
 
 		/// <summary>
 		/// Properties of the created object
 		/// (shared via BaseProps)
 		/// </summary>
-		public IProperties ClassProps { get; set; }
+		public IProperties TypeProps { get; set; }
 
 		/// <summary>
 		/// Create object (with some static properties)
 		/// </summary>
 		public ReflectedType(Engine engine, Type type, IProperties staticProps = null)
 			: base(engine, staticProps)
-			=> Class = type;
+			=> Type = type;
 
 		/// <summary>
 		/// Create object with both static and class/instance properties
 		/// </summary>
 		public ReflectedType(Engine engine, Type type,
-			IProperties staticProps, IProperties classProps)
+			IProperties staticProps, IProperties typeProps)
 			: this(engine, type, staticProps)
-			=> ClassProps = classProps;
+			=> TypeProps = typeProps;
 
 		public override Value Call(IObject self, int argc)
 			=> new Value(Create(argc));
 
 		public override IObject Create(int argc)
 		{
-			if (Class.IsAbstract)
+			if (Type.IsAbstract)
 				return null;
 			if (argc == 0)
 			{
-				var ctor = Class.GetConstructor(new Type[0]);
+				var ctor = Type.GetConstructor(new Type[0]);
 				if (ctor == null)
 					return null;
-				return new ReflectedObject(Engine, ctor.Invoke(new object[0]), this, ClassProps);
+				return new ReflectedObject(Engine, ctor.Invoke(new object[0]), this, TypeProps);
 			}
-			foreach (var ctor in Class.GetConstructors())
+			foreach (var ctor in Type.GetConstructors())
 			{
 				var para = ctor.GetParameters();
 				if (para.Length != argc)
@@ -61,7 +62,7 @@ namespace RedOnion.Script.ReflectedObjects
 		{
 			if (BaseProps?.Has(name) == true)
 				return this;
-			foreach (var member in Class.GetMember(name,
+			foreach (var member in Type.GetMember(name,
 				BindingFlags.IgnoreCase|BindingFlags.Static|BindingFlags.Public))
 			{
 				if (member is MethodInfo method)
@@ -82,12 +83,28 @@ namespace RedOnion.Script.ReflectedObjects
 		{
 			if (base.Get(name, out value))
 				return true;
-			foreach (var member in Class.GetMember(name,
-				BindingFlags.IgnoreCase|BindingFlags.Static|BindingFlags.Public))
+			var members = Type.GetMember(name,
+				BindingFlags.IgnoreCase|BindingFlags.Static|BindingFlags.Public);
+			for (int i = 0; i < members.Length;)
 			{
+				var member = members[i++];
 				if (member is MethodInfo method)
 				{
-					var func = new ReflectedFunction(Engine, this, name);
+					List<MethodInfo> allMethods = null;
+					while (i < members.Length)
+					{
+						if (members[i++] is MethodInfo method2)
+						{
+							if (allMethods == null)
+							{
+								allMethods = new List<MethodInfo>();
+								allMethods.Add(method);
+							}
+							allMethods.Add(method2);
+						}
+					}
+					var func = new ReflectedFunction(Engine, this, name,
+						allMethods == null ? new MethodInfo[] { method } : allMethods.ToArray());
 					if (BaseProps == null)
 						BaseProps = new Properties();
 					BaseProps.Set(name, value = new Value(func));

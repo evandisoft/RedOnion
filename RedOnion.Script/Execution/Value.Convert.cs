@@ -170,12 +170,33 @@ namespace RedOnion.Script
 		}
 
 		public ValueKind Type => type;
-		public bool IsString => (Type & ValueKind.fNum) != 0;
+		/// <summary>
+		/// Is string or char
+		/// </summary>
+		public bool IsString => (Type & ValueKind.fStr) != 0;
+		/// <summary>
+		/// Is number (primitive type - includes char and bool)
+		/// </summary>
 		public bool IsNumber => (Type & ValueKind.fNum) != 0;
+		/// <summary>
+		/// Is 64bit or more (long, ulong and double, more bits not supported yet)
+		/// </summary>
 		public bool Is64 => (Type & ValueKind.f64) != 0;
-		public byte NumberSize => unchecked((byte)(((ushort)(Type & ValueKind.mSz)) >> 8));
+		/// <summary>
+		/// Number of bytes the number / primitive type uses (zero if not primitive type)
+		/// </summary>
+		public byte NumberSize => (byte)(((ushort)(Type & ValueKind.mSz)) >> 8);
+		/// <summary>
+		/// Is signed number type (double, float, int, long, short or sbyte)
+		/// </summary>
 		public bool Signed => (Type & ValueKind.fSig) != 0;
+		/// <summary>
+		/// Is foating point number (double or float)
+		/// </summary>
 		public bool IsFloatigPoint => (Type & ValueKind.fFp) != 0;
+		/// <summary>
+		/// Is floating point number with not-a-number value
+		/// </summary>
 		public bool IsNaN => (Type & ValueKind.fFp) != 0 && double.IsNaN(data.Double);
 
 		public static implicit operator bool(Value value)

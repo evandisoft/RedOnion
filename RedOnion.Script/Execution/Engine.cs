@@ -57,6 +57,11 @@ namespace RedOnion.Script
 			/// Get type reference with parameter (array or generic)
 			/// </summary>
 			Value Get(OpCode OpCode, params Value[] par);
+
+			/// <summary>
+			/// Get or set type creator (ReflectedType)
+			/// </summary>
+			IObject this[Type type] { get; set; }
 		}
 
 		/// <summary>

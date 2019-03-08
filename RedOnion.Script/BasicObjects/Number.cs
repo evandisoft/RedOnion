@@ -39,7 +39,7 @@ namespace RedOnion.Script.BasicObjects
 		/// Boxed value
 		/// </summary>
 		public Value Number { get; protected set; }
-		public override Value Value => this.Number;
+		public override Value Value => Number;
 
 		/// <summary>
 		/// Create Number.prototype

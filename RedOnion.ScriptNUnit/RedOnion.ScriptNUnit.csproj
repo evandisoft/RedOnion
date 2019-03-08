@@ -39,6 +39,7 @@
     <Compile Include="OpCodeTests.cs" />
     <Compile Include="ParseExpressionTests.cs" />
     <Compile Include="ParseStatementsTests.cs" />
+    <Compile Include="ReflectionTests.cs" />
     <Compile Include="ScannerTests.cs" />
     <Compile Include="ScopeTests.cs" />
     <Compile Include="StatementTests.cs" />
