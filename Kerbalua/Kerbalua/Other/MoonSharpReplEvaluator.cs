@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.REPL;
 using MoonSharp.Interpreter.Interop;
@@ -22,7 +22,7 @@ namespace Kerbalua.Other
 			DynValue result;
 			try {
 				result = scriptEngine.DoString(source);
-				output= Environment.NewLine;
+				output= "\n";
 				if (result.UserData == null) {
 					output += result;
 				} else {

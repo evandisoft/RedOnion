@@ -28,7 +28,7 @@ namespace Kerbalua.Gui {
 			if (monoSpaceFont == null) {
 				string[] fonts = Font.GetOSInstalledFontNames();
 				foreach (var fontName in fonts) {
-					if (fontName.Contains("Mono")) {
+					if (fontName.Contains("Courier New")) {
 						monoSpaceFont = Font.CreateDynamicFontFromOSFont(fontName, 12);
 					}
 				}

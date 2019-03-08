@@ -13,7 +13,7 @@ namespace Kerbalua.Gui {
 		{
 			if (style == null) {
 				style = new GUIStyle(GUI.skin.textArea);
-				style.font = GUIUtil.GetMonoSpaceFont();
+				//style.font = GUIUtil.GetMonoSpaceFont();
 			}
 
 			TextEditor editor;
@@ -202,10 +202,23 @@ namespace Kerbalua.Gui {
 				//}
 				//break;
 				case KeyCode.Return:
-					editor.ReplaceSelection(Environment.NewLine);
+					editor.ReplaceSelection("\n");
 					IndentToPreviousLine(editor);
 					event1.Use();
 					break;
+				}
+				if (event1.type == EventType.Used)
+				{
+					Debug.Log(event1 + " was used");
+				}
+				else
+				{
+					Debug.Log(event1 + " was not used");
+					if (event1.keyCode == KeyCode.None)
+					{
+						event1.Use();
+					}
+					
 				}
 			}
 		}
@@ -266,14 +279,14 @@ namespace Kerbalua.Gui {
 		void InsertLineBefore(TextEditor editor)
 		{
 			editor.MoveLineStart();
-			editor.ReplaceSelection(Environment.NewLine);
+			editor.ReplaceSelection("\n");
 			editor.MoveLeft();
 		}
 
 		void InsertLineAfter(TextEditor editor)
 		{
 			editor.MoveLineEnd();
-			editor.ReplaceSelection(Environment.NewLine);
+			editor.ReplaceSelection("\n");
 		}
 
 		void IndentToPreviousLine(TextEditor editor)

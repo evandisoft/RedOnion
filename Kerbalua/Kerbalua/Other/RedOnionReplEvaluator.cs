@@ -17,7 +17,7 @@ namespace Kerbalua.Other {
 			try {
 				engine.Execute(source);
 				Value result = engine.Result;
-				output = Environment.NewLine;
+				output = "\n";
 				output +=result.ToString();
 			}
 			catch(Exception e) {

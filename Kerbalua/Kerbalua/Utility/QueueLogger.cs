@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
@@ -98,7 +98,7 @@ namespace Kerbalua.Utility {
                 }
                 sb.Append(",");
             }
-            sb.Append(Environment.NewLine);
+            sb.Append("\n");
             return sb.ToString();
         }
 

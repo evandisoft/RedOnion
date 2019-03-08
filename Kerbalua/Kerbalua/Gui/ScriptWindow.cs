@@ -189,7 +189,7 @@ namespace Kerbalua.Gui {
 		//	DynValue result = new DynValue();
 		//	try {
 		//		result = replEvaluator.DoString(text);
-		//		repl.outputBox.content.text += Environment.NewLine;
+		//		repl.outputBox.content.text += "\n";
 		//		if (result.UserData == null) {
 		//			repl.outputBox.content.text += result;
 		//		} else {
