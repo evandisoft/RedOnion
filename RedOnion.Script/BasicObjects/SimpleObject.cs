@@ -6,7 +6,7 @@ using System.Text;
 namespace RedOnion.Script.BasicObjects
 {
 	/// <summary>
-	/// Simple implementation if IObject
+	/// Simple implementation of IObject
 	/// suitable for custom objects
 	/// </summary>
 	public class SimpleObject : IObject

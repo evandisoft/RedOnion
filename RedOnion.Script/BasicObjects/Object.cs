@@ -42,7 +42,7 @@ namespace RedOnion.Script.BasicObjects
 	/// <remarks>
 	/// New properties can be added in runtime
 	/// and also accessed by indexing (by name)
-	/// which 
+	/// which can be used like string-keyed dictionary.
 	/// </remarks>
 	[DebuggerDisplay("{GetType().Name}")]
 	public class BasicObject : IObject
