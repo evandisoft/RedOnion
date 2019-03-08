@@ -14,6 +14,11 @@ namespace Kerbalua.Gui {
 			if (style == null) {
 				style = new GUIStyle(GUI.skin.textArea);
 				style.font = GUIUtil.GetMonoSpaceFont();
+				style.hover.textColor
+					=style.normal.textColor
+					=style.active.textColor 
+					=Color.white;
+
 			}
 
 			TextEditor editor;
