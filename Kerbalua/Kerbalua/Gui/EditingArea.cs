@@ -64,6 +64,7 @@ namespace Kerbalua.Gui {
 			//}
 
 			if (event1.type == EventType.KeyDown) {
+				GUIUtil.ConsumeMarkedCharEvent(event1);
 				switch (event1.keyCode) {
 				case KeyCode.Tab:
 					//Debug.Log(event1.keyCode);
@@ -216,7 +217,7 @@ namespace Kerbalua.Gui {
 					Debug.Log(event1 + " was not used");
 				}
 
-				GUIUtil.ConsumeMarkedCharEvent(event1);
+
 			}
 		}
 
