@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using MoonSharp.Interpreter;
@@ -55,7 +55,7 @@ namespace Kerbalua.Gui {
 
 		public void Print(string str)
 		{
-			scriptWindow.repl.outputBox.content.text += Environment.NewLine + str;
+			scriptWindow.repl.outputBox.content.text += "\n" + str;
 		}
 
 		public void Render(bool guiActive)

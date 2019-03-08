@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
 using UnityEngine;
@@ -125,7 +125,7 @@ namespace Kerbalua.Completion {
                 } else {
 					completionBoxContent.text = "";
 					foreach (var completion in completions) {
-                        completionBoxContent.text += completion + Environment.NewLine;
+                        completionBoxContent.text += completion + "\n";
                     }
 					//Debug.Log("not completing "+completions.Count);
                 }

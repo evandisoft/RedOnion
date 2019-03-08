@@ -189,7 +189,7 @@ namespace Kerbalua.Gui {
 		//	DynValue result = new DynValue();
 		//	try {
 		//		result = replEvaluator.DoString(text);
-		//		repl.outputBox.content.text += Environment.NewLine;
+		//		repl.outputBox.content.text += "\n";
 		//		if (result.UserData == null) {
 		//			repl.outputBox.content.text += result;
 		//		} else {
@@ -277,29 +277,30 @@ namespace Kerbalua.Gui {
 			if (editor.HasFocus()) {
 				Event event1 = Event.current;
 				if (event1.type == EventType.KeyDown) {
+
 					switch (event1.keyCode) {
 					case KeyCode.Space:
 						if (event1.shift) {
 							//AllCompletion.Complete(replEvaluator.Globals, editor, completionBox.content, true);
-							event1.Use();
+							GUIUtil.ConsumeAndMarkNextCharEvent(event1);
 						}
 						break;
 					case KeyCode.E:
 						if (event1.control) {
 							repl.outputBox.content.text += currentReplEvaluator.Evaluate(editor.content.text);
-							event1.Use();
+							GUIUtil.ConsumeAndMarkNextCharEvent(event1);
 						}
 						break;
 					case KeyCode.D:
 						if (event1.control) {
 							LoadScript(scriptNameInput.content.text);
-							event1.Use();
+							GUIUtil.ConsumeAndMarkNextCharEvent(event1);
 						}
 						break;
 					case KeyCode.S:
 						if (event1.control) {
 							SaveScript(scriptNameInput.content.text);
-							event1.Use();
+							GUIUtil.ConsumeAndMarkNextCharEvent(event1);
 						}
 						break;
 					}
@@ -323,13 +324,13 @@ namespace Kerbalua.Gui {
 						if (event1.shift) {
 							//AllCompletion.Complete(replEvaluator.Globals, repl.inputBox, completionBox.content, true);
 							repl.outputBox.ResetScroll();
-							event1.Use();
+							GUIUtil.ConsumeAndMarkNextCharEvent(event1);
 						}
 						break;
 					case KeyCode.E:
 						if (event1.control) {
 							repl.outputBox.content.text += currentReplEvaluator.Evaluate(repl.inputBox.content.text);
-							event1.Use();
+							GUIUtil.ConsumeAndMarkNextCharEvent(event1);
 						}
 						break;
 					case KeyCode.Return:
@@ -337,7 +338,7 @@ namespace Kerbalua.Gui {
 							repl.outputBox.content.text += currentReplEvaluator.Evaluate(repl.inputBox.content.text);
 							repl.inputBox.content.text = "";
 							completionBox.content.text = "";
-							event1.Use();
+							GUIUtil.ConsumeAndMarkNextCharEvent(event1);
 						}
 						break;
 					

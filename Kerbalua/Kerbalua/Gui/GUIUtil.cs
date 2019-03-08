@@ -16,7 +16,7 @@ namespace Kerbalua.Gui {
 			absoluteRect.x = absoluteRectStart.x;
 			absoluteRect.y = absoluteRectStart.y;
 			absoluteRect.width = rect.width;
-			absoluteRect.height = rect.height;
+			absoluteRect.height = rect.height; 
 
 			//Debug.Log($"{absoluteRect.Contains(Mouse.screenPos)},{Mouse.screenPos},{absoluteRect}");
 			return absoluteRect.Contains(Mouse.screenPos);
@@ -28,12 +28,50 @@ namespace Kerbalua.Gui {
 			if (monoSpaceFont == null) {
 				string[] fonts = Font.GetOSInstalledFontNames();
 				foreach (var fontName in fonts) {
-					if (fontName.Contains("Mono")) {
+					// Accept Courier New if available
+					if (fontName=="Courier New") {
 						monoSpaceFont = Font.CreateDynamicFontFromOSFont(fontName, 12);
+						return monoSpaceFont;
+					}
+					// Accept the last listed Mono font if Courier New is not available
+					else if (fontName.Contains("Mono"))
+					{
+						monoSpaceFont= Font.CreateDynamicFontFromOSFont(fontName, 12);
 					}
 				}
 			}
 			return monoSpaceFont;
+		}
+
+		static bool consumeNextCharEvent;
+		/// <summary>
+		/// Consumes the current event, assumed to be a keycode event
+		/// and marks any followup character event to also be consumed.
+		/// </summary>
+		/// <param name="event1">Event1.</param>
+		static public void ConsumeAndMarkNextCharEvent(Event event1)
+		{
+			if (event1.keyCode != KeyCode.None) {
+				event1.Use();
+				consumeNextCharEvent = true;
+			}
+		}
+		/// <summary>
+		/// Consumes the current char event that was marked. If it is not
+		/// a character event, the previous event did not have a followup char
+		/// event and so this event will be ignored and the next char event
+		/// will not be marked. Always call this function prior to intercepting
+		/// input.
+		/// </summary>
+		/// <param name="event1">Event1.</param>
+		static public void ConsumeMarkedCharEvent(Event event1)
+		{
+			if (event1.type != EventType.Used) {
+				consumeNextCharEvent = false;
+			}
+			if (consumeNextCharEvent && event1.keyCode == KeyCode.None) {
+				event1.Use();
+			}
 		}
 	}
 }

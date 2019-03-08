@@ -77,7 +77,7 @@ namespace Kerbalua.Gui {
 						//Debug.Log("Indent");
 					}
 
-					event1.Use();
+					GUIUtil.ConsumeAndMarkNextCharEvent(event1);
 					break;
 				case KeyCode.J:
 					if (event1.control) {
@@ -86,7 +86,7 @@ namespace Kerbalua.Gui {
 						} else {
 							editor.MoveLeft();
 						}
-						event1.Use();
+						GUIUtil.ConsumeAndMarkNextCharEvent(event1);
 					}
 					break;
 				case KeyCode.K:
@@ -96,7 +96,7 @@ namespace Kerbalua.Gui {
 						} else {
 							editor.MoveDown();
 						}
-						event1.Use();
+						GUIUtil.ConsumeAndMarkNextCharEvent(event1);
 					}
 					break;
 				case KeyCode.L:
@@ -106,7 +106,7 @@ namespace Kerbalua.Gui {
 						} else {
 							editor.MoveUp();
 						}
-						event1.Use();
+						GUIUtil.ConsumeAndMarkNextCharEvent(event1);
 					}
 					break;
 				case KeyCode.Semicolon:
@@ -117,7 +117,7 @@ namespace Kerbalua.Gui {
 							editor.MoveRight();
 						}
 
-						event1.Use();
+						GUIUtil.ConsumeAndMarkNextCharEvent(event1);
 					}
 					break;
 				case KeyCode.M:
@@ -134,7 +134,7 @@ namespace Kerbalua.Gui {
 								editor.MoveLeft();
 							}
 						}
-						event1.Use();
+						GUIUtil.ConsumeAndMarkNextCharEvent(event1);
 					}
 					break;
 				case KeyCode.Comma:
@@ -148,7 +148,7 @@ namespace Kerbalua.Gui {
 								editor.MoveDown();
 							}
 						}
-						event1.Use();
+						GUIUtil.ConsumeAndMarkNextCharEvent(event1);
 					}
 					break;
 				case KeyCode.Period:
@@ -162,7 +162,7 @@ namespace Kerbalua.Gui {
 								editor.MoveUp();
 							}
 						}
-						event1.Use();
+						GUIUtil.ConsumeAndMarkNextCharEvent(event1);
 					}
 					break;
 				case KeyCode.Slash:
@@ -179,7 +179,7 @@ namespace Kerbalua.Gui {
 								editor.MoveRight();
 							}
 						}
-						event1.Use();
+						GUIUtil.ConsumeAndMarkNextCharEvent(event1);
 					}
 					break;
 				case KeyCode.O:
@@ -190,7 +190,7 @@ namespace Kerbalua.Gui {
 							InsertLineAfter(editor);
 						}
 						IndentToPreviousLine(editor);
-						event1.Use();
+						GUIUtil.ConsumeAndMarkNextCharEvent(event1);
 					}
 
 					break;
@@ -198,15 +198,25 @@ namespace Kerbalua.Gui {
 				//if (event1.control) {
 				// Doesn't seem to work
 				//	editor.Undo();
-				//	event1.Use();
+				//	GUIUtil.ConsumeAndMarkNextCharEvent(event1);
 				//}
 				//break;
 				case KeyCode.Return:
-					editor.ReplaceSelection(Environment.NewLine);
+					editor.ReplaceSelection("\n");
 					IndentToPreviousLine(editor);
-					event1.Use();
+					GUIUtil.ConsumeAndMarkNextCharEvent(event1);
 					break;
 				}
+				//if (event1.type == EventType.Used)
+				//{
+				//	Debug.Log(event1 + " was used");
+				//}
+				//else
+				//{
+				//	Debug.Log(event1 + " was not used");
+				//}
+
+				GUIUtil.ConsumeMarkedCharEvent(event1);
 			}
 		}
 
@@ -266,14 +276,14 @@ namespace Kerbalua.Gui {
 		void InsertLineBefore(TextEditor editor)
 		{
 			editor.MoveLineStart();
-			editor.ReplaceSelection(Environment.NewLine);
+			editor.ReplaceSelection("\n");
 			editor.MoveLeft();
 		}
 
 		void InsertLineAfter(TextEditor editor)
 		{
 			editor.MoveLineEnd();
-			editor.ReplaceSelection(Environment.NewLine);
+			editor.ReplaceSelection("\n");
 		}
 
 		void IndentToPreviousLine(TextEditor editor)
