@@ -16,7 +16,7 @@ namespace Kerbalua.Gui {
 			absoluteRect.x = absoluteRectStart.x;
 			absoluteRect.y = absoluteRectStart.y;
 			absoluteRect.width = rect.width;
-			absoluteRect.height = rect.height;
+			absoluteRect.height = rect.height; 
 
 			//Debug.Log($"{absoluteRect.Contains(Mouse.screenPos)},{Mouse.screenPos},{absoluteRect}");
 			return absoluteRect.Contains(Mouse.screenPos);
