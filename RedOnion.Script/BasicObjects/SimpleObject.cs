@@ -66,7 +66,7 @@ namespace RedOnion.Script.BasicObjects
 				return false;
 			if (value.Type == ValueKind.Create)
 			{
-				value = new Value(((CreateObj)value.ptr)(Engine));
+				value = new Value(((CreateObject)value.ptr)(Engine));
 				BaseProps.Set(name, value);
 			}
 			else if (value.Type == ValueKind.Property)
@@ -80,7 +80,7 @@ namespace RedOnion.Script.BasicObjects
 		{
 			if (BaseProps == null)
 				return false;
-			if (BaseProps.Get(name, out var query))
+			if (!BaseProps.Get(name, out var query))
 				return false;
 			if (query.Type != ValueKind.Property)
 				return false;

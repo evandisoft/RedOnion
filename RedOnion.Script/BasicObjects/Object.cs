@@ -151,7 +151,7 @@ namespace RedOnion.Script.BasicObjects
 			}
 			if (value.Type == ValueKind.Create)
 			{
-				value = new Value(((CreateObj)value.ptr)(Engine));
+				value = new Value(((CreateObject)value.ptr)(Engine));
 				props.Set(name, value);
 			}
 			else if (value.Type == ValueKind.Property)

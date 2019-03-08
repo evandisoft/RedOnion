@@ -115,46 +115,10 @@ namespace RedOnion.Script.ReflectedObjects
 					args[i] = ((IObjectProxy)val).Target;
 				}
 			}
-			var ret = method.IsStatic
+			result = ReflectedType.Convert(engine, method.IsStatic
 				? method.Invoke(null, args)
-				: method.Invoke(self is IObjectProxy obj ? obj.Target : self, args);
-			if (method.ReturnType != typeof(void))
-			{
-				var type = method.ReturnType;
-				if (ret == null)
-					result = new Value((IObject)null);
-				else if (ret is string || type == typeof(string))
-					result = ret.ToString();
-				else if (type.IsPrimitive || type.IsEnum)
-				{
-					if (ret is Enum e)
-						ret = Convert.ChangeType(ret, Enum.GetUnderlyingType(type));
-					if (ret is bool bval)
-						result = bval;
-					else if (ret is int ival)
-						result = ival;
-					else if (ret is float fval)
-						result = fval;
-					else if (ret is double dval)
-						result = dval;
-					else if (ret is uint uval)
-						result = uval;
-					else if (ret is long i64)
-						result = i64;
-					else if (ret is ulong u64)
-						result = u64;
-					else if (ret is short i16)
-						result = i16;
-					else if (ret is ushort u16)
-						result = u16;
-					else if (ret is byte u8)
-						result = u8;
-					else if (ret is sbyte i8)
-						result = i8;
-					else if (ret is char c)
-						result = c;
-				}
-			}
+				: method.Invoke(self is IObjectProxy obj ? obj.Target : self, args),
+				method.ReturnType);
 			return true;
 		}
 	}

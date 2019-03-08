@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace RedOnion.Script.ReflectedObjects
 {
-	public class ReflectedType : BasicObjects.SimpleObject
+	public class ReflectedType : BasicObjects.SimpleObject, IObjectConverter
 	{
 		/// <summary>
 		/// Reflected type this object represents
@@ -58,12 +58,39 @@ namespace RedOnion.Script.ReflectedObjects
 			return null;
 		}
 
+		public IObject Convert(object value)
+			=> new ReflectedObject(Engine, value, this, TypeProps);
+
+		public class MemberComparer : IComparer<MemberInfo>
+		{
+			public static MemberComparer Instance { get; } = new MemberComparer();
+			public int Compare(MemberInfo x, MemberInfo y)
+			{
+				// BIG letters first to prefer properties over fields
+				int cmp = string.CompareOrdinal(x.Name, y.Name);
+				// sorting by MetadataToken ensures stability
+				// (to avoid problems with reflection cache)
+				return cmp != 0 ? cmp
+					: x.MetadataToken.CompareTo(y.MetadataToken);
+			}
+		}
+		public static MemberInfo[] GetMembers(Type type, string name, bool instance)
+		{
+			var flags = BindingFlags.IgnoreCase|BindingFlags.Public
+				| (instance ? BindingFlags.Instance : BindingFlags.Static);
+			var members = name == null
+				? type.GetMembers(flags)
+				: type.GetMember(name, flags);
+			if (members.Length > 1)
+				Array.Sort(members, MemberComparer.Instance);
+			return members;
+		}
+
 		public override IObject Which(string name)
 		{
 			if (BaseProps?.Has(name) == true)
 				return this;
-			foreach (var member in Type.GetMember(name,
-				BindingFlags.IgnoreCase|BindingFlags.Static|BindingFlags.Public))
+			foreach (var member in GetMembers(Type, name, instance: false))
 			{
 				if (member is MethodInfo method)
 					return this;
@@ -83,8 +110,7 @@ namespace RedOnion.Script.ReflectedObjects
 		{
 			if (base.Get(name, out value))
 				return true;
-			var members = Type.GetMember(name,
-				BindingFlags.IgnoreCase|BindingFlags.Static|BindingFlags.Public);
+			var members = GetMembers(Type, name, instance: false);
 			for (int i = 0; i < members.Length;)
 			{
 				var member = members[i++];
@@ -110,17 +136,168 @@ namespace RedOnion.Script.ReflectedObjects
 					BaseProps.Set(name, value = new Value(func));
 					return true;
 				}
-				//TODO
 				if (member is FieldInfo field)
+				{
+					var fld = new Field(field);
+					if (BaseProps == null)
+						BaseProps = new Properties();
+					BaseProps.Set(name, new Value(fld));
+					value = fld.Get(this);
 					return true;
+				}
 				if (member is PropertyInfo property)
 				{
 					if (property.GetIndexParameters().Length > 0)
 						continue;
+					var prop = new Property(property);
+					if (BaseProps == null)
+						BaseProps = new Properties();
+					BaseProps.Set(name, new Value(prop));
+					value = prop.Get(this);
 					return true;
 				}
 			}
 			return false;
+		}
+
+		public override bool Set(string name, Value value)
+		{
+			if (BaseProps != null && BaseProps.Get(name, out var query))
+			{
+				if (query.Type != ValueKind.Property)
+					return false;
+				((IProperty)query.ptr).Set(this, value);
+				return true;
+			}
+			var members = GetMembers(Type, name, instance: false);
+			for (int i = 0; i < members.Length;)
+			{
+				var member = members[i++];
+				if (member is MethodInfo method)
+					return false;
+				if (member is FieldInfo field)
+				{
+					var fld = new Field(field);
+					if (BaseProps == null)
+						BaseProps = new Properties();
+					BaseProps.Set(name, new Value(fld));
+					return fld.Set(this, value);
+				}
+				if (member is PropertyInfo property)
+				{
+					if (property.GetIndexParameters().Length > 0)
+						continue;
+					var prop = new Property(property);
+					if (BaseProps == null)
+						BaseProps = new Properties();
+					BaseProps.Set(name, new Value(prop));
+					return prop.Set(this, value);
+				}
+			}
+			return false;
+		}
+
+		public static Value Convert(Engine engine, object value)
+			=> value == null ? new Value((IObject)null)
+			: Convert(engine, value, value.GetType());
+		public static Value Convert(Engine engine, object value, Type type)
+		{
+			if (type == typeof(void))
+				return new Value();
+			if (value == null)
+				return new Value((IObject)null);
+			if (value is string || type == typeof(string))
+				return value.ToString();
+			if (type.IsPrimitive || type.IsEnum)
+			{
+				if (value is Enum e)
+					value = System.Convert.ChangeType(value, Enum.GetUnderlyingType(type));
+				if (value is bool bval)
+					return bval;
+				if (value is int ival)
+					return ival;
+				if (value is float fval)
+					return fval;
+				if (value is double dval)
+					return dval;
+				if (value is uint uval)
+					return uval;
+				if (value is long i64)
+					return i64;
+				if (value is ulong u64)
+					return u64;
+				if (value is short i16)
+					return i16;
+				if (value is ushort u16)
+					return u16;
+				if (value is byte u8)
+					return u8;
+				if (value is sbyte i8)
+					return i8;
+				if (value is char c)
+					return c;
+			}
+			var converter = engine.Root[type];
+			return converter == null ? new Value()
+				: new Value(converter.Convert(value));
+		}
+		public static object Convert(Value value, Type type)
+		{
+			if (type == typeof(string))
+				return value.String;
+			if (type.IsPrimitive || type.IsEnum)
+				return System.Convert.ChangeType(value.Native, type);
+			var val = value.Native;
+			if (val == null)
+				return null;
+			if (type.IsAssignableFrom(val.GetType()))
+				return val;
+			if (val is IObjectProxy proxy)
+				return proxy.Target;
+			// TODO: consider throwing NotImplementedException
+			return null;
+		}
+
+		protected class Field : IProperty
+		{
+			public FieldInfo Info { get; }
+			public Field(FieldInfo info) => Info = info;
+			public Value Get(IObject self)
+				=> Convert(self.Engine, Info.GetValue(null));
+			public bool Set(IObject self, Value value)
+			{
+				try
+				{
+					Info.SetValue(null, Convert(value, Info.FieldType));
+					return true;
+				}
+				catch
+				{
+					return false;
+				}
+			}
+		}
+		protected class Property : IProperty
+		{
+			public PropertyInfo Info { get; }
+			public Property(PropertyInfo info) => Info = info;
+			public Value Get(IObject self)
+				=> !Info.CanRead ? new Value()
+				: Convert(self.Engine, Info.GetValue(null, new object[0]));
+			public bool Set(IObject self, Value value)
+			{
+				if (!Info.CanWrite)
+					return false;
+				try
+				{
+					Info.SetValue(null, Convert(value, Info.PropertyType), new object[0]);
+					return true;
+				}
+				catch
+				{
+					return false;
+				}
+			}
 		}
 	}
 }

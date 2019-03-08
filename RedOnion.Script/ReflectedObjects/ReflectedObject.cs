@@ -3,10 +3,6 @@ using System.Reflection;
 
 namespace RedOnion.Script.ReflectedObjects
 {
-	public interface IObjectProxy
-	{
-		object Target { get; }
-	}
 	public class ReflectedObject : BasicObjects.SimpleObject, IObjectProxy
 	{
 		public object Target { get; }

@@ -9,7 +9,7 @@ namespace RedOnion.Script.BasicObjects
 	/// <summary>
 	/// String function (used to create new string objects)
 	/// </summary>
-	public class StringFun : BasicObject
+	public class StringFun : BasicObject, IObjectConverter
 	{
 		/// <summary>
 		/// Prototype of all string objects
@@ -25,6 +25,9 @@ namespace RedOnion.Script.BasicObjects
 
 		public override IObject Create(int argc)
 			=> new StringObj(Engine, Prototype, argc == 0 ? "" : Arg(argc).String);
+
+		public IObject Convert(object value)
+			=> new StringObj(Engine, Prototype, value.ToString());
 	}
 
 	/// <summary>

@@ -17,20 +17,23 @@ namespace RedOnion.Script.BasicObjects
 		public StringFun String { get; }
 		public NumberFun Number { get; }
 
-		public Dictionary<Type, IObject>
-			TypeMap { get; } = new Dictionary<Type, IObject>();
-		public IObject this[Type type]
+		public Dictionary<Type, IObjectConverter>
+			TypeMap { get; } = new Dictionary<Type, IObjectConverter>();
+		public IObjectConverter this[Type type]
 		{
 			get
 			{
 				if (TypeMap.TryGetValue(type, out var value))
 					return value;
-				value = new ReflectedObjects.ReflectedType(Engine, type);
-				TypeMap[type] = value;
+				value = ReflectType(type);
+				if (value != null)
+					TypeMap[type] = value;
 				return value;
 			}
 			set => TypeMap[type] = value;
 		}
+		protected virtual IObjectConverter ReflectType(Type type)
+			=> new ReflectedObjects.ReflectedType(Engine, type);
 
 		public Root(Engine engine)
 			: base(engine, null, new Properties(), new Properties())
@@ -64,6 +67,7 @@ namespace RedOnion.Script.BasicObjects
 			BaseProps.Set("Object", new Value(Object));
 			BaseProps.Set("String", new Value(String));
 			BaseProps.Set("Number", new Value(Number));
+			TypeMap[typeof(string)] = String;
 		}
 
 		public IObject Box(Value value)

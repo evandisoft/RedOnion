@@ -20,7 +20,12 @@ namespace RedOnion.Script
 				default:
 					return null;
 				case ValueKind.Object:
-					return ptr == null ? null : ((IObject)ptr).Value.Native;
+					if (ptr == null)
+						return null;
+					var obj = (IObject)ptr;
+					if (obj is IObjectProxy proxy)
+						return proxy.Target;
+					return obj.Value.Native;
 				case ValueKind.Reference:
 					return ((IProperties)ptr).Get(str).Native;
 				case ValueKind.String:

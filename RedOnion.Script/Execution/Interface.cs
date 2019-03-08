@@ -12,7 +12,25 @@ namespace RedOnion.Script
 	/// </summary>
 	/// <param name="engine">The engine to associate the object with</param>
 	/// <returns>The object</returns>
-	delegate IObject CreateObj(Engine engine);
+	delegate IObject CreateObject(Engine engine);
+
+	/// <summary>
+	/// Can convert native objects into script object
+	/// (e.g. BasicObjects.StringFun)
+	/// </summary>
+	public interface IObjectConverter
+	{
+		IObject Convert(object value);
+	}
+
+	/// <summary>
+	/// Script object holding reference to native object
+	/// (e.g. ReflectedObjects.ReflectedObject)
+	/// </summary>
+	public interface IObjectProxy
+	{
+		object Target { get; }
+	}
 
 	/// <summary>
 	/// Property interface (single property with custom access methods)
@@ -23,13 +41,13 @@ namespace RedOnion.Script
 		/// <summary>
 		/// Get value of this property
 		/// </summary>
-		Value Get(IObject iObject);
+		Value Get(IObject self);
 
 		/// <summary>
 		/// Set value of this property
 		/// </summary>
 		/// <returns>False if not set (e.g. read-only)</returns>
-		bool Set(IObject iObject, Value value);
+		bool Set(IObject self, Value value);
 	}
 
 	/// <summary>
@@ -105,7 +123,7 @@ namespace RedOnion.Script
 		}
 
 		/// <summary>
-		/// Delete the specified property
+		/// Set the specified property to IProperty implementation
 		/// </summary>
 		public bool Set(string name, IProperty prop)
 		{

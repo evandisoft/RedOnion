@@ -61,7 +61,7 @@ namespace RedOnion.Script
 			/// <summary>
 			/// Get or set type creator (ReflectedType)
 			/// </summary>
-			IObject this[Type type] { get; set; }
+			IObjectConverter this[Type type] { get; set; }
 		}
 
 		/// <summary>
