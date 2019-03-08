@@ -66,10 +66,12 @@ namespace Kerbalua.Gui {
 		/// <param name="event1">Event1.</param>
 		static public void ConsumeMarkedCharEvent(Event event1)
 		{
+			if (event1.type != EventType.Used) {
+				consumeNextCharEvent = false;
+			}
 			if (consumeNextCharEvent && event1.keyCode == KeyCode.None) {
 				event1.Use();
 			}
-			consumeNextCharEvent = false;
 		}
 	}
 }

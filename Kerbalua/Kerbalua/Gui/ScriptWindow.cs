@@ -277,7 +277,7 @@ namespace Kerbalua.Gui {
 			if (editor.HasFocus()) {
 				Event event1 = Event.current;
 				if (event1.type == EventType.KeyDown) {
-					GUIUtil.ConsumeMarkedCharEvent(event1);
+
 					switch (event1.keyCode) {
 					case KeyCode.Space:
 						if (event1.shift) {
@@ -319,7 +319,6 @@ namespace Kerbalua.Gui {
 			if (repl.inputBox.HasFocus()) {
 				Event event1 = Event.current;
 				if (event1.type == EventType.KeyDown) {
-					GUIUtil.ConsumeMarkedCharEvent(event1);
 					switch (event1.keyCode) {
 					case KeyCode.Space:
 						if (event1.shift) {
