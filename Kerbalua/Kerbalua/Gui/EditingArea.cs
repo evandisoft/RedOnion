@@ -109,12 +109,12 @@ namespace Kerbalua.Gui {
 					editor.MoveRight();
 				}
 			});
-			KeyBindings.Add(new EventKey(KeyCode.O, true), () => {
-				InsertLineAfter();
+			KeyBindings.Add(new EventKey(KeyCode.H, true), () => {
+				InsertLineBefore();
 				IndentToPreviousLine();
 			});
-			KeyBindings.Add(new EventKey(KeyCode.O, true, true), () => {
-				InsertLineBefore();
+			KeyBindings.Add(new EventKey(KeyCode.N, true), () => {
+				InsertLineAfter();
 				IndentToPreviousLine();
 			});
 			KeyBindings.Add(new EventKey(KeyCode.Return), () => {

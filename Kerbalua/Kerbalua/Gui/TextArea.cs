@@ -17,6 +17,7 @@ namespace Kerbalua.Gui {
 
 		public void Render()
 		{
+			SetNextControlAsMainControl();
 			content.text = GUILayout.TextArea(content.text);
 		}
 	}

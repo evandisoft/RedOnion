@@ -50,6 +50,8 @@ namespace Kerbalua.Gui {
 
 		const string defaultScriptFilename = "untitled.b";
 
+		KeyBindings KeyBindings = new KeyBindings();
+
 		string CreateFullPath(string scriptName)
 		{
 			if (scriptName == "") {
@@ -123,6 +125,11 @@ namespace Kerbalua.Gui {
 			}
 			widgetBar.renderables.Add(replEvaluatorLabel);
 			//Complete(false);
+			KeyBindings.Add(new EventKey(KeyCode.U, true), () => editor.GrabFocus());
+			KeyBindings.Add(new EventKey(KeyCode.I, true), () => scriptNameInput.GrabFocus());
+			KeyBindings.Add(new EventKey(KeyCode.O, true), () => repl.inputBox.GrabFocus());
+			KeyBindings.Add(new EventKey(KeyCode.P, true), () => completionBox.GrabFocus());
+
 			InitializeEditorAndReplKeyBindings();
 		}
 
@@ -218,7 +225,7 @@ namespace Kerbalua.Gui {
 
 
 			mainWindowRect = GUI.Window(windowID, mainWindowRect, MainWindow, Title);
-
+			KeyBindings.ExecuteAndConsumeIfMatched(Event.current);
 
 			if (editorVisible) {
 
@@ -232,11 +239,7 @@ namespace Kerbalua.Gui {
 			}
 
 			if (replVisible) {
-				if (GUI.GetNameOfFocusedControl() == completionBox.ControlName) {
-					GUI.FocusControl(repl.inputBox.ControlName);
-				}
-
-				completionBoxRect =UpdateBoxPositionWithWindow(completionBoxRect, mainWindowRect.width);
+				completionBoxRect=UpdateBoxPositionWithWindow(completionBoxRect, mainWindowRect.width);
 				completionBox.Render(completionBoxRect);
 			}
 
@@ -254,6 +257,7 @@ namespace Kerbalua.Gui {
 		void MainWindow(int id)
 		{
 			GUI.DragWindow(new Rect(0, 0, mainWindowRect.width, titleHeight));
+			KeyBindings.ExecuteAndConsumeIfMatched(Event.current);
 			widgetBar.Render(buttonBarRect);
 			
 			if (replVisible) {
