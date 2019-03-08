@@ -124,7 +124,7 @@ namespace Kerbalua.Gui {
 				}));
 			}
 			widgetBar.renderables.Add(replEvaluatorLabel);
-			//Complete(false);
+
 			KeyBindings.Add(new EventKey(KeyCode.U, true), () => editor.GrabFocus());
 			KeyBindings.Add(new EventKey(KeyCode.I, true), () => scriptNameInput.GrabFocus());
 			KeyBindings.Add(new EventKey(KeyCode.O, true), () => repl.inputBox.GrabFocus());

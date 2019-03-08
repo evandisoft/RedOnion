@@ -38,11 +38,9 @@ namespace Kerbalua.Gui {
 				editor.selectIndex = selectIndex;
 
 				KeyBindings.ExecuteAndConsumeIfMatched(Event.current);
-				if(Event.current.type==EventType.KeyDown) 
-					GUIUtil.ConsumeMarkedCharEvent(Event.current);
+
 
 				content.text = editor.text;
-
 				base.Render(rect, style);
 
 				cursorIndex = editor.cursorIndex;

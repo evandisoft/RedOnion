@@ -43,5 +43,12 @@ namespace Kerbalua.Gui {
 		{
 			GUI.FocusControl(ControlName);
 		}
+
+		protected void ClearCharEvent()
+		{
+			if (Event.current.type == EventType.KeyDown) {
+				GUIUtil.ConsumeMarkedCharEvent(Event.current);
+			}
+		}
 	}
 }
