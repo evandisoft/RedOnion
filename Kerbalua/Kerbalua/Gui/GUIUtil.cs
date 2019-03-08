@@ -49,6 +49,14 @@ namespace Kerbalua.Gui {
 				consumeNextCharEvent = true;
 			}
 		}
+		/// <summary>
+		/// Consumes the current char event that was marked. If it is not
+		/// a character event, the previous event did not have a followup char
+		/// event and so this event will be ignored and the next char event
+		/// will not be marked. Always call this function prior to intercepting
+		/// input.
+		/// </summary>
+		/// <param name="event1">Event1.</param>
 		static public void ConsumeMarkedCharEvent(Event event1)
 		{
 			if (consumeNextCharEvent && event1.keyCode == KeyCode.None) {
