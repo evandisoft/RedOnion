@@ -13,7 +13,7 @@ namespace Kerbalua.Gui {
 		{
 			if (style == null) {
 				style = new GUIStyle(GUI.skin.textArea);
-				//style.font = GUIUtil.GetMonoSpaceFont();
+				style.font = GUIUtil.GetMonoSpaceFont();
 			}
 
 			TextEditor editor;
