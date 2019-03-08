@@ -52,7 +52,7 @@ namespace RedOnion.Script
 						Ctx.Pop();
 					return;
 				}
-				for (;;)
+				for (;; CountStatement())
 				{
 					at = stts;
 					Block(ref at);
@@ -79,15 +79,16 @@ namespace RedOnion.Script
 				if ((Options & Option.BlockScope) != 0)
 					Ctx.Push(this);
 				test = at;
-				do
+				for(;; CountStatement())
 				{
 					at = test;
 					Expression(ref at);
 					if (Value.Bool == (op == OpCode.Until))
 						break;
 					Block(ref at);
+					if (Exit != 0 && Exit != OpCode.Continue)
+						break;
 				}
-				while (Exit == 0 || Exit == OpCode.Continue);
 				if ((Options & Option.BlockScope) != 0)
 					Ctx.Pop();
 				if (Exit == OpCode.Break || Exit == OpCode.Continue)
@@ -97,14 +98,16 @@ namespace RedOnion.Script
 			case OpCode.DoUntil:
 				if ((Options & Option.BlockScope) != 0)
 					Ctx.Push(this);
-				do
+				for(var start = at;; CountStatement())
 				{
+					at = start;
 					Block(ref at);
 					if (Exit != 0 && Exit != OpCode.Continue)
 						break;
 					Expression(ref at);
+					if (Value.Bool == (op == OpCode.DoUntil))
+						break;
 				}
-				while (Value.Bool != (op == OpCode.DoUntil));
 				if ((Options & Option.BlockScope) != 0)
 					Ctx.Pop();
 				if (Exit == OpCode.Break || Exit == OpCode.Continue)
