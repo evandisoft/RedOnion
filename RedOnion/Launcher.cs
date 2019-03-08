@@ -47,7 +47,7 @@ namespace RedOnion
 				yield return null;
 
 			button = ApplicationLauncher.Instance.AddModApplication(
-				Open, Close, null, null, null, null,
+				RunScript, StopScript, null, null, null, null,
 				ApplicationLauncher.AppScenes.SPACECENTER
 				| ApplicationLauncher.AppScenes.FLIGHT
 				| ApplicationLauncher.AppScenes.MAPVIEW
@@ -66,29 +66,68 @@ namespace RedOnion
 
 			ApplicationLauncher.Instance.RemoveModApplication(button);
 			button = null;
-			if (terminal != null)
-			{
-				terminal.Dispose();
-				terminal = null;
-			}
 		}
 
-		Terminal terminal;
-		private void Open()
+		Script.Engine engine;
+		bool running = false;
+		private void RunScript()
 		{
-			Log("Open");
-			if (terminal == null)
+			if(!File.Exists("scripts/launcher.ros"))
 			{
-				terminal = new Terminal();
-				terminal.Closed += () => button.SetFalse();
+				Log("Script scripts/launcher.ros does not exist");
+				return;
 			}
-			terminal.Show();
+			if (engine == null)
+				engine = new Script.Engine();
+			try
+			{
+				engine.ExecutionCountdown = 10000;
+				engine.Execute(File.ReadAllText("scripts/launcher.ros"));
+				running = true;
+			}
+			catch(Script.Parsing.ParseError err)
+			{
+				Log("ParseError at {0}.{1}: {2}", err.LineNumber, err.Column, err.Message);
+				Log("Content of the line: " + err.Line);
+			}
+			catch(Exception err)
+			{
+				Log("Exception in engine or parser: " + err.Message);
+			}
 		}
+		private void StopScript()
+			=> running = false;
 
-		private void Close()
+		private void FixedUpdate()
+			=> RunFunction("FixedUpdate");
+		private void Update()
+			=> RunFunction("Update");
+		private void OnGUI()
+			=> RunFunction("OnGUI");
+		private void RunFunction(string name)
 		{
-			Log("Close");
-			terminal?.Hide();
+			if (!running)
+				return;
+			if (!engine.Root.Get(name, out var value))
+				return;
+			if (value.Native is Script.BasicObjects.FunctionObj fn)
+			{
+				try
+				{
+					engine.ExecutionCountdown = 1000;
+					fn.Call(null, 0);
+				}
+				catch (Script.Engine.TookTooLong)
+				{
+					Log(name + " took too long");
+					running = false;
+				}
+				catch (Exception err)
+				{
+					Log("Exception in {0}: {1}", name, err.Message);
+					running = false;
+				}
+			}
 		}
 
 		private static void Log(string msg)

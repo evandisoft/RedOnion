@@ -10,6 +10,7 @@ namespace RedOnion.Script
 	{
 		protected override void Statement(OpCode op, ref int at)
 		{
+			CountStatement();
 			Debug.Assert(op.Kind() == OpKind.Statement || op.Kind() == OpKind.Statement2);
 			switch (op)
 			{
@@ -171,7 +172,7 @@ namespace RedOnion.Script
 				size = CodeInt(ref at);
 				Ctx.Root.Set(fname, new Value(Root.Create(Strings, Code, at, size, ftat, args, null, Ctx.Vars)));
 				at += size;
-				Value = new Value(ValueKind.Reference, Ctx.Root, fname);
+				Value = new Value(Ctx.Root, fname);
 				return;
 			}
 		}

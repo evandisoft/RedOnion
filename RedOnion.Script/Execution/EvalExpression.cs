@@ -115,6 +115,7 @@ namespace RedOnion.Script
 				}
 				goto case OpCode.Call0;
 			case OpCode.Call0:
+				CountStatement();
 				if (create)
 					TypeReference(ref at);
 				else
@@ -129,6 +130,7 @@ namespace RedOnion.Script
 				Value = create ? new Value(fn.Create(0)) : fn.Call(self, 0);
 				return;
 			case OpCode.Call1:
+				CountStatement();
 				if (create)
 					TypeReference(ref at);
 				else
@@ -146,6 +148,7 @@ namespace RedOnion.Script
 				Args.Remove(1);
 				return;
 			case OpCode.Call2:
+				CountStatement();
 				if (create)
 					TypeReference(ref at);
 				else
@@ -165,6 +168,7 @@ namespace RedOnion.Script
 				Args.Remove(2);
 				return;
 			case OpCode.CallN:
+				CountStatement();
 				int n = Code[at++];
 				if (create)
 					TypeReference(ref at);
@@ -188,6 +192,7 @@ namespace RedOnion.Script
 				return;
 			case OpCode.Index:
 			case OpCode.IndexN:
+				CountStatement();
 				n = op == OpCode.Index ? 2 : Code[at++];
 				Expression(ref at);
 				self = null;
@@ -215,6 +220,7 @@ namespace RedOnion.Script
 					Ctx.Vars.Set(name, Value);
 					return;
 				}
+				CountStatement();
 				fn = Box(Value);
 				Expression(ref at);
 				Args.Add(Result);

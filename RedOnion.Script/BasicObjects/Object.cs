@@ -36,6 +36,14 @@ namespace RedOnion.Script.BasicObjects
 		}
 	}
 
+	/// <summary>
+	/// Basic object created by `new object`
+	/// </summary>
+	/// <remarks>
+	/// New properties can be added in runtime
+	/// and also accessed by indexing (by name)
+	/// which 
+	/// </remarks>
 	[DebuggerDisplay("{GetType().Name}")]
 	public class BasicObject : IObject
 	{
@@ -50,7 +58,7 @@ namespace RedOnion.Script.BasicObjects
 		public IObject BaseClass { get; }
 
 		/// <summary>
-		/// Basic properties - not enumerable, not writable unless iProp with set returning true
+		/// Basic properties - not enumerable, not writable unless IProperty with set returning true
 		/// </summary>
 		public IProperties BaseProps { get; protected set; }
 

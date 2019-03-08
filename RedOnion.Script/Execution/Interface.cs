@@ -158,7 +158,7 @@ namespace RedOnion.Script
 		/// </summary>
 		IObject BaseClass { get; }
 		/// <summary>
-		/// Basic properties - not enumerable, not writable unless iProp with set returning true
+		/// Basic properties - not enumerable, not writable unless IProperty with set returning true
 		/// </summary>
 		IProperties BaseProps { get; }
 		/// <summary>
