@@ -35,5 +35,26 @@ namespace Kerbalua.Gui {
 			}
 			return monoSpaceFont;
 		}
+
+		static bool consumeNextCharEvent;
+		/// <summary>
+		/// Consumes the current event, assumed to be a keycode event
+		/// and marks any followup character event to also be consumed.
+		/// </summary>
+		/// <param name="event1">Event1.</param>
+		static public void ConsumeAndMarkNextCharEvent(Event event1)
+		{
+			if (event1.keyCode != KeyCode.None) {
+				event1.Use();
+				consumeNextCharEvent = true;
+			}
+		}
+		static public void ConsumeMarkedCharEvent(Event event1)
+		{
+			if (consumeNextCharEvent && event1.keyCode == KeyCode.None) {
+				event1.Use();
+			}
+			consumeNextCharEvent = false;
+		}
 	}
 }
