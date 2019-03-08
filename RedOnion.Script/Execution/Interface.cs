@@ -190,6 +190,10 @@ namespace RedOnion.Script
 		/// <summary>
 		/// Find the object containing the property
 		/// </summary>
+		/// <remarks>
+		/// This is actually used only by Engine.Context (to handle OpCode.Identifier).
+		/// It may be removed in the future - we only need Has and even that is questionable.
+		/// </remarks>
 		IObject Which(string name);
 
 		/// <summary>

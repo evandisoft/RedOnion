@@ -43,6 +43,8 @@ namespace RedOnion.Script.ReflectedObjects
 				return null;
 			if (argc == 0)
 			{
+				if (Type.IsValueType)
+					return new ReflectedObject(Engine, Activator.CreateInstance(Type), this, TypeProps);
 				var ctor = Type.GetConstructor(new Type[0]);
 				if (ctor == null)
 					return null;
@@ -138,7 +140,7 @@ namespace RedOnion.Script.ReflectedObjects
 				}
 				if (member is FieldInfo field)
 				{
-					var fld = new Field(field);
+					var fld = new StaticField(field);
 					if (BaseProps == null)
 						BaseProps = new Properties();
 					BaseProps.Set(name, new Value(fld));
@@ -149,7 +151,7 @@ namespace RedOnion.Script.ReflectedObjects
 				{
 					if (property.GetIndexParameters().Length > 0)
 						continue;
-					var prop = new Property(property);
+					var prop = new StaticProperty(property);
 					if (BaseProps == null)
 						BaseProps = new Properties();
 					BaseProps.Set(name, new Value(prop));
@@ -177,7 +179,7 @@ namespace RedOnion.Script.ReflectedObjects
 					return false;
 				if (member is FieldInfo field)
 				{
-					var fld = new Field(field);
+					var fld = new StaticField(field);
 					if (BaseProps == null)
 						BaseProps = new Properties();
 					BaseProps.Set(name, new Value(fld));
@@ -187,7 +189,7 @@ namespace RedOnion.Script.ReflectedObjects
 				{
 					if (property.GetIndexParameters().Length > 0)
 						continue;
-					var prop = new Property(property);
+					var prop = new StaticProperty(property);
 					if (BaseProps == null)
 						BaseProps = new Properties();
 					BaseProps.Set(name, new Value(prop));
@@ -258,10 +260,10 @@ namespace RedOnion.Script.ReflectedObjects
 			return null;
 		}
 
-		protected class Field : IProperty
+		public class StaticField : IProperty
 		{
 			public FieldInfo Info { get; }
-			public Field(FieldInfo info) => Info = info;
+			public StaticField(FieldInfo info) => Info = info;
 			public Value Get(IObject self)
 				=> Convert(self.Engine, Info.GetValue(null));
 			public bool Set(IObject self, Value value)
@@ -277,10 +279,10 @@ namespace RedOnion.Script.ReflectedObjects
 				}
 			}
 		}
-		protected class Property : IProperty
+		public class StaticProperty : IProperty
 		{
 			public PropertyInfo Info { get; }
-			public Property(PropertyInfo info) => Info = info;
+			public StaticProperty(PropertyInfo info) => Info = info;
 			public Value Get(IObject self)
 				=> !Info.CanRead ? new Value()
 				: Convert(self.Engine, Info.GetValue(null, new object[0]));

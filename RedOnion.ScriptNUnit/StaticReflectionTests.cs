@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using NUnit.Framework;
 using RedOnion.Script;
 using RedOnion.Script.ReflectedObjects;
@@ -7,7 +6,7 @@ using RedOnion.Script.ReflectedObjects;
 namespace RedOnion.ScriptNUnit
 {
 	[TestFixture]
-	public class ReflectionTests : EngineTestsBase
+	public class StaticReflectionTests : EngineTestsBase
 	{
 		[TearDown]
 		public void ResetEngine() => Reset();
@@ -33,7 +32,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void Reflection_01_SimpleAction()
+		public void StaticReflection_01_SimpleAction()
 		{
 			var creator = new ReflectedType(this, typeof(StaticClass));
 			Assert.IsTrue(creator.Get("simpleAction", out var simpleAction));
@@ -50,7 +49,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void Reflection_02_SimpleFunctions()
+		public void StaticReflection_02_SimpleFunctions()
 		{
 			Root.Set("testClass", new Value(new ReflectedType(this,
 				typeof(StaticClass))));
@@ -59,7 +58,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void Reflection_03_ComplexFunctions()
+		public void StaticReflection_03_ComplexFunctions()
 		{
 			Root.Set("testClass", new Value(new ReflectedType(this,
 				typeof(StaticClass))));
@@ -71,7 +70,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void Reflection_04_FieldAndProperties()
+		public void StaticReflection_04_FieldAndProperties()
 		{
 			Root.Set("testClass", new Value(new ReflectedType(this,
 				typeof(StaticClass))));

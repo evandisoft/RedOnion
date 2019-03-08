@@ -11,7 +11,7 @@ namespace RedOnion.Script.ReflectedObjects
 		public ReflectedType Creator { get; }
 
 		/// <summary>
-		/// Class this function belongs to
+		/// Class/type this function belongs to (may be null)
 		/// </summary>
 		public Type Type { get; }
 
@@ -25,11 +25,13 @@ namespace RedOnion.Script.ReflectedObjects
 		/// </summary>
 		protected MethodInfo[] Methods { get; }
 
-		public ReflectedFunction(Engine engine, ReflectedType creator, string name, MethodInfo[] methods)
+		public ReflectedFunction(
+			Engine engine, ReflectedType creator,
+			string name, MethodInfo[] methods)
 			: base(engine, null)
 		{
 			Creator = creator;
-			Type = creator.Type;
+			Type = creator?.Type;
 			Name = name;
 			Methods = methods;
 		}
@@ -43,9 +45,9 @@ namespace RedOnion.Script.ReflectedObjects
 			return result;
 		}
 
-		internal static bool TryCall(
+		protected internal static bool TryCall(
 			Engine engine, MethodInfo method,
-			IObject self, int argc, ref Value result)
+			object self, int argc, ref Value result)
 		{
 			var pars = method.GetParameters();
 			if (pars.Length != argc)
@@ -115,9 +117,10 @@ namespace RedOnion.Script.ReflectedObjects
 					args[i] = ((IObjectProxy)val).Target;
 				}
 			}
-			result = ReflectedType.Convert(engine, method.IsStatic
+			result = ReflectedType.Convert(
+				engine, method.IsStatic
 				? method.Invoke(null, args)
-				: method.Invoke(self is IObjectProxy obj ? obj.Target : self, args),
+				: method.Invoke(self, args),
 				method.ReturnType);
 			return true;
 		}
