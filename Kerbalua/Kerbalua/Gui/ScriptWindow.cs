@@ -123,6 +123,11 @@ namespace Kerbalua.Gui {
 			}
 			widgetBar.renderables.Add(replEvaluatorLabel);
 			//Complete(false);
+			InitializeEditorAndReplKeyBindings();
+		}
+
+		void InitializeEditorAndReplKeyBindings()
+		{
 			editor.KeyBindings.Add(new EventKey(KeyCode.Space, false, true), () => {
 				//AllCompletion.Complete(replEvaluator.Globals, editor, completionBox.content, true);
 			});
@@ -135,7 +140,7 @@ namespace Kerbalua.Gui {
 			editor.KeyBindings.Add(new EventKey(KeyCode.S, true), () => {
 				SaveScript(scriptNameInput.content.text);
 			});
-			repl.inputBox.KeyBindings.Add(new EventKey(KeyCode.Space, false,true), () => {
+			repl.inputBox.KeyBindings.Add(new EventKey(KeyCode.Space, false, true), () => {
 				//AllCompletion.Complete(replEvaluator.Globals, editor, completionBox.content, true);
 			});
 			repl.inputBox.KeyBindings.Add(new EventKey(KeyCode.E, true), () => {
@@ -146,51 +151,7 @@ namespace Kerbalua.Gui {
 				repl.inputBox.content.text = "";
 				completionBox.content.text = "";
 			});
-			//if (editor.HasFocus()) {
-			//	Event event1 = Event.current;
-			//	if (event1.type == EventType.KeyDown) {
-
-			//		switch (event1.keyCode) {
-			//		case KeyCode.Space:
-			//			if (event1.shift) {
-			//				//AllCompletion.Complete(replEvaluator.Globals, editor, completionBox.content, true);
-			//				GUIUtil.ConsumeAndMarkNextCharEvent(event1);
-			//			}
-			//			break;
-			//		case KeyCode.E:
-			//			if (event1.control) {
-			//				repl.outputBox.content.text += currentReplEvaluator.Evaluate(editor.content.text);
-			//				GUIUtil.ConsumeAndMarkNextCharEvent(event1);
-			//			}
-			//			break;
-			//		case KeyCode.D:
-			//			if (event1.control) {
-			//				LoadScript(scriptNameInput.content.text);
-			//				GUIUtil.ConsumeAndMarkNextCharEvent(event1);
-			//			}
-			//			break;
-			//		case KeyCode.S:
-			//			if (event1.control) {
-			//				SaveScript(scriptNameInput.content.text);
-			//				GUIUtil.ConsumeAndMarkNextCharEvent(event1);
-			//			}
-			//			break;
-			//		}
-			//		int diff = repl.outputBox.content.text.Length - maxOutputBytes;
-			//		if (diff > 0) {
-			//			repl.outputBox.content.text = repl.outputBox.content.text.Substring(diff);
-			//		}
-
-			//		editorChanged = true;
-			//	}
-			//}
 		}
-
-		//void Complete(bool completing)
-		//{
-		//	AllCompletion.Complete(script.Globals, repl.inputBox.content, completionBox.content, repl.inputBox.cursorPos, completing, out int newCursorPos);
-		//	repl.inputBox.cursorPos = newCursorPos;
-		//}
 
 		/// <summary>
 		/// This updates Rects for boxes that are not inside the main window 
@@ -245,29 +206,8 @@ namespace Kerbalua.Gui {
 			}
 		}
 
-		//public void Evaluate(string text)
-		//{
-		//	DynValue result = new DynValue();
-		//	try {
-		//		result = replEvaluator.DoString(text);
-		//		repl.outputBox.content.text += "\n";
-		//		if (result.UserData == null) {
-		//			repl.outputBox.content.text += result;
-		//		} else {
-		//			repl.outputBox.content.text += result.UserData.Object;
-		//			if (result.UserData.Object == null) {
-		//				repl.outputBox.content.text += " (" + result.UserData.Object.GetType() + ")";
-		//			}
-		//		}
-		//	} catch (Exception exception) {
-		//		Debug.Log(exception);
-		//	}
-		//}
-
 		public void Render()
 		{
-
-
 			SetOrReleaseInputLock();
 
 			if (replVisible) {
@@ -281,7 +221,6 @@ namespace Kerbalua.Gui {
 
 
 			if (editorVisible) {
-				//HandleEditorInput();
 
 				editorRect =UpdateBoxPositionWithWindow(editorRect, -editorRect.width);
 				editor.Render(editorRect);
@@ -322,8 +261,6 @@ namespace Kerbalua.Gui {
 					repl.inputBox.GrabFocus();
 				}
 
-				//HandleReplInput();
-
 				repl.Render(replRect);
 
 				if (inputBoxChanged) {
@@ -332,88 +269,5 @@ namespace Kerbalua.Gui {
 				}
 			}
 		}
-
-		//void HandleEditorInput()
-		//{
-		//	//if (editor.HasFocus()) {
-		//	//	Event event1 = Event.current;
-		//	//	if (event1.type == EventType.KeyDown) {
-
-		//	//		switch (event1.keyCode) {
-		//	//		case KeyCode.Space:
-		//	//			if (event1.shift) {
-		//	//				//AllCompletion.Complete(replEvaluator.Globals, editor, completionBox.content, true);
-		//	//				GUIUtil.ConsumeAndMarkNextCharEvent(event1);
-		//	//			}
-		//	//			break;
-		//	//		case KeyCode.E:
-		//	//			if (event1.control) {
-		//	//				repl.outputBox.content.text += currentReplEvaluator.Evaluate(editor.content.text);
-		//	//				GUIUtil.ConsumeAndMarkNextCharEvent(event1);
-		//	//			}
-		//	//			break;
-		//	//		case KeyCode.D:
-		//	//			if (event1.control) {
-		//	//				LoadScript(scriptNameInput.content.text);
-		//	//				GUIUtil.ConsumeAndMarkNextCharEvent(event1);
-		//	//			}
-		//	//			break;
-		//	//		case KeyCode.S:
-		//	//			if (event1.control) {
-		//	//				SaveScript(scriptNameInput.content.text);
-		//	//				GUIUtil.ConsumeAndMarkNextCharEvent(event1);
-		//	//			}
-		//	//			break;
-		//	//		}
-		//	//		int diff = repl.outputBox.content.text.Length - maxOutputBytes;
-		//	//		if (diff > 0) {
-		//	//			repl.outputBox.content.text = repl.outputBox.content.text.Substring(diff);
-		//	//		}
-
-		//	//		editorChanged = true;
-		//	//	}
-		//	//}
-		//}
-
-		//void HandleReplInput()
-		//{
-		//	if (repl.inputBox.HasFocus()) {
-		//		Event event1 = Event.current;
-		//		if (event1.type == EventType.KeyDown) {
-		//			switch (event1.keyCode) {
-		//			case KeyCode.Space:
-		//				if (event1.shift) {
-		//					//AllCompletion.Complete(replEvaluator.Globals, repl.inputBox, completionBox.content, true);
-		//					repl.outputBox.ResetScroll();
-		//					GUIUtil.ConsumeAndMarkNextCharEvent(event1);
-		//				}
-		//				break;
-		//			case KeyCode.E:
-		//				if (event1.control) {
-		//					repl.outputBox.content.text += currentReplEvaluator.Evaluate(repl.inputBox.content.text);
-		//					GUIUtil.ConsumeAndMarkNextCharEvent(event1);
-		//				}
-		//				break;
-		//			case KeyCode.Return:
-		//				if (!event1.shift) {
-		//					repl.outputBox.content.text += currentReplEvaluator.Evaluate(repl.inputBox.content.text);
-		//					repl.inputBox.content.text = "";
-		//					completionBox.content.text = "";
-		//					GUIUtil.ConsumeAndMarkNextCharEvent(event1);
-		//				}
-		//				break;
-					
-		//			}
-		//			int diff = repl.outputBox.content.text.Length - maxOutputBytes;
-		//			if (diff > 0) {
-		//				repl.outputBox.content.text = repl.outputBox.content.text.Substring(diff);
-		//			}
-
-		//			repl.outputBox.ResetScroll();
-
-		//			inputBoxChanged = true;
-		//		}
-		//	}
-		//}
 	}
 }
