@@ -105,6 +105,8 @@
     <Compile Include="Kerbalua\Other\ReplEvaluator.cs" />
     <Compile Include="Kerbalua\Other\RedOnionReplEvaluator.cs" />
     <Compile Include="Kerbalua\Other\SimpleScript.cs" />
+    <Compile Include="Kerbalua\Gui\EventKey.cs" />
+    <Compile Include="Kerbalua\Gui\KeyBindings.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
