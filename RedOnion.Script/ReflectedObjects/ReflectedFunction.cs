@@ -44,6 +44,11 @@ namespace RedOnion.Script.ReflectedObjects
 			foreach (MethodInfo method in Methods)
 				if (TryCall(Engine, method, null, argc, ref result))
 					return result;
+			if (!Engine.HasOption(Engine.Option.Silent))
+				throw new InvalidOperationException(
+					"Could not call " + (Type == null ? Name
+					: Type.Name + "." + Name)
+					+ " " + Methods.Length + " candidates");
 			return result;
 		}
 
@@ -118,11 +123,14 @@ namespace RedOnion.Script.ReflectedObjects
 				else if (typeof(Delegate).IsAssignableFrom(type))
 				{
 					var fn = (BasicObjects.FunctionObj)arg.RValue.Deref;
-					var fnargs = new List<ParameterExpression>();
 					var invoke = type.GetMethod("Invoke");
 					var mipars = invoke.GetParameters();
+					var fnargs = new ParameterExpression[mipars.Length];
 					for (int j = 0; j < mipars.Length; j++)
-						fnargs.Add(Expression.Parameter(mipars[j].ParameterType, fn.ArgName(j)));
+						fnargs[j] = Expression.Parameter(mipars[j].ParameterType, fn.ArgName(j));
+					var chargs = new Expression[mipars.Length];
+					for (int j = 0; j < mipars.Length; j++)
+						chargs[j] = Expression.Convert(fnargs[j], typeof(object));
 					// (x, y, ...) => FunctionCallHelper<T>(fn, new object[] { x, y, ... })
 					var lambda = Expression.Call(
 						invoke.ReturnType == typeof(void)
@@ -130,7 +138,7 @@ namespace RedOnion.Script.ReflectedObjects
 						: typeof(ReflectedFunction).GetMethod("FunctionCallHelper")
 						.MakeGenericMethod(invoke.ReturnType),
 						Expression.Constant(fn),
-						Expression.NewArrayInit(typeof(object), fnargs.ToArray()));
+						Expression.NewArrayInit(typeof(object), chargs));
 					args[i] = Expression.Lambda(type, lambda, fnargs).Compile();
 				}
 				else

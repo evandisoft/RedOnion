@@ -111,5 +111,43 @@ namespace RedOnion.ScriptNUnit
 				"testClass.exec setStr, \"done\"");
 			Assert.AreEqual("done", StaticClass.str);
 		}
+
+		public struct Rect
+		{
+			public float X, Y, Width, Height;
+			public float Left { get => X; set => X = value; }
+			public float Right { get => X+Width; set => Width = value-X; }
+			public float Top { get => Y; set => Y = value; }
+			public float Bottom { get => Y+Height; set => Height = value-Y; }
+			public Rect(float x, float y, float w, float h)
+			{
+				X = x; Y = y; Width = w; Height = h;
+			}
+		}
+		public delegate Rect WindowFunction(int id);
+		public class UnknownClass {}
+		public class KnownClass {}
+		public static class Test06
+		{
+			public static Rect Window(int id, Rect rc, WindowFunction fn, string title) => rc;
+			public static Rect Window(int id, Rect rc, WindowFunction fn, string title, KnownClass known) => rc;
+			public static Rect Window(int id, Rect rc, WindowFunction fn, UnknownClass unknown) => rc;
+			public static Rect Window(int id, Rect rc, WindowFunction fn, UnknownClass unknown, KnownClass known) => rc;
+		}
+
+		[Test]
+		public void StaticReflection_06_Complex()
+		{
+			Root.Set("GUI", new Value(new ReflectedType(this,
+				typeof(Test06))));
+			Test(
+				"rc = new rect 10,40,200,300\n" +
+				"title = \"ROS Test Window\"\n" +
+				"function onGUI\n" +
+				" rc = GUI.window 0, rc, testWindow, title\n" +
+				"function testWindow id\n" +
+				" return");
+			Test("onGUI()");
+ 		}
 	}
 }
