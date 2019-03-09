@@ -15,7 +15,7 @@ namespace Kerbalua.Gui {
 		public ICompletionSelector completionSelector;
 		public string lastFocusedControl = "";
 		public string currentlyFocusedControl = "";
-		bool focusChanged = true;
+		bool focusChanged;// = true;
 
 		public CompletionManager(ICompletionSelector completionSelector)
 		{
@@ -28,22 +28,22 @@ namespace Kerbalua.Gui {
 		}
 
 		int inc = 0;
-		public void Update()
+		public void Update(bool guiChanged)
 		{
 			if (GUI.GetNameOfFocusedControl() != currentlyFocusedControl) {
 				lastFocusedControl = currentlyFocusedControl;
 				currentlyFocusedControl = GUI.GetNameOfFocusedControl();
-				focusChanged = true;
+				//focusChanged = true;
 			}
 
 
-			if (GUI.changed || focusChanged) {
-				//Debug.Log("GUI/foc: " + GUI.changed + "," + focusChanged + "," + currentlyFocusedControl + "," + inc++);
+			if (guiChanged || focusChanged) {
+				Debug.Log("GUI/foc: " + guiChanged + "," + focusChanged + "," + currentlyFocusedControl + "," + inc++);
 				if (focusChanged) focusChanged = false;
-				//Debug.Log("Changed");
+				Debug.Log("Changed");
 				ICompletable currentCompletable;
 				if(completableMap.TryGetValue(currentlyFocusedControl,out currentCompletable)) {
-					//Debug.Log("Displaying completions");
+					Debug.Log("Displaying completions");
 					DisplayCurrentCompletions(currentCompletable);
 				}
 			}
