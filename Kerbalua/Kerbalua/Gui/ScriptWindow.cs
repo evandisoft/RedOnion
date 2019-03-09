@@ -65,8 +65,8 @@ namespace Kerbalua.Gui {
 			this.mainWindowRect = mainWindowRect;
 			completionManager = new CompletionManager(completionBox);
 			completionManager.AddCompletable(scriptIOTextArea);
-			completionManager.AddCompletable(new EditingAreaCompletionAdapter(editor, this));
-			completionManager.AddCompletable(new EditingAreaCompletionAdapter(repl.inputBox, this));
+			//completionManager.AddCompletable(new EditingAreaCompletionAdapter(editor, this));
+			//completionManager.AddCompletable(new EditingAreaCompletionAdapter(repl.inputBox, this));
 
 			scriptIOTextArea.content.text = saveLoadFilename;
 			editor.content.text=scriptIOTextArea.Load();
