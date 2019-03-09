@@ -31,11 +31,9 @@ namespace Kerbalua.Gui {
 		Rect replRect;
 		Rect completionBoxRect;
 		Rect editorRect;
-		TextArea scriptNameInput=new TextArea();
+		ScriptNameInputArea scriptIOTextArea=new ScriptNameInputArea();
 		// Should be a label but I haven't made a label yet.
 		TextArea replEvaluatorLabel = new TextArea();
-
-		Rect SaveLoadRect;
 
 		public string saveLoadFilename = "untitled.b";
 
@@ -43,43 +41,14 @@ namespace Kerbalua.Gui {
 
 		bool inputIsLocked;
 
-		string baseFolderPath = "scripts";
+		public KeyBindings GlobalKeyBindings = new KeyBindings();
 
-		bool editorChanged;
-		bool inputBoxChanged;
-
-		const string defaultScriptFilename = "untitled.b";
-
-		string CreateFullPath(string scriptName)
-		{
-			if (scriptName == "") {
-				scriptName = defaultScriptFilename;
-				scriptNameInput.content.text = scriptName;
-				saveLoadFilename = defaultScriptFilename;
-			}
-
-			string fullPath=baseFolderPath + "/" + scriptName;
-
-			if (!File.Exists(fullPath)) {
-				File.WriteAllText(fullPath, "");
-			}
-
-			return fullPath;
-		}
-
-		void SaveScript(string scriptName)
-		{
-			Directory.CreateDirectory(baseFolderPath);
-			File.WriteAllText(CreateFullPath(scriptName), editor.content.text);
-			saveLoadFilename = scriptName;
-		}
-
-		void LoadScript(string scriptName)
-		{
-			Directory.CreateDirectory(baseFolderPath);
-			editor.content.text=File.ReadAllText(CreateFullPath(scriptName));
-			saveLoadFilename = scriptName;
-		}
+		/// <summary>
+		/// This manages completion. Keeps track of what is was focused and
+		/// manages the completion interaction between an control that can
+		/// use completion, and the completion 
+		/// </summary>
+		CompletionManager completionManager;
 
 		public void SetCurrentEvaluator(string evaluatorName)
 		{
@@ -94,9 +63,13 @@ namespace Kerbalua.Gui {
 			SetCurrentEvaluator("RedOnion");
 
 			this.mainWindowRect = mainWindowRect;
+			completionManager = new CompletionManager(completionBox);
+			completionManager.AddCompletable(scriptIOTextArea);
+			//completionManager.AddCompletable(new EditingAreaCompletionAdapter(editor, this));
+			//completionManager.AddCompletable(new EditingAreaCompletionAdapter(repl.inputBox, this));
 
-			scriptNameInput.content.text = saveLoadFilename;
-			LoadScript(scriptNameInput.content.text);
+			scriptIOTextArea.content.text = saveLoadFilename;
+			editor.content.text=scriptIOTextArea.Load();
 
 			buttonBarRect = new Rect(0, titleHeight, 100, mainWindowRect.height-titleHeight);
 			replRect = new Rect(buttonBarRect.width, titleHeight, mainWindowRect.width - buttonBarRect.width, mainWindowRect.height-titleHeight);
@@ -105,12 +78,12 @@ namespace Kerbalua.Gui {
 
 			widgetBar.renderables.Add(new Button("<<", () => editorVisible = !editorVisible));
 			widgetBar.renderables.Add(new Button(">>", () => replVisible = !replVisible));
-			widgetBar.renderables.Add(scriptNameInput);
+			widgetBar.renderables.Add(scriptIOTextArea);
 			widgetBar.renderables.Add(new Button("Save", () => {
-				SaveScript(scriptNameInput.content.text);
+				scriptIOTextArea.Save(editor.content.text);
 			}));
 			widgetBar.renderables.Add(new Button("Load", () => {
-				LoadScript(scriptNameInput.content.text);
+				editor.content.text=scriptIOTextArea.Load();
 			}));
 			widgetBar.renderables.Add(new Button("Evaluate", () => {
 				repl.outputBox.content.text+=currentReplEvaluator.Evaluate(editor.content.text);
@@ -122,14 +95,35 @@ namespace Kerbalua.Gui {
 				}));
 			}
 			widgetBar.renderables.Add(replEvaluatorLabel);
-			//Complete(false);
+
+			InitializeKeyBindings();
 		}
 
-		//void Complete(bool completing)
-		//{
-		//	AllCompletion.Complete(script.Globals, repl.inputBox.content, completionBox.content, repl.inputBox.cursorPos, completing, out int newCursorPos);
-		//	repl.inputBox.cursorPos = newCursorPos;
-		//}
+		void InitializeKeyBindings()
+		{
+			GlobalKeyBindings.Add(new EventKey(KeyCode.U, true), () => editor.GrabFocus());
+			GlobalKeyBindings.Add(new EventKey(KeyCode.I, true), () => scriptIOTextArea.GrabFocus());
+			GlobalKeyBindings.Add(new EventKey(KeyCode.O, true), () => repl.inputBox.GrabFocus());
+			GlobalKeyBindings.Add(new EventKey(KeyCode.P, true), () => completionBox.GrabFocus());
+			GlobalKeyBindings.Add(new EventKey(KeyCode.D, true), () => {
+				editor.content.text = scriptIOTextArea.Load();
+			});
+			GlobalKeyBindings.Add(new EventKey(KeyCode.S, true), () => {
+				scriptIOTextArea.Save(editor.content.text);
+			});
+			GlobalKeyBindings.Add(new EventKey(KeyCode.Space, false, true), completionManager.Complete);
+			editor.KeyBindings.Add(new EventKey(KeyCode.E, true), () => {
+				repl.outputBox.content.text += currentReplEvaluator.Evaluate(editor.content.text);
+			});
+			repl.inputBox.KeyBindings.Add(new EventKey(KeyCode.E, true), () => {
+				repl.outputBox.content.text += currentReplEvaluator.Evaluate(repl.inputBox.content.text);
+			});
+			repl.inputBox.KeyBindings.Add(new EventKey(KeyCode.Return), () => {
+				repl.outputBox.content.text += currentReplEvaluator.Evaluate(repl.inputBox.content.text);
+				repl.inputBox.content.text = "";
+				completionBox.content.text = "";
+			});
+		}
 
 		/// <summary>
 		/// This updates Rects for boxes that are not inside the main window 
@@ -184,30 +178,10 @@ namespace Kerbalua.Gui {
 			}
 		}
 
-		//public void Evaluate(string text)
-		//{
-		//	DynValue result = new DynValue();
-		//	try {
-		//		result = replEvaluator.DoString(text);
-		//		repl.outputBox.content.text += "\n";
-		//		if (result.UserData == null) {
-		//			repl.outputBox.content.text += result;
-		//		} else {
-		//			repl.outputBox.content.text += result.UserData.Object;
-		//			if (result.UserData.Object == null) {
-		//				repl.outputBox.content.text += " (" + result.UserData.Object.GetType() + ")";
-		//			}
-		//		}
-		//	} catch (Exception exception) {
-		//		Debug.Log(exception);
-		//	}
-		//}
-
 		public void Render()
 		{
-
-
 			SetOrReleaseInputLock();
+			completionManager.Update();
 
 			if (replVisible) {
 				mainWindowRect.width = buttonBarRect.width + replRect.width;
@@ -215,32 +189,19 @@ namespace Kerbalua.Gui {
 				mainWindowRect.width = buttonBarRect.width;
 			}
 
-
 			mainWindowRect = GUI.Window(windowID, mainWindowRect, MainWindow, Title);
-
+			GlobalKeyBindings.ExecuteAndConsumeIfMatched(Event.current);
 
 			if (editorVisible) {
-				HandleEditorInput();
-
 				editorRect =UpdateBoxPositionWithWindow(editorRect, -editorRect.width);
 				editor.Render(editorRect);
-
-				if (editorChanged) {
-					//AllCompletion.Complete(replEvaluator.Globals, editor, completionBox.content, false);
-					editorChanged = false;
-				}
 			}
 
-			if (replVisible) {
-				if (GUI.GetNameOfFocusedControl() == completionBox.ControlName) {
-					GUI.FocusControl(repl.inputBox.ControlName);
-				}
 
+			if (replVisible) {
 				completionBoxRect =UpdateBoxPositionWithWindow(completionBoxRect, mainWindowRect.width);
 				completionBox.Render(completionBoxRect);
 			}
-
-
 		}
 
 		/// <summary>
@@ -254,6 +215,7 @@ namespace Kerbalua.Gui {
 		void MainWindow(int id)
 		{
 			GUI.DragWindow(new Rect(0, 0, mainWindowRect.width, titleHeight));
+			GlobalKeyBindings.ExecuteAndConsumeIfMatched(Event.current);
 			widgetBar.Render(buttonBarRect);
 
 			if (replVisible) {
@@ -261,97 +223,7 @@ namespace Kerbalua.Gui {
 					repl.inputBox.GrabFocus();
 				}
 
-				HandleReplInput();
-
 				repl.Render(replRect);
-
-				if (inputBoxChanged) {
-					//AllCompletion.Complete(replEvaluator.Globals, repl.inputBox, completionBox.content, false);
-					inputBoxChanged = false;
-				}
-			}
-		}
-
-		void HandleEditorInput()
-		{
-			if (editor.HasFocus()) {
-				Event event1 = Event.current;
-				if (event1.type == EventType.KeyDown) {
-
-					switch (event1.keyCode) {
-					case KeyCode.Space:
-						if (event1.shift) {
-							//AllCompletion.Complete(replEvaluator.Globals, editor, completionBox.content, true);
-							GUIUtil.ConsumeAndMarkNextCharEvent(event1);
-						}
-						break;
-					case KeyCode.E:
-						if (event1.control) {
-							repl.outputBox.content.text += currentReplEvaluator.Evaluate(editor.content.text);
-							GUIUtil.ConsumeAndMarkNextCharEvent(event1);
-						}
-						break;
-					case KeyCode.D:
-						if (event1.control) {
-							LoadScript(scriptNameInput.content.text);
-							GUIUtil.ConsumeAndMarkNextCharEvent(event1);
-						}
-						break;
-					case KeyCode.S:
-						if (event1.control) {
-							SaveScript(scriptNameInput.content.text);
-							GUIUtil.ConsumeAndMarkNextCharEvent(event1);
-						}
-						break;
-					}
-					int diff = repl.outputBox.content.text.Length - maxOutputBytes;
-					if (diff > 0) {
-						repl.outputBox.content.text = repl.outputBox.content.text.Substring(diff);
-					}
-
-					editorChanged = true;
-				}
-			}
-		}
-
-		void HandleReplInput()
-		{
-			if (repl.inputBox.HasFocus()) {
-				Event event1 = Event.current;
-				if (event1.type == EventType.KeyDown) {
-					switch (event1.keyCode) {
-					case KeyCode.Space:
-						if (event1.shift) {
-							//AllCompletion.Complete(replEvaluator.Globals, repl.inputBox, completionBox.content, true);
-							repl.outputBox.ResetScroll();
-							GUIUtil.ConsumeAndMarkNextCharEvent(event1);
-						}
-						break;
-					case KeyCode.E:
-						if (event1.control) {
-							repl.outputBox.content.text += currentReplEvaluator.Evaluate(repl.inputBox.content.text);
-							GUIUtil.ConsumeAndMarkNextCharEvent(event1);
-						}
-						break;
-					case KeyCode.Return:
-						if (!event1.shift) {
-							repl.outputBox.content.text += currentReplEvaluator.Evaluate(repl.inputBox.content.text);
-							repl.inputBox.content.text = "";
-							completionBox.content.text = "";
-							GUIUtil.ConsumeAndMarkNextCharEvent(event1);
-						}
-						break;
-					
-					}
-					int diff = repl.outputBox.content.text.Length - maxOutputBytes;
-					if (diff > 0) {
-						repl.outputBox.content.text = repl.outputBox.content.text.Substring(diff);
-					}
-
-					repl.outputBox.ResetScroll();
-
-					inputBoxChanged = true;
-				}
 			}
 		}
 	}

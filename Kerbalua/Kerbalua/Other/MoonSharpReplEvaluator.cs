@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.REPL;
 using MoonSharp.Interpreter.Interop;
@@ -36,6 +37,16 @@ namespace Kerbalua.Other
 			}
 
 			return output;
+		}
+
+		public override List<string> GetCompletions(string source, int cursorPos)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override string GetPartialCompletion(string source, int cursorPos)
+		{
+			throw new NotImplementedException();
 		}
 	}
 }

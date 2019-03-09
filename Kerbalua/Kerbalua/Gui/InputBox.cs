@@ -4,12 +4,12 @@ using Kerbalua.Completion;
 
 namespace Kerbalua.Gui {
 	public class InputBox:EditingArea {
+		public KeyBindings KeyBindings = new KeyBindings();
 
-		protected override void HandleInput(TextEditor editor)
+		public override void Render(Rect rect, GUIStyle style = null)
 		{
-
-
-			base.HandleInput(editor);
+			if (HasFocus()) KeyBindings.ExecuteAndConsumeIfMatched(Event.current);
+			base.Render(rect, style);
 		}
 	}
 }
