@@ -95,24 +95,24 @@ namespace RedOnion.Script
 			Ctx = new Context(this);
 		}
 
-		public Engine(IRoot root)
+		public Engine(Func<Engine, IRoot> createRoot)
 		{
 			Parser = new Parser(DefaultParserOptions);
-			Root = root;
+			Root = createRoot(this);
 			Ctx = new Context(this);
 		}
 
-		public Engine(IRoot root, Parser.Option opt)
+		public Engine(Func<Engine, IRoot> createRoot, Parser.Option opt)
 		{
 			Parser = new Parser(opt);
-			Root = root;
+			Root = createRoot(this);
 			Ctx = new Context(this);
 		}
 
-		public Engine(IRoot root, Parser.Option opton, Parser.Option optoff)
+		public Engine(Func<Engine, IRoot> createRoot, Parser.Option opton, Parser.Option optoff)
 		{
 			Parser = new Parser(opton, optoff);
-			Root = root;
+			Root = createRoot(this);
 			Ctx = new Context(this);
 		}
 
