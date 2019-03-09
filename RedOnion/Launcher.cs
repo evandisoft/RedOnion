@@ -78,7 +78,7 @@ namespace RedOnion
 				return;
 			}
 			if (engine == null)
-				engine = new Script.Engine();
+				engine = new Script.Engine(engine => new EngineRoot(engine));
 			try
 			{
 				engine.ExecutionCountdown = 10000;
