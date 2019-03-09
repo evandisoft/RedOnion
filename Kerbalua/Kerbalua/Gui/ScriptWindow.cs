@@ -26,6 +26,8 @@ namespace Kerbalua.Gui {
 		Rect mainWindowRect;
 		bool editorVisible = true;
 		bool replVisible = true;
+		bool guiChanged;
+		bool windowChanged;
 
 		Rect buttonBarRect;
 		Rect replRect;
@@ -58,7 +60,7 @@ namespace Kerbalua.Gui {
 
 		public ScriptWindow(Rect mainWindowRect)
 		{
-			replEvaluators["RedOnion"] = new RedOnionReplEvaluator(new Engine());
+			replEvaluators["RedOnion"] = new RedOnionReplEvaluator();
 			replEvaluators["MoonSharp"] = new MoonSharpReplEvaluator(CoreModules.Preset_Complete);
 			SetCurrentEvaluator("RedOnion");
 
@@ -87,6 +89,9 @@ namespace Kerbalua.Gui {
 			}));
 			widgetBar.renderables.Add(new Button("Evaluate", () => {
 				repl.outputBox.content.text+=currentReplEvaluator.Evaluate(editor.content.text);
+			}));
+			widgetBar.renderables.Add(new Button("Reset Engine", () => {
+				currentReplEvaluator.ResetEngine();
 			}));
 
 			foreach(var evaluatorName in replEvaluators.Keys) {
@@ -181,7 +186,7 @@ namespace Kerbalua.Gui {
 		public void Render()
 		{
 			SetOrReleaseInputLock();
-			completionManager.Update();
+			completionManager.Update(guiChanged);
 
 			if (replVisible) {
 				mainWindowRect.width = buttonBarRect.width + replRect.width;
@@ -202,6 +207,8 @@ namespace Kerbalua.Gui {
 				completionBoxRect =UpdateBoxPositionWithWindow(completionBoxRect, mainWindowRect.width);
 				completionBox.Render(completionBoxRect);
 			}
+
+			guiChanged = Event.current.type == EventType.Used;
 		}
 
 		/// <summary>
@@ -225,6 +232,7 @@ namespace Kerbalua.Gui {
 
 				repl.Render(replRect);
 			}
+			//windowChanged = GUI.changed;
 		}
 	}
 }

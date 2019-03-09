@@ -10,7 +10,7 @@ namespace Kerbalua.Gui {
 		const int spacesPerTab = 4;
 		public KeyBindings KeyBindings = new KeyBindings();
 		protected TextEditor editor;
-		public bool hasReceivedNewInput;
+
 		/// <summary>
 		/// Setting this to true will not allow any key-down input events
 		/// to reach the control's default handling of events.

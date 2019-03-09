@@ -20,6 +20,11 @@ namespace Kerbalua.Other {
 
 		public string ControlName => editingArea.ControlName;
 
+		public bool Changed()
+		{
+			throw new NotImplementedException();
+		}
+
 		public void Complete(int index)
 		{
 			var completions = GetCompletionContent();
