@@ -58,7 +58,7 @@ namespace Kerbalua.Gui {
 
 		public ScriptWindow(Rect mainWindowRect)
 		{
-			replEvaluators["RedOnion"] = new RedOnionReplEvaluator(new Engine());
+			replEvaluators["RedOnion"] = new RedOnionReplEvaluator();
 			replEvaluators["MoonSharp"] = new MoonSharpReplEvaluator(CoreModules.Preset_Complete);
 			SetCurrentEvaluator("RedOnion");
 
@@ -87,6 +87,9 @@ namespace Kerbalua.Gui {
 			}));
 			widgetBar.renderables.Add(new Button("Evaluate", () => {
 				repl.outputBox.content.text+=currentReplEvaluator.Evaluate(editor.content.text);
+			}));
+			widgetBar.renderables.Add(new Button("Reset Engine", () => {
+				currentReplEvaluator.ResetEngine();
 			}));
 
 			foreach(var evaluatorName in replEvaluators.Keys) {

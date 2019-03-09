@@ -6,9 +6,9 @@ namespace Kerbalua.Gui {
 	/// <summary>
 	/// Manages an interaction between focusable objects that can produce a 
 	/// list of possible completions (ICompletable) and an object for displaying 
-	/// that completion. Completes whichever completable that was either focused currently, or
-	/// if the CompletionSelector is focused, completes whichever completable
-	/// was focused last.
+	/// that completion (ICompletionSelector). Completes whichever ICompletable 
+	/// is focused currently, or if the completionSelector is focused, 
+	/// completes whichever ICompletable was focused last.
 	/// </summary>
 	public class CompletionManager {
 		Dictionary<string,ICompletable> completableMap=new Dictionary<string, ICompletable>();
@@ -16,7 +16,6 @@ namespace Kerbalua.Gui {
 		public string lastFocusedControl = "";
 		public string currentlyFocusedControl = "";
 		bool focusChanged = true;
-
 
 		public CompletionManager(ICompletionSelector completionSelector)
 		{

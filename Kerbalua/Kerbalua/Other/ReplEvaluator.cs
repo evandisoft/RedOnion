@@ -34,5 +34,10 @@ namespace Kerbalua.Other {
 		/// <param name="source">Source.</param>
 		/// <param name="cursorPos">Cursor position.</param>
 		public abstract string GetPartialCompletion(string source, int cursorPos);
+
+		/// <summary>
+		/// Resets the engine.
+		/// </summary>
+		public abstract void ResetEngine();
 	}
 }

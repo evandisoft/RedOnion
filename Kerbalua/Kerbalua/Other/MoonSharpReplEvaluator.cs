@@ -11,9 +11,11 @@ namespace Kerbalua.Other
     public class MoonSharpReplEvaluator:ReplEvaluator
     {
 		SimpleScript scriptEngine;
+		CoreModules coreModules;
 
 		public MoonSharpReplEvaluator(CoreModules coreModules)
 		{
+			this.coreModules = coreModules;
 			scriptEngine = new SimpleScript(coreModules);
 		}
 
@@ -47,6 +49,11 @@ namespace Kerbalua.Other
 		public override string GetPartialCompletion(string source, int cursorPos)
 		{
 			throw new NotImplementedException();
+		}
+
+		public override void ResetEngine()
+		{
+			scriptEngine = new SimpleScript(coreModules);
 		}
 	}
 }
