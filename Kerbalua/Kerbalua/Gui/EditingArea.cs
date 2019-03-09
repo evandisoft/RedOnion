@@ -28,7 +28,6 @@ namespace Kerbalua.Gui {
 
 			}
 
-
 			if (HasFocus()) {
 				int id = GUIUtility.keyboardControl;
 				editor = (TextEditor)GUIUtility.GetStateObject(typeof(TextEditor), id);
