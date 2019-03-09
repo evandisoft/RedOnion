@@ -1,5 +1,7 @@
 using System;
 using System.Reflection;
+using System.Linq.Expressions;
+using System.Collections.Generic;
 
 namespace RedOnion.Script.ReflectedObjects
 {
@@ -74,6 +76,18 @@ namespace RedOnion.Script.ReflectedObjects
 						continue;
 					return false;
 				}
+				if (typeof(Delegate).IsAssignableFrom(type))
+				{
+					if (arg.RValue.Deref is BasicObjects.FunctionObj fn)
+					{
+						var invoke = type.GetMethod("Invoke");
+						var mipars = invoke.GetParameters();
+						if (mipars.Length != fn.ArgCount)
+							return false;
+						continue;
+					}
+					return false;
+				}
 				var val = arg.Native;
 				if (val == null)
 					continue;
@@ -101,6 +115,24 @@ namespace RedOnion.Script.ReflectedObjects
 					args[i] = arg.String;
 				else if (type.IsPrimitive || type.IsEnum)
 					args[i] = Convert.ChangeType(arg.Native, type);
+				else if (typeof(Delegate).IsAssignableFrom(type))
+				{
+					var fn = (BasicObjects.FunctionObj)arg.RValue.Deref;
+					var fnargs = new List<ParameterExpression>();
+					var invoke = type.GetMethod("Invoke");
+					var mipars = invoke.GetParameters();
+					for (int j = 0; j < mipars.Length; j++)
+						fnargs.Add(Expression.Parameter(mipars[j].ParameterType, fn.ArgName(j)));
+					// (x, y, ...) => FunctionCallHelper<T>(fn, new object[] { x, y, ... })
+					var lambda = Expression.Call(
+						invoke.ReturnType == typeof(void)
+						? typeof(ReflectedFunction).GetMethod("ActionCallHelper")
+						: typeof(ReflectedFunction).GetMethod("FunctionCallHelper")
+						.MakeGenericMethod(invoke.ReturnType),
+						Expression.Constant(fn),
+						Expression.NewArrayInit(typeof(object), fnargs.ToArray()));
+					args[i] = Expression.Lambda(type, lambda, fnargs).Compile();
+				}
 				else
 				{
 					var val = arg.Native;
@@ -123,6 +155,37 @@ namespace RedOnion.Script.ReflectedObjects
 				: method.Invoke(self, args),
 				method.ReturnType);
 			return true;
+		}
+
+		public static void ActionCallHelper(BasicObjects.FunctionObj fn, params object[] args)
+		{
+			var engine = fn.Engine;
+			var engargs = engine.Args;
+			foreach (var arg in args)
+				engargs.Add(ReflectedType.Convert(engine, arg));
+			try
+			{
+				fn.Call(null, args.Length);
+			}
+			finally
+			{
+				engargs.Remove(args.Length);
+			}
+		}
+		public static T FunctionCallHelper<T>(BasicObjects.FunctionObj fn, params object[] args)
+		{
+			var engine = fn.Engine;
+			var engargs = engine.Args;
+			foreach (var arg in args)
+				engargs.Add(ReflectedType.Convert(engine, arg));
+			try
+			{
+				return ReflectedType.Convert<T>(fn.Call(null, args.Length));
+			}
+			finally
+			{
+				engargs.Remove(args.Length);
+			}
 		}
 	}
 }

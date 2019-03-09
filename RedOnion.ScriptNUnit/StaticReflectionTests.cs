@@ -29,6 +29,11 @@ namespace RedOnion.ScriptNUnit
 			public static float SomeValue { get; set; }
 			public static double PI { get; } = Math.PI;
 			public static bool SetOnly { set => WasExecuted = value; }
+
+			public static void DoIt(Action action) => action();
+
+			public static string str;
+			public static void Exec(Action<string> action, string value) => action(value);
 		}
 
 		[Test]
@@ -86,6 +91,25 @@ namespace RedOnion.ScriptNUnit
 			StaticClass.WasExecuted = false;
 			Test(true, "testClass.setOnly = true");
 			Test(true, "testClass.wasExecuted");
+		}
+
+		[Test]
+		public void StaticReflection_05_Delegate()
+		{
+			Root.Set("testClass", new Value(new ReflectedType(this,
+				typeof(StaticClass))));
+			StaticClass.WasExecuted = false;
+			Test(
+				"function action\n" +
+				" testClass.wasExecuted = true\n" +
+				"testClass.doIt action");
+			Assert.IsTrue(StaticClass.WasExecuted);
+
+			Test(
+				"function setStr str\n" +
+				" testClass.str = str\n" +
+				"testClass.exec setStr, \"done\"");
+			Assert.AreEqual("done", StaticClass.str);
 		}
 	}
 }

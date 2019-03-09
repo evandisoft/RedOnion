@@ -15,14 +15,28 @@ namespace RedOnion.Script
 		public enum Option
 		{
 			None = 0,
+			/// <summary>
+			/// Variables live only inside blocks
+			/// (otherwise inside script or function)
+			/// </summary>
 			BlockScope	= 1 << 0,
-			FuncText	= 1 << 1,
+			/// <summary>
+			/// Make errors/exceptions produce undefined value where possible
+			/// (throw exception otherwise)
+			/// </summary>
+			Silent = 1 << 1,
+			/// <summary>
+			/// Anonymous functions (created by Function(args, body))
+			/// expose their body (script code).
+			/// </summary>
+			FuncText	= 1 << 31,
 		}
 
 		/// <summary>
 		/// Engine options
 		/// </summary>
 		public Option Options { get; set; } = Option.BlockScope;
+		public bool HasOption(Option option) => (Options & option) != 0;
 
 		public struct ArgInfo
 		{
