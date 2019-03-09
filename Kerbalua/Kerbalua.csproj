@@ -107,6 +107,12 @@
     <Compile Include="Kerbalua\Other\SimpleScript.cs" />
     <Compile Include="Kerbalua\Gui\EventKey.cs" />
     <Compile Include="Kerbalua\Gui\KeyBindings.cs" />
+    <Compile Include="Kerbalua\Gui\ScriptNameInputArea.cs" />
+    <Compile Include="Kerbalua\Gui\CompletionManager.cs" />
+    <Compile Include="Kerbalua\Gui\ICompletionSelector.cs" />
+    <Compile Include="Kerbalua\Gui\ICompletable.cs" />
+    <Compile Include="Kerbalua\Gui\IFocusable.cs" />
+    <Compile Include="Kerbalua\Other\EditAreaCompletionAdapter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

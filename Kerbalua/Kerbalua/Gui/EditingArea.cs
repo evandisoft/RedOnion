@@ -9,7 +9,13 @@ namespace Kerbalua.Gui {
 		public int selectIndex = 0;
 		const int spacesPerTab = 4;
 		public KeyBindings KeyBindings = new KeyBindings();
-		TextEditor editor;
+		protected TextEditor editor;
+		public bool hasReceivedNewInput;
+		/// <summary>
+		/// Setting this to true will not allow any key-down input events
+		/// to reach the control's default handling of events.
+		/// </summary>
+		protected bool onlyUseKeyBindings;
 
 		public EditingArea()
 		{
@@ -29,17 +35,8 @@ namespace Kerbalua.Gui {
 			}
 
 			if (HasFocus()) {
-				int id = GUIUtility.keyboardControl;
-				editor = (TextEditor)GUIUtility.GetStateObject(typeof(TextEditor), id);
-				//Debug.Log(ControlName+","+inc++);
-				editor.text = content.text;
-				editor.cursorIndex = cursorIndex;
-				editor.selectIndex = selectIndex;
+				HandleInput();
 
-				KeyBindings.ExecuteAndConsumeIfMatched(Event.current);
-
-
-				content.text = editor.text;
 				base.Render(rect, style);
 
 				cursorIndex = editor.cursorIndex;
@@ -47,6 +44,39 @@ namespace Kerbalua.Gui {
 			} else {
 				base.Render(rect, style);
 			}
+		}
+
+		public override void Render()
+		{
+			if (HasFocus()) {
+				HandleInput();
+
+				base.Render();
+
+				cursorIndex = editor.cursorIndex;
+				selectIndex = editor.selectIndex;
+			} else {
+				base.Render();
+			}
+		}
+
+		void HandleInput()
+		{
+			int id = GUIUtility.keyboardControl;
+			editor = (TextEditor)GUIUtility.GetStateObject(typeof(TextEditor), id);
+			//Debug.Log(ControlName+","+inc++);
+			editor.text = content.text;
+			editor.cursorIndex = cursorIndex;
+			editor.selectIndex = selectIndex;
+
+			KeyBindings.ExecuteAndConsumeIfMatched(Event.current);
+
+			// Intercept all keydown events that are about to be processed by the
+			// control itself if onlyUseKeyBindings is set to true.
+			if (onlyUseKeyBindings && Event.current.type == EventType.KeyDown) {
+				Event.current.Use();
+			}
+			content.text = editor.text;
 		}
 
 		void InitializeDefaultKeyBindings()
@@ -121,7 +151,7 @@ namespace Kerbalua.Gui {
 		}
 
 
-		int NextTabLeft(int fromIndex)
+		protected int NextTabLeft(int fromIndex)
 		{
 			int prevCursorIndex = editor.cursorIndex;
 			int prevSelectIndex = editor.selectIndex;
@@ -146,7 +176,7 @@ namespace Kerbalua.Gui {
 			return charsToMove;
 		}
 
-		int NextTabRight(int fromIndex)
+		protected int NextTabRight(int fromIndex)
 		{
 			int prevCursorIndex = editor.cursorIndex;
 			int prevSelectIndex = editor.selectIndex;
@@ -173,20 +203,20 @@ namespace Kerbalua.Gui {
 			return charsToMove;
 		}
 
-		void InsertLineBefore()
+		protected void InsertLineBefore()
 		{
 			editor.MoveLineStart();
 			editor.ReplaceSelection("\n");
 			editor.MoveLeft();
 		}
 
-		void InsertLineAfter()
+		protected void InsertLineAfter()
 		{
 			editor.MoveLineEnd();
 			editor.ReplaceSelection("\n");
 		}
 
-		void IndentToPreviousLine()
+		protected void IndentToPreviousLine()
 		{
 			RemoveIndentation();
 			int currentIndex = editor.cursorIndex;
@@ -204,7 +234,7 @@ namespace Kerbalua.Gui {
 			MoveToIndex(newIndex);
 		}
 
-		void RemoveIndentation()
+		protected void RemoveIndentation()
 		{
 			int indentation = StartingSpaces();
 			int newIndex = Math.Max(editor.cursorIndex-indentation,0);
@@ -219,7 +249,7 @@ namespace Kerbalua.Gui {
 		/// <summary>
 		/// Adds one level of indentation
 		/// </summary>
-		void Indent()
+		protected void Indent()
 		{
 			int startingSpaces = StartingSpaces();
 			int charsNeeded = spacesPerTab - startingSpaces % spacesPerTab;
@@ -237,7 +267,7 @@ namespace Kerbalua.Gui {
 		/// <summary>
 		/// Removes one level of indentation
 		/// </summary>
-		void Unindent()
+		protected void Unindent()
 		{
 			int startingSpaces = StartingSpaces();
 
@@ -263,7 +293,7 @@ namespace Kerbalua.Gui {
 			MoveToIndex(newIndex);
 		}
 
-		void MoveToIndex(int index)
+		protected void MoveToIndex(int index)
 		{
 			editor.cursorIndex = index;
 			editor.selectIndex = index;
@@ -274,7 +304,7 @@ namespace Kerbalua.Gui {
 		/// of the line to the cursor
 		/// </summary>
 		/// <returns>The from line start.</returns>
-		int CharsFromLineStart()
+		protected int CharsFromLineStart()
 		{
 			int prevCursorIndex = editor.cursorIndex;
 			editor.MoveLineStart();
@@ -289,7 +319,7 @@ namespace Kerbalua.Gui {
 			return chars;
 		}
 
-		int CharsFromLineEnd()
+		protected int CharsFromLineEnd()
 		{
 			int prevCursorIndex = editor.cursorIndex;
 			editor.MoveLineEnd();
@@ -308,7 +338,7 @@ namespace Kerbalua.Gui {
 		/// Gets number of starting spaces on the current line
 		/// </summary>
 		/// <returns>The spaces.</returns>
-		int StartingSpaces()
+		protected int StartingSpaces()
 		{
 			string currentLine=CurrentLine();
 			int i = 0;
@@ -329,7 +359,7 @@ namespace Kerbalua.Gui {
 		/// Returns the text on the current line
 		/// </summary>
 		/// <returns>The line.</returns>
-		string CurrentLine()
+		protected string CurrentLine()
 		{
 			int prevCursorIndex = editor.cursorIndex;
 			editor.MoveLineEnd();

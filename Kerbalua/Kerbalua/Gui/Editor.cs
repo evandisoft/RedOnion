@@ -4,7 +4,10 @@ using System;
 
 namespace Kerbalua.Gui {
     public class Editor:EditingArea{
-		public KeyBindings KeyBindings = new KeyBindings();
+		/// <summary>
+		/// These bindings intentionally shadow the base class bindings.
+		/// </summary>
+		public new KeyBindings KeyBindings = new KeyBindings();
 
 		public override void Render(Rect rect,GUIStyle style=null)
 		{

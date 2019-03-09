@@ -7,7 +7,7 @@ namespace Kerbalua.Gui {
 	/// their Render code to set which control will respond to HasFocus() and 
 	/// GrabFocus().
 	/// </summary>
-	public class UIElement {
+	public class UIElement:IFocusable {
 		static long NextID = 0;
 		/// <summary>
 		/// Auto-generated unique name for this control, to be used as the name
@@ -15,6 +15,8 @@ namespace Kerbalua.Gui {
 		/// and GUI.FocusControl can be used for managing focus of that control.
 		/// </summary>
 		public readonly string ControlName = "Control-"+NextID++;
+
+		string IFocusable.ControlName => ControlName;
 
 		/// <summary>
 		/// Assigns the next control the unique name generated in ControlName.

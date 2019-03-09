@@ -16,7 +16,7 @@ namespace Kerbalua.Gui {
 			}
 		}
 
-		public void Render()
+		public virtual void Render()
 		{
 			ClearCharEvent();
 			SetNextControlAsMainControl();

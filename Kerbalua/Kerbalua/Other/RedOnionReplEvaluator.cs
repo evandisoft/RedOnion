@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using RedOnion.Script;
 using UnityEngine;
 
@@ -27,6 +28,17 @@ namespace Kerbalua.Other {
 			}
 
 			return output;
+		}
+
+
+		public override List<string> GetCompletions(string source, int cursorPos)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override string GetPartialCompletion(string source, int cursorPos)
+		{
+			throw new NotImplementedException();
 		}
 	}
 }
