@@ -24,6 +24,11 @@ namespace RedOnion.Script
 	}
 
 	/// <summary>
+	/// Joined interface IObject also implementing IObjectConverter
+	/// </summary>
+	public interface IObjectAndConverter : IObject, IObjectConverter { }
+
+	/// <summary>
 	/// Script object holding reference to native object
 	/// (e.g. ReflectedObjects.ReflectedObject)
 	/// </summary>

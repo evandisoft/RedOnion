@@ -9,7 +9,7 @@ namespace RedOnion.Script.BasicObjects
 	/// <summary>
 	/// String function (used to create new string objects)
 	/// </summary>
-	public class StringFun : BasicObject, IObjectConverter
+	public class StringFun : BasicObject, IObjectAndConverter
 	{
 		/// <summary>
 		/// Prototype of all string objects

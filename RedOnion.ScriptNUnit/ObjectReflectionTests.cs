@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using NUnit.Framework;
 using RedOnion.Script;
 using RedOnion.Script.ReflectedObjects;
@@ -68,6 +69,11 @@ namespace RedOnion.ScriptNUnit
 			public float Bottom { get => Y+Height; set => Height = value-Y; }
 		}
 
+		public static class RectFunctions
+		{
+			public static float Area(Rect rc) => rc.Width*rc.Height;
+		}
+
 		[Test]
 		public void ObjectReflection_03_Structure()
 		{
@@ -76,8 +82,17 @@ namespace RedOnion.ScriptNUnit
 			Root.Set("Rect", new Value(creator));
 			Test("var rc = new rect");
 			Assert.True(Result.Native is Rect);
-			Test("rc.x = 1");
-			Test(1, "rc.x");
+			Test("rc.x = 10");
+			Test(10, "rc.x");
+			Test("rc.right = 30");
+			Test(30, "rc.right");
+			Test(20, "rc.width");
+
+			Root.Set("area", new Value(new ReflectedFunction(this, null, "area",
+				new MethodInfo[] { typeof(RectFunctions).GetMethod("Area") })));
+			Test("rc.height = 10");
+			Test(200, "area rc");
 		}
+
 	}
 }

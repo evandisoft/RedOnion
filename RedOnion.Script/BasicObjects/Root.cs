@@ -70,6 +70,23 @@ namespace RedOnion.Script.BasicObjects
 			TypeMap[typeof(string)] = String;
 		}
 
+		public void AddType(string name, Type type, IObjectAndConverter creator)
+		{
+			this[type] = creator;
+			Set(name, new Value(creator));
+		}
+		public void AddType(string name, Type type)
+		{
+			var creator = new ReflectedObjects.ReflectedType(Engine, type);
+			this[type] = creator;
+			Set(name, new Value(creator));
+		}
+		public void AddType(string name, ReflectedObjects.ReflectedType type)
+		{
+			this[type.Type] = type;
+			Set(name, new Value(type));
+		}
+
 		public IObject Box(Value value)
 		{
 			for (;;)

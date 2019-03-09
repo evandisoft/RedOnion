@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace RedOnion.Script.ReflectedObjects
 {
-	public class ReflectedType : BasicObjects.SimpleObject, IObjectConverter
+	public class ReflectedType : BasicObjects.SimpleObject, IObjectAndConverter
 	{
 		/// <summary>
 		/// Reflected type this object represents
