@@ -7,9 +7,9 @@ namespace Kerbalua.Other {
 	public class RedOnionReplEvaluator:ReplEvaluator {
 		Engine engine;
 
-		public RedOnionReplEvaluator(Engine engine)
+		public RedOnionReplEvaluator()
 		{
-			this.engine = engine;
+			engine = new Engine();
 		}
 
 		public override string Evaluate(string source)
@@ -39,6 +39,11 @@ namespace Kerbalua.Other {
 		public override string GetPartialCompletion(string source, int cursorPos)
 		{
 			throw new NotImplementedException();
+		}
+
+		public override void ResetEngine()
+		{
+			engine.Reset();
 		}
 	}
 }
