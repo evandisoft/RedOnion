@@ -726,5 +726,44 @@ namespace RedOnion.ScriptNUnit
 			CodeCheck(13, OpCode.Undefined);
 			CodeCheck(14);
 		}
+
+		[Test]
+		public void ParseExpression_17_AutocallWithNew()
+		{
+			Test("fn new pt 1, 2");
+
+			ValueCheck	( 0, 0, "fn");
+			ValueCheck	( 4, OpCode.Identifier);
+			ValueTopMark( 9, 0);
+			ValueCheck	( 9, 1, "pt");
+			ValueCheck	(13, OpCode.Identifier);
+			ValueTopMark(18, 9);
+			ValueCheck	(18, 1);
+			ValueCheck	(22, OpCode.Int);
+			ValueTopMark(27, 18);
+			ValueCheck	(27, 2);
+			ValueCheck	(31, OpCode.Int);
+			ValueTopMark(36, 27);
+			ValueCheck	(36, OpCode.Call2);
+			ValueCheck	(37, OpCode.Create);
+			ValueTopMark(42, 9);
+			ValueCheck	(42, OpCode.Call1);
+			ValueFinal	(47);
+
+			Rewrite(ValuesAt);
+
+			CodeCheck( 0, OpCode.Call1);
+			CodeCheck( 1, OpCode.Identifier);
+			CodeCheck( 2, 0, "fn");
+			CodeCheck( 6, OpCode.Create);
+			CodeCheck( 7, OpCode.Call2);
+			CodeCheck( 8, OpCode.Identifier);
+			CodeCheck( 9, 1, "pt");
+			CodeCheck(13, OpCode.Int);
+			CodeCheck(14, 1);
+			CodeCheck(18, OpCode.Int);
+			CodeCheck(19, 2);
+			CodeCheck(23);
+		}
 	}
 }

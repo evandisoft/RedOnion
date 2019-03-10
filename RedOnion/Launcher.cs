@@ -69,7 +69,6 @@ namespace RedOnion
 		}
 
 		Script.Engine engine;
-		bool running = false;
 		private void RunScript()
 		{
 			if(!File.Exists("scripts/launcher.ros"))
@@ -77,26 +76,26 @@ namespace RedOnion
 				Log("Script scripts/launcher.ros does not exist");
 				return;
 			}
-			if (engine == null)
-				engine = new Script.Engine(engine => new EngineRoot(engine));
 			try
 			{
+				engine = new Script.Engine(engine => new EngineRoot(engine));
 				engine.ExecutionCountdown = 10000;
 				engine.Execute(File.ReadAllText("scripts/launcher.ros"));
-				running = true;
 			}
 			catch(Script.Parsing.ParseError err)
 			{
 				Log("ParseError at {0}.{1}: {2}", err.LineNumber, err.Column, err.Message);
 				Log("Content of the line: " + err.Line);
+				engine = null;
 			}
 			catch(Exception err)
 			{
 				Log("Exception in engine or parser: " + err.Message);
+				engine = null;
 			}
 		}
 		private void StopScript()
-			=> running = false;
+			=> engine = null;
 
 		private void FixedUpdate()
 			=> RunFunction("FixedUpdate");
@@ -106,7 +105,7 @@ namespace RedOnion
 			=> RunFunction("OnGUI");
 		private void RunFunction(string name)
 		{
-			if (!running)
+			if (engine == null)
 				return;
 			if (!engine.Root.Get(name, out var value))
 				return;
@@ -120,12 +119,12 @@ namespace RedOnion
 				catch (Script.Engine.TookTooLong)
 				{
 					Log(name + " took too long");
-					running = false;
+					engine = null;
 				}
 				catch (Exception err)
 				{
 					Log("Exception in {0}: {1}", name, err.Message);
-					running = false;
+					engine = null;
 				}
 			}
 		}

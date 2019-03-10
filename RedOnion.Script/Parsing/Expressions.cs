@@ -172,7 +172,8 @@ namespace RedOnion.Script.Parsing
 				switch (code)
 				{
 				case OpCode.Create:
-					CheckUnary(unary, true);
+					if (!unary)
+						goto autocall;
 					Next();
 					PushOperator(code);
 					ParseType(flags);
