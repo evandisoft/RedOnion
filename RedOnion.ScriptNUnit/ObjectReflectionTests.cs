@@ -67,6 +67,11 @@ namespace RedOnion.ScriptNUnit
 			public float Right { get => X+Width; set => Width = value-X; }
 			public float Top { get => Y; set => Y = value; }
 			public float Bottom { get => Y+Height; set => Height = value-Y; }
+
+			public Rect(float x, float y, float w, float h)
+			{
+				X = x; Y = y; Width = w; Height = h;
+			}
 		}
 
 		public static class RectFunctions
@@ -94,5 +99,35 @@ namespace RedOnion.ScriptNUnit
 			Test(200, "area rc");
 		}
 
+		public delegate Rect WindowFunction(int id);
+
+		public static class GUITest
+		{
+			public static int counter;
+			public static Rect Window(int id, Rect rc, WindowFunction fn, string title)
+				=> fn(id);
+		}
+
+		[Test]
+		public void ObjectReflection_04_ComplexArguments()
+		{
+			var creator = new ReflectedType(this, typeof(Rect));
+			Root[typeof(Rect)] = creator;
+			Root.Set("Rect", new Value(creator));
+			Root.Set("GUI", new Value(new ReflectedType(this,
+				typeof(GUITest))));
+
+			Test("rc = new rect 10,40,200,300");
+			Test(10, "rc.x");
+			Test(
+				"title = \"ROS Test Window\"\n" +
+				"function onGUI\n" +
+				" rc = GUI.window 0, rc, testWindow, title\n" +
+				"function testWindow id\n" +
+				" GUI.counter++\n" +
+				" return rc");
+			Test("onGUI()");
+			Assert.AreEqual(1, GUITest.counter);
+		}
 	}
 }

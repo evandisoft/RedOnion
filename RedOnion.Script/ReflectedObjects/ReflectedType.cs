@@ -50,13 +50,19 @@ namespace RedOnion.Script.ReflectedObjects
 					return null;
 				return new ReflectedObject(Engine, ctor.Invoke(new object[0]), this, TypeProps);
 			}
+			var value = new Value();
 			foreach (var ctor in Type.GetConstructors())
 			{
-				var para = ctor.GetParameters();
-				if (para.Length != argc)
+				if (!ReflectedFunction.TryCall(Engine, ctor, this, argc, ref value))
 					continue;
-				//TODO
+				var obj = value.RValue.Deref;
+				if (obj != null)
+					return obj;
+				break;
 			}
+			if (!Engine.HasOption(Engine.Option.Silent))
+				throw new NotImplementedException(string.Format(
+					"Could not create {0} with {1} arguments", Type.FullName, argc));
 			return null;
 		}
 

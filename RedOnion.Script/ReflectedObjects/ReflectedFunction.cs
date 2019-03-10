@@ -48,12 +48,12 @@ namespace RedOnion.Script.ReflectedObjects
 				throw new InvalidOperationException(
 					"Could not call " + (Type == null ? Name
 					: Type.Name + "." + Name)
-					+ " " + Methods.Length + " candidates");
+					+ ", " + Methods.Length + " candidates");
 			return result;
 		}
 
 		protected internal static bool TryCall(
-			Engine engine, MethodInfo method,
+			Engine engine, MethodBase method,
 			object self, int argc, ref Value result)
 		{
 			var pars = method.GetParameters();
@@ -157,11 +157,18 @@ namespace RedOnion.Script.ReflectedObjects
 					args[i] = ((IObjectProxy)val).Target;
 				}
 			}
+			var ctor = method as ConstructorInfo;
+			if (ctor != null)
+			{
+				var creator = self as ReflectedType;
+				result = new Value(new ReflectedObject(engine, ctor.Invoke(args), creator, creator?.TypeProps));
+				return true;
+			}
 			result = ReflectedType.Convert(
 				engine, method.IsStatic
 				? method.Invoke(null, args)
 				: method.Invoke(self, args),
-				method.ReturnType);
+				((MethodInfo)method).ReturnType);
 			return true;
 		}
 
