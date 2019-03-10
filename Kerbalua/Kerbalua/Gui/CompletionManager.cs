@@ -33,20 +33,22 @@ namespace Kerbalua.Gui {
 			if (GUI.GetNameOfFocusedControl() != currentlyFocusedControl) {
 				lastFocusedControl = currentlyFocusedControl;
 				currentlyFocusedControl = GUI.GetNameOfFocusedControl();
-				//focusChanged = true;
+				focusChanged = true;
 			}
 
-
-			if (guiChanged || focusChanged) {
-				Debug.Log("GUI/foc: " + guiChanged + "," + focusChanged + "," + currentlyFocusedControl + "," + inc++);
+			if (focusChanged) {
+				focusChanged = false;
+			} else if (guiChanged) {
+				//Debug.Log("GUI/foc: " + guiChanged + "," + focusChanged + "," + currentlyFocusedControl + "," + inc++);
 				if (focusChanged) focusChanged = false;
-				Debug.Log("Changed");
+				//Debug.Log("Changed");
 				ICompletable currentCompletable;
-				if(completableMap.TryGetValue(currentlyFocusedControl,out currentCompletable)) {
-					Debug.Log("Displaying completions");
+				if (completableMap.TryGetValue(currentlyFocusedControl, out currentCompletable)) {
+					//Debug.Log("Displaying completions");
 					DisplayCurrentCompletions(currentCompletable);
 				}
 			}
+
 		}
 
 		void DisplayCurrentCompletions(ICompletable completable)

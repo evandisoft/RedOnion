@@ -75,7 +75,7 @@ namespace Kerbalua.Gui {
 
 			buttonBarRect = new Rect(0, titleHeight, 100, mainWindowRect.height-titleHeight);
 			replRect = new Rect(buttonBarRect.width, titleHeight, mainWindowRect.width - buttonBarRect.width, mainWindowRect.height-titleHeight);
-			editorRect = new Rect(0, 0, replRect.width, mainWindowRect.height);
+			editorRect = new Rect(0, 0, replRect.width+200, mainWindowRect.height);
 			completionBoxRect = new Rect(0, 0, 150, mainWindowRect.height);
 
 			widgetBar.renderables.Add(new Button("<<", () => editorVisible = !editorVisible));
@@ -208,7 +208,13 @@ namespace Kerbalua.Gui {
 				completionBox.Render(completionBoxRect);
 			}
 
-			guiChanged = Event.current.type == EventType.Used;
+			// prevent two Completions in a row.
+			if (guiChanged) {
+				guiChanged = false;
+			} else {
+				guiChanged = Event.current.type == EventType.Used;
+			}
+
 		}
 
 		/// <summary>
