@@ -77,7 +77,7 @@ namespace RedOnion.Script.BasicObjects
 	}
 
 	/// <summary>
-	/// Gunction object (callable, can construct)
+	/// Function object (callable, can construct)
 	/// </summary>
 	[DebuggerDisplay("{GetType().Name}: {String}")]
 	public class FunctionObj : BasicObject
@@ -105,15 +105,24 @@ namespace RedOnion.Script.BasicObjects
 		/// <summary>
 		/// Comma-separated list of argument names
 		/// </summary>
-		public string Arglist { get; protected set; }
+		public string ArgsString { get; protected set; }
 		/// <summary>
 		/// Array of argument names and values (will be null if empty)
 		/// </summary>
 		protected Engine.ArgInfo[] Args { get; set; }
 		/// <summary>
+		/// Number of declared arguments
+		/// </summary>
+		public int ArgCount => Args?.Length ?? 0;
+		/// <summary>
+		/// Get name of argument by index
+		/// </summary>
+		public string ArgName(int i)
+			=> i >= ArgCount ? null : Args[i].Name;
+		/// <summary>
 		/// Full function code as string
 		/// </summary>
-		public String String { get; protected set; }
+		public string String { get; protected set; }
 		/// <summary>
 		/// Get function code as string (if enabled in engine options - opt.funcText)
 		/// </summary>
@@ -145,7 +154,7 @@ namespace RedOnion.Script.BasicObjects
 			CodeSize = codeSize;
 			TypeAt = typeAt;
 			Args = args;
-			Arglist = args == null ? "" : string.Join(", ", args.Select(x => x.Name).ToArray());
+			ArgsString = args == null ? "" : string.Join(", ", args.Select(x => x.Name).ToArray());
 			String = body ?? "function";
 			Scope = scope;
 		}

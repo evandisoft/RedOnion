@@ -110,7 +110,7 @@ namespace RedOnion
 				return;
 			if (!engine.Root.Get(name, out var value))
 				return;
-			if (value.Native is Script.BasicObjects.FunctionObj fn)
+			if (value.RValue.Deref is Script.BasicObjects.FunctionObj fn)
 			{
 				try
 				{

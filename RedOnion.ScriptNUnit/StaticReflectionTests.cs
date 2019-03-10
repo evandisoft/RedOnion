@@ -29,6 +29,11 @@ namespace RedOnion.ScriptNUnit
 			public static float SomeValue { get; set; }
 			public static double PI { get; } = Math.PI;
 			public static bool SetOnly { set => WasExecuted = value; }
+
+			public static void DoIt(Action action) => action();
+
+			public static string str;
+			public static void Exec(Action<string> action, string value) => action(value);
 		}
 
 		[Test]
@@ -87,5 +92,62 @@ namespace RedOnion.ScriptNUnit
 			Test(true, "testClass.setOnly = true");
 			Test(true, "testClass.wasExecuted");
 		}
+
+		[Test]
+		public void StaticReflection_05_Delegate()
+		{
+			Root.Set("testClass", new Value(new ReflectedType(this,
+				typeof(StaticClass))));
+			StaticClass.WasExecuted = false;
+			Test(
+				"function action\n" +
+				" testClass.wasExecuted = true\n" +
+				"testClass.doIt action");
+			Assert.IsTrue(StaticClass.WasExecuted);
+
+			Test(
+				"function setStr str\n" +
+				" testClass.str = str\n" +
+				"testClass.exec setStr, \"done\"");
+			Assert.AreEqual("done", StaticClass.str);
+		}
+
+		public struct Rect
+		{
+			public float X, Y, Width, Height;
+			public float Left { get => X; set => X = value; }
+			public float Right { get => X+Width; set => Width = value-X; }
+			public float Top { get => Y; set => Y = value; }
+			public float Bottom { get => Y+Height; set => Height = value-Y; }
+			public Rect(float x, float y, float w, float h)
+			{
+				X = x; Y = y; Width = w; Height = h;
+			}
+		}
+		public delegate Rect WindowFunction(int id);
+		public class UnknownClass {}
+		public class KnownClass {}
+		public static class Test06
+		{
+			public static Rect Window(int id, Rect rc, WindowFunction fn, string title) => rc;
+			public static Rect Window(int id, Rect rc, WindowFunction fn, string title, KnownClass known) => rc;
+			public static Rect Window(int id, Rect rc, WindowFunction fn, UnknownClass unknown) => rc;
+			public static Rect Window(int id, Rect rc, WindowFunction fn, UnknownClass unknown, KnownClass known) => rc;
+		}
+
+		[Test]
+		public void StaticReflection_06_Complex()
+		{
+			Root.Set("GUI", new Value(new ReflectedType(this,
+				typeof(Test06))));
+			Test(
+				"rc = new rect 10,40,200,300\n" +
+				"title = \"ROS Test Window\"\n" +
+				"function onGUI\n" +
+				" rc = GUI.window 0, rc, testWindow, title\n" +
+				"function testWindow id\n" +
+				" return");
+			Test("onGUI()");
+ 		}
 	}
 }

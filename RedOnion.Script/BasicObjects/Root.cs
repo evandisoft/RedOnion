@@ -75,17 +75,12 @@ namespace RedOnion.Script.BasicObjects
 			this[type] = creator;
 			Set(name, new Value(creator));
 		}
-		public void AddType(string name, Type type)
-		{
-			var creator = new ReflectedObjects.ReflectedType(Engine, type);
-			this[type] = creator;
-			Set(name, new Value(creator));
-		}
 		public void AddType(string name, ReflectedObjects.ReflectedType type)
-		{
-			this[type.Type] = type;
-			Set(name, new Value(type));
-		}
+			=> AddType(name, type.Type, type);
+		public void AddType(string name, Type type)
+			=> AddType(name, new ReflectedObjects.ReflectedType(Engine, type));
+		public void AddType(Type type)
+			=> AddType(type.Name, type);
 
 		public IObject Box(Value value)
 		{

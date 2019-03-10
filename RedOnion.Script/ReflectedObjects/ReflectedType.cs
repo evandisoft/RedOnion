@@ -259,6 +259,8 @@ namespace RedOnion.Script.ReflectedObjects
 			// TODO: consider throwing NotImplementedException
 			return null;
 		}
+		public static T Convert<T>(Value value)
+			=> (T)Convert(value, typeof(T));
 
 		public class StaticField : IProperty
 		{
