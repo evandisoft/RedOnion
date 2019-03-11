@@ -51,7 +51,7 @@ namespace Kerbalua.Gui {
 				content.text = defaultScriptFilename;
 			}
 
-			string fullPath = baseFolderPath + "/" + content.text;
+			string fullPath = Path.Combine(baseFolderPath,content.text);
 
 			if (!File.Exists(fullPath)) {
 				File.WriteAllText(fullPath, "");
@@ -64,9 +64,10 @@ namespace Kerbalua.Gui {
 		public List<string> GetCompletionContent()
 		{
 			var newList = new List<string>();
-			foreach (var scriptName in GetScriptList()) {
-				if (scriptName.StartsWith(baseFolderPath + "/" + content.text)) {
-					newList.Add(scriptName.Split('/')[1]);
+			foreach (var scriptPathString in GetScriptList()) {
+				string scriptFileName = Path.GetFileName(scriptPathString);
+				if (scriptFileName.StartsWith(content.text)) {
+					newList.Add(scriptFileName);
 				}
 			}
 			return newList;
