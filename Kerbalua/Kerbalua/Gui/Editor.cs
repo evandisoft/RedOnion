@@ -12,7 +12,10 @@ namespace Kerbalua.Gui {
 		protected override void ProtectedUpdate(Rect rect)
 		{
 			if (HasFocus()) KeyBindings.ExecuteAndConsumeIfMatched(Event.current);
-
+			//if (HasFocus()) {
+			//	int id = GUIUtility.keyboardControl;
+			//	Debug.Log("Id for editor is " + id);
+			//}
 			base.ProtectedUpdate(rect);
 		}
 	}

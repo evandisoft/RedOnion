@@ -13,9 +13,9 @@ namespace Kerbalua.Gui {
 	public class CompletionManager {
 		Dictionary<string,ICompletable> completableMap=new Dictionary<string, ICompletable>();
 		public ICompletionSelector completionSelector;
-		public string lastFocusedControl = "";
-		public string currentlyFocusedControl = "";
+		public string mostRecentlyFocusedCompletable = "";
 		bool focusChanged;// = true;
+		bool completeOnNextUpdate = false;
 
 		public CompletionManager(ICompletionSelector completionSelector)
 		{
@@ -35,9 +35,10 @@ namespace Kerbalua.Gui {
 				newInput |= completable.ReceivedInput;
 			}
 
-			if (GUI.GetNameOfFocusedControl() != currentlyFocusedControl) {
-				lastFocusedControl = currentlyFocusedControl;
-				currentlyFocusedControl = GUI.GetNameOfFocusedControl();
+			string focusedControlName = GUI.GetNameOfFocusedControl();
+			if (GUI.GetNameOfFocusedControl() != mostRecentlyFocusedCompletable &&
+				completableMap.ContainsKey(focusedControlName)) {
+				mostRecentlyFocusedCompletable = focusedControlName;
 				focusChanged = true;
 			}
 
@@ -46,12 +47,27 @@ namespace Kerbalua.Gui {
 				focusChanged = false;
 				//Debug.Log("Changed");
 				ICompletable currentCompletable;
-				if (completableMap.TryGetValue(currentlyFocusedControl, out currentCompletable)) {
+				if (completableMap.TryGetValue(mostRecentlyFocusedCompletable, out currentCompletable)) {
 					//Debug.Log("Displaying completions");
 					DisplayCurrentCompletions(currentCompletable);
 				}
 			}
 
+
+		}
+
+		public void CompleteOnNextUpdate()
+		{
+			completeOnNextUpdate = true;
+		}
+
+		public void DisplayCurrentCompletions()
+		{
+			ICompletable currentCompletable;
+			if (completableMap.TryGetValue(mostRecentlyFocusedCompletable, out currentCompletable)) {
+				//Debug.Log("Displaying completions");
+				DisplayCurrentCompletions(currentCompletable);
+			}
 		}
 
 		void DisplayCurrentCompletions(ICompletable completable)
@@ -65,11 +81,10 @@ namespace Kerbalua.Gui {
 		public void Complete()
 		{
 			ICompletable completable;
-			if (completableMap.TryGetValue(currentlyFocusedControl,out completable)) {
+			if (completableMap.TryGetValue(mostRecentlyFocusedCompletable,out completable)) {
+				completable.GrabFocus();
 				completable.Complete(completionSelector.SelectionIndex);
-			} else if (completionSelector.HasFocus() && completableMap.TryGetValue(lastFocusedControl, out completable)) {
-				completable.Complete(completionSelector.SelectionIndex);
-			}
+			} 
 		}
 	}
 }
