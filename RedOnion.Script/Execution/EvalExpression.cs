@@ -376,82 +376,35 @@ namespace RedOnion.Script
 				left.Set(Value);
 				return;
 			case OpCode.OrAssign:
-				left.Set(Value = left | Value);
-				return;
 			case OpCode.XorAssign:
-				left.Set(Value = left ^ Value);
-				return;
 			case OpCode.AndAssign:
-				left.Set(Value = left & Value);
-				return;
 			case OpCode.LshAssign:
-				left.Set(Value = left.ShiftLeft(Value));
-				return;
 			case OpCode.RshAssign:
-				left.Set(Value = left.ShiftRight(Value));
-				return;
 			case OpCode.AddAssign:
-				left.Set(Value = left + Value);
-				return;
 			case OpCode.SubAssign:
-				left.Set(Value = left - Value);
-				return;
 			case OpCode.MulAssign:
-				left.Set(Value = left * Value);
-				return;
 			case OpCode.DivAssign:
-				left.Set(Value = left / Value);
-				return;
 			case OpCode.ModAssign:
-				left.Set(Value = left % Value);
+				left.Modify(op, Value);
+				Value = left;
 				return;
 			case OpCode.BitOr:
-				Value = left | Value;
-				return;
 			case OpCode.BitXor:
-				Value = left ^ Value;
-				return;
 			case OpCode.BitAnd:
-				Value = left & Value;
-				return;
 			case OpCode.ShiftLeft:
-				Value = left.ShiftLeft(Value);
-				return;
 			case OpCode.ShiftRight:
-				Value = left.ShiftRight(Value);
-				return;
 			case OpCode.Add:
-				Value = left + Value;
-				return;
 			case OpCode.Sub:
-				Value = left - Value;
-				return;
 			case OpCode.Mul:
-				Value = left * Value;
-				return;
 			case OpCode.Div:
-				Value = left / Value;
-				return;
 			case OpCode.Mod:
-				Value = left % Value;
-				return;
 			case OpCode.Equals:
-				Value = new Value(left == Value);
-				return;
 			case OpCode.Differ:
-				Value = new Value(left != Value);
-				return;
 			case OpCode.Less:
-				Value = new Value(left < Value);
-				return;
 			case OpCode.More:
-				Value = new Value(left > Value);
-				return;
 			case OpCode.LessEq:
-				Value = new Value(left <= Value);
-				return;
 			case OpCode.MoreEq:
-				Value = new Value(left >= Value);
+				Value = left.Binary(op, Value);
 				return;
 			}
 			throw new NotImplementedException();

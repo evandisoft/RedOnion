@@ -86,6 +86,62 @@ namespace RedOnion.Script
 					((IProperties)value.ptr).Get(value.str) : value);
 			}
 		}
+		/// <summary>
+		/// Modify the value (compound assignment)
+		/// </summary>
+		public void Modify(OpCode op, Value value)
+		{
+			if (Type == ValueKind.Reference)
+			{
+				if (value.Type == ValueKind.Reference)
+					value = ((IProperties)value.ptr).Get(value.str);
+				if (ptr is IObject obj)
+					obj.Modify(str, op, value);
+				else
+				{
+					var tmp = this;
+					tmp.Modify(op, value);
+					((IProperties)ptr).Set(str, tmp);
+				}
+				return;
+			}
+			switch (op)
+			{
+			case OpCode.Assign:
+				this = value;
+				return;
+			case OpCode.OrAssign:
+				this = this | value;
+				return;
+			case OpCode.XorAssign:
+				this = this ^ value;
+				return;
+			case OpCode.AndAssign:
+				this = this & value;
+				return;
+			case OpCode.LshAssign:
+				this = ShiftLeft(value);
+				return;
+			case OpCode.RshAssign:
+				this = ShiftRight(value);
+				return;
+			case OpCode.AddAssign:
+				this = this + value;
+				return;
+			case OpCode.SubAssign:
+				this = this - value;
+				return;
+			case OpCode.MulAssign:
+				this = this * value;
+				return;
+			case OpCode.DivAssign:
+				this = this / value;
+				return;
+			case OpCode.ModAssign:
+				this = this % value;
+				return;
+			}
+		}
 
 		/// <summary>
 		/// Helper for compound assignment operators and increment/decrement

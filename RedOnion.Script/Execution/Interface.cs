@@ -61,6 +61,19 @@ namespace RedOnion.Script
 		/// </summary>
 		/// <returns>False if not set (e.g. read-only)</returns>
 		bool Set(IObject self, Value value);
+
+	}
+
+	/// <summary>
+	/// Enhanced property interface (single property with custom access methods)
+	/// </summary>
+	/// <remarks>Can only be hosted in read-only properties (not in dynamic)</remarks>
+	public interface IPropertyEx: IProperty
+	{
+		/// <summary>
+		/// Modify the value of this property (compound assignment)
+		/// </summary>
+		bool Modify(IObject self, OpCode op, Value value);
 	}
 
 	/// <summary>
@@ -145,6 +158,18 @@ namespace RedOnion.Script
 		}
 
 		/// <summary>
+		/// Modify the value of specified property (compound assignment)
+		/// </summary>
+		public bool Modify(string name, OpCode op, Value value)
+		{
+			if (!TryGetValue(name, out var left))
+				return false;
+			left.Modify(op, value);
+			this[name] = left;
+			return true;
+		}
+
+		/// <summary>
 		/// Delete the specified property
 		/// </summary>
 		public bool Delete(string name)
@@ -185,6 +210,11 @@ namespace RedOnion.Script
 		/// </summary>
 		Engine Engine { get; }
 		/// <summary>
+		/// Feature flags
+		/// </summary>
+		ObjectFeatures Features { get; }
+
+		/// <summary>
 		/// Base class (to search properties in this object next)
 		/// </summary>
 		IObject BaseClass { get; }
@@ -197,13 +227,22 @@ namespace RedOnion.Script
 		/// </summary>
 		IProperties MoreProps { get; }
 		/// <summary>
+		/// Find the object containing the property
+		/// </summary>
+		/// <remarks>
+		/// This is actually used only by Engine.Context (to handle OpCode.Identifier).
+		/// It may be removed in the future - we only need Has and even that is questionable.
+		/// </remarks>
+		IObject Which(string name);
+		/// <summary>
+		/// Modify the value of specified property (compound assignment)
+		/// </summary>
+		bool Modify(string name, OpCode op, Value value);
+
+		/// <summary>
 		/// Contained value (if any)
 		/// </summary>
 		Value Value { get; }
-		/// <summary>
-		/// Feature flags
-		/// </summary>
-		ObjectFeatures Features { get; }
 		/// <summary>
 		/// Referenced type (if any). Features.TypeReference
 		/// </summary>
@@ -212,14 +251,6 @@ namespace RedOnion.Script
 		/// Referenced native object (if any). Features.Proxy
 		/// </summary>
 		object Target { get; }
-		/// <summary>
-		/// Find the object containing the property
-		/// </summary>
-		/// <remarks>
-		/// This is actually used only by Engine.Context (to handle OpCode.Identifier).
-		/// It may be removed in the future - we only need Has and even that is questionable.
-		/// </remarks>
-		IObject Which(string name);
 
 		/// <summary>
 		/// Execute regular function call. Features.Function

@@ -240,11 +240,11 @@ namespace RedOnion.Script
 		/// <summary>
 		/// Argument list for function calls
 		/// </summary>
-		protected internal Arglist Args = new Arglist();
+		protected internal ArgumentList Args = new ArgumentList();
 		/// <summary>
 		/// Argument list for function calls
 		/// </summary>
-		public class Arglist : List<Value>
+		public class ArgumentList : List<Value>
 		{
 			public int Length => Count;
 			public void Remove(int last)

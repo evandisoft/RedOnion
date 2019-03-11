@@ -171,10 +171,7 @@ namespace RedOnion.Script.BasicObjects
 				if (props != null && props.Get(name, out query))
 				{
 					if (query.Type == ValueKind.Property)
-					{
-						((IProperty)query.ptr).Set(obj, value);
-						return true;
-					}
+						return ((IProperty)query.ptr).Set(obj, value);
 					if (obj == this)
 						return false;
 					break;
@@ -189,6 +186,38 @@ namespace RedOnion.Script.BasicObjects
 				MoreProps = new Properties();
 			return MoreProps.Set(name, value);
 		}
+
+		public virtual bool Modify(string name, OpCode op, Value value)
+		{
+			IProperties props;
+			Value query;
+			for (IObject obj = this; ;)
+			{
+				props = obj.BaseProps;
+				if (props != null && props.Get(name, out query))
+				{
+					if (query.Type == ValueKind.Property)
+					{
+						var prop = (IProperty)query.ptr;
+						if (prop is IPropertyEx ex)
+							return ex.Modify(this, op, value);
+						var tmp = prop.Get(this);
+						tmp.Modify(op, value);
+						return prop.Set(this, tmp);
+					}
+					return false;
+				}
+				props = obj.MoreProps;
+				if (props != null && props.Get(name, out query))
+				{
+					query.Modify(op, value);
+					return props.Set(name, query);
+				}
+				if ((obj = obj.BaseClass) == null)
+					return false;
+			}
+		}
+
 
 		public bool Delete(string name)
 			=> MoreProps == null ? false : MoreProps.Delete(name);

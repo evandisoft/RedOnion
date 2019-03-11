@@ -8,6 +8,47 @@ namespace RedOnion.Script
 {
 	public partial struct Value
 	{
+		public Value Binary(OpCode op, Value right)
+		{
+			switch(op)
+			{
+			default:
+				return new Value();
+			case OpCode.BitOr:
+				return this | right;
+			case OpCode.BitXor:
+				return this ^ right;
+			case OpCode.BitAnd:
+				return this & right;
+			case OpCode.ShiftLeft:
+				return ShiftLeft(right);
+			case OpCode.ShiftRight:
+				return ShiftRight(right);
+			case OpCode.Add:
+				return this + right;
+			case OpCode.Sub:
+				return this - right;
+			case OpCode.Mul:
+				return this * right;
+			case OpCode.Div:
+				return this / right;
+			case OpCode.Mod:
+				return this % right;
+			case OpCode.Equals:
+				return new Value(this == right);
+			case OpCode.Differ:
+				return new Value(this != right);
+			case OpCode.Less:
+				return new Value(this < right);
+			case OpCode.More:
+				return new Value(this > right);
+			case OpCode.LessEq:
+				return new Value(this <= right);
+			case OpCode.MoreEq:
+				return new Value(this >= right);
+			}
+		}
+
 		public static Value operator +(Value lhs, Value rhs)
 		{
 			if (lhs.Type == ValueKind.Reference)

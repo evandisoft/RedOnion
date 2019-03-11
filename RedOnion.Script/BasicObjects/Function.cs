@@ -238,30 +238,32 @@ namespace RedOnion.Script.BasicObjects
 		{
 			var engine = fn.Engine;
 			var engargs = engine.Args;
-			foreach (var arg in args)
-				engargs.Add(ReflectedType.Convert(engine, arg));
+			var startLength = engargs.Length;
 			try
 			{
+				foreach (var arg in args)
+					engargs.Add(ReflectedType.Convert(engine, arg));
 				fn.Call(null, args.Length);
 			}
 			finally
 			{
-				engargs.Remove(args.Length);
+				engargs.Remove(engargs.Length - startLength);
 			}
 		}
 		public static T FunctionCallHelper<T>(FunctionObj fn, params object[] args)
 		{
 			var engine = fn.Engine;
 			var engargs = engine.Args;
-			foreach (var arg in args)
-				engargs.Add(ReflectedType.Convert(engine, arg));
+			var startLength = engargs.Length;
 			try
 			{
+				foreach (var arg in args)
+					engargs.Add(ReflectedType.Convert(engine, arg));
 				return ReflectedType.Convert<T>(fn.Call(null, args.Length));
 			}
 			finally
 			{
-				engargs.Remove(args.Length);
+				engargs.Remove(engargs.Length - startLength);
 			}
 		}
 	}

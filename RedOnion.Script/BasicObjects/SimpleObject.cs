@@ -93,6 +93,22 @@ namespace RedOnion.Script.BasicObjects
 			return true;
 		}
 
+		public virtual bool Modify(string name, OpCode op, Value value)
+		{
+			if (BaseProps == null)
+				return false;
+			if (!BaseProps.Get(name, out var query))
+				return false;
+			if (query.Type != ValueKind.Property)
+				return false;
+			var prop = (IProperty)query.ptr;
+			if (prop is IPropertyEx ex)
+				return ex.Modify(this, op, value);
+			var tmp = prop.Get(this);
+			tmp.Modify(op, value);
+			return prop.Set(this, tmp);
+		}
+
 		public bool Delete(string name)
 			=> false;
 

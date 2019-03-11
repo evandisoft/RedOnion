@@ -147,6 +147,8 @@ namespace RedOnion.ScriptNUnit
 			Test(1, "counter");
 			Test("test.removeAction action"); // see FunctionObj.GetDelegate/DelegateCache
 			Test(0, "test.numberOfActions");
+			Test("test.action += action");
+			Test(1, "test.numberOfActions");
 		}
 	}
 }
