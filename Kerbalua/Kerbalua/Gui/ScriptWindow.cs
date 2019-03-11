@@ -115,11 +115,7 @@ namespace Kerbalua.Gui {
 				scriptIOTextArea.Save(editor.content.text);
 			});
 			GlobalKeyBindings.Add(new EventKey(KeyCode.Space, false, true), completionManager.Complete);
-			GlobalKeyBindings.Add(new EventKey(KeyCode.Return), () => {
-				if (completionBox.HasFocus()) {
-					completionManager.Complete();
-				}
-			});
+
 			editor.KeyBindings.Add(new EventKey(KeyCode.E, true), () => {
 				repl.outputBox.content.text += currentReplEvaluator.Evaluate(editor.content.text);
 			});
@@ -130,6 +126,9 @@ namespace Kerbalua.Gui {
 				repl.outputBox.content.text += currentReplEvaluator.Evaluate(repl.inputBox.content.text);
 				repl.inputBox.content.text = "";
 				completionBox.content.text = "";
+			});
+			completionBox.KeyBindings.Add(new EventKey(KeyCode.Return), () => {
+				completionManager.Complete();
 			});
 		}
 

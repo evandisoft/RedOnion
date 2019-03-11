@@ -60,12 +60,13 @@ namespace Kerbalua.Gui {
 				HandleInput();
 
 				content.text = editor.text;
-			}
-			protectedUpdate.Invoke();
 
-			if (HasFocus()) {
+				protectedUpdate.Invoke();
+
 				cursorIndex = editor.cursorIndex;
 				selectIndex = editor.selectIndex;
+			} else {
+				protectedUpdate.Invoke();
 			}
 		}
 

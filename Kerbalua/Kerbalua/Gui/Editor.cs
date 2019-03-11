@@ -11,7 +11,6 @@ namespace Kerbalua.Gui {
 
 		protected override void ProtectedUpdate(Rect rect)
 		{
-			Debug.Log("cursorIndex " + cursorIndex);
 			if (HasFocus()) KeyBindings.ExecuteAndConsumeIfMatched(Event.current);
 
 			base.ProtectedUpdate(rect);
