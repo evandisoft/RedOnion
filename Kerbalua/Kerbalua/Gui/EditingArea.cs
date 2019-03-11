@@ -50,30 +50,27 @@ namespace Kerbalua.Gui {
 					= Color.white;
 			}
 
-			editor.text = content.text;
-			editor.cursorIndex = cursorIndex;
-			editor.selectIndex = selectIndex;
-
 			if (HasFocus()) {
+				int id = GUIUtility.keyboardControl;
+				editor = (TextEditor)GUIUtility.GetStateObject(typeof(TextEditor), id);
+				editor.text = content.text;
+				editor.cursorIndex = cursorIndex;
+				editor.selectIndex = selectIndex;
+
 				HandleInput();
+
+				content.text = editor.text;
 			}
-			content.text = editor.text;
-
-
 			protectedUpdate.Invoke();
 
-			cursorIndex = editor.cursorIndex;
-			selectIndex = editor.selectIndex;
+			if (HasFocus()) {
+				cursorIndex = editor.cursorIndex;
+				selectIndex = editor.selectIndex;
+			}
 		}
 
 		void HandleInput()
 		{
-			int id = GUIUtility.keyboardControl;
-			editor = (TextEditor)GUIUtility.GetStateObject(typeof(TextEditor), id);
-
-			//Debug.Log(ControlName+","+inc++);
-
-
 			KeyBindings.ExecuteAndConsumeIfMatched(Event.current);
 
 			// Intercept all keydown events that are about to be processed by the
@@ -387,13 +384,13 @@ namespace Kerbalua.Gui {
 
 			int lineNum = 0;
 			editor.MoveLineStart();
-			Debug.Log("index is " + editor.cursorIndex);
-			Debug.Log("lineNum is " + lineNum);
+			//Debug.Log("index is " + editor.cursorIndex);
+			//Debug.Log("lineNum is " + lineNum);
 			while (editor.cursorIndex > 0) {
 				editor.MoveUp();
 				lineNum++;
-				Debug.Log("index is " + editor.cursorIndex);
-				Debug.Log("lineNum is " + lineNum);
+				//Debug.Log("index is " + editor.cursorIndex);
+				//Debug.Log("lineNum is " + lineNum);
 			}
 
 			editor.cursorIndex = prevCursorIndex;

@@ -212,14 +212,14 @@ namespace Kerbalua.Gui {
 				completionBoxRect =UpdateBoxPositionWithWindow(completionBoxRect, mainWindowRect.width);
 				completionBox.Update(completionBoxRect);
 				if (lastEventWasMouseDown && Event.current.type == EventType.Used) {
-					Debug.Log("trying to complete");
+					//Debug.Log("trying to complete");
 					Rect rectMinusScrollBar = new Rect(completionBoxRect) {
 						width = completionBoxRect.width - 20,
 						height = completionBoxRect.height - 20
 					};
 					if (GUIUtil.MouseInRect(rectMinusScrollBar)) {
 						completionManager.Complete();
-						GUI.FocusControl(lastControlname);
+						//GUI.FocusControl(lastControlname);
 						completionManager.DisplayCurrentCompletions();
 					}
 				}

@@ -14,11 +14,11 @@ namespace Kerbalua.Gui {
 		{
 			this.contentStrings = contentStrings;
 			StringBuilder sb = new StringBuilder();
-			Debug.Log("partial is " + partialCompletion);
+			//Debug.Log("partial is " + partialCompletion);
 			foreach(string str in contentStrings) {
 				sb.Append(str);
 				sb.Append('\n');
-				Debug.Log("Adding string " + str);
+				//Debug.Log("Adding string " + str);
 			}
 			// Remove last newline
 			if (sb.Length > 0) {
@@ -35,7 +35,7 @@ namespace Kerbalua.Gui {
 			if (editor == null) {
 				return;
 			}
-			Debug.Log("Updating Cursor Position");
+			//Debug.Log("Updating Cursor Position");
 
 			int partialCompletionLength = partialCompletion.Length;
 			editor.MoveTextStart();
