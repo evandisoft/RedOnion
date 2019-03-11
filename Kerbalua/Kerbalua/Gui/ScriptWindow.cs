@@ -56,13 +56,13 @@ namespace Kerbalua.Gui {
 			replEvaluatorLabel.content.text = evaluatorName;
 		}
 
-		public ScriptWindow(Rect mainWindowRect)
+		public ScriptWindow(Rect param_mainWindowRect)
 		{
 			replEvaluators["RedOnion"] = new RedOnionReplEvaluator();
 			replEvaluators["MoonSharp"] = new MoonSharpReplEvaluator(CoreModules.Preset_Complete);
 			SetCurrentEvaluator("RedOnion");
 
-			this.mainWindowRect = mainWindowRect;
+			mainWindowRect = param_mainWindowRect;
 			completionManager = new CompletionManager(completionBox);
 			completionManager.AddCompletable(scriptIOTextArea);
 			completionManager.AddCompletable(new EditingAreaCompletionAdapter(editor, this));
@@ -71,10 +71,34 @@ namespace Kerbalua.Gui {
 			scriptIOTextArea.content.text = saveLoadFilename;
 			editor.content.text=scriptIOTextArea.Load();
 
-			buttonBarRect = new Rect(0, titleHeight, 100, mainWindowRect.height-titleHeight);
-			replRect = new Rect(buttonBarRect.width, titleHeight, mainWindowRect.width - buttonBarRect.width, mainWindowRect.height-titleHeight);
-			editorRect = new Rect(0, 0, replRect.width+200, mainWindowRect.height);
-			completionBoxRect = new Rect(0, 0, 150, mainWindowRect.height);
+			editorRect = new Rect(
+				0,
+				titleHeight,
+				500,
+				param_mainWindowRect.height - titleHeight
+				);
+			buttonBarRect = new Rect(
+				0,
+				titleHeight,
+				100,
+				param_mainWindowRect.height - titleHeight
+				);
+			replRect = new Rect(
+				0,
+				titleHeight,
+				400,
+				param_mainWindowRect.height - titleHeight
+				);
+			completionBoxRect = new Rect(
+				0,
+				titleHeight,
+				150,
+				param_mainWindowRect.height - titleHeight
+				);
+			buttonBarRect.x = editorRect.width;
+			replRect.x = buttonBarRect.x + buttonBarRect.width;
+			completionBoxRect.x = replRect.x + replRect.width;
+			mainWindowRect.width = buttonBarRect.width + replRect.width + editorRect.width + completionBoxRect.width;
 
 			widgetBar.renderables.Add(new Button("<<", () => editorVisible = !editorVisible));
 			widgetBar.renderables.Add(new Button(">>", () => replVisible = !replVisible));
@@ -115,6 +139,7 @@ namespace Kerbalua.Gui {
 				scriptIOTextArea.Save(editor.content.text);
 			});
 			GlobalKeyBindings.Add(new EventKey(KeyCode.Space, false, true), completionManager.Complete);
+			GlobalKeyBindings.Add(new EventKey(KeyCode.Return, true), completionManager.Complete);
 
 			editor.KeyBindings.Add(new EventKey(KeyCode.E, true), () => {
 				repl.outputBox.content.text += currentReplEvaluator.Evaluate(editor.content.text);
@@ -127,10 +152,9 @@ namespace Kerbalua.Gui {
 				repl.inputBox.content.text = "";
 				completionBox.content.text = "";
 			});
-			completionBox.KeyBindings.Add(new EventKey(KeyCode.Return), () => {
-				completionManager.Complete();
+			// For some reason having this event occur inside completionBox update
+			// makes it so that the target for completion has its cursorIndex reset to 0
 
-			});
 		}
 
 		/// <summary>
@@ -154,21 +178,7 @@ namespace Kerbalua.Gui {
 		/// </summary>
 		public Rect GetTotalArea()
 		{
-			Rect totalArea = new Rect();
-			totalArea.x = mainWindowRect.x;
-			totalArea.y = mainWindowRect.y;
-			totalArea.height = mainWindowRect.height;
-			totalArea.width = mainWindowRect.width;
-
-			if (editorVisible) {
-				totalArea.width += editorRect.width;
-				totalArea.x -= editorRect.width;
-			}
-			if (replVisible) {
-				totalArea.width += completionBoxRect.width;
-			}
-
-			return totalArea;
+			return GetCurrentWindowRect();
 		}
 
 		public void SetOrReleaseInputLock()
@@ -191,26 +201,96 @@ namespace Kerbalua.Gui {
 			SetOrReleaseInputLock();
 			completionManager.Update();
 
-			if (replVisible) {
-				mainWindowRect.width = buttonBarRect.width + replRect.width;
-			} else {
-				mainWindowRect.width = buttonBarRect.width;
-			}
+			//if (replVisible) {
+			//	mainWindowRect.width = buttonBarRect.width + replRect.width;
+			//} else {
+			//	mainWindowRect.width = buttonBarRect.width;
+			//}
 
-			mainWindowRect = GUI.Window(windowID, mainWindowRect, MainWindow, Title);
+			Rect effectiveWindowRect = GetCurrentWindowRect();
+			Rect modifiedEffectiveRect = GUI.Window(windowID, effectiveWindowRect, MainWindow, Title);
+			mainWindowRect.x += modifiedEffectiveRect.x - effectiveWindowRect.x;
+			mainWindowRect.y += modifiedEffectiveRect.y - effectiveWindowRect.y;
+			//GlobalKeyBindings.ExecuteAndConsumeIfMatched(Event.current);
+		}
+
+		Rect GetCurrentWindowRect()
+		{
+			Rect currentWindowRect = new Rect(mainWindowRect);
+			if (!editorVisible) {
+				currentWindowRect.x += editorRect.width;
+				currentWindowRect.width -= editorRect.width;
+			}
+			if (!replVisible) {
+				currentWindowRect.width -= completionBoxRect.width + replRect.width;
+			}
+			return currentWindowRect;
+		}
+
+		Rect GetCurrentButtonBarRect()
+		{
+			Rect currentButtonBarRect = new Rect(buttonBarRect);
+			if (!editorVisible) {
+				currentButtonBarRect.x -= editorRect.width;
+			}
+			return currentButtonBarRect;
+		}
+
+		Rect GetCurrentReplRect()
+		{
+			Rect currentReplRect = new Rect(replRect);
+			if (!editorVisible) {
+				currentReplRect.x -= editorRect.width;
+			}
+			return currentReplRect;
+		}
+
+		Rect GetCurrentCompletionBoxRect()
+		{
+			Rect currentCompletionBoxRect = new Rect(completionBoxRect);
+			if (!editorVisible) {
+				currentCompletionBoxRect.x -= editorRect.width;
+			}
+			return currentCompletionBoxRect;
+		}
+
+		/// <summary>
+		/// To make input handling simpler, only the repl and button bar are in
+		/// the main window. The other boxes are updated to always be beside this window.
+		/// 
+		/// This design decision may be reviewed in the future with a better understanding
+		/// of IMGUI.
+		/// </summary>
+		/// <param name="id">Identifier.</param>
+		void MainWindow(int id)
+		{
+			Rect effectiveWindowRect = GetCurrentWindowRect();
+			GUI.DragWindow(new Rect(0, 0, effectiveWindowRect.width, titleHeight));
 			GlobalKeyBindings.ExecuteAndConsumeIfMatched(Event.current);
 
+			widgetBar.Update(GetCurrentButtonBarRect());
+
+			if (replVisible) {
+				if(repl.outputBox.HasFocus()) {
+					repl.inputBox.GrabFocus();
+				}
+
+				repl.Update(GetCurrentReplRect());
+			}
+
 			if (editorVisible) {
-				editorRect =UpdateBoxPositionWithWindow(editorRect, -editorRect.width);
+				//editorRect = UpdateBoxPositionWithWindow(editorRect, -editorRect.width);
 				editor.Update(editorRect);
 			}
 
-
+			// Lots of hacks here. I will eventually better understand how this
+			// works and replace it.
 			if (replVisible) {
 				bool lastEventWasMouseDown = Event.current.type == EventType.MouseDown;
 				string lastControlname = GUI.GetNameOfFocusedControl();
-				completionBoxRect =UpdateBoxPositionWithWindow(completionBoxRect, mainWindowRect.width);
-				completionBox.Update(completionBoxRect);
+				//completionBoxRect = UpdateBoxPositionWithWindow(completionBoxRect, mainWindowRect.width);
+
+				completionBox.Update(GetCurrentCompletionBoxRect());
 				if (lastEventWasMouseDown && Event.current.type == EventType.Used) {
 					//Debug.Log("trying to complete");
 					Rect rectMinusScrollBar = new Rect(completionBoxRect) {
@@ -224,29 +304,7 @@ namespace Kerbalua.Gui {
 					}
 				}
 			}
-		}
 
-		/// <summary>
-		/// To make input handling simpler, only the repl and button bar are in
-		/// the main window. The other boxes are updated to always be beside this window.
-		/// 
-		/// This design decision may be reviewed in the future with a better understanding
-		/// of IMGUI.
-		/// </summary>
-		/// <param name="id">Identifier.</param>
-		void MainWindow(int id)
-		{
-			GUI.DragWindow(new Rect(0, 0, mainWindowRect.width, titleHeight));
-			GlobalKeyBindings.ExecuteAndConsumeIfMatched(Event.current);
-			widgetBar.Update(buttonBarRect);
-
-			if (replVisible) {
-				if(repl.outputBox.HasFocus()) {
-					repl.inputBox.GrabFocus();
-				}
-
-				repl.Update(replRect);
-			}
 		}
 	}
 }

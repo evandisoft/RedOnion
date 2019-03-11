@@ -39,7 +39,7 @@ namespace Kerbalua.Gui {
 				GrabFocus();
 				int id = GUIUtility.keyboardControl;
 				editor = (TextEditor)GUIUtility.GetStateObject(typeof(TextEditor), id);
-				Debug.Log("initializing editor");
+				//Debug.Log("initializing editor");
 			}
 
 			if (style == null) {

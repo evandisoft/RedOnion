@@ -15,6 +15,7 @@ namespace Kerbalua.Gui {
 		public ICompletionSelector completionSelector;
 		public string mostRecentlyFocusedCompletable = "";
 		bool focusChanged;// = true;
+		bool completeOnNextUpdate = false;
 
 		public CompletionManager(ICompletionSelector completionSelector)
 		{
@@ -52,6 +53,12 @@ namespace Kerbalua.Gui {
 				}
 			}
 
+
+		}
+
+		public void CompleteOnNextUpdate()
+		{
+			completeOnNextUpdate = true;
 		}
 
 		public void DisplayCurrentCompletions()

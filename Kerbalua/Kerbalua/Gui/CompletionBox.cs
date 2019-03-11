@@ -61,19 +61,19 @@ namespace Kerbalua.Gui {
 			KeyBindings.Clear();
 			// Prevent underlying control from processing any keydown events.
 			onlyUseKeyBindings = true;
-			KeyBindings.Add(new EventKey(KeyCode.K), () => {
+			KeyBindings.Add(new EventKey(KeyCode.K,true), () => {
 				SelectionIndex = Math.Min(contentStrings.Count-1, SelectionIndex + 1);
 				UpdateCursorPosition();
 			});
-			KeyBindings.Add(new EventKey(KeyCode.L), () => {
+			KeyBindings.Add(new EventKey(KeyCode.L, true), () => {
 				SelectionIndex = Math.Max(0, SelectionIndex - 1);
 				UpdateCursorPosition();
 			});
-			KeyBindings.Add(new EventKey(KeyCode.Comma), () => {
+			KeyBindings.Add(new EventKey(KeyCode.Comma, true), () => {
 				SelectionIndex = Math.Min(contentStrings.Count - 1, SelectionIndex + 4);
 				UpdateCursorPosition();
 			});
-			KeyBindings.Add(new EventKey(KeyCode.Period), () => {
+			KeyBindings.Add(new EventKey(KeyCode.Period, true), () => {
 				SelectionIndex = Math.Max(0, SelectionIndex - 4);
 				UpdateCursorPosition();
 			});
