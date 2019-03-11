@@ -6,7 +6,7 @@ namespace Kerbalua.Gui {
 	public class AutoLayoutBox {
 		public List<ILayoutRenderer> renderables = new List<ILayoutRenderer>();
 
-		public void Update(Rect rect,bool vertical=true)
+		public virtual void Update(Rect rect,bool vertical=true,GUIStyle style=null)
 		{
 			GUILayout.BeginArea(rect);
 			{

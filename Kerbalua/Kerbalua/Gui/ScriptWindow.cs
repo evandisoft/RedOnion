@@ -18,6 +18,7 @@ namespace Kerbalua.Gui {
 
 		public CompletionBox completionBox = new CompletionBox();
 		public AutoLayoutBox widgetBar = new AutoLayoutBox();
+		public RecentFilesList recentFiles;
 		public ReplEvaluator currentReplEvaluator;
 		public Dictionary<string,ReplEvaluator> replEvaluators = new Dictionary<string,ReplEvaluator>();
 
@@ -27,7 +28,7 @@ namespace Kerbalua.Gui {
 		bool editorVisible = true;
 		bool replVisible = true;
 
-		Rect buttonBarRect;
+		Rect widgetBarRect;
 		Rect replRect;
 		Rect completionBoxRect;
 		Rect editorRect;
@@ -61,6 +62,10 @@ namespace Kerbalua.Gui {
 			replEvaluators["RedOnion"] = new RedOnionReplEvaluator();
 			replEvaluators["MoonSharp"] = new MoonSharpReplEvaluator(CoreModules.Preset_Complete);
 			SetCurrentEvaluator("RedOnion");
+			recentFiles = new RecentFilesList((string filename) => {
+				scriptIOTextArea.content.text = filename;
+				editor.content.text = scriptIOTextArea.Load();
+			});
 
 			mainWindowRect = param_mainWindowRect;
 			completionManager = new CompletionManager(completionBox);
@@ -77,11 +82,11 @@ namespace Kerbalua.Gui {
 				500,
 				param_mainWindowRect.height - titleHeight
 				);
-			buttonBarRect = new Rect(
+			widgetBarRect = new Rect(
 				0,
 				titleHeight,
 				100,
-				param_mainWindowRect.height - titleHeight
+				(param_mainWindowRect.height - titleHeight)/2
 				);
 			replRect = new Rect(
 				0,
@@ -95,10 +100,10 @@ namespace Kerbalua.Gui {
 				150,
 				param_mainWindowRect.height - titleHeight
 				);
-			buttonBarRect.x = editorRect.width;
-			replRect.x = buttonBarRect.x + buttonBarRect.width;
+			widgetBarRect.x = editorRect.width;
+			replRect.x = widgetBarRect.x + widgetBarRect.width;
 			completionBoxRect.x = replRect.x + replRect.width;
-			mainWindowRect.width = buttonBarRect.width + replRect.width + editorRect.width + completionBoxRect.width;
+			mainWindowRect.width = widgetBarRect.width + replRect.width + editorRect.width + completionBoxRect.width;
 
 			widgetBar.renderables.Add(new Button("<<", () => editorVisible = !editorVisible));
 			widgetBar.renderables.Add(new Button(">>", () => replVisible = !replVisible));
@@ -227,13 +232,13 @@ namespace Kerbalua.Gui {
 			return currentWindowRect;
 		}
 
-		Rect GetCurrentButtonBarRect()
+		Rect GetCurrentWidgetBarRect()
 		{
-			Rect currentButtonBarRect = new Rect(buttonBarRect);
+			Rect currentWidgetRect = new Rect(widgetBarRect);
 			if (!editorVisible) {
-				currentButtonBarRect.x -= editorRect.width;
+				currentWidgetRect.x -= editorRect.width;
 			}
-			return currentButtonBarRect;
+			return currentWidgetRect;
 		}
 
 		Rect GetCurrentReplRect()
@@ -268,7 +273,10 @@ namespace Kerbalua.Gui {
 			GUI.DragWindow(new Rect(0, 0, effectiveWindowRect.width, titleHeight));
 			GlobalKeyBindings.ExecuteAndConsumeIfMatched(Event.current);
 
-			widgetBar.Update(GetCurrentButtonBarRect());
+			Rect currentWidgetBarRect = GetCurrentWidgetBarRect();
+			widgetBar.Update(currentWidgetBarRect);
+			currentWidgetBarRect.y += widgetBarRect.height;
+			recentFiles.Update(currentWidgetBarRect);
 
 			if (replVisible) {
 				if(repl.outputBox.HasFocus()) {

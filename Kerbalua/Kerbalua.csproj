@@ -115,6 +115,9 @@
     <Compile Include="Kerbalua\Other\EditAreaCompletionAdapter.cs" />
     <Compile Include="Kerbalua\Gui\IRectRenderer.cs" />
     <Compile Include="Kerbalua\Gui\IRenderer.cs" />
+    <Compile Include="Kerbalua\Gui\RecentFilesList.cs" />
+    <Compile Include="Kerbalua\Gui\Label.cs" />
+    <Compile Include="Kerbalua\Gui\LeftAlignedButton.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
