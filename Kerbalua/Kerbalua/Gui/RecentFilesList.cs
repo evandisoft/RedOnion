@@ -31,8 +31,10 @@ namespace Kerbalua.Gui {
 				renderables.Add(new Label("Recent Files:"));
 				int i = 0;
 				foreach (var script in scriptList) {
-					if (++i > 5) break;
 					string filename = Path.GetFileName(script);
+					if (filename.StartsWith(".")) continue;
+					if (++i > 5) break;
+
 					renderables.Add(new Button(filename, () => loadAction.Invoke(filename)));
 				}
 				ioDelayWatch.Reset();
@@ -45,17 +47,5 @@ namespace Kerbalua.Gui {
 		
 		private string baseFolderPath="scripts";
 		const int ioDelayMillis = 5000;
-		/// <summary>
-		/// This is used to update the script list at most every ioDelayMillis milliseconds.
-		/// </summary>
-		List<string> GetScriptList()
-		{
-			if (scriptList == null || ioDelayWatch.ElapsedMilliseconds > ioDelayMillis) {
-
-
-
-			}
-			return scriptList;
-		}
 	}
 }

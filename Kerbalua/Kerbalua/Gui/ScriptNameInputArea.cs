@@ -66,6 +66,10 @@ namespace Kerbalua.Gui {
 			var newList = new List<string>();
 			foreach (var scriptPathString in GetScriptList()) {
 				string scriptFileName = Path.GetFileName(scriptPathString);
+				if (scriptFileName.StartsWith(".")) {
+					continue;
+				}
+
 				if (scriptFileName.StartsWith(content.text)) {
 					newList.Add(scriptFileName);
 				}
