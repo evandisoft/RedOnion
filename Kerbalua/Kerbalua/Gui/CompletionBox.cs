@@ -86,6 +86,11 @@ namespace Kerbalua.Gui {
 			}
 			style.richText = true;
 
+			if (HasFocus()) {
+				int id = GUIUtility.keyboardControl;
+				Debug.Log("Id for completionBox is " + id);
+			}
+
 			bool lastEventWasMouseDown = Event.current.type == EventType.MouseDown && GUIUtil.MouseInRect(rect);
 			if (lastEventWasMouseDown) {
 				GrabFocus();

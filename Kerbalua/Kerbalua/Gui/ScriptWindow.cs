@@ -129,6 +129,7 @@ namespace Kerbalua.Gui {
 			});
 			completionBox.KeyBindings.Add(new EventKey(KeyCode.Return), () => {
 				completionManager.Complete();
+
 			});
 		}
 
