@@ -115,6 +115,11 @@ namespace Kerbalua.Gui {
 				scriptIOTextArea.Save(editor.content.text);
 			});
 			GlobalKeyBindings.Add(new EventKey(KeyCode.Space, false, true), completionManager.Complete);
+			GlobalKeyBindings.Add(new EventKey(KeyCode.Return), () => {
+				if (completionBox.HasFocus()) {
+					completionManager.Complete();
+				}
+			});
 			editor.KeyBindings.Add(new EventKey(KeyCode.E, true), () => {
 				repl.outputBox.content.text += currentReplEvaluator.Evaluate(editor.content.text);
 			});
@@ -202,8 +207,22 @@ namespace Kerbalua.Gui {
 
 
 			if (replVisible) {
+				bool lastEventWasMouseDown = Event.current.type == EventType.MouseDown;
+				string lastControlname = GUI.GetNameOfFocusedControl();
 				completionBoxRect =UpdateBoxPositionWithWindow(completionBoxRect, mainWindowRect.width);
 				completionBox.Update(completionBoxRect);
+				if (lastEventWasMouseDown && Event.current.type == EventType.Used) {
+					Debug.Log("trying to complete");
+					Rect rectMinusScrollBar = new Rect(completionBoxRect) {
+						width = completionBoxRect.width - 20,
+						height = completionBoxRect.height - 20
+					};
+					if (GUIUtil.MouseInRect(rectMinusScrollBar)) {
+						completionManager.Complete();
+						GUI.FocusControl(lastControlname);
+						completionManager.DisplayCurrentCompletions();
+					}
+				}
 			}
 		}
 

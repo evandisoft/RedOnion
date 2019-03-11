@@ -20,7 +20,7 @@ namespace Kerbalua.Gui {
 		/// and GUI.FocusControl can be used for managing focus of that control.
 		/// </summary>
 		public readonly string ControlName = "Control-"+NextID++;
-		public bool ReceivedInput { get; private set; }
+		public bool ReceivedInput { get; set; }
 
 		string IFocusable.ControlName => ControlName;
 		/// <summary>

@@ -73,6 +73,9 @@ namespace Kerbalua.Other {
 			NOT_IMPLEMENTED_COMPLETIONS.Add("not");
 			NOT_IMPLEMENTED_COMPLETIONS.Add("currently");
 			NOT_IMPLEMENTED_COMPLETIONS.Add("implemented");
+			for (int i = 0;i < 100;i++) {
+				NOT_IMPLEMENTED_COMPLETIONS.Add("test-string #" + i);
+			}
 			return NOT_IMPLEMENTED_COMPLETIONS;
 		}
 

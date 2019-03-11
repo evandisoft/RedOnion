@@ -24,62 +24,63 @@ namespace Kerbalua.Gui {
 
 		protected override void ProtectedUpdate(Rect rect)
 		{
+			CommonProtectedUpdateOperations(()=>base.ProtectedUpdate(rect));
+		}
+
+		protected override void ProtectedUpdate()
+		{
+			CommonProtectedUpdateOperations(base.ProtectedUpdate);
+		}
+
+		void CommonProtectedUpdateOperations(Action protectedUpdate)
+		{
+			// Initialize editor
+			if (editor == null) {
+				GrabFocus();
+				int id = GUIUtility.keyboardControl;
+				editor = (TextEditor)GUIUtility.GetStateObject(typeof(TextEditor), id);
+			}
+
 			if (style == null) {
 				style = new GUIStyle(GUI.skin.textArea);
 				style.font = GUIUtil.GetMonoSpaceFont();
 				style.hover.textColor
-					=style.normal.textColor
-					=style.active.textColor 
-					=Color.white;
-
+					= style.normal.textColor
+					= style.active.textColor
+					= Color.white;
 			}
+
+			editor.text = content.text;
+			editor.cursorIndex = cursorIndex;
+			editor.selectIndex = selectIndex;
 
 			if (HasFocus()) {
 				HandleInput();
-
-				base.ProtectedUpdate(rect);
-
-				cursorIndex = editor.cursorIndex;
-				selectIndex = editor.selectIndex;
-			} else {
-				base.ProtectedUpdate(rect);
 			}
-		}
+			content.text = editor.text;
 
 
+			protectedUpdate.Invoke();
 
-		protected override void ProtectedUpdate()
-		{
-			if (HasFocus()) {
-				HandleInput();
-
-				base.ProtectedUpdate();
-
-				cursorIndex = editor.cursorIndex;
-				selectIndex = editor.selectIndex;
-			} else {
-				base.ProtectedUpdate();
-			}
+			cursorIndex = editor.cursorIndex;
+			selectIndex = editor.selectIndex;
 		}
 
 		void HandleInput()
 		{
 			int id = GUIUtility.keyboardControl;
 			editor = (TextEditor)GUIUtility.GetStateObject(typeof(TextEditor), id);
+
 			//Debug.Log(ControlName+","+inc++);
-			editor.text = content.text;
-			editor.cursorIndex = cursorIndex;
-			editor.selectIndex = selectIndex;
+
 
 			KeyBindings.ExecuteAndConsumeIfMatched(Event.current);
-
 
 			// Intercept all keydown events that are about to be processed by the
 			// control itself if onlyUseKeyBindings is set to true.
 			if (onlyUseKeyBindings && Event.current.type == EventType.KeyDown) {
 				Event.current.Use();
 			}
-			content.text = editor.text;
 		}
 
 		void InitializeDefaultKeyBindings()
@@ -376,6 +377,29 @@ namespace Kerbalua.Gui {
 			MoveToIndex(prevCursorIndex);
 
 			return currentLine;
+		}
+
+
+		protected int CurrentLineNumber()
+		{
+			int prevCursorIndex = editor.cursorIndex;
+			int prevSelectIndex = editor.selectIndex;
+
+			int lineNum = 0;
+			editor.MoveLineStart();
+			Debug.Log("index is " + editor.cursorIndex);
+			Debug.Log("lineNum is " + lineNum);
+			while (editor.cursorIndex > 0) {
+				editor.MoveUp();
+				lineNum++;
+				Debug.Log("index is " + editor.cursorIndex);
+				Debug.Log("lineNum is " + lineNum);
+			}
+
+			editor.cursorIndex = prevCursorIndex;
+			editor.selectIndex = prevSelectIndex;
+
+			return lineNum;
 		}
 	}
 }
