@@ -12,11 +12,11 @@ namespace Kerbalua.Gui {
 		public new KeyBindings KeyBindings = new KeyBindings();
 		bool hadFocus;
 
-		public override void Render()
+
+		protected override void ProtectedUpdate()
 		{
-			receivedInput = HasFocus() && Event.current.type == EventType.KeyDown;
-			KeyBindings.ExecuteAndConsumeIfMatched(Event.current);
-			base.Render();
+			if (HasFocus()) KeyBindings.ExecuteAndConsumeIfMatched(Event.current);
+			base.ProtectedUpdate();
 		}
 
 		public void Complete(int index)

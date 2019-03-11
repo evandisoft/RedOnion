@@ -62,14 +62,14 @@ namespace Kerbalua.Gui {
 			});
 		}
 
-		public override void Render(Rect rect, GUIStyle style = null)
+		protected override void ProtectedUpdate(Rect rect)
 		{
 			if (style == null) {
 				style = new GUIStyle(GUI.skin.textArea);
 			}
 
 			if (HasFocus()) KeyBindings.ExecuteAndConsumeIfMatched(Event.current);
-			base.Render(rect, style);
+			base.ProtectedUpdate(rect);
 		}
 	}
 }

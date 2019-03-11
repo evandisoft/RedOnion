@@ -9,10 +9,11 @@ namespace Kerbalua.Gui {
 		/// </summary>
 		public new KeyBindings KeyBindings = new KeyBindings();
 
-		public override void Render(Rect rect,GUIStyle style=null)
+		protected override void ProtectedUpdate(Rect rect)
 		{
 			if (HasFocus()) KeyBindings.ExecuteAndConsumeIfMatched(Event.current);
-			base.Render(rect, style);
+
+			base.ProtectedUpdate(rect);
 		}
 	}
 }

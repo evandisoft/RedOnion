@@ -41,14 +41,33 @@ namespace Kerbalua.Other
 			return output;
 		}
 
+		/// <summary>
+		/// TODO: NOT CURRENTLY IMPLEMENTED
+		/// </summary>
+		/// <returns>The completions.</returns>
+		/// <param name="source">Source.</param>
+		/// <param name="cursorPos">Cursor position.</param>
 		public override List<string> GetCompletions(string source, int cursorPos)
 		{
-			throw new NotImplementedException();
+			List<string> NOT_IMPLEMENTED_COMPLETIONS = new List<string>();
+			NOT_IMPLEMENTED_COMPLETIONS.Add("MoonSharp");
+			NOT_IMPLEMENTED_COMPLETIONS.Add("intellisense");
+			NOT_IMPLEMENTED_COMPLETIONS.Add("is");
+			NOT_IMPLEMENTED_COMPLETIONS.Add("not");
+			NOT_IMPLEMENTED_COMPLETIONS.Add("currently");
+			NOT_IMPLEMENTED_COMPLETIONS.Add("implemented");
+			return NOT_IMPLEMENTED_COMPLETIONS;
 		}
 
+		/// <summary>
+		/// TODO: NOT CURRENTLY IMPLEMENTED
+		/// </summary>
+		/// <returns>The partial completion.</returns>
+		/// <param name="source">Source.</param>
+		/// <param name="cursorPos">Cursor position.</param>
 		public override string GetPartialCompletion(string source, int cursorPos)
 		{
-			throw new NotImplementedException();
+			return "";
 		}
 
 		public override void ResetEngine()

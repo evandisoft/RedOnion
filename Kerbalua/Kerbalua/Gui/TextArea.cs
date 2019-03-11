@@ -2,25 +2,29 @@ using System;
 using UnityEngine;
 
 namespace Kerbalua.Gui {
-	public class TextArea:UIElement,ILayoutRenderer {
+	public class TextArea:UIElement {
 		public GUIContent content = new GUIContent("");
 
-		public virtual void Render(Rect rect,GUIStyle style=null)
+		protected override void ProtectedUpdate(Rect rect)
 		{
-			ClearCharEvent();
-			SetNextControlAsMainControl();
-			if (style != null) {
-				content.text = GUI.TextArea(rect, content.text,style);
-			} else {
-				content.text = GUI.TextArea(rect, content.text);
+			if (Visible) {
+				if (style != null) {
+					content.text = GUI.TextArea(rect, content.text, style);
+				} else {
+					content.text = GUI.TextArea(rect, content.text);
+				}
 			}
 		}
 
-		public virtual void Render()
+		protected override void ProtectedUpdate()
 		{
-			ClearCharEvent();
-			SetNextControlAsMainControl();
-			content.text = GUILayout.TextArea(content.text);
+			if (Visible) {
+				if (style != null) {
+					content.text = GUILayout.TextArea(content.text, style);
+				} else {
+					content.text = GUILayout.TextArea(content.text);
+				}
+			}
 		}
 	}
 }
