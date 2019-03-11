@@ -26,8 +26,6 @@ namespace Kerbalua.Gui {
 		Rect mainWindowRect;
 		bool editorVisible = true;
 		bool replVisible = true;
-		bool guiChanged;
-		bool windowChanged;
 
 		Rect buttonBarRect;
 		Rect replRect;
@@ -207,9 +205,6 @@ namespace Kerbalua.Gui {
 				completionBoxRect =UpdateBoxPositionWithWindow(completionBoxRect, mainWindowRect.width);
 				completionBox.Update(completionBoxRect);
 			}
-
-
-			guiChanged = Event.current.type == EventType.Used;
 		}
 
 		/// <summary>
@@ -233,7 +228,6 @@ namespace Kerbalua.Gui {
 
 				repl.Update(replRect);
 			}
-			//windowChanged = GUI.changed;
 		}
 	}
 }

@@ -42,12 +42,12 @@ namespace Kerbalua.Gui {
 			}
 
 			if (focusChanged || newInput) {
-				Debug.Log("GUI/foc: " + newInput + "," + focusChanged + "," + currentlyFocusedControl + "," + inc++);
+				//Debug.Log("GUI/foc: " + newInput + "," + focusChanged + "," + currentlyFocusedControl + "," + inc++);
 				focusChanged = false;
-				Debug.Log("Changed");
+				//Debug.Log("Changed");
 				ICompletable currentCompletable;
 				if (completableMap.TryGetValue(currentlyFocusedControl, out currentCompletable)) {
-					Debug.Log("Displaying completions");
+					//Debug.Log("Displaying completions");
 					DisplayCurrentCompletions(currentCompletable);
 				}
 			}
