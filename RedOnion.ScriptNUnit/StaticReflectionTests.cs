@@ -124,5 +124,29 @@ namespace RedOnion.ScriptNUnit
 			Test(1, "test.pass 1");
 			Test(2u, "test.pass.[uint] 2");
 		}
+
+		public static class EventTest
+		{
+			public static event Action action;
+			public static void DoAction() => action?.Invoke();
+			public static void AddAction(Action a) => action += a;
+			public static void RemoveAction(Action a) => action -= a;
+			public static int NumberOfActions => action?.GetInvocationList().Length ?? 0;
+		}
+		[Test]
+		public void StaticReflection_07_Events()
+		{
+			Root.Set("test", new Value(new ReflectedType(this,
+				typeof(EventTest))));
+			Test("var counter = 0");
+			Test("function action\n\tcounter++");
+			Test(0, "test.numberOfActions");
+			Test("test.addAction action");
+			Test(1, "test.numberOfActions");
+			Test("test.doAction()");
+			Test(1, "counter");
+			Test("test.removeAction action"); // see FunctionObj.GetDelegate/DelegateCache
+			Test(0, "test.numberOfActions");
+		}
 	}
 }

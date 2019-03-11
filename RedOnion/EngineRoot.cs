@@ -15,6 +15,7 @@ namespace RedOnion
 		protected override void Fill()
 		{
 			AddType(typeof(Debug));
+			AddType(typeof(Delegate));
 			AddType(typeof(Color));
 			AddType(typeof(Rect));
 			AddType(typeof(Vector2));
