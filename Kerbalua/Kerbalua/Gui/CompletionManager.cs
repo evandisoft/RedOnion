@@ -28,23 +28,26 @@ namespace Kerbalua.Gui {
 		}
 
 		int inc = 0;
-		public void Update(bool guiChanged)
+		public void Update()
 		{
+			bool newInput=false;
+			foreach(var completable in completableMap.Values) {
+				newInput |= completable.ReceivedInput;
+			}
+
 			if (GUI.GetNameOfFocusedControl() != currentlyFocusedControl) {
 				lastFocusedControl = currentlyFocusedControl;
 				currentlyFocusedControl = GUI.GetNameOfFocusedControl();
 				focusChanged = true;
 			}
 
-			if (focusChanged) {
+			if (focusChanged || newInput) {
+				Debug.Log("GUI/foc: " + newInput + "," + focusChanged + "," + currentlyFocusedControl + "," + inc++);
 				focusChanged = false;
-			} else if (guiChanged) {
-				//Debug.Log("GUI/foc: " + guiChanged + "," + focusChanged + "," + currentlyFocusedControl + "," + inc++);
-				if (focusChanged) focusChanged = false;
-				//Debug.Log("Changed");
+				Debug.Log("Changed");
 				ICompletable currentCompletable;
 				if (completableMap.TryGetValue(currentlyFocusedControl, out currentCompletable)) {
-					//Debug.Log("Displaying completions");
+					Debug.Log("Displaying completions");
 					DisplayCurrentCompletions(currentCompletable);
 				}
 			}

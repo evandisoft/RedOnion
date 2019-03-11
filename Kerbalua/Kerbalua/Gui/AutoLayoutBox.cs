@@ -6,7 +6,7 @@ namespace Kerbalua.Gui {
 	public class AutoLayoutBox {
 		public List<ILayoutRenderer> renderables = new List<ILayoutRenderer>();
 
-		public void Render(Rect rect,bool vertical=true)
+		public void Update(Rect rect,bool vertical=true)
 		{
 			GUILayout.BeginArea(rect);
 			{
@@ -17,7 +17,7 @@ namespace Kerbalua.Gui {
 				}
 
 				foreach (var button in renderables) {
-					button.Render();
+					button.Update();
 				}
 
 				if (vertical) {

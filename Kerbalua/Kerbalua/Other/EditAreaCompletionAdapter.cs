@@ -20,6 +20,8 @@ namespace Kerbalua.Other {
 
 		public string ControlName => editingArea.ControlName;
 
+		public bool ReceivedInput => editingArea.ReceivedInput;
+
 		public bool Changed()
 		{
 			throw new NotImplementedException();

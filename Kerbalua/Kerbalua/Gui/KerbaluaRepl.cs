@@ -63,7 +63,7 @@ namespace Kerbalua.Gui {
 			if (!guiActive) return;
 
 			try {
-				scriptWindow.Render();
+				scriptWindow.Update();
 			} catch (Exception e) {
 				Debug.Log(e);
 			}

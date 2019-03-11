@@ -11,5 +11,6 @@ namespace Kerbalua.Gui {
 		string PartialCompletion();
 		void Complete(int index);
 		List<string> GetCompletionContent();
+		bool ReceivedInput { get; }
 	}
 }

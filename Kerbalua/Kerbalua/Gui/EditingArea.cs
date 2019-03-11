@@ -22,7 +22,7 @@ namespace Kerbalua.Gui {
 			InitializeDefaultKeyBindings();
 		}
 
-		public override void Render(Rect rect, GUIStyle style = null)
+		protected override void ProtectedUpdate(Rect rect)
 		{
 			if (style == null) {
 				style = new GUIStyle(GUI.skin.textArea);
@@ -37,26 +37,28 @@ namespace Kerbalua.Gui {
 			if (HasFocus()) {
 				HandleInput();
 
-				base.Render(rect, style);
+				base.ProtectedUpdate(rect);
 
 				cursorIndex = editor.cursorIndex;
 				selectIndex = editor.selectIndex;
 			} else {
-				base.Render(rect, style);
+				base.ProtectedUpdate(rect);
 			}
 		}
 
-		public override void Render()
+
+
+		protected override void ProtectedUpdate()
 		{
 			if (HasFocus()) {
 				HandleInput();
 
-				base.Render();
+				base.ProtectedUpdate();
 
 				cursorIndex = editor.cursorIndex;
 				selectIndex = editor.selectIndex;
 			} else {
-				base.Render();
+				base.ProtectedUpdate();
 			}
 		}
 
@@ -70,6 +72,7 @@ namespace Kerbalua.Gui {
 			editor.selectIndex = selectIndex;
 
 			KeyBindings.ExecuteAndConsumeIfMatched(Event.current);
+
 
 			// Intercept all keydown events that are about to be processed by the
 			// control itself if onlyUseKeyBindings is set to true.

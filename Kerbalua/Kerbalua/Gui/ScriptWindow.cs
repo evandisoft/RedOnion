@@ -67,8 +67,8 @@ namespace Kerbalua.Gui {
 			this.mainWindowRect = mainWindowRect;
 			completionManager = new CompletionManager(completionBox);
 			completionManager.AddCompletable(scriptIOTextArea);
-			//completionManager.AddCompletable(new EditingAreaCompletionAdapter(editor, this));
-			//completionManager.AddCompletable(new EditingAreaCompletionAdapter(repl.inputBox, this));
+			completionManager.AddCompletable(new EditingAreaCompletionAdapter(editor, this));
+			completionManager.AddCompletable(new EditingAreaCompletionAdapter(repl.inputBox, this));
 
 			scriptIOTextArea.content.text = saveLoadFilename;
 			editor.content.text=scriptIOTextArea.Load();
@@ -183,10 +183,10 @@ namespace Kerbalua.Gui {
 			}
 		}
 
-		public void Render()
+		public void Update()
 		{
 			SetOrReleaseInputLock();
-			completionManager.Update(guiChanged);
+			completionManager.Update();
 
 			if (replVisible) {
 				mainWindowRect.width = buttonBarRect.width + replRect.width;
@@ -199,22 +199,17 @@ namespace Kerbalua.Gui {
 
 			if (editorVisible) {
 				editorRect =UpdateBoxPositionWithWindow(editorRect, -editorRect.width);
-				editor.Render(editorRect);
+				editor.Update(editorRect);
 			}
 
 
 			if (replVisible) {
 				completionBoxRect =UpdateBoxPositionWithWindow(completionBoxRect, mainWindowRect.width);
-				completionBox.Render(completionBoxRect);
+				completionBox.Update(completionBoxRect);
 			}
 
-			// prevent two Completions in a row.
-			if (guiChanged) {
-				guiChanged = false;
-			} else {
-				guiChanged = Event.current.type == EventType.Used;
-			}
 
+			guiChanged = Event.current.type == EventType.Used;
 		}
 
 		/// <summary>
@@ -229,14 +224,14 @@ namespace Kerbalua.Gui {
 		{
 			GUI.DragWindow(new Rect(0, 0, mainWindowRect.width, titleHeight));
 			GlobalKeyBindings.ExecuteAndConsumeIfMatched(Event.current);
-			widgetBar.Render(buttonBarRect);
+			widgetBar.Update(buttonBarRect);
 
 			if (replVisible) {
 				if(repl.outputBox.HasFocus()) {
 					repl.inputBox.GrabFocus();
 				}
 
-				repl.Render(replRect);
+				repl.Update(replRect);
 			}
 			//windowChanged = GUI.changed;
 		}

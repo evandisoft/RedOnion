@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using UnityEngine;
 
 namespace Kerbalua.Gui {
@@ -6,8 +6,8 @@ namespace Kerbalua.Gui {
 		public Vector2 scrollPos = new Vector2();
 		bool resetScroll;
 
-		public override void Render(Rect rect,GUIStyle style=null)
-		{
+		protected override void ProtectedUpdate(Rect rect)
+        {
 			GUI.BeginGroup(rect);
 			{
 				rect.x = 0;
@@ -27,7 +27,7 @@ namespace Kerbalua.Gui {
 
 				scrollPos = GUI.BeginScrollView(rect, scrollPos, contentRect);
 				{
-					base.Render(contentRect, style);
+					base.ProtectedUpdate(contentRect);
 
 					if (resetScroll) {
 						scrollPos.y = rect.height;
