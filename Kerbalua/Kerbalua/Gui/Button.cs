@@ -14,15 +14,27 @@ namespace Kerbalua.Gui {
 
 		protected override void ProtectedUpdate(Rect rect)
 		{
-			if (GUI.Button(rect, content)) {
-				action.Invoke();
+			if (style == null) {
+				if (GUI.Button(rect, content)) {
+					action.Invoke();
+				}
+			} else {
+				if (GUI.Button(rect, content,style)) {
+					action.Invoke();
+				}
 			}
 		}
 
 		protected override void ProtectedUpdate()
 		{
-			if (GUILayout.Button(content)) {
-				action.Invoke();
+			if (style == null) {
+				if (GUILayout.Button(content)) {
+					action.Invoke();
+				}
+			} else {
+				if (GUILayout.Button(content, style)) {
+					action.Invoke();
+				}
 			}
 		}
 	}
