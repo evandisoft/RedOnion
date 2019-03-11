@@ -8,6 +8,12 @@ using UnityEngine.UI;
 
 namespace RedOnion
 {
+	public class ScriptEngine : Engine
+	{
+		public ScriptEngine() : base(engine => new EngineRoot(engine)) { }
+		public override void Log(string msg)
+			=> Debug.Log("[RedOnion] " + msg);
+	}
 	public class EngineRoot : Root
 	{
 		public EngineRoot(Engine engine) : base(engine) { }

@@ -1,6 +1,8 @@
 using System;
 using NUnit.Framework;
 using RedOnion.Script;
+using RedOnion.Script.BasicObjects;
+using RedOnion.Script.ReflectedObjects;
 
 namespace RedOnion.ScriptNUnit
 {
@@ -31,6 +33,18 @@ namespace RedOnion.ScriptNUnit
 		{
 			Test(3.14f, "float 3.14");
 			Test(123, "int \"123\"");
+		}
+
+		public class Thing { }
+		[Test]
+		public void ObjectModel_03_NewWithNamespace()
+		{
+			Root.Set("space", new Value(new SimpleObject(this, new Properties()
+			{
+				{ "Thing", new Value(Root[typeof(Thing)]) }
+			})));
+			Test("it = new space.thing");
+			Assert.AreEqual(typeof(Thing), Result.Native.GetType());
 		}
 	}
 }

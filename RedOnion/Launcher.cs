@@ -68,7 +68,7 @@ namespace RedOnion
 			button = null;
 		}
 
-		Script.Engine engine;
+		ScriptEngine engine;
 		private void RunScript()
 		{
 			if(!File.Exists("scripts/launcher.ros"))
@@ -78,7 +78,7 @@ namespace RedOnion
 			}
 			try
 			{
-				engine = new Script.Engine(engine => new EngineRoot(engine));
+				engine = new ScriptEngine();
 				engine.ExecutionCountdown = 10000;
 				engine.Execute(File.ReadAllText("scripts/launcher.ros"));
 			}

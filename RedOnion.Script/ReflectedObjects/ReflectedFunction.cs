@@ -47,10 +47,39 @@ namespace RedOnion.Script.ReflectedObjects
 				if (TryCall(Engine, method, null, argc, ref result))
 					return result;
 			if (!Engine.HasOption(Engine.Option.Silent))
+			{
+#if DEBUG
+				Engine.DebugLog("{0}(argc:{1})", Type == null ? Name : Type.Name + "." + Name, argc);
+				for (int i = 0; i < argc; i++)
+				{
+					var arg = Arg(argc, i);
+					var native = arg.Native;
+					Engine.DebugLog("#{0} {1} -> {2} {4}", i, arg.Type, arg.String,
+						native?.GetType().FullName ?? "null", native?.ToString() ?? "null");
+				}
+				var sb = new System.Text.StringBuilder();
+				foreach (MethodInfo method in Methods)
+				{
+					foreach(ParameterInfo pi in method.GetParameters())
+					{
+						if (sb.Length > 0) sb.Append(", ");
+						sb.AppendFormat("{0} {1}", pi.Name, pi.ParameterType.FullName);
+						var def = pi.RawDefaultValue;
+						if (def != DBNull.Value)
+						{
+							sb.Append(" = ");
+							sb.Append(def == null ? "null" : def.ToString());
+						}
+					}
+					Engine.DebugLog(sb.ToString());
+					sb.Length = 0;
+				}
+#endif
 				throw new InvalidOperationException(
 					"Could not call " + (Type == null ? Name
 					: Type.Name + "." + Name)
 					+ ", " + Methods.Length + " candidates");
+			}
 			return result;
 		}
 

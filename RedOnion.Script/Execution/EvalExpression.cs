@@ -33,6 +33,12 @@ namespace RedOnion.Script
 				Value = new Value(Root.GetType(OpCode.Array, Value));
 				return;
 			}
+			if (op == OpCode.Dot)
+			{
+				Expression(ref at);
+				Value = new Value(Box(Value), Strings[CodeInt(ref at)]);
+				return;
+			}
 			throw new NotImplementedException();
 		}
 
@@ -119,7 +125,7 @@ namespace RedOnion.Script
 			case OpCode.Create:
 				create = true;
 				op = ((OpCode)Code[at]).Extend();
-				if (op.Kind() == OpKind.Special && (byte)op < OpCode.Generic.Code())
+				if (op.Kind() == OpKind.Special && (byte)op < OpCode.Dot.Code())
 				{
 					at++;
 					goto next;
