@@ -8,7 +8,7 @@ using System.Text;
 namespace RedOnion.Script
 {
 	//todo: try matching this with System.TypeCode
-	public enum ValueKind
+	public enum ValueKind : ushort
 	{
 		Undefined	= 0x0000,// Undefined value
 		Object		= 0x0001,// Engine object (ptr is IObject)
@@ -37,6 +37,13 @@ namespace RedOnion.Script
 		mSz			= 0x3F00,// number size mask
 	}
 
+	[Flags]
+	public enum PropertyFlags : ushort
+	{
+		None		= 0,
+		StrongType	= 0x0001
+	}
+
 	[StructLayout(LayoutKind.Explicit)]
 	internal struct ValueData
 	{
@@ -60,14 +67,16 @@ namespace RedOnion.Script
 	[DebuggerDisplay("{type}; ptr: {ptr}; str: {str}; long: {data.Long}; double: {data.Double}")]
 	public partial struct Value
 	{
-		private ValueKind type;
-		internal Object ptr;
+		internal ValueKind type;
+		internal PropertyFlags flag;
+		internal object ptr;
 		internal string str;
 		internal ValueData data;
 
 		internal Value(ValueKind vtype)
 		{
 			type = vtype;
+			flag = 0;
 			ptr = null;
 			str = null;
 			data = new ValueData();
@@ -76,6 +85,7 @@ namespace RedOnion.Script
 		internal Value(ValueKind vtype, object value)
 		{
 			type = vtype;
+			flag = 0;
 			ptr = value;
 			str = null;
 			data = new ValueData();
@@ -84,6 +94,7 @@ namespace RedOnion.Script
 		internal Value(ValueKind vtype, object obj, string name)
 		{
 			type = vtype;
+			flag = 0;
 			ptr = obj;
 			str = name;
 			data = new ValueData();
@@ -92,6 +103,7 @@ namespace RedOnion.Script
 		internal Value(ValueKind vtype, long value)
 		{
 			type = vtype;
+			flag = 0;
 			ptr = null;
 			str = null;
 			data = new ValueData();
@@ -101,6 +113,7 @@ namespace RedOnion.Script
 		internal Value(ValueKind vtype, double value)
 		{
 			type = vtype;
+			flag = 0;
 			ptr = null;
 			str = null;
 			data = new ValueData();
@@ -110,6 +123,7 @@ namespace RedOnion.Script
 		public Value(Value value)
 		{
 			type = value.Type;
+			flag = 0;
 			ptr = value.ptr;
 			str = value.str;
 			data = value.data;
@@ -118,6 +132,7 @@ namespace RedOnion.Script
 		public Value(IObject obj)
 		{
 			type = ValueKind.Object;
+			flag = 0;
 			ptr = obj;
 			str = null;
 			data = new ValueData();
@@ -126,6 +141,7 @@ namespace RedOnion.Script
 		public Value(IProperty prop)
 		{
 			type = ValueKind.Property;
+			flag = 0;
 			ptr = prop;
 			str = null;
 			data = new ValueData();
@@ -134,6 +150,7 @@ namespace RedOnion.Script
 		public Value(IProperties obj, string name)
 		{
 			type = ValueKind.Reference;
+			flag = 0;
 			ptr = obj;
 			str = name;
 			data = new ValueData();
@@ -147,6 +164,7 @@ namespace RedOnion.Script
 		public Value(string value)
 		{
 			type = ValueKind.String;
+			flag = 0;
 			ptr = null;
 			str = value;
 			data = new ValueData();
@@ -160,6 +178,7 @@ namespace RedOnion.Script
 		public Value(char value)
 		{
 			type = ValueKind.Char;
+			flag = 0;
 			ptr = null;
 			str = null;
 			data = new ValueData();
@@ -174,6 +193,7 @@ namespace RedOnion.Script
 		public Value(bool value)
 		{
 			type = ValueKind.Bool;
+			flag = 0;
 			ptr = null;
 			str = null;
 			data = new ValueData();
@@ -188,6 +208,7 @@ namespace RedOnion.Script
 		public Value(byte value)
 		{
 			type = ValueKind.Byte;
+			flag = 0;
 			ptr = null;
 			str = null;
 			data = new ValueData();
@@ -202,6 +223,7 @@ namespace RedOnion.Script
 		public Value(ushort value)
 		{
 			type = ValueKind.UShort;
+			flag = 0;
 			ptr = null;
 			str = null;
 			data = new ValueData();
@@ -216,6 +238,7 @@ namespace RedOnion.Script
 		public Value(uint value)
 		{
 			type = ValueKind.UInt;
+			flag = 0;
 			ptr = null;
 			str = null;
 			data = new ValueData();
@@ -230,6 +253,7 @@ namespace RedOnion.Script
 		public Value(ulong value)
 		{
 			type = ValueKind.ULong;
+			flag = 0;
 			ptr = null;
 			str = null;
 			data = new ValueData();
@@ -244,6 +268,7 @@ namespace RedOnion.Script
 		public Value(sbyte value)
 		{
 			type = ValueKind.SByte;
+			flag = 0;
 			ptr = null;
 			str = null;
 			data = new ValueData();
@@ -258,6 +283,7 @@ namespace RedOnion.Script
 		public Value(short value)
 		{
 			type = ValueKind.Short;
+			flag = 0;
 			ptr = null;
 			str = null;
 			data = new ValueData();
@@ -272,6 +298,7 @@ namespace RedOnion.Script
 		public Value(int value)
 		{
 			type = ValueKind.Int;
+			flag = 0;
 			ptr = null;
 			str = null;
 			data = new ValueData();
@@ -286,6 +313,7 @@ namespace RedOnion.Script
 		public Value(long value)
 		{
 			type = ValueKind.Long;
+			flag = 0;
 			ptr = null;
 			str = null;
 			data = new ValueData();
@@ -300,6 +328,7 @@ namespace RedOnion.Script
 		public Value(float value)
 		{
 			type = ValueKind.Float;
+			flag = 0;
 			ptr = null;
 			str = null;
 			data = new ValueData();
@@ -314,6 +343,7 @@ namespace RedOnion.Script
 		public Value(double value)
 		{
 			type = ValueKind.Double;
+			flag = 0;
 			ptr = null;
 			str = null;
 			data = new ValueData();

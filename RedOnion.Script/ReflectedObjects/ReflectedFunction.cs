@@ -15,7 +15,11 @@ namespace RedOnion.Script.ReflectedObjects
 		/// <summary>
 		/// Class/type this function belongs to (may be null)
 		/// </summary>
-		public Type Type { get; }
+		public override Type Type => _type;
+		private Type _type;
+
+		public override ObjectFeatures Features
+			=> ObjectFeatures.Function;
 
 		/// <summary>
 		/// Function name (static method)
@@ -25,15 +29,15 @@ namespace RedOnion.Script.ReflectedObjects
 		/// <summary>
 		/// Discovered methods with same name
 		/// </summary>
-		protected MethodInfo[] Methods { get; }
+		protected internal MethodInfo[] Methods { get; }
 
 		public ReflectedFunction(
 			Engine engine, ReflectedType creator,
-			string name, MethodInfo[] methods)
+			string name, params MethodInfo[] methods)
 			: base(engine, null)
 		{
 			Creator = creator;
-			Type = creator?.Type;
+			_type = creator?.Type;
 			Name = name;
 			Methods = methods;
 		}
@@ -83,7 +87,7 @@ namespace RedOnion.Script.ReflectedObjects
 				}
 				if (typeof(Delegate).IsAssignableFrom(type))
 				{
-					if (arg.RValue.Deref is BasicObjects.FunctionObj fn)
+					if (arg.Object is BasicObjects.FunctionObj fn)
 					{
 						var invoke = type.GetMethod("Invoke");
 						var mipars = invoke.GetParameters();
@@ -98,13 +102,23 @@ namespace RedOnion.Script.ReflectedObjects
 					continue;
 				if (type.IsAssignableFrom(val.GetType()))
 					continue;
-				if (val is IObjectProxy proxy)
+				if (type.IsGenericParameter)
 				{
-					val = proxy.Target;
-					if (val == null)
+					if (!method.IsGenericMethod)
+						return false;
+					// TODO: generic methods with multiple parameters
+					if (method.GetGenericArguments().Length != 1)
+						return false;
+					try
+					{
+						method = ((MethodInfo)method).MakeGenericMethod(val.GetType());
+						pars = method.GetParameters();
 						continue;
-					if (type.IsAssignableFrom(val.GetType()))
-						continue;
+					}
+					catch
+					{
+						return false;
+					}
 				}
 				return false;
 			}
@@ -119,10 +133,10 @@ namespace RedOnion.Script.ReflectedObjects
 				else if (type == typeof(string))
 					args[i] = arg.String;
 				else if (type.IsPrimitive || type.IsEnum)
-					args[i] = Convert.ChangeType(arg.Native, type);
+					args[i] = System.Convert.ChangeType(arg.Native, type);
 				else if (typeof(Delegate).IsAssignableFrom(type))
 				{
-					var fn = (BasicObjects.FunctionObj)arg.RValue.Deref;
+					var fn = (BasicObjects.FunctionObj)arg.Object;
 					var invoke = type.GetMethod("Invoke");
 					var mipars = invoke.GetParameters();
 					var fnargs = new ParameterExpression[mipars.Length];
@@ -154,7 +168,7 @@ namespace RedOnion.Script.ReflectedObjects
 						args[i] = val;
 						continue;
 					}
-					args[i] = ((IObjectProxy)val).Target;
+					args[i] = ((IObject)val).Target;
 				}
 			}
 			var ctor = method as ConstructorInfo;

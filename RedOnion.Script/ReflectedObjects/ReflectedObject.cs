@@ -4,14 +4,19 @@ using System.Reflection;
 
 namespace RedOnion.Script.ReflectedObjects
 {
-	public class ReflectedObject : BasicObjects.SimpleObject, IObjectProxy
+	public class ReflectedObject : BasicObjects.SimpleObject
 	{
-		public object Target { get; }
+		public override object Target => _target;
+		private object _target;
+
+		public override ObjectFeatures Features
+			=> ObjectFeatures.Proxy;
+
 		public ReflectedType Creator { get; }
 
 		public ReflectedObject(Engine engine, object target, IProperties properties = null)
 			: base(engine, properties)
-			=> Target = target;
+			=> _target = target;
 		public ReflectedObject(Engine engine, object target, ReflectedType type, IProperties properties = null)
 			: this(engine, target, properties)
 		{
@@ -145,12 +150,12 @@ namespace RedOnion.Script.ReflectedObjects
 			public FieldInfo Info { get; }
 			public Field(FieldInfo info) => Info = info;
 			public Value Get(IObject self)
-				=> Convert(self.Engine, Info.GetValue(((IObjectProxy)self).Target));
+				=> Convert(self.Engine, Info.GetValue(self.Target));
 			public bool Set(IObject self, Value value)
 			{
 				try
 				{
-					Info.SetValue(((IObjectProxy)self).Target, Convert(value, Info.FieldType));
+					Info.SetValue(self.Target, Convert(value, Info.FieldType));
 					return true;
 				}
 				catch
@@ -165,14 +170,14 @@ namespace RedOnion.Script.ReflectedObjects
 			public Property(PropertyInfo info) => Info = info;
 			public Value Get(IObject self)
 				=> !Info.CanRead ? new Value()
-				: Convert(self.Engine, Info.GetValue(((IObjectProxy)self).Target, new object[0]));
+				: Convert(self.Engine, Info.GetValue(self.Target, new object[0]));
 			public bool Set(IObject self, Value value)
 			{
 				if (!Info.CanWrite)
 					return false;
 				try
 				{
-					Info.SetValue(((IObjectProxy)self).Target, Convert(value, Info.PropertyType), new object[0]);
+					Info.SetValue(self.Target, Convert(value, Info.PropertyType), new object[0]);
 					return true;
 				}
 				catch

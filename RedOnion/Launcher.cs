@@ -86,30 +86,39 @@ namespace RedOnion
 			{
 				Log("ParseError at {0}.{1}: {2}", err.LineNumber, err.Column, err.Message);
 				Log("Content of the line: " + err.Line);
-				engine = null;
+				StopScript();
 			}
 			catch(Exception err)
 			{
 				Log("Exception in engine or parser: " + err.Message);
-				engine = null;
+				StopScript();
 			}
 		}
+
+		private bool stopping;
 		private void StopScript()
-			=> engine = null;
+		{
+			if (stopping)
+				return;
+			stopping = true;
+			RunFunction("shutdown");
+			engine = null;
+			stopping = false;
+		}
 
 		private void FixedUpdate()
-			=> RunFunction("FixedUpdate");
+			=> RunFunction("fixedUpdate");
 		private void Update()
-			=> RunFunction("Update");
+			=> RunFunction("update");
 		private void OnGUI()
-			=> RunFunction("OnGUI");
+			=> RunFunction("onGUI");
 		private void RunFunction(string name)
 		{
 			if (engine == null)
 				return;
 			if (!engine.Root.Get(name, out var value))
 				return;
-			if (value.RValue.Deref is Script.BasicObjects.FunctionObj fn)
+			if (value.Object is Script.BasicObjects.FunctionObj fn)
 			{
 				try
 				{
@@ -119,12 +128,12 @@ namespace RedOnion
 				catch (Script.Engine.TookTooLong)
 				{
 					Log(name + " took too long");
-					engine = null;
+					StopScript();
 				}
 				catch (Exception err)
 				{
 					Log("Exception in {0}: {1}", name, err.Message);
-					engine = null;
+					StopScript();
 				}
 			}
 		}

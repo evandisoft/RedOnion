@@ -60,22 +60,22 @@ namespace RedOnion.Script
 			/// <summary>
 			/// Get type reference (StringFun, NumberFun, ...)
 			/// </summary>
-			Value Get(OpCode OpCode);
+			IObject GetType(OpCode OpCode);
 
 			/// <summary>
 			/// Get type reference with parameter (array or generic)
 			/// </summary>
-			Value Get(OpCode OpCode, Value value);
+			IObject GetType(OpCode OpCode, Value value);
 
 			/// <summary>
 			/// Get type reference with parameter (array or generic)
 			/// </summary>
-			Value Get(OpCode OpCode, params Value[] par);
+			IObject GetType(OpCode OpCode, params Value[] par);
 
 			/// <summary>
 			/// Get or set type creator (ReflectedType)
 			/// </summary>
-			IObjectConverter this[Type type] { get; set; }
+			IObject this[Type type] { get; set; }
 		}
 
 		/// <summary>

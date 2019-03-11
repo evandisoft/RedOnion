@@ -17,6 +17,9 @@ namespace RedOnion.Script.BasicObjects
 		/// </summary>
 		public FunctionObj Prototype { get; }
 
+		public override ObjectFeatures Features
+			=> ObjectFeatures.Function | ObjectFeatures.Constructor;
+
 		public FunctionFun(Engine engine, IObject baseClass, FunctionObj prototype)
 			: base(engine, baseClass, new Properties("prototype", prototype))
 			=> Prototype = prototype;
@@ -131,6 +134,9 @@ namespace RedOnion.Script.BasicObjects
 		/// Private variables/fields
 		/// </summary>
 		public IObject Scope { get; protected set; }
+
+		public override ObjectFeatures Features
+			=> ObjectFeatures.Function | ObjectFeatures.Constructor;
 
 		/// <summary>
 		/// Create Function.prototype

@@ -23,8 +23,8 @@ namespace RedOnion.Script
 					if (ptr == null)
 						return null;
 					var obj = (IObject)ptr;
-					if (obj is IObjectProxy proxy)
-						return proxy.Target;
+					if ((obj.Features & ObjectFeatures.Proxy) != 0)
+						return obj.Target;
 					return obj.Value.Native;
 				case ValueKind.Reference:
 					return ((IProperties)ptr).Get(str).Native;
@@ -64,10 +64,17 @@ namespace RedOnion.Script
 		public Value RValue => Type == ValueKind.Reference ?
 			((IProperties)ptr).Get(str) : this;
 		/// <summary>
-		/// Get referenced object (if object or reference; null otherwise)
+		/// Get referenced object (if object or reference; null otherwise).
+		/// Returns the object whose property is referenced if reference.
+		/// Consider using Object or Engine.Box instead.
 		/// </summary>
 		public IObject Deref => Type == ValueKind.Reference ?
 			ptr as IObject : Type == ValueKind.Object ? (IObject)ptr : null;
+		/// <summary>
+		/// Get referenced object if it is object (null otherwise).
+		/// Consider using Engine.Box if that was desired.
+		/// </summary>
+		public IObject Object => RValue.Deref;
 		/// <summary>
 		/// Set the value for references
 		/// </summary>

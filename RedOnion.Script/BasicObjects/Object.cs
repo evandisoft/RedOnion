@@ -16,14 +16,9 @@ namespace RedOnion.Script.BasicObjects
 		/// </summary>
 		public IObject Prototype { get; }
 
-		public Engine.IRoot Root { get; }
-
-		public ObjectFun(Engine engine, IObject baseClass, IObject prototype, Engine.IRoot root)
+		public ObjectFun(Engine engine, IObject baseClass, IObject prototype)
 			: base(engine, baseClass, new Properties("prototype", prototype))
-		{
-			Prototype = prototype;
-			Root = root;
-		}
+			=> Prototype = prototype;
 
 		public override Value Call(IObject self, int argc)
 			=> new Value(Create(argc));
@@ -32,7 +27,7 @@ namespace RedOnion.Script.BasicObjects
 		{
 			if (argc == 0)
 				return new BasicObject(Engine, Prototype);
-			return Root.Box(Arg(argc));
+			return Engine.Root.Box(Arg(argc));
 		}
 	}
 
@@ -68,7 +63,12 @@ namespace RedOnion.Script.BasicObjects
 		public IProperties MoreProps { get; protected set; }
 
 		public virtual Value Value
-			=> new Value("[internal]");
+			=> new Value(GetType().FullName);
+		public virtual ObjectFeatures Features
+			=> ObjectFeatures.Collection;
+		public virtual Type Type => null;
+		public virtual object Target => null;
+		public virtual IObject Convert(object value) => null;
 
 		/// <summary>
 		/// Create empty object with no base class
@@ -197,10 +197,18 @@ namespace RedOnion.Script.BasicObjects
 			=> MoreProps = null;
 
 		public virtual Value Call(IObject self, int argc)
-			=> new Value();
+		{
+			if (!Engine.HasOption(Engine.Option.Silent))
+				throw new NotImplementedException(GetType().FullName + " is not a function");
+			return new Value();
+		}
 
 		public virtual IObject Create(int argc)
-			=> null;
+		{
+			if (!Engine.HasOption(Engine.Option.Silent))
+				throw new NotImplementedException(GetType().FullName + " is not a constructor");
+			return null;
+		}
 
 		public virtual Value Index(IObject self, int argc)
 		{

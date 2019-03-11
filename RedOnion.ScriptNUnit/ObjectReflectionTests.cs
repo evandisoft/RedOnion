@@ -129,5 +129,20 @@ namespace RedOnion.ScriptNUnit
 			Test("onGUI()");
 			Assert.AreEqual(1, GUITest.counter);
 		}
+
+		public class GenericTest
+		{
+			public T Pass<T>(T value) => value;
+		}
+		[Test]
+		public void ObjectReflection_05_GenericFunction()
+		{
+			var creator = new ReflectedType(this, typeof(GenericTest));
+			Root[typeof(GenericTest)] = creator;
+			Root.Set("testClass", new Value(creator));
+			Test("test = new testClass");
+			Test(1, "test.pass 1");
+			Test(2u, "test.pass.[uint] 2");
+		}
 	}
 }

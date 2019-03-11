@@ -16,17 +16,48 @@ namespace RedOnion.Script.BasicObjects
 		/// </summary>
 		public NumberObj Prototype { get; }
 
+		/// <summary>
+		/// Target type (null for no conversion)
+		/// </summary>
+		public override Type Type => _type;
+		private Type _type;
+		/// <summary>
+		/// Target value kind
+		/// </summary>
+		public ValueKind Kind { get; }
+
+		public override ObjectFeatures Features
+			=> Type == null ? ObjectFeatures.Function | ObjectFeatures.Constructor
+			: ObjectFeatures.Function | ObjectFeatures.Constructor
+			| ObjectFeatures.TypeReference; // maybe add converter
+
 		public NumberFun(Engine engine, IObject baseClass, NumberObj prototype)
 			: base(engine, baseClass, new Properties("prototype", prototype))
+			=> Prototype = prototype;
+		public NumberFun(Engine engine, IObject baseClass, NumberObj prototype,
+			Type type, ValueKind kind)
+			: this(engine, baseClass, prototype)
 		{
-			Prototype = prototype;
+			_type = type;
+			Kind = kind;
 		}
 
 		public override Value Call(IObject self, int argc)
-			=> argc == 0 ? new Value() : Arg(argc).Number;
+		{
+			if (argc == 0)
+				return new Value();
+			var value = Arg(argc).Number;
+			if (Type == null)
+				return value;
+			if ((Kind & ValueKind.fFp) != 0)
+				return new Value(Kind, (double)System.Convert.ChangeType(Value.Double, Type));
+			if ((Kind & ValueKind.fSig) != 0)
+				return new Value(Kind, (long)System.Convert.ChangeType(Value.Long, Type));
+			return new Value(Kind, (ulong)System.Convert.ChangeType(Value.ULong, Type));
+		}
 
 		public override IObject Create(int argc)
-			=> new NumberObj(Engine, Prototype, argc == 0 ? new Value() : Arg(argc).Number);
+			=> new NumberObj(Engine, Prototype, Call(null, argc));
 	}
 
 	/// <summary>

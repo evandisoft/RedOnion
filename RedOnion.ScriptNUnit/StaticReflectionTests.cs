@@ -111,5 +111,18 @@ namespace RedOnion.ScriptNUnit
 				"testClass.exec setStr, \"done\"");
 			Assert.AreEqual("done", StaticClass.str);
 		}
+
+		public static class GenericTest
+		{
+			public static T Pass<T>(T value) => value;
+		}
+		[Test]
+		public void StaticReflection_06_GenericFunction()
+		{
+			Root.Set("test", new Value(new ReflectedType(this,
+				typeof(GenericTest))));
+			Test(1, "test.pass 1");
+			Test(2u, "test.pass.[uint] 2");
+		}
 	}
 }

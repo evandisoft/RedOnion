@@ -9,12 +9,17 @@ namespace RedOnion.Script.BasicObjects
 	/// <summary>
 	/// String function (used to create new string objects)
 	/// </summary>
-	public class StringFun : BasicObject, IObjectAndConverter
+	public class StringFun : BasicObject
 	{
 		/// <summary>
 		/// Prototype of all string objects
 		/// </summary>
 		public StringObj Prototype { get; }
+
+		public override ObjectFeatures Features
+			=> ObjectFeatures.Function | ObjectFeatures.Constructor
+			| ObjectFeatures.Converter | ObjectFeatures.TypeReference;
+		public override Type Type => typeof(string);
 
 		public StringFun(Engine engine, IObject baseClass, StringObj prototype)
 			: base(engine, baseClass, new Properties("prototype", prototype))
@@ -26,7 +31,7 @@ namespace RedOnion.Script.BasicObjects
 		public override IObject Create(int argc)
 			=> new StringObj(Engine, Prototype, argc == 0 ? "" : Arg(argc).String);
 
-		public IObject Convert(object value)
+		public override IObject Convert(object value)
 			=> new StringObj(Engine, Prototype, value.ToString());
 	}
 

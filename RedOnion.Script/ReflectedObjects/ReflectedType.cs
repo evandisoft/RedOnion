@@ -6,12 +6,17 @@ using System.Reflection;
 
 namespace RedOnion.Script.ReflectedObjects
 {
-	public class ReflectedType : BasicObjects.SimpleObject, IObjectAndConverter
+	public class ReflectedType : BasicObjects.SimpleObject
 	{
 		/// <summary>
 		/// Reflected type this object represents
 		/// </summary>
-		public Type Type { get; }
+		public override Type Type => _type;
+		private Type _type;
+
+		public override ObjectFeatures Features
+			=> ObjectFeatures.Function | ObjectFeatures.Constructor
+			| ObjectFeatures.Converter | ObjectFeatures.TypeReference;
 
 		/// <summary>
 		/// Properties of the created object
@@ -24,7 +29,7 @@ namespace RedOnion.Script.ReflectedObjects
 		/// </summary>
 		public ReflectedType(Engine engine, Type type, IProperties staticProps = null)
 			: base(engine, staticProps)
-			=> Type = type;
+			=> _type = type;
 
 		/// <summary>
 		/// Create object with both static and class/instance properties
@@ -47,7 +52,12 @@ namespace RedOnion.Script.ReflectedObjects
 					return new ReflectedObject(Engine, Activator.CreateInstance(Type), this, TypeProps);
 				var ctor = Type.GetConstructor(new Type[0]);
 				if (ctor == null)
+				{
+					if (!Engine.HasOption(Engine.Option.Silent))
+						throw new NotImplementedException(Type.FullName
+							+ " cannot be constructed with zero arguments");
 					return null;
+				}
 				return new ReflectedObject(Engine, ctor.Invoke(new object[0]), this, TypeProps);
 			}
 			var value = new Value();
@@ -55,18 +65,18 @@ namespace RedOnion.Script.ReflectedObjects
 			{
 				if (!ReflectedFunction.TryCall(Engine, ctor, this, argc, ref value))
 					continue;
-				var obj = value.RValue.Deref;
+				var obj = value.Object;
 				if (obj != null)
 					return obj;
 				break;
 			}
 			if (!Engine.HasOption(Engine.Option.Silent))
 				throw new NotImplementedException(string.Format(
-					"Could not create {0} with {1} arguments", Type.FullName, argc));
+					"{0} cannot be constructed with {1} argument(s)", Type.FullName, argc));
 			return null;
 		}
 
-		public IObject Convert(object value)
+		public override IObject Convert(object value)
 			=> new ReflectedObject(Engine, value, this, TypeProps);
 
 		public class MemberComparer : IComparer<MemberInfo>
@@ -260,10 +270,7 @@ namespace RedOnion.Script.ReflectedObjects
 				return null;
 			if (type.IsAssignableFrom(val.GetType()))
 				return val;
-			if (val is IObjectProxy proxy)
-				return proxy.Target;
-			// TODO: consider throwing NotImplementedException
-			return null;
+			throw new NotImplementedException();
 		}
 		public static T Convert<T>(Value value)
 			=> (T)Convert(value, typeof(T));
