@@ -6,6 +6,8 @@ using UnityEngine;
 
 namespace Kerbalua.Gui {
 	public class RecentFilesList:AutoLayoutBox {
+		private string baseFolderPath = Path.Combine(KSPUtil.ApplicationRootPath, "scripts");
+		const int ioDelayMillis = 5000;
 
 		Action<string> loadAction;
 		public RecentFilesList(Action<string> loadAction)
@@ -45,7 +47,6 @@ namespace Kerbalua.Gui {
 		}
 
 		
-		private string baseFolderPath="scripts";
-		const int ioDelayMillis = 5000;
+
 	}
 }

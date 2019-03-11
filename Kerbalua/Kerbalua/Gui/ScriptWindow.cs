@@ -73,7 +73,6 @@ namespace Kerbalua.Gui {
 			completionManager.AddCompletable(new EditingAreaCompletionAdapter(editor, this));
 			completionManager.AddCompletable(new EditingAreaCompletionAdapter(repl.inputBox, this));
 
-			scriptIOTextArea.content.text = saveLoadFilename;
 			editor.content.text=scriptIOTextArea.Load();
 
 			editorRect = new Rect(
