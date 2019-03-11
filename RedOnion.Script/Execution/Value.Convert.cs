@@ -114,11 +114,10 @@ namespace RedOnion.Script
 				case ValueKind.String:
 					if (str == "")
 						return new Value();
-					return this.Double;
+					return Double;
 				case ValueKind.Char:
-					return this.UShort;
+					return UShort;
 				case ValueKind.Bool:
-					return this.Byte;
 				case ValueKind.Byte:
 				case ValueKind.UShort:
 				case ValueKind.UInt:
@@ -247,7 +246,7 @@ namespace RedOnion.Script
 			{
 				if (Type == ValueKind.String)
 				{
-					if (ptr != null && double.TryParse((string)ptr,
+					if (str != null && double.TryParse(str,
 						NumberStyles.Float, CultureInfo.InvariantCulture,
 						out var v))
 						return v;

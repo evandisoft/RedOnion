@@ -63,6 +63,7 @@ namespace RedOnion.Script.BasicObjects
 			BaseProps.Reset();
 			MoreProps.Reset();
 			TypeMap.Clear();
+			Fill();
 		}
 
 		protected virtual void Fill()

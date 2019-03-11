@@ -12,7 +12,7 @@ namespace RedOnion.Script
 	/// </summary>
 	/// <param name="engine">The engine to associate the object with</param>
 	/// <returns>The object</returns>
-	delegate IObject CreateObject(Engine engine);
+	public delegate IObject CreateObject(Engine engine);
 
 	[Flags]
 	public enum ObjectFeatures

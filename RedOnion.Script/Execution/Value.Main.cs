@@ -138,6 +138,15 @@ namespace RedOnion.Script
 			data = new ValueData();
 		}
 
+		public Value(CreateObject create)
+		{
+			type = ValueKind.Create;
+			flag = 0;
+			ptr = create;
+			str = null;
+			data = new ValueData();
+		}
+
 		public Value(IProperty prop)
 		{
 			type = ValueKind.Property;

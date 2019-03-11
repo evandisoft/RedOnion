@@ -49,11 +49,34 @@ namespace RedOnion.Script.BasicObjects
 			var value = Arg(argc).Number;
 			if (Type == null)
 				return value;
-			if ((Kind & ValueKind.fFp) != 0)
-				return new Value(Kind, (double)System.Convert.ChangeType(Value.Double, Type));
-			if ((Kind & ValueKind.fSig) != 0)
-				return new Value(Kind, (long)System.Convert.ChangeType(Value.Long, Type));
-			return new Value(Kind, (ulong)System.Convert.ChangeType(Value.ULong, Type));
+			switch (Kind)
+			{
+			case ValueKind.Byte:
+				return value.Byte;
+			case ValueKind.UShort:
+				return value.UShort;
+			case ValueKind.UInt:
+				return value.UInt;
+			case ValueKind.ULong:
+				return value.ULong;
+			case ValueKind.SByte:
+				return value.SByte;
+			case ValueKind.Short:
+				return value.Short;
+			case ValueKind.Int:
+				return value.Int;
+			case ValueKind.Long:
+				return value.Long;
+			case ValueKind.Float:
+				return value.Float;
+			case ValueKind.Double:
+				return value.Double;
+			case ValueKind.Bool:
+				return value.Bool;
+			case ValueKind.Char:
+				return value.Char;
+			}
+			throw new NotImplementedException();
 		}
 
 		public override IObject Create(int argc)

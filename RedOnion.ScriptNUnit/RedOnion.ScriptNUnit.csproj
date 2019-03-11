@@ -36,6 +36,7 @@
   <ItemGroup>
     <Compile Include="ExecutionCountdownTests.cs" />
     <Compile Include="ExpressionTests.cs" />
+    <Compile Include="ObjectModelTests.cs" />
     <Compile Include="ObjectReflectionTests.cs" />
     <Compile Include="OpCodeTests.cs" />
     <Compile Include="ParseExpressionTests.cs" />
