@@ -32,15 +32,15 @@ namespace RedOnion
 			{
 				var gui = new ReflectedType(engine, typeof(GUI), new Properties()
 				{
-					{ "GUISkin",		new Value(this[typeof(GUISkin)]) },
-					{ "GUIStyle",		new Value(this[typeof(GUIStyle)]) },
-					{ "GUIStyleState",	new Value(this[typeof(GUIStyleState)]) },
-					{ "GUIContent",		new Value(this[typeof(GUIContent)]) },
-					{ "GUIElement",		new Value(this[typeof(GUIElement)]) },
-					{ "GUILayer",		new Value(this[typeof(GUILayer)]) },
-					{ "GUILayout",		new Value(this[typeof(GUILayout)]) },
-					{ "GUIText",		new Value(this[typeof(GUIText)]) },
-					{ "GUIUtility",		new Value(this[typeof(GUIUtility)]) },
+					{ "GUISkin",		this[typeof(GUISkin)] },
+					{ "GUIStyle",		this[typeof(GUIStyle)] },
+					{ "GUIStyleState",	this[typeof(GUIStyleState)] },
+					{ "GUIContent",		this[typeof(GUIContent)] },
+					{ "GUIElement",		this[typeof(GUIElement)] },
+					{ "GUILayer",		this[typeof(GUILayer)] },
+					{ "GUILayout",		this[typeof(GUILayout)] },
+					{ "GUIText",		this[typeof(GUIText)] },
+					{ "GUIUtility",		this[typeof(GUIUtility)] },
 				});
 				this[typeof(GUI)] = gui;
 				return gui;
@@ -48,39 +48,50 @@ namespace RedOnion
 
 			BaseProps.Set("Unity", new Value(engine =>
 			{
-				var unity = new SimpleObject(engine, new Properties()
+				return new SimpleObject(engine, new Properties()
 				{
-					{ "DefaultControls", new Value(this[typeof(DefaultControls)]) },
-					{ "UISkinDef",		new Value(this[typeof(UISkinDef)]) },
-					{ "UISkinManager",	new Value(this[typeof(UISkinManager)]) },
-					{ "UIStyle",		new Value(this[typeof(UIStyle)]) },
-					{ "UIStyleState",	new Value(this[typeof(UIStyleState)]) },
-					{ "Object",         new Value(this[typeof(UnityEngine.Object)]) },
-					{ "GameObject",		new Value(this[typeof(GameObject)]) },
-					{ "Canvas",			new Value(this[typeof(Canvas)]) },
-					{ "CanvasGroup",	new Value(this[typeof(CanvasGroup)]) },
-					{ "RectTransform",	new Value(this[typeof(RectTransform)]) },
-					{ "LayerMask",		new Value(this[typeof(LayerMask)]) },
-					{ "Text",			new Value(this[typeof(Text)]) },
-					{ "Button",			new Value(this[typeof(Button)]) },
-					{ "Image",			new Value(this[typeof(Image)]) },
-					{ "RawImage",		new Value(this[typeof(RawImage)]) },
-					{ "Sprite",			new Value(this[typeof(Sprite)]) },
-					{ "Texture",		new Value(this[typeof(Texture)]) },
-					{ "Texture2D",		new Value(this[typeof(Texture2D)]) },
-					{ "Renderer",		new Value(this[typeof(Renderer)]) },
-					{ "Master",         new Value(this[typeof(UIMasterController)]) },
+					{ "DefaultControls", this[typeof(DefaultControls)] },
+					{ "UISkinDef",		this[typeof(UISkinDef)] },
+					{ "UISkinManager",	this[typeof(UISkinManager)] },
+					{ "UIStyle",		this[typeof(UIStyle)] },
+					{ "UIStyleState",	this[typeof(UIStyleState)] },
+					{ "Object",         this[typeof(UnityEngine.Object)] },
+					{ "GameObject",		this[typeof(GameObject)] },
+					{ "Canvas",			this[typeof(Canvas)] },
+					{ "CanvasGroup",	this[typeof(CanvasGroup)] },
+					{ "RectTransform",	this[typeof(RectTransform)] },
+					{ "LayerMask",		this[typeof(LayerMask)] },
+					{ "Text",			this[typeof(Text)] },
+					{ "Button",			this[typeof(Button)] },
+					{ "Image",			this[typeof(Image)] },
+					{ "RawImage",		this[typeof(RawImage)] },
+					{ "Sprite",			this[typeof(Sprite)] },
+					{ "Texture",		this[typeof(Texture)] },
+					{ "Texture2D",		this[typeof(Texture2D)] },
+					{ "Renderer",		this[typeof(Renderer)] },
+					{ "Master",         this[typeof(UIMasterController)] },
 				});
-				return unity;
+			}));
+
+			BaseProps.Set("UI", new Value(engine =>
+			{
+				return new SimpleObject(engine, new Properties()
+				{
+					{ "Element",		this[typeof(UI.Element)] },
+					{ "Panel",			this[typeof(UI.Panel)] },
+					{ "Window",         this[typeof(UI.Window)] },
+					{ "Label",			this[typeof(UI.Label)] },
+					{ "Button",         this[typeof(UI.Button)] },
+				});
 			}));
 
 			BaseProps.Set("KSP", new Value(engine =>
 			{
 				var ksp = new SimpleObject(engine, new Properties()
 				{
-					{ "Vessel",			new Value(this[typeof(Vessel)]) },
-					{ "FlightGlobals",	new Value(this[typeof(FlightGlobals)]) },
-					{ "FlightCtrlState", new Value(this[typeof(FlightCtrlState)]) },
+					{ "Vessel",			this[typeof(Vessel)] },
+					{ "FlightGlobals",	this[typeof(FlightGlobals)] },
+					{ "FlightCtrlState", this[typeof(FlightCtrlState)] },
 				});
 				return ksp;
 			}));

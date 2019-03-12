@@ -189,18 +189,17 @@ namespace RedOnion.Script
 		{ }
 
 		/// <summary>
-		/// Create with one property
-		/// </summary>
-		public Properties(string name, Value value)
-			: base(StringComparer.OrdinalIgnoreCase)
-			=> Set(name, value);
-
-		/// <summary>
 		/// Create with one object-reference property (usually "prototype")
 		/// </summary>
 		public Properties(string name, IObject obj)
 			: base(StringComparer.OrdinalIgnoreCase)
 			=> Set(name, new Value(obj));
+
+		/// <summary>
+		/// Add object with name (for inline initialization)
+		/// </summary>
+		public void Add(string name, IObject obj)
+			=> Add(name, Value.FromObject(obj));
 	}
 
 	public interface IObject : IProperties

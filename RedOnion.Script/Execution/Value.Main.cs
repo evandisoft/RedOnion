@@ -129,24 +129,6 @@ namespace RedOnion.Script
 			data = value.data;
 		}
 
-		public Value(IObject obj)
-		{
-			type = ValueKind.Object;
-			flag = 0;
-			ptr = obj;
-			str = null;
-			data = new ValueData();
-		}
-
-		public Value(CreateObject create)
-		{
-			type = ValueKind.Create;
-			flag = 0;
-			ptr = create;
-			str = null;
-			data = new ValueData();
-		}
-
 		public Value(IProperty prop)
 		{
 			type = ValueKind.Property;
@@ -165,11 +147,50 @@ namespace RedOnion.Script
 			data = new ValueData();
 		}
 
-		public static implicit operator Value(string value)
+		public static implicit operator Value(BasicObjects.BasicObject obj)
+			=> Value.FromObject(obj);
+		public static implicit operator Value(BasicObjects.SimpleObject obj)
+			=> Value.FromObject(obj);
+		public static Value FromObject(IObject obj)
+			=> new Value(obj);
+		public Value(IObject obj)
 		{
-			return new Value(value);
+			type = ValueKind.Object;
+			flag = 0;
+			ptr = obj;
+			str = null;
+			data = new ValueData();
+		}
+		public Value(BasicObjects.BasicObject obj)
+		{
+			type = ValueKind.Object;
+			flag = 0;
+			ptr = obj;
+			str = null;
+			data = new ValueData();
+		}
+		public Value(BasicObjects.SimpleObject obj)
+		{
+			type = ValueKind.Object;
+			flag = 0;
+			ptr = obj;
+			str = null;
+			data = new ValueData();
 		}
 
+		public static implicit operator Value(CreateObject create)
+			=> new Value(create);
+		public Value(CreateObject create)
+		{
+			type = ValueKind.Create;
+			flag = 0;
+			ptr = create;
+			str = null;
+			data = new ValueData();
+		}
+
+		public static implicit operator Value(string value)
+			=> new Value(value);
 		public Value(string value)
 		{
 			type = ValueKind.String;
@@ -180,10 +201,7 @@ namespace RedOnion.Script
 		}
 
 		public static implicit operator Value(char value)
-		{
-			return new Value(value);
-		}
-
+			=> new Value(value);
 		public Value(char value)
 		{
 			type = ValueKind.Char;
@@ -195,10 +213,7 @@ namespace RedOnion.Script
 		}
 
 		public static implicit operator Value(bool value)
-		{
-			return new Value(value);
-		}
-
+			=> new Value(value);
 		public Value(bool value)
 		{
 			type = ValueKind.Bool;
@@ -210,10 +225,7 @@ namespace RedOnion.Script
 		}
 
 		public static implicit operator Value(byte value)
-		{
-			return new Value(value);
-		}
-
+			=> new Value(value);
 		public Value(byte value)
 		{
 			type = ValueKind.Byte;

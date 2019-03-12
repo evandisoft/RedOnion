@@ -99,8 +99,11 @@ namespace RedOnion.ScriptNUnit
 			Test(3,			"obj.s.length");// test internal property (baseProps)
 
 			// obj.s needs to be boxed first - properties are otherwise lost
+			var options = Options;
+			Options |= Option.Silent; // will otherwise throw exception that `s` does not have `bad`
 			Test(3.14,		"obj.s.bad = obj.x");
 			Test(null,		"obj.s.bad");   // was assigned to boxed value and now lost
+			Options = options;
 
 			Test("s = new string \"hello\"");// box
 			Test("s.e = 2.7");              // preserved as s is boxed, not native string

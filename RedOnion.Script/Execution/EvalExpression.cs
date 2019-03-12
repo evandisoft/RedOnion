@@ -321,8 +321,8 @@ namespace RedOnion.Script
 					try
 					{
 						var mtd = method.MakeGenericMethod(gtype.Type);
-						Value = new Value(new ReflectedObjects.ReflectedFunction(
-							this, rfn.Creator, rfn.Name, mtd));
+						Value = new ReflectedObjects.ReflectedFunction(
+							this, rfn.Creator, rfn.Name, mtd);
 						return self;
 					}
 					catch
@@ -344,8 +344,8 @@ namespace RedOnion.Script
 					try
 					{
 						var mtd2 = method.MakeGenericMethod(gtype.Type);
-						Value = new Value(new ReflectedObjects.ReflectedMethod(
-							this, mtd.Creator, mtd.Name, mtd2));
+						Value = new ReflectedObjects.ReflectedMethod(
+							this, mtd.Creator, mtd.Name, mtd2);
 						return self;
 					}
 					catch

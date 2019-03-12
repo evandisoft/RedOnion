@@ -183,7 +183,7 @@ namespace RedOnion.Script.ReflectedObjects
 			if (ctor != null)
 			{
 				var creator = self as ReflectedType;
-				result = new Value(new ReflectedObject(engine, ctor.Invoke(args), creator, creator?.TypeProps));
+				result = new ReflectedObject(engine, ctor.Invoke(args), creator, creator?.TypeProps);
 				return true;
 			}
 			result = ReflectedType.Convert(

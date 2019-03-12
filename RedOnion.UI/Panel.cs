@@ -15,15 +15,15 @@ namespace RedOnion.UI
 				if (image == null)
 				{
 					if (GameObject == null)
-						throw new ObjectDisposedException(GetType().Name);
+						throw new ObjectDisposedException(Name ?? GetType().Name);
 					image = GameObject.AddComponent<UUI.RawImage>();
 				}
 				return image;
 			}
 		}
 
-		public Panel(Element parent = null, string name = null)
-			: base(parent, name)
+		public Panel(string name = null)
+			: base(name)
 		{
 		}
 

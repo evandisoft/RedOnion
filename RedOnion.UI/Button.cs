@@ -10,30 +10,7 @@ namespace RedOnion.UI
 		protected UUI.Image Image { get; private set; }
 		protected UUI.Button Core { get; private set; }
 
-		private Element icon;
 		private Label label;
-		protected bool HasIcon => icon != null;
-		protected bool HasLabel => label != null;
-
-		protected Element Icon
-		{
-			get
-			{
-				if (icon == null)
-				{
-					if (GameObject == null)
-						throw new ObjectDisposedException(GetType().Name);
-					icon = new Element(this, "Icon");
-					if (label == null)
-						icon.Anchors = new Rect(.5f, .5f, .5f, .5f);
-					else
-						icon.Anchors = new Rect(0, .5f, 0, .5f);
-					icon.SizeDelta = new Vector2(13, 13);
-				}
-				return icon;
-			}
-		}
-
 		protected Label LabelCore
 		{
 			get
@@ -41,17 +18,34 @@ namespace RedOnion.UI
 				if (label == null)
 				{
 					if (GameObject == null)
-						throw new ObjectDisposedException(GetType().Name);
-					label = new Label(this, "Label");
+						throw new ObjectDisposedException(Name ?? GetType().Name);
+					Add(label = new Label("Label"));
 				}
 				return label;
 			}
 		}
 
-		public Button(Element parent = null, string name = null)
-			: this(UISkinManager.defaultSkin.button, parent, name) { }
-		public Button(UIStyle style, Element parent = null, string name = null)
-			: base(parent, name)
+		private Icon icon;
+		protected Icon IconCore
+		{
+			get
+			{
+				if (icon == null)
+				{
+					if (GameObject == null)
+						throw new ObjectDisposedException(Name ?? GetType().Name);
+					icon = new Icon("Icon");
+					icon.Anchors = label == null ? Anchors.Center : Anchors.Left;
+					Add(icon);
+				}
+				return icon;
+			}
+		}
+
+		public Button(string name = null)
+			: this(UISkinManager.defaultSkin.button, name) { }
+		public Button(UIStyle style, string name = null)
+			: base(name)
 		{
 			Image = GameObject.AddComponent<UUI.Image>();
 			Image.sprite = style.normal.background;
@@ -63,5 +57,21 @@ namespace RedOnion.UI
 			add => Core.onClick.AddListener(value);
 			remove => Core.onClick.RemoveListener(value);
 		}
+
+		public bool HasLabel => label != null;
+		public bool HasIcon => icon != null;
+
+		public string Text
+		{
+			get => label == null ? "" : label.Text;
+			set => LabelCore.Text = value;
+		}
+
+		public Texture IconTexture
+		{
+			get => icon?.Texture;
+			set => IconCore.Texture = value;
+		}
+
 	}
 }

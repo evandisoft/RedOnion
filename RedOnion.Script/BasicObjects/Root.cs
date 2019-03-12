@@ -68,22 +68,22 @@ namespace RedOnion.Script.BasicObjects
 
 		protected virtual void Fill()
 		{
-			BaseProps.Set("undefined", Undefined);
-			BaseProps.Set("null", Null);
-			BaseProps.Set("nan", NaN);
-			BaseProps.Set("infinity", Infinity);
-			MoreProps.Set("inf", Infinity);
-			BaseProps.Set("Function", new Value(Function));
-			BaseProps.Set("Object", new Value(Object));
-			BaseProps.Set("String", new Value(String));
-			BaseProps.Set("Number", new Value(Number));
-			BaseProps.Set("Float", new Value(Float));
-			MoreProps.Set("Single", new Value(Float));
-			BaseProps.Set("Double", new Value(Double));
-			BaseProps.Set("Long", new Value(Long));
-			MoreProps.Set("Int64", new Value(Long));
-			BaseProps.Set("ULong", new Value(ULong));
-			MoreProps.Set("UInt64", new Value(ULong));
+			BaseProps.Set("undefined",	Undefined);
+			BaseProps.Set("null",		Null);
+			BaseProps.Set("nan",		NaN);
+			BaseProps.Set("infinity",	Infinity);
+			MoreProps.Set("inf",		Infinity);
+			BaseProps.Set("Function",	Function);
+			BaseProps.Set("Object",		Object);
+			BaseProps.Set("String",		String);
+			BaseProps.Set("Number",		Number);
+			BaseProps.Set("Float",		Float);
+			MoreProps.Set("Single",		Float);
+			BaseProps.Set("Double",		Double);
+			BaseProps.Set("Long",		Long);
+			MoreProps.Set("Int64",		Long);
+			BaseProps.Set("ULong",		ULong);
+			MoreProps.Set("UInt64",		ULong);
 			BaseProps.Set("Int", new Value(Int));
 			MoreProps.Set("Int32", new Value(Int));
 			BaseProps.Set("UInt", new Value(UInt));

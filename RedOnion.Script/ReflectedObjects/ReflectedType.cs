@@ -153,7 +153,7 @@ namespace RedOnion.Script.ReflectedObjects
 						allMethods == null ? new MethodInfo[] { method } : allMethods.ToArray());
 					if (BaseProps == null)
 						BaseProps = new Properties();
-					BaseProps.Set(name, value = new Value(func));
+					BaseProps.Set(name, value = func);
 					return true;
 				}
 				if (member is FieldInfo field)

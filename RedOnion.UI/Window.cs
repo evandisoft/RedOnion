@@ -31,7 +31,7 @@ namespace RedOnion.UI
 		protected Button CloseButton { get; private set; }
 
 		public Window(string name = null)
-			: base(null, name)
+			: base(name)
 		{
 			GameObject.transform.SetParent(UIMasterController.Instance.appCanvas.transform, false);
 			GameObject.SetLayerRecursive(UIMasterController.Instance.appCanvas.gameObject.layer);
@@ -40,23 +40,22 @@ namespace RedOnion.UI
 			SizeDelta = Default.SizeDelta;
 			Color = new Color(0.2f, 0.2f, 0.2f, 0.8f);
 
-			TitleLabel = new Label(this, "Title")
+			Add(TitleLabel = new Label("Title")
 			{
-				Anchors = new Rect(0, 0, 1, 0),
-				Position = new Vector2(Default.FrameWidth, -Default.FrameWidth),
-				SizeDelta = new Vector2(-Default.CloseButtonSize.x - Default.FrameWidth, Default.CloseButtonSize.y),
+				Anchors = Anchors.TopLeftRight,
+				Position = new Vector2(Default.FrameWidth, Default.FrameWidth),
+				SizeDelta = new Vector2(Default.CloseButtonSize.x + Default.FrameWidth, Default.CloseButtonSize.y),
 				Text = "Window",
 				TextColor = Default.TitleTextColor
-			};
+			});
 
-			CloseButton = new Button(this, "CloseButton")
+			Add(CloseButton = new Button("CloseButton")
 			{
-				Anchors = new Rect(1, 0, 1, 0),
-				Pivot = new Vector2(1, 0),
-				Position = new Vector2(-Default.FrameWidth, Default.FrameWidth),
-				SizeDelta = new Vector2(-Default.CloseButtonSize.x, -Default.CloseButtonSize.y)
-				//Icon = Default.CloseButtonIcon
-			};
+				Anchors = Anchors.TopRight,
+				Position = new Vector2(Default.FrameWidth, Default.FrameWidth),
+				SizeDelta = new Vector2(Default.CloseButtonSize.x, Default.CloseButtonSize.y),
+				IconTexture = Default.CloseButtonIcon
+			});
 			CloseButton.Click += Close;
 		}
 

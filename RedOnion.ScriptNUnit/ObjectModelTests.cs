@@ -39,10 +39,10 @@ namespace RedOnion.ScriptNUnit
 		[Test]
 		public void ObjectModel_03_NewWithNamespace()
 		{
-			Root.Set("space", new Value(new SimpleObject(this, new Properties()
+			Root.Set("space", new SimpleObject(this, new Properties()
 			{
-				{ "Thing", new Value(Root[typeof(Thing)]) }
-			})));
+				{ "Thing", Root[typeof(Thing)] }
+			}));
 			Test("it = new space.thing");
 			Assert.AreEqual(typeof(Thing), Result.Native.GetType());
 		}

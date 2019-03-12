@@ -8,10 +8,10 @@ namespace RedOnion.UI
 	{
 		protected UUI.Text Core { get; private set; }
 
-		public Label(Element parent = null, string name = null)
-			: this(UISkinManager.defaultSkin.label, parent, name) { }
-		public Label(UIStyle style, Element parent = null, string name = null)
-			: base(parent, name)
+		public Label(string name = null)
+			: this(UISkinManager.defaultSkin.label, name) { }
+		public Label(UIStyle style, string name = null)
+			: base(name)
 		{
 			Core = GameObject.AddComponent<UUI.Text>();
 			Core.alignment = TextAnchor.MiddleCenter;

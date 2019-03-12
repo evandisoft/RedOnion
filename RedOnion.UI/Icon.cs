@@ -8,10 +8,16 @@ namespace RedOnion.UI
 	{
 		protected UUI.RawImage Core { get; private set; }
 
-		public Icon(Element parent = null, string name = null)
-			: base(parent, name)
+		public Icon(string name = null)
+			: base(name)
 		{
 			Core = GameObject.AddComponent<UUI.RawImage>();
+		}
+
+		public Texture Texture
+		{
+			get => Core.texture;
+			set => Core.texture = value;
 		}
 	}
 }

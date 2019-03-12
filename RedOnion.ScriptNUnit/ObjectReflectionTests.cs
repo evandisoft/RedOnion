@@ -31,7 +31,7 @@ namespace RedOnion.ScriptNUnit
 		{
 			var creator = new ReflectedType(this, typeof(PointClass));
 			Root[typeof(PointClass)] = creator;
-			Root.Set("Point", new Value(creator));
+			Root.Set("Point", creator);
 
 			Test("var pt = new point");
 			var pt = Result.Native as PointClass;
@@ -49,7 +49,7 @@ namespace RedOnion.ScriptNUnit
 		{
 			var creator = new ReflectedType(this, typeof(PointClass));
 			Root[typeof(PointClass)] = creator;
-			Root.Set("Point", new Value(creator));
+			Root.Set("Point", creator);
 			Test("var pt = new point");
 			var pt = Result.Native as PointClass;
 			Assert.NotNull(pt);
@@ -84,7 +84,7 @@ namespace RedOnion.ScriptNUnit
 		{
 			var creator = new ReflectedType(this, typeof(Rect));
 			Root[typeof(Rect)] = creator;
-			Root.Set("Rect", new Value(creator));
+			Root.Set("Rect", creator);
 			Test("var rc = new rect");
 			Assert.True(Result.Native is Rect);
 			Test("rc.x = 10");
@@ -93,8 +93,8 @@ namespace RedOnion.ScriptNUnit
 			Test(30, "rc.right");
 			Test(20, "rc.width");
 
-			Root.Set("area", new Value(new ReflectedFunction(this, null, "area",
-				new MethodInfo[] { typeof(RectFunctions).GetMethod("Area") })));
+			Root.Set("area", new ReflectedFunction(this, null, "area",
+				new MethodInfo[] { typeof(RectFunctions).GetMethod("Area") }));
 			Test("rc.height = 10");
 			Test(200, "area rc");
 		}
@@ -113,9 +113,9 @@ namespace RedOnion.ScriptNUnit
 		{
 			var creator = new ReflectedType(this, typeof(Rect));
 			Root[typeof(Rect)] = creator;
-			Root.Set("Rect", new Value(creator));
-			Root.Set("GUI", new Value(new ReflectedType(this,
-				typeof(GUITest))));
+			Root.Set("Rect", creator);
+			Root.Set("GUI", new ReflectedType(this,
+				typeof(GUITest)));
 
 			Test("rc = new rect 10,40,200,300");
 			Test(10, "rc.x");
@@ -139,7 +139,7 @@ namespace RedOnion.ScriptNUnit
 		{
 			var creator = new ReflectedType(this, typeof(GenericTest));
 			Root[typeof(GenericTest)] = creator;
-			Root.Set("testClass", new Value(creator));
+			Root.Set("testClass", creator);
 			Test("test = new testClass");
 			Test(1, "test.pass 1");
 			Test(2u, "test.pass.[uint] 2");
@@ -158,7 +158,7 @@ namespace RedOnion.ScriptNUnit
 		{
 			var creator = new ReflectedType(this, typeof(EventTest));
 			Root[typeof(EventTest)] = creator;
-			Root.Set("testClass", new Value(creator));
+			Root.Set("testClass", creator);
 			Test("test = new testClass");
 			Test("counter = 0");
 			Test("function action\n\tcounter++");
