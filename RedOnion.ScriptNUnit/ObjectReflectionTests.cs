@@ -130,12 +130,29 @@ namespace RedOnion.ScriptNUnit
 			Assert.AreEqual(1, GUITest.counter);
 		}
 
+		public class DefaultConstruct
+		{
+			public string Name { get; set; }
+			public DefaultConstruct(string name = null)
+				=> Name = name;
+		}
+		[Test]
+		public void ObjectReflection_05_CtorWithDefaultArgs()
+		{
+			var creator = new ReflectedType(this, typeof(DefaultConstruct));
+			Root[typeof(DefaultConstruct)] = creator;
+			Root.Set("thing", creator);
+			Test("new thing");
+			Assert.IsNotNull(Result.Native);
+			Assert.AreEqual(typeof(DefaultConstruct), Result.Native.GetType());
+		}
+
 		public class GenericTest
 		{
 			public T Pass<T>(T value) => value;
 		}
 		[Test]
-		public void ObjectReflection_05_GenericFunction()
+		public void ObjectReflection_06_GenericFunction()
 		{
 			var creator = new ReflectedType(this, typeof(GenericTest));
 			Root[typeof(GenericTest)] = creator;
@@ -154,7 +171,7 @@ namespace RedOnion.ScriptNUnit
 			public int NumberOfActions => action?.GetInvocationList().Length ?? 0;
 		}
 		[Test]
-		public void ObjectReflection_06_Events()
+		public void ObjectReflection_07_Events()
 		{
 			var creator = new ReflectedType(this, typeof(EventTest));
 			Root[typeof(EventTest)] = creator;

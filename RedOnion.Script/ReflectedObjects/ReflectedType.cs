@@ -48,17 +48,31 @@ namespace RedOnion.Script.ReflectedObjects
 				return null;
 			if (argc == 0)
 			{
+				// Structure/ValueType has implicit default constructor (zero everything)
 				if (Type.IsValueType)
 					return new ReflectedObject(Engine, Activator.CreateInstance(Type), this, TypeProps);
+
+				// try to find constructor with no arguments
 				var ctor = Type.GetConstructor(new Type[0]);
-				if (ctor == null)
+				if (ctor != null)
+					return new ReflectedObject(Engine, ctor.Invoke(new object[0]), this, TypeProps);
+
+				// try to find constructor with all default values
+				foreach (var ctr in Type.GetConstructors())
 				{
-					if (!Engine.HasOption(Engine.Option.Silent))
-						throw new NotImplementedException(Type.FullName
-							+ " cannot be constructed with zero arguments");
-					return null;
+					var cpars = ctr.GetParameters();
+					if (cpars[0].RawDefaultValue == DBNull.Value)
+						continue;
+					var args = new object[cpars.Length];
+					for (int i = 0; i < args.Length; i++)
+						args[i] = cpars[i].DefaultValue;
+					return new ReflectedObject(Engine, ctr.Invoke(args), this, TypeProps);
 				}
-				return new ReflectedObject(Engine, ctor.Invoke(new object[0]), this, TypeProps);
+
+				if (!Engine.HasOption(Engine.Option.Silent))
+					throw new NotImplementedException(Type.FullName
+						+ " cannot be constructed with zero arguments");
+				return null;
 			}
 			var value = new Value();
 			foreach (var ctor in Type.GetConstructors())

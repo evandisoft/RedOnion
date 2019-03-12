@@ -54,7 +54,7 @@ namespace RedOnion.UI
 				Anchors = Anchors.TopRight,
 				Position = new Vector2(Default.FrameWidth, Default.FrameWidth),
 				SizeDelta = new Vector2(Default.CloseButtonSize.x, Default.CloseButtonSize.y),
-				IconTexture = Default.CloseButtonIcon
+				//IconTexture = Default.CloseButtonIcon
 			});
 			CloseButton.Click += Close;
 		}
