@@ -4,6 +4,8 @@ using RedOnion.Script;
 using RedOnion.Script.BasicObjects;
 using RedOnion.Script.ReflectedObjects;
 using UnityEngine;
+using Kerbalua.AutoPilot;
+using KSP.UI.Screens;
 
 namespace Kerbalua.Other {
 	public class RedOnionReplEvaluator:ReplEvaluator {
@@ -37,10 +39,12 @@ namespace Kerbalua.Other {
 				AddType(typeof(FlightCtrlState));
 				AddType(typeof(FlightGlobals));
 				AddType(typeof(Vessel));
+				AddType(typeof(StageManager));
+				AddType(typeof(AutoPilotAPI));
 			}
 		}
 
-		public override string Evaluate(string source)
+		protected override string ProtectedEvaluate(string source)
 		{
 			string output = "";
 			try {

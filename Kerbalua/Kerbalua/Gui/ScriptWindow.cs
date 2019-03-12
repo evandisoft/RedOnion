@@ -73,7 +73,6 @@ namespace Kerbalua.Gui {
 			completionManager.AddCompletable(new EditingAreaCompletionAdapter(editor, this));
 			completionManager.AddCompletable(new EditingAreaCompletionAdapter(repl.inputBox, this));
 
-			scriptIOTextArea.content.text = saveLoadFilename;
 			editor.content.text=scriptIOTextArea.Load();
 
 			editorRect = new Rect(
@@ -100,6 +99,7 @@ namespace Kerbalua.Gui {
 				150,
 				param_mainWindowRect.height - titleHeight
 				);
+
 			widgetBarRect.x = editorRect.width;
 			replRect.x = widgetBarRect.x + widgetBarRect.width;
 			completionBoxRect.x = replRect.x + replRect.width;
@@ -120,8 +120,11 @@ namespace Kerbalua.Gui {
 			widgetBar.renderables.Add(new Button("Reset Engine", () => {
 				currentReplEvaluator.ResetEngine();
 			}));
+			widgetBar.renderables.Add(new Button("Show Hotkeys", () => {
+				PrintHotkeysInOutputArea();
+			}));
 
-			foreach(var evaluatorName in replEvaluators.Keys) {
+			foreach (var evaluatorName in replEvaluators.Keys) {
 				widgetBar.renderables.Add(new Button(evaluatorName, () => {
 					SetCurrentEvaluator(evaluatorName);
 				}));
@@ -131,8 +134,82 @@ namespace Kerbalua.Gui {
 			InitializeKeyBindings();
 		}
 
+		void PrintHotkeysInOutputArea()
+		{
+			string hotkeyText =
+
+@"CURRENT KEYBINDINGS(partially inspired by vim):
+
+Common to Editor and Repl input area:
+			shift + space: Intellisense completion. 
+ctrl + e: evaluate content
+tab: indent
+shift + tab: unindent
+ctrl + tab: make current line's indentation match previous line's indentation
+ctrl + j: move cursor left
+ctrl + k: move cursor down
+ctrl + l: move cursor up
+ctrl +;: move cursor right
+ctrl + m: move cursor to next tab left
+ctrl + comma: move cursor 4 lines down
+ctrl + period: move cursor 4 lines up
+ctrl +/: move cursor to next tab right
+Shift plus movement commands selects text.
+ctrl + u: focus editor
+ctrl + i: focus scriptNameTextArea
+ctrl + o: focus repl input area
+ctrl + p: focus completion/ intellisense box
+ctrl + n: insert and move to new line after current line
+ctrl + h: insert and move to new line before current line
+  When creating a new line, its indentation starts matched with the indentation of the line above it.
+
+Editor only:
+ctrl + s: Saves the file in `Scripts` folder within KSP folder based on the name specified in the textarea that is dedicated to this.
+  ctrl + d: Loads the file from `Scripts` folder within KSP folder based on the name specified in the textarea that is dedicated to this.
+
+REPL input area only:
+enter: evaluate content and clear repl input area.
+shift + enter: add newline
+ctrl +[or ctrl + UpArrow: go to previous history
+ctrl + ' or ctrl+DownArrow: go to next history
+
+Completion area only:
+ctrl + k: select next line down
+ctrl + l: select next line up
+ctrl + comma: select line 4 lines down
+ctrl + period: select line 4 lines up
+ctrl + enter: submit completion";
+
+			repl.outputBox.content.text += "\n" + hotkeyText;
+		}
+
 		void InitializeKeyBindings()
 		{
+			repl.inputBox.KeyBindings.Add(new EventKey(KeyCode.LeftBracket, true), () => {
+				//Debug.Log("history up");
+				repl.inputBox.content.text = currentReplEvaluator.HistoryUp();
+				repl.inputBox.selectIndex = repl.inputBox.content.text.Length;
+				repl.inputBox.cursorIndex = repl.inputBox.content.text.Length;
+			});
+			repl.inputBox.KeyBindings.Add(new EventKey(KeyCode.Quote, true), () => {
+				//Debug.Log("history down");
+				repl.inputBox.content.text = currentReplEvaluator.HistoryDown();
+				repl.inputBox.selectIndex = repl.inputBox.content.text.Length;
+				repl.inputBox.cursorIndex = repl.inputBox.content.text.Length;
+			});
+			repl.inputBox.KeyBindings.Add(new EventKey(KeyCode.UpArrow, true), () => {
+				//Debug.Log("history up");
+				repl.inputBox.content.text = currentReplEvaluator.HistoryUp();
+				repl.inputBox.selectIndex = repl.inputBox.content.text.Length;
+				repl.inputBox.cursorIndex = repl.inputBox.content.text.Length;
+			});
+			repl.inputBox.KeyBindings.Add(new EventKey(KeyCode.DownArrow, true), () => {
+				//Debug.Log("history down");
+				repl.inputBox.content.text = currentReplEvaluator.HistoryDown();
+				repl.inputBox.selectIndex = repl.inputBox.content.text.Length;
+				repl.inputBox.cursorIndex = repl.inputBox.content.text.Length;
+			});
+
 			GlobalKeyBindings.Add(new EventKey(KeyCode.U, true), () => editor.GrabFocus());
 			GlobalKeyBindings.Add(new EventKey(KeyCode.I, true), () => scriptIOTextArea.GrabFocus());
 			GlobalKeyBindings.Add(new EventKey(KeyCode.O, true), () => repl.inputBox.GrabFocus());
@@ -153,7 +230,7 @@ namespace Kerbalua.Gui {
 				repl.outputBox.content.text += currentReplEvaluator.Evaluate(repl.inputBox.content.text);
 			});
 			repl.inputBox.KeyBindings.Add(new EventKey(KeyCode.Return), () => {
-				repl.outputBox.content.text += currentReplEvaluator.Evaluate(repl.inputBox.content.text);
+				repl.outputBox.content.text += currentReplEvaluator.Evaluate(repl.inputBox.content.text,true);
 				repl.inputBox.content.text = "";
 				completionBox.content.text = "";
 			});
@@ -227,7 +304,10 @@ namespace Kerbalua.Gui {
 				currentWindowRect.width -= editorRect.width;
 			}
 			if (!replVisible) {
-				currentWindowRect.width -= completionBoxRect.width + replRect.width;
+				currentWindowRect.width -= replRect.width;
+			}
+			if (!replVisible && !editorVisible) {
+				currentWindowRect.width -= completionBoxRect.width;
 			}
 			return currentWindowRect;
 		}
@@ -256,6 +336,10 @@ namespace Kerbalua.Gui {
 			if (!editorVisible) {
 				currentCompletionBoxRect.x -= editorRect.width;
 			}
+			if (!replVisible) {
+				currentCompletionBoxRect.x -= replRect.width;
+			}
+
 			return currentCompletionBoxRect;
 		}
 
@@ -293,7 +377,7 @@ namespace Kerbalua.Gui {
 
 			// Lots of hacks here. I will eventually better understand how this
 			// works and replace it.
-			if (replVisible) {
+			if (replVisible || editorVisible) {
 				bool lastEventWasMouseDown = Event.current.type == EventType.MouseDown;
 				string lastControlname = GUI.GetNameOfFocusedControl();
 				//completionBoxRect = UpdateBoxPositionWithWindow(completionBoxRect, mainWindowRect.width);

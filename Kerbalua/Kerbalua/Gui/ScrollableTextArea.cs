@@ -5,6 +5,8 @@ namespace Kerbalua.Gui {
 	public class ScrollableTextArea : TextArea {
 		public Vector2 scrollPos = new Vector2();
 		bool resetScroll;
+		protected Vector2 lastScrollViewVector2 = new Vector2();
+		protected Vector2 lastContentVector2 = new Vector2();
 
 		protected override void ProtectedUpdate(Rect rect)
         {
@@ -24,7 +26,7 @@ namespace Kerbalua.Gui {
 					Math.Max(contentSize.x, rect.width),
 					Math.Max(contentSize.y, rect.height)
 					);
-
+				
 				scrollPos = GUI.BeginScrollView(rect, scrollPos, contentRect);
 				{
 					base.ProtectedUpdate(contentRect);
@@ -33,11 +35,20 @@ namespace Kerbalua.Gui {
 						scrollPos.y = rect.height;
 						resetScroll = false;
 					}
+
+					lastScrollViewVector2 = new Vector2(rect.width, rect.height);
+					lastContentVector2 = new Vector2(rect.width, rect.height);
+
 				}
 				GUI.EndScrollView();
 			}
 			GUI.EndGroup();
 		}
+
+		//protected override void ProtectedUpdate()
+		//{
+		//	throw new NotSupportedException();
+		//}
 
 		// Manually handling scrolling because there is a coordinate issue
 		// with the default method. The system measures the mouse vertical

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Kerbalua.Other {
 	/// <summary>
@@ -8,12 +9,72 @@ namespace Kerbalua.Other {
 	/// source.
 	/// </summary>
 	public abstract class ReplEvaluator {
+		const int maxHistorySize = 1000;
+
+		LinkedListNode<string> currentHistoryItem=null;
+
 		/// <summary>
 		/// Evaluate the source and return the result of that evaluation.
 		/// </summary>
 		/// <returns>A toString of the result of evaluating the source string.</returns>
 		/// <param name="source">The source string to be evaluated.</param>
-		public abstract string Evaluate(string source);
+		public string Evaluate(string source,bool withHistory=false)
+		{
+			if (withHistory) {
+				if(!(History.Count>0 && source == History.First.Value)) {
+					History.AddFirst(source);
+				}
+
+				if (History.Count > maxHistorySize) {
+					History.RemoveLast();
+				}
+
+				currentHistoryItem = null;
+
+				//foreach (var item in History) {
+				//	Debug.Log(item);
+				//}
+			}
+
+			return ProtectedEvaluate(source);
+		}
+
+		public string GetCurrentHistoryItem()
+		{
+			if (currentHistoryItem == null) {
+				return "";
+			}
+
+			return currentHistoryItem.Value;
+		}
+
+		public string HistoryUp()
+		{
+			if (currentHistoryItem == null) {
+				currentHistoryItem = History.First;
+			} else if(currentHistoryItem != History.Last) {
+				currentHistoryItem = currentHistoryItem.Next;
+			}
+
+			return currentHistoryItem.Value;
+		}
+
+		public string HistoryDown()
+		{
+			if (currentHistoryItem == null) {
+				return "";
+			} 
+
+			if (currentHistoryItem != History.First) {
+				currentHistoryItem = currentHistoryItem.Previous;
+			}
+
+			return currentHistoryItem.Value;
+		}
+
+		protected abstract string ProtectedEvaluate(string source);
+
+		protected LinkedList<string> History = new LinkedList<string>();
 
 		/// <summary>
 		/// Looking at the source text and an index to the current cursor
