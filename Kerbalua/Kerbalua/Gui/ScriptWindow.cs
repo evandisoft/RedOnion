@@ -154,7 +154,11 @@ ctrl + m: move cursor to next tab left
 ctrl + comma: move cursor 4 lines down
 ctrl + period: move cursor 4 lines up
 ctrl +/: move cursor to next tab right
+ctrl + Home: move cursor to start
+ctrl + End: mvoe cursor to end
 Shift plus movement commands selects text.
+ctrl + insert: copy selected text
+shift + insert: paste selected text
 ctrl + u: focus editor
 ctrl + i: focus scriptNameTextArea
 ctrl + o: focus repl input area
