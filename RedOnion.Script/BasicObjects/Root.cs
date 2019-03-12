@@ -33,6 +33,8 @@ namespace RedOnion.Script.BasicObjects
 		public NumberFun Char { get; }
 
 		public Root(Engine engine)
+			: this(engine, true) { }
+		protected Root(Engine engine, bool fill)
 			: base(engine, null, new Properties(), new Properties())
 		{
 			var obj = new BasicObject(engine);
@@ -55,7 +57,8 @@ namespace RedOnion.Script.BasicObjects
 			Byte = new NumberFun(engine, fun, num, typeof(byte), ValueKind.Byte);
 			Bool = new NumberFun(engine, fun, num, typeof(bool), ValueKind.Bool);
 			Char = new NumberFun(engine, fun, num, typeof(char), ValueKind.Char);
-			Fill();
+			if (fill)
+				Fill();
 		}
 
 		public override void Reset()

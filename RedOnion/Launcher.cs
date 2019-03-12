@@ -3,6 +3,7 @@ using System.Collections;
 using System.IO;
 using UnityEngine;
 using KSP.UI.Screens;
+using RedOnion.KSP;
 
 namespace RedOnion
 {
@@ -68,7 +69,7 @@ namespace RedOnion
 			button = null;
 		}
 
-		ScriptEngine engine;
+		RuntimeEngine engine;
 		private void RunScript()
 		{
 			if(!File.Exists("scripts/launcher.ros"))
@@ -78,7 +79,7 @@ namespace RedOnion
 			}
 			try
 			{
-				engine = new ScriptEngine();
+				engine = new RuntimeEngine();
 				engine.ExecutionCountdown = 10000;
 				engine.Execute(File.ReadAllText("scripts/launcher.ros"));
 			}

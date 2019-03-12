@@ -33,8 +33,7 @@ namespace RedOnion.UI
 		public Window(string name = null)
 			: base(name)
 		{
-			GameObject.transform.SetParent(UIMasterController.Instance.appCanvas.transform, false);
-			GameObject.SetLayerRecursive(UIMasterController.Instance.appCanvas.gameObject.layer);
+			GameObject.transform.SetParent(UIMasterController.Instance.dialogCanvas.transform, false);
 
 			Position = Default.Position;
 			SizeDelta = Default.SizeDelta;

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <KerbalLibs Condition=" '$(KerbalLibs)' == '' And '$(OS)' == 'Windows_NT' And Exists('$(SolutionDir)\..\ksp')">$(SolutionDir)\..\ksp\KSP_x64_Data\Managed</KerbalLibs>
@@ -7,11 +7,11 @@
     <KerbalLibs Condition=" '$(KerbalLibs)' == '' And '$(OS)' == 'Windows_NT' ">C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\KSP_x64_Data\Managed</KerbalLibs>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{3A40C452-1B11-4769-9D6B-FD318F2CB514}</ProjectGuid>
+    <ProjectGuid>{DEC12E09-29AD-4666-9954-8C8A1D7BF454}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RedOnion</RootNamespace>
-    <AssemblyName>RedOnion</AssemblyName>
+    <RootNamespace>RedOnion.KSP</RootNamespace>
+    <AssemblyName>RedOnion.KSP</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -38,10 +38,6 @@
       <HintPath>$(KerbalLibs)\System.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Assembly-CSharp">
-      <HintPath>$(KerbalLibs)\Assembly-CSharp.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="UnityEngine">
       <HintPath>$(KerbalLibs)\UnityEngine.dll</HintPath>
       <Private>False</Private>
@@ -50,16 +46,20 @@
       <HintPath>$(KerbalLibs)\UnityEngine.UI.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>$(KerbalLibs)\Assembly-CSharp.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Ionic.Zip.dll">
+      <HintPath>$(KerbalLibs)\Ionic.Zip.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Launcher.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Script.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\RedOnion.KSP\RedOnion.KSP.csproj">
-      <Project>{dec12e09-29ad-4666-9954-8c8a1d7bf454}</Project>
-      <Name>RedOnion.KSP</Name>
-    </ProjectReference>
     <ProjectReference Include="..\RedOnion.Script\RedOnion.Script.csproj">
       <Project>{0d0a04f3-0a82-49cd-8178-7640ace88bff}</Project>
       <Name>RedOnion.Script</Name>
@@ -69,11 +69,5 @@
       <Name>RedOnion.UI</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\AppIcon.png" />
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Target Name="AfterBuild">
-    <ZipDirectory SourceDirectory="Resources" Overwrite="True" DestinationFile="$(OutputPath)\$(AssemblyName).zip" />
-  </Target>
 </Project>
