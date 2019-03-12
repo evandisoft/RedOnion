@@ -118,6 +118,7 @@
     <Compile Include="Kerbalua\Gui\RecentFilesList.cs" />
     <Compile Include="Kerbalua\Gui\Label.cs" />
     <Compile Include="Kerbalua\Gui\LeftAlignedButton.cs" />
+    <Compile Include="Kerbalua\AutoPilot\AutoPilotAPI.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -148,6 +149,7 @@
     <Folder Include="Kerbalua\Gui\" />
     <Folder Include="Kerbalua\Utility\" />
     <Folder Include="Kerbalua\Completion\" />
+    <Folder Include="Kerbalua\AutoPilot\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RedOnion.Script\RedOnion.Script.csproj">

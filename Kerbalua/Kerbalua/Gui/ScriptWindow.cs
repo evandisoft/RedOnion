@@ -240,7 +240,10 @@ namespace Kerbalua.Gui {
 				currentWindowRect.width -= editorRect.width;
 			}
 			if (!replVisible) {
-				currentWindowRect.width -= completionBoxRect.width + replRect.width;
+				currentWindowRect.width -= replRect.width;
+			}
+			if (!replVisible && !editorVisible) {
+				currentWindowRect.width -= completionBoxRect.width;
 			}
 			return currentWindowRect;
 		}
@@ -269,6 +272,10 @@ namespace Kerbalua.Gui {
 			if (!editorVisible) {
 				currentCompletionBoxRect.x -= editorRect.width;
 			}
+			if (!replVisible) {
+				currentCompletionBoxRect.x -= replRect.width;
+			}
+
 			return currentCompletionBoxRect;
 		}
 
@@ -306,7 +313,7 @@ namespace Kerbalua.Gui {
 
 			// Lots of hacks here. I will eventually better understand how this
 			// works and replace it.
-			if (replVisible) {
+			if (replVisible || editorVisible) {
 				bool lastEventWasMouseDown = Event.current.type == EventType.MouseDown;
 				string lastControlname = GUI.GetNameOfFocusedControl();
 				//completionBoxRect = UpdateBoxPositionWithWindow(completionBoxRect, mainWindowRect.width);
