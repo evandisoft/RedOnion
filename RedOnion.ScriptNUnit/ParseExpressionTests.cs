@@ -8,6 +8,8 @@ using RedOnion.Script.Parsing;
 //	1u + x * 3f
 //	(1L + x) * 3.0
 //	cond ? true : false
+//	++x--
+//	"string" + 'c'
 //	abs(-1)
 //	abs -1
 //	abs(-x)
@@ -18,13 +20,13 @@ using RedOnion.Script.Parsing;
 //	fn null, this, base.field
 //	f g(x), h x
 //	f (g x, y), z, h()
-//	++x--
-//	"string" + 'c'
+//	fn new pt 1, 2
 //	var x
 //	var x int
 //	var a:byte[]
 //	var a = new byte[n]
 //	var a as list.[byte]
+//	fn.[int] 1
 
 namespace RedOnion.ScriptNUnit
 {
@@ -282,34 +284,78 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void ParseExpression_05_CallWithUnary_v1()
+		public void ParseExpression_05_PreAndPost()
+		{
+			Test("++x--");
+
+			ValueCheck(0, 0, "x");
+			ValueCheck(4, OpCode.Identifier);
+			ValueCheck(5, OpCode.Inc);
+			ValueCheck(6, OpCode.PostDec);
+			ValueFinal(11);
+
+			Rewrite(ValuesAt);
+
+			CodeCheck(0, OpCode.PostDec);
+			CodeCheck(1, OpCode.Inc);
+			CodeCheck(2, OpCode.Identifier);
+			CodeCheck(3, 0, "x");
+			CodeCheck(7);
+		}
+
+		[Test]
+		public void ParseExpression_06_StringAndChar()
+		{
+			Test("\"string\" + 'c'");
+
+			ValueCheck(0, 0, "string");
+			ValueCheck(4, OpCode.String);
+			ValueTopMark(9, 0);
+			ValueCheck(9, (byte)'c');
+			ValueCheck(10, OpCode.Char);
+			ValueTopMark(15, 9);
+			ValueCheck(15, OpCode.Add);
+			ValueFinal(20);
+
+			Rewrite(ValuesAt);
+
+			CodeCheck(0, OpCode.Add);
+			CodeCheck(1, OpCode.String);
+			CodeCheck(2, 0, "string");
+			CodeCheck(6, OpCode.Char);
+			CodeCheck(7, (byte)'c');
+			CodeCheck(8);
+		}
+
+		[Test]
+		public void ParseExpression_07_CallWithUnary_v1()
 		{
 			Test("abs(-1)");
-			ParseExpression_05_CallWithUnary();
+			ParseExpression_07_CallWithUnary();
 		}
 
 		[Test]
-		public void ParseExpression_05_CallWithUnary_v2()
+		public void ParseExpression_07_CallWithUnary_v2()
 		{
 			Test("abs -1");
-			ParseExpression_05_CallWithUnary();
+			ParseExpression_07_CallWithUnary();
 		}
 
 		[Test]
-		public void ParseExpression_05_CallWithUnary_v3()
+		public void ParseExpression_07_CallWithUnary_v3()
 		{
 			Test("abs(-x)");
-			ParseExpression_05_CallWithUnary2();
+			ParseExpression_07_CallWithUnary2();
 		}
 
 		[Test]
-		public void ParseExpression_05_CallWithUnary_v4()
+		public void ParseExpression_07_CallWithUnary_v4()
 		{
 			Test("abs -x");
-			ParseExpression_05_CallWithUnary2();
+			ParseExpression_07_CallWithUnary2();
 		}
 
-		public void ParseExpression_05_CallWithUnary()
+		public void ParseExpression_07_CallWithUnary()
 		{
 			ValueCheck	( 0, 0, "abs");
 			ValueCheck	( 4, OpCode.Identifier);
@@ -329,7 +375,7 @@ namespace RedOnion.ScriptNUnit
 			CodeCheck( 7, -1);
 			CodeCheck(11);
 		}
-		public void ParseExpression_05_CallWithUnary2()
+		public void ParseExpression_07_CallWithUnary2()
 		{
 			ValueCheck	( 0, 0, "abs");
 			ValueCheck	( 4, OpCode.Identifier);
@@ -353,20 +399,20 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void ParseExpression_06_CallTwoArgs_v1()
+		public void ParseExpression_08_CallTwoArgs_v1()
 		{
 			Test("fn(x,y)");
-			ParseExpression_06_CallTwoArgs();
+			ParseExpression_08_CallTwoArgs();
 		}
 
 		[Test]
-		public void ParseExpression_06_CallTwoArgs_v2()
+		public void ParseExpression_08_CallTwoArgs_v2()
 		{
 			Test("fn x,y");
-			ParseExpression_06_CallTwoArgs();
+			ParseExpression_08_CallTwoArgs();
 		}
 
-		public void ParseExpression_06_CallTwoArgs()
+		public void ParseExpression_08_CallTwoArgs()
 		{
 			ValueCheck	( 0, 0, "fn");
 			ValueCheck	( 4, OpCode.Identifier);
@@ -393,20 +439,20 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void ParseExpression_07_CallManyArgs_v1()
+		public void ParseExpression_09_CallManyArgs_v1()
 		{
 			Test("fn(null, this, base.field)");
-			ParseExpression_07_CallManyArgs();
+			ParseExpression_09_CallManyArgs();
 		}
 
 		[Test]
-		public void ParseExpression_07_CallManyArgs_v2()
+		public void ParseExpression_09_CallManyArgs_v2()
 		{
 			Test("fn null, this, base.field");
-			ParseExpression_07_CallManyArgs();
+			ParseExpression_09_CallManyArgs();
 		}
 
-		public void ParseExpression_07_CallManyArgs()
+		public void ParseExpression_09_CallManyArgs()
 		{
 			ValueCheck	( 0, 0, "fn");
 			ValueCheck	( 4, OpCode.Identifier);
@@ -441,7 +487,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void ParseExpression_08_NestedCalls()
+		public void ParseExpression_10_NestedCalls()
 		{
 			Test("f g(x), h x");
 
@@ -486,7 +532,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void ParseExpression_09_MoreCalls()
+		public void ParseExpression_11_MoreCalls()
 		{
 			Test("f (g x, y), z, h()");
 
@@ -537,51 +583,46 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void ParseExpression_10_PreAndPost()
+		public void ParseExpression_12_AutocallWithNew()
 		{
-			Test("++x--");
+			Test("fn new pt 1, 2");
 
-			ValueCheck( 0, 0, "x");
-			ValueCheck( 4, OpCode.Identifier);
-			ValueCheck( 5, OpCode.Inc);
-			ValueCheck( 6, OpCode.PostDec);
-			ValueFinal(11);
+			ValueCheck(0, 0, "fn");
+			ValueCheck(4, OpCode.Identifier);
+			ValueTopMark(9, 0);
+			ValueCheck(9, 1, "pt");
+			ValueCheck(13, OpCode.Identifier);
+			ValueTopMark(18, 9);
+			ValueCheck(18, 1);
+			ValueCheck(22, OpCode.Int);
+			ValueTopMark(27, 18);
+			ValueCheck(27, 2);
+			ValueCheck(31, OpCode.Int);
+			ValueTopMark(36, 27);
+			ValueCheck(36, OpCode.Call2);
+			ValueCheck(37, OpCode.Create);
+			ValueTopMark(42, 9);
+			ValueCheck(42, OpCode.Call1);
+			ValueFinal(47);
 
 			Rewrite(ValuesAt);
 
-			CodeCheck( 0, OpCode.PostDec);
-			CodeCheck( 1, OpCode.Inc);
-			CodeCheck( 2, OpCode.Identifier);
-			CodeCheck( 3, 0, "x");
-			CodeCheck( 7);
+			CodeCheck(0, OpCode.Call1);
+			CodeCheck(1, OpCode.Identifier);
+			CodeCheck(2, 0, "fn");
+			CodeCheck(6, OpCode.Create);
+			CodeCheck(7, OpCode.Call2);
+			CodeCheck(8, OpCode.Identifier);
+			CodeCheck(9, 1, "pt");
+			CodeCheck(13, OpCode.Int);
+			CodeCheck(14, 1);
+			CodeCheck(18, OpCode.Int);
+			CodeCheck(19, 2);
+			CodeCheck(23);
 		}
 
 		[Test]
-		public void ParseExpression_11_StringAndChar()
-		{
-			Test("\"string\" + 'c'");
-
-			ValueCheck	( 0, 0, "string");
-			ValueCheck	( 4, OpCode.String);
-			ValueTopMark( 9, 0);
-			ValueCheck	( 9, (byte)'c');
-			ValueCheck	(10, OpCode.Char);
-			ValueTopMark(15, 9);
-			ValueCheck	(15, OpCode.Add);
-			ValueFinal	(20);
-
-			Rewrite(ValuesAt);
-
-			CodeCheck( 0, OpCode.Add);
-			CodeCheck( 1, OpCode.String);
-			CodeCheck( 2, 0, "string");
-			CodeCheck( 6, OpCode.Char);
-			CodeCheck( 7, (byte)'c');
-			CodeCheck( 8);
-		}
-
-		[Test]
-		public void ParseExpression_12_Variable()
+		public void ParseExpression_13_Variable()
 		{
 			Test("var x");
 
@@ -605,7 +646,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void ParseExpression_13_TypedVariable()
+		public void ParseExpression_14_TypedVariable()
 		{
 			Test("var x int"); // pure style
 
@@ -629,7 +670,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void ParseExpression_14_ArrayVariable()
+		public void ParseExpression_15_ArrayVariable()
 		{
 			Test("var a:byte[]"); // ActionScript
 
@@ -658,7 +699,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void ParseExpression_15_CreateArray()
+		public void ParseExpression_16_CreateArray()
 		{
 			Test("var a = new byte[n]");
 
@@ -694,7 +735,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void ParseExpression_16_GenericType()
+		public void ParseExpression_17_GenericType()
 		{
 			Test("var a as list.[byte]"); // Boo/Python type-spec (var x as type)
 
@@ -724,6 +765,38 @@ namespace RedOnion.ScriptNUnit
 			CodeCheck( 8, 1, "list");
 			CodeCheck(12, OpCode.Byte);
 			CodeCheck(13, OpCode.Undefined);
+			CodeCheck(14);
+		}
+
+		[Test]
+		public void ParseExpression_18_GenericCall()
+		{
+			Test("fn.[int] 1");
+
+			ValueCheck	( 0, 0, "fn");
+			ValueCheck	( 4, OpCode.Identifier);
+			ValueTopMark( 9, 0);
+			ValueCheck	( 9, OpCode.Int);
+			ValueTopMark(14, 9);
+			ValueCheck	(14, (byte)2);
+			ValueCheck	(15, OpCode.Generic);
+			ValueTopMark(20, 0);
+			ValueCheck	(20, 1);
+			ValueCheck	(24, OpCode.Int);
+			ValueTopMark(29, 20);
+			ValueCheck	(29, OpCode.Call1);
+			ValueFinal	(34);
+
+			Rewrite(ValuesAt);
+
+			CodeCheck( 0, OpCode.Call1);
+			CodeCheck( 1, OpCode.Generic);
+			CodeCheck( 2, (byte)2);
+			CodeCheck( 3, OpCode.Identifier);
+			CodeCheck( 4, 0, "fn");
+			CodeCheck( 8, OpCode.Int);
+			CodeCheck( 9, OpCode.Int);
+			CodeCheck(10, 1);
 			CodeCheck(14);
 		}
 	}

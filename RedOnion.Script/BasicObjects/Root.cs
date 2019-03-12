@@ -7,6 +7,9 @@ namespace RedOnion.Script.BasicObjects
 {
 	public class Root : BasicObject, Engine.IRoot
 	{
+		public Dictionary<Type, IObject> TypeMap
+		{ get; } = new Dictionary<Type, IObject>();
+
 		public static Value Undefined { get; } = new Value();
 		public static Value Null { get; } = new Value(ValueKind.Object, null);
 		public static Value NaN { get; } = new Value(double.NaN);
@@ -16,24 +19,18 @@ namespace RedOnion.Script.BasicObjects
 		public ObjectFun Object { get; }
 		public StringFun String { get; }
 		public NumberFun Number { get; }
-
-		public Dictionary<Type, IObjectConverter>
-			TypeMap { get; } = new Dictionary<Type, IObjectConverter>();
-		public IObjectConverter this[Type type]
-		{
-			get
-			{
-				if (TypeMap.TryGetValue(type, out var value))
-					return value;
-				value = ReflectType(type);
-				if (value != null)
-					TypeMap[type] = value;
-				return value;
-			}
-			set => TypeMap[type] = value;
-		}
-		protected virtual IObjectConverter ReflectType(Type type)
-			=> new ReflectedObjects.ReflectedType(Engine, type);
+		public NumberFun Float { get; }
+		public NumberFun Double { get; }
+		public NumberFun Long { get; }
+		public NumberFun ULong { get; }
+		public NumberFun Int { get; }
+		public NumberFun UInt { get; }
+		public NumberFun Short { get; }
+		public NumberFun UShort { get; }
+		public NumberFun SByte { get; }
+		public NumberFun Byte { get; }
+		public NumberFun Bool { get; }
+		public NumberFun Char { get; }
 
 		public Root(Engine engine)
 			: base(engine, null, new Properties(), new Properties())
@@ -43,9 +40,21 @@ namespace RedOnion.Script.BasicObjects
 			var str = new StringObj(engine, obj);
 			var num = new NumberObj(engine, obj);
 			Function = new FunctionFun(engine, fun, fun);
-			Object = new ObjectFun(engine, fun, obj, this);
+			Object = new ObjectFun(engine, fun, obj);
 			String = new StringFun(engine, fun, str);
 			Number = new NumberFun(engine, fun, num);
+			Float = new NumberFun(engine, fun, num, typeof(float), ValueKind.Float);
+			Double = new NumberFun(engine, fun, num, typeof(double), ValueKind.Double);
+			Long = new NumberFun(engine, fun, num, typeof(long), ValueKind.Long);
+			ULong = new NumberFun(engine, fun, num, typeof(ulong), ValueKind.ULong);
+			Int = new NumberFun(engine, fun, num, typeof(int), ValueKind.Int);
+			UInt = new NumberFun(engine, fun, num, typeof(uint), ValueKind.UInt);
+			Short = new NumberFun(engine, fun, num, typeof(short), ValueKind.Short);
+			UShort = new NumberFun(engine, fun, num, typeof(ushort), ValueKind.UShort);
+			SByte = new NumberFun(engine, fun, num, typeof(sbyte), ValueKind.SByte);
+			Byte = new NumberFun(engine, fun, num, typeof(byte), ValueKind.Byte);
+			Bool = new NumberFun(engine, fun, num, typeof(bool), ValueKind.Bool);
+			Char = new NumberFun(engine, fun, num, typeof(char), ValueKind.Char);
 			Fill();
 		}
 
@@ -54,6 +63,7 @@ namespace RedOnion.Script.BasicObjects
 			BaseProps.Reset();
 			MoreProps.Reset();
 			TypeMap.Clear();
+			Fill();
 		}
 
 		protected virtual void Fill()
@@ -67,20 +77,30 @@ namespace RedOnion.Script.BasicObjects
 			BaseProps.Set("Object", new Value(Object));
 			BaseProps.Set("String", new Value(String));
 			BaseProps.Set("Number", new Value(Number));
+			BaseProps.Set("Float", new Value(Float));
+			MoreProps.Set("Single", new Value(Float));
+			BaseProps.Set("Double", new Value(Double));
+			BaseProps.Set("Long", new Value(Long));
+			MoreProps.Set("Int64", new Value(Long));
+			BaseProps.Set("ULong", new Value(ULong));
+			MoreProps.Set("UInt64", new Value(ULong));
+			BaseProps.Set("Int", new Value(Int));
+			MoreProps.Set("Int32", new Value(Int));
+			BaseProps.Set("UInt", new Value(UInt));
+			MoreProps.Set("UInt32", new Value(UInt));
+			BaseProps.Set("Short", new Value(Short));
+			MoreProps.Set("Int16", new Value(Short));
+			BaseProps.Set("UShort", new Value(UShort));
+			MoreProps.Set("UInt16", new Value(UShort));
+			BaseProps.Set("SByte", new Value(SByte));
+			MoreProps.Set("Int8", new Value(SByte));
+			BaseProps.Set("Byte", new Value(Byte));
+			MoreProps.Set("UInt8", new Value(Byte));
+			BaseProps.Set("Bool", new Value(Bool));
+			MoreProps.Set("Boolean", new Value(Bool));
+			BaseProps.Set("Char", new Value(Char));
 			TypeMap[typeof(string)] = String;
 		}
-
-		public void AddType(string name, Type type, IObjectAndConverter creator)
-		{
-			this[type] = creator;
-			Set(name, new Value(creator));
-		}
-		public void AddType(string name, ReflectedObjects.ReflectedType type)
-			=> AddType(name, type.Type, type);
-		public void AddType(string name, Type type)
-			=> AddType(name, new ReflectedObjects.ReflectedType(Engine, type));
-		public void AddType(Type type)
-			=> AddType(type.Name, type);
 
 		public IObject Box(Value value)
 		{
@@ -114,19 +134,83 @@ namespace RedOnion.Script.BasicObjects
 				args, body, scope == this ? null : scope);
 		}
 
-		public Value Get(OpCode op)
+		public IObject GetType(OpCode op)
 		{
-			return op == OpCode.Null ? new Value(Object) : Get(op.Text());
+			switch(op)
+			{
+			case OpCode.Null:
+			case OpCode.Object:
+				return Object;
+			case OpCode.String:
+				return String;
+			case OpCode.Byte:
+				return Byte;
+			case OpCode.UShort:
+				return UShort;
+			case OpCode.UInt:
+				return UInt;
+			case OpCode.ULong:
+				return ULong;
+			case OpCode.SByte:
+				return SByte;
+			case OpCode.Short:
+				return Short;
+			case OpCode.Int:
+				return Int;
+			case OpCode.Long:
+				return Long;
+			case OpCode.Float:
+				return Float;
+			case OpCode.Double:
+				return Double;
+			case OpCode.Bool:
+				return Bool;
+			case OpCode.Char:
+				return Char;
+			default:
+				return Number;
+			}
 		}
 
-		public Value Get(OpCode op, Value value)
+		public IObject GetType(OpCode op, Value value)
 		{
+			//TODO: array object
 			throw new NotImplementedException();
 		}
 
-		public Value Get(OpCode op, params Value[] par)
+		public IObject GetType(OpCode op, params Value[] par)
 		{
+			//TODO: multi-dimensional array
 			throw new NotImplementedException();
 		}
+
+		public IObject this[Type type]
+		{
+			get
+			{
+				if (TypeMap.TryGetValue(type, out var value))
+					return value;
+				value = ReflectType(type);
+				if (value != null)
+					TypeMap[type] = value;
+				return value;
+			}
+			set => TypeMap[type] = value;
+		}
+		protected virtual IObject ReflectType(Type type)
+			=> new ReflectedObjects.ReflectedType(Engine, type);
+
+		public void AddType(string name, Type type, IObject creator)
+		{
+			this[type] = creator;
+			Set(name, new Value(creator));
+		}
+		public void AddType(string name, ReflectedObjects.ReflectedType type)
+			=> AddType(name, type.Type, type);
+		public void AddType(string name, Type type)
+			=> AddType(name, type, ReflectType(type));
+		public void AddType(Type type)
+			=> AddType(type.Name, type, ReflectType(type));
+
 	}
 }

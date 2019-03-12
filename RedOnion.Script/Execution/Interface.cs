@@ -12,29 +12,37 @@ namespace RedOnion.Script
 	/// </summary>
 	/// <param name="engine">The engine to associate the object with</param>
 	/// <returns>The object</returns>
-	delegate IObject CreateObject(Engine engine);
+	public delegate IObject CreateObject(Engine engine);
 
-	/// <summary>
-	/// Can convert native objects into script object
-	/// (e.g. BasicObjects.StringFun)
-	/// </summary>
-	public interface IObjectConverter
+	[Flags]
+	public enum ObjectFeatures
 	{
-		IObject Convert(object value);
-	}
-
-	/// <summary>
-	/// Joined interface IObject also implementing IObjectConverter
-	/// </summary>
-	public interface IObjectAndConverter : IObject, IObjectConverter { }
-
-	/// <summary>
-	/// Script object holding reference to native object
-	/// (e.g. ReflectedObjects.ReflectedObject)
-	/// </summary>
-	public interface IObjectProxy
-	{
-		object Target { get; }
+		None = 0,
+		/// <summary>
+		/// Is function / does implement Call
+		/// </summary>
+		Function = 1 << 1,
+		/// <summary>
+		/// Is constructor / does implement Create
+		/// </summary>
+		Constructor = 1 << 2,
+		/// <summary>
+		/// Is collection (array, list, dictionary) / does implement Index
+		/// </summary>
+		Collection = 1 << 3,
+		/// <summary>
+		/// Can convert native objects into script object
+		/// (e.g. BasicObjects.StringFun, usually comes with Function flag)
+		/// </summary>
+		Converter = 1 << 4,
+		/// <summary>
+		/// Represents native type (usually comes with Contstructor flag)
+		/// </summary>
+		TypeReference = 1 << 5,
+		/// <summary>
+		/// Is proxy/wrapper of native object
+		/// </summary>
+		Proxy = 1 << 6
 	}
 
 	/// <summary>
@@ -53,6 +61,19 @@ namespace RedOnion.Script
 		/// </summary>
 		/// <returns>False if not set (e.g. read-only)</returns>
 		bool Set(IObject self, Value value);
+
+	}
+
+	/// <summary>
+	/// Enhanced property interface (single property with custom access methods)
+	/// </summary>
+	/// <remarks>Can only be hosted in read-only properties (not in dynamic)</remarks>
+	public interface IPropertyEx: IProperty
+	{
+		/// <summary>
+		/// Modify the value of this property (compound assignment)
+		/// </summary>
+		bool Modify(IObject self, OpCode op, Value value);
 	}
 
 	/// <summary>
@@ -137,6 +158,18 @@ namespace RedOnion.Script
 		}
 
 		/// <summary>
+		/// Modify the value of specified property (compound assignment)
+		/// </summary>
+		public bool Modify(string name, OpCode op, Value value)
+		{
+			if (!TryGetValue(name, out var left))
+				return false;
+			left.Modify(op, value);
+			this[name] = left;
+			return true;
+		}
+
+		/// <summary>
 		/// Delete the specified property
 		/// </summary>
 		public bool Delete(string name)
@@ -177,6 +210,11 @@ namespace RedOnion.Script
 		/// </summary>
 		Engine Engine { get; }
 		/// <summary>
+		/// Feature flags
+		/// </summary>
+		ObjectFeatures Features { get; }
+
+		/// <summary>
 		/// Base class (to search properties in this object next)
 		/// </summary>
 		IObject BaseClass { get; }
@@ -189,10 +227,6 @@ namespace RedOnion.Script
 		/// </summary>
 		IProperties MoreProps { get; }
 		/// <summary>
-		/// Contained value (if any)
-		/// </summary>
-		Value Value { get; }
-		/// <summary>
 		/// Find the object containing the property
 		/// </summary>
 		/// <remarks>
@@ -200,9 +234,26 @@ namespace RedOnion.Script
 		/// It may be removed in the future - we only need Has and even that is questionable.
 		/// </remarks>
 		IObject Which(string name);
+		/// <summary>
+		/// Modify the value of specified property (compound assignment)
+		/// </summary>
+		bool Modify(string name, OpCode op, Value value);
 
 		/// <summary>
-		/// Execute regular function call
+		/// Contained value (if any)
+		/// </summary>
+		Value Value { get; }
+		/// <summary>
+		/// Referenced type (if any). Features.TypeReference
+		/// </summary>
+		Type Type { get; }
+		/// <summary>
+		/// Referenced native object (if any). Features.Proxy
+		/// </summary>
+		object Target { get; }
+
+		/// <summary>
+		/// Execute regular function call. Features.Function
 		/// </summary>
 		/// <param name="self">The object to call it on (as method if not null)</param>
 		/// <param name="argc">number of arguments (pass to Arg method)</param>
@@ -210,19 +261,24 @@ namespace RedOnion.Script
 		Value Call(IObject self, int argc);
 
 		/// <summary>
-		/// Execute constructor ('new' used)
+		/// Execute constructor ('new' used). Features.Constructor
 		/// </summary>
 		/// <param name="argc">Number of arguments (pass to Arg method)</param>
 		/// <returns>The new object (or null if not supported)</returns>
 		IObject Create(int argc);
 
 		/// <summary>
-		/// Get propertu/value (reference) at the indexes
+		/// Get property/value (reference) at the indexes. Features.Collection
 		/// </summary>
 		/// <remarks>
 		/// Default implementation treats x[y, z] as x[y][z],
 		/// but redirecting to Call may be valid as well
 		/// </remarks>
 		Value Index(IObject self, int argc);
+
+		/// <summary>
+		/// Convert native object into script object Features.Converter
+		/// </summary>
+		IObject Convert(object value);
 	}
 }

@@ -112,42 +112,43 @@ namespace RedOnion.ScriptNUnit
 			Assert.AreEqual("done", StaticClass.str);
 		}
 
-		public struct Rect
+		public static class GenericTest
 		{
-			public float X, Y, Width, Height;
-			public float Left { get => X; set => X = value; }
-			public float Right { get => X+Width; set => Width = value-X; }
-			public float Top { get => Y; set => Y = value; }
-			public float Bottom { get => Y+Height; set => Height = value-Y; }
-			public Rect(float x, float y, float w, float h)
-			{
-				X = x; Y = y; Width = w; Height = h;
-			}
+			public static T Pass<T>(T value) => value;
 		}
-		public delegate Rect WindowFunction(int id);
-		public class UnknownClass {}
-		public class KnownClass {}
-		public static class Test06
+		[Test]
+		public void StaticReflection_06_GenericFunction()
 		{
-			public static Rect Window(int id, Rect rc, WindowFunction fn, string title) => rc;
-			public static Rect Window(int id, Rect rc, WindowFunction fn, string title, KnownClass known) => rc;
-			public static Rect Window(int id, Rect rc, WindowFunction fn, UnknownClass unknown) => rc;
-			public static Rect Window(int id, Rect rc, WindowFunction fn, UnknownClass unknown, KnownClass known) => rc;
+			Root.Set("test", new Value(new ReflectedType(this,
+				typeof(GenericTest))));
+			Test(1, "test.pass 1");
+			Test(2u, "test.pass.[uint] 2");
 		}
 
-		[Test]
-		public void StaticReflection_06_Complex()
+		public static class EventTest
 		{
-			Root.Set("GUI", new Value(new ReflectedType(this,
-				typeof(Test06))));
-			Test(
-				"rc = new rect 10,40,200,300\n" +
-				"title = \"ROS Test Window\"\n" +
-				"function onGUI\n" +
-				" rc = GUI.window 0, rc, testWindow, title\n" +
-				"function testWindow id\n" +
-				" return");
-			Test("onGUI()");
- 		}
+			public static event Action action;
+			public static void DoAction() => action?.Invoke();
+			public static void AddAction(Action a) => action += a;
+			public static void RemoveAction(Action a) => action -= a;
+			public static int NumberOfActions => action?.GetInvocationList().Length ?? 0;
+		}
+		[Test]
+		public void StaticReflection_07_Events()
+		{
+			Root.Set("test", new Value(new ReflectedType(this,
+				typeof(EventTest))));
+			Test("var counter = 0");
+			Test("function action\n\tcounter++");
+			Test(0, "test.numberOfActions");
+			Test("test.addAction action");
+			Test(1, "test.numberOfActions");
+			Test("test.doAction()");
+			Test(1, "counter");
+			Test("test.removeAction action"); // see FunctionObj.GetDelegate/DelegateCache
+			Test(0, "test.numberOfActions");
+			Test("test.action += action");
+			Test(1, "test.numberOfActions");
+		}
 	}
 }

@@ -63,8 +63,8 @@ namespace RedOnion.Script.Parsing
 					unary = false;
 					goto next;
 				case OpCode.Generic:
-					if (unary) // maybe throw, but we leave it here for possible future extensions
-						break;
+					if (unary)
+						throw new ParseError(lexer, "Unexpected '.[' - nothing to specialize");
 					if (Next().lexer.Curr != ']')
 					{
 						for (;;)

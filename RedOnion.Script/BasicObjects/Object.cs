@@ -16,14 +16,9 @@ namespace RedOnion.Script.BasicObjects
 		/// </summary>
 		public IObject Prototype { get; }
 
-		public Engine.IRoot Root { get; }
-
-		public ObjectFun(Engine engine, IObject baseClass, IObject prototype, Engine.IRoot root)
+		public ObjectFun(Engine engine, IObject baseClass, IObject prototype)
 			: base(engine, baseClass, new Properties("prototype", prototype))
-		{
-			Prototype = prototype;
-			Root = root;
-		}
+			=> Prototype = prototype;
 
 		public override Value Call(IObject self, int argc)
 			=> new Value(Create(argc));
@@ -32,7 +27,7 @@ namespace RedOnion.Script.BasicObjects
 		{
 			if (argc == 0)
 				return new BasicObject(Engine, Prototype);
-			return Root.Box(Arg(argc));
+			return Engine.Root.Box(Arg(argc));
 		}
 	}
 
@@ -68,7 +63,12 @@ namespace RedOnion.Script.BasicObjects
 		public IProperties MoreProps { get; protected set; }
 
 		public virtual Value Value
-			=> new Value("[internal]");
+			=> new Value(GetType().FullName);
+		public virtual ObjectFeatures Features
+			=> ObjectFeatures.Collection;
+		public virtual Type Type => null;
+		public virtual object Target => null;
+		public virtual IObject Convert(object value) => null;
 
 		/// <summary>
 		/// Create empty object with no base class
@@ -171,10 +171,7 @@ namespace RedOnion.Script.BasicObjects
 				if (props != null && props.Get(name, out query))
 				{
 					if (query.Type == ValueKind.Property)
-					{
-						((IProperty)query.ptr).Set(obj, value);
-						return true;
-					}
+						return ((IProperty)query.ptr).Set(obj, value);
 					if (obj == this)
 						return false;
 					break;
@@ -190,6 +187,38 @@ namespace RedOnion.Script.BasicObjects
 			return MoreProps.Set(name, value);
 		}
 
+		public virtual bool Modify(string name, OpCode op, Value value)
+		{
+			IProperties props;
+			Value query;
+			for (IObject obj = this; ;)
+			{
+				props = obj.BaseProps;
+				if (props != null && props.Get(name, out query))
+				{
+					if (query.Type == ValueKind.Property)
+					{
+						var prop = (IProperty)query.ptr;
+						if (prop is IPropertyEx ex)
+							return ex.Modify(this, op, value);
+						var tmp = prop.Get(this);
+						tmp.Modify(op, value);
+						return prop.Set(this, tmp);
+					}
+					return false;
+				}
+				props = obj.MoreProps;
+				if (props != null && props.Get(name, out query))
+				{
+					query.Modify(op, value);
+					return props.Set(name, query);
+				}
+				if ((obj = obj.BaseClass) == null)
+					return false;
+			}
+		}
+
+
 		public bool Delete(string name)
 			=> MoreProps == null ? false : MoreProps.Delete(name);
 
@@ -197,10 +226,18 @@ namespace RedOnion.Script.BasicObjects
 			=> MoreProps = null;
 
 		public virtual Value Call(IObject self, int argc)
-			=> new Value();
+		{
+			if (!Engine.HasOption(Engine.Option.Silent))
+				throw new NotImplementedException(GetType().FullName + " is not a function");
+			return new Value();
+		}
 
 		public virtual IObject Create(int argc)
-			=> null;
+		{
+			if (!Engine.HasOption(Engine.Option.Silent))
+				throw new NotImplementedException(GetType().FullName + " is not a constructor");
+			return null;
+		}
 
 		public virtual Value Index(IObject self, int argc)
 		{

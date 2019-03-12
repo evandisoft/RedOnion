@@ -14,7 +14,7 @@ namespace RedOnion.Script
 			{
 				if (op == OpCode.Null || (byte)op >= OpCode.String.Code())
 				{
-					Value = Root.Get(op);
+					Value = new Value(Root.GetType(op));
 					return;
 				}
 				if (op == OpCode.Identifier)
@@ -30,7 +30,13 @@ namespace RedOnion.Script
 				if (Code[at++] != 0)
 					throw new NotImplementedException("Fixed and multi-dimensional arrays not implemented");
 				TypeReference(ref at);
-				Value = Root.Get(OpCode.Array, Value);
+				Value = new Value(Root.GetType(OpCode.Array, Value));
+				return;
+			}
+			if (op == OpCode.Dot)
+			{
+				Expression(ref at);
+				Value = new Value(Box(Value), Strings[CodeInt(ref at)]);
 				return;
 			}
 			throw new NotImplementedException();
@@ -64,6 +70,17 @@ namespace RedOnion.Script
 				return;
 			case OpCode.String:
 				Value = Strings[CodeInt(ref at)];
+				return;
+			case OpCode.Char:
+				Value = (char)Code[at++];
+				return;
+			case OpCode.WideChar:
+				Value = (char)CodeUShort(ref at);
+				return;
+			case OpCode.LongChar:
+				var ch1 = (char)CodeUShort(ref at);
+				var ch2 = (char)CodeUShort(ref at);
+				Value = new string(ch1, ch2);
 				return;
 			case OpCode.Byte:
 				Value = Code[at++];
@@ -108,7 +125,7 @@ namespace RedOnion.Script
 			case OpCode.Create:
 				create = true;
 				op = ((OpCode)Code[at]).Extend();
-				if (op.Kind() == OpKind.Special && (byte)op < OpCode.Generic.Code())
+				if (op.Kind() == OpKind.Special && (byte)op < OpCode.Dot.Code())
 				{
 					at++;
 					goto next;
@@ -116,11 +133,16 @@ namespace RedOnion.Script
 				goto case OpCode.Call0;
 			case OpCode.Call0:
 				CountStatement();
+				IObject self = null;
 				if (create)
 					TypeReference(ref at);
-				else
+				else if (Code[at] != OpCode.Generic.Code())
 					Expression(ref at);
-				IObject self = null;
+				else
+				{
+					at++;
+					self = Generic(ref at);
+				}
 				if (Value.Type == ValueKind.Reference)
 				{
 					self = Value.ptr as IObject;
@@ -131,11 +153,16 @@ namespace RedOnion.Script
 				return;
 			case OpCode.Call1:
 				CountStatement();
+				self = null;
 				if (create)
 					TypeReference(ref at);
-				else
+				else if (Code[at] != OpCode.Generic.Code())
 					Expression(ref at);
-				self = null;
+				else
+				{
+					at++;
+					self = Generic(ref at);
+				}
 				if (Value.Type == ValueKind.Reference)
 				{
 					self = Value.ptr as IObject;
@@ -149,11 +176,16 @@ namespace RedOnion.Script
 				return;
 			case OpCode.Call2:
 				CountStatement();
+				self = null;
 				if (create)
 					TypeReference(ref at);
-				else
+				else if (Code[at] != OpCode.Generic.Code())
 					Expression(ref at);
-				self = null;
+				else
+				{
+					at++;
+					self = Generic(ref at);
+				}
 				if (Value.Type == ValueKind.Reference)
 				{
 					self = Value.ptr as IObject;
@@ -170,11 +202,16 @@ namespace RedOnion.Script
 			case OpCode.CallN:
 				CountStatement();
 				int n = Code[at++];
+				self = null;
 				if (create)
 					TypeReference(ref at);
-				else
+				else if (Code[at] != OpCode.Generic.Code())
 					Expression(ref at);
-				self = null;
+				else
+				{
+					at++;
+					self = Generic(ref at);
+				}
 				if (Value.Type == ValueKind.Reference)
 				{
 					self = Value.ptr as IObject;
@@ -254,6 +291,73 @@ namespace RedOnion.Script
 			}
 			throw new NotImplementedException();
 		}
+		private IObject Generic(ref int at)
+		{
+			int n = Code[at++];
+			if (n != 2)
+				throw new NotImplementedException("Generic with more than one parameter");
+			Expression(ref at);
+			IObject self = null;
+			if (Value.Type == ValueKind.Reference)
+			{
+				self = Value.ptr as IObject;
+				Value = ((IProperties)Value.ptr).Get(Value.str);
+			}
+			var fn = Box(Value);
+			TypeReference(ref at);
+			var gtype = Value.Object;
+			if (gtype == null || (gtype.Features & ObjectFeatures.TypeReference) == 0)
+				throw new NotImplementedException("Could not resolve generic argument");
+			//TODO: use some interface for this
+			if (fn is ReflectedObjects.ReflectedFunction rfn)
+			{
+				foreach (var method in rfn.Methods)
+				{
+					if (!method.IsGenericMethod)
+						continue;
+					var gargs = method.GetGenericArguments();
+					if (gargs.Length != 1)
+						continue;
+					try
+					{
+						var mtd = method.MakeGenericMethod(gtype.Type);
+						Value = new Value(new ReflectedObjects.ReflectedFunction(
+							this, rfn.Creator, rfn.Name, mtd));
+						return self;
+					}
+					catch
+					{
+						continue;
+					}
+				}
+				throw new NotImplementedException("Did not find suitable generic function");
+			}
+			else if (fn is ReflectedObjects.ReflectedMethod mtd)
+			{
+				foreach (var method in mtd.Methods)
+				{
+					if (!method.IsGenericMethod)
+						continue;
+					var gargs = method.GetGenericArguments();
+					if (gargs.Length != 1)
+						continue;
+					try
+					{
+						var mtd2 = method.MakeGenericMethod(gtype.Type);
+						Value = new Value(new ReflectedObjects.ReflectedMethod(
+							this, mtd.Creator, mtd.Name, mtd2));
+						return self;
+					}
+					catch
+					{
+						continue;
+					}
+				}
+				throw new NotImplementedException("Did not find suitable generic function");
+			}
+			throw new NotImplementedException("Unknown type for specialization: "
+				+ (fn?.GetType().Name ?? "null"));
+		}
 
 		protected override void Binary(OpCode op, ref int at)
 		{
@@ -278,82 +382,35 @@ namespace RedOnion.Script
 				left.Set(Value);
 				return;
 			case OpCode.OrAssign:
-				left.Set(Value = left | Value);
-				return;
 			case OpCode.XorAssign:
-				left.Set(Value = left ^ Value);
-				return;
 			case OpCode.AndAssign:
-				left.Set(Value = left & Value);
-				return;
 			case OpCode.LshAssign:
-				left.Set(Value = left.ShiftLeft(Value));
-				return;
 			case OpCode.RshAssign:
-				left.Set(Value = left.ShiftRight(Value));
-				return;
 			case OpCode.AddAssign:
-				left.Set(Value = left + Value);
-				return;
 			case OpCode.SubAssign:
-				left.Set(Value = left - Value);
-				return;
 			case OpCode.MulAssign:
-				left.Set(Value = left * Value);
-				return;
 			case OpCode.DivAssign:
-				left.Set(Value = left / Value);
-				return;
 			case OpCode.ModAssign:
-				left.Set(Value = left % Value);
+				left.Modify(op, Value);
+				Value = left;
 				return;
 			case OpCode.BitOr:
-				Value = left | Value;
-				return;
 			case OpCode.BitXor:
-				Value = left ^ Value;
-				return;
 			case OpCode.BitAnd:
-				Value = left & Value;
-				return;
 			case OpCode.ShiftLeft:
-				Value = left.ShiftLeft(Value);
-				return;
 			case OpCode.ShiftRight:
-				Value = left.ShiftRight(Value);
-				return;
 			case OpCode.Add:
-				Value = left + Value;
-				return;
 			case OpCode.Sub:
-				Value = left - Value;
-				return;
 			case OpCode.Mul:
-				Value = left * Value;
-				return;
 			case OpCode.Div:
-				Value = left / Value;
-				return;
 			case OpCode.Mod:
-				Value = left % Value;
-				return;
 			case OpCode.Equals:
-				Value = new Value(left == Value);
-				return;
 			case OpCode.Differ:
-				Value = new Value(left != Value);
-				return;
 			case OpCode.Less:
-				Value = new Value(left < Value);
-				return;
 			case OpCode.More:
-				Value = new Value(left > Value);
-				return;
 			case OpCode.LessEq:
-				Value = new Value(left <= Value);
-				return;
 			case OpCode.MoreEq:
-				Value = new Value(left >= Value);
+				Value = left.Binary(op, Value);
 				return;
 			}
 			throw new NotImplementedException();

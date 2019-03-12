@@ -32,7 +32,12 @@ namespace RedOnion.Script.BasicObjects
 		public IProperties MoreProps => null;
 
 		public virtual Value Value
-			=> new Value("[internal]");
+			=> new Value(GetType().FullName);
+		public virtual ObjectFeatures Features
+			=> ObjectFeatures.None;
+		public virtual Type Type => null;
+		public virtual object Target => null;
+		public virtual IObject Convert(object value) => null;
 
 		/// <summary>
 		/// Create object with some base properties
@@ -86,6 +91,22 @@ namespace RedOnion.Script.BasicObjects
 				return false;
 			((IProperty)query.ptr).Set(this, value);
 			return true;
+		}
+
+		public virtual bool Modify(string name, OpCode op, Value value)
+		{
+			if (BaseProps == null)
+				return false;
+			if (!BaseProps.Get(name, out var query))
+				return false;
+			if (query.Type != ValueKind.Property)
+				return false;
+			var prop = (IProperty)query.ptr;
+			if (prop is IPropertyEx ex)
+				return ex.Modify(this, op, value);
+			var tmp = prop.Get(this);
+			tmp.Modify(op, value);
+			return prop.Set(this, tmp);
 		}
 
 		public bool Delete(string name)

@@ -27,6 +27,15 @@ namespace RedOnion.Script
 		/// </summary>
 		public byte[] Code { get; protected set; }
 
+		public virtual void Log(string msg) { }
+		public void Log(string msg, params object[] args)
+			=> Log(string.Format(msg, args));
+		[Conditional("DEBUG")]
+		public void DebugLog(string msg) => Log(msg);
+		[Conditional("DEBUG")]
+		public void DebugLog(string msg, params object[] args)
+			=> Log(string.Format(msg, args));
+
 		/// <summary>
 		/// Run script
 		/// </summary>

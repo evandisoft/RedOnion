@@ -2,8 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
+using System.Linq.Expressions;
 using RedOnion.Script.Parsing;
+using RedOnion.Script.ReflectedObjects;
 
 namespace RedOnion.Script.BasicObjects
 {
@@ -16,6 +17,9 @@ namespace RedOnion.Script.BasicObjects
 		/// Prototype of all function objects
 		/// </summary>
 		public FunctionObj Prototype { get; }
+
+		public override ObjectFeatures Features
+			=> ObjectFeatures.Function | ObjectFeatures.Constructor;
 
 		public FunctionFun(Engine engine, IObject baseClass, FunctionObj prototype)
 			: base(engine, baseClass, new Properties("prototype", prototype))
@@ -132,6 +136,9 @@ namespace RedOnion.Script.BasicObjects
 		/// </summary>
 		public IObject Scope { get; protected set; }
 
+		public override ObjectFeatures Features
+			=> ObjectFeatures.Function | ObjectFeatures.Constructor;
+
 		/// <summary>
 		/// Create Function.prototype
 		/// </summary>
@@ -198,5 +205,66 @@ namespace RedOnion.Script.BasicObjects
 		}
 
 		public static Properties StdProps { get; } = new Properties();
+
+		private Dictionary<Type, Delegate> DelegateCache;
+		public Delegate GetDelegate(Type type)
+		{
+			if (DelegateCache != null && DelegateCache.TryGetValue(type, out var value))
+				return value;
+			var invoke = type.GetMethod("Invoke");
+			var mipars = invoke.GetParameters();
+			var fnargs = new ParameterExpression[mipars.Length];
+			for (int j = 0; j < mipars.Length; j++)
+				fnargs[j] = Expression.Parameter(mipars[j].ParameterType, ArgName(j));
+			var chargs = new Expression[mipars.Length];
+			for (int j = 0; j < mipars.Length; j++)
+				chargs[j] = Expression.Convert(fnargs[j], typeof(object));
+			// (x, y, ...) => FunctionCallHelper<T>(fn, new object[] { x, y, ... })
+			var lambda = Expression.Call(
+				invoke.ReturnType == typeof(void)
+				? typeof(FunctionObj).GetMethod("ActionCallHelper")
+				: typeof(FunctionObj).GetMethod("FunctionCallHelper")
+				.MakeGenericMethod(invoke.ReturnType),
+				Expression.Constant(this),
+				Expression.NewArrayInit(typeof(object), chargs));
+			var it = Expression.Lambda(type, lambda, fnargs).Compile();
+			if (DelegateCache == null)
+				DelegateCache = new Dictionary<Type, Delegate>();
+			DelegateCache[type] = it;
+			return it;
+		}
+
+		public static void ActionCallHelper(FunctionObj fn, params object[] args)
+		{
+			var engine = fn.Engine;
+			var engargs = engine.Args;
+			var startLength = engargs.Length;
+			try
+			{
+				foreach (var arg in args)
+					engargs.Add(ReflectedType.Convert(engine, arg));
+				fn.Call(null, args.Length);
+			}
+			finally
+			{
+				engargs.Remove(engargs.Length - startLength);
+			}
+		}
+		public static T FunctionCallHelper<T>(FunctionObj fn, params object[] args)
+		{
+			var engine = fn.Engine;
+			var engargs = engine.Args;
+			var startLength = engargs.Length;
+			try
+			{
+				foreach (var arg in args)
+					engargs.Add(ReflectedType.Convert(engine, arg));
+				return ReflectedType.Convert<T>(fn.Call(null, args.Length));
+			}
+			finally
+			{
+				engargs.Remove(engargs.Length - startLength);
+			}
+		}
 	}
 }

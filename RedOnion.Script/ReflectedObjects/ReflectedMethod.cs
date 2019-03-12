@@ -13,7 +13,11 @@ namespace RedOnion.Script.ReflectedObjects
 		/// <summary>
 		/// Class/type this function belongs to (may be null)
 		/// </summary>
-		public Type Type { get; }
+		public override Type Type => _type;
+		private Type _type;
+
+		public override ObjectFeatures Features
+			=> ObjectFeatures.Function;
 
 		/// <summary>
 		/// Method name
@@ -23,15 +27,15 @@ namespace RedOnion.Script.ReflectedObjects
 		/// <summary>
 		/// Discovered methods with same name
 		/// </summary>
-		protected MethodInfo[] Methods { get; }
+		protected internal MethodInfo[] Methods { get; }
 
 		public ReflectedMethod(
 			Engine engine, ReflectedType creator,
-			string name, MethodInfo[] methods)
+			string name, params MethodInfo[] methods)
 			: base(engine, null)
 		{
 			Creator = creator;
-			Type = creator?.Type;
+			_type = creator?.Type;
 			Name = name;
 			Methods = methods;
 		}
@@ -39,18 +43,30 @@ namespace RedOnion.Script.ReflectedObjects
 		public override Value Call(IObject self, int argc)
 		{
 			var result = new Value();
-			if (self is IObjectProxy proxy)
+			if (self == null || (self.Features & ObjectFeatures.Proxy) == 0)
 			{
-				var target = proxy.Target;
-				if (target == null)
-					goto finish;
-				if (Type != null && !Type.IsAssignableFrom(target.GetType()))
-					goto finish;
-				foreach (MethodInfo method in Methods)
-					if (TryCall(Engine, method, target, argc, ref result))
-						return result;
+				if (!Engine.HasOption(Engine.Option.Silent))
+					throw new InvalidOperationException("Called "
+						+ (Type == null ? Name : Type.Name + "." + Name)
+						+ " without native self");
+				return result;
 			}
-		finish:
+			var target = self.Target;
+			if (target == null || (Type != null && !Type.IsAssignableFrom(target.GetType())))
+			{
+				if (!Engine.HasOption(Engine.Option.Silent))
+					throw new InvalidOperationException("Called "
+						+ (Type == null ? Name : Type.Name + "." + Name)
+						+ " without proper self");
+				return result;
+			}
+			foreach (MethodInfo method in Methods)
+				if (TryCall(Engine, method, target, argc, ref result))
+					return result;
+			if (!Engine.HasOption(Engine.Option.Silent))
+				throw new InvalidOperationException("Could not call "
+					+ (Type == null ? Name : Type.Name + "." + Name)
+					+ ", " + Methods.Length + " candidates");
 			return result;
 		}
 
