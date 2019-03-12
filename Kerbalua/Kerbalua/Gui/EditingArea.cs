@@ -141,6 +141,24 @@ namespace Kerbalua.Gui {
 
 		void InitializeDefaultKeyBindings()
 		{
+			KeyBindings.Add(new EventKey(KeyCode.Home, true,true), () => {
+				editor.SelectTextStart();
+			});
+			KeyBindings.Add(new EventKey(KeyCode.End, true,true), () => {
+				editor.SelectTextEnd();
+			});
+			KeyBindings.Add(new EventKey(KeyCode.Home, true), () => {
+				editor.MoveTextStart();
+			});
+			KeyBindings.Add(new EventKey(KeyCode.End, true), () => {
+				editor.MoveTextEnd();
+			});
+			KeyBindings.Add(new EventKey(KeyCode.Insert, true), () => {
+				editor.Copy();
+			});
+			KeyBindings.Add(new EventKey(KeyCode.Insert, false,true), () => {
+				editor.Paste();
+			});
 			KeyBindings.Add(new EventKey(KeyCode.Tab), () => Indent());
 			KeyBindings.Add(new EventKey(KeyCode.Tab, false, true), () => Unindent());
 			KeyBindings.Add(new EventKey(KeyCode.Tab, true), () => IndentToPreviousLine());
