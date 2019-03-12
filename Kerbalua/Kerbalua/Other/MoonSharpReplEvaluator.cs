@@ -19,7 +19,7 @@ namespace Kerbalua.Other
 			scriptEngine = new SimpleScript(coreModules);
 		}
 
-		public override string Evaluate(string source)
+		protected override string ProtectedEvaluate(string source)
 		{
 			string output="";
 			DynValue result;

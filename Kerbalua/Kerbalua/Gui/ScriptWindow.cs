@@ -133,6 +133,19 @@ namespace Kerbalua.Gui {
 
 		void InitializeKeyBindings()
 		{
+			repl.inputBox.KeyBindings.Add(new EventKey(KeyCode.LeftBracket, true), () => {
+				//Debug.Log("history up");
+				repl.inputBox.content.text = currentReplEvaluator.HistoryUp();
+				repl.inputBox.selectIndex = repl.inputBox.content.text.Length;
+				repl.inputBox.cursorIndex = repl.inputBox.content.text.Length;
+			});
+			repl.inputBox.KeyBindings.Add(new EventKey(KeyCode.Quote, true), () => {
+				//Debug.Log("history down");
+				repl.inputBox.content.text = currentReplEvaluator.HistoryDown();
+				repl.inputBox.selectIndex = repl.inputBox.content.text.Length;
+				repl.inputBox.cursorIndex = repl.inputBox.content.text.Length;
+			});
+
 			GlobalKeyBindings.Add(new EventKey(KeyCode.U, true), () => editor.GrabFocus());
 			GlobalKeyBindings.Add(new EventKey(KeyCode.I, true), () => scriptIOTextArea.GrabFocus());
 			GlobalKeyBindings.Add(new EventKey(KeyCode.O, true), () => repl.inputBox.GrabFocus());
@@ -153,7 +166,7 @@ namespace Kerbalua.Gui {
 				repl.outputBox.content.text += currentReplEvaluator.Evaluate(repl.inputBox.content.text);
 			});
 			repl.inputBox.KeyBindings.Add(new EventKey(KeyCode.Return), () => {
-				repl.outputBox.content.text += currentReplEvaluator.Evaluate(repl.inputBox.content.text);
+				repl.outputBox.content.text += currentReplEvaluator.Evaluate(repl.inputBox.content.text,true);
 				repl.inputBox.content.text = "";
 				completionBox.content.text = "";
 			});

@@ -40,7 +40,7 @@ namespace Kerbalua.Other {
 			}
 		}
 
-		public override string Evaluate(string source)
+		protected override string ProtectedEvaluate(string source)
 		{
 			string output = "";
 			try {
