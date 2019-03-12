@@ -62,6 +62,7 @@ namespace Kerbalua.Gui {
 		/// </summary>
 		protected abstract void ProtectedUpdate();
 
+		protected bool hadKeyDownThisUpdate = false;
 		/// <summary>
 		/// Any processing that is to occur before/after any ProtectedUpdate
 		/// from any subclass code should go here.
@@ -73,12 +74,12 @@ namespace Kerbalua.Gui {
 			style = param_style;
 
 			ClearMarkedCharEvent();
-			bool wasKeyDown = Event.current.type == EventType.KeyDown;
+			hadKeyDownThisUpdate = Event.current.type == EventType.KeyDown;
 
 			if(Visible) GUI.SetNextControlName(ControlName);
 			protectedUpdate.Invoke();
 
-			ReceivedInput = wasKeyDown && Event.current.type == EventType.Used;
+			ReceivedInput = hadKeyDownThisUpdate && Event.current.type == EventType.Used;
 		}
 
 		/// <summary>

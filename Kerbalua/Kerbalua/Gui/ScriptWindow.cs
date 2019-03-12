@@ -99,6 +99,7 @@ namespace Kerbalua.Gui {
 				150,
 				param_mainWindowRect.height - titleHeight
 				);
+
 			widgetBarRect.x = editorRect.width;
 			replRect.x = widgetBarRect.x + widgetBarRect.width;
 			completionBoxRect.x = replRect.x + replRect.width;
