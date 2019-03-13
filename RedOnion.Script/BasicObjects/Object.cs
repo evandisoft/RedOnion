@@ -39,13 +39,18 @@ namespace RedOnion.Script.BasicObjects
 	/// and also accessed by indexing (by name)
 	/// which can be used like string-keyed dictionary.
 	/// </remarks>
-	[DebuggerDisplay("{GetType().Name}")]
+	[DebuggerDisplay("{Name}")]
 	public class BasicObject : IObject
 	{
 		/// <summary>
 		/// Engine this object belongs to
 		/// </summary>
 		public IEngine Engine { get; }
+
+		/// <summary>
+		/// Name of the object (or full name of the type)
+		/// </summary>
+		public virtual string Name => GetType().FullName;
 
 		/// <summary>
 		/// Base class (to search properties in this object next)

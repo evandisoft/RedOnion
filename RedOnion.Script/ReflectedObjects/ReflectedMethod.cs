@@ -22,7 +22,7 @@ namespace RedOnion.Script.ReflectedObjects
 		/// <summary>
 		/// Method name
 		/// </summary>
-		public string Name { get; }
+		public override string Name { get; }
 
 		/// <summary>
 		/// Discovered methods with same name

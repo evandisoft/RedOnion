@@ -19,7 +19,7 @@ namespace RedOnion.Script
 				}
 				if (op == OpCode.Identifier)
 				{
-					Value = Ctx.Get(Strings[CodeInt(ref at)]);
+					Value = Context.Get(Strings[CodeInt(ref at)]);
 					return;
 				}
 				Value = new Value();
@@ -36,7 +36,12 @@ namespace RedOnion.Script
 			if (op == OpCode.Dot)
 			{
 				Expression(ref at);
-				Value = new Value(Box(Value), Strings[CodeInt(ref at)]);
+				var obj = Box(Value);
+				if (obj != null)
+					Value = new Value(obj, Strings[CodeInt(ref at)]);
+				else if (HasOption(EngineOption.Silent))
+					Value = new Value();
+				else throw new InvalidOperationException("Null cannot be dereferenced");
 				return;
 			}
 			throw new NotImplementedException();
@@ -59,14 +64,23 @@ namespace RedOnion.Script
 				Value = true;
 				return;
 			case OpCode.This:
-				Value = new Value(Ctx.Self);
+				Value = new Value(Context.Self);
 				return;
 			case OpCode.Base:
-				Value = new Value(Ctx.Self?.BaseClass);
+				Value = new Value(Context.Self?.BaseClass);
 				return;
 			case OpCode.Identifier:
 				var name = Strings[CodeInt(ref at)];
-				Value = new Value(ValueKind.Reference, Ctx.Which(name) ?? Ctx.Root, name);
+				var which = Context.Which(name);
+				if (which == null && HasOption(EngineOption.Strict))
+				{
+					if (!HasOption(EngineOption.Silent))
+						throw new InvalidOperationException(string.Format(
+							"Variable {0} does not exist", name));
+					Value = new Value();
+					return;
+				}
+				Value = new Value(ValueKind.Reference, which ?? Context.Root, name);
 				return;
 			case OpCode.String:
 				Value = Strings[CodeInt(ref at)];
@@ -148,6 +162,8 @@ namespace RedOnion.Script
 					self = Value.ptr as IObject;
 					Value = ((IProperties)Value.ptr).Get(Value.str);
 				}
+				if (self == Root && HasOption(EngineOption.Strict))
+					self = null;
 				var fn = Box(Value);
 				Value = create ? new Value(fn.Create(0)) : fn.Call(self, 0);
 				return;
@@ -254,7 +270,7 @@ namespace RedOnion.Script
 				if (Value.Type == ValueKind.Undefined)
 				{
 					Expression(ref at);
-					Ctx.Vars.Set(name, Value);
+					Context.Vars.Set(name, Value);
 					return;
 				}
 				CountStatement();
@@ -263,13 +279,17 @@ namespace RedOnion.Script
 				Arguments.Add(Result);
 				Value = fn.Call(null, 1);
 				Arguments.Remove(1);
-				Ctx.Vars.Set(name, Value);
+				Context.Vars.Set(name, Value);
 				return;
 			case OpCode.Dot:
 				Expression(ref at);
 				fn = Box(Value);
 				name = Strings[CodeInt(ref at)];
-				Value = new Value(fn, name);
+				if (fn != null)
+					Value = new Value(fn, name);
+				else if (HasOption(EngineOption.Silent))
+					Value = new Value();
+				else throw new InvalidOperationException("Null cannot be dereferenced");
 				return;
 			case OpCode.Ternary:
 				Expression(ref at);
@@ -379,8 +399,6 @@ namespace RedOnion.Script
 			switch (op)
 			{
 			case OpCode.Assign:
-				left.Set(Value);
-				return;
 			case OpCode.OrAssign:
 			case OpCode.XorAssign:
 			case OpCode.AndAssign:
@@ -391,6 +409,20 @@ namespace RedOnion.Script
 			case OpCode.MulAssign:
 			case OpCode.DivAssign:
 			case OpCode.ModAssign:
+				if (left.Type != ValueKind.Reference || left.ptr == null)
+				{
+					if (!HasOption(EngineOption.Silent))
+						throw new InvalidOperationException("Cannot assign to " + left.Name);
+					return;
+				}
+				if (left.ptr == Root && HasOption(EngineOption.Strict) && !Root.Has(left.str))
+					throw new InvalidOperationException(string.Format(
+						"Global variable '{0}' does not exist", left.str));
+				if (op == OpCode.Assign)
+				{
+					left.Set(Value);
+					return;
+				}
 				left.Modify(op, Value);
 				Value = left;
 				return;

@@ -304,6 +304,10 @@ namespace RedOnion.Script
 		ObjectFeatures Features { get; }
 
 		/// <summary>
+		/// Name of the object (or full name of the type)
+		/// </summary>
+		string Name { get; }
+		/// <summary>
 		/// Base class (to search properties in this object next)
 		/// </summary>
 		IObject BaseClass { get; }

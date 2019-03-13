@@ -17,6 +17,11 @@ namespace RedOnion.Script.BasicObjects
 		public IEngine Engine { get; }
 
 		/// <summary>
+		/// Name of the object (or full name of the type)
+		/// </summary>
+		public virtual string Name => GetType().FullName;
+
+		/// <summary>
 		/// No base class
 		/// </summary>
 		public IObject BaseClass => null;

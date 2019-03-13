@@ -43,7 +43,7 @@ namespace RedOnion.ScriptNUnit
 			{
 				{ "Thing", Root[typeof(Thing)] }
 			}));
-			Test("it = new space.thing");
+			Test("var it = new space.thing");
 			Assert.AreEqual(typeof(Thing), Result.Native.GetType());
 		}
 	}

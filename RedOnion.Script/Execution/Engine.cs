@@ -14,7 +14,8 @@ namespace RedOnion.Script
 		/// <summary>
 		/// Engine options
 		/// </summary>
-		public EngineOption Options { get; set; } = EngineOption.BlockScope;
+		public EngineOption Options { get; set; }
+			= EngineOption.BlockScope | EngineOption.Strict;
 		public bool HasOption(EngineOption option) => (Options & option) != 0;
 
 		/// <summary>
@@ -45,28 +46,28 @@ namespace RedOnion.Script
 		{
 			Parser = new Parser(DefaultParserOptions);
 			Root = new BasicObjects.Root(this);
-			Ctx = new EngineContext(this);
+			Context = new EngineContext(this);
 		}
 
 		public Engine(Func<IEngine, IEngineRoot> createRoot)
 		{
 			Parser = new Parser(DefaultParserOptions);
 			Root = createRoot(this);
-			Ctx = new EngineContext(this);
+			Context = new EngineContext(this);
 		}
 
 		public Engine(Func<IEngine, IEngineRoot> createRoot, Parser.Option opt)
 		{
 			Parser = new Parser(opt);
 			Root = createRoot(this);
-			Ctx = new EngineContext(this);
+			Context = new EngineContext(this);
 		}
 
 		public Engine(Func<IEngine, IEngineRoot> createRoot, Parser.Option opton, Parser.Option optoff)
 		{
 			Parser = new Parser(opton, optoff);
 			Root = createRoot(this);
-			Ctx = new EngineContext(this);
+			Context = new EngineContext(this);
 		}
 
 		/// <summary>
@@ -84,8 +85,8 @@ namespace RedOnion.Script
 			Root.Reset();
 			Parser.Reset();
 			Arguments.Clear();
-			Ctx = new EngineContext(this);
-			CtxStack.Clear();
+			Context = new EngineContext(this);
+			ContextStack.Clear();
 		}
 
 		/// <summary>
@@ -143,20 +144,20 @@ namespace RedOnion.Script
 		/// <summary>
 		/// Current context (method)
 		/// </summary>
-		protected internal EngineContext Ctx;
+		protected EngineContext Context;
 		/// <summary>
 		/// Stack of contexts (methods)
 		/// </summary>
-		protected internal Stack<EngineContext> CtxStack = new Stack<EngineContext>();
+		protected Stack<EngineContext> ContextStack = new Stack<EngineContext>();
 
 		/// <summary>
 		/// Create new execution/activation context (for function call)
 		/// </summary>
 		public IObject CreateContext(IObject self, IObject scope = null)
 		{
-			CtxStack.Push(Ctx);
-			Ctx = new EngineContext(this, self, scope);
-			return Ctx.Vars.BaseClass;
+			ContextStack.Push(Context);
+			Context = new EngineContext(this, self, scope);
+			return Context.Vars.BaseClass;
 		}
 
 		/// <summary>
@@ -170,7 +171,7 @@ namespace RedOnion.Script
 		/// </summary>
 		public Value DestroyContext()
 		{
-			Ctx = CtxStack.Pop();
+			Context = ContextStack.Pop();
 			var value = Exit == OpCode.Return ? Result : new Value();
 			if (Exit != OpCode.Raise)
 				Exit = OpCode.Undefined;

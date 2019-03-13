@@ -78,13 +78,12 @@ namespace RedOnion.Script
 		/// <summary>
 		/// Set the value for references
 		/// </summary>
-		public void Set(Value value)
+		public bool Set(Value value)
 		{
-			if (Type == ValueKind.Reference)
-			{
-				((IProperties)ptr).Set(str, value.Type == ValueKind.Reference ?
-					((IProperties)value.ptr).Get(value.str) : value);
-			}
+			if (Type != ValueKind.Reference)
+				return false;
+			return ((IProperties)ptr).Set(str, value.Type == ValueKind.Reference ?
+				((IProperties)value.ptr).Get(value.str) : value);
 		}
 		/// <summary>
 		/// Modify the value (compound assignment)
@@ -233,6 +232,27 @@ namespace RedOnion.Script
 				return data.Float.ToString(Culture);
 			case ValueKind.Double:
 				return data.Double.ToString(Culture);
+			}
+		}
+
+		public string Name
+		{
+			get
+			{
+				switch (Type)
+				{
+				default:
+					return String;
+				case ValueKind.Undefined:
+					return "undefined";
+				case ValueKind.Object:
+					return ptr == null ? "null" : ((IObject)ptr).Name;
+				case ValueKind.Reference:
+					var props = (IProperties)ptr;
+					if (props is IObject obj)
+						return obj.Name + "." + str;
+					return (ptr == null ? "null." : "unknown.") + str;
+				}
 			}
 		}
 

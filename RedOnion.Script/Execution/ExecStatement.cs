@@ -18,10 +18,10 @@ namespace RedOnion.Script
 				throw new NotImplementedException();
 			case OpCode.Block:
 				if (HasOption(EngineOption.BlockScope))
-					Ctx.Push(this);
+					Context.Push(this);
 				Block(ref at);
 				if (HasOption(EngineOption.BlockScope))
-					Ctx.Pop();
+					Context.Pop();
 				return;
 			case OpCode.Return:
 			case OpCode.Raise:
@@ -33,7 +33,7 @@ namespace RedOnion.Script
 				return;
 			case OpCode.For:
 				if (HasOption(EngineOption.BlockScope))
-					Ctx.Push(this);
+					Context.Push(this);
 				Expression(ref at);
 				var test = at;
 				var notest = Code[at] == 0;
@@ -49,7 +49,7 @@ namespace RedOnion.Script
 				{
 					at = cend;
 					if (HasOption(EngineOption.BlockScope))
-						Ctx.Pop();
+						Context.Pop();
 					return;
 				}
 				for (;; CountStatement())
@@ -70,14 +70,14 @@ namespace RedOnion.Script
 				}
 				at = cend;
 				if (HasOption(EngineOption.BlockScope))
-					Ctx.Pop();
+					Context.Pop();
 				if (Exit == OpCode.Break || Exit == OpCode.Continue)
 					Exit = 0;
 				return;
 			case OpCode.While:
 			case OpCode.Until:
 				if (HasOption(EngineOption.BlockScope))
-					Ctx.Push(this);
+					Context.Push(this);
 				test = at;
 				for(;; CountStatement())
 				{
@@ -90,14 +90,14 @@ namespace RedOnion.Script
 						break;
 				}
 				if (HasOption(EngineOption.BlockScope))
-					Ctx.Pop();
+					Context.Pop();
 				if (Exit == OpCode.Break || Exit == OpCode.Continue)
 					Exit = 0;
 				return;
 			case OpCode.Do:
 			case OpCode.DoUntil:
 				if (HasOption(EngineOption.BlockScope))
-					Ctx.Push(this);
+					Context.Push(this);
 				for(var start = at;; CountStatement())
 				{
 					at = start;
@@ -109,13 +109,13 @@ namespace RedOnion.Script
 						break;
 				}
 				if (HasOption(EngineOption.BlockScope))
-					Ctx.Pop();
+					Context.Pop();
 				if (Exit == OpCode.Break || Exit == OpCode.Continue)
 					Exit = 0;
 				return;
 			case OpCode.If:
 				if (HasOption(EngineOption.BlockScope))
-					Ctx.Push(this);
+					Context.Push(this);
 				Expression(ref at);
 				if (Value.Bool)
 				{
@@ -138,7 +138,7 @@ namespace RedOnion.Script
 					}
 				}
 				if (HasOption(EngineOption.BlockScope))
-					Ctx.Pop();
+					Context.Pop();
 				return;
 			}
 		}
@@ -173,9 +173,9 @@ namespace RedOnion.Script
 				Debug.Assert(at == body);
 				at = body;
 				size = CodeInt(ref at);
-				Ctx.Root.Set(fname, new Value(Root.Create(Compiled, at, size, ftat, args, null, Ctx.Vars)));
+				Context.Root.Set(fname, new Value(Root.Create(Compiled, at, size, ftat, args, null, Context.Vars)));
 				at += size;
-				Value = new Value(Ctx.Root, fname);
+				Value = new Value(Context.Root, fname);
 				return;
 			}
 		}

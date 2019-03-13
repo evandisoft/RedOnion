@@ -117,10 +117,10 @@ namespace RedOnion.ScriptNUnit
 			Root.Set("GUI", new ReflectedType(this,
 				typeof(GUITest)));
 
-			Test("rc = new rect 10,40,200,300");
+			Test("var rc = new rect 10,40,200,300");
 			Test(10, "rc.x");
 			Test(
-				"title = \"ROS Test Window\"\n" +
+				"var title = \"ROS Test Window\"\n" +
 				"function onGUI\n" +
 				" rc = GUI.window 0, rc, testWindow, title\n" +
 				"function testWindow id\n" +
@@ -157,7 +157,7 @@ namespace RedOnion.ScriptNUnit
 			var creator = new ReflectedType(this, typeof(GenericTest));
 			Root[typeof(GenericTest)] = creator;
 			Root.Set("testClass", creator);
-			Test("test = new testClass");
+			Test("var test = new testClass");
 			Test(1, "test.pass 1");
 			Test(2u, "test.pass.[uint] 2");
 		}
@@ -176,8 +176,8 @@ namespace RedOnion.ScriptNUnit
 			var creator = new ReflectedType(this, typeof(EventTest));
 			Root[typeof(EventTest)] = creator;
 			Root.Set("testClass", creator);
-			Test("test = new testClass");
-			Test("counter = 0");
+			Test("var test = new testClass");
+			Test("var counter = 0");
 			Test("function action\n\tcounter++");
 			Test(0, "test.numberOfActions");
 			Test("test.addAction action");
