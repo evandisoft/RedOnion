@@ -131,11 +131,11 @@ namespace RedOnion.Script.Parsing
 		public Parser Expression(string value)
 		{
 			Reset();
-			lexer.Reader = new StringReader(value);
+			lexer.Source = value;
 			var state = StartExpression();
 			ParseExpression();
 			FinishExpression(state);
-			lexer.Reader = null;
+			lexer.Source = null;
 			return this;
 		}
 
@@ -145,9 +145,9 @@ namespace RedOnion.Script.Parsing
 		public Parser Unit(string source)
 		{
 			Reset();
-			lexer.Reader = new StringReader(source);
+			lexer.Source = source;
 			Unit();
-			lexer.Reader = null;
+			lexer.Source = null;
 			return this;
 		}
 

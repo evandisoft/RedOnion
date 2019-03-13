@@ -11,26 +11,30 @@ namespace RedOnion.Script.Parsing
 		/// Line with error
 		/// </summary>
 		public string Line { get; protected set; }
-		 /// <summary>
-		 /// Line number of error
-		 /// </summary>
+		/// <summary>
+		/// Line number of error
+		/// </summary>
 		public int LineNumber { get; protected set; }
-		 /// <summary>
-		 /// Start of erroneous token/span
-		 /// </summary>
+		/// <summary>
+		/// Start of erroneous token/span
+		/// </summary>
 		public int At { get; protected set; }
-		 /// <summary>
-		 /// End of erroneous token/span
-		 /// </summary>
+		/// <summary>
+		/// End of erroneous token/span
+		/// </summary>
 		public int End { get; protected set; }
-		 /// <summary>
-		 /// Column of erroneous token/span
-		 /// </summary>
+		/// <summary>
+		/// Column of erroneous token/span
+		/// </summary>
 		public int Column { get; protected set; }
-		 /// <summary>
-		 /// Line number of end of erroneous token/span
-		 /// </summary>
+		/// <summary>
+		/// Line number of end of erroneous token/span
+		/// </summary>
 		public int EndLine { get; protected set; }
+		/// <summary>
+		/// Character offset from the start of the source
+		/// </summary>
+		public int CharCounter { get; protected set; }
 
 		private void Init(Scanner scanner)
 		{
@@ -39,6 +43,7 @@ namespace RedOnion.Script.Parsing
 			At = scanner.At;
 			End = scanner.End;
 			Column = scanner.Column;
+			CharCounter = scanner.CharCounter;
 		}
 
 		public ParseError(Scanner scanner)

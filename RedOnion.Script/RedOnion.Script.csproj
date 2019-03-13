@@ -42,6 +42,8 @@
     <Compile Include="BasicObjects\SimpleObject.cs" />
     <Compile Include="BasicObjects\Root.cs" />
     <Compile Include="BasicObjects\String.cs" />
+    <Compile Include="Completion\CompletionEngine.cs" />
+    <Compile Include="Completion\CompletionParser.cs" />
     <Compile Include="Execution\ExecStatement.cs" />
     <Compile Include="Execution\Engine.cs" />
     <Compile Include="Execution\Abstract.cs" />
@@ -69,8 +71,6 @@
     <Compile Include="ReflectedObjects\ReflectedObject.cs" />
     <Compile Include="ReflectedObjects\ReflectedType.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Completion\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

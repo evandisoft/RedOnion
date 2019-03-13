@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Diagnostics;
 
@@ -9,14 +9,14 @@ namespace RedOnion.Script.Parsing
 	{
 		public Scanner()
 			=> Line = null;
-		public Scanner(string line)
-			=> Line = line;
+		public Scanner(string source)
+			=> Source = source;
 		public Scanner(TextReader reader)
 			=> Reader = reader;
 
 		private TextReader _reader;
 		/// <summary>
-		/// Source text reader
+		/// Source text reader (if used)
 		/// </summary>
 		public TextReader Reader
 		{
@@ -24,8 +24,29 @@ namespace RedOnion.Script.Parsing
 			set
 			{
 				_reader = value;
+				_source = null;
 				SetLine(null);
 				LineNumber = 0;
+				CharCounter = 0;
+				State = 0;
+				NextLine();
+			}
+		}
+
+		private string _source;
+		/// <summary>
+		/// Full source string (if available)
+		/// </summary>
+		public string Source
+		{
+			get => _source;
+			set
+			{
+				_reader = null;
+				_source = value;
+				SetLine(null);
+				LineNumber = 0;
+				CharCounter = 0;
 				State = 0;
 				NextLine();
 			}
@@ -41,6 +62,7 @@ namespace RedOnion.Script.Parsing
 			set
 			{
 				_reader = null;
+				_source = null;
 				SetLine(value);
 				Next();
 			}
@@ -71,6 +93,10 @@ namespace RedOnion.Script.Parsing
 		/// Current line number
 		/// </summary>
 		public int LineNumber { get; set; }
+		/// <summary>
+		/// Character counter (position in full source string)
+		/// </summary>
+		public int CharCounter { get; set; }
 		/// <summary>
 		/// Current word or null (if not word)
 		/// </summary>
@@ -198,7 +224,47 @@ namespace RedOnion.Script.Parsing
 		{
 			do
 			{
-				SetLine(Reader?.ReadLine());
+				if (Source == null)
+					SetLine(Reader?.ReadLine());
+				else 
+				{
+					if (Line != null)
+					{
+						char c = '\0';
+						while (CharCounter < Source.Length)
+						{
+							c = Source[CharCounter++];
+							if (c == '\0' || c == '\r' || c == '\n')
+								break;
+						}
+						if (c == '\r' || c == '\n')
+						{
+							while (CharCounter < Source.Length)
+							{
+								var c2 = Source[CharCounter];
+								if (c2 != '\r' && c2 != '\n')
+									break;
+								if (c2 == c)
+									break;
+								CharCounter++;
+							}
+						}
+					}
+					if (CharCounter >= Source.Length)
+						SetLine(null);
+					else
+					{
+						int pos = CharCounter;
+						while (pos < Source.Length)
+						{
+							var c3 = Source[pos];
+							if (c3 == '\r' || c3 == '\n')
+								break;
+							pos++;
+						}
+						SetLine(Source.Substring(CharCounter, pos-CharCounter));
+					}
+				}
 				if (Eof)
 					return;
 				if (!skipEmpty)
@@ -252,6 +318,7 @@ namespace RedOnion.Script.Parsing
 			Word = null;
 			Curr = '\0';
 			SkipWhite();
+			CharCounter += End-At;
 			At = End;
 			if (Indent < 0)
 				Indent = Column;
@@ -329,6 +396,7 @@ namespace RedOnion.Script.Parsing
 		public string Rest()
 		{
 			var s = Line.Substring(At, End - At);
+			CharCounter += End-At;
 			At = End;
 			return s;
 		}

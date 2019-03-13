@@ -39,7 +39,7 @@ namespace RedOnion.Script
 				throw new TookTooLong();
 		}
 
-		private static Parser.Option DefaultParserOptions =
+		internal static Parser.Option DefaultParserOptions =
 			Parser.Option.Script | Parser.Option.Untyped | Parser.Option.Typed;
 
 		public Engine()
@@ -66,6 +66,13 @@ namespace RedOnion.Script
 		public Engine(Func<IEngine, IEngineRoot> createRoot, Parser.Option opton, Parser.Option optoff)
 		{
 			Parser = new Parser(opton, optoff);
+			Root = createRoot(this);
+			Context = new EngineContext(this);
+		}
+
+		protected Engine(Func<IEngine, IEngineRoot> createRoot, Parser parser)
+		{
+			Parser = parser;
 			Root = createRoot(this);
 			Context = new EngineContext(this);
 		}

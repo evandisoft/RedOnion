@@ -4,6 +4,7 @@ using KSP.UI;
 using KSP.UI.Screens;
 using RedOnion.Script;
 using RedOnion.Script.BasicObjects;
+using RedOnion.Script.Completion;
 using RedOnion.Script.ReflectedObjects;
 using RedOnion.UI;
 using UnityEngine;
@@ -34,7 +35,7 @@ namespace RedOnion.KSP
 	/// <summary>
 	/// Engine designed to provide hints and documentation for runtime engine
 	/// </summary>
-	public class DocumentingEngine : Engine
+	public class DocumentingEngine : CompletionEngine
 	{
 		public DocumentingEngine()
 			: base(engine => new EngineRoot(engine, EngineRoot.RootKind.Completion))
