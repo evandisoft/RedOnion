@@ -12,7 +12,97 @@ namespace RedOnion.Script
 	/// </summary>
 	/// <param name="engine">The engine to associate the object with</param>
 	/// <returns>The object</returns>
-	public delegate IObject CreateObject(Engine engine);
+	public delegate IObject CreateObject(IEngine engine);
+
+	[Flags]
+	public enum EngineOption
+	{
+		None = 0,
+		/// <summary>
+		/// Variables live only inside blocks
+		/// (otherwise inside script or function)
+		/// </summary>
+		BlockScope = 1 << 0,
+		/// <summary>
+		/// Make errors/exceptions produce undefined value where possible
+		/// (throw exception otherwise)
+		/// </summary>
+		Silent = 1 << 1,
+		/// <summary>
+		/// Strict mode sets `this` in functions (not called as method) to null (global otherwise)
+		/// </summary>
+		Strict = 1 << 2,
+		/// <summary>
+		/// Anonymous functions (created by Function(args, body))
+		/// expose their body (script code).
+		/// </summary>
+		FuncText = 1 << 31,
+	}
+
+	public interface IEngine
+	{
+		/// <summary>
+		/// Engine options
+		/// </summary>
+		EngineOption Options { get; }
+		/// <summary>
+		/// Root object (global namespace)
+		/// </summary>
+		IEngineRoot Root { get; }
+
+		/// <summary>
+		/// Exit code (of last statement, code block or whole program)
+		/// </summary>
+		OpCode Exit { get; }
+		/// <summary>
+		/// Result of last expression (rvalue)
+		/// </summary>
+		Value Result { get; }
+
+		/// <summary>
+		/// Reset engine
+		/// </summary>
+		void Reset();
+		/// <summary>
+		/// Compile source to code
+		/// </summary>
+		CompiledCode Compile(string source);
+		/// <summary>
+		/// Run script
+		/// </summary>
+		void Execute(CompiledCode code, int at, int size);
+		/// <summary>
+		/// Evaluate expression
+		/// </summary>
+		Value Evaluate(CompiledCode code, int at);
+
+		/// <summary>
+		/// Box value (StringObj, NumberObj, ...)
+		/// </summary>
+		IObject Box(Value value);
+
+		/// <summary>
+		/// Argument list for function calls
+		/// </summary>
+		ArgumentList Arguments { get; }
+		/// <summary>
+		/// Create new variables holder object
+		/// </summary>
+		IObject CreateVars(IObject vars);
+		/// <summary>
+		/// Create new execution/activation context (for function call)
+		/// </summary>
+		IObject CreateContext(IObject self, IObject scope = null);
+		/// <summary>
+		/// Destroy last execution/activation context
+		/// </summary>
+		Value DestroyContext();
+
+		/// <summary>
+		/// Log message
+		/// </summary>
+		void Log(string msg);
+	}
 
 	[Flags]
 	public enum ObjectFeatures
@@ -207,7 +297,7 @@ namespace RedOnion.Script
 		/// <summary>
 		/// Engine this object belongs to
 		/// </summary>
-		Engine Engine { get; }
+		IEngine Engine { get; }
 		/// <summary>
 		/// Feature flags
 		/// </summary>
@@ -279,5 +369,200 @@ namespace RedOnion.Script
 		/// Convert native object into script object Features.Converter
 		/// </summary>
 		IObject Convert(object value);
+	}
+
+	public interface IEngineRoot : IObject
+	{
+		/// <summary>
+		/// Box value (StringObj, NumberObj, ...)
+		/// </summary>
+		IObject Box(Value value);
+
+		/// <summary>
+		/// Create new function
+		/// </summary>
+		IObject Create(CompiledCode code, int codeAt, int codeSize, int typeAt, ArgumentInfo[] args, string body = null, IObject scope = null);
+
+		/// <summary>
+		/// Get type reference (StringFun, NumberFun, ...)
+		/// </summary>
+		IObject GetType(OpCode OpCode);
+
+		/// <summary>
+		/// Get type reference with parameter (array or generic)
+		/// </summary>
+		IObject GetType(OpCode OpCode, Value value);
+
+		/// <summary>
+		/// Get type reference with parameter (array or generic)
+		/// </summary>
+		IObject GetType(OpCode OpCode, params Value[] par);
+
+		/// <summary>
+		/// Get or set type creator (ReflectedType)
+		/// </summary>
+		IObject this[Type type] { get; set; }
+	}
+
+	/// <summary>
+	/// Compiled code (at least string table and byte code)
+	/// with possibly other references
+	/// </summary>
+	public class CompiledCode
+	{
+		public CompiledCode(string[] strings, byte[] code)
+		{
+			Strings = strings;
+			Code = code;
+		}
+		/// <summary>
+		/// String table
+		/// </summary>
+		public string[] Strings { get; }
+		/// <summary>
+		/// Compiled code
+		/// </summary>
+		public byte[] Code { get; }
+
+		/// <summary>
+		/// Path to source file
+		/// </summary>
+		public string Path { get; set; }
+		/// <summary>
+		/// Source content
+		/// </summary>
+		public string Source { get; set; }
+		/// <summary>
+		/// Source content separated to lines
+		/// </summary>
+		public IList<SourceLine> Lines { get; set; }
+		/// <summary>
+		/// Line of source content (with position and text)
+		/// </summary>
+		public struct SourceLine
+		{
+			public int Position;
+			public string Text;
+			public SourceLine(int position, string text)
+			{
+				Position = position;
+				Text = text;
+			}
+		}
+	}
+
+	/// <summary>
+	/// Argument name, type and default value for functions
+	/// </summary>
+	public struct ArgumentInfo
+	{
+		public string Name;
+		public int Type;
+		public int Value;
+	}
+
+	/// <summary>
+	/// Argument list for function calls
+	/// </summary>
+	public class ArgumentList : List<Value>
+	{
+		public int Length => Count;
+		public void Remove(int last)
+			=> RemoveRange(Count - last, last);
+
+		public Value Get(int argc, int index = 0)
+		{
+			var idx = Count - argc + index;
+			return idx < Count ? this[idx] : new Value();
+		}
+	}
+
+	/// <summary>
+	/// Stack of blocks of current function/method
+	/// </summary>
+	public struct EngineContext : IProperties
+	{
+		/// <summary>
+		/// Current object accessible by 'this' keyword
+		/// </summary>
+		public IObject Self { get; }
+		/// <summary>
+		/// Variables of current block (previous block/scope is in baseClass)
+		/// </summary>
+		public IObject Vars { get; private set; }
+		/// <summary>
+		/// Root (activation) object (new variables not declared with var will be created here)
+		/// </summary>
+		public IObject Root { get; }
+
+		/// <summary>
+		/// Root context
+		/// </summary>
+		public EngineContext(IEngine engine)
+		{
+			Vars = Root = engine.Root;
+			Self = engine.HasOption(EngineOption.Strict) ? null : Root;
+		}
+
+		/// <summary>
+		/// Function execution context
+		/// </summary>
+		public EngineContext(IEngine engine, IObject self, IObject scope)
+		{
+			Self = self ?? (engine.HasOption(EngineOption.Strict) ? null : engine.Root);
+			Root = Vars = engine.CreateVars(engine.CreateVars(scope ?? engine.Root));
+			Vars.Set("arguments", new Value(Vars.BaseClass));
+		}
+
+		public void Push(Engine engine)
+			=> Vars = engine.CreateVars(Vars);
+		public void Pop()
+			=> Vars = Vars.BaseClass;
+		public bool Has(string name)
+			=> Vars.Has(name);
+		public IObject Which(string name)
+			=> Vars.Which(name);
+		public Value Get(string name)
+			=> Vars.Get(name);
+		public bool Get(string name, out Value value)
+			=> Vars.Get(name, out value);
+		public bool Set(string name, Value value)
+			=> Vars.Set(name, value);
+		public bool Delete(string name)
+			=> Vars.Delete(name);
+		public void Reset()
+			=> Vars.Reset();
+	}
+
+	public static class EngineExtensions
+	{
+		public static bool HasOption(this IEngine engine, EngineOption option)
+			=> (engine.Options & option) != 0;
+
+		/// <summary>
+		/// Run script in a string
+		/// </summary>
+		public static void Execute(this IEngine engine, string source)
+			=> engine.Execute(engine.Compile(source));
+		/// <summary>
+		/// Run compiled script
+		/// </summary>
+		public static void Execute(this IEngine engine, CompiledCode code)
+			=> engine.Execute(code, 0, code.Code.Length);
+
+		/// <summary>
+		/// Get argument of function call
+		/// </summary>
+		public static Value GetArgument(this IEngine engine, int argc, int index = 0)
+			=> engine.Arguments.Get(argc, index);
+
+		public static void Log(this IEngine engine, string msg, params object[] args)
+			=> engine.Log(string.Format(msg, args));
+		[Conditional("DEBUG")]
+		public static void DebugLog(this IEngine engine, string msg)
+			=> engine.Log(msg);
+		[Conditional("DEBUG")]
+		public static void DebugLog(this IEngine engine, string msg, params object[] args)
+			=> engine.Log(string.Format(msg, args));
 	}
 }

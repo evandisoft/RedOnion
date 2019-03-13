@@ -30,7 +30,7 @@ namespace RedOnion.Script.ReflectedObjects
 		protected internal MethodInfo[] Methods { get; }
 
 		public ReflectedFunction(
-			Engine engine, ReflectedType creator,
+			IEngine engine, ReflectedType creator,
 			string name, params MethodInfo[] methods)
 			: base(engine, null)
 		{
@@ -46,7 +46,7 @@ namespace RedOnion.Script.ReflectedObjects
 			foreach (MethodInfo method in Methods)
 				if (TryCall(Engine, method, null, argc, ref result))
 					return result;
-			if (!Engine.HasOption(Engine.Option.Silent))
+			if (!Engine.HasOption(EngineOption.Silent))
 			{
 #if DEBUG
 				Engine.DebugLog("{0}(argc:{1})", Type == null ? Name : Type.Name + "." + Name, argc);
@@ -84,7 +84,7 @@ namespace RedOnion.Script.ReflectedObjects
 		}
 
 		protected internal static bool TryCall(
-			Engine engine, MethodBase method,
+			IEngine engine, MethodBase method,
 			object self, int argc, ref Value result)
 		{
 			var pars = method.GetParameters();
@@ -98,7 +98,7 @@ namespace RedOnion.Script.ReflectedObjects
 			for (int i = 0; i < argc; i++)
 			{
 				var param = pars[i];
-				var arg = engine.Args.Arg(argc, i);
+				var arg = engine.GetArgument(argc, i);
 				var type = param.ParameterType;
 				if (type == typeof(string))
 				{
@@ -118,7 +118,7 @@ namespace RedOnion.Script.ReflectedObjects
 					{
 						var invoke = type.GetMethod("Invoke");
 						var mipars = invoke.GetParameters();
-						if (mipars.Length != fn.ArgCount)
+						if (mipars.Length != fn.ArgumentCount)
 							return false;
 						continue;
 					}
@@ -153,7 +153,7 @@ namespace RedOnion.Script.ReflectedObjects
 			for (int i = 0; i < args.Length; i++)
 			{
 				var param = pars[i];
-				var arg = engine.Args.Arg(argc, i);
+				var arg = engine.GetArgument(argc, i);
 				var type = param.ParameterType;
 				if (i >= argc)
 					args[i] = param.DefaultValue;

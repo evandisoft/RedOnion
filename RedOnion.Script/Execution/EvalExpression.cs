@@ -170,9 +170,9 @@ namespace RedOnion.Script
 				}
 				fn = Box(Value);
 				Expression(ref at);
-				Args.Add(Result);
+				Arguments.Add(Result);
 				Value = create ? new Value(fn.Create(1)) : fn.Call(self, 1);
-				Args.Remove(1);
+				Arguments.Remove(1);
 				return;
 			case OpCode.Call2:
 				CountStatement();
@@ -193,11 +193,11 @@ namespace RedOnion.Script
 				}
 				fn = Box(Value);
 				Expression(ref at);
-				Args.Add(Result);
+				Arguments.Add(Result);
 				Expression(ref at);
-				Args.Add(Result);
+				Arguments.Add(Result);
 				Value = create ? new Value(fn.Create(2)) : fn.Call(self, 2);
-				Args.Remove(2);
+				Arguments.Remove(2);
 				return;
 			case OpCode.CallN:
 				CountStatement();
@@ -222,10 +222,10 @@ namespace RedOnion.Script
 				while (--n > 0)
 				{
 					Expression(ref at);
-					Args.Add(Result);
+					Arguments.Add(Result);
 				}
 				Value = create ? new Value(fn.Create(argc)) : fn.Call(self, argc);
-				Args.Remove(argc);
+				Arguments.Remove(argc);
 				return;
 			case OpCode.Index:
 			case OpCode.IndexN:
@@ -243,10 +243,10 @@ namespace RedOnion.Script
 				while (--n > 0)
 				{
 					Expression(ref at);
-					Args.Add(Result);
+					Arguments.Add(Result);
 				}
 				Value = fn.Index(self, argc);
-				Args.Remove(argc);
+				Arguments.Remove(argc);
 				return;
 			case OpCode.Var:
 				var name = Strings[CodeInt(ref at)];
@@ -260,9 +260,9 @@ namespace RedOnion.Script
 				CountStatement();
 				fn = Box(Value);
 				Expression(ref at);
-				Args.Add(Result);
+				Arguments.Add(Result);
 				Value = fn.Call(null, 1);
-				Args.Remove(1);
+				Arguments.Remove(1);
 				Ctx.Vars.Set(name, Value);
 				return;
 			case OpCode.Dot:

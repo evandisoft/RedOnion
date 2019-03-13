@@ -69,5 +69,8 @@
     <Compile Include="ReflectedObjects\ReflectedObject.cs" />
     <Compile Include="ReflectedObjects\ReflectedType.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Completion\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

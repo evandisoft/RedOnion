@@ -21,15 +21,15 @@ namespace RedOnion.Script.BasicObjects
 			| ObjectFeatures.Converter | ObjectFeatures.TypeReference;
 		public override Type Type => typeof(string);
 
-		public StringFun(Engine engine, IObject baseClass, StringObj prototype)
+		public StringFun(IEngine engine, IObject baseClass, StringObj prototype)
 			: base(engine, baseClass, new Properties("prototype", prototype))
 			=> Prototype = prototype;
 
 		public override Value Call(IObject self, int argc)
-			=> argc == 0 ? new Value("") : new Value(Arg(argc).String);
+			=> argc == 0 ? new Value("") : new Value(Engine.GetArgument(argc).String);
 
 		public override IObject Create(int argc)
-			=> new StringObj(Engine, Prototype, argc == 0 ? "" : Arg(argc).String);
+			=> new StringObj(Engine, Prototype, argc == 0 ? "" : Engine.GetArgument(argc).String);
 
 		public override IObject Convert(object value)
 			=> new StringObj(Engine, Prototype, value.ToString());
@@ -50,14 +50,14 @@ namespace RedOnion.Script.BasicObjects
 		/// <summary>
 		/// Create String.prototype
 		/// </summary>
-		public StringObj(Engine engine, IObject baseClass)
+		public StringObj(IEngine engine, IObject baseClass)
 			: base(engine, baseClass)
 			=> String = "";
 
 		/// <summary>
 		/// Create new string object boxing the string
 		/// </summary>
-		public StringObj(Engine engine, StringObj baseClass, string value)
+		public StringObj(IEngine engine, StringObj baseClass, string value)
 			: base(engine, baseClass, StdProps)
 			=> String = value;
 

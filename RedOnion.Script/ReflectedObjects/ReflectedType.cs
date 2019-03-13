@@ -27,14 +27,14 @@ namespace RedOnion.Script.ReflectedObjects
 		/// <summary>
 		/// Create object (with some static properties)
 		/// </summary>
-		public ReflectedType(Engine engine, Type type, IProperties staticProps = null)
+		public ReflectedType(IEngine engine, Type type, IProperties staticProps = null)
 			: base(engine, staticProps)
 			=> _type = type;
 
 		/// <summary>
 		/// Create object with both static and class/instance properties
 		/// </summary>
-		public ReflectedType(Engine engine, Type type,
+		public ReflectedType(IEngine engine, Type type,
 			IProperties staticProps, IProperties typeProps)
 			: this(engine, type, staticProps)
 			=> TypeProps = typeProps;
@@ -69,7 +69,7 @@ namespace RedOnion.Script.ReflectedObjects
 					return new ReflectedObject(Engine, ctr.Invoke(args), this, TypeProps);
 				}
 
-				if (!Engine.HasOption(Engine.Option.Silent))
+				if (!Engine.HasOption(EngineOption.Silent))
 					throw new NotImplementedException(Type.FullName
 						+ " cannot be constructed with zero arguments");
 				return null;
@@ -84,7 +84,7 @@ namespace RedOnion.Script.ReflectedObjects
 					return obj;
 				break;
 			}
-			if (!Engine.HasOption(Engine.Option.Silent))
+			if (!Engine.HasOption(EngineOption.Silent))
 				throw new NotImplementedException(string.Format(
 					"{0} cannot be constructed with {1} argument(s)", Type.FullName, argc));
 			return null;
@@ -288,10 +288,10 @@ namespace RedOnion.Script.ReflectedObjects
 			return false;
 		}
 
-		public static Value Convert(Engine engine, object value)
+		public static Value Convert(IEngine engine, object value)
 			=> value == null ? new Value((IObject)null)
 			: Convert(engine, value, value.GetType());
-		public static Value Convert(Engine engine, object value, Type type)
+		public static Value Convert(IEngine engine, object value, Type type)
 		{
 			if (type == typeof(void))
 				return new Value();

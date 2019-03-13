@@ -14,10 +14,10 @@ namespace RedOnion.Script.ReflectedObjects
 
 		public ReflectedType Creator { get; }
 
-		public ReflectedObject(Engine engine, object target, IProperties properties = null)
+		public ReflectedObject(IEngine engine, object target, IProperties properties = null)
 			: base(engine, properties)
 			=> _target = target;
-		public ReflectedObject(Engine engine, object target, ReflectedType type, IProperties properties = null)
+		public ReflectedObject(IEngine engine, object target, ReflectedType type, IProperties properties = null)
 			: this(engine, target, properties)
 		{
 			Creator = type;
@@ -195,9 +195,9 @@ namespace RedOnion.Script.ReflectedObjects
 			return false;
 		}
 
-		public static Value Convert(Engine engine, object value)
+		public static Value Convert(IEngine engine, object value)
 			=> ReflectedType.Convert(engine, value);
-		public static Value Convert(Engine engine, object value, Type type)
+		public static Value Convert(IEngine engine, object value, Type type)
 			=> ReflectedType.Convert(engine, value, type);
 		public static object Convert(Value value, Type type)
 			=> ReflectedType.Convert(value, type);

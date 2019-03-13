@@ -30,7 +30,7 @@ namespace RedOnion.Script.ReflectedObjects
 		protected internal MethodInfo[] Methods { get; }
 
 		public ReflectedMethod(
-			Engine engine, ReflectedType creator,
+			IEngine engine, ReflectedType creator,
 			string name, params MethodInfo[] methods)
 			: base(engine, null)
 		{
@@ -45,7 +45,7 @@ namespace RedOnion.Script.ReflectedObjects
 			var result = new Value();
 			if (self == null || (self.Features & ObjectFeatures.Proxy) == 0)
 			{
-				if (!Engine.HasOption(Engine.Option.Silent))
+				if (!Engine.HasOption(EngineOption.Silent))
 					throw new InvalidOperationException("Called "
 						+ (Type == null ? Name : Type.Name + "." + Name)
 						+ " without native self");
@@ -54,7 +54,7 @@ namespace RedOnion.Script.ReflectedObjects
 			var target = self.Target;
 			if (target == null || (Type != null && !Type.IsAssignableFrom(target.GetType())))
 			{
-				if (!Engine.HasOption(Engine.Option.Silent))
+				if (!Engine.HasOption(EngineOption.Silent))
 					throw new InvalidOperationException("Called "
 						+ (Type == null ? Name : Type.Name + "." + Name)
 						+ " without proper self");
@@ -63,7 +63,7 @@ namespace RedOnion.Script.ReflectedObjects
 			foreach (MethodInfo method in Methods)
 				if (TryCall(Engine, method, target, argc, ref result))
 					return result;
-			if (!Engine.HasOption(Engine.Option.Silent))
+			if (!Engine.HasOption(EngineOption.Silent))
 				throw new InvalidOperationException("Could not call "
 					+ (Type == null ? Name : Type.Name + "." + Name)
 					+ ", " + Methods.Length + " candidates");
@@ -71,7 +71,7 @@ namespace RedOnion.Script.ReflectedObjects
 		}
 
 		protected static bool TryCall(
-			Engine engine, MethodInfo method,
+			IEngine engine, MethodInfo method,
 			object self, int argc, ref Value result)
 			=> ReflectedFunction.TryCall(
 				engine, method, self, argc, ref result);

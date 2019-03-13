@@ -11,7 +11,7 @@ namespace RedOnion.ScriptNUnit
 		[SetUp]
 		public void SetUp()
 		{
-			Options = Option.BlockScope;
+			Options = EngineOption.BlockScope;
 		}
 
 		[Test]
@@ -74,9 +74,9 @@ namespace RedOnion.ScriptNUnit
 				"		var x = 2\r\n" +
 				"	return x\r\n" +
 				"f()";
-			Options = Option.None;
+			Options = EngineOption.None;
 			Test(2, s);
-			Options = Option.BlockScope;
+			Options = EngineOption.BlockScope;
 			Test(1, s);
 		}
 

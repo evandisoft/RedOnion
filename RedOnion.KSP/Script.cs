@@ -22,7 +22,7 @@ namespace RedOnion.KSP
 			=> Debug.Log("[RedOnion] " + msg);
 	}
 	/// <summary>
-	/// Limited engine whith what is save in REPL / Immediate Mode
+	/// Limited engine whith what is safe in REPL / Immediate Mode
 	/// </summary>
 	public class ImmediateEngine : Engine
 	{
@@ -38,10 +38,10 @@ namespace RedOnion.KSP
 	{
 		public DocumentingEngine()
 			: base(engine => new EngineRoot(engine, EngineRoot.RootKind.Completion))
-			=> Options = Options | Option.Silent;
-		protected DocumentingEngine(Func<Engine, IRoot> createRoot)
+			=> Options = Options | EngineOption.Silent;
+		protected DocumentingEngine(Func<IEngine, IEngineRoot> createRoot)
 			: base(createRoot)
-			=> Options = Options | Option.Silent;
+			=> Options = Options | EngineOption.Silent;
 		public override void Log(string msg)
 			=> Debug.Log("[RedOnion.DOC] " + msg);
 		public virtual IList<string> Complete(string source, int at)
@@ -69,7 +69,7 @@ namespace RedOnion.KSP
 			ReplCompletion
 		}
 		public RootKind Kind { get; }
-		public EngineRoot(Engine engine, RootKind kind)
+		public EngineRoot(IEngine engine, RootKind kind)
 			: base(engine, fill: false)
 		{
 			Kind = kind;

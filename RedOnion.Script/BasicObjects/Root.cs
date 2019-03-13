@@ -5,7 +5,7 @@ using System.Text;
 
 namespace RedOnion.Script.BasicObjects
 {
-	public class Root : BasicObject, Engine.IRoot
+	public class Root : BasicObject, IEngineRoot
 	{
 		public Dictionary<Type, IObject> TypeMap
 		{ get; } = new Dictionary<Type, IObject>();
@@ -32,31 +32,31 @@ namespace RedOnion.Script.BasicObjects
 		public NumberFun Bool { get; }
 		public NumberFun Char { get; }
 
-		public Root(Engine engine)
+		public Root(IEngine engine)
 			: this(engine, true) { }
-		protected Root(Engine engine, bool fill)
+		protected Root(IEngine engine, bool fill)
 			: base(engine, null, new Properties(), new Properties())
 		{
-			var obj = new BasicObject(engine);
-			var fun = new FunctionObj(engine, obj);
-			var str = new StringObj(engine, obj);
-			var num = new NumberObj(engine, obj);
-			Function = new FunctionFun(engine, fun, fun);
-			Object = new ObjectFun(engine, fun, obj);
-			String = new StringFun(engine, fun, str);
-			Number = new NumberFun(engine, fun, num);
-			Float = new NumberFun(engine, fun, num, typeof(float), ValueKind.Float);
-			Double = new NumberFun(engine, fun, num, typeof(double), ValueKind.Double);
-			Long = new NumberFun(engine, fun, num, typeof(long), ValueKind.Long);
-			ULong = new NumberFun(engine, fun, num, typeof(ulong), ValueKind.ULong);
-			Int = new NumberFun(engine, fun, num, typeof(int), ValueKind.Int);
-			UInt = new NumberFun(engine, fun, num, typeof(uint), ValueKind.UInt);
-			Short = new NumberFun(engine, fun, num, typeof(short), ValueKind.Short);
-			UShort = new NumberFun(engine, fun, num, typeof(ushort), ValueKind.UShort);
-			SByte = new NumberFun(engine, fun, num, typeof(sbyte), ValueKind.SByte);
-			Byte = new NumberFun(engine, fun, num, typeof(byte), ValueKind.Byte);
-			Bool = new NumberFun(engine, fun, num, typeof(bool), ValueKind.Bool);
-			Char = new NumberFun(engine, fun, num, typeof(char), ValueKind.Char);
+			var obj	= new BasicObject(engine);
+			var fun	= new FunctionObj(engine, obj);
+			var str	= new StringObj(engine, obj);
+			var num	= new NumberObj(engine, obj);
+			Function= new FunctionFun(engine, fun, fun);
+			Object	= new ObjectFun(engine, fun, obj);
+			String	= new StringFun(engine, fun, str);
+			Number	= new NumberFun(engine, fun, num);
+			Float	= new NumberFun(engine, fun, num, typeof(float),	ValueKind.Float);
+			Double	= new NumberFun(engine, fun, num, typeof(double),	ValueKind.Double);
+			Long	= new NumberFun(engine, fun, num, typeof(long),		ValueKind.Long);
+			ULong	= new NumberFun(engine, fun, num, typeof(ulong),	ValueKind.ULong);
+			Int		= new NumberFun(engine, fun, num, typeof(int),		ValueKind.Int);
+			UInt	= new NumberFun(engine, fun, num, typeof(uint),		ValueKind.UInt);
+			Short	= new NumberFun(engine, fun, num, typeof(short),	ValueKind.Short);
+			UShort	= new NumberFun(engine, fun, num, typeof(ushort),	ValueKind.UShort);
+			SByte	= new NumberFun(engine, fun, num, typeof(sbyte),	ValueKind.SByte);
+			Byte	= new NumberFun(engine, fun, num, typeof(byte),		ValueKind.Byte);
+			Bool	= new NumberFun(engine, fun, num, typeof(bool),		ValueKind.Bool);
+			Char	= new NumberFun(engine, fun, num, typeof(char),		ValueKind.Char);
 			if (fill)
 				Fill();
 		}
@@ -129,11 +129,11 @@ namespace RedOnion.Script.BasicObjects
 		}
 
 		public IObject Create(
-			string[] strings, byte[] code, int codeAt, int codeSize, int typeAt,
-			Engine.ArgInfo[] args, string body = null, IObject scope = null)
+			CompiledCode code, int codeAt, int codeSize, int typeAt,
+			ArgumentInfo[] args, string body = null, IObject scope = null)
 		{
 			return new FunctionObj(Engine, Function.Prototype,
-				strings, code, codeAt, codeSize, typeAt,
+				code, codeAt, codeSize, typeAt,
 				args, body, scope == this ? null : scope);
 		}
 

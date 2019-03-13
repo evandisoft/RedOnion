@@ -16,7 +16,7 @@ namespace RedOnion.Script.BasicObjects
 		/// </summary>
 		public IObject Prototype { get; }
 
-		public ObjectFun(Engine engine, IObject baseClass, IObject prototype)
+		public ObjectFun(IEngine engine, IObject baseClass, IObject prototype)
 			: base(engine, baseClass, new Properties("prototype", prototype))
 			=> Prototype = prototype;
 
@@ -27,7 +27,7 @@ namespace RedOnion.Script.BasicObjects
 		{
 			if (argc == 0)
 				return new BasicObject(Engine, Prototype);
-			return Engine.Root.Box(Arg(argc));
+			return Engine.Box(Engine.GetArgument(argc));
 		}
 	}
 
@@ -45,7 +45,7 @@ namespace RedOnion.Script.BasicObjects
 		/// <summary>
 		/// Engine this object belongs to
 		/// </summary>
-		public Engine Engine { get; }
+		public IEngine Engine { get; }
 
 		/// <summary>
 		/// Base class (to search properties in this object next)
@@ -73,7 +73,7 @@ namespace RedOnion.Script.BasicObjects
 		/// <summary>
 		/// Create empty object with no base class
 		/// </summary>
-		public BasicObject(Engine engine)
+		public BasicObject(IEngine engine)
 		{
 			Engine = engine;
 		}
@@ -81,7 +81,7 @@ namespace RedOnion.Script.BasicObjects
 		/// <summary>
 		/// Create empty object with base class
 		/// </summary>
-		public BasicObject(Engine engine, IObject baseClass)
+		public BasicObject(IEngine engine, IObject baseClass)
 		{
 			Engine = engine;
 			BaseClass = baseClass;
@@ -90,7 +90,7 @@ namespace RedOnion.Script.BasicObjects
 		/// <summary>
 		/// Create object with prototype and some base properties
 		/// </summary>
-		public BasicObject(Engine engine, IObject baseClass, IProperties baseProps)
+		public BasicObject(IEngine engine, IObject baseClass, IProperties baseProps)
 		{
 			Engine = engine;
 			BaseClass = baseClass;
@@ -100,7 +100,7 @@ namespace RedOnion.Script.BasicObjects
 		/// <summary>
 		/// Create object with prototype, some base properties and more properties
 		/// </summary>
-		public BasicObject(Engine engine, IObject baseClass, IProperties baseProps, IProperties moreProps)
+		public BasicObject(IEngine engine, IObject baseClass, IProperties baseProps, IProperties moreProps)
 		{
 			Engine = engine;
 			BaseClass = baseClass;
@@ -129,7 +129,7 @@ namespace RedOnion.Script.BasicObjects
 
 		public Value Get(string name)
 		{
-			if (!Get(name, out var value) && !Engine.HasOption(Engine.Option.Silent))
+			if (!Get(name, out var value) && !Engine.HasOption(EngineOption.Silent))
 				throw new NotImplementedException(name + " does not exist");
 			return value;
 		}
@@ -228,14 +228,14 @@ namespace RedOnion.Script.BasicObjects
 
 		public virtual Value Call(IObject self, int argc)
 		{
-			if (!Engine.HasOption(Engine.Option.Silent))
+			if (!Engine.HasOption(EngineOption.Silent))
 				throw new NotImplementedException(GetType().FullName + " is not a function");
 			return new Value();
 		}
 
 		public virtual IObject Create(int argc)
 		{
-			if (!Engine.HasOption(Engine.Option.Silent))
+			if (!Engine.HasOption(EngineOption.Silent))
 				throw new NotImplementedException(GetType().FullName + " is not a constructor");
 			return null;
 		}
@@ -247,44 +247,11 @@ namespace RedOnion.Script.BasicObjects
 			case 0:
 				return new Value();
 			case 1:
-				return new Value(this, Arg(argc, 0).String);
+				return new Value(this, Engine.GetArgument(argc, 0).String);
 			default:
-				self = Engine.Box(new Value(this, Arg(argc, 0).String));
+				self = Engine.Box(new Value(this, Engine.GetArgument(argc, 0).String));
 				return self.Index(this, argc - 1);
 			}
 		}
-
-		/// <summary>
-		/// Get n-th argument (for call/create implementation)
-		/// </summary>
-		protected Value Arg(int argc, int n = 0)
-			=> Engine.Args.Arg(argc, n);
-
-		/// <summary>
-		/// Activation context
-		/// </summary>
-		protected Engine.Context Ctx => Engine.Ctx;
-
-		/// <summary>
-		/// Create new activation context
-		/// </summary>
-		protected void CreateContext()
-			=> Engine.CreateContext(Ctx.Self);
-		/// <summary>
-		/// Create new activation context
-		/// </summary>
-		protected void CreateContext(IObject self)
-			=> Engine.CreateContext(self);
-		/// <summary>
-		/// Create new activation context
-		/// </summary>
-		protected void CreateContext(IObject self, IObject scope)
-			=> Engine.CreateContext(self, scope);
-
-		/// <summary>
-		/// Destroy activation context
-		/// </summary>
-		protected Value DestroyContext()
-			=> Engine.DestroyContext();
 	}
 }

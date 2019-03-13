@@ -31,10 +31,10 @@ namespace RedOnion.Script.BasicObjects
 			: ObjectFeatures.Function | ObjectFeatures.Constructor
 			| ObjectFeatures.TypeReference; // maybe add converter
 
-		public NumberFun(Engine engine, IObject baseClass, NumberObj prototype)
+		public NumberFun(IEngine engine, IObject baseClass, NumberObj prototype)
 			: base(engine, baseClass, new Properties("prototype", prototype))
 			=> Prototype = prototype;
-		public NumberFun(Engine engine, IObject baseClass, NumberObj prototype,
+		public NumberFun(IEngine engine, IObject baseClass, NumberObj prototype,
 			Type type, ValueKind kind)
 			: this(engine, baseClass, prototype)
 		{
@@ -46,7 +46,7 @@ namespace RedOnion.Script.BasicObjects
 		{
 			if (argc == 0)
 				return new Value();
-			var value = Arg(argc).Number;
+			var value = Engine.GetArgument(argc).Number;
 			if (Type == null)
 				return value;
 			switch (Kind)
@@ -98,7 +98,7 @@ namespace RedOnion.Script.BasicObjects
 		/// <summary>
 		/// Create Number.prototype
 		/// </summary>
-		public NumberObj(Engine engine, IObject baseClass)
+		public NumberObj(IEngine engine, IObject baseClass)
 			: base(engine, baseClass)
 		{
 		}
@@ -106,7 +106,7 @@ namespace RedOnion.Script.BasicObjects
 		/// <summary>
 		/// Create new number object boxing the value
 		/// </summary>
-		public NumberObj(Engine engine, NumberObj baseClass, Value value)
+		public NumberObj(IEngine engine, NumberObj baseClass, Value value)
 			: base(engine, baseClass, StdProps)
 			=> Number = value;
 

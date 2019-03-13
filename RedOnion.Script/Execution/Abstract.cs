@@ -16,12 +16,34 @@ namespace RedOnion.Script
 		/// Exit code (of last statement, code block or whole program)
 		/// </summary>
 		public OpCode Exit { get; protected set; }
+		/// <summary>
+		/// Result of last expression (lvalue)
+		/// </summary>
+		protected Value Value;
+		/// <summary>
+		/// Result of last expression (rvalue)
+		/// </summary>
+		public Value Result => Value.RValue;
+
+		/// <summary>
+		/// Currently executed code
+		/// </summary>
+		public CompiledCode Compiled
+		{
+			get => _compiled;
+			set
+			{
+				_compiled = value;
+				Strings = value?.Strings;
+				Code = value?.Code;
+			}
+		}
+		private CompiledCode _compiled;
 
 		/// <summary>
 		/// String table associated with code
 		/// </summary>
 		public string[] Strings { get; protected set; }
-
 		/// <summary>
 		/// Active code (compilation unit)
 		/// </summary>
@@ -39,77 +61,57 @@ namespace RedOnion.Script
 		/// <summary>
 		/// Run script
 		/// </summary>
-		public AbstractEngine Execute(string[] strings, byte[] code)
-			=> Execute(strings, code, 0, code.Length);
-
-		/// <summary>
-		/// Run script
-		/// </summary>
-		public AbstractEngine Execute(string[] strings, byte[] code, int at, int size)
-		{
-			ExecCode(strings, code, at, size);
-			return this;
-		}
-
-		/// <summary>
-		/// Run script
-		/// </summary>
-		protected virtual void ExecCode(string[] strings, byte[] code, int at, int size)
+		public virtual void Execute(CompiledCode code, int at, int size)
 		{
 			Exit = 0;
 
-			var prevStrings = Strings;
-			var prevCode = Code;
-			Strings = strings;
-			Code = code;
-
-			Current = 0;
-			Inside = 0;
-			var end = at + size;
-			while (at < end)
+			var prev = Compiled;
+			Compiled = code;
+			try
 			{
-				Process(ref at);
-				if (Exit != 0)
-					break;
+
+				Current = 0;
+				Inside = 0;
+				var end = at + size;
+				while (at < end)
+				{
+					Process(ref at);
+					if (Exit != 0)
+						break;
+				}
 			}
-
-			Strings = prevStrings;
-			Code = prevCode;
+			finally
+			{
+				Compiled = prev;
+			}
 		}
+		/// <summary>
+		/// Run compiled script
+		/// </summary>
+		public void Execute(CompiledCode code)
+			=> Execute(code, 0, code.Code.Length);
 
 		/// <summary>
-		/// Evaluate expression
+		/// Run script
 		/// </summary>
-		public AbstractEngine Expression(string[] strings, byte[] code)
-			=> Expression(strings, code, 0);
-
-		/// <summary>
-		/// Evaluate expression
-		/// </summary>
-		public AbstractEngine Expression(string[] strings, byte[] code, int at)
-		{
-			EvalExpression(strings, code, at);
-			return this;
-		}
-
-		/// <summary>
-		/// Evaluate expression
-		/// </summary>
-		protected virtual void EvalExpression(string[] strings, byte[] code, int at)
+		public virtual Value Evaluate(CompiledCode code, int at)
 		{
 			Exit = 0;
 
-			var prevStrings = Strings;
-			var prevCode = Code;
-			Strings = strings;
-			Code = code;
+			var prev = Compiled;
+			Compiled = code;
+			try
+			{
 
-			Current = 0;
-			Inside = 0;
-			Expression(ref at);
-
-			Strings = prevStrings;
-			Code = prevCode;
+				Current = 0;
+				Inside = 0;
+				Expression(ref at);
+			}
+			finally
+			{
+				Compiled = prev;
+			}
+			return Result;
 		}
 
 		/// <summary>

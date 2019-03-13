@@ -14,7 +14,7 @@ namespace RedOnion.Script.BasicObjects
 		/// <summary>
 		/// Engine this object belongs to
 		/// </summary>
-		public Engine Engine { get; }
+		public IEngine Engine { get; }
 
 		/// <summary>
 		/// No base class
@@ -42,7 +42,7 @@ namespace RedOnion.Script.BasicObjects
 		/// <summary>
 		/// Create object with some base properties
 		/// </summary>
-		public SimpleObject(Engine engine, IProperties properties)
+		public SimpleObject(IEngine engine, IProperties properties)
 		{
 			Engine = engine;
 			BaseProps = properties;
@@ -56,7 +56,7 @@ namespace RedOnion.Script.BasicObjects
 
 		public Value Get(string name)
 		{
-			if (!Get(name, out var value) && !Engine.HasOption(Engine.Option.Silent))
+			if (!Get(name, out var value) && !Engine.HasOption(EngineOption.Silent))
 				throw new NotImplementedException(name + " does not exist");
 			return value;
 		}
@@ -140,6 +140,6 @@ namespace RedOnion.Script.BasicObjects
 		/// Get n-th argument (for call/create implementation)
 		/// </summary>
 		protected Value Arg(int argc, int n = 0)
-			=> Engine.Args.Arg(argc, n);
+			=> Engine.GetArgument(argc, n);
 	}
 }

@@ -100,7 +100,7 @@ namespace RedOnion.ScriptNUnit
 
 			// obj.s needs to be boxed first - properties are otherwise lost
 			var options = Options;
-			Options |= Option.Silent; // will otherwise throw exception that `s` does not have `bad`
+			Options |= EngineOption.Silent; // will otherwise throw exception that `s` does not have `bad`
 			Test(3.14,		"obj.s.bad = obj.x");
 			Test(null,		"obj.s.bad");   // was assigned to boxed value and now lost
 			Options = options;
