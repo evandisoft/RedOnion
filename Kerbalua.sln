@@ -7,7 +7,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KerbaluaTester", "KerbaluaT
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KerbaluaParserTester", "KerbaluaParserTester\KerbaluaParserTester.csproj", "{910D0CF0-3517-4D47-9A3C-F451C3B6A8FF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedOnion.KSP", "RedOnion.KSP\RedOnion.KSP.csproj", "{DEC12E09-29AD-4666-9954-8C8A1D7BF454}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedOnion.Script", "RedOnion.Script\RedOnion.Script.csproj", "{0D0A04F3-0A82-49CD-8178-7640ACE88BFF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedOnion.ScriptNUnit", "RedOnion.ScriptNUnit\RedOnion.ScriptNUnit.csproj", "{B705F43E-2E55-4309-9399-22608AB4F4B3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedOnion.UI", "RedOnion.UI\RedOnion.UI.csproj", "{034C16AB-D16E-4AFE-9837-812499EE2F3D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedOnion", "RedOnion\RedOnion.csproj", "{3A40C452-1B11-4769-9D6B-FD318F2CB514}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,10 +35,26 @@ Global
 		{910D0CF0-3517-4D47-9A3C-F451C3B6A8FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{910D0CF0-3517-4D47-9A3C-F451C3B6A8FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{910D0CF0-3517-4D47-9A3C-F451C3B6A8FF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DEC12E09-29AD-4666-9954-8C8A1D7BF454}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DEC12E09-29AD-4666-9954-8C8A1D7BF454}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DEC12E09-29AD-4666-9954-8C8A1D7BF454}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DEC12E09-29AD-4666-9954-8C8A1D7BF454}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0D0A04F3-0A82-49CD-8178-7640ACE88BFF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0D0A04F3-0A82-49CD-8178-7640ACE88BFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0D0A04F3-0A82-49CD-8178-7640ACE88BFF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0D0A04F3-0A82-49CD-8178-7640ACE88BFF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B705F43E-2E55-4309-9399-22608AB4F4B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B705F43E-2E55-4309-9399-22608AB4F4B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B705F43E-2E55-4309-9399-22608AB4F4B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B705F43E-2E55-4309-9399-22608AB4F4B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{034C16AB-D16E-4AFE-9837-812499EE2F3D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{034C16AB-D16E-4AFE-9837-812499EE2F3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{034C16AB-D16E-4AFE-9837-812499EE2F3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{034C16AB-D16E-4AFE-9837-812499EE2F3D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3A40C452-1B11-4769-9D6B-FD318F2CB514}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A40C452-1B11-4769-9D6B-FD318F2CB514}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A40C452-1B11-4769-9D6B-FD318F2CB514}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A40C452-1B11-4769-9D6B-FD318F2CB514}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		outputpath = ../../programs/KSPDev/KerbaluaDev/GameData/Kerbalua/Plugins

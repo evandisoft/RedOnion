@@ -5,11 +5,10 @@ using System.Collections.Generic;
 namespace Kerbalua.Gui {
 	public class EditingArea:ScrollableTextArea {
 		//int inc = 0;
-		public int cursorIndex = 0;
-		public int selectIndex = 0;
 		const int spacesPerTab = 4;
 		public KeyBindings KeyBindings = new KeyBindings();
 		protected TextEditor editor;
+
 
 		/// <summary>
 		/// Setting this to true will not allow any key-down input events
