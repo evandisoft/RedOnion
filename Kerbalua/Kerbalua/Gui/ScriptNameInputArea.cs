@@ -45,7 +45,7 @@ namespace Kerbalua.Gui {
 
 		public void Complete(int index)
 		{
-			var completionContent = GetCompletionContent();
+			var completionContent = GetCompletionContent(out int replaceStart,out int replaceEnd);
 			if (completionContent.Count > index) {
 				content.text = completionContent[index];
 				selectIndex=cursorIndex = content.text.Length;
@@ -105,7 +105,7 @@ namespace Kerbalua.Gui {
 		}
 
 
-		public List<string> GetCompletionContent()
+		public IList<string> GetCompletionContent(out int replaceStart,out int replaceEnd)
 		{
 			var newList = new List<string>();
 			foreach (var scriptPathString in GetScriptList()) {
@@ -118,6 +118,7 @@ namespace Kerbalua.Gui {
 					newList.Add(scriptFileName);
 				}
 			}
+			replaceStart = 0;replaceEnd = content.text.Length;
 			return newList;
 		}
 

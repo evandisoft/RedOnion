@@ -59,7 +59,7 @@ namespace Kerbalua.Other
 		/// <returns>The completions.</returns>
 		/// <param name="source">Source.</param>
 		/// <param name="cursorPos">Cursor position.</param>
-		public override List<string> GetCompletions(string source, int cursorPos)
+		public override IList<string> GetCompletions(string source, int cursorPos,out int replaceStart,out int replaceEnd)
 		{
 			List<string> NOT_IMPLEMENTED_COMPLETIONS = new List<string>();
 			NOT_IMPLEMENTED_COMPLETIONS.Add("MoonSharp");
@@ -71,19 +71,10 @@ namespace Kerbalua.Other
 			for(int i = 0;i < 100;i++) {
 				NOT_IMPLEMENTED_COMPLETIONS.Add("test-string #"+i);
 			}
+			replaceStart = replaceEnd = 0;
 			return NOT_IMPLEMENTED_COMPLETIONS;
 		}
 
-		/// <summary>
-		/// TODO: NOT CURRENTLY IMPLEMENTED
-		/// </summary>
-		/// <returns>The partial completion.</returns>
-		/// <param name="source">Source.</param>
-		/// <param name="cursorPos">Cursor position.</param>
-		public override string GetPartialCompletion(string source, int cursorPos)
-		{
-			return "";
-		}
 
 		void InternalResetEngine()
 		{

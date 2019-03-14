@@ -5,14 +5,14 @@ using System.Collections.Generic;
 
 namespace Kerbalua.Gui {
 	public class CompletionBox:EditingArea,ICompletionSelector {
-		List<string> contentStrings = new List<string>();
-		string partialCompletion;
+		IList<string> contentStrings = new List<string>();
+		int partialLength;
 
 		public int SelectionIndex { get; private set; } = 0;
 
-		public void SetContentWithStringList(List<string> contentStrings,string partialCompletion)
+		public void SetContentFromICompletable(ICompletable completable)
 		{
-			this.contentStrings = contentStrings;
+			contentStrings = completable.GetCompletionContent(out int replaceStart, out int replaceEnd);
 			StringBuilder sb = new StringBuilder();
 			//Debug.Log("partial is " + partialCompletion);
 			foreach(string str in contentStrings) {
@@ -26,7 +26,7 @@ namespace Kerbalua.Gui {
 			}
 			content.text = sb.ToString();
 			SelectionIndex = 0;
-			this.partialCompletion = partialCompletion;
+			partialLength = replaceEnd - replaceStart;
 			UpdateCursorPosition();
 		}
 
@@ -37,7 +37,7 @@ namespace Kerbalua.Gui {
 			}
 			//Debug.Log("Updating Cursor Position");
 
-			int partialCompletionLength = partialCompletion.Length;
+			//int partialCompletionLength = partialLength.Length;
 			editor.MoveTextStart();
 			for(int i = 0;i < SelectionIndex; i++) {
 				editor.MoveDown();

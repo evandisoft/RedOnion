@@ -73,10 +73,7 @@ namespace Kerbalua.Gui {
 
 		void DisplayCurrentCompletions(ICompletable completable)
 		{
-			completionSelector.SetContentWithStringList(
-				completable.GetCompletionContent(),
-				completable.PartialCompletion()
-				);
+			completionSelector.SetContentFromICompletable(completable);
 		}
 
 		public void Complete()
