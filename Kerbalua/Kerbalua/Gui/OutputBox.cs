@@ -8,7 +8,7 @@ namespace Kerbalua.Gui {
 			content.text += "\nr> " + str;
 		}
 
-		public void AddIO(string str)
+		public void AddOutput(string str)
 		{
 			content.text += "\no> " + str;
 		}

@@ -63,7 +63,7 @@ namespace Kerbalua.Gui {
 			replEvaluators["RedOnion"] = new RedOnionReplEvaluator();
 			replEvaluators["MoonSharp"] = new MoonSharpReplEvaluator(CoreModules.Preset_Complete);
 			replEvaluators["MoonSharp"].PrintAction = (str) => {
-				repl.outputBox.AddIO(str);
+				repl.outputBox.AddOutput(str);
 			};
 			SetCurrentEvaluator("RedOnion");
 			recentFiles = new RecentFilesList((string filename) => {
@@ -152,7 +152,7 @@ namespace Kerbalua.Gui {
 
 Common to Editor and Repl input area:
 			shift + space: Intellisense completion. 
-ctrl + e: evaluate content
+ctrl + e: evaluate content. For editor this also saves to the file in the filename input area
 tab: indent
 shift + tab: unindent
 ctrl + tab: make current line's indentation match previous line's indentation
@@ -179,7 +179,7 @@ ctrl + h: insert and move to new line before current line
 
 Editor only:
 ctrl + s: Saves the file in `Scripts` folder within KSP folder based on the name specified in the textarea that is dedicated to this.
-  ctrl + d: Loads the file from `Scripts` folder within KSP folder based on the name specified in the textarea that is dedicated to this.
+ctrl + d: Loads the file from `Scripts` folder within KSP folder based on the name specified in the textarea that is dedicated to this.
 
 REPL input area only:
 enter: evaluate content and clear repl input area.

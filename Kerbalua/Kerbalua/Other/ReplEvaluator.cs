@@ -86,17 +86,7 @@ namespace Kerbalua.Other {
 		/// <returns>The completion.</returns>
 		/// <param name="source">Source.</param>
 		/// <param name="cursorPos">Cursor position.</param>
-		public abstract List<string> GetCompletions(string source, int cursorPos);
-
-		/// <summary>
-		/// Return the part of the string that will be replaced by a completion.
-		/// For example "a.bla" may complete to "a.blah" but the partial would be
-		/// "bla"
-		/// </summary>
-		/// <returns>The partial completion.</returns>
-		/// <param name="source">Source.</param>
-		/// <param name="cursorPos">Cursor position.</param>
-		public abstract string GetPartialCompletion(string source, int cursorPos);
+		public abstract IList<string> GetCompletions(string source, int cursorPos,out int replaceStart,out int replaceEnd);
 
 		/// <summary>
 		/// Resets the engine.

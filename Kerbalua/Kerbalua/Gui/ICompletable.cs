@@ -8,9 +8,8 @@ namespace Kerbalua.Gui {
 	/// the portion of the text that is to be replaced.
 	/// </summary>
     public interface ICompletable:IFocusable {
-		string PartialCompletion();
 		void Complete(int index);
-		List<string> GetCompletionContent();
+		IList<string> GetCompletionContent(out int replaceStart,out int replaceEnd);
 		bool ReceivedInput { get; }
 	}
 }
