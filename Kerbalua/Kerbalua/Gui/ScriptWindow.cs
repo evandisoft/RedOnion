@@ -62,6 +62,9 @@ namespace Kerbalua.Gui {
 		{
 			replEvaluators["RedOnion"] = new RedOnionReplEvaluator();
 			replEvaluators["MoonSharp"] = new MoonSharpReplEvaluator(CoreModules.Preset_Complete);
+			replEvaluators["MoonSharp"].PrintAction = (str) => {
+				repl.outputBox.AddIO(str);
+			};
 			SetCurrentEvaluator("RedOnion");
 			recentFiles = new RecentFilesList((string filename) => {
 				scriptIOTextArea.content.text = filename;
@@ -116,8 +119,10 @@ namespace Kerbalua.Gui {
 				editor.content.text=scriptIOTextArea.Load();
 			}));
 			widgetBar.renderables.Add(new Button("Evaluate", () => {
+				scriptIOTextArea.Save(editor.content.text);
+				repl.outputBox.AddFileContent(scriptIOTextArea.content.text);
 				if (currentReplEvaluator.Evaluate(editor.content.text, out string output)) {
-					repl.outputBox.content.text += output;
+					repl.outputBox.AddReturnValue(output);
 				} else {
 					evaluationNotFinished = true;
 				}
@@ -233,22 +238,26 @@ ctrl + enter: submit completion";
 			GlobalKeyBindings.Add(new EventKey(KeyCode.Return, true), completionManager.Complete);
 
 			editor.KeyBindings.Add(new EventKey(KeyCode.E, true), () => {
+				scriptIOTextArea.Save(editor.content.text);
+				repl.outputBox.AddFileContent(scriptIOTextArea.content.text);
 				if (currentReplEvaluator.Evaluate(editor.content.text, out string output)) {
-					repl.outputBox.content.text += output;
+					repl.outputBox.AddReturnValue(output);
 				} else {
 					evaluationNotFinished = true;
 				}
 			});
 			repl.inputBox.KeyBindings.Add(new EventKey(KeyCode.E, true), () => {
+				repl.outputBox.AddSourceString(repl.inputBox.content.text);
 				if (currentReplEvaluator.Evaluate(repl.inputBox.content.text, out string output)) {
-					repl.outputBox.content.text += output;
+					repl.outputBox.AddReturnValue(output);
 				} else {
 					evaluationNotFinished = true;
 				}
 			});
 			repl.inputBox.KeyBindings.Add(new EventKey(KeyCode.Return), () => {
-				if (currentReplEvaluator.Evaluate(repl.inputBox.content.text, out string output)) {
-					repl.outputBox.content.text += output;
+				repl.outputBox.AddSourceString(repl.inputBox.content.text);
+				if (currentReplEvaluator.Evaluate(repl.inputBox.content.text, out string output,true)) {
+					repl.outputBox.AddReturnValue(output);
 				} else {
 					evaluationNotFinished = true;
 				}
@@ -382,6 +391,8 @@ ctrl + enter: submit completion";
 					&& Event.current.control) {
 				GUIUtil.ConsumeAndMarkNextCharEvent(Event.current);
 				currentReplEvaluator.Terminate();
+				evaluationNotFinished = false;
+				repl.outputBox.AddError("Execution Manually Terminated");
 			}
 
 			if (evaluationNotFinished) {
@@ -390,7 +401,7 @@ ctrl + enter: submit completion";
 				if (currentReplEvaluator.Evaluate("", out output)) {
 					//Debug.Log("Evaluation Finally Finished");
 					evaluationNotFinished = false;
-					repl.outputBox.content.text += output;
+					repl.outputBox.AddReturnValue(output);
 				} else {
 					//Debug.Log("Evaluation Still Not Finished");
 					if (Event.current.type == EventType.KeyDown ||

@@ -12,6 +12,7 @@ namespace Kerbalua.Other
     public class MoonSharpReplEvaluator:ReplEvaluator
     {
 		SimpleScript scriptEngine;
+
 		CoreModules coreModules;
 		KerbaluaExecutionManager kem = new KerbaluaExecutionManager();
 
@@ -31,7 +32,6 @@ namespace Kerbalua.Other
 				if(scriptEngine.EvaluateWithCoroutine(source,out result)) {
 					isComplete = true;
 
-					output = "\n";
 					if (result.UserData == null) {
 						output += result;
 					} else {
@@ -88,6 +88,9 @@ namespace Kerbalua.Other
 		void InternalResetEngine()
 		{
 			scriptEngine = new SimpleScript(coreModules);
+			scriptEngine.Options.DebugPrint = (string str) => {
+				PrintAction?.Invoke(str);
+			};
 			//scriptEngine.AttachDebugger(kem);
 		}
 

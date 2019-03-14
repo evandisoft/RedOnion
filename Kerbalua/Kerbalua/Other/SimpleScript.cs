@@ -8,62 +8,61 @@ namespace Kerbalua.Other {
 	public class SimpleScript:Script {
 		public SimpleScript(CoreModules coreModules) : base(coreModules)
 		{
-
 		}
 
-		protected bool markedForTermination = false;
 		DynValue coroutine;
-		public bool EvaluateWithCoroutine(string str, out DynValue result)
+		public bool EvaluateWithCoroutine(string source, out DynValue result)
 		{
-			if (markedForTermination) {
-				markedForTermination = false;
+			if (coroutine == null) {
+				SetCoroutine(source);
+			} 
+			result = coroutine.Coroutine.Resume();
+			//Debug.Log("result is " + result);
+			//if (coroutine.Coroutine.State == CoroutineState.ForceSuspended) {
+			//	Globals["suspended"] = result;
+			//}
+
+			bool isComplete = false;
+			if (coroutine.Coroutine.State == CoroutineState.Dead) {
+				//Debug.Log("It's dead jim " + result);
+
+				//Debug.Log("Coroutine state is" + coroutine.Coroutine.State + ", result is " + result);
+				isComplete = true;
 				coroutine = null;
-				result = DynValue.NewString("(Execution Terminated)");
-				
-				return true;
+			} else {
+				//Debug.Log("Coroutine state is" + coroutine.Coroutine.State + ", result is incomplete");
 			}
 
+			//DynValue result = base.DoString("return " + str);
+			return isComplete;
+		}
 
+		void SetCoroutine(string source)
+		{
 			try {
-				if (coroutine == null) {
-					DynValue mainFunction = base.DoString("return function () " + str + " end");
-					//Debug.Log("Main function is "+mainFunction);
-					coroutine = CreateCoroutine(mainFunction);
-					//Debug.Log("Coroutine is " + coroutine);
-					coroutine.Coroutine.AutoYieldCounter = 1000;
-					//Debug.Log("AutoYield is " + coroutine.Coroutine.AutoYieldCounter);
-				} 
-				result = coroutine.Coroutine.Resume();
-				//Debug.Log("result is " + result);
-				//if (coroutine.Coroutine.State == CoroutineState.ForceSuspended) {
-				//	Globals["suspended"] = result;
-				//}
-
-				bool isComplete = false;
-				if (coroutine.Coroutine.State == CoroutineState.Dead) {
-					//Debug.Log("It's dead jim " + result);
-
-					//Debug.Log("Coroutine state is" + coroutine.Coroutine.State + ", result is " + result);
-					isComplete = true;
-					coroutine = null;
-				} else {
-					//Debug.Log("Coroutine state is" + coroutine.Coroutine.State + ", result is incomplete");
+				if (source.StartsWith("=")) {
+					source = "return " + source.Substring(1);
 				}
-
-				//DynValue result = base.DoString("return " + str);
-				return isComplete;
-			} catch (SyntaxErrorException e) {
-				//DynValue result = base.DoString(str);
-				//return result;
-				Debug.Log(e);
-				result = DynValue.NewString("(Execution Terminated)");
-				return true;
+				DynValue mainFunction = base.DoString("return function () " + source + " end");
+				//Debug.Log("Main function is "+mainFunction);
+				coroutine = CreateCoroutine(mainFunction);
+				//Debug.Log("Coroutine is " + coroutine);
 			}
+			catch(SyntaxErrorException e) {
+				//Doesn't work in general
+				//DynValue mainFunction = base.DoString("return function () return " + source + " end");
+				//Debug.Log("Main function is "+mainFunction);
+				//coroutine = CreateCoroutine(mainFunction);
+				//Debug.Log(e);
+				//Debug.Log("Coroutine is " + coroutine);
+				throw e;
+			}
+			coroutine.Coroutine.AutoYieldCounter = 1000;
 		}
 
 		public void Terminate()
 		{
-			markedForTermination = true;
+			coroutine = null;
 		}
 	}
 }

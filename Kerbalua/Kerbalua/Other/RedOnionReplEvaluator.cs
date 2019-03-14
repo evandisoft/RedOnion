@@ -54,7 +54,6 @@ namespace Kerbalua.Other {
 				engine.ExecutionCountdown = 10000;
 				engine.Execute(source);
 				Value result = engine.Result;
-				output = "\n";
 				output +=result.ToString();
 			}
 			catch(Exception e) {
