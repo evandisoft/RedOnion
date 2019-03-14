@@ -14,7 +14,11 @@ namespace RedOnion.Script
 		public Engine()
 			: this(engine => new BasicObjects.Root(engine)) { }
 		public Engine(Func<IEngine, IEngineRoot> createRoot)
-			: base(createRoot, new Parser()) { }
+			: base(createRoot, new Parser(DefaultParserOptions)) { }
+		internal static Parser.Option DefaultParserOptions
+			= Parsing.Parser.Option.Script
+			| Parsing.Parser.Option.Untyped
+			| Parsing.Parser.Option.Typed;
 	}
 	/// <summary>
 	/// Runtime engine
@@ -48,11 +52,6 @@ namespace RedOnion.Script
 			if (ExecutionCountdown > 0 && --ExecutionCountdown == 0)
 				throw new TookTooLong();
 		}
-
-		internal static Parser.Option DefaultParserOptions
-			= Parsing.Parser.Option.Script
-			| Parsing.Parser.Option.Untyped
-			| Parsing.Parser.Option.Typed;
 
 		protected Engine(Func<IEngine, IEngineRoot> createRoot, P parser)
 		{

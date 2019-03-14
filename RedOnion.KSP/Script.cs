@@ -12,15 +12,105 @@ using UnityEngine.UI;
 
 namespace RedOnion.KSP
 {
+	public enum EngineType
+	{
+		Runtime,
+		Immediate,
+		Completion,
+		ReplCompletion
+	}
+
 	/// <summary>
 	/// Runtime engine with all the features
 	/// </summary>
 	public class RuntimeEngine : Engine
 	{
 		public RuntimeEngine()
-			: base(engine => new EngineRoot(engine, EngineRoot.RootKind.Runtime)) { }
+			: base(engine => new RuntimeRoot(engine, root =>
+			FillRoot(root, EngineType.Runtime))) { }
 		public override void Log(string msg)
 			=> Debug.Log("[RedOnion] " + msg);
+
+		public static void FillRoot(IEngineRoot root, EngineType engineType)
+		{
+			// neutral types first
+			root.AddType(typeof(System.Delegate));
+			root.AddType(typeof(UnityEngine.Debug));
+			root.AddType(typeof(UnityEngine.Color));
+			root.AddType(typeof(UnityEngine.Rect));
+			root.AddType(typeof(UnityEngine.Vector2));
+			root.AddType(typeof(UnityEngine.Vector3));
+			root.AddType(typeof(UnityEngine.Vector4));
+
+			// safe types next (TODO: ref-count or bind to engine to dispose with engine reset)
+			root.BaseProps.Set("UI", new Value(engine =>
+			new SimpleObject(engine, new Properties()
+			{
+				{ "Anchors",        root[typeof(UI.Anchors)] },
+				{ "Element",        root[typeof(UI.Element)] },
+				{ "Panel",          root[typeof(UI.Panel)] },
+				{ "Window",         root[typeof(UI.Window)] },
+				{ "Label",          root[typeof(UI.Label)] },
+				{ "Button",         root[typeof(UI.Button)] },
+			})));
+
+			// things that are dangerous in immediate / REPL mode
+			if (engineType == EngineType.Runtime || engineType == EngineType.Completion)
+			{
+				// definitely dangerous, IMGUI is not for REPL
+				root.BaseProps.Set("IMGUI", new Value(engine =>
+				root[typeof(GUI)] = new ReflectedType(engine, typeof(UnityEngine.GUI), new Properties()
+				{
+					{ "GUISkin",        root[typeof(UnityEngine.GUISkin)] },
+					{ "GUIStyle",       root[typeof(UnityEngine.GUIStyle)] },
+					{ "GUIStyleState",  root[typeof(UnityEngine.GUIStyleState)] },
+					{ "GUIContent",     root[typeof(UnityEngine.GUIContent)] },
+					{ "GUIElement",     root[typeof(UnityEngine.GUIElement)] },
+					{ "GUILayer",       root[typeof(UnityEngine.GUILayer)] },
+					{ "GUILayout",      root[typeof(UnityEngine.GUILayout)] },
+					{ "GUIText",        root[typeof(UnityEngine.GUIText)] },
+					{ "GUIUtility",     root[typeof(UnityEngine.GUIUtility)] },
+				})));
+
+				// potentionally dangerous (could stay without a way to destroy)
+				root.BaseProps.Set("Unity", new Value(engine =>
+				new SimpleObject(engine, new Properties()
+				{
+					{ "DefaultControls", root[typeof(UnityEngine.UI.DefaultControls)] },
+					{ "Object",         root[typeof(UnityEngine.Object)] },
+					{ "GameObject",     root[typeof(UnityEngine.GameObject)] },
+					{ "Canvas",         root[typeof(UnityEngine.Canvas)] },
+					{ "CanvasGroup",    root[typeof(UnityEngine.CanvasGroup)] },
+					{ "RectTransform",  root[typeof(UnityEngine.RectTransform)] },
+					{ "LayerMask",      root[typeof(UnityEngine.LayerMask)] },
+					{ "Text",           root[typeof(UnityEngine.UI.Text)] },
+					{ "Button",         root[typeof(UnityEngine.UI.Button)] },
+					{ "Image",          root[typeof(UnityEngine.UI.Image)] },
+					{ "RawImage",       root[typeof(UnityEngine.UI.RawImage)] },
+					{ "Sprite",         root[typeof(UnityEngine.Sprite)] },
+					{ "Texture",        root[typeof(UnityEngine.Texture)] },
+					{ "Texture2D",      root[typeof(UnityEngine.Texture2D)] },
+					{ "Renderer",       root[typeof(UnityEngine.Renderer)] },
+
+					{ "Master",         root[typeof(UIMasterController)] },
+					{ "UIMasterController", root[typeof(UIMasterController)] },
+					{ "UISkinDef",      root[typeof(UISkinDef)] },
+					{ "UISkinManager",  root[typeof(UISkinManager)] },
+					{ "UIStyle",        root[typeof(UIStyle)] },
+					{ "UIStyleState",   root[typeof(UIStyleState)] },
+				})));
+
+				// potentionally dangerous (who the heck knows, we need our own safe API)
+				root.BaseProps.Set("KSP", new Value(engine =>
+				new SimpleObject(engine, new Properties()
+				{
+					{ "Vessel",         root[typeof(Vessel)] },
+					{ "FlightGlobals",  root[typeof(FlightGlobals)] },
+					{ "FlightCtrlState", root[typeof(FlightCtrlState)] },
+					{ "StageManager",   root[typeof(StageManager)] },
+				})));
+			}
+		}
 	}
 	/// <summary>
 	/// Limited engine whith what is safe in REPL / Immediate Mode
@@ -28,17 +118,32 @@ namespace RedOnion.KSP
 	public class ImmediateEngine : Engine
 	{
 		public ImmediateEngine()
-			: base(engine => new EngineRoot(engine, EngineRoot.RootKind.Immediate)) { }
+			: base(engine => new RuntimeRoot(engine, root =>
+			RuntimeEngine.FillRoot(root, EngineType.Immediate))) { }
 		public override void Log(string msg)
 			=> Debug.Log("[RedOnion.REPL] " + msg);
 	}
+
+	public class RuntimeRoot : Root
+	{
+		protected Action<IEngineRoot> FillMe;
+		protected override void Fill()
+		{
+			base.Fill();
+			FillMe?.Invoke(this);
+		}
+		public RuntimeRoot(IEngine engine, Action<IEngineRoot> fill)
+			: base(engine) => FillMe = fill;
+	}
+
 	/// <summary>
 	/// Engine designed to provide hints and documentation for runtime engine
 	/// </summary>
 	public class DocumentingEngine : CompletionEngine
 	{
 		public DocumentingEngine()
-			: base(engine => new EngineRoot(engine, EngineRoot.RootKind.Completion))
+			: base(engine => new CompletionRoot(engine, root =>
+			RuntimeEngine.FillRoot(root, EngineType.Completion)))
 			=> Options = Options | EngineOption.Silent;
 		protected DocumentingEngine(Func<IEngine, IEngineRoot> createRoot)
 			: base(createRoot)
@@ -65,106 +170,21 @@ namespace RedOnion.KSP
 	public class ReplHintsEngine : DocumentingEngine
 	{
 		public ReplHintsEngine()
-			: base(engine => new EngineRoot(engine, EngineRoot.RootKind.ReplCompletion)) { }
+			: base(engine => new CompletionRoot(engine, root =>
+			RuntimeEngine.FillRoot(root, EngineType.ReplCompletion))) { }
 		public override void Log(string msg)
 			=> Debug.Log("[RedOnion.ReplDOC] " + msg);
 	}
-	public class EngineRoot : Root
-	{
-		public enum RootKind
-		{
-			Runtime,
-			Immediate,
-			Completion,
-			ReplCompletion
-		}
-		public RootKind Kind { get; }
-		public EngineRoot(IEngine engine, RootKind kind)
-			: base(engine, fill: false)
-		{
-			Kind = kind;
-			Fill();
-		}
 
+	public class CompletionRoot : Root
+	{
+		protected Action<IEngineRoot> FillMe;
 		protected override void Fill()
 		{
-			// neutral types first
-			AddType(typeof(System.Delegate));
-			AddType(typeof(UnityEngine.Debug));
-			AddType(typeof(UnityEngine.Color));
-			AddType(typeof(UnityEngine.Rect));
-			AddType(typeof(UnityEngine.Vector2));
-			AddType(typeof(UnityEngine.Vector3));
-			AddType(typeof(UnityEngine.Vector4));
-
-			// safe types next (TODO: ref-count or bind to engine to dispose with engine reset)
-			BaseProps.Set("UI", new Value(engine =>
-			new SimpleObject(engine, new Properties()
-			{
-				{ "Anchors",        this[typeof(UI.Anchors)] },
-				{ "Element",        this[typeof(UI.Element)] },
-				{ "Panel",          this[typeof(UI.Panel)] },
-				{ "Window",         this[typeof(UI.Window)] },
-				{ "Label",          this[typeof(UI.Label)] },
-				{ "Button",         this[typeof(UI.Button)] },
-			})));
-
-			// things that are dangerous in immediate / REPL mode
-			if (Kind == RootKind.Runtime /* TODO: || Kind == RootKind.Completion */)
-			{
-				// definitely dangerous, IMGUI is not for REPL
-				BaseProps.Set("IMGUI", new Value(engine =>
-				this[typeof(GUI)] = new ReflectedType(engine, typeof(UnityEngine.GUI), new Properties()
-				{
-					{ "GUISkin",        this[typeof(UnityEngine.GUISkin)] },
-					{ "GUIStyle",       this[typeof(UnityEngine.GUIStyle)] },
-					{ "GUIStyleState",  this[typeof(UnityEngine.GUIStyleState)] },
-					{ "GUIContent",     this[typeof(UnityEngine.GUIContent)] },
-					{ "GUIElement",     this[typeof(UnityEngine.GUIElement)] },
-					{ "GUILayer",       this[typeof(UnityEngine.GUILayer)] },
-					{ "GUILayout",      this[typeof(UnityEngine.GUILayout)] },
-					{ "GUIText",        this[typeof(UnityEngine.GUIText)] },
-					{ "GUIUtility",     this[typeof(UnityEngine.GUIUtility)] },
-				})));
-
-				// potentionally dangerous (could stay without a way to destroy)
-				BaseProps.Set("Unity", new Value(engine =>
-				new SimpleObject(engine, new Properties()
-				{
-					{ "DefaultControls", this[typeof(UnityEngine.UI.DefaultControls)] },
-					{ "Object",         this[typeof(UnityEngine.Object)] },
-					{ "GameObject",     this[typeof(UnityEngine.GameObject)] },
-					{ "Canvas",         this[typeof(UnityEngine.Canvas)] },
-					{ "CanvasGroup",    this[typeof(UnityEngine.CanvasGroup)] },
-					{ "RectTransform",  this[typeof(UnityEngine.RectTransform)] },
-					{ "LayerMask",      this[typeof(UnityEngine.LayerMask)] },
-					{ "Text",           this[typeof(UnityEngine.UI.Text)] },
-					{ "Button",         this[typeof(UnityEngine.UI.Button)] },
-					{ "Image",          this[typeof(UnityEngine.UI.Image)] },
-					{ "RawImage",       this[typeof(UnityEngine.UI.RawImage)] },
-					{ "Sprite",         this[typeof(UnityEngine.Sprite)] },
-					{ "Texture",        this[typeof(UnityEngine.Texture)] },
-					{ "Texture2D",      this[typeof(UnityEngine.Texture2D)] },
-					{ "Renderer",       this[typeof(UnityEngine.Renderer)] },
-
-					{ "Master",         this[typeof(UIMasterController)] },
-					{ "UIMasterController", this[typeof(UIMasterController)] },
-					{ "UISkinDef",      this[typeof(UISkinDef)] },
-					{ "UISkinManager",  this[typeof(UISkinManager)] },
-					{ "UIStyle",        this[typeof(UIStyle)] },
-					{ "UIStyleState",   this[typeof(UIStyleState)] },
-				})));
-
-				// potentionally dangerous (who the heck knows, we need our own safe API)
-				BaseProps.Set("KSP", new Value(engine =>
-				new SimpleObject(engine, new Properties()
-				{
-					{ "Vessel",         this[typeof(Vessel)] },
-					{ "FlightGlobals",  this[typeof(FlightGlobals)] },
-					{ "FlightCtrlState", this[typeof(FlightCtrlState)] },
-					{ "StageManager",   this[typeof(StageManager)] },
-				})));
-			}
+			base.Fill();
+			FillMe?.Invoke(this);
 		}
+		public CompletionRoot(IEngine engine, Action<IEngineRoot> fill)
+			: base(engine) => FillMe = fill;
 	}
 }

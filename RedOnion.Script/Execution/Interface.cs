@@ -569,4 +569,20 @@ namespace RedOnion.Script
 		public static void DebugLog(this IEngine engine, string msg, params object[] args)
 			=> engine.Log(string.Format(msg, args));
 	}
+
+	public static class EngineRootExtensions
+	{
+		public static void AddType(this IEngineRoot root, string name, Type type, IObject creator = null)
+		{
+			if (creator == null)
+				creator = root[type];
+			else root[type] = creator;
+			root.Set(name, new Value(creator));
+		}
+		public static void AddType(this IEngineRoot root, Type type)
+		{
+			var creator = root[type];
+			root.Set(type.Name, new Value(creator));
+		}
+	}
 }

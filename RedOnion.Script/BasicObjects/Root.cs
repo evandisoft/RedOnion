@@ -87,21 +87,21 @@ namespace RedOnion.Script.BasicObjects
 			MoreProps.Set("Int64",		Long);
 			BaseProps.Set("ULong",		ULong);
 			MoreProps.Set("UInt64",		ULong);
-			BaseProps.Set("Int", new Value(Int));
-			MoreProps.Set("Int32", new Value(Int));
-			BaseProps.Set("UInt", new Value(UInt));
-			MoreProps.Set("UInt32", new Value(UInt));
-			BaseProps.Set("Short", new Value(Short));
-			MoreProps.Set("Int16", new Value(Short));
-			BaseProps.Set("UShort", new Value(UShort));
-			MoreProps.Set("UInt16", new Value(UShort));
-			BaseProps.Set("SByte", new Value(SByte));
-			MoreProps.Set("Int8", new Value(SByte));
-			BaseProps.Set("Byte", new Value(Byte));
-			MoreProps.Set("UInt8", new Value(Byte));
-			BaseProps.Set("Bool", new Value(Bool));
-			MoreProps.Set("Boolean", new Value(Bool));
-			BaseProps.Set("Char", new Value(Char));
+			BaseProps.Set("Int",		Int);
+			MoreProps.Set("Int32",		Int);
+			BaseProps.Set("UInt",		UInt);
+			MoreProps.Set("UInt32",		UInt);
+			BaseProps.Set("Short",		Short);
+			MoreProps.Set("Int16",		Short);
+			BaseProps.Set("UShort",		UShort);
+			MoreProps.Set("UInt16",		UShort);
+			BaseProps.Set("SByte",		SByte);
+			MoreProps.Set("Int8",		SByte);
+			BaseProps.Set("Byte",		Byte);
+			MoreProps.Set("UInt8",		Byte);
+			BaseProps.Set("Bool",		Bool);
+			MoreProps.Set("Boolean",	Bool);
+			BaseProps.Set("Char",		Char);
 			TypeMap[typeof(string)] = String;
 		}
 
