@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Kerbalua.Other {
 	/// <summary>
-	/// Subclasses of this class implement a function, Evaluate, that evaluates
+	/// Subclasses of this class implement a function, ProtectedEvaluate, that evaluates
 	/// a string (source) and returns a toString of the result of evaluating
 	/// source.
 	/// </summary>
@@ -16,12 +16,12 @@ namespace Kerbalua.Other {
 		/// <summary>
 		/// Evaluate the source and return the result of that evaluation.
 		/// Subclasses override the protected method "ProtectedEvaluate" to provide a per-engine evaluation
-		/// implementation.
+		/// implementation that will be called by this function.
 		/// </summary>
 		/// <returns>True if evaluation has completed. False if evaluation is unfinished.</returns>
 		/// <param name="source">The source string to be evaluated.</param>
 		/// <param name="output">A ToString of the result of evaluating source.</param>
-		/// <param name="withHistory">True if this sources evaluated should be added to the history.</param>
+		/// <param name="withHistory">True if this source should be added to the history.</param>
 		public bool Evaluate(string source,out string output,bool withHistory=false)
 		{
 			if (withHistory) {
@@ -43,6 +43,9 @@ namespace Kerbalua.Other {
 			return ProtectedEvaluate(source, out output);
 		}
 
+		/// <summary>
+		/// Tell the engine to end an incomplete evaluation.
+		/// </summary>
 		public abstract void Terminate();
 
 		public string GetCurrentHistoryItem()
@@ -79,11 +82,11 @@ namespace Kerbalua.Other {
 		}
 
 		/// <summary>
-		/// Overriden to by subclasses to add the per-engine evaluation functionality.
+		/// Overriden by subclasses for their per-engine evaluation functionality.
 		/// </summary>
 		/// <returns><c>true</c>, if evaluation was complete, <c>false</c> otherwise.</returns>
 		/// <param name="source">String to be evaluated.</param>
-		/// <param name="output">To string of the result of the evaluation.</param>
+		/// <param name="output">ToString of the result of the evaluation.</param>
 		protected abstract bool ProtectedEvaluate(string source,out string output);
 
 		protected LinkedList<string> History = new LinkedList<string>();
