@@ -71,7 +71,7 @@ namespace Kerbalua.Other
 			for(int i = 0;i < 100;i++) {
 				NOT_IMPLEMENTED_COMPLETIONS.Add("test-string #"+i);
 			}
-			replaceStart = replaceEnd = 0;
+			replaceStart = replaceEnd = cursorPos;
 			return NOT_IMPLEMENTED_COMPLETIONS;
 		}
 
