@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using RedOnion.Script.Parsing;
 
 namespace RedOnion.Script.Completion
 {
-	public class CompletionEngine : IEngine
+	public partial class CompletionEngine : IEngine
 	{
 		/// <summary>
 		/// Completion/replacement suggestions for point of interest
@@ -13,6 +14,12 @@ namespace RedOnion.Script.Completion
 			=> new ArraySegment<string>(_suggestions, 0, _suggestionsCount);
 		protected string[] _suggestions = new string[64];
 		protected int _suggestionsCount;
+		protected void AddSuggestion(string name)
+		{
+			if (_suggestionsCount == _suggestions.Length)
+				Array.Resize(ref _suggestions, _suggestions.Length << 1);
+			_suggestions[_suggestionsCount++] = name;
+		}
 		/// <summary>
 		/// Get copy of the suggestions
 		/// (unfortunately ArraySegment is not IList in .NET 3.5)
@@ -25,22 +32,32 @@ namespace RedOnion.Script.Completion
 			return it;
 		}
 
-		public CompletionEngine()
-			: this(engine => new CompletionRoot(engine)) { }
-		public CompletionEngine(Func<IEngine, IEngineRoot> createRoot)
-			: this(createRoot, Engine.DefaultParserOptions) { }
-		public CompletionEngine(Func<IEngine, IEngineRoot> createRoot, Parser.Option options)
-		{
-		}
+		protected IEngineRoot linked;
+		public CompletionEngine(IEngine linked)
+			: this(linked?.Root) { }
+		public CompletionEngine(IEngineRoot linked)
+			=> Root = new CompletionRoot(this, this.linked = linked);
+
+		protected Lexer lexer = new Lexer();
+		protected int interest, replaceAt, replaceEnd;
+		protected IObject found;
 
 		public virtual IList<string> Complete(
 			string source, int at, out int replaceFrom, out int replaceTo)
 		{
 			Reset();
-			//Interest = at;
-			//Execute(source);
-			replaceFrom = at; //Parser.TokenStart;
-			replaceTo = at; //Parser.TokenEnd;
+			interest = at;
+			this.replaceAt = at;
+			this.replaceEnd = at;
+			lexer.Source = source;
+			Execute();
+			replaceFrom = this.replaceAt;
+			replaceTo = this.replaceEnd;
+			if (found != null)
+			{
+				FillFrom(found);
+				RemoveDuplicates();
+			}
 			return GetSuggestions();
 		}
 		public virtual string Documentation(string source, int at)
@@ -81,10 +98,14 @@ namespace RedOnion.Script.Completion
 		{
 			Exit = 0;
 			Root.Reset();
-			//Parser.Reset();
 			Arguments.Clear();
 			Context = new EngineContext(this);
 			ContextStack.Clear();
+			if (_suggestionsCount > 0)
+			{
+				Array.Clear(_suggestions, 0, _suggestionsCount);
+				_suggestionsCount = 0;
+			}
 		}
 
 		CompiledCode IEngine.Compile(string source)
@@ -151,5 +172,73 @@ namespace RedOnion.Script.Completion
 		}
 
 		public virtual void Log(string msg) { }
+
+		private void FillFrom(IObject obj)
+		{
+			if (obj == null)
+				return;
+			for (; ; )
+			{
+				FillFrom(obj.BaseProps);
+				FillFrom(obj.MoreProps);
+				if (obj.HasFeature(ObjectFeatures.TypeReference|ObjectFeatures.Proxy))
+				{
+					Type type = obj.Type;
+					if (type != null)
+					{
+						var binding = BindingFlags.Public;
+						if (obj.HasFeature(ObjectFeatures.TypeReference))
+							binding |= BindingFlags.Static;
+						if (obj.HasFeature(ObjectFeatures.Proxy))
+							binding |= BindingFlags.Instance;
+						foreach (var member in type.GetMembers(binding))
+						{
+							if (member is ConstructorInfo)
+								continue;
+							AddSuggestion(member.Name);
+						}
+					}
+				}
+				bool wasRoot = obj == Root;
+				if ((obj = obj.BaseClass) != null)
+					continue;
+				if (!wasRoot)
+					break;
+				obj = linked;
+				if (obj == null)
+					return;
+			}
+		}
+		private void FillFrom(IProperties iprops)
+		{
+			if (!(iprops is Properties props))
+				return;
+			foreach (var name in props.Keys)
+				AddSuggestion(name);
+		}
+		private void RemoveDuplicates(string prefix = null)
+		{
+			if (_suggestionsCount <= 1)
+				return;
+			int i, j;
+			if (prefix != null && prefix.Length > 0)
+			{
+				for (i = 0, j = i + 1; j < _suggestionsCount; j++)
+				{
+					if (!_suggestions[j].StartsWith(prefix,
+						StringComparison.OrdinalIgnoreCase))
+						_suggestions[++i] = _suggestions[j];
+				}
+				_suggestionsCount = i + 1;
+			}
+			Array.Sort(_suggestions, 0, _suggestionsCount, StringComparer.OrdinalIgnoreCase);
+			for (i = 0, j = i + 1; j < _suggestionsCount; j++)
+			{
+				if (string.Compare(_suggestions[j], _suggestions[i],
+					StringComparison.OrdinalIgnoreCase) != 0)
+					_suggestions[++i] = _suggestions[j];
+			}
+			_suggestionsCount = i + 1;
+		}
 	}
 }

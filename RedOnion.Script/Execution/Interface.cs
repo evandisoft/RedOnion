@@ -585,4 +585,10 @@ namespace RedOnion.Script
 			root.Set(type.Name, new Value(creator));
 		}
 	}
+
+	public static class ObjectExtensions
+	{
+		public static bool HasFeature(this IObject obj, ObjectFeatures feature)
+			=> (obj.Features & feature) != 0;
+	}
 }

@@ -12,7 +12,7 @@ namespace RedOnion.Script
 	public class Engine : Engine<Parser>, IEngine
 	{
 		public Engine()
-			: this(engine => new BasicObjects.Root(engine)) { }
+			: this(engine => new BasicObjects.BasicRoot(engine)) { }
 		public Engine(Func<IEngine, IEngineRoot> createRoot)
 			: base(createRoot, new Parser(DefaultParserOptions)) { }
 		internal static Parser.Option DefaultParserOptions

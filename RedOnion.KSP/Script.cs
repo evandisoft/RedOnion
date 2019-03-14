@@ -12,14 +12,6 @@ using UnityEngine.UI;
 
 namespace RedOnion.KSP
 {
-	public enum EngineType
-	{
-		Runtime,
-		Immediate,
-		Completion,
-		ReplCompletion
-	}
-
 	/// <summary>
 	/// Runtime engine with all the features
 	/// </summary>
@@ -27,11 +19,11 @@ namespace RedOnion.KSP
 	{
 		public RuntimeEngine()
 			: base(engine => new RuntimeRoot(engine, root =>
-			FillRoot(root, EngineType.Runtime))) { }
+			FillRoot(root, repl: false))) { }
 		public override void Log(string msg)
 			=> Debug.Log("[RedOnion] " + msg);
 
-		public static void FillRoot(IEngineRoot root, EngineType engineType)
+		public static void FillRoot(IEngineRoot root, bool repl)
 		{
 			// neutral types first
 			root.AddType(typeof(System.Delegate));
@@ -55,7 +47,7 @@ namespace RedOnion.KSP
 			})));
 
 			// things that are dangerous in immediate / REPL mode
-			if (engineType == EngineType.Runtime || engineType == EngineType.Completion)
+			if (!repl)
 			{
 				// definitely dangerous, IMGUI is not for REPL
 				root.BaseProps.Set("IMGUI", new Value(engine =>
@@ -119,12 +111,12 @@ namespace RedOnion.KSP
 	{
 		public ImmediateEngine()
 			: base(engine => new RuntimeRoot(engine, root =>
-			RuntimeEngine.FillRoot(root, EngineType.Immediate))) { }
+			RuntimeEngine.FillRoot(root, repl: true))) { }
 		public override void Log(string msg)
 			=> Debug.Log("[RedOnion.REPL] " + msg);
 	}
 
-	public class RuntimeRoot : Root
+	public class RuntimeRoot : BasicRoot
 	{
 		protected Action<IEngineRoot> FillMe;
 		protected override void Fill()
@@ -141,37 +133,19 @@ namespace RedOnion.KSP
 	/// </summary>
 	public class DocumentingEngine : CompletionEngine
 	{
-		public DocumentingEngine()
-			: base(engine => new DocumentingRoot(engine, root =>
-			RuntimeEngine.FillRoot(root, EngineType.Completion)))
-			=> Options = Options | EngineOption.Silent;
-		protected DocumentingEngine(Func<IEngine, IEngineRoot> createRoot)
-			: base(createRoot)
-			=> Options = Options | EngineOption.Silent;
+		public DocumentingEngine(RuntimeEngine engine)
+			: base(engine) { }
 		public override void Log(string msg)
 			=> Debug.Log("[RedOnion.DOC] " + msg);
 	}
 	/// <summary>
 	/// Engine designed to provide hints and documentation for REPL / Immediate Mode
 	/// </summary>
-	public class ReplHintsEngine : DocumentingEngine
+	public class ReplHintsEngine : CompletionEngine
 	{
-		public ReplHintsEngine()
-			: base(engine => new DocumentingRoot(engine, root =>
-			RuntimeEngine.FillRoot(root, EngineType.ReplCompletion))) { }
+		public ReplHintsEngine(ImmediateEngine engine)
+			: base(engine) { }
 		public override void Log(string msg)
 			=> Debug.Log("[RedOnion.ReplDOC] " + msg);
-	}
-
-	public class DocumentingRoot : CompletionRoot
-	{
-		protected Action<IEngineRoot> FillMe;
-		protected override void Fill()
-		{
-			base.Fill();
-			FillMe?.Invoke(this);
-		}
-		public DocumentingRoot(IEngine engine, Action<IEngineRoot> fill)
-			: base(engine) => FillMe = fill;
 	}
 }

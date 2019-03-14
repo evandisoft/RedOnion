@@ -5,7 +5,7 @@ using System.Text;
 
 namespace RedOnion.Script.BasicObjects
 {
-	public class Root : BasicObject, IEngineRoot
+	public class BasicRoot : BasicObject, IEngineRoot
 	{
 		public Dictionary<Type, IObject> TypeMap
 		{ get; } = new Dictionary<Type, IObject>();
@@ -32,9 +32,9 @@ namespace RedOnion.Script.BasicObjects
 		public NumberFun Bool { get; }
 		public NumberFun Char { get; }
 
-		public Root(IEngine engine)
+		public BasicRoot(IEngine engine)
 			: this(engine, true) { }
-		protected Root(IEngine engine, bool fill)
+		protected BasicRoot(IEngine engine, bool fill)
 			: base(engine, null, new Properties(), new Properties())
 		{
 			var obj	= new BasicObject(engine);

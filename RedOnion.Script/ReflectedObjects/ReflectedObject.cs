@@ -13,6 +13,7 @@ namespace RedOnion.Script.ReflectedObjects
 			=> ObjectFeatures.Proxy;
 
 		public ReflectedType Creator { get; }
+		public override Type Type => Creator?.Type;
 
 		public ReflectedObject(IEngine engine, object target, IProperties properties = null)
 			: base(engine, properties)

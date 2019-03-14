@@ -34,6 +34,7 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CompletionTests.cs" />
     <Compile Include="ExecutionCountdownTests.cs" />
     <Compile Include="ExpressionTests.cs" />
     <Compile Include="ObjectModelTests.cs" />
