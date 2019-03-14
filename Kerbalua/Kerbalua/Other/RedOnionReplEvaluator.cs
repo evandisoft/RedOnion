@@ -6,45 +6,19 @@ using RedOnion.Script.ReflectedObjects;
 using UnityEngine;
 using Kerbalua.AutoPilot;
 using KSP.UI.Screens;
+using RedOnion.KSP;
 
 namespace Kerbalua.Other {
 	public class RedOnionReplEvaluator:ReplEvaluator {
-		Engine engine;
+		ImmediateEngine engine;
 
 		public RedOnionReplEvaluator()
 		{
 			//temporarily commenting this out
 			//engine = new Engine(engine => new EngineRoot(engine));
-			engine = new Engine();
+			engine = new ImmediateEngine();
 		}
 
-		class EngineRoot : Root {
-			public EngineRoot(Engine engine) : base(engine) { }
-
-			protected override void Fill()
-			{
-				AddType(typeof(Debug));
-				AddType(typeof(Color));
-				AddType(typeof(Rect));
-				AddType(typeof(Vector2));
-				AddType(typeof(Vector3));
-				AddType(typeof(GUI));
-				AddType(typeof(GUISkin));
-				AddType(typeof(GUIStyle));
-				AddType(typeof(GUIStyleState));
-				AddType(typeof(GUIContent));
-				AddType(typeof(GUIElement));
-				AddType(typeof(GUILayer));
-				AddType(typeof(GUILayout));
-				AddType(typeof(GUIText));
-				AddType(typeof(GUIUtility));
-				AddType(typeof(FlightCtrlState));
-				AddType(typeof(FlightGlobals));
-				AddType(typeof(Vessel));
-				AddType(typeof(StageManager));
-				AddType(typeof(AutoPilotAPI));
-			}
-		}
 
 		protected override bool ProtectedEvaluate(string source,out string output)
 		{
