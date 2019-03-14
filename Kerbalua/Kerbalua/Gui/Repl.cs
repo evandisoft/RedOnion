@@ -30,12 +30,14 @@ namespace Kerbalua.Gui {
 					case KeyCode.RightControl:
 					case KeyCode.C:
 						if (!Event.current.control) {
+							// Don't give focus for the followup char events.
 							if(Event.current.keyCode!=KeyCode.None)
 								inputBox.GrabFocus();
 						}
 						break;
 					
 					default:
+						// Don't give focus for the followup char events.
 						if (Event.current.keyCode != KeyCode.None)
 							inputBox.GrabFocus();
 						break;
