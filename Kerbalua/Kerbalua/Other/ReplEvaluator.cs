@@ -12,13 +12,12 @@ namespace Kerbalua.Other {
 		const int maxHistorySize = 1000;
 
 		LinkedListNode<string> currentHistoryItem=null;
-
 		/// <summary>
 		/// Evaluate the source and return the result of that evaluation.
 		/// </summary>
 		/// <returns>A toString of the result of evaluating the source string.</returns>
 		/// <param name="source">The source string to be evaluated.</param>
-		public string Evaluate(string source,bool withHistory=false)
+		public bool Evaluate(string source,out string output,bool withHistory=false)
 		{
 			if (withHistory) {
 				if(!(History.Count>0 && source == History.First.Value)) {
@@ -36,8 +35,10 @@ namespace Kerbalua.Other {
 				//}
 			}
 
-			return ProtectedEvaluate(source);
+			return ProtectedEvaluate(source, out output);
 		}
+
+		public abstract void Terminate();
 
 		public string GetCurrentHistoryItem()
 		{
@@ -72,7 +73,7 @@ namespace Kerbalua.Other {
 			return currentHistoryItem.Value;
 		}
 
-		protected abstract string ProtectedEvaluate(string source);
+		protected abstract bool ProtectedEvaluate(string source,out string output);
 
 		protected LinkedList<string> History = new LinkedList<string>();
 

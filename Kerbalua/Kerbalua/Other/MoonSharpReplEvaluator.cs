@@ -4,7 +4,8 @@ using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.REPL;
 using MoonSharp.Interpreter.Interop;
 using UnityEngine;
-using RedOnion.Script;
+//using RedOnion.Script;
+using Kerbalua.MoonSharp;
 
 namespace Kerbalua.Other
 {
@@ -12,33 +13,44 @@ namespace Kerbalua.Other
     {
 		SimpleScript scriptEngine;
 		CoreModules coreModules;
+		KerbaluaExecutionManager kem = new KerbaluaExecutionManager();
 
 		public MoonSharpReplEvaluator(CoreModules coreModules)
 		{
 			this.coreModules = coreModules;
-			scriptEngine = new SimpleScript(coreModules);
+			InternalResetEngine();
+			//scriptEngine = new SimpleScript(coreModules);
 		}
 
-		protected override string ProtectedEvaluate(string source)
+		protected override bool ProtectedEvaluate(string source,out string output)
 		{
-			string output="";
+			output="";
 			DynValue result;
+			bool isComplete = false;
 			try {
-				result = scriptEngine.DoString(source);
-				output= "\n";
-				if (result.UserData == null) {
-					output += result;
-				} else {
-					output += result.UserData.Object;
-					if (result.UserData.Object == null) {
-						output += " (" + result.UserData.Object.GetType() + ")";
+				if(scriptEngine.EvaluateWithCoroutine(source,out result)) {
+					isComplete = true;
+
+					output = "\n";
+					if (result.UserData == null) {
+						output += result;
+					} else {
+						output += result.UserData.Object;
+						if (result.UserData.Object == null) {
+							output += " (" + result.UserData.Object.GetType() + ")";
+						}
 					}
+
+				} else {
+					output = "";
 				}
+
 			} catch (Exception exception) {
 				Debug.Log(exception);
+				isComplete = true;
 			}
 
-			return output;
+			return isComplete;
 		}
 
 		/// <summary>
@@ -73,9 +85,20 @@ namespace Kerbalua.Other
 			return "";
 		}
 
-		public override void ResetEngine()
+		void InternalResetEngine()
 		{
 			scriptEngine = new SimpleScript(coreModules);
+			//scriptEngine.AttachDebugger(kem);
+		}
+
+		public override void ResetEngine()
+		{
+			InternalResetEngine();
+		}
+
+		public override void Terminate()
+		{
+			scriptEngine.Terminate();
 		}
 	}
 }

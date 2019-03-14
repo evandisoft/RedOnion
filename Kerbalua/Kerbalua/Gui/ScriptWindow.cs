@@ -6,7 +6,7 @@ using System;
 using System.IO;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
-using RedOnion.Script;
+//using RedOnion.Script;
 
 namespace Kerbalua.Gui {
 	public class ScriptWindow {
@@ -41,6 +41,7 @@ namespace Kerbalua.Gui {
 		const float titleHeight = 20;
 
 		bool inputIsLocked;
+		bool evaluationNotFinished = false;
 
 		public KeyBindings GlobalKeyBindings = new KeyBindings();
 
@@ -59,9 +60,9 @@ namespace Kerbalua.Gui {
 
 		public ScriptWindow(Rect param_mainWindowRect)
 		{
-			replEvaluators["RedOnion"] = new RedOnionReplEvaluator();
+			//replEvaluators["RedOnion"] = new RedOnionReplEvaluator();
 			replEvaluators["MoonSharp"] = new MoonSharpReplEvaluator(CoreModules.Preset_Complete);
-			SetCurrentEvaluator("RedOnion");
+			SetCurrentEvaluator("MoonSharp");
 			recentFiles = new RecentFilesList((string filename) => {
 				scriptIOTextArea.content.text = filename;
 				editor.content.text = scriptIOTextArea.Load();
@@ -115,7 +116,11 @@ namespace Kerbalua.Gui {
 				editor.content.text=scriptIOTextArea.Load();
 			}));
 			widgetBar.renderables.Add(new Button("Evaluate", () => {
-				repl.outputBox.content.text+=currentReplEvaluator.Evaluate(editor.content.text);
+				if (currentReplEvaluator.Evaluate(editor.content.text, out string output)) {
+					repl.outputBox.content.text += output;
+				} else {
+					evaluationNotFinished = true;
+				}
 			}));
 			widgetBar.renderables.Add(new Button("Reset Engine", () => {
 				currentReplEvaluator.ResetEngine();
@@ -228,13 +233,25 @@ ctrl + enter: submit completion";
 			GlobalKeyBindings.Add(new EventKey(KeyCode.Return, true), completionManager.Complete);
 
 			editor.KeyBindings.Add(new EventKey(KeyCode.E, true), () => {
-				repl.outputBox.content.text += currentReplEvaluator.Evaluate(editor.content.text);
+				if (currentReplEvaluator.Evaluate(editor.content.text, out string output)) {
+					repl.outputBox.content.text += output;
+				} else {
+					evaluationNotFinished = true;
+				}
 			});
 			repl.inputBox.KeyBindings.Add(new EventKey(KeyCode.E, true), () => {
-				repl.outputBox.content.text += currentReplEvaluator.Evaluate(repl.inputBox.content.text);
+				if (currentReplEvaluator.Evaluate(repl.inputBox.content.text, out string output)) {
+					repl.outputBox.content.text += output;
+				} else {
+					evaluationNotFinished = true;
+				}
 			});
 			repl.inputBox.KeyBindings.Add(new EventKey(KeyCode.Return), () => {
-				repl.outputBox.content.text += currentReplEvaluator.Evaluate(repl.inputBox.content.text,true);
+				if (currentReplEvaluator.Evaluate(repl.inputBox.content.text, out string output)) {
+					repl.outputBox.content.text += output;
+				} else {
+					evaluationNotFinished = true;
+				}
 				repl.inputBox.content.text = "";
 				completionBox.content.text = "";
 			});
@@ -285,6 +302,8 @@ ctrl + enter: submit completion";
 		public void Update()
 		{
 			SetOrReleaseInputLock();
+
+
 			completionManager.Update();
 
 			//if (replVisible) {
@@ -357,6 +376,30 @@ ctrl + enter: submit completion";
 		/// <param name="id">Identifier.</param>
 		void MainWindow(int id)
 		{
+			if (evaluationNotFinished
+					&& Event.current.type == EventType.KeyDown
+					&& Event.current.keyCode == KeyCode.C
+					&& Event.current.control) {
+				GUIUtil.ConsumeAndMarkNextCharEvent(Event.current);
+				currentReplEvaluator.Terminate();
+			}
+
+			if (evaluationNotFinished) {
+				//Debug.Log("Evaluation Not Finished");
+				string output;
+				if (currentReplEvaluator.Evaluate("", out output)) {
+					//Debug.Log("Evaluation Finally Finished");
+					evaluationNotFinished = false;
+					repl.outputBox.content.text += output;
+				} else {
+					//Debug.Log("Evaluation Still Not Finished");
+					if (Event.current.type == EventType.KeyDown ||
+						Event.current.type == EventType.MouseDown) {
+						Event.current.Use();
+					}
+				}
+			}
+
 			Rect effectiveWindowRect = GetCurrentWindowRect();
 			GUI.DragWindow(new Rect(0, 0, effectiveWindowRect.width, titleHeight));
 			GlobalKeyBindings.ExecuteAndConsumeIfMatched(Event.current);

@@ -119,6 +119,8 @@
     <Compile Include="Kerbalua\Gui\Label.cs" />
     <Compile Include="Kerbalua\Gui\LeftAlignedButton.cs" />
     <Compile Include="Kerbalua\AutoPilot\AutoPilotAPI.cs" />
+    <Compile Include="Kerbalua\MoonSharp\KerbaluaExecutionManager.cs" />
+    <Compile Include="Kerbalua\MoonSharp\ExecutionLimitException.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -150,12 +152,7 @@
     <Folder Include="Kerbalua\Utility\" />
     <Folder Include="Kerbalua\Completion\" />
     <Folder Include="Kerbalua\AutoPilot\" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\RedOnion.Script\RedOnion.Script.csproj">
-      <Project>{0D0A04F3-0A82-49CD-8178-7640ACE88BFF}</Project>
-      <Name>RedOnion.Script</Name>
-    </ProjectReference>
+    <Folder Include="Kerbalua\MoonSharp\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
