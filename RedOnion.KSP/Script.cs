@@ -45,8 +45,17 @@ namespace RedOnion.KSP
 			=> Options = Options | EngineOption.Silent;
 		public override void Log(string msg)
 			=> Debug.Log("[RedOnion.DOC] " + msg);
-		public virtual IList<string> Complete(string source, int at)
-			=> new string[0];
+
+		public virtual IList<string> Complete(
+			string source, int at, out int replaceFrom, out int replaceTo)
+		{
+			Reset();
+			Parser.Interest = at;
+			Execute(source);
+			replaceFrom = Parser.TokenStart;
+			replaceTo = Parser.TokenEnd;
+			return GetSuggestions();
+		}
 		public virtual string Documentation(string source, int at)
 			=> "TODO";
 	}

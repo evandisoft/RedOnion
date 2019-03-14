@@ -9,7 +9,17 @@ namespace RedOnion.Script
 	/// <summary>
 	/// Runtime engine
 	/// </summary>
-	public partial class Engine : AbstractEngine, IEngine
+	public class Engine : Engine<Parser>, IEngine
+	{
+		public Engine()
+			: this(engine => new BasicObjects.Root(engine)) { }
+		public Engine(Func<IEngine, IEngineRoot> createRoot)
+			: base(createRoot, new Parser()) { }
+	}
+	/// <summary>
+	/// Runtime engine
+	/// </summary>
+	public partial class Engine<P> : AbstractEngine, IEngine where P : Parser
 	{
 		/// <summary>
 		/// Engine options
@@ -39,38 +49,12 @@ namespace RedOnion.Script
 				throw new TookTooLong();
 		}
 
-		internal static Parser.Option DefaultParserOptions =
-			Parser.Option.Script | Parser.Option.Untyped | Parser.Option.Typed;
+		internal static Parser.Option DefaultParserOptions
+			= Parsing.Parser.Option.Script
+			| Parsing.Parser.Option.Untyped
+			| Parsing.Parser.Option.Typed;
 
-		public Engine()
-		{
-			Parser = new Parser(DefaultParserOptions);
-			Root = new BasicObjects.Root(this);
-			Context = new EngineContext(this);
-		}
-
-		public Engine(Func<IEngine, IEngineRoot> createRoot)
-		{
-			Parser = new Parser(DefaultParserOptions);
-			Root = createRoot(this);
-			Context = new EngineContext(this);
-		}
-
-		public Engine(Func<IEngine, IEngineRoot> createRoot, Parser.Option opt)
-		{
-			Parser = new Parser(opt);
-			Root = createRoot(this);
-			Context = new EngineContext(this);
-		}
-
-		public Engine(Func<IEngine, IEngineRoot> createRoot, Parser.Option opton, Parser.Option optoff)
-		{
-			Parser = new Parser(opton, optoff);
-			Root = createRoot(this);
-			Context = new EngineContext(this);
-		}
-
-		protected Engine(Func<IEngine, IEngineRoot> createRoot, Parser parser)
+		protected Engine(Func<IEngine, IEngineRoot> createRoot, P parser)
 		{
 			Parser = parser;
 			Root = createRoot(this);
@@ -142,7 +126,7 @@ namespace RedOnion.Script
 		/// <summary>
 		/// Parser
 		/// </summary>
-		protected Parser Parser;
+		protected P Parser;
 		/// <summary>
 		/// Argument list for function calls
 		/// </summary>

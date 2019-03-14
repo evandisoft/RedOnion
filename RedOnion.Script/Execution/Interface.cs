@@ -518,7 +518,7 @@ namespace RedOnion.Script
 			Vars.Set("arguments", new Value(Vars.BaseClass));
 		}
 
-		public void Push(Engine engine)
+		public void Push(IEngine engine)
 			=> Vars = engine.CreateVars(Vars);
 		public void Pop()
 			=> Vars = Vars.BaseClass;

@@ -6,7 +6,7 @@ using System.Text;
 
 namespace RedOnion.Script
 {
-	public partial class Engine
+	public partial class Engine<P>
 	{
 		protected override void Statement(OpCode op, ref int at)
 		{
