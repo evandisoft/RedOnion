@@ -192,7 +192,14 @@ ctrl + k: select next line down
 ctrl + l: select next line up
 ctrl + comma: select line 4 lines down
 ctrl + period: select line 4 lines up
-ctrl + enter: submit completion";
+ctrl + enter: submit completion
+
+Output Area:
+Only allows the following.
+ctrl + c: copy selected area.
+ctrl + insert: copy selected area.
+Any other key gives focus to input box.
+";
 
 			repl.outputBox.content.text += "\n" + hotkeyText;
 		}
@@ -421,9 +428,9 @@ ctrl + enter: submit completion";
 			recentFiles.Update(currentWidgetBarRect);
 
 			if (replVisible) {
-				if(repl.outputBox.HasFocus()) {
-					repl.inputBox.GrabFocus();
-				}
+				//if(repl.outputBox.HasFocus()) {
+				//	repl.inputBox.GrabFocus();
+				//}
 
 				repl.Update(GetCurrentReplRect());
 			}

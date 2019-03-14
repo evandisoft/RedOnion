@@ -15,9 +15,13 @@ namespace Kerbalua.Other {
 		LinkedListNode<string> currentHistoryItem=null;
 		/// <summary>
 		/// Evaluate the source and return the result of that evaluation.
+		/// Subclasses override the protected method "ProtectedEvaluate" to provide a per-engine evaluation
+		/// implementation.
 		/// </summary>
-		/// <returns>A toString of the result of evaluating the source string.</returns>
+		/// <returns>True if evaluation has completed. False if evaluation is unfinished.</returns>
 		/// <param name="source">The source string to be evaluated.</param>
+		/// <param name="output">A ToString of the result of evaluating source.</param>
+		/// <param name="withHistory">True if this sources evaluated should be added to the history.</param>
 		public bool Evaluate(string source,out string output,bool withHistory=false)
 		{
 			if (withHistory) {
@@ -74,6 +78,12 @@ namespace Kerbalua.Other {
 			return currentHistoryItem.Value;
 		}
 
+		/// <summary>
+		/// Overriden to by subclasses to add the per-engine evaluation functionality.
+		/// </summary>
+		/// <returns><c>true</c>, if evaluation was complete, <c>false</c> otherwise.</returns>
+		/// <param name="source">String to be evaluated.</param>
+		/// <param name="output">To string of the result of the evaluation.</param>
 		protected abstract bool ProtectedEvaluate(string source,out string output);
 
 		protected LinkedList<string> History = new LinkedList<string>();
@@ -86,6 +96,8 @@ namespace Kerbalua.Other {
 		/// <returns>The completion.</returns>
 		/// <param name="source">Source.</param>
 		/// <param name="cursorPos">Cursor position.</param>
+		/// <param name="replaceStart">The start index of the string to be replaced by a completion.</param>
+		/// <param name="replaceEnd">The end index of the string to be replaced by a completion</param>
 		public abstract IList<string> GetCompletions(string source, int cursorPos,out int replaceStart,out int replaceEnd);
 
 		/// <summary>

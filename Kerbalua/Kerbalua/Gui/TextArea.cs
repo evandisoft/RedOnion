@@ -4,6 +4,9 @@ using UnityEngine;
 namespace Kerbalua.Gui {
 	public class TextArea:UIElement {
 		public GUIContent content = new GUIContent("");
+		// 
+		public int cursorIndex = 0;
+		public int selectIndex = 0;
 
 		protected override void ProtectedUpdate(Rect rect)
 		{

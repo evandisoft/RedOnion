@@ -55,10 +55,8 @@ namespace Kerbalua.Other
 
 		/// <summary>
 		/// TODO: NOT CURRENTLY IMPLEMENTED
+		/// See the abstract version for complete comments.
 		/// </summary>
-		/// <returns>The completions.</returns>
-		/// <param name="source">Source.</param>
-		/// <param name="cursorPos">Cursor position.</param>
 		public override IList<string> GetCompletions(string source, int cursorPos,out int replaceStart,out int replaceEnd)
 		{
 			List<string> NOT_IMPLEMENTED_COMPLETIONS = new List<string>();

@@ -32,8 +32,9 @@ namespace Kerbalua.Gui {
 					base.ProtectedUpdate(contentRect);
 
 					if (resetScroll) {
-						scrollPos.y = rect.height;
+						scrollPos.y = contentRect.height;
 						resetScroll = false;
+						//selectIndex = cursorIndex = content.text.Length;
 					}
 
 					lastScrollViewVector2 = new Vector2(rect.width, rect.height);
@@ -69,7 +70,7 @@ namespace Kerbalua.Gui {
 			}
 		}
 
-		public void ResetScroll()
+		public virtual void ResetScroll()
 		{
 			resetScroll = true;
 		}
