@@ -9,7 +9,7 @@ namespace RedOnion.Script.Parsing
 		protected Lexer lexer = new Lexer();
 
 		public CultureInfo Culture { get; set; } = CultureInfo.InvariantCulture;
-		public Option Options { get; set; } = Option.Script | Option.DotThisAfterWhite;
+		public Option Options { get; set; } = Option.Script | Option.Untyped | Option.Typed;
 
 		public Parser() { }
 		public Parser(Option opts) => Options = opts;

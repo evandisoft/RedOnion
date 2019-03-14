@@ -43,7 +43,7 @@
     <Compile Include="BasicObjects\Root.cs" />
     <Compile Include="BasicObjects\String.cs" />
     <Compile Include="Completion\CompletionEngine.cs" />
-    <Compile Include="Completion\CompletionParser.cs" />
+    <Compile Include="Completion\CompletionRoot.cs" />
     <Compile Include="Execution\ExecStatement.cs" />
     <Compile Include="Execution\Engine.cs" />
     <Compile Include="Execution\Abstract.cs" />

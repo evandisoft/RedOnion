@@ -142,7 +142,7 @@ namespace RedOnion.KSP
 	public class DocumentingEngine : CompletionEngine
 	{
 		public DocumentingEngine()
-			: base(engine => new CompletionRoot(engine, root =>
+			: base(engine => new DocumentingRoot(engine, root =>
 			RuntimeEngine.FillRoot(root, EngineType.Completion)))
 			=> Options = Options | EngineOption.Silent;
 		protected DocumentingEngine(Func<IEngine, IEngineRoot> createRoot)
@@ -150,19 +150,6 @@ namespace RedOnion.KSP
 			=> Options = Options | EngineOption.Silent;
 		public override void Log(string msg)
 			=> Debug.Log("[RedOnion.DOC] " + msg);
-
-		public virtual IList<string> Complete(
-			string source, int at, out int replaceFrom, out int replaceTo)
-		{
-			Reset();
-			Parser.Interest = at;
-			Execute(source);
-			replaceFrom = Parser.TokenStart;
-			replaceTo = Parser.TokenEnd;
-			return GetSuggestions();
-		}
-		public virtual string Documentation(string source, int at)
-			=> "TODO";
 	}
 	/// <summary>
 	/// Engine designed to provide hints and documentation for REPL / Immediate Mode
@@ -170,13 +157,13 @@ namespace RedOnion.KSP
 	public class ReplHintsEngine : DocumentingEngine
 	{
 		public ReplHintsEngine()
-			: base(engine => new CompletionRoot(engine, root =>
+			: base(engine => new DocumentingRoot(engine, root =>
 			RuntimeEngine.FillRoot(root, EngineType.ReplCompletion))) { }
 		public override void Log(string msg)
 			=> Debug.Log("[RedOnion.ReplDOC] " + msg);
 	}
 
-	public class CompletionRoot : Root
+	public class DocumentingRoot : CompletionRoot
 	{
 		protected Action<IEngineRoot> FillMe;
 		protected override void Fill()
@@ -184,7 +171,7 @@ namespace RedOnion.KSP
 			base.Fill();
 			FillMe?.Invoke(this);
 		}
-		public CompletionRoot(IEngine engine, Action<IEngineRoot> fill)
+		public DocumentingRoot(IEngine engine, Action<IEngineRoot> fill)
 			: base(engine) => FillMe = fill;
 	}
 }

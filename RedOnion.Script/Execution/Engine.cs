@@ -29,8 +29,11 @@ namespace RedOnion.Script
 		/// Engine options
 		/// </summary>
 		public EngineOption Options { get; set; }
+			= DefaultOptions;
+		internal static EngineOption DefaultOptions
 			= EngineOption.BlockScope | EngineOption.Strict;
-		public bool HasOption(EngineOption option) => (Options & option) != 0;
+		public bool HasOption(EngineOption option)
+			=> (Options & option) != 0;
 
 		/// <summary>
 		/// Root object (global namespace)
