@@ -4,6 +4,7 @@ namespace Kerbalua.Gui {
 	public class Repl:IRectRenderer {
 		public InputBox inputBox = new InputBox();
 		public OutputBox outputBox = new OutputBox();
+		KeyBindings specialKeyBindings = new KeyBindings();
 
 		public void Update(Rect rect, bool visible = true, GUIStyle style = null)
 		{
@@ -20,8 +21,28 @@ namespace Kerbalua.Gui {
 				Rect outputRect = new Rect(0, 0, rect.width, inputStart);
 				Rect inputRect = new Rect(0, inputStart, rect.width, inputHeight);
 
-				inputBox.Update(inputRect, true, inputStyle);
+				// Allow copying event to get through to output box. Any other keydown gives
+				// input box focus.
+				if (outputBox.HasFocus() && Event.current.type == EventType.KeyDown) {
+					switch (Event.current.keyCode) {
+					case KeyCode.Insert:
+					case KeyCode.LeftControl:
+					case KeyCode.RightControl:
+					case KeyCode.C:
+						if (!Event.current.control) {
+							inputBox.GrabFocus();
+						}
+						break;
+					
+					default:
+						inputBox.GrabFocus();
+						break;
+					}
+				}
 				outputBox.Update(outputRect);
+
+				inputBox.Update(inputRect, true, inputStyle);
+
 			}
 			GUI.EndGroup();
 		}
