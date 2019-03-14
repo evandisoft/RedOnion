@@ -76,16 +76,6 @@
     <Compile Include="Kerbalua\Utility\QueueLogger.cs" />
     <Compile Include="Kerbalua\Gui\InputBox.cs" />
     <Compile Include="Kerbalua\Completion\AllCompletion.cs" />
-    <Compile Include="Kerbalua\Completion\CompletionParser.cs" />
-    <Compile Include="Kerbalua\Completion\CompletionParser2.cs" />
-    <Compile Include="Kerbalua\Completion\Grammar\LuaCompletion2BaseListener.cs" />
-    <Compile Include="Kerbalua\Completion\Grammar\LuaCompletion2Lexer.cs" />
-    <Compile Include="Kerbalua\Completion\Grammar\LuaCompletion2Listener.cs" />
-    <Compile Include="Kerbalua\Completion\Grammar\LuaCompletion2Parser.cs" />
-    <Compile Include="Kerbalua\Completion\Grammar\LuaCompletionBaseListener.cs" />
-    <Compile Include="Kerbalua\Completion\Grammar\LuaCompletionLexer.cs" />
-    <Compile Include="Kerbalua\Completion\Grammar\LuaCompletionListener.cs" />
-    <Compile Include="Kerbalua\Completion\Grammar\LuaCompletionParser.cs" />
     <Compile Include="Kerbalua\Completion\LastVarExtracter.cs" />
     <Compile Include="Kerbalua\Completion\TableCompletion.cs" />
     <Compile Include="Kerbalua\Completion\UserDataCompletion.cs" />
@@ -124,24 +114,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="Kerbalua\Completion\Grammar\.antlr\LuaCompletion2.interp" />
-    <None Include="Kerbalua\Completion\Grammar\.antlr\LuaCompletion2.tokens" />
-    <None Include="Kerbalua\Completion\Grammar\.antlr\LuaCompletion2Lexer.interp" />
-    <None Include="Kerbalua\Completion\Grammar\.antlr\LuaCompletion2Lexer.java" />
-    <None Include="Kerbalua\Completion\Grammar\.antlr\LuaCompletion2Lexer.tokens" />
-    <None Include="Kerbalua\Completion\Grammar\.antlr\LuaCompletion2Parser.java" />
-    <None Include="Kerbalua\Completion\Grammar\antlr-4.7.1-complete.jar" />
-    <None Include="Kerbalua\Completion\Grammar\LuaCompletion.g4" />
-    <None Include="Kerbalua\Completion\Grammar\LuaCompletion.interp" />
-    <None Include="Kerbalua\Completion\Grammar\LuaCompletion.tokens" />
-    <None Include="Kerbalua\Completion\Grammar\LuaCompletion2.g4" />
-    <None Include="Kerbalua\Completion\Grammar\LuaCompletion2.interp" />
-    <None Include="Kerbalua\Completion\Grammar\LuaCompletion2.tokens" />
-    <None Include="Kerbalua\Completion\Grammar\LuaCompletion2Lexer.interp" />
-    <None Include="Kerbalua\Completion\Grammar\LuaCompletion2Lexer.tokens" />
-    <None Include="Kerbalua\Completion\Grammar\LuaCompletionLexer.interp" />
-    <None Include="Kerbalua\Completion\Grammar\LuaCompletionLexer.tokens" />
-    <None Include="Kerbalua\Completion\Grammar\regenerate.sh" />
     <None Include="Kerbalua\Completion\UserDataCompletion.cs.old" />
   </ItemGroup>
   <ItemGroup>

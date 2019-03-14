@@ -14,13 +14,13 @@ namespace Kerbalua.Completion {
             UserData.RegistrationPolicy = InteropRegistrationPolicy.Automatic;
             //script.Globals["Adf"] = new Adf();
             var data = "return adf.asdf().blah[Adf.asdf().blah[Adf.adfs[3]().";
-            var data2 = "a";
+            //var data2 = "a";
             var tokens = LastVarExtracter.Parse(data);
             prin.tlist(tokens);
             //var completions = UserDataCompletion.Complete(script.Globals, tokens);
             //prin.tall("Completions are ",completions);
         }
-        Action<string> messageTarget;
+       // Action<string> messageTarget;
 
         static public Adf aaa(int i)
         {

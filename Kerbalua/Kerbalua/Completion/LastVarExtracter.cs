@@ -10,7 +10,7 @@ namespace Kerbalua.Completion {
 
         public static void Test(){
             string tokenstring2 = "local a=a[a1a].b[ b1a]( b2.b2a)().c(b3).asdf[ a() . asdf().asdf";
-            string tokenstring = "(b3)";
+            //string tokenstring = "(b3)";
             var rawtokens = CreateTokensBackwardsFromEnd(tokenstring2);
             prin.tlist("Raw tokens",rawtokens);
             var correctTokens = ParseBackwardsTokens(rawtokens);
@@ -109,7 +109,7 @@ namespace Kerbalua.Completion {
         static public List<Token> CreateTokensBackwardsFromEnd(string luaString)
         {
             var tokens = new List<Token>();
-            bool endOfInput;
+            //bool endOfInput;
             var charStack = StringToCharStack(luaString);
             while (charStack.Count>0) {
                 char currentChar = charStack.Peek();

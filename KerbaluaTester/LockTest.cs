@@ -63,26 +63,26 @@ namespace KerbaluaTester
 			SimpleScript script = new SimpleScript(MoonSharp.Interpreter.CoreModules.Preset_Complete);
 			Debugger debugger = new Debugger(AllowMainThreadAndWaitForItToPause);
 			script.AttachDebugger(debugger);
-			string source =
-@"
--- defines a factorial function
-function fact (n)
-	if (n == 0) then
-		return 1
-	else
-		return n*fact(n - 1)
-	end
-end
+//			string source =
+//@"
+//-- defines a factorial function
+//function fact (n)
+//	if (n == 0) then
+//		return 1
+//	else
+//		return n*fact(n - 1)
+//	end
+//end
 
-return fact(5)";
+//return fact(5)";
 
-			//for(int i=0;i<100;i++) {
-			//	Console.WriteLine("Script Thread "+i);
+			////for(int i=0;i<100;i++) {
+			////	Console.WriteLine("Script Thread "+i);
 
-			//	//Thread.Sleep(1000);
+			////	//Thread.Sleep(1000);
 
-			//	WaitForMainThread();
-			//}
+			////	WaitForMainThread();
+			////}
 
 			//";
 			//Console.WriteLine(script.EvaluateAsCoroutine(source));

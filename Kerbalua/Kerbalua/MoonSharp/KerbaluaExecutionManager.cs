@@ -17,7 +17,7 @@ namespace Kerbalua.MoonSharp {
 		}
 
 		DebuggerAction debuggerAction = new DebuggerAction();
-		int i = 0;
+		//int i = 0;
 		public DebuggerAction GetAction(int ip, SourceRef sourceref)
 		{
 			if (!stopWatch.IsRunning) {

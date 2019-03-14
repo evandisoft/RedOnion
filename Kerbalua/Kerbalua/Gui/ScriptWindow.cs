@@ -60,9 +60,9 @@ namespace Kerbalua.Gui {
 
 		public ScriptWindow(Rect param_mainWindowRect)
 		{
-			//replEvaluators["RedOnion"] = new RedOnionReplEvaluator();
+			replEvaluators["RedOnion"] = new RedOnionReplEvaluator();
 			replEvaluators["MoonSharp"] = new MoonSharpReplEvaluator(CoreModules.Preset_Complete);
-			SetCurrentEvaluator("MoonSharp");
+			SetCurrentEvaluator("RedOnion");
 			recentFiles = new RecentFilesList((string filename) => {
 				scriptIOTextArea.content.text = filename;
 				editor.content.text = scriptIOTextArea.Load();
