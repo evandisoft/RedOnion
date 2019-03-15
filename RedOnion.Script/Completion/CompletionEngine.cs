@@ -218,8 +218,6 @@ namespace RedOnion.Script.Completion
 		}
 		private void RemoveDuplicates(string prefix = null)
 		{
-			if (_suggestionsCount <= 1)
-				return;
 			int i, j;
 			if (prefix != null && prefix.Length > 0)
 			{
@@ -231,6 +229,8 @@ namespace RedOnion.Script.Completion
 				}
 				_suggestionsCount = i;
 			}
+			if (_suggestionsCount <= 1)
+				return;
 			Array.Sort(_suggestions, 0, _suggestionsCount, StringComparer.OrdinalIgnoreCase);
 			for (i = 0, j = 1; j < _suggestionsCount; j++)
 			{
