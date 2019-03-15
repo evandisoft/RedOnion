@@ -203,11 +203,23 @@ var
 
 incompleteVar
     : incompleteName | '(' incompleteExp | '(' exp ')' incompleteVarSuffix
-    | (NAME | '(' exp ')' varSuffix) varSuffix* incompleteVarSuffix
+    | (varName | '(' exp ')' varSuffix) varSuffix* incompleteVarSuffix
+    ;
+
+varName
+    : NAME
     ;
 
 varSuffix
-    : nameAndArgs* ('[' exp ']' | '.' NAME)
+    : nameAndArgs* ('[' arrayArg ']' | '.' memberName)
+    ;
+
+memberName
+    : NAME
+    ;
+
+arrayArg
+    : exp
     ;
 
 incompleteVarSuffix
@@ -240,6 +252,8 @@ functioncall
 args
     : '(' explist? ')' | tableconstructor | string
     ;
+
+
 
 incompleteArgs
     : '(' incompleteExplist | incompleteTableconstructor | incompleteString

@@ -30,8 +30,8 @@ namespace Kerbalua.Other {
 				int partialStart = replaceStart;
 				string textPriorToPartial = editingArea.content.text.Substring(0, partialStart);
 				string completion = completions[index];
-				//int cursorChange = completion.Length - partialLength;
-				int newCursor = replaceEnd; //editingArea.cursorIndex + cursorChange;
+				int cursorChange = completion.Length - partialLength;
+				int newCursor = replaceEnd+cursorChange; //editingArea.cursorIndex + cursorChange;
 				string textAfterPartial = editingArea.content.text.Substring(partialStart + partialLength);
 				editingArea.content.text = textPriorToPartial + completion + textAfterPartial;
 				editingArea.selectIndex=editingArea.cursorIndex = newCursor;
