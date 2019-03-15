@@ -13,7 +13,7 @@ namespace Kerbalua.Gui {
 		public void SetContentFromICompletable(ICompletable completable)
 		{
 			contentStrings = completable.GetCompletionContent(out int replaceStart, out int replaceEnd);
-			Debug.Log("Completing");
+			//Debug.Log("Getting Completions");
 			StringBuilder sb = new StringBuilder();
 			//Debug.Log("partial is " + partialCompletion);
 			foreach(string str in contentStrings) {

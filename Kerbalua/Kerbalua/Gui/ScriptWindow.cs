@@ -453,10 +453,12 @@ Any other key gives focus to input box.
 
 				completionBox.Update(GetCurrentCompletionBoxRect());
 				if (lastEventWasMouseDown && Event.current.type == EventType.Used) {
+					//Debug.Log("completionBox got a mouse down");
 					//Debug.Log("trying to complete");
-					Rect rectMinusScrollBar = new Rect(completionBoxRect) {
-						width = completionBoxRect.width - 20,
-						height = completionBoxRect.height - 20
+					Rect currentCompletionBoxRect = GetCurrentCompletionBoxRect();
+					Rect rectMinusScrollBar = new Rect(currentCompletionBoxRect) {
+						width = currentCompletionBoxRect.width - 20,
+						height = currentCompletionBoxRect.height - 20
 					};
 					if (GUIUtil.MouseInRect(rectMinusScrollBar)) {
 						completionManager.Complete();

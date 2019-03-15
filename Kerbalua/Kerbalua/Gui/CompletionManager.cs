@@ -46,7 +46,7 @@ namespace Kerbalua.Gui {
 			}
 
 			if (focusChanged || newInput) {
-				Debug.Log("GUI/foc: " + newInput + "," + focusChanged + "," + mostRecentlyFocusedCompletable + "," + inc++);
+				//Debug.Log("GUI/foc: " + newInput + "," + focusChanged + "," + mostRecentlyFocusedCompletable + "," + inc++);
 				focusChanged = false;
 				//Debug.Log("Changed");
 				ICompletable currentCompletable;
@@ -80,6 +80,7 @@ namespace Kerbalua.Gui {
 
 		public void Complete()
 		{
+			//Debug.Log("completing");
 			ICompletable completable;
 			if (completableMap.TryGetValue(mostRecentlyFocusedCompletable,out completable)) {
 				completable.GrabFocus();
