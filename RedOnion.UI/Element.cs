@@ -30,6 +30,14 @@ namespace RedOnion.UI
 	public partial class Element: IDisposable
 	{
 		protected static readonly int UILayer = LayerMask.NameToLayer("UI");
+
+		private static UISkinDef _defaultSkin;
+		public static UISkinDef DefaultSkin
+		{
+			get => _defaultSkin ?? UISkinManager.defaultSkin;
+			set => _defaultSkin = value;
+		}
+
 		protected internal GameObject GameObject { get; private set; }
 		protected RectTransform RectTransform { get; private set; }
 
@@ -46,19 +54,19 @@ namespace RedOnion.UI
 			_anchors = Anchors.TopLeft;
 		}
 
-		protected void Add(Element element)
+		public virtual void Add(Element element)
 			=> element.GameObject.transform.SetParent(GameObject.transform, false);
-		protected void Add(IEnumerable<Element> elements)
+		public void Add(params Element[] elements)
 		{
 			foreach (var element in elements)
 				Add(element);
 		}
-		protected void Remove(Element element)
+		public virtual void Remove(Element element)
 		{
 			if (element.GameObject.transform.parent == GameObject.transform)
 				element.GameObject.transform.SetParent(null);
 		}
-		protected void Remove(IEnumerable<Element> elements)
+		protected void Remove(params Element[] elements)
 		{
 			foreach (var element in elements)
 				Remove(element);
@@ -110,8 +118,18 @@ namespace RedOnion.UI
 			{
 				RectTransform.anchoredPosition = new Vector2(
 					(_anchors & Anchors.Left) != 0 ? value.x : -value.x,
-					(_anchors & Anchors.Top) != 0 ? -value.y : value.y);
+					(_anchors & Anchors.Top) != 0 ? -value.y : value.y); ;
 			}
+		}
+		public float X
+		{
+			get => Position.x;
+			set => Position = new Vector2(value, Y);
+		}
+		public float Y
+		{
+			get => Position.y;
+			set => Position = new Vector2(X, value);
 		}
 		public Vector2 SizeDelta
 		{
@@ -129,11 +147,24 @@ namespace RedOnion.UI
 			{
 				if (_anchors == Anchors.TopLeft)
 					RectTransform.sizeDelta = value;
-				var pt = RectTransform.anchoredPosition;
-				RectTransform.sizeDelta = new Vector2(
-					(_anchors & Anchors.LeftRight) == Anchors.LeftRight ? -value.x-pt.x : value.x,
-					(_anchors & Anchors.TopBottom) == Anchors.TopBottom ? -value.y+pt.y : value.y);
+				else
+				{
+					var pt = RectTransform.anchoredPosition;
+					RectTransform.sizeDelta = new Vector2(
+						(_anchors & Anchors.LeftRight) == Anchors.LeftRight ? -value.x-pt.x : value.x,
+						(_anchors & Anchors.TopBottom) == Anchors.TopBottom ? -value.y+pt.y : value.y);
+				}
 			}
+		}
+		public float W
+		{
+			get => SizeDelta.x;
+			set => SizeDelta = new Vector2(value, H);
+		}
+		public float H
+		{
+			get => SizeDelta.y;
+			set => SizeDelta = new Vector2(W, value);
 		}
 	}
 }

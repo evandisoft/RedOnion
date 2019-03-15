@@ -7,6 +7,8 @@ namespace RedOnion.UI
 {
 	public class Button : Element
 	{
+		protected UISkinDef skin;
+		protected UIStyle style;
 		protected UUI.Image Image { get; private set; }
 		protected UUI.Button Core { get; private set; }
 
@@ -19,7 +21,7 @@ namespace RedOnion.UI
 				{
 					if (GameObject == null)
 						throw new ObjectDisposedException(Name ?? GetType().Name);
-					Add(label = new Label("Label"));
+					Add(label = new Label(skin, style, "Label"));
 				}
 				return label;
 			}
@@ -43,10 +45,12 @@ namespace RedOnion.UI
 		}
 
 		public Button(string name = null)
-			: this(UISkinManager.defaultSkin.button, name) { }
-		public Button(UIStyle style, string name = null)
+			: this(DefaultSkin, DefaultSkin.button, name) { }
+		public Button(UISkinDef skin, UIStyle style, string name = null)
 			: base(name)
 		{
+			this.skin = skin;
+			this.style = style;
 			Image = GameObject.AddComponent<UUI.Image>();
 			Image.sprite = style.normal.background;
 			Core = GameObject.AddComponent<UUI.Button>();
@@ -72,12 +76,5 @@ namespace RedOnion.UI
 			get => icon?.Texture;
 			set => IconCore.Texture = value;
 		}
-
-#if DEBUG
-		public Label DebugGetLabel() => label;
-		public Label DebugEnsureLabel() => LabelCore;
-		public Icon DebugGetIcon() => icon;
-		public Icon DebugEnsureIcon() => IconCore;
-#endif
 	}
 }

@@ -203,7 +203,15 @@ namespace RedOnion.Script
 			default:
 				return "undefined";
 			case ValueKind.Object:
-				return ptr == null ? "null" : ((IObject)ptr).Value.String;
+				if (ptr == null)
+					return "null";
+				var obj = (IObject)ptr;
+				if (obj.HasFeature(ObjectFeatures.Proxy))
+				{
+					var it = obj.Target;
+					return it == null ? "null" : it.ToString();
+				}
+				return obj.Value.String;
 			case ValueKind.Reference:
 				return ((IProperties)ptr).Get(str).String;
 			case ValueKind.String:
