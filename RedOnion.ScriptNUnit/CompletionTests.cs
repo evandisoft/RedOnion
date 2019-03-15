@@ -52,5 +52,19 @@ namespace RedOnion.ScriptNUnit
 			Test("space.thing.y = 2");
 			Same(Complete("space.thing.", 12), new[] { "x", "y" });
 		}
+
+		[Test]
+		public void Completion_04_Partial()
+		{
+			Test("var it = new object");
+			Test("it.aaa = 1");
+			Test("it.aab = 2");
+			Test("it.abb = 3");
+			Test("it.abc = 4");
+			Test("it.bcd = 5");
+			Same(Hints.Complete("it.aa", 5, out var from, out var to), new[] { "aaa", "aab", });
+			Assert.AreEqual(3, from);
+			Assert.AreEqual(5, to);
+		}
 	}
 }

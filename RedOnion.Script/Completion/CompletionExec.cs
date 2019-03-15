@@ -13,6 +13,7 @@ namespace RedOnion.Script.Completion
 			var source = lexer.Source;
 			int i = interest;
 			int dotAt = -1;
+			int firstAt = -1;
 			while (i > 0)
 			{
 				char c = source[--i];
@@ -23,6 +24,8 @@ namespace RedOnion.Script.Completion
 				if (c == '.')
 				{
 					dotAt = i;
+					if (firstAt < 0)
+						firstAt = i;
 					continue;
 				}
 				i++;
@@ -30,7 +33,7 @@ namespace RedOnion.Script.Completion
 			}
 			if (i > 0 && !char.IsWhiteSpace(source[i-1]))
 				return;
-			replaceAt = dotAt < 0 ? i : dotAt + 1;
+			replaceAt = firstAt < 0 ? i : firstAt + 1;
 			int j = interest;
 			while (j < source.Length)
 			{
@@ -42,7 +45,7 @@ namespace RedOnion.Script.Completion
 				j--;
 				break;
 			}
-			replaceEnd = j;
+			replaceTo = j;
 			if (dotAt < 0)
 			{
 				found = Root;

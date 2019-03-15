@@ -39,24 +39,24 @@ namespace RedOnion.Script.Completion
 			=> Root = new CompletionRoot(this, this.linked = linked);
 
 		protected Lexer lexer = new Lexer();
-		protected int interest, replaceAt, replaceEnd;
+		protected int interest, replaceAt, replaceTo;
 		protected IObject found;
 
 		public virtual IList<string> Complete(
-			string source, int at, out int replaceFrom, out int replaceTo)
+			string source, int at, out int replaceAt, out int replaceTo)
 		{
 			Reset();
 			interest = at;
 			this.replaceAt = at;
-			this.replaceEnd = at;
+			this.replaceTo = at;
 			lexer.Source = source;
 			Execute();
-			replaceFrom = this.replaceAt;
-			replaceTo = this.replaceEnd;
+			replaceAt = this.replaceAt;
+			replaceTo = this.replaceTo;
 			if (found != null)
 			{
 				FillFrom(found);
-				RemoveDuplicates();
+				RemoveDuplicates(at == replaceAt ? null : source.Substring(replaceAt, at-replaceAt));
 			}
 			return GetSuggestions();
 		}
@@ -223,16 +223,16 @@ namespace RedOnion.Script.Completion
 			int i, j;
 			if (prefix != null && prefix.Length > 0)
 			{
-				for (i = 0, j = i + 1; j < _suggestionsCount; j++)
+				for (i = 0, j = 0; j < _suggestionsCount; j++)
 				{
-					if (!_suggestions[j].StartsWith(prefix,
+					if (_suggestions[j].StartsWith(prefix,
 						StringComparison.OrdinalIgnoreCase))
-						_suggestions[++i] = _suggestions[j];
+						_suggestions[i++] = _suggestions[j];
 				}
-				_suggestionsCount = i + 1;
+				_suggestionsCount = i;
 			}
 			Array.Sort(_suggestions, 0, _suggestionsCount, StringComparer.OrdinalIgnoreCase);
-			for (i = 0, j = i + 1; j < _suggestionsCount; j++)
+			for (i = 0, j = 1; j < _suggestionsCount; j++)
 			{
 				if (string.Compare(_suggestions[j], _suggestions[i],
 					StringComparison.OrdinalIgnoreCase) != 0)
