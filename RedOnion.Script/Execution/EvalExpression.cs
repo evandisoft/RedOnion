@@ -5,7 +5,7 @@ using System.Text;
 
 namespace RedOnion.Script
 {
-	public partial class Engine
+	public partial class Engine<P>
 	{
 		protected virtual void TypeReference(ref int at)
 		{

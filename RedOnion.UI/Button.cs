@@ -73,5 +73,11 @@ namespace RedOnion.UI
 			set => IconCore.Texture = value;
 		}
 
+#if DEBUG
+		public Label DebugGetLabel() => label;
+		public Label DebugEnsureLabel() => LabelCore;
+		public Icon DebugGetIcon() => icon;
+		public Icon DebugEnsureIcon() => IconCore;
+#endif
 	}
 }

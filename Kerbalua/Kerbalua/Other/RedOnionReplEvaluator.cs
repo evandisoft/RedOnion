@@ -10,11 +10,13 @@ using RedOnion.KSP;
 
 namespace Kerbalua.Other {
 	public class RedOnionReplEvaluator:ReplEvaluator {
-		protected ImmediateEngine engine;
+		ImmediateEngine engine;
+		ReplHintsEngine hints;
 
 		public RedOnionReplEvaluator()
 		{
 			engine = new ImmediateEngine();
+			hints = new ReplHintsEngine(engine);
 		}
 
 		public RedOnionReplEvaluator(Engine engine)
@@ -43,29 +45,18 @@ namespace Kerbalua.Other {
 		}
 
 		/// <summary>
-		/// TODO: NOT CURRENTLY IMPLEMENTED
 		/// See the abstract version for complete comments.
 		/// </summary>
 		public override IList<string> GetCompletions(string source, int cursorPos,out int replaceStart,out int replaceEnd)
 		{
-			List<string> NOT_IMPLEMENTED_COMPLETIONS = new List<string>();
-			NOT_IMPLEMENTED_COMPLETIONS.Add("RedOnion");
-			NOT_IMPLEMENTED_COMPLETIONS.Add("intellisense");
-			NOT_IMPLEMENTED_COMPLETIONS.Add("is");
-			NOT_IMPLEMENTED_COMPLETIONS.Add("not");
-			NOT_IMPLEMENTED_COMPLETIONS.Add("currently");
-			NOT_IMPLEMENTED_COMPLETIONS.Add("implemented");
-			for (int i = 0;i < 100;i++) {
-				NOT_IMPLEMENTED_COMPLETIONS.Add("test-string #" + i);
-			}
-			replaceStart = replaceEnd = cursorPos;
-			return NOT_IMPLEMENTED_COMPLETIONS;
+			return hints.Complete(source, cursorPos, out replaceStart, out replaceEnd);
 		}
 
 
 		public override void ResetEngine()
 		{
 			engine.Reset();
+			hints.Reset();
 		}
 
 		public override void Terminate()

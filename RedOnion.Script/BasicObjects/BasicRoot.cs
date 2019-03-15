@@ -5,7 +5,7 @@ using System.Text;
 
 namespace RedOnion.Script.BasicObjects
 {
-	public class Root : BasicObject, IEngineRoot
+	public class BasicRoot : BasicObject, IEngineRoot
 	{
 		public Dictionary<Type, IObject> TypeMap
 		{ get; } = new Dictionary<Type, IObject>();
@@ -32,9 +32,9 @@ namespace RedOnion.Script.BasicObjects
 		public NumberFun Bool { get; }
 		public NumberFun Char { get; }
 
-		public Root(IEngine engine)
+		public BasicRoot(IEngine engine)
 			: this(engine, true) { }
-		protected Root(IEngine engine, bool fill)
+		protected BasicRoot(IEngine engine, bool fill)
 			: base(engine, null, new Properties(), new Properties())
 		{
 			var obj	= new BasicObject(engine);
@@ -71,38 +71,46 @@ namespace RedOnion.Script.BasicObjects
 
 		protected virtual void Fill()
 		{
-			BaseProps.Set("undefined",	Undefined);
-			BaseProps.Set("null",		Null);
-			BaseProps.Set("nan",		NaN);
-			BaseProps.Set("infinity",	Infinity);
-			MoreProps.Set("inf",		Infinity);
-			BaseProps.Set("Function",	Function);
-			BaseProps.Set("Object",		Object);
-			BaseProps.Set("String",		String);
-			BaseProps.Set("Number",		Number);
-			BaseProps.Set("Float",		Float);
-			MoreProps.Set("Single",		Float);
-			BaseProps.Set("Double",		Double);
-			BaseProps.Set("Long",		Long);
-			MoreProps.Set("Int64",		Long);
-			BaseProps.Set("ULong",		ULong);
-			MoreProps.Set("UInt64",		ULong);
-			BaseProps.Set("Int", new Value(Int));
-			MoreProps.Set("Int32", new Value(Int));
-			BaseProps.Set("UInt", new Value(UInt));
-			MoreProps.Set("UInt32", new Value(UInt));
-			BaseProps.Set("Short", new Value(Short));
-			MoreProps.Set("Int16", new Value(Short));
-			BaseProps.Set("UShort", new Value(UShort));
-			MoreProps.Set("UInt16", new Value(UShort));
-			BaseProps.Set("SByte", new Value(SByte));
-			MoreProps.Set("Int8", new Value(SByte));
-			BaseProps.Set("Byte", new Value(Byte));
-			MoreProps.Set("UInt8", new Value(Byte));
-			BaseProps.Set("Bool", new Value(Bool));
-			MoreProps.Set("Boolean", new Value(Bool));
-			BaseProps.Set("Char", new Value(Char));
 			TypeMap[typeof(string)] = String;
+			FillSystem(BaseProps, MoreProps);
+			var sys = new Properties();
+			FillSystem(sys, sys);
+			BaseProps.Set("System", new SimpleObject(Engine, sys));
+		}
+
+		protected void FillSystem(IProperties core, IProperties more)
+		{
+			core.Set("undefined",	Undefined);
+			core.Set("null",		Null);
+			core.Set("nan",			NaN);
+			core.Set("infinity",	Infinity);
+			more.Set("inf",			Infinity);
+			core.Set("Function",	Function);
+			core.Set("Object",		Object);
+			core.Set("String",		String);
+			core.Set("Number",		Number);
+			core.Set("Float",		Float);
+			more.Set("Single",		Float);
+			core.Set("Double",		Double);
+			core.Set("Long",		Long);
+			more.Set("Int64",		Long);
+			core.Set("ULong",		ULong);
+			more.Set("UInt64",		ULong);
+			core.Set("Int",			Int);
+			more.Set("Int32",		Int);
+			core.Set("UInt",		UInt);
+			more.Set("UInt32",		UInt);
+			core.Set("Short",		Short);
+			more.Set("Int16",		Short);
+			core.Set("UShort",		UShort);
+			more.Set("UInt16",		UShort);
+			core.Set("SByte",		SByte);
+			more.Set("Int8",		SByte);
+			core.Set("Byte",		Byte);
+			more.Set("UInt8",		Byte);
+			core.Set("Bool",		Bool);
+			more.Set("Boolean",		Bool);
+			core.Set("Char",		Char);
 		}
 
 		public IObject Box(Value value)

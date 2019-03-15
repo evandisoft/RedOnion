@@ -518,7 +518,7 @@ namespace RedOnion.Script
 			Vars.Set("arguments", new Value(Vars.BaseClass));
 		}
 
-		public void Push(Engine engine)
+		public void Push(IEngine engine)
 			=> Vars = engine.CreateVars(Vars);
 		public void Pop()
 			=> Vars = Vars.BaseClass;
@@ -568,5 +568,48 @@ namespace RedOnion.Script
 		[Conditional("DEBUG")]
 		public static void DebugLog(this IEngine engine, string msg, params object[] args)
 			=> engine.Log(string.Format(msg, args));
+	}
+
+	public static class EngineRootExtensions
+	{
+		public static IObject AddType(this IEngineRoot root, string name, Type type, IObject creator = null)
+		{
+			if (creator == null)
+				creator = root[type];
+			else root[type] = creator;
+			root.Set(name, new Value(creator));
+			root.DebugLog("{0} = {1}", name, type.FullName);
+			return creator;
+		}
+		public static IObject AddType(this IEngineRoot root, Type type)
+		{
+			var creator = root[type];
+			root.Set(type.Name, new Value(creator));
+			root.DebugLog("{0} = {1}", type.Name, type.FullName);
+			return creator;
+		}
+
+		public static void Log(this IEngineRoot root, string msg)
+			=> root.Engine.Log(msg);
+		public static void Log(this IEngineRoot root, string msg, params object[] args)
+			=> root.Engine.Log(string.Format(msg, args));
+		[Conditional("DEBUG")]
+		public static void DebugLog(this IEngineRoot root, string msg)
+			=> root.Engine.Log(msg);
+		[Conditional("DEBUG")]
+		public static void DebugLog(this IEngineRoot root, string msg, params object[] args)
+			=> root.Engine.Log(string.Format(msg, args));
+	}
+
+	public static class ObjectExtensions
+	{
+		public static bool HasFeature(this IObject obj, ObjectFeatures feature)
+			=> (obj.Features & feature) != 0;
+	}
+
+	public static class PropertiesExcentions
+	{
+		public static bool Set(this IProperties props, string name, IObject value)
+			=> props.Set(name, new Value(value));
 	}
 }
