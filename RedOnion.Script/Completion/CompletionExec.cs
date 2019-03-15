@@ -1,6 +1,8 @@
+using RedOnion.Script.ReflectedObjects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace RedOnion.Script.Completion
@@ -52,6 +54,8 @@ namespace RedOnion.Script.Completion
 				return;
 			}
 			IObject obj = Root;
+			Type type = null;
+			bool instance = false;
 			for (; ; i = j + 1)
 			{
 				string name = source.Substring(i, dotAt-i);
@@ -67,14 +71,47 @@ namespace RedOnion.Script.Completion
 						return;
 					break;
 				}
-				if (!obj.Get(name, out var value)
-					&& (linked == null || obj != Root
-					|| !linked.Get(name, out value)))
-					return;
-				obj = Box(value);
+				if (obj != null)
+				{
+					if (obj.HasFeature(ObjectFeatures.Proxy|ObjectFeatures.TypeReference))
+					{
+						type = obj.Type;
+						instance = obj.HasFeature(ObjectFeatures.Proxy);
+						obj = null;
+					}
+					else
+					{
+						if (!obj.Get(name, out var value)
+						&& (linked == null || obj != Root
+						|| !linked.Get(name, out value)))
+							return;
+						obj = Box(value);
+					}
+				}
+				if (type != null)
+				{
+					bool matched = false;
+					foreach (var member in ReflectedType.GetMembers(type, name, instance))
+					{
+						if (member is FieldInfo field)
+						{
+							matched = true;
+							type = field.FieldType;
+							break;
+						}
+						if (member is PropertyInfo property)
+						{
+							matched = true;
+							type = property.PropertyType;
+							break;
+						}
+					}
+					if (!matched || type == typeof(void))
+						return;
+				}
 				if (dotAt == interest)
 				{
-					found = obj;
+					found = (object)obj ?? type;
 					return;
 				}
 			}

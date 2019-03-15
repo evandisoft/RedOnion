@@ -27,8 +27,13 @@ namespace RedOnion.UI
 			TitleTextColor = new Color(0.8f, 0.8f, 0.8f, 0.8f)
 		};
 
+#if DEBUG
+		public Label TitleLabel { get; private set; }
+		public Button CloseButton { get; private set; }
+#else
 		protected Label TitleLabel { get; private set; }
 		protected Button CloseButton { get; private set; }
+#endif
 
 		public Window(string name = null)
 			: base(name)
@@ -53,7 +58,7 @@ namespace RedOnion.UI
 				Anchors = Anchors.TopRight,
 				Position = new Vector2(Default.FrameWidth, Default.FrameWidth),
 				SizeDelta = new Vector2(Default.CloseButtonSize.x, Default.CloseButtonSize.y),
-				//IconTexture = Default.CloseButtonIcon
+				IconTexture = Default.CloseButtonIcon
 			});
 			CloseButton.Click += Close;
 		}

@@ -572,19 +572,21 @@ namespace RedOnion.Script
 
 	public static class EngineRootExtensions
 	{
-		public static void AddType(this IEngineRoot root, string name, Type type, IObject creator = null)
+		public static IObject AddType(this IEngineRoot root, string name, Type type, IObject creator = null)
 		{
 			if (creator == null)
 				creator = root[type];
 			else root[type] = creator;
 			root.Set(name, new Value(creator));
 			root.DebugLog("{0} = {1}", name, type.FullName);
+			return creator;
 		}
-		public static void AddType(this IEngineRoot root, Type type)
+		public static IObject AddType(this IEngineRoot root, Type type)
 		{
 			var creator = root[type];
 			root.Set(type.Name, new Value(creator));
 			root.DebugLog("{0} = {1}", type.Name, type.FullName);
+			return creator;
 		}
 
 		public static void Log(this IEngineRoot root, string msg)
@@ -603,5 +605,11 @@ namespace RedOnion.Script
 	{
 		public static bool HasFeature(this IObject obj, ObjectFeatures feature)
 			=> (obj.Features & feature) != 0;
+	}
+
+	public static class PropertiesExcentions
+	{
+		public static bool Set(this IProperties props, string name, IObject value)
+			=> props.Set(name, new Value(value));
 	}
 }

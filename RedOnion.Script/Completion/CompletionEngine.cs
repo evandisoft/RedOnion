@@ -40,7 +40,7 @@ namespace RedOnion.Script.Completion
 
 		protected Lexer lexer = new Lexer();
 		protected int interest, replaceAt, replaceTo;
-		protected IObject found;
+		protected object found;
 
 		public virtual IList<string> Complete(
 			string source, int at, out int replaceAt, out int replaceTo)
@@ -173,48 +173,61 @@ namespace RedOnion.Script.Completion
 
 		public virtual void Log(string msg) { }
 
-		private void FillFrom(IObject obj)
+		private void FillFrom(object value)
 		{
-			if (obj == null)
+			if (value == null)
 				return;
 			for (; ; )
 			{
-				FillFrom(obj.BaseProps);
-				FillFrom(obj.MoreProps);
-				if (obj.HasFeature(ObjectFeatures.TypeReference|ObjectFeatures.Proxy))
+				var type = value as Type;
+				var props = value as IProperties;
+				IObject obj = null;
+				if (props != null)
 				{
-					Type type = obj.Type;
-					if (type != null)
+					obj = props as IObject;
+					if (obj != null)
 					{
-						var binding = BindingFlags.Public;
-						if (obj.HasFeature(ObjectFeatures.TypeReference))
-							binding |= BindingFlags.Static;
-						if (obj.HasFeature(ObjectFeatures.Proxy))
-							binding |= BindingFlags.Instance;
-						foreach (var member in type.GetMembers(binding))
+						FillFrom(obj.BaseProps);
+						FillFrom(obj.MoreProps);
+						if (obj.HasFeature(ObjectFeatures.TypeReference|ObjectFeatures.Proxy))
+							type = obj.Type;
+					}
+					else
+					{
+						if (props is IDictionary<string, Value> dict)
 						{
-							if (member is ConstructorInfo)
-								continue;
-							AddSuggestion(member.Name);
+							foreach (var name in dict.Keys)
+								AddSuggestion(name);
 						}
+						return;
 					}
 				}
-				bool wasRoot = obj == Root;
-				if ((obj = obj.BaseClass) != null)
+				if (type != null)
+				{
+					var binding = BindingFlags.Public;
+					if (obj != null && obj.HasFeature(ObjectFeatures.TypeReference))
+						binding |= BindingFlags.Static;
+					if (obj == null || obj.HasFeature(ObjectFeatures.Proxy))
+						binding |= BindingFlags.Instance;
+					foreach (var member in type.GetMembers(binding))
+					{
+						if (member.MemberType == MemberTypes.Constructor)
+							continue;
+						if (member.MemberType == MemberTypes.Method
+							&& ((MethodInfo)member).IsSpecialName)
+							continue;
+						AddSuggestion(member.Name);
+					}
+				}
+				bool wasRoot = value == Root;
+				if (obj != null && (value = obj.BaseClass) != null)
 					continue;
 				if (!wasRoot)
 					break;
-				obj = linked;
-				if (obj == null)
+				value = linked;
+				if (value == null)
 					return;
 			}
-		}
-		private void FillFrom(IProperties iprops)
-		{
-			if (!(iprops is Properties props))
-				return;
-			foreach (var name in props.Keys)
-				AddSuggestion(name);
 		}
 		private void RemoveDuplicates(string prefix = null)
 		{

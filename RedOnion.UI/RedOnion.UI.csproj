@@ -65,8 +65,13 @@
       <Private>False</Private>
     </Reference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="$(AssemblyName).zip">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Target Name="AfterBuild">
-    <ZipDirectory SourceDirectory="Resources" Overwrite="True" DestinationFile="$(OutputPath)\$(AssemblyName).zip" />
+  <Target Name="BeforeBuild">
+    <ZipDirectory SourceDirectory="Resources" Overwrite="True" DestinationFile="$(AssemblyName).zip" />
   </Target>
 </Project>

@@ -25,14 +25,26 @@ namespace RedOnion.KSP
 
 		public static void FillRoot(IEngineRoot root, bool repl)
 		{
+#if DEBUG
+			repl = false; // FOR NOW!
+#endif
 			// neutral types first
-			root.AddType(typeof(System.Delegate));
-			root.AddType(typeof(UnityEngine.Debug));
-			root.AddType(typeof(UnityEngine.Color));
-			root.AddType(typeof(UnityEngine.Rect));
-			root.AddType(typeof(UnityEngine.Vector2));
-			root.AddType(typeof(UnityEngine.Vector3));
-			root.AddType(typeof(UnityEngine.Vector4));
+			// aliases in global namespaces are in MoreProps = overwrittable,
+			// while names under "System" namespace are read-only (BaseProps)
+			var system = root.Get("System").Object;
+			var sys = system?.BaseProps ?? new Properties();
+			sys.Set("Delegate",	root.AddType(typeof(System.Delegate)));
+			sys.Set("Debug",	root.AddType(typeof(UnityEngine.Debug)));
+			sys.Set("Color",	root.AddType(typeof(UnityEngine.Color)));
+			sys.Set("Rect",		root.AddType(typeof(UnityEngine.Rect)));
+			sys.Set("Vector2",	root.AddType(typeof(UnityEngine.Vector2)));
+			var vector = root.AddType(typeof(UnityEngine.Vector3));
+			root.MoreProps.Set("Vector", vector);
+			sys.Set("Vector",	vector);
+			sys.Set("Vector3",	vector);
+			sys.Set("Vector4",	root.AddType(typeof(UnityEngine.Vector4)));
+			if (system == null)
+				root.BaseProps.Set("System", new SimpleObject(root.Engine, sys));
 
 			// safe types next (TODO: ref-count or bind to engine to dispose with engine reset)
 			root.BaseProps.Set("UI", new Value(engine =>
@@ -79,6 +91,7 @@ namespace RedOnion.KSP
 					{ "Button",         root[typeof(UnityEngine.UI.Button)] },
 					{ "Image",          root[typeof(UnityEngine.UI.Image)] },
 					{ "RawImage",       root[typeof(UnityEngine.UI.RawImage)] },
+					{ "Screen",			root[typeof(UnityEngine.Screen)] },
 					{ "Sprite",         root[typeof(UnityEngine.Sprite)] },
 					{ "Texture",        root[typeof(UnityEngine.Texture)] },
 					{ "Texture2D",      root[typeof(UnityEngine.Texture2D)] },

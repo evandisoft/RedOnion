@@ -90,7 +90,9 @@ namespace RedOnion.UI
 					(value & Anchors.Right) != 0 ? 1f : (value & Anchors.Left) != 0 ? 0f : 0.5f,
 					(value & Anchors.Top) != 0 ? 1f : (value & Anchors.Bottom) != 0 ? 0f : 0.5f);
 				RectTransform.pivot = new Vector2(
+					(value & Anchors.LeftRight) == Anchors.Center ? 0.5f :
 					(value & Anchors.LeftRight) != Anchors.Right ? 0f : 1f,
+					(value & Anchors.TopBottom) == Anchors.Center ? 0.5f :
 					(value & Anchors.TopBottom) != Anchors.Bottom ? 1f : 0f);
 				_anchors = value;
 			}
