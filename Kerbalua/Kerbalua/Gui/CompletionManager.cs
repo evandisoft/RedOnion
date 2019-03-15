@@ -18,6 +18,7 @@ namespace Kerbalua.Gui {
 
 		//bool completeOnNextUpdate = false;
 
+
 		public CompletionManager(ICompletionSelector completionSelector)
 		{
 			this.completionSelector = completionSelector;
@@ -28,11 +29,12 @@ namespace Kerbalua.Gui {
 			completableMap[source.ControlName] = source;
 		}
 
-		//int inc = 0;
-		public void Update()
+		int inc = 0;
+		public void Update(bool hadMouseDownLastUpdate)
 		{
-			bool newInput=false;
-			foreach(var completable in completableMap.Values) {
+			bool newInput= hadMouseDownLastUpdate;
+
+			foreach (var completable in completableMap.Values) {
 				newInput |= completable.ReceivedInput;
 			}
 
@@ -44,7 +46,7 @@ namespace Kerbalua.Gui {
 			}
 
 			if (focusChanged || newInput) {
-				//Debug.Log("GUI/foc: " + newInput + "," + focusChanged + "," + currentlyFocusedControl + "," + inc++);
+				Debug.Log("GUI/foc: " + newInput + "," + focusChanged + "," + mostRecentlyFocusedCompletable + "," + inc++);
 				focusChanged = false;
 				//Debug.Log("Changed");
 				ICompletable currentCompletable;

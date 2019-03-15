@@ -315,12 +315,13 @@ Any other key gives focus to input box.
 			}
 		}
 
+		bool hadMouseDownLastUpdate = false;
 		public void Update()
 		{
 			SetOrReleaseInputLock();
+			completionManager.Update(hadMouseDownLastUpdate);
+			hadMouseDownLastUpdate = false;
 
-
-			completionManager.Update();
 
 			//if (replVisible) {
 			//	mainWindowRect.width = buttonBarRect.width + replRect.width;
@@ -332,7 +333,7 @@ Any other key gives focus to input box.
 			Rect modifiedEffectiveRect = GUI.Window(windowID, effectiveWindowRect, MainWindow, Title);
 			mainWindowRect.x += modifiedEffectiveRect.x - effectiveWindowRect.x;
 			mainWindowRect.y += modifiedEffectiveRect.y - effectiveWindowRect.y;
-			//GlobalKeyBindings.ExecuteAndConsumeIfMatched(Event.current);
+			//GlobalKeyBindings.ExecuteAndConsumeIfMatched(Event.current)
 		}
 
 		Rect GetCurrentWindowRect()
@@ -418,6 +419,10 @@ Any other key gives focus to input box.
 				}
 			}
 
+			if (Event.current.type == EventType.MouseDown) {
+				hadMouseDownLastUpdate = true;
+			}
+
 			Rect effectiveWindowRect = GetCurrentWindowRect();
 			GUI.DragWindow(new Rect(0, 0, effectiveWindowRect.width, titleHeight));
 			GlobalKeyBindings.ExecuteAndConsumeIfMatched(Event.current);
@@ -427,18 +432,17 @@ Any other key gives focus to input box.
 			currentWidgetBarRect.y += widgetBarRect.height;
 			recentFiles.Update(currentWidgetBarRect);
 
-			if (replVisible) {
+			//if (replVisible) {
 				//if(repl.outputBox.HasFocus()) {
 				//	repl.inputBox.GrabFocus();
 				//}
+			repl.Update(GetCurrentReplRect(),replVisible);
+			//}
 
-				repl.Update(GetCurrentReplRect());
-			}
-
-			if (editorVisible) {
+			//if (editorVisible) {
 				//editorRect = UpdateBoxPositionWithWindow(editorRect, -editorRect.width);
-				editor.Update(editorRect);
-			}
+			editor.Update(editorRect,editorVisible);
+			//}
 
 			// Lots of hacks here. I will eventually better understand how this
 			// works and replace it.
