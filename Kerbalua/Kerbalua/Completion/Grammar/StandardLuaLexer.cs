@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// Generated from LuaCompletion2.g4 by ANTLR 4.7.1
+// Generated from StandardLua.g4 by ANTLR 4.7.1
 
 // Unreachable code detected
 #pragma warning disable 0162
@@ -29,7 +29,7 @@ using DFA = Antlr4.Runtime.Dfa.DFA;
 
 [System.CodeDom.Compiler.GeneratedCode("ANTLR", "4.7.1")]
 [System.CLSCompliant(false)]
-public partial class LuaCompletion2Lexer : Lexer {
+public partial class StandardLuaLexer : Lexer {
 	protected static DFA[] decisionToDFA;
 	protected static PredictionContextCache sharedContextCache = new PredictionContextCache();
 	public const int
@@ -66,10 +66,10 @@ public partial class LuaCompletion2Lexer : Lexer {
 	};
 
 
-	public LuaCompletion2Lexer(ICharStream input)
+	public StandardLuaLexer(ICharStream input)
 	: this(input, Console.Out, Console.Error) { }
 
-	public LuaCompletion2Lexer(ICharStream input, TextWriter output, TextWriter errorOutput)
+	public StandardLuaLexer(ICharStream input, TextWriter output, TextWriter errorOutput)
 	: base(input, output, errorOutput)
 	{
 		Interpreter = new LexerATNSimulator(this, _ATN, decisionToDFA, sharedContextCache);
@@ -104,7 +104,7 @@ public partial class LuaCompletion2Lexer : Lexer {
 		}
 	}
 
-	public override string GrammarFileName { get { return "LuaCompletion2.g4"; } }
+	public override string GrammarFileName { get { return "StandardLua.g4"; } }
 
 	public override string[] RuleNames { get { return ruleNames; } }
 
@@ -114,7 +114,7 @@ public partial class LuaCompletion2Lexer : Lexer {
 
 	public override string SerializedAtn { get { return new string(_serializedATN); } }
 
-	static LuaCompletion2Lexer() {
+	static StandardLuaLexer() {
 		decisionToDFA = new DFA[_ATN.NumberOfDecisions];
 		for (int i = 0; i < _ATN.NumberOfDecisions; i++) {
 			decisionToDFA[i] = new DFA(_ATN.GetDecisionState(i), i);

@@ -97,15 +97,10 @@ backwardsArgs
     ;
 
 arg
-    : ignoredExpr
+    : 
     ;
 
-ignoredExpr
-    : ')' ignoredExpr '('
-    | ']' ignoredExpr '['
-    | '}' ignoredExpr '{'
-    | ~('('|')'|'['|']'|'{'|'}'|',')* (',' ignoredExpr)*
-    ;
+
 
 BACKWARDS_NAME
     : [a-zA-Z_0-9]*[a-zA-Z_]
@@ -113,4 +108,99 @@ BACKWARDS_NAME
 
 WS 
     : [ \t\u000C\r\n]+ -> skip
+    ;
+
+NORMALSTRING
+    : '"' ( BackwardsEscapeSequence | ~('\\'|'"') )* '"' 
+    ;
+
+CHARSTRING
+    : '\'' ( BackwardsEscapeSequence | ~('\''|'\\') )* '\''
+    ;
+
+LONGSTRING
+    : '[' NESTED_STR ']'
+    ;
+
+fragment
+NESTED_STR
+    : '=' NESTED_STR '='
+    | '[' .*? ']'
+    ;
+
+INT
+    : Digit+
+    ;
+
+HEX
+    : '0' [xX] HexDigit+
+    ;
+
+FLOAT
+    : Digit+ '.' Digit* ExponentPart?
+    | '.' Digit+ ExponentPart?
+    | Digit+ ExponentPart
+    ;
+
+HEX_FLOAT
+    : '0' [xX] HexDigit+ '.' HexDigit* HexExponentPart?
+    | '0' [xX] '.' HexDigit+ HexExponentPart?
+    | '0' [xX] HexDigit+ HexExponentPart
+    ;
+
+fragment
+ExponentPart
+    : [eE] [+-]? Digit+
+    ;
+
+fragment
+HexExponentPart
+    : [pP] [+-]? Digit+
+    ;
+
+fragment
+BackwardsEscapeSequence
+    :  [abfnrtvz"'\\] '\\'
+    | '\n' '\r'? '\\'  
+    | BackwardsDecimalEscape
+    | BackwardsHexEscape
+    ;
+    
+fragment
+BackwardsDecimalEscape
+    :  Digit '\\'
+    |  Digit Digit '\\'
+    |  Digit [0-2] Digit '\\'
+    ;
+    
+fragment
+BackwardsHexEscape
+    :  HexDigit HexDigit 'x' '\\'
+    ;
+
+
+fragment
+Digit
+    : [0-9]
+    ;
+
+fragment
+HexDigit
+    : [0-9a-fA-F]
+    ;
+    
+LINE_COMMENT
+    : '--'
+    (                                               // --
+    | '[' '='*                                      // --[==
+    | '[' '='* ~('='|'['|'\r'|'\n') ~('\r'|'\n')*   // --[==AA
+    | ~('['|'\r'|'\n') ~('\r'|'\n')*                // --AAA
+    ) ('\r\n'|'\r'|'\n'|EOF)
+    -> channel(HIDDEN)
+    ;
+    
+
+
+SHEBANG
+    : '#' '!' ~('\n'|'\r')* -> channel(HIDDEN)
     ;

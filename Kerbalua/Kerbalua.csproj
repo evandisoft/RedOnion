@@ -111,27 +111,41 @@
     <Compile Include="Kerbalua\AutoPilot\AutoPilotAPI.cs" />
     <Compile Include="Kerbalua\MoonSharp\KerbaluaExecutionManager.cs" />
     <Compile Include="Kerbalua\MoonSharp\ExecutionLimitException.cs" />
-    <Compile Include="Kerbalua\Completion\Grammar\BackwardsLuaBaseListener.cs" />
-    <Compile Include="Kerbalua\Completion\Grammar\BackwardsLuaLexer.cs" />
-    <Compile Include="Kerbalua\Completion\Grammar\BackwardsLuaListener.cs" />
-    <Compile Include="Kerbalua\Completion\Grammar\BackwardsLuaParser.cs" />
-    <Compile Include="Kerbalua\Completion\LuaIntellisenseParser.cs" />
-    <Compile Include="Kerbalua\Completion\Grammar\BackwardsLuaBaseVisitor.cs" />
-    <Compile Include="Kerbalua\Completion\Grammar\BackwardsLuaVisitor.cs" />
+    <Compile Include="Kerbalua\Completion\IncompleteLuaIntellisense.cs" />
     <Compile Include="Kerbalua\Utility\Misc.cs" />
     <Compile Include="Kerbalua\Completion\LuaIntellisenseListener.cs" />
     <Compile Include="Kerbalua\Completion\LastVarExtracter.cs" />
+    <Compile Include="Kerbalua\Completion\Grammar\IncompleteLuaBaseListener.cs" />
+    <Compile Include="Kerbalua\Completion\Grammar\IncompleteLuaBaseVisitor.cs" />
+    <Compile Include="Kerbalua\Completion\Grammar\IncompleteLuaLexer.cs" />
+    <Compile Include="Kerbalua\Completion\Grammar\IncompleteLuaListener.cs" />
+    <Compile Include="Kerbalua\Completion\Grammar\IncompleteLuaParser.cs" />
+    <Compile Include="Kerbalua\Completion\Grammar\IncompleteLuaVisitor.cs" />
+    <Compile Include="Kerbalua\Completion\Grammar\StandardLuaBaseListener.cs" />
+    <Compile Include="Kerbalua\Completion\Grammar\StandardLuaBaseVisitor.cs" />
+    <Compile Include="Kerbalua\Completion\Grammar\StandardLuaLexer.cs" />
+    <Compile Include="Kerbalua\Completion\Grammar\StandardLuaListener.cs" />
+    <Compile Include="Kerbalua\Completion\Grammar\StandardLuaParser.cs" />
+    <Compile Include="Kerbalua\Completion\Grammar\StandardLuaVisitor.cs" />
+    <Compile Include="Kerbalua\Completion\IncompleteLuaListenerImpl.cs" />
+    <Compile Include="Kerbalua\Completion\IntellisenseParts.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="Kerbalua\Completion\UserDataCompletion.cs.old" />
     <None Include="Kerbalua\Completion\Grammar\regenerate.sh" />
     <None Include="Kerbalua\Completion\Grammar\BackwardsLua.g4" />
-    <None Include="Kerbalua\Completion\Grammar\BackwardsLua.interp" />
-    <None Include="Kerbalua\Completion\Grammar\BackwardsLua.tokens" />
-    <None Include="Kerbalua\Completion\Grammar\BackwardsLuaLexer.interp" />
-    <None Include="Kerbalua\Completion\Grammar\BackwardsLuaLexer.tokens" />
-    <None Include="Kerbalua\Completion\Grammar\Lua.g4" />
+    <None Include="Kerbalua\Completion\Grammar\StandardLua.g4" />
+    <None Include="Kerbalua\Completion\Grammar\StandardIncompleteLua.g4" />
+    <None Include="Kerbalua\Completion\Grammar\IncompleteLua.interp" />
+    <None Include="Kerbalua\Completion\Grammar\IncompleteLua.tokens" />
+    <None Include="Kerbalua\Completion\Grammar\IncompleteLuaLexer.interp" />
+    <None Include="Kerbalua\Completion\Grammar\IncompleteLuaLexer.tokens" />
+    <None Include="Kerbalua\Completion\Grammar\StandardLua.interp" />
+    <None Include="Kerbalua\Completion\Grammar\StandardLua.tokens" />
+    <None Include="Kerbalua\Completion\Grammar\StandardLuaLexer.interp" />
+    <None Include="Kerbalua\Completion\Grammar\StandardLuaLexer.tokens" />
+    <None Include="Kerbalua\Completion\Grammar\IncompleteLua.g4" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Kerbalua\" />

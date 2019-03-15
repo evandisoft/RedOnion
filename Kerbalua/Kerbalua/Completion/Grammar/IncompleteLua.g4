@@ -1,9 +1,9 @@
-/*
+﻿/*
 BSD License
 
 Copyright (c) 2013, Kazunori Sakamoto
 Copyright (c) 2016, Alexander Alexeev
-Copyright (c) 2018, Evan Dickinson
+Copyright (c) 2019, Evan Dickinson
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -41,23 +41,25 @@ This grammar file derived from:
 
     Lua 5.1 grammar written by Nicolai Mainiero
     http://www.antlr3.org/grammar/1178608849736/Lua.g
-
-Tested by Kazunori Sakamoto with Test suite for Lua 5.2 (http://www.lua.org/tests/5.2/)
-
-Tested by Alexander Alexeev with Test suite for Lua 5.3 http://www.lua.org/tests/lua-5.3.2-tests.tar.gz 
 */
 
-grammar LuaCompletion2;
-
-
-
+grammar IncompleteLua;
 
 chunk
-    : block // EOF
+    : block EOF
+    ;
+
+incompleteChunk
+    : incompleteBlock EOF
     ;
 
 block
     : stat* retstat?
+    ;
+
+incompleteBlock
+    : stat* incompleteStat
+    | stat* incompleteRetstat
     ;
 
 stat
@@ -78,8 +80,32 @@ stat
     | 'local' namelist ('=' explist)?
     ;
 
+incompleteStat
+    : incompleteVarlist | varlist '=' incompleteExplist
+    | incompleteFunctionCall
+    | 'goto' incompleteName
+    | 'do' incompleteBlock
+    | 'while' incompleteExp | 'while' exp 'do' incompleteBlock
+    | 'repeat' incompleteBlock | 'repeat' block 'until' incompleteExp
+    | 'if' incompleteExp | 'if' exp 'then' incompleteBlock | 'if' exp 'then' block incompleteElse
+    | 'for' incompleteName | 'for' NAME '=' incompleteExp | 'for' NAME '=' exp ',' incompleteExp
+    | 'for' NAME '=' exp ',' exp ',' incompleteExp | | 'for' NAME '=' exp ',' exp (',' exp)? 'do' incompleteBlock
+    | 'function' incompleteFuncname | 'function' funcname incompleteFuncbody
+    | 'local' 'function' incompleteName | 'local' 'function' NAME incompleteFuncbody 
+    | 'local' incompleteNamelist | 'local' namelist '=' incompleteExplist
+    ;
+
+incompleteElse
+    : ('elseif' exp 'then' block)* 'elseif' incompleteExp | 'elseif' exp 'then' incompleteBlock
+    | ('elseif' exp 'then' block)* 'else' incompleteBlock
+    ;
+
 retstat
     : 'return' explist? ';'?
+    ;
+
+incompleteRetstat
+    : 'return' incompleteExplist
     ;
 
 label
@@ -90,16 +116,33 @@ funcname
     : NAME ('.' NAME)* (':' NAME)?
     ;
 
+incompleteFuncname
+    : (NAME '.')* incompleteName
+    | NAME ('.' NAME)* ':' incompleteName
+    ;
+
 varlist
     : var (',' var)*
+    ;
+
+incompleteVarlist
+    :  (var ',')* incompleteVar
     ;
 
 namelist
     : NAME (',' NAME)*
     ;
 
+incompleteNamelist
+    : (NAME ',')* incompleteName
+    ;
+
 explist
     : exp (',' exp)*
+    ;
+
+incompleteExplist
+    : (exp ',')* incompleteExp
     ;
 
 exp
@@ -121,47 +164,63 @@ exp
     | exp operatorBitwise exp
     ;
 
+incompleteExp
+    : incompleteFunctiondef | incompletePrefixexp | incompleteTableconstructor
+    | <assoc=right> exp operatorPower incompleteExp | operatorUnary incompleteExp
+    | exp operatorMulDivMod incompleteExp | exp operatorAddSub incompleteExp
+    | <assoc=right> exp operatorStrcat incompleteExp | exp operatorComparison incompleteExp
+    | exp operatorAnd incompleteExp | exp operatorOr incompleteExp
+    | exp operatorBitwise incompleteExp
+    ;
+
 prefixexp
     : varOrExp nameAndArgs*
+    ;
+
+incompletePrefixexp
+    : incompleteVarOrExp | varOrExp nameAndArgs* incompleteNameAndArgs
     ;
 
 functioncall
     : varOrExp nameAndArgs+
     ;
 
+incompleteFunctionCall
+    : incompleteVarOrExp | varOrExp nameAndArgs* incompleteNameAndArgs
+    ;
+
 varOrExp
-    : var | newExp
+    : var | '(' exp ')'
+    ;
+
+incompleteVarOrExp
+    : incompleteVar | '(' incompleteExp
     ;
 
 var
-    : (NAME | newExp varSuffix) varSuffix*
-    | terminalVar
+    : (NAME | '(' exp ')' varSuffix) varSuffix*
+    ;
+
+incompleteVar
+    : incompleteName | '(' incompleteExp | '(' exp ')' incompleteVarSuffix
+    | (NAME | '(' exp ')' varSuffix) varSuffix* incompleteVarSuffix
     ;
 
 varSuffix
-    : nameAndArgs* (arrayAccessExp | '.' NAME)
+    : nameAndArgs* ('[' exp ']' | '.' NAME)
     ;
-    
-terminalVar
-    : NAME varSuffix* terminalVarSuffix
+
+incompleteVarSuffix
+    : nameAndArgs* incompleteNameAndArgs
+    | nameAndArgs* ('[' incompleteExp | '.' incompleteName)
     ;
-    
-terminalVarSuffix
-    : nameAndArgs* '.' NAME? EOF
-    ;
-    
+
 nameAndArgs
     : (':' NAME)? args
     ;
-    
-newExp
-    : '(' exp ')'
-    | '(' terminalVar
-    ;
-    
-arrayAccessExp
-    : '[' exp ']'
-    | '[' terminalVar
+
+incompleteNameAndArgs
+    : ':' incompleteName | (':' NAME)? incompleteArgs
     ;
 
 /*
@@ -180,65 +239,85 @@ functioncall
 
 args
     : '(' explist? ')' | tableconstructor | string
-    | '(' (explist ',')? terminalVar
     ;
+
+incompleteArgs
+    : '(' incompleteExplist | incompleteTableconstructor | incompleteString
+    ;
+
 
 functiondef
     : 'function' funcbody
+    ;
+
+incompleteFunctiondef
+    : 'function' incompleteFuncbody
     ;
 
 funcbody
     : '(' parlist? ')' block 'end'
     ;
 
+incompleteFuncbody
+    : '(' incompleteParlist | '(' parlist? ')' incompleteBlock
+    ;
+
 parlist
     : namelist (',' '...')? | '...'
     ;
 
-tableconstructor
-    : '{' fieldlist? '}' 
-    | '{' (fieldlist fieldsep)? terminalField
+incompleteParlist
+    : incompleteNamelist
     ;
-    
+
+tableconstructor
+    : '{' fieldlist? '}'
+    ;
+
+incompleteTableconstructor
+    : '{' incompleteFieldlist
+    ;
+
 fieldlist
     : field (fieldsep field)* fieldsep?
+    ;
+
+incompleteFieldlist
+    : (field fieldsep)* incompleteField
     ;
 
 field
     : '[' exp ']' '=' exp | NAME '=' exp | exp
     ;
-    
-terminalField
-    : '[' terminalVar
-    | '[' exp ']' '=' terminalVar
-    | NAME '=' terminalVar
-    | terminalVar
+
+incompleteField
+    : '[' incompleteExp | '[' exp ']' '=' incompleteExp | incompleteName | NAME '=' incompleteExp | incompleteExp
     ;
-    
+
 fieldsep
     : ',' | ';'
     ;
 
 operatorOr 
-	: 'or';
+    : 'or';
 
 operatorAnd 
-	: 'and';
+    : 'and';
 
 operatorComparison 
-	: '<' | '>' | '<=' | '>=' | '~=' | '==';
+    : '<' | '>' | '<=' | '>=' | '~=' | '==';
 
 operatorStrcat
-	: '..';
+    : '..';
 
 operatorAddSub
-	: '+' | '-';
+    : '+' | '-';
 
 operatorMulDivMod
-	: '*' | '/' | '%' | '//';
+    : '*' | '/' | '%' | '//';
 
 operatorBitwise
-	: '&' | '|' | '~' | '<<' | '>>';
+    : '&' | '|' | '~' | '<<' | '>>';
 
 operatorUnary
     : 'not' | '#' | '-' | '~';
@@ -252,6 +331,14 @@ number
 
 string
     : NORMALSTRING | CHARSTRING | LONGSTRING
+    ;
+
+incompleteString
+    : NORMALSTRING | CHARSTRING | LONGSTRING
+    ;
+
+incompleteName
+    : NAME
     ;
 
 // LEXER

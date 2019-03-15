@@ -10,15 +10,17 @@ using RedOnion.KSP;
 
 namespace Kerbalua.Other {
 	public class RedOnionReplEvaluator:ReplEvaluator {
-		ImmediateEngine engine;
+		protected ImmediateEngine engine;
 
 		public RedOnionReplEvaluator()
 		{
-			//temporarily commenting this out
-			//engine = new Engine(engine => new EngineRoot(engine));
 			engine = new ImmediateEngine();
 		}
 
+		public RedOnionReplEvaluator(Engine engine)
+		{
+			engine = new ImmediateEngine();
+		}
 
 		protected override bool ProtectedEvaluate(string source,out string output)
 		{

@@ -3,6 +3,7 @@ BSD License
 
 Copyright (c) 2013, Kazunori Sakamoto
 Copyright (c) 2016, Alexander Alexeev
+Copyright (c) 2019, Evan Dickinson
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -40,13 +41,9 @@ This grammar file derived from:
 
     Lua 5.1 grammar written by Nicolai Mainiero
     http://www.antlr3.org/grammar/1178608849736/Lua.g
-
-Tested by Kazunori Sakamoto with Test suite for Lua 5.2 (http://www.lua.org/tests/5.2/)
-
-Tested by Alexander Alexeev with Test suite for Lua 5.3 http://www.lua.org/tests/lua-5.3.2-tests.tar.gz 
 */
 
-grammar Lua;
+grammar StandardLua;
 
 chunk
     : block EOF
@@ -326,7 +323,9 @@ LINE_COMMENT
     -> channel(HIDDEN)
     ;
     
-
+WS  
+    : [ \t\u000C\r\n]+ -> skip
+    ;
 
 SHEBANG
     : '#' '!' ~('\n'|'\r')* -> channel(HIDDEN)
