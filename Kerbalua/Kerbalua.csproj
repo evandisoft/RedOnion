@@ -77,7 +77,6 @@
     <Compile Include="Kerbalua\Utility\QueueLogger.cs" />
     <Compile Include="Kerbalua\Gui\InputBox.cs" />
     <Compile Include="Kerbalua\Completion\AllCompletion.cs" />
-    <Compile Include="Kerbalua\Completion\LastVarExtracter.cs" />
     <Compile Include="Kerbalua\Completion\TableCompletion.cs" />
     <Compile Include="Kerbalua\Completion\UserDataCompletion.cs" />
     <Compile Include="Kerbalua\Gui\ScriptWindow.cs" />
@@ -116,17 +115,23 @@
     <Compile Include="Kerbalua\Completion\Grammar\BackwardsLuaLexer.cs" />
     <Compile Include="Kerbalua\Completion\Grammar\BackwardsLuaListener.cs" />
     <Compile Include="Kerbalua\Completion\Grammar\BackwardsLuaParser.cs" />
+    <Compile Include="Kerbalua\Completion\LuaIntellisenseParser.cs" />
+    <Compile Include="Kerbalua\Completion\Grammar\BackwardsLuaBaseVisitor.cs" />
+    <Compile Include="Kerbalua\Completion\Grammar\BackwardsLuaVisitor.cs" />
+    <Compile Include="Kerbalua\Utility\Misc.cs" />
+    <Compile Include="Kerbalua\Completion\LuaIntellisenseListener.cs" />
+    <Compile Include="Kerbalua\Completion\LastVarExtracter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="Kerbalua\Completion\UserDataCompletion.cs.old" />
     <None Include="Kerbalua\Completion\Grammar\regenerate.sh" />
-    <None Include="Kerbalua\Completion\Grammar\LuaCompletion.g4" />
     <None Include="Kerbalua\Completion\Grammar\BackwardsLua.g4" />
     <None Include="Kerbalua\Completion\Grammar\BackwardsLua.interp" />
     <None Include="Kerbalua\Completion\Grammar\BackwardsLua.tokens" />
     <None Include="Kerbalua\Completion\Grammar\BackwardsLuaLexer.interp" />
     <None Include="Kerbalua\Completion\Grammar\BackwardsLuaLexer.tokens" />
+    <None Include="Kerbalua\Completion\Grammar\Lua.g4" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Kerbalua\" />

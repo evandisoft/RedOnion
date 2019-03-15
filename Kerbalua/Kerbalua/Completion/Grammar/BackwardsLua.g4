@@ -42,123 +42,75 @@ This grammar file derived from:
     Lua 5.1 grammar written by Nicolai Mainiero
     http://www.antlr3.org/grammar/1178608849736/Lua.g
 
-Tested by Kazunori Sakamoto with Test suite for Lua 5.2 (http://www.lua.org/tests/5.2/)
-
-Tested by Alexander Alexeev with Test suite for Lua 5.3 http://www.lua.org/tests/lua-5.3.2-tests.tar.gz 
 */
 
 
 grammar BackwardsLua;
 
-expr
-    : NAME;
-
-NAME
-    : [a-zA-Z_][a-zA-Z_0-9]*
+backwardsCompletionExpr
+    : backwardsPartialCompletion? ('.' completionChain)? '.' backwardsStartSymbol terminal
+    | backwardsPartialCompletion terminal
     ;
 
-NORMALSTRING
-    : '"' ( EscapeSequence | ~('\\'|'"') )* '"' 
+terminal
+    : ~('.') | EOF
     ;
 
-CHARSTRING
-    : '\'' ( EscapeSequence | ~('\''|'\\') )* '\''
+backwardsPartialCompletion
+    : BACKWARDS_NAME
     ;
 
-LONGSTRING
-    : '[' NESTED_STR ']'
+backwardsStartSymbol
+    : BACKWARDS_NAME
     ;
 
-fragment
-NESTED_STR
-    : '=' NESTED_STR '='
-    | '[' .*? ']'
+completionChain
+    :  segment ('.' completionChain)*
     ;
 
-INT
-    : Digit+
+segment
+    : anonymousPart*? (backwardsCall | backwardsField)
     ;
 
-HEX
-    : '0' [xX] HexDigit+
+anonymousPart
+    : (backwardsAnonCall | backwardsAnonArray)
     ;
 
-FLOAT
-    : Digit+ '.' Digit* ExponentPart?
-    | '.' Digit+ ExponentPart?
-    | Digit+ ExponentPart
+backwardsField
+    : BACKWARDS_NAME
     ;
 
-HEX_FLOAT
-    : '0' [xX] HexDigit+ '.' HexDigit* HexExponentPart?
-    | '0' [xX] '.' HexDigit+ HexExponentPart?
-    | '0' [xX] HexDigit+ HexExponentPart
+backwardsAnonCall
+    : ')' backwardsArgs '('
     ;
 
-fragment
-ExponentPart
-    : [eE] [+-]? Digit+
+backwardsAnonArray
+    : ']' backwardsArgs '['
     ;
 
-fragment
-HexExponentPart
-    : [pP] [+-]? Digit+
+backwardsCall
+    : ')' backwardsArgs '(' BACKWARDS_NAME
     ;
 
-fragment
-EscapeSequence
-    : '\\' [abfnrtvz"'\\]
-    | '\\' '\r'? '\n'
-    | DecimalEscape
-    | HexEscape
-    | UtfEscape
-    ;
-    
-fragment
-DecimalEscape
-    : '\\' Digit
-    | '\\' Digit Digit
-    | '\\' [0-2] Digit Digit
-    ;
-    
-fragment
-HexEscape
-    : '\\' 'x' HexDigit HexDigit
+backwardsArgs
+    : arg (',' arg)*
     ;
 
-fragment
-UtfEscape
-    : '\\' 'u{' HexDigit+ '}'
+arg
+    : ignoredExpr
     ;
 
-fragment
-Digit
-    : [0-9]
+ignoredExpr
+    : ')' ignoredExpr '('
+    | ']' ignoredExpr '['
+    | '}' ignoredExpr '{'
+    | ~('('|')'|'['|']'|'{'|'}'|',')* (',' ignoredExpr)*
     ;
 
-fragment
-HexDigit
-    : [0-9a-fA-F]
+BACKWARDS_NAME
+    : [a-zA-Z_0-9]*[a-zA-Z_]
     ;
 
-COMMENT
-    : '--[' NESTED_STR ']' -> channel(HIDDEN)
-    ;
-    
-LINE_COMMENT
-    : '--'
-    (                                               // --
-    | '[' '='*                                      // --[==
-    | '[' '='* ~('='|'['|'\r'|'\n') ~('\r'|'\n')*   // --[==AA
-    | ~('['|'\r'|'\n') ~('\r'|'\n')*                // --AAA
-    ) ('\r\n'|'\r'|'\n'|EOF)
-    -> channel(HIDDEN)
-    ;
-    
-WS  
+WS 
     : [ \t\u000C\r\n]+ -> skip
-    ;
-
-SHEBANG
-    : '#' '!' ~('\n'|'\r')* -> channel(HIDDEN)
     ;

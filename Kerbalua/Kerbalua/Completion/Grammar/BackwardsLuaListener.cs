@@ -31,13 +31,143 @@ using IToken = Antlr4.Runtime.IToken;
 [System.CLSCompliant(false)]
 public interface IBackwardsLuaListener : IParseTreeListener {
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="BackwardsLuaParser.expr"/>.
+	/// Enter a parse tree produced by <see cref="BackwardsLuaParser.backwardsCompletionExpr"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void EnterExpr([NotNull] BackwardsLuaParser.ExprContext context);
+	void EnterBackwardsCompletionExpr([NotNull] BackwardsLuaParser.BackwardsCompletionExprContext context);
 	/// <summary>
-	/// Exit a parse tree produced by <see cref="BackwardsLuaParser.expr"/>.
+	/// Exit a parse tree produced by <see cref="BackwardsLuaParser.backwardsCompletionExpr"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void ExitExpr([NotNull] BackwardsLuaParser.ExprContext context);
+	void ExitBackwardsCompletionExpr([NotNull] BackwardsLuaParser.BackwardsCompletionExprContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="BackwardsLuaParser.terminal"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterTerminal([NotNull] BackwardsLuaParser.TerminalContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="BackwardsLuaParser.terminal"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitTerminal([NotNull] BackwardsLuaParser.TerminalContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="BackwardsLuaParser.backwardsPartialCompletion"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterBackwardsPartialCompletion([NotNull] BackwardsLuaParser.BackwardsPartialCompletionContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="BackwardsLuaParser.backwardsPartialCompletion"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitBackwardsPartialCompletion([NotNull] BackwardsLuaParser.BackwardsPartialCompletionContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="BackwardsLuaParser.backwardsStartSymbol"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterBackwardsStartSymbol([NotNull] BackwardsLuaParser.BackwardsStartSymbolContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="BackwardsLuaParser.backwardsStartSymbol"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitBackwardsStartSymbol([NotNull] BackwardsLuaParser.BackwardsStartSymbolContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="BackwardsLuaParser.completionChain"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterCompletionChain([NotNull] BackwardsLuaParser.CompletionChainContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="BackwardsLuaParser.completionChain"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitCompletionChain([NotNull] BackwardsLuaParser.CompletionChainContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="BackwardsLuaParser.segment"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterSegment([NotNull] BackwardsLuaParser.SegmentContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="BackwardsLuaParser.segment"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitSegment([NotNull] BackwardsLuaParser.SegmentContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="BackwardsLuaParser.anonymousPart"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterAnonymousPart([NotNull] BackwardsLuaParser.AnonymousPartContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="BackwardsLuaParser.anonymousPart"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitAnonymousPart([NotNull] BackwardsLuaParser.AnonymousPartContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="BackwardsLuaParser.backwardsField"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterBackwardsField([NotNull] BackwardsLuaParser.BackwardsFieldContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="BackwardsLuaParser.backwardsField"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitBackwardsField([NotNull] BackwardsLuaParser.BackwardsFieldContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="BackwardsLuaParser.backwardsAnonCall"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterBackwardsAnonCall([NotNull] BackwardsLuaParser.BackwardsAnonCallContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="BackwardsLuaParser.backwardsAnonCall"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitBackwardsAnonCall([NotNull] BackwardsLuaParser.BackwardsAnonCallContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="BackwardsLuaParser.backwardsAnonArray"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterBackwardsAnonArray([NotNull] BackwardsLuaParser.BackwardsAnonArrayContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="BackwardsLuaParser.backwardsAnonArray"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitBackwardsAnonArray([NotNull] BackwardsLuaParser.BackwardsAnonArrayContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="BackwardsLuaParser.backwardsCall"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterBackwardsCall([NotNull] BackwardsLuaParser.BackwardsCallContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="BackwardsLuaParser.backwardsCall"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitBackwardsCall([NotNull] BackwardsLuaParser.BackwardsCallContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="BackwardsLuaParser.backwardsArgs"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterBackwardsArgs([NotNull] BackwardsLuaParser.BackwardsArgsContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="BackwardsLuaParser.backwardsArgs"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitBackwardsArgs([NotNull] BackwardsLuaParser.BackwardsArgsContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="BackwardsLuaParser.arg"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterArg([NotNull] BackwardsLuaParser.ArgContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="BackwardsLuaParser.arg"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitArg([NotNull] BackwardsLuaParser.ArgContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="BackwardsLuaParser.ignoredExpr"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterIgnoredExpr([NotNull] BackwardsLuaParser.IgnoredExprContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="BackwardsLuaParser.ignoredExpr"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitIgnoredExpr([NotNull] BackwardsLuaParser.IgnoredExprContext context);
 }
