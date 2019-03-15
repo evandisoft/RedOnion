@@ -22,11 +22,6 @@ namespace Kerbalua.Other {
 
 		public bool ReceivedInput => editingArea.ReceivedInput;
 
-		public bool Changed()
-		{
-			throw new NotImplementedException();
-		}
-
 		public void Complete(int index)
 		{
 			var completions = GetCompletionContent(out int replaceStart,out int replaceEnd);

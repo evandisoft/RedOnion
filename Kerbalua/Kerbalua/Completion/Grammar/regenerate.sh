@@ -1,1 +1,1 @@
-java -jar antlr-4.7.1-complete.jar -Dlanguage=CSharp $1
+java -jar antlr-4.7.1-complete.jar -visitor -Dlanguage=CSharp $1
