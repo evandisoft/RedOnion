@@ -578,12 +578,25 @@ namespace RedOnion.Script
 				creator = root[type];
 			else root[type] = creator;
 			root.Set(name, new Value(creator));
+			root.DebugLog("{0} = {1}", name, type.FullName);
 		}
 		public static void AddType(this IEngineRoot root, Type type)
 		{
 			var creator = root[type];
 			root.Set(type.Name, new Value(creator));
+			root.DebugLog("{0} = {1}", type.Name, type.FullName);
 		}
+
+		public static void Log(this IEngineRoot root, string msg)
+			=> root.Engine.Log(msg);
+		public static void Log(this IEngineRoot root, string msg, params object[] args)
+			=> root.Engine.Log(string.Format(msg, args));
+		[Conditional("DEBUG")]
+		public static void DebugLog(this IEngineRoot root, string msg)
+			=> root.Engine.Log(msg);
+		[Conditional("DEBUG")]
+		public static void DebugLog(this IEngineRoot root, string msg, params object[] args)
+			=> root.Engine.Log(string.Format(msg, args));
 	}
 
 	public static class ObjectExtensions

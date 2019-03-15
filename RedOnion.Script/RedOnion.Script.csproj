@@ -72,6 +72,8 @@
     <Compile Include="ReflectedObjects\ReflectedObject.cs" />
     <Compile Include="ReflectedObjects\ReflectedType.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="README.md" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

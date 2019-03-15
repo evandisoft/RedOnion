@@ -125,7 +125,11 @@ namespace RedOnion.KSP
 			FillMe?.Invoke(this);
 		}
 		public RuntimeRoot(IEngine engine, Action<IEngineRoot> fill)
-			: base(engine) => FillMe = fill;
+			: base(engine, fill: false)
+		{
+			FillMe = fill;
+			Fill();
+		}
 	}
 
 	/// <summary>
