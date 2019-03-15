@@ -33,7 +33,9 @@ namespace Kerbalua.Gui {
 		public void Update(bool hadMouseDownLastUpdate)
 		{
 			bool newInput= hadMouseDownLastUpdate;
-
+			//if (hadMouseDownLastUpdate) {
+			//	Debug.Log("mouse down last update");
+			//}
 			foreach (var completable in completableMap.Values) {
 				newInput |= completable.ReceivedInput;
 			}

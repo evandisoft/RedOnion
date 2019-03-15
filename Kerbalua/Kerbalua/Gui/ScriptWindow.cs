@@ -432,17 +432,17 @@ Any other key gives focus to input box.
 			currentWidgetBarRect.y += widgetBarRect.height;
 			recentFiles.Update(currentWidgetBarRect);
 
-			//if (replVisible) {
+			if (replVisible) {
 				//if(repl.outputBox.HasFocus()) {
 				//	repl.inputBox.GrabFocus();
 				//}
-			repl.Update(GetCurrentReplRect(),replVisible);
-			//}
+				repl.Update(GetCurrentReplRect(),replVisible);
+			}
 
-			//if (editorVisible) {
+			if (editorVisible) {
 				//editorRect = UpdateBoxPositionWithWindow(editorRect, -editorRect.width);
-			editor.Update(editorRect,editorVisible);
-			//}
+				editor.Update(editorRect,editorVisible);
+			}
 
 			// Lots of hacks here. I will eventually better understand how this
 			// works and replace it.

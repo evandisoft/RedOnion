@@ -43,9 +43,9 @@ namespace Kerbalua.Gui {
 						break;
 					}
 				}
-				outputBox.Update(outputRect);
+				outputBox.Update(outputRect, visible);
 
-				inputBox.Update(inputRect, true, inputStyle);
+				inputBox.Update(inputRect, visible, inputStyle);
 
 			}
 			GUI.EndGroup();
