@@ -7,98 +7,108 @@ using UUI = UnityEngine.UI;
 
 namespace RedOnion.UI
 {
-	public class Window : Panel
+	public class Window : IDisposable
 	{
-		public struct Defaults
+		public class FramePanel : Panel
 		{
-			public Vector2 Position;
-			public Vector2 SizeDelta;
-			public Vector2 CloseButtonSize;
-			public Texture2D CloseButtonIcon;
-			public float FrameWidth;
-			public Color TitleTextColor;
+			static Texture2D DefaultCloseButtonIcon = LoadIcon(13, 13, "CloseButtonIcon.png");
+
+			public CanvasGroup Group { get; }
+			public UUI.ContentSizeFitter Fitter { get; }
+			public Element Header { get; }
+			public Label Title { get; }
+			public Button Close { get; }
+			public Panel Content { get; }
+
+			public FramePanel(string name = null)
+				: base("Window Frame")
+			{
+				GameObject.transform.SetParent(UIMasterController.Instance.dialogCanvas.transform, false);
+				Group = GameObject.AddComponent<CanvasGroup>();
+				Group.alpha = .9f;
+				MinWidth = 160;
+				MinHeight = 120;
+				Fitter = GameObject.AddComponent<UUI.ContentSizeFitter>();
+				Fitter.horizontalFit = UUI.ContentSizeFitter.FitMode.PreferredSize;
+				Fitter.verticalFit = UUI.ContentSizeFitter.FitMode.PreferredSize;
+				Color = new Color(.2f, .2f, .2f, .8f);
+				Layout = Layout.Vertical;
+				Padding = new RectOffset(4, 4, 4, 4);
+				Spacing = 4;
+				Header = Add(new Element("Window Title Row")
+				{
+					Layout = Layout.Horizontal
+				});
+				Title = Header.Add(new Label("Window Title")
+				{
+					Text = "Window",
+					TextColor = Color.white
+				});
+				Close = Header.Add(new Button("Window Close Button")
+				{
+					IconTexture = DefaultCloseButtonIcon
+				});
+				Content = Add(new Panel("Window Content Panel")
+				{
+					Anchors = Anchors.Fill,
+					Color = new Color(.5f, .5f, .5f, .5f)
+				});
+
+				GameObject.AddComponent<Components.DragHandler>();
+			}
+
+			public bool Active
+			{
+				get => GameObject.activeSelf;
+				set => GameObject.SetActive(value);
+			}
+			public bool Visible
+			{
+				get => GameObject.activeInHierarchy;
+				set => GameObject.SetActive(value);
+			}
 		}
-		public static Defaults Default = new Defaults
+
+		public FramePanel Frame { get; private set; }
+		public Panel Content { get; private set; }
+
+		public string Name
 		{
-			Position = new Vector2(400, 400),
-			SizeDelta = new Vector2(400, 300),
-			CloseButtonSize = new Vector2(23, 23),
-			CloseButtonIcon = LoadIcon(13, 13, "CloseButtonIcon.png"),
-			FrameWidth = 4,
-			TitleTextColor = new Color(0.8f, 0.8f, 0.8f, 0.8f)
-		};
-
-		protected Label TitleLabel { get; private set; }
-		protected Button CloseButton { get; private set; }
-		protected Panel ContentPanel { get; private set; }
-
-		public Window(string name = null)
-			: base(name ?? "Window")
-		{
-			GameObject.transform.SetParent(UIMasterController.Instance.dialogCanvas.transform, false);
-
-			Position = Default.Position;
-			SizeDelta = Default.SizeDelta;
-			Color = new Color(0.2f, 0.2f, 0.2f, 0.8f);
-
-			AddToFrame(TitleLabel = new Label("Window Title")
-			{
-				Anchors = Anchors.TopLeftRight,
-				Position = new Vector2(Default.FrameWidth, Default.FrameWidth),
-				SizeDelta = new Vector2(Default.CloseButtonSize.x + Default.FrameWidth, Default.CloseButtonSize.y),
-				Text = "Window",
-				TextColor = Default.TitleTextColor
-			});
-			AddToFrame(CloseButton = new Button("Window Close Button")
-			{
-				Anchors = Anchors.TopRight,
-				Position = new Vector2(Default.FrameWidth, Default.FrameWidth),
-				SizeDelta = new Vector2(Default.CloseButtonSize.x, Default.CloseButtonSize.y),
-				IconTexture = Default.CloseButtonIcon
-			});
-			AddToFrame(ContentPanel = new Panel("Window Content Panel")
-			{
-				Anchors = Anchors.Fill,
-				Position = new Vector2(Default.FrameWidth, Default.CloseButtonSize.y + 2*Default.FrameWidth),
-				SizeDelta = new Vector2(Default.FrameWidth, Default.FrameWidth)
-			});
-
-			CloseButton.Click += Close;
-			GameObject.AddComponent<DragHandler>();
+			get => Frame.Name;
+			set => Frame.Name = value;
 		}
 
-		protected override void Dispose(bool disposing)
+		public Window(Layout layout)
+			: this(null, layout) { }
+		public Window(string name = null, Layout layout = Layout.Vertical)
 		{
-			if (!disposing || GameObject == null)
+			Frame = new FramePanel(name);
+			Content = Frame.Content;
+			Content.Layout = layout;
+			Frame.Close.Click += Close;
+		}
+
+		~Window() => Dispose(false);
+		public void Dispose() => Dispose(true);
+		protected virtual void Dispose(bool disposing)
+		{
+			if (Frame == null)
 				return;
-			Hide();
-			base.Dispose(true);
-			TitleLabel?.Dispose();
-			TitleLabel = null;
-			CloseButton?.Dispose();
-			CloseButton = null;
+			Frame.Dispose();
+			Frame = null;
 		}
-
-		protected void AddToFrame(Element e)
-			=> base.Add(e);
-		protected void RemoveFromFrame(Element e)
-			=> base.Remove(e);
-		public override void Add(Element e)
-			=> ContentPanel.Add(e);
-		public override void Remove(Element element)
-			=> ContentPanel.Remove(element);
 
 		public void Show()
 		{
-			if (GameObject == null)
+			if (Frame == null)
 				throw new ObjectDisposedException(GetType().Name);
-			GameObject.SetActive(true);
+			Frame.Visible = true;
 		}
 		public void Hide()
 		{
-			if (GameObject == null)
+			if (Frame == null)
 				throw new ObjectDisposedException(GetType().Name);
-			GameObject.SetActive(false);
+			Frame.Visible = false;
 		}
 
 		public event UnityAction Closed;
@@ -110,23 +120,48 @@ namespace RedOnion.UI
 
 		public string Title
 		{
-			get => TitleLabel.Text;
-			set => TitleLabel.Text = value;
+			get => Frame.Title.Text;
+			set => Frame.Title.Text = value;
 		}
 
-		[RequireComponent(typeof(RectTransform))]
-		public class DragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+		public float Alpha
 		{
-			private Vector2 dragDelta = new Vector2(float.NaN, float.NaN);
-			void IBeginDragHandler.OnBeginDrag(PointerEventData eventData)
-				=> dragDelta = GetComponent<RectTransform>().anchoredPosition - eventData.position;
-			void IEndDragHandler.OnEndDrag(PointerEventData eventData)
-				=> dragDelta = new Vector2(float.NaN, float.NaN);
-			void IDragHandler.OnDrag(PointerEventData eventData)
-			{
-				if (!float.IsNaN(dragDelta.x))
-					GetComponent<RectTransform>().anchoredPosition = dragDelta + eventData.position;
-			}
+			get => Frame.Group.alpha;
+			set => Frame.Group.alpha = value;
 		}
+
+		public float MinWidth
+		{
+			get => Frame.MinWidth.Value;
+			set => Frame.MinWidth = Mathf.Max(80f, value);
+		}
+		public float MinHeight
+		{
+			get => Frame.MinHeight.Value;
+			set => Frame.MinHeight = Mathf.Max(80f, value);
+		}
+		public float? PreferWidth
+		{
+			get => Frame.PreferWidth;
+			set => Frame.PreferWidth = value;
+		}
+		public float? PreferHeight
+		{
+			get => Frame.PreferHeight;
+			set => Frame.PreferHeight = value;
+		}
+
+		public E Add<E>(E element) where E : Element
+			=> Content.Add(element);
+		public E Remove<E>(E element) where E : Element
+			=> Content.Add(element);
+		public Element Add(Element element)
+			=> Content.Add(element);
+		public Element Remove(Element element)
+			=> Content.Remove(element);
+		public void Add(params Element[] elements)
+			=> Content.Add(elements);
+		public void Remove(params Element[] elements)
+			=> Content.Remove(elements);
 	}
 }

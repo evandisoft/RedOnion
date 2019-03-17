@@ -33,8 +33,12 @@ namespace RedOnion.Script.Completion
 				i++;
 				break;
 			}
-			if (i > 0 && !char.IsWhiteSpace(source[i-1]))
-				return;
+			if (i > 0)
+			{
+				char c = source[i-1];
+				if (!char.IsWhiteSpace(c) && c != '(' && c != '[')
+					return;
+			}
 			replaceAt = firstAt < 0 ? i : firstAt + 1;
 			int j = interest;
 			while (j < source.Length)

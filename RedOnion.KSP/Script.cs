@@ -1,14 +1,13 @@
 using System;
 using System.Collections.Generic;
-using KSP.UI;
-using KSP.UI.Screens;
 using RedOnion.Script;
 using RedOnion.Script.BasicObjects;
 using RedOnion.Script.Completion;
 using RedOnion.Script.ReflectedObjects;
 using RedOnion.UI;
-using UnityEngine;
-using UnityEngine.UI;
+using UE = UnityEngine;
+using UUI = UnityEngine.UI;
+using KUI = KSP.UI;
 
 namespace RedOnion.KSP
 {
@@ -21,7 +20,7 @@ namespace RedOnion.KSP
 			: base(engine => new RuntimeRoot(engine, root =>
 			FillRoot(root, repl: false))) { }
 		public override void Log(string msg)
-			=> Debug.Log("[RedOnion] " + msg);
+			=> UE.Debug.Log("[RedOnion] " + msg);
 
 		public static void FillRoot(IEngineRoot root, bool repl)
 		{
@@ -33,16 +32,16 @@ namespace RedOnion.KSP
 			// while names under "System" namespace are read-only (BaseProps)
 			var system = root.Get("System").Object;
 			var sys = system?.BaseProps ?? new Properties();
-			sys.Set("Delegate",	root.AddType(typeof(System.Delegate)));
-			sys.Set("Debug",	root.AddType(typeof(UnityEngine.Debug)));
-			sys.Set("Color",	root.AddType(typeof(UnityEngine.Color)));
-			sys.Set("Rect",		root.AddType(typeof(UnityEngine.Rect)));
-			sys.Set("Vector2",	root.AddType(typeof(UnityEngine.Vector2)));
-			var vector = root.AddType(typeof(UnityEngine.Vector3));
+			sys.Set("Delegate",	root.AddType(typeof(Delegate)));
+			sys.Set("Debug",	root.AddType(typeof(UE.Debug)));
+			sys.Set("Color",	root.AddType(typeof(UE.Color)));
+			sys.Set("Rect",		root.AddType(typeof(UE.Rect)));
+			sys.Set("Vector2",	root.AddType(typeof(UE.Vector2)));
+			var vector = root.AddType(typeof(UE.Vector3));
 			root.MoreProps.Set("Vector", vector);
 			sys.Set("Vector",	vector);
 			sys.Set("Vector3",	vector);
-			sys.Set("Vector4",	root.AddType(typeof(UnityEngine.Vector4)));
+			sys.Set("Vector4",	root.AddType(typeof(UE.Vector4)));
 			if (system == null)
 				root.BaseProps.Set("System", new SimpleObject(root.Engine, sys));
 
@@ -63,42 +62,52 @@ namespace RedOnion.KSP
 			{
 				// definitely dangerous, IMGUI is not for REPL
 				root.BaseProps.Set("IMGUI", new Value(engine =>
-				root[typeof(GUI)] = new ReflectedType(engine, typeof(UnityEngine.GUI), new Properties()
+				root[typeof(UE.GUI)] = new ReflectedType(engine, typeof(UE.GUI), new Properties()
 				{
-					{ "GUISkin",        root[typeof(UnityEngine.GUISkin)] },
-					{ "GUIStyle",       root[typeof(UnityEngine.GUIStyle)] },
-					{ "GUIStyleState",  root[typeof(UnityEngine.GUIStyleState)] },
-					{ "GUIContent",     root[typeof(UnityEngine.GUIContent)] },
-					{ "GUIElement",     root[typeof(UnityEngine.GUIElement)] },
-					{ "GUILayer",       root[typeof(UnityEngine.GUILayer)] },
-					{ "GUILayout",      root[typeof(UnityEngine.GUILayout)] },
-					{ "GUIText",        root[typeof(UnityEngine.GUIText)] },
-					{ "GUIUtility",     root[typeof(UnityEngine.GUIUtility)] },
+					{ "GUISkin",        root[typeof(UE.GUISkin)] },
+					{ "GUIStyle",       root[typeof(UE.GUIStyle)] },
+					{ "GUIStyleState",  root[typeof(UE.GUIStyleState)] },
+					{ "GUIContent",     root[typeof(UE.GUIContent)] },
+					{ "GUIElement",     root[typeof(UE.GUIElement)] },
+					{ "GUILayer",       root[typeof(UE.GUILayer)] },
+					{ "GUILayout",      root[typeof(UE.GUILayout)] },
+					{ "GUIText",        root[typeof(UE.GUIText)] },
+					{ "GUIUtility",     root[typeof(UE.GUIUtility)] },
 				})));
 
 				// potentionally dangerous (could stay without a way to destroy)
 				root.BaseProps.Set("Unity", new Value(engine =>
 				new SimpleObject(engine, new Properties()
 				{
-					{ "DefaultControls", root[typeof(UnityEngine.UI.DefaultControls)] },
-					{ "Object",         root[typeof(UnityEngine.Object)] },
-					{ "GameObject",     root[typeof(UnityEngine.GameObject)] },
-					{ "Canvas",         root[typeof(UnityEngine.Canvas)] },
-					{ "CanvasGroup",    root[typeof(UnityEngine.CanvasGroup)] },
-					{ "RectTransform",  root[typeof(UnityEngine.RectTransform)] },
-					{ "LayerMask",      root[typeof(UnityEngine.LayerMask)] },
-					{ "Text",           root[typeof(UnityEngine.UI.Text)] },
-					{ "Button",         root[typeof(UnityEngine.UI.Button)] },
-					{ "Image",          root[typeof(UnityEngine.UI.Image)] },
-					{ "RawImage",       root[typeof(UnityEngine.UI.RawImage)] },
-					{ "Screen",			root[typeof(UnityEngine.Screen)] },
-					{ "Sprite",         root[typeof(UnityEngine.Sprite)] },
-					{ "Texture",        root[typeof(UnityEngine.Texture)] },
-					{ "Texture2D",      root[typeof(UnityEngine.Texture2D)] },
-					{ "Renderer",       root[typeof(UnityEngine.Renderer)] },
+					{ "Object",         root[typeof(UE.Object)] },
+					{ "GameObject",     root[typeof(UE.GameObject)] },
+					{ "Canvas",         root[typeof(UE.Canvas)] },
+					{ "CanvasGroup",    root[typeof(UE.CanvasGroup)] },
+					{ "RectTransform",  root[typeof(UE.RectTransform)] },
+					{ "LayerMask",      root[typeof(UE.LayerMask)] },
 
-					{ "Master",         root[typeof(UIMasterController)] },
-					{ "UIMasterController", root[typeof(UIMasterController)] },
+					{ "DefaultControls",root[typeof(UUI.DefaultControls)] },
+					{ "GridLayout",		root[typeof(UUI.GridLayoutGroup)] },
+					{ "HorizontalLayout",root[typeof(UUI.HorizontalLayoutGroup)] },
+					{ "VerticalLayout",	root[typeof(UUI.VerticalLayoutGroup)] },
+					{ "LayoutRebuilder",root[typeof(UUI.LayoutRebuilder)] },
+					{ "LayoutUtility",	root[typeof(UUI.LayoutUtility)] },
+					{ "ContentSizeFitter", root[typeof(UUI.ContentSizeFitter)] },
+					{ "AspectRatioFitter", root[typeof(UUI.AspectRatioFitter)] },
+					{ "SizeFitter",		root[typeof(UUI.ContentSizeFitter)] },
+					{ "RatioFitter",	root[typeof(UUI.AspectRatioFitter)] },
+
+					{ "Text",           root[typeof(UUI.Text)] },
+					{ "Button",         root[typeof(UUI.Button)] },
+					{ "Image",          root[typeof(UUI.Image)] },
+					{ "RawImage",       root[typeof(UUI.RawImage)] },
+
+					{ "Screen",			root[typeof(UE.Screen)] },
+					{ "Sprite",         root[typeof(UE.Sprite)] },
+					{ "Texture",        root[typeof(UE.Texture)] },
+					{ "Texture2D",      root[typeof(UE.Texture2D)] },
+
+					{ "UIMaster",       root[typeof(KUI.UIMasterController)] },
 					{ "UISkinDef",      root[typeof(UISkinDef)] },
 					{ "UISkinManager",  root[typeof(UISkinManager)] },
 					{ "UIStyle",        root[typeof(UIStyle)] },
@@ -112,7 +121,7 @@ namespace RedOnion.KSP
 					{ "Vessel",         root[typeof(Vessel)] },
 					{ "FlightGlobals",  root[typeof(FlightGlobals)] },
 					{ "FlightCtrlState", root[typeof(FlightCtrlState)] },
-					{ "StageManager",   root[typeof(StageManager)] },
+					{ "StageManager",   root[typeof(KUI.Screens.StageManager)] },
 				})));
 			}
 		}
@@ -126,7 +135,7 @@ namespace RedOnion.KSP
 			: base(engine => new RuntimeRoot(engine, root =>
 			RuntimeEngine.FillRoot(root, repl: true))) { }
 		public override void Log(string msg)
-			=> Debug.Log("[RedOnion.REPL] " + msg);
+			=> UE.Debug.Log("[RedOnion.REPL] " + msg);
 	}
 
 	public class RuntimeRoot : BasicRoot
@@ -153,7 +162,7 @@ namespace RedOnion.KSP
 		public DocumentingEngine(RuntimeEngine engine)
 			: base(engine) { }
 		public override void Log(string msg)
-			=> Debug.Log("[RedOnion.DOC] " + msg);
+			=> UE.Debug.Log("[RedOnion.DOC] " + msg);
 	}
 	/// <summary>
 	/// Engine designed to provide hints and documentation for REPL / Immediate Mode
@@ -163,6 +172,6 @@ namespace RedOnion.KSP
 		public ReplHintsEngine(ImmediateEngine engine)
 			: base(engine) { }
 		public override void Log(string msg)
-			=> Debug.Log("[RedOnion.ReplDOC] " + msg);
+			=> UE.Debug.Log("[RedOnion.ReplDOC] " + msg);
 	}
 }

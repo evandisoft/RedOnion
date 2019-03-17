@@ -8,6 +8,15 @@ namespace RedOnion.UI
 {
 	public partial class Element
 	{
+		protected static readonly int UILayer = LayerMask.NameToLayer("UI");
+
+		private static UISkinDef _Skin = UISkinManager.defaultSkin;
+		public static UISkinDef Skin
+		{
+			get => _Skin;
+			set => _Skin = value ?? UISkinManager.defaultSkin;
+		}
+
 		private static readonly Dictionary<string, ZipFile>
 			ResourceZipFilesCache = new Dictionary<string, ZipFile>();
 		private static MemoryStream ResourceStream(Assembly asm, string path)

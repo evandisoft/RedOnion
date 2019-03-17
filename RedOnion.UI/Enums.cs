@@ -4,6 +4,14 @@ using UUI = UnityEngine.UI;
 
 namespace RedOnion.UI
 {
+	public enum Layout
+	{
+		Stack,
+		Horizontal,
+		Vertical,
+		FlowHorizontal,
+		FlowVertical
+	}
 	public enum ImageType
 	{
 		Simple	= UUI.Image.Type.Simple,

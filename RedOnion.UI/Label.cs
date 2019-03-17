@@ -9,16 +9,18 @@ namespace RedOnion.UI
 		protected UUI.Text Core { get; private set; }
 
 		public Label(string name = null)
-			: this(DefaultSkin, DefaultSkin.label, name) { }
-		public Label(UISkinDef skin, UIStyle style, string name = null)
 			: base(name)
 		{
 			Core = GameObject.AddComponent<UUI.Text>();
-			Core.alignment = TextAnchor.MiddleCenter;
-			Core.font = style.font ?? skin.font;
-			Core.fontSize = style.fontSize;
-			Core.fontStyle = style.fontStyle;
-			Core.color = style.normal.textColor;
+			Core.alignment = TextAnchor.MiddleLeft;
+			Core.font = Skin.font;
+			Core.fontSize = 14;
+			Core.fontStyle = FontStyle.Normal;
+			Core.color = Color.black;
+
+			var contentSizeFitter = GameObject.AddComponent<UUI.ContentSizeFitter>();
+			contentSizeFitter.horizontalFit = UUI.ContentSizeFitter.FitMode.PreferredSize;
+			contentSizeFitter.verticalFit = UUI.ContentSizeFitter.FitMode.PreferredSize;
 		}
 
 		protected override void Dispose(bool disposing)

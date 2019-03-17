@@ -35,12 +35,17 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Button.cs" />
+    <Compile Include="Components\DragHandler.cs" />
     <Compile Include="Icon.cs" />
     <Compile Include="Label.cs" />
     <Compile Include="Element.cs" />
     <Compile Include="Enums.cs" />
+    <Compile Include="Components\LayoutComponent.cs" />
+    <Compile Include="Structures\Anchors.cs" />
+    <Compile Include="Structures\Padding.cs" />
     <Compile Include="Panel.cs" />
     <Compile Include="Element.Utils.cs" />
+    <Compile Include="Structures\SizeConstraint.cs" />
     <Compile Include="Window.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
