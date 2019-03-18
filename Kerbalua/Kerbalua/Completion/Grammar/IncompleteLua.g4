@@ -58,7 +58,7 @@ block
     ;
 
 incompleteBlock
-    : stat* incompleteStat
+    : stat*? incompleteStat
     | stat* incompleteRetstat
     ;
 

@@ -79,7 +79,6 @@
     <Compile Include="Kerbalua\Utility\prin.cs" />
     <Compile Include="Kerbalua\Utility\QueueLogger.cs" />
     <Compile Include="Kerbalua\Gui\InputBox.cs" />
-    <Compile Include="Kerbalua\Completion\TableCompletion.cs" />
     <Compile Include="Kerbalua\Gui\ScriptWindow.cs" />
     <Compile Include="Kerbalua\Gui\Repl.cs" />
     <Compile Include="Kerbalua\Gui\OutputBox.cs" />
@@ -126,11 +125,14 @@
     <Compile Include="Kerbalua\Completion\Grammar\StandardLuaListener.cs" />
     <Compile Include="Kerbalua\Completion\Grammar\StandardLuaParser.cs" />
     <Compile Include="Kerbalua\Completion\Grammar\StandardLuaVisitor.cs" />
-    <Compile Include="Kerbalua\Completion\ParsedIncompleteVar.cs" />
+    <Compile Include="Kerbalua\Completion\ProcessedIncompleteVar.cs" />
     <Compile Include="Kerbalua\CompletionOld\AllCompletion.cs" />
     <Compile Include="Kerbalua\CompletionOld\LuaIntellisenseListener.cs" />
     <Compile Include="Kerbalua\CompletionOld\LastVarExtracter.cs" />
-    <Compile Include="Kerbalua\Completion\UserDataCompletion.cs" />
+    <Compile Include="Kerbalua\Completion\LuaIntellisenseException.cs" />
+    <Compile Include="Kerbalua\Completion\CompletionObject.cs" />
+    <Compile Include="Kerbalua\CompletionOld\TableCompletionOld.cs" />
+    <Compile Include="Kerbalua\CompletionOld\UserDataCompletionOld.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -3,11 +3,11 @@ using System.Text;
 using System.Collections.Generic;
 
 namespace Kerbalua.Completion {
-	public class ParsedIncompleteVar {
+	public class ProcessedIncompleteVar {
 		public bool Success = false;
 		public List<Segment> Segments = new List<Segment>();
 
-		public ParsedIncompleteVar(IncompleteLuaParser.IncompleteVarContext incompleteVar)
+		public ProcessedIncompleteVar(IncompleteLuaParser.IncompleteVarContext incompleteVar)
 		{
 			if (incompleteVar == null) {
 				return;

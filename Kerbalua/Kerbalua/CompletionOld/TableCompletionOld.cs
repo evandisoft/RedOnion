@@ -6,7 +6,7 @@ using UnityEngine;
 using Kerbalua.Utility;
 
 namespace Kerbalua.Completion {
-    public class TableCompletion {
+    public class TableCompletionOld {
         static public List<string> Complete(Table table, List<LastVarExtracter.Token> correctTokens)
         {
             List<string> completions = new List<string>();

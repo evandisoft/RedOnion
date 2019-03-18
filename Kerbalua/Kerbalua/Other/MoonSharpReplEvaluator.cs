@@ -6,6 +6,7 @@ using MoonSharp.Interpreter.Interop;
 using UnityEngine;
 //using RedOnion.Script;
 using Kerbalua.MoonSharp;
+using Kerbalua.Completion;
 
 namespace Kerbalua.Other
 {
@@ -54,23 +55,11 @@ namespace Kerbalua.Other
 		}
 
 		/// <summary>
-		/// TODO: NOT CURRENTLY IMPLEMENTED
 		/// See the abstract version for complete comments.
 		/// </summary>
 		public override IList<string> GetCompletions(string source, int cursorPos,out int replaceStart,out int replaceEnd)
 		{
-			List<string> NOT_IMPLEMENTED_COMPLETIONS = new List<string>();
-			NOT_IMPLEMENTED_COMPLETIONS.Add("MoonSharp");
-			NOT_IMPLEMENTED_COMPLETIONS.Add("intellisense");
-			NOT_IMPLEMENTED_COMPLETIONS.Add("is");
-			NOT_IMPLEMENTED_COMPLETIONS.Add("not");
-			NOT_IMPLEMENTED_COMPLETIONS.Add("currently");
-			NOT_IMPLEMENTED_COMPLETIONS.Add("implemented");
-			for(int i = 0;i < 100;i++) {
-				NOT_IMPLEMENTED_COMPLETIONS.Add("test-string #"+i);
-			}
-			replaceStart = replaceEnd = cursorPos;
-			return NOT_IMPLEMENTED_COMPLETIONS;
+			return LuaIntellisense.GetCompletions(scriptEngine.Globals, source, cursorPos, out replaceStart, out replaceEnd);
 		}
 
 
