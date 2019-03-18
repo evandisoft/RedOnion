@@ -1,3 +1,4 @@
+using RedOnion.UI.Components;
 using System;
 using UnityEngine;
 using UnityEngine.Events;
@@ -7,10 +8,10 @@ namespace RedOnion.UI
 {
 	public class Button : Element
 	{
-		public UUI.RawImage Image { get; private set; }
-		public UUI.Button Core { get; private set; }
+		protected UUI.Button Core { get; private set; }
+		protected BackgroundImage Image { get; private set; }
 
-		public Label label;
+		protected Label label;
 		protected Label LabelCore
 		{
 			get
@@ -25,7 +26,7 @@ namespace RedOnion.UI
 			}
 		}
 
-		public Icon icon;
+		protected Icon icon;
 		protected Icon IconCore
 		{
 			get
@@ -43,12 +44,23 @@ namespace RedOnion.UI
 		public Button(string name = null)
 			: base(name)
 		{
-			Image = GameObject.AddComponent<UUI.RawImage>();
-			Image.texture = Skin.button.normal.background.texture;
 			Core = GameObject.AddComponent<UUI.Button>();
+			Image = GameObject.AddComponent<BackgroundImage>();
+			Image.sprite = Skin.button.normal.background;
 			Layout = Layout.Horizontal;
 			MinWidth = 19;
 			MinHeight = 19;
+		}
+
+		protected override void Dispose(bool disposing)
+		{
+			if (!disposing || GameObject == null)
+				return;
+			Core = null;
+			Image = null;
+			label = null;
+			icon = null;
+			base.Dispose(true);
 		}
 
 		public event UnityAction Click

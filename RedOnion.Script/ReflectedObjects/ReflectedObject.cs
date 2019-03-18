@@ -2,6 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
+// TODO: Better support for structures in properties (having both get and set)
+// ----- Allow the changes to inner fields/properties be propagated back
+// ----- Will need precise lvalue/rvalue tracking (rvalue does not propagate back)
+
 namespace RedOnion.Script.ReflectedObjects
 {
 	public class ReflectedObject : BasicObjects.SimpleObject

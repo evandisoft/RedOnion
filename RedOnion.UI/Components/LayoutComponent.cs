@@ -34,15 +34,15 @@ namespace RedOnion.UI.Components
 		[SerializeField]
 		protected Layout layout;
 		[SerializeField]
-		protected Padding padding;
+		protected LayoutPadding padding;
 		[SerializeField]
-		protected Anchors? overrideAnchors;
+		protected Anchors childAnchors;
 		[SerializeField]
 		protected SizeConstraints size = new SizeConstraints(float.NaN);
 		[NonSerialized]
 		protected SizeConstraints calc = new SizeConstraints(float.NaN);
 
-		int ILayoutElement.layoutPriority => 0;
+		int ILayoutElement.layoutPriority => 2;
 		float ILayoutElement.minWidth => size.x.minimal >= 0f ? size.x.minimal : calc.x.minimal;
 		float ILayoutElement.minHeight => size.y.minimal >= 0f ? size.y.minimal : calc.y.minimal;
 		float ILayoutElement.preferredWidth => size.x.preferred >= 0f ? size.x.preferred : calc.x.preferred;
@@ -73,15 +73,15 @@ namespace RedOnion.UI.Components
 			get => layout;
 			set => Set(ref layout, value);
 		}
-		public Padding Padding
+		public LayoutPadding Padding
 		{
 			get => padding;
 			set => Set(ref padding, value);
 		}
-		public Anchors? OverrideAnchors
+		public Anchors ChildAnchors
 		{
-			get => overrideAnchors;
-			set => Set(ref overrideAnchors, value);
+			get => childAnchors;
+			set => Set(ref childAnchors, value);
 		}
 
 		public SizeConstraints Constraints

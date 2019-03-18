@@ -6,7 +6,7 @@ namespace RedOnion.UI
 {
 	public class Label : Element
 	{
-		protected UUI.Text Core { get; private set; }
+		protected internal UUI.Text Core { get; private set; }
 
 		public Label(string name = null)
 			: base(name)
@@ -23,8 +23,8 @@ namespace RedOnion.UI
 		{
 			if (!disposing || GameObject == null)
 				return;
-			base.Dispose(true);
 			Core = null;
+			base.Dispose(true);
 		}
 
 		public string Text
@@ -41,6 +41,16 @@ namespace RedOnion.UI
 		{
 			get => Core.alignment;
 			set => Core.alignment = value;
+		}
+		public int FontSize
+		{
+			get => Core.fontSize;
+			set => Core.fontSize = value;
+		}
+		public FontStyle FontStyle
+		{
+			get => Core.fontStyle;
+			set => Core.fontStyle = value;
 		}
 	}
 }

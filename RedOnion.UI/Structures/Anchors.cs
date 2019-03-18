@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace RedOnion.UI
 {
+	/// <summary>
+	/// Anchor definition for positioning UI element within a cell
+	/// </summary>
 	[Serializable]
 	public struct Anchors : IEquatable<Anchors>
 	{
@@ -25,7 +28,7 @@ namespace RedOnion.UI
 			&& top == other.top && bottom == other.bottom;
 		public override bool Equals(object obj)
 			=> obj is Anchors && Equals((Anchors)obj);
-		public override int GetHashCode() // some arbitrarily selected primes
+		public override int GetHashCode() // some primes as in Padding
 			=> unchecked(left.GetHashCode() * 37 + right.GetHashCode() * 101
 			+ top.GetHashCode() * 277 + bottom.GetHashCode() * 613);
 
@@ -48,6 +51,7 @@ namespace RedOnion.UI
 
 		public static readonly Anchors Horizontal	= new Anchors(0f, 1f, .5f, .5f);
 		public static readonly Anchors Vertical		= new Anchors(.5f, .5f, 0f, 1f);
+		public static readonly Anchors Invalid      = new Anchors(float.NaN, float.NaN, float.NaN, float.NaN);
 
 		// aliases from TextAnchor
 		public static readonly Anchors UpperLeft = TopLeft;
@@ -87,10 +91,19 @@ namespace RedOnion.UI
 		}
 		public TextAnchor ToTextAnchor()
 		{
+			var x = float.IsNaN(left) ? right : float.IsNaN(right) ? left : (left + right) * 0.5f;
+			var y = float.IsNaN(top) ? bottom : float.IsNaN(bottom) ? top : (top + bottom) * 0.5f;
+			var min = 1f/3f;
+			var max = 2f/3f;
+			x = x <= min ? 0f : x >= max ? 1f : .5f;
+			y = y <= min ? 0f : y >= max ? 1f : .5f;
 			for (int i = 0; i < TextAnchorTable.Length; i++)
-				if (Equals(TextAnchorTable[i]))
+			{
+				var test = TextAnchorTable[i];
+				if (test.left == x && test.top == y)
 					return (TextAnchor)i;
-			return TextAnchor.MiddleLeft;
+			}
+			return TextAnchor.MiddleCenter;
 		}
 
 		public float Left

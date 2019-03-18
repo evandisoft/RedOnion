@@ -1,13 +1,12 @@
 using System;
-using System.Collections.Generic;
 using RedOnion.Script;
 using RedOnion.Script.BasicObjects;
 using RedOnion.Script.Completion;
 using RedOnion.Script.ReflectedObjects;
-using RedOnion.UI;
 using UE = UnityEngine;
 using UUI = UnityEngine.UI;
 using KUI = KSP.UI;
+using ROC = RedOnion.UI.Components;
 
 namespace RedOnion.KSP
 {
@@ -28,7 +27,7 @@ namespace RedOnion.KSP
 			repl = false; // FOR NOW!
 #endif
 			// neutral types first
-			// aliases in global namespaces are in MoreProps = overwrittable,
+			// aliases in global namespace are in MoreProps = overwrittable,
 			// while names under "System" namespace are read-only (BaseProps)
 			var system = root.Get("System").Object;
 			var sys = system?.BaseProps ?? new Properties();
@@ -50,15 +49,28 @@ namespace RedOnion.KSP
 			new SimpleObject(engine, new Properties()
 			{
 				{ "Anchors",        root[typeof(UI.Anchors)] },
+				{ "Padding",        root[typeof(UI.Padding)] },
+				{ "Layout",			root[typeof(UI.Layout)] },
+				{ "LayoutPadding",	root[typeof(UI.LayoutPadding)] },
+				{ "SizeConstraint",	root[typeof(UI.SizeConstraint)] },
+				{ "SizeConstraints",root[typeof(UI.SizeConstraints)] },
+				{ "Constraint",		root[typeof(UI.SizeConstraint)] },
+				{ "Constraints",	root[typeof(UI.SizeConstraints)] },
 				{ "Element",        root[typeof(UI.Element)] },
 				{ "Panel",          root[typeof(UI.Panel)] },
 				{ "Window",         root[typeof(UI.Window)] },
 				{ "Label",          root[typeof(UI.Label)] },
 				{ "Button",         root[typeof(UI.Button)] },
+				{ "TextBox",		root[typeof(UI.TextBox)] },
 			})));
+			root.Set("Anchors", root[typeof(UI.Anchors)]);
+			root.Set("Padding",	root[typeof(UI.Padding)]);
+			root.Set("Layout",	root[typeof(UI.Layout)]);
 			root.Set("Window",	root[typeof(UI.Window)]);
+			root.Set("Panel",	root[typeof(UI.Panel)]);
 			root.Set("Label",	root[typeof(UI.Label)]);
 			root.Set("Button",	root[typeof(UI.Button)]);
+			root.Set("TextBox",	root[typeof(UI.TextBox)]);
 
 			// things that are dangerous in immediate / REPL mode
 			if (!repl)
@@ -91,7 +103,7 @@ namespace RedOnion.KSP
 
 					{ "DefaultControls",root[typeof(UUI.DefaultControls)] },
 					{ "GridLayout",		root[typeof(UUI.GridLayoutGroup)] },
-					{ "HorizontalLayout",root[typeof(UUI.HorizontalLayoutGroup)] },
+					{ "HorizontalLayout", root[typeof(UUI.HorizontalLayoutGroup)] },
 					{ "VerticalLayout",	root[typeof(UUI.VerticalLayoutGroup)] },
 					{ "LayoutRebuilder",root[typeof(UUI.LayoutRebuilder)] },
 					{ "LayoutUtility",	root[typeof(UUI.LayoutUtility)] },
@@ -104,6 +116,9 @@ namespace RedOnion.KSP
 					{ "Button",         root[typeof(UUI.Button)] },
 					{ "Image",          root[typeof(UUI.Image)] },
 					{ "RawImage",       root[typeof(UUI.RawImage)] },
+					{ "BackgroundImage",root[typeof(ROC.BackgroundImage)] },
+					{ "DragHandler",	root[typeof(ROC.DragHandler)] },
+					{ "LayoutComponent",root[typeof(ROC.LayoutComponent)] },
 
 					{ "Screen",			root[typeof(UE.Screen)] },
 					{ "Sprite",         root[typeof(UE.Sprite)] },
@@ -123,7 +138,10 @@ namespace RedOnion.KSP
 				{
 					{ "Vessel",         root[typeof(Vessel)] },
 					{ "FlightGlobals",  root[typeof(FlightGlobals)] },
-					{ "FlightCtrlState", root[typeof(FlightCtrlState)] },
+					{ "FlightCtrlState",root[typeof(FlightCtrlState)] },
+					{ "HighLogic",      root[typeof(HighLogic)] },
+					{ "InputLockManager", root[typeof(InputLockManager)] },
+					{ "InputLock",		root[typeof(InputLockManager)] },
 					{ "StageManager",   root[typeof(KUI.Screens.StageManager)] },
 				})));
 			}
