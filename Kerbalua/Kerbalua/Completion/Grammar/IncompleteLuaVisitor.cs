@@ -188,6 +188,12 @@ public interface IIncompleteLuaVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitIncompleteVarOrExp([NotNull] IncompleteLuaParser.IncompleteVarOrExpContext context);
 	/// <summary>
+	/// Visit a parse tree produced by <see cref="IncompleteLuaParser.varName"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitVarName([NotNull] IncompleteLuaParser.VarNameContext context);
+	/// <summary>
 	/// Visit a parse tree produced by <see cref="IncompleteLuaParser.var"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>

@@ -6,12 +6,12 @@ using Kerbalua.Utility;
 using System.Collections.Generic;
 
 namespace Kerbalua.Completion {
-	public class IncompleteLuaIntellisense {
-		public IncompleteLuaIntellisense()
+	public class LuaIntellisense {
+		public LuaIntellisense()
 		{
 		}
 
-		static public IncompleteLuaListenerImpl Parse(string str)
+		static public ParsedIncompleteVar Parse(string str)
 		{
 			ICharStream stream = CharStreams.fromstring(str);
 			ITokenSource lexer = new IncompleteLuaLexer(stream);
@@ -23,10 +23,22 @@ namespace Kerbalua.Completion {
 
 			IParseTree tree = parser.incompleteChunk();
 			
-			var intellisenseListener = new IncompleteLuaListenerImpl();
+			var intellisenseListener = new LastIncompleteVarExtractor();
 			ParseTreeWalker.Default.Walk(intellisenseListener, tree);
+			var context = intellisenseListener.LastIncompleteVar;
 
-			return intellisenseListener;
+			var parsedResult = new ParsedIncompleteVar(context);
+
+			return parsedResult;
+		}
+
+		class LastIncompleteVarExtractor : IncompleteLuaBaseListener {
+			public IncompleteLuaParser.IncompleteVarContext LastIncompleteVar;
+
+			public override void EnterIncompleteVar([NotNull] IncompleteLuaParser.IncompleteVarContext context)
+			{
+				LastIncompleteVar = context;
+			}
 		}
 
 		//class ReversedTokenStream : ITokenStream {

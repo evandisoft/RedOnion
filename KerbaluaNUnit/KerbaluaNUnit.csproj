@@ -31,7 +31,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IncompleteLuaIntellisenseTests.cs" />
+    <Compile Include="ParsedIncompleteVarTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

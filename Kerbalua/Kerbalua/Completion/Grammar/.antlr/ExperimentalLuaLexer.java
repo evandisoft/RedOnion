@@ -1,4 +1,4 @@
-// Generated from /home/developer/Sync/BigFiles/BigProjects/Kerbalua/Kerbalua/Kerbalua/Kerbalua/Completion/Grammar/IncompleteLua .g4 by ANTLR 4.7.1
+// Generated from /home/developer/Sync/BigFiles/BigProjects/Kerbalua/Kerbalua/Kerbalua/Kerbalua/Completion/Grammar/IncompleteLua.g4 by ANTLR 4.7.1
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;
@@ -9,7 +9,7 @@ import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.*;
 
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
-public class StandardIncompleteLuaLexer extends Lexer {
+public class ExperimentalLuaLexer extends Lexer {
 	static { RuntimeMetaData.checkVersion("4.7.1", RuntimeMetaData.VERSION); }
 
 	protected static final DFA[] _decisionToDFA;
@@ -52,7 +52,7 @@ public class StandardIncompleteLuaLexer extends Lexer {
 		null, "';'", "'='", "'break'", "'goto'", "'do'", "'end'", "'while'", "'repeat'", 
 		"'until'", "'if'", "'then'", "'elseif'", "'else'", "'for'", "','", "'in'", 
 		"'function'", "'local'", "'return'", "'::'", "'.'", "':'", "'nil'", "'false'", 
-		"'true'", "'...'", "'('", "')'", "'['", "']'", "'{'", "'}'", "'or'", "'and'", 
+		"'true'", "'...'", "'['", "']'", "'('", "')'", "'{'", "'}'", "'or'", "'and'", 
 		"'<'", "'>'", "'<='", "'>='", "'~='", "'=='", "'..'", "'+'", "'-'", "'*'", 
 		"'/'", "'%'", "'//'", "'&'", "'|'", "'~'", "'<<'", "'>>'", "'not'", "'#'", 
 		"'^'"
@@ -100,13 +100,13 @@ public class StandardIncompleteLuaLexer extends Lexer {
 	}
 
 
-	public StandardIncompleteLuaLexer(CharStream input) {
+	public ExperimentalLuaLexer(CharStream input) {
 		super(input);
 		_interp = new LexerATNSimulator(this,_ATN,_decisionToDFA,_sharedContextCache);
 	}
 
 	@Override
-	public String getGrammarFileName() { return "IncompleteLua .g4"; }
+	public String getGrammarFileName() { return "IncompleteLua.g4"; }
 
 	@Override
 	public String[] getRuleNames() { return ruleNames; }
@@ -229,9 +229,9 @@ public class StandardIncompleteLuaLexer extends Lexer {
 		"\u0105\7n\2\2\u0105\u0106\7u\2\2\u0106\u0107\7g\2\2\u0107\62\3\2\2\2\u0108"+
 		"\u0109\7v\2\2\u0109\u010a\7t\2\2\u010a\u010b\7w\2\2\u010b\u010c\7g\2\2"+
 		"\u010c\64\3\2\2\2\u010d\u010e\7\60\2\2\u010e\u010f\7\60\2\2\u010f\u0110"+
-		"\7\60\2\2\u0110\66\3\2\2\2\u0111\u0112\7*\2\2\u01128\3\2\2\2\u0113\u0114"+
-		"\7+\2\2\u0114:\3\2\2\2\u0115\u0116\7]\2\2\u0116<\3\2\2\2\u0117\u0118\7"+
-		"_\2\2\u0118>\3\2\2\2\u0119\u011a\7}\2\2\u011a@\3\2\2\2\u011b\u011c\7\177"+
+		"\7\60\2\2\u0110\66\3\2\2\2\u0111\u0112\7]\2\2\u01128\3\2\2\2\u0113\u0114"+
+		"\7_\2\2\u0114:\3\2\2\2\u0115\u0116\7*\2\2\u0116<\3\2\2\2\u0117\u0118\7"+
+		"+\2\2\u0118>\3\2\2\2\u0119\u011a\7}\2\2\u011a@\3\2\2\2\u011b\u011c\7\177"+
 		"\2\2\u011cB\3\2\2\2\u011d\u011e\7q\2\2\u011e\u011f\7t\2\2\u011fD\3\2\2"+
 		"\2\u0120\u0121\7c\2\2\u0121\u0122\7p\2\2\u0122\u0123\7f\2\2\u0123F\3\2"+
 		"\2\2\u0124\u0125\7>\2\2\u0125H\3\2\2\2\u0126\u0127\7@\2\2\u0127J\3\2\2"+

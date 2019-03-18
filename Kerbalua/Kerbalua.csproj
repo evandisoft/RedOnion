@@ -79,9 +79,7 @@
     <Compile Include="Kerbalua\Utility\prin.cs" />
     <Compile Include="Kerbalua\Utility\QueueLogger.cs" />
     <Compile Include="Kerbalua\Gui\InputBox.cs" />
-    <Compile Include="Kerbalua\Completion\AllCompletion.cs" />
     <Compile Include="Kerbalua\Completion\TableCompletion.cs" />
-    <Compile Include="Kerbalua\Completion\UserDataCompletion.cs" />
     <Compile Include="Kerbalua\Gui\ScriptWindow.cs" />
     <Compile Include="Kerbalua\Gui\Repl.cs" />
     <Compile Include="Kerbalua\Gui\OutputBox.cs" />
@@ -114,10 +112,8 @@
     <Compile Include="Kerbalua\AutoPilot\AutoPilotAPI.cs" />
     <Compile Include="Kerbalua\MoonSharp\KerbaluaExecutionManager.cs" />
     <Compile Include="Kerbalua\MoonSharp\ExecutionLimitException.cs" />
-    <Compile Include="Kerbalua\Completion\IncompleteLuaIntellisense.cs" />
+    <Compile Include="Kerbalua\Completion\LuaIntellisense.cs" />
     <Compile Include="Kerbalua\Utility\Misc.cs" />
-    <Compile Include="Kerbalua\Completion\LuaIntellisenseListener.cs" />
-    <Compile Include="Kerbalua\Completion\LastVarExtracter.cs" />
     <Compile Include="Kerbalua\Completion\Grammar\IncompleteLuaBaseListener.cs" />
     <Compile Include="Kerbalua\Completion\Grammar\IncompleteLuaBaseVisitor.cs" />
     <Compile Include="Kerbalua\Completion\Grammar\IncompleteLuaLexer.cs" />
@@ -130,12 +126,14 @@
     <Compile Include="Kerbalua\Completion\Grammar\StandardLuaListener.cs" />
     <Compile Include="Kerbalua\Completion\Grammar\StandardLuaParser.cs" />
     <Compile Include="Kerbalua\Completion\Grammar\StandardLuaVisitor.cs" />
-    <Compile Include="Kerbalua\Completion\IncompleteLuaListenerImpl.cs" />
-    <Compile Include="Kerbalua\Completion\IntellisenseParts.cs" />
+    <Compile Include="Kerbalua\Completion\ParsedIncompleteVar.cs" />
+    <Compile Include="Kerbalua\CompletionOld\AllCompletion.cs" />
+    <Compile Include="Kerbalua\CompletionOld\LuaIntellisenseListener.cs" />
+    <Compile Include="Kerbalua\CompletionOld\LastVarExtracter.cs" />
+    <Compile Include="Kerbalua\Completion\UserDataCompletion.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="Kerbalua\Completion\UserDataCompletion.cs.old" />
     <None Include="Kerbalua\Completion\Grammar\regenerate.sh" />
     <None Include="Kerbalua\Completion\Grammar\BackwardsLua.g4" />
     <None Include="Kerbalua\Completion\Grammar\StandardLua.g4" />
@@ -149,6 +147,7 @@
     <None Include="Kerbalua\Completion\Grammar\StandardLuaLexer.interp" />
     <None Include="Kerbalua\Completion\Grammar\StandardLuaLexer.tokens" />
     <None Include="Kerbalua\Completion\Grammar\IncompleteLua.g4" />
+    <None Include="Kerbalua\CompletionOld\UserDataCompletion.cs.old" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Kerbalua\" />
@@ -160,6 +159,7 @@
     <Folder Include="Kerbalua\AutoPilot\" />
     <Folder Include="Kerbalua\MoonSharp\" />
     <Folder Include="Kerbalua\Completion\Grammar\" />
+    <Folder Include="Kerbalua\CompletionOld\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RedOnion.KSP\RedOnion.KSP.csproj">

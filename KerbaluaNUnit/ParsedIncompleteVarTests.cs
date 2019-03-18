@@ -3,39 +3,45 @@ using Kerbalua.Completion;
 using System;
 namespace KerbaluaNUnit {
 	[TestFixture()]
-	public class IncompleteLuaIntellisenseTests {
-		public IncompleteLuaListenerImpl TestParse(string source)
+	public class ParsedIncompleteVarTests {
+		public ParsedIncompleteVar Parse(string source)
 		{
-			return IncompleteLuaIntellisense.Parse(source);
+			return LuaIntellisense.Parse(source);
 		}
 
 		[Test()]
 		public void TestCase_1()
 		{
-			var listener = TestParse(
+			var parsed = Parse(
 				@"
 				function a() blah1[a](b).blah2(blah3.d
 				"
 				);
 
-			//Assert.AreEqual("d", listener.IncompleteName);
+			Assert.AreEqual(2, parsed.Segments.Count);
+			Assert.AreEqual("blah3", parsed.Segments[0].Name);
 		}
 
 		[Test()]
 		public void TestCase_2()
 		{
-			var listener = TestParse(
+			var parsed = Parse(
 			@"
-				function a() blah1[a](b).blah2(blah3
+				function a() blah1[a](b).blah2().baa
 			");
 
-			//Assert.AreEqual("blah3", listener.IncompleteName);
+			Assert.AreEqual(3, parsed.Segments.Count);
+			Assert.AreEqual("baa", parsed.Segments[2].Name);
+			Assert.AreEqual(2, parsed.Segments[0].Parts.Count);
 		}
 
 		[Test()]
 		public void TestCase_3()
 		{
-			var listener = TestParse("return asdf.qwer[1]().alpha");
+			var parsed = Parse("return asdf");
+
+			Assert.AreEqual(1, parsed.Segments.Count);
+			Assert.AreEqual("asdf", parsed.Segments[0].Name);
 
 			//Assert.AreEqual("alpha", listener.IncompleteName);
 		}
@@ -43,9 +49,10 @@ namespace KerbaluaNUnit {
 		[Test()]
 		public void TestCase_4()
 		{
-			var listener = IncompleteLuaIntellisense.Parse("return asdf.qwer[1]().");
+			var parsed = LuaIntellisense.Parse("return asdf.qwer[1]().");
 
-			//Assert.AreEqual("", listener.IncompleteName);
+			Assert.AreEqual(3, parsed.Segments.Count);
+			Assert.AreEqual("", parsed.Segments[2].Name);
 		}
 
 		//[Test()]

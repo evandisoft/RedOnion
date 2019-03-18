@@ -5,44 +5,7 @@ using Kerbalua.Utility;
 using System.Collections.Generic;
 
 namespace Kerbalua.Completion {
-	public abstract class Part 
-	{
-		public string Symbol = "";
-		public string Name = "";
-		public override string ToString()
-		{
-			return Name+Symbol;
-		}
-	}
-	public abstract class AnonPart:Part { }
 
-	public abstract class NamedPart:Part { }
-
-	public class NamedFieldPart : NamedPart { }
-	public class NamedCallPart : NamedPart {
-		public NamedCallPart() { Symbol = "()"; }
-	}
-	public class AnonArrayPart : AnonPart {
-		public AnonArrayPart() { Symbol = "[]"; }
-	}
-	public class AnonCallPart : AnonPart {
-		public AnonCallPart() { Symbol = "()"; }
-	}
-
-	public class Segment {
-		public NamedPart NamedPart;
-		public Stack<AnonPart> AnonParts = new Stack<AnonPart>();
-
-		public override string ToString()
-		{
-			StringBuilder sb = new StringBuilder();
-			sb.Append(NamedPart.ToString());
-			foreach(var part in AnonParts) {
-				sb.Append(part.ToString());
-			}
-			return sb.ToString();
-		}
-	}
 
 	//public class LuaIntellisenseListener : BackwardsLuaBaseListener {
 	//	public string PartialCompletion = "";
