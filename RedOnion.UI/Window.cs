@@ -37,12 +37,15 @@ namespace RedOnion.UI
 				Spacing = 4;
 				Header = Add(new Element("Window Title Row")
 				{
-					Layout = Layout.Horizontal
+					Layout = Layout.Horizontal,
+					FlexWidth = 1f,
 				});
 				Title = Header.Add(new Label("Window Title")
 				{
 					Text = "Window",
-					TextColor = Color.white
+					TextColor = Color.white,
+					TextAlign = TextAnchor.MiddleLeft,
+					FlexWidth = 1f
 				});
 				Close = Header.Add(new Button("Window Close Button")
 				{
@@ -51,7 +54,8 @@ namespace RedOnion.UI
 				Content = Add(new Panel("Window Content Panel")
 				{
 					Anchors = Anchors.Fill,
-					Color = new Color(.5f, .5f, .5f, .5f)
+					Color = new Color(.5f, .5f, .5f, .5f),
+					FlexWidth = 1f, FlexHeight = 1f
 				});
 
 				GameObject.AddComponent<Components.DragHandler>();

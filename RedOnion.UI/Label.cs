@@ -17,10 +17,6 @@ namespace RedOnion.UI
 			Core.fontSize = 14;
 			Core.fontStyle = FontStyle.Normal;
 			Core.color = Color.black;
-
-			var contentSizeFitter = GameObject.AddComponent<UUI.ContentSizeFitter>();
-			contentSizeFitter.horizontalFit = UUI.ContentSizeFitter.FitMode.PreferredSize;
-			contentSizeFitter.verticalFit = UUI.ContentSizeFitter.FitMode.PreferredSize;
 		}
 
 		protected override void Dispose(bool disposing)

@@ -56,6 +56,9 @@ namespace RedOnion.KSP
 				{ "Label",          root[typeof(UI.Label)] },
 				{ "Button",         root[typeof(UI.Button)] },
 			})));
+			root.Set("Window",	root[typeof(UI.Window)]);
+			root.Set("Label",	root[typeof(UI.Label)]);
+			root.Set("Button",	root[typeof(UI.Button)]);
 
 			// things that are dangerous in immediate / REPL mode
 			if (!repl)

@@ -7,7 +7,7 @@ namespace RedOnion.UI
 {
 	public class Button : Element
 	{
-		public UUI.Image Image { get; private set; }
+		public UUI.RawImage Image { get; private set; }
 		public UUI.Button Core { get; private set; }
 
 		public Label label;
@@ -43,10 +43,12 @@ namespace RedOnion.UI
 		public Button(string name = null)
 			: base(name)
 		{
-			Image = GameObject.AddComponent<UUI.Image>();
-			Image.sprite = Skin.button.normal.background;
+			Image = GameObject.AddComponent<UUI.RawImage>();
+			Image.texture = Skin.button.normal.background.texture;
 			Core = GameObject.AddComponent<UUI.Button>();
 			Layout = Layout.Horizontal;
+			MinWidth = 19;
+			MinHeight = 19;
 		}
 
 		public event UnityAction Click
