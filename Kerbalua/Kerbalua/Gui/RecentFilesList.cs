@@ -8,6 +8,7 @@ namespace Kerbalua.Gui {
 	public class RecentFilesList:AutoLayoutBox {
 		private string baseFolderPath = Path.Combine(KSPUtil.ApplicationRootPath, "scripts");
 		const int ioDelayMillis = 5000;
+		public int MaxFiles = 10;
 
 		Action<string> loadAction;
 		public RecentFilesList(Action<string> loadAction)
@@ -35,7 +36,7 @@ namespace Kerbalua.Gui {
 				foreach (var script in scriptList) {
 					string filename = Path.GetFileName(script);
 					if (filename.StartsWith(".")) continue;
-					if (++i > 5) break;
+					if (++i > MaxFiles) break;
 
 					renderables.Add(new Button(filename, () => loadAction.Invoke(filename)));
 				}

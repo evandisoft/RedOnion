@@ -59,7 +59,13 @@ namespace Kerbalua.Other
 		/// </summary>
 		public override IList<string> GetCompletions(string source, int cursorPos,out int replaceStart,out int replaceEnd)
 		{
-			return LuaIntellisense.GetCompletions(scriptEngine.Globals, source, cursorPos, out replaceStart, out replaceEnd);
+			try {
+				return LuaIntellisense.GetCompletions(scriptEngine.Globals, source, cursorPos, out replaceStart, out replaceEnd);
+			} catch (Exception e) {
+				Debug.Log(e);
+				replaceStart = replaceEnd = cursorPos;
+				return new List<string>();
+			}
 		}
 
 
