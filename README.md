@@ -1,6 +1,6 @@
 # RedOnion and Kerbalua
 
-A joined effort of Evan Dickinson and Lukáš Fireš to create
+A joined effort of Evan Dickinson and Lukï¿½ Fireï¿½ to create
 unrestricted scripted environment inside Kerbal Space Program
 for all players and even modders wishing to control the game,
 vessels, anything, with own script.
@@ -18,3 +18,8 @@ access to every public method of KSP and Unity.
 **ROS** was created anew and may contain bugs,
 **LUA** may have some limitations
 but should be much safer to use.
+
+## Contributing
+We welcome people of all skill levels to contribute or give feedback, ask questions, etc.
+
+Here is more information about [contributing](Contributing.md).

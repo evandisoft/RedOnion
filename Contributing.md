@@ -13,7 +13,7 @@ Make a new branch with your username in it, and use that to contribute and make 
 ## Linux:
 For Linux you have to use the repositories [Here](https://www.mono-project.com/download/stable/) to get the best version of the mono tools, including monodevelop (which is a very good ide on linux for c# development). The default version of mono tools on your linux distribution may not work at all with this project.
 
-Note that due to KSP using a version of Unity that was not released for Linux, debugging c# code does not seem to work. However, the nature of this project means that we may be able to provide better debugging tools inside for our scripting languages.
+Note that due to KSP using a version of Unity that was not released for Linux, debugging C# code does not seem to work. However, the nature of this project means that we may be able to provide better debugging tools inside for our scripting languages, or even the regular C# development part.
 
 ## Windows:
 On Windows, Visual Studio 2017 Community is the easiest way to contribute.
@@ -25,5 +25,8 @@ The link should link to your KSP game install.
 On Windows, you can make symbolic links using [mklink](https://www.howtogeek.com/howto/16226/complete-guide-to-symbolic-links-symlinks-on-windows-or-linux/). Use the version that has the "/D" option.
 
 Once you have that set up, you can build the project. The output will go into RedOnion/bin/Debug. In order for your KSP install to see these resulting dll's, you can create a folder in the GameData folder of your KSP install, call it RedOnion, and then make a symbolic link inside that folder pointing to the RedOnion/bin/Debug folder of your project folder.
+
+Firda has created a cmd script (create-links.cmd) for windows that will create these links assuming that you have set your ksp install directory in the environment variable "ksp". If you have not, it assumes ksp is installed in the default location it would be installed under steam.
+("C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program")
 
 Once again, any questions, feedback, concerns for now can be placed into "issues" on the project github page.
