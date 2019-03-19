@@ -171,19 +171,21 @@ namespace Kerbalua.Completion {
 
 		IList<string> GetCurrentTypeCompletions()
 		{
-			IList<string> completion = new List<string>();
+			List<string> completions = new List<string>();
 			string partial = CurrentPartial;
 			foreach (var memberName in ListAllMembers(CurrentType)) {
 				if (memberName.StartsWith(partial)) {
-					completion.Add(memberName);
+					completions.Add(memberName);
 				}
 			}
-			return completion;
+
+			completions.Sort();
+			return completions;
 		}
 
 		IList<string> GetCurrentTableCompletions()
 		{
-			IList<string> completion = new List<string>();
+			List<string> completions = new List<string>();
 			string partial = CurrentPartial;
 
 			foreach (var entry in CurrentTable.Keys) {
@@ -192,10 +194,12 @@ namespace Kerbalua.Completion {
 				}
 
 				if (entry.String.StartsWith(partial)) {
-					completion.Add(entry.String);
+					completions.Add(entry.String);
 				}
 			}
-			return completion;
+
+			completions.Sort();
+			return completions;
 		}
 
 		static public HashSet<string> ListAllMembers(Type t)
