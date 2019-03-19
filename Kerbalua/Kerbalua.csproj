@@ -133,6 +133,7 @@
     <Compile Include="Kerbalua\Completion\CompletionObject.cs" />
     <Compile Include="Kerbalua\CompletionOld\TableCompletionOld.cs" />
     <Compile Include="Kerbalua\CompletionOld\UserDataCompletionOld.cs" />
+    <Compile Include="Kerbalua\Utility\Settings.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

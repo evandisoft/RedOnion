@@ -3,6 +3,7 @@ using System.IO;
 using UnityEngine;
 using System.Collections.Generic;
 using System.Diagnostics;
+using Kerbalua.Utility;
 
 namespace Kerbalua.Gui {
 	public class ScriptNameInputArea:EditingArea, ICompletable {
@@ -19,23 +20,10 @@ namespace Kerbalua.Gui {
 
 		public ScriptNameInputArea()
 		{
-			content.text = LoadConfig().GetValue("lastScriptName");
+			content.text = Settings.LoadSetting("lastScriptName",defaultScriptFilename);
 		}
 
 		public new KeyBindings KeyBindings = new KeyBindings();
-
-		ConfigNode LoadConfig()
-		{
-			ConfigNode configNode;
-			if (!File.Exists(settingsFile)) {
-				Directory.CreateDirectory(baseFolderPath);
-				configNode = new ConfigNode();
-				configNode.SetValue("lastScriptName", "", true);
-				configNode.Save(settingsFile);
-				return configNode;
-			} 
-			return ConfigNode.Load(settingsFile);
-		}
 
 		protected override void ProtectedUpdate()
 		{
@@ -59,9 +47,7 @@ namespace Kerbalua.Gui {
 
 		void CommonSaveLoadActions()
 		{
-			ConfigNode configNode = LoadConfig();
-			configNode.SetValue("lastScriptName", content.text, true);
-			configNode.Save(settingsFile);
+			Settings.SaveSetting("lastScriptName", content.text);
 		}
 
 		public void Save(string text)
