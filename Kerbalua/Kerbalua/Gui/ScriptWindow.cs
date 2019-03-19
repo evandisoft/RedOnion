@@ -6,6 +6,7 @@ using System;
 using System.IO;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
+using Kerbalua.Utility;
 //using RedOnion.Script;
 
 namespace Kerbalua.Gui {
@@ -65,7 +66,7 @@ namespace Kerbalua.Gui {
 			replEvaluators["MoonSharp"].PrintAction = (str) => {
 				repl.outputBox.AddOutput(str);
 			};
-			SetCurrentEvaluator("RedOnion");
+			SetCurrentEvaluator(Settings.LoadSetting("lastEngine","RedOnion"));
 			recentFiles = new RecentFilesList((string filename) => {
 				scriptIOTextArea.content.text = filename;
 				editor.content.text = scriptIOTextArea.Load();
@@ -137,6 +138,7 @@ namespace Kerbalua.Gui {
 			foreach (var evaluatorName in replEvaluators.Keys) {
 				widgetBar.renderables.Add(new Button(evaluatorName, () => {
 					SetCurrentEvaluator(evaluatorName);
+					Settings.SaveSetting("lastEngine", evaluatorName);
 				}));
 			}
 			widgetBar.renderables.Add(replEvaluatorLabel);
