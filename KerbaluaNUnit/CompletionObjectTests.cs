@@ -72,20 +72,15 @@ namespace KerbaluaNUnit {
 			script.Globals["ADF"] = new Adf();
 
 			var completion = GetCompletionObject(script.Globals,
-				@"
-vessel=FlightGlobals.ActiveVessel
-StageManager.ActivateNextStage()
-
-function fly st
-    st.mainThrottle=1
-    
-vessel.OnFlyByWire=fly"
+@"
+	ADF.a
+"
 				);
 			var completions = completion.GetCurrentCompletions();
 			Assert.AreEqual(1, completions.Count);
 			Assert.True(completion.ProcessNextSegment());
 			completions = completion.GetCurrentCompletions();
-			Assert.AreEqual(10, completions.Count);
+			Assert.AreEqual(3, completions.Count);
 		}
 	}
 }

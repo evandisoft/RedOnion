@@ -16,6 +16,7 @@ namespace Kerbalua.Completion {
 			)
 		{
 			string relevantText = source.Substring(0, cursorPos);
+
 			var processedIncompleteVar = Parse(relevantText);
 			var completionObject = new CompletionObject(globals, processedIncompleteVar.Segments);
 

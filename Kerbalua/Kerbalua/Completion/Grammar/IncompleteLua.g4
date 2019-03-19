@@ -50,7 +50,7 @@ chunk
     ;
 
 incompleteChunk
-    : incompleteBlock EOF
+    : '=' incompleteBlock EOF
     ;
 
 block
