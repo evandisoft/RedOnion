@@ -4,12 +4,16 @@ using Kerbalua.Completion;
 
 namespace Kerbalua.Gui {
 	public class InputBox:EditingArea {
-		public KeyBindings KeyBindings = new KeyBindings();
+		public new KeyBindings KeyBindings = new KeyBindings();
 
-		public override void Render(Rect rect, GUIStyle style = null)
+		protected override void ProtectedUpdate(Rect rect)
 		{
 			if (HasFocus()) KeyBindings.ExecuteAndConsumeIfMatched(Event.current);
-			base.Render(rect, style);
+			//if (HasFocus()) {
+			//	int id = GUIUtility.keyboardControl;
+			//	Debug.Log("Id for inputBox is " + id);
+			//}
+			base.ProtectedUpdate(rect);
 		}
 	}
 }

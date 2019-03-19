@@ -9,7 +9,7 @@ namespace RedOnion.Script.Parsing
 		protected Lexer lexer = new Lexer();
 
 		public CultureInfo Culture { get; set; } = CultureInfo.InvariantCulture;
-		public Option Options { get; set; } = Option.Script | Option.DotThisAfterWhite;
+		public Option Options { get; set; } = Option.Script | Option.Untyped | Option.Typed;
 
 		public Parser() { }
 		public Parser(Option opts) => Options = opts;
@@ -111,14 +111,20 @@ namespace RedOnion.Script.Parsing
 		/// </summary>
 		public Parser Reset()
 		{
-			CodeAt = 0;
-			StringsAt = 0;
-			Array.Clear(_stringTable, 0, _stringTable.Length);
+			if (StringsAt > 0)
+			{
+				Array.Clear(_stringTable, 0, StringsAt);
+				StringsAt = 0;
+			}
+			if (StringValuesAt > 0)
+			{
+				Array.Clear(StringValues, 0, StringValuesAt);
+				StringValuesAt = 0;
+			}
 			_stringMap.Clear();
+			CodeAt = 0;
 			OperatorAt = 0;
 			ValuesAt = 0;
-			StringValuesAt = 0;
-			Array.Clear(StringValues, 0, StringValues.Length);
 			LabelTable?.Clear();
 			GotoTable?.Clear();
 			ParentIndent = -1;
@@ -131,11 +137,11 @@ namespace RedOnion.Script.Parsing
 		public Parser Expression(string value)
 		{
 			Reset();
-			lexer.Reader = new StringReader(value);
+			lexer.Source = value;
 			var state = StartExpression();
 			ParseExpression();
 			FinishExpression(state);
-			lexer.Reader = null;
+			lexer.Source = null;
 			return this;
 		}
 
@@ -145,9 +151,9 @@ namespace RedOnion.Script.Parsing
 		public Parser Unit(string source)
 		{
 			Reset();
-			lexer.Reader = new StringReader(source);
+			lexer.Source = source;
 			Unit();
-			lexer.Reader = null;
+			lexer.Source = null;
 			return this;
 		}
 

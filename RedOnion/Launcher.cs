@@ -3,6 +3,7 @@ using System.Collections;
 using System.IO;
 using UnityEngine;
 using KSP.UI.Screens;
+using RedOnion.KSP;
 
 namespace RedOnion
 {
@@ -68,8 +69,7 @@ namespace RedOnion
 			button = null;
 		}
 
-		Script.Engine engine;
-		bool running = false;
+		RuntimeEngine engine;
 		private void RunScript()
 		{
 			if(!File.Exists("scripts/launcher.ros"))
@@ -77,40 +77,49 @@ namespace RedOnion
 				Log("Script scripts/launcher.ros does not exist");
 				return;
 			}
-			if (engine == null)
-				engine = new Script.Engine(engine => new EngineRoot(engine));
 			try
 			{
+				engine = new RuntimeEngine();
 				engine.ExecutionCountdown = 10000;
 				engine.Execute(File.ReadAllText("scripts/launcher.ros"));
-				running = true;
 			}
 			catch(Script.Parsing.ParseError err)
 			{
 				Log("ParseError at {0}.{1}: {2}", err.LineNumber, err.Column, err.Message);
 				Log("Content of the line: " + err.Line);
+				StopScript();
 			}
 			catch(Exception err)
 			{
 				Log("Exception in engine or parser: " + err.Message);
+				StopScript();
 			}
 		}
+
+		private bool stopping;
 		private void StopScript()
-			=> running = false;
+		{
+			if (stopping)
+				return;
+			stopping = true;
+			RunFunction("shutdown");
+			engine = null;
+			stopping = false;
+		}
 
 		private void FixedUpdate()
-			=> RunFunction("FixedUpdate");
+			=> RunFunction("fixedUpdate");
 		private void Update()
-			=> RunFunction("Update");
+			=> RunFunction("update");
 		private void OnGUI()
-			=> RunFunction("OnGUI");
+			=> RunFunction("onGUI");
 		private void RunFunction(string name)
 		{
-			if (!running)
+			if (engine == null)
 				return;
 			if (!engine.Root.Get(name, out var value))
 				return;
-			if (value.Native is Script.BasicObjects.FunctionObj fn)
+			if (value.Object is Script.BasicObjects.FunctionObj fn)
 			{
 				try
 				{
@@ -120,12 +129,12 @@ namespace RedOnion
 				catch (Script.Engine.TookTooLong)
 				{
 					Log(name + " took too long");
-					running = false;
+					StopScript();
 				}
 				catch (Exception err)
 				{
 					Log("Exception in {0}: {1}", name, err.Message);
-					running = false;
+					StopScript();
 				}
 			}
 		}

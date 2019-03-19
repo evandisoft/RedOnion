@@ -13,7 +13,7 @@ namespace Kerbalua.Completion {
         public static void AntlrTest()
         {
             string input = "local a=a[a1a].b[b1a](b2.b2a)().c(b3)[b4[a.b";
-            string input1 = "function() return b";
+            //string input1 = "function() return b";
 
             var terminalVar = ParseCompletion(input);
             Console.WriteLine(terminalVar);

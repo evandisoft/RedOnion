@@ -2,87 +2,117 @@ using KSP.UI;
 using System;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.EventSystems;
 using UUI = UnityEngine.UI;
 
 namespace RedOnion.UI
 {
-	public class Window : Panel
+	public class Window : IDisposable
 	{
-		public struct Defaults
+		protected class FramePanel : Panel
 		{
-			public Vector2 Position;
-			public Vector2 SizeDelta;
-			public Vector2 CloseButtonSize;
-			public Texture2D CloseButtonIcon;
-			public float FrameWidth;
-			public Color TitleTextColor;
-		}
-		public static Defaults Default = new Defaults
-		{
-			Position = new Vector2(400, 400),
-			SizeDelta = new Vector2(400, 300),
-			CloseButtonSize = new Vector2(23, 23),
-			CloseButtonIcon = LoadIcon(13, 13, "CloseButtonIcon.png"),
-			FrameWidth = 4,
-			TitleTextColor = new Color(0.8f, 0.8f, 0.8f, 0.8f)
-		};
+			static Texture2D DefaultCloseButtonIcon = LoadIcon(13, 13, "CloseButtonIcon.png");
 
-		protected Label TitleLabel { get; private set; }
-		protected Button CloseButton { get; private set; }
+			public new GameObject GameObject => base.GameObject;
+			public new RectTransform RectTransform => base.RectTransform;
+			public CanvasGroup Group { get; }
+			public UUI.ContentSizeFitter Fitter { get; }
+			public Element Header { get; }
+			public Label Title { get; }
+			public Button Close { get; }
+			public Panel Content { get; }
 
-		public Window(string name = null)
-			: base(null, name)
-		{
-			GameObject.transform.SetParent(UIMasterController.Instance.appCanvas.transform, false);
-			GameObject.SetLayerRecursive(UIMasterController.Instance.appCanvas.gameObject.layer);
-
-			Position = Default.Position;
-			SizeDelta = Default.SizeDelta;
-			Color = new Color(0.2f, 0.2f, 0.2f, 0.8f);
-
-			TitleLabel = new Label(this, "Title")
+			public FramePanel(string name = null)
+				: base("Window Frame")
 			{
-				Anchors = new Rect(0, 0, 1, 0),
-				Position = new Vector2(Default.FrameWidth, -Default.FrameWidth),
-				SizeDelta = new Vector2(-Default.CloseButtonSize.x - Default.FrameWidth, Default.CloseButtonSize.y),
-				Text = "Window",
-				TextColor = Default.TitleTextColor
-			};
+				GameObject.transform.SetParent(UIMasterController.Instance.dialogCanvas.transform, false);
+				Group = GameObject.AddComponent<CanvasGroup>();
+				Group.alpha = .9f;
+				MinWidth = 160;
+				MinHeight = 120;
+				Fitter = GameObject.AddComponent<UUI.ContentSizeFitter>();
+				Fitter.horizontalFit = UUI.ContentSizeFitter.FitMode.PreferredSize;
+				Fitter.verticalFit = UUI.ContentSizeFitter.FitMode.PreferredSize;
+				Color = new Color(.2f, .2f, .2f, .8f);
+				Layout = Layout.Vertical;
+				LayoutPadding = new LayoutPadding(4);
+				Header = Add(new Element("Window Title Row")
+				{
+					Layout = Layout.Horizontal,
+					FlexWidth = 1f,
+				});
+				Title = Header.Add(new Label("Window Title")
+				{
+					Text = "Window",
+					TextColor = Color.white,
+					TextAlign = TextAnchor.MiddleLeft,
+					FlexWidth = 1f,
+				});
+				Close = Header.Add(new Button("Window Close Button")
+				{
+					IconTexture = DefaultCloseButtonIcon
+				});
+				Content = Add(new Panel("Window Content Panel")
+				{
+					Color = new Color(.5f, .5f, .5f, .5f),
+					FlexWidth = 1f, FlexHeight = 1f,
+				});
 
-			CloseButton = new Button(this, "CloseButton")
+				GameObject.AddComponent<Components.DragHandler>();
+			}
+
+			public bool Active
 			{
-				Anchors = new Rect(1, 0, 1, 0),
-				Pivot = new Vector2(1, 0),
-				Position = new Vector2(-Default.FrameWidth, Default.FrameWidth),
-				SizeDelta = new Vector2(-Default.CloseButtonSize.x, -Default.CloseButtonSize.y)
-				//Icon = Default.CloseButtonIcon
-			};
-			CloseButton.Click += Close;
+				get => GameObject.activeSelf;
+				set => GameObject.SetActive(value);
+			}
+			public bool Visible
+			{
+				get => GameObject.activeInHierarchy;
+				set => GameObject.SetActive(value);
+			}
 		}
 
-		protected override void Dispose(bool disposing)
+		protected FramePanel Frame { get; private set; }
+		public Panel Content { get; private set; }
+
+		public string Name
 		{
-			if (!disposing || GameObject == null)
+			get => Frame.Name;
+			set => Frame.Name = value;
+		}
+
+		public Window(Layout layout)
+			: this(null, layout) { }
+		public Window(string name = null, Layout layout = Layout.Vertical)
+		{
+			Frame = new FramePanel(name);
+			Content = Frame.Content;
+			Content.Layout = layout;
+			Frame.Close.Click += Close;
+		}
+
+		~Window() => Dispose(false);
+		public void Dispose() => Dispose(true);
+		protected virtual void Dispose(bool disposing)
+		{
+			if (Frame == null)
 				return;
-			Hide();
-			base.Dispose(true);
-			TitleLabel?.Dispose();
-			TitleLabel = null;
-			CloseButton?.Dispose();
-			CloseButton = null;
+			Frame.Dispose();
+			Frame = null;
 		}
 
 		public void Show()
 		{
-			if (GameObject == null)
-				throw new ObjectDisposedException(GetType().Name);
-			GameObject.SetActive(true);
+			if (Frame == null)
+				throw new ObjectDisposedException(Name);
+			Frame.Visible = true;
 		}
 		public void Hide()
 		{
-			if (GameObject == null)
-				throw new ObjectDisposedException(GetType().Name);
-			GameObject.SetActive(false);
+			if (Frame == null)
+				throw new ObjectDisposedException(Name);
+			Frame.Visible = false;
 		}
 
 		public event UnityAction Closed;
@@ -94,8 +124,111 @@ namespace RedOnion.UI
 
 		public string Title
 		{
-			get => TitleLabel.Text;
-			set => TitleLabel.Text = value;
+			get => Frame.Title.Text;
+			set => Frame.Title.Text = value;
+		}
+
+		public float Alpha
+		{
+			get => Frame.Group.alpha;
+			set => Frame.Group.alpha = value;
+		}
+
+		public float MinWidth
+		{
+			get => Frame.MinWidth;
+			set => Frame.MinWidth = Mathf.Max(80f, value);
+		}
+		public float MinHeight
+		{
+			get => Frame.MinHeight;
+			set => Frame.MinHeight = Mathf.Max(80f, value);
+		}
+		public float PreferWidth
+		{
+			get => Frame.PreferWidth;
+			set => Frame.PreferWidth = value;
+		}
+		public float PreferHeight
+		{
+			get => Frame.PreferHeight;
+			set => Frame.PreferHeight = value;
+		}
+
+		public E Add<E>(E element) where E : Element
+			=> Content.Add(element);
+		public E Remove<E>(E element) where E : Element
+			=> Content.Add(element);
+		public Element Add(Element element)
+			=> Content.Add(element);
+		public Element Remove(Element element)
+			=> Content.Remove(element);
+		public void Add(params Element[] elements)
+			=> Content.Add(elements);
+		public void Remove(params Element[] elements)
+			=> Content.Remove(elements);
+
+		public Vector2 Position
+		{
+			get
+			{
+				var pt = Frame.RectTransform.anchoredPosition;
+				return new Vector2(pt.x, -pt.y);
+			}
+			set
+			{
+				Frame.RectTransform.anchoredPosition = new Vector2(value.x, -value.y);
+			}
+		}
+		public float X
+		{
+			get => Frame.RectTransform.anchoredPosition.x;
+			set => Position = new Vector2(value, Y);
+		}
+		public float Y
+		{
+			get => -Frame.RectTransform.anchoredPosition.y;
+			set => Position = new Vector2(X, -value);
+		}
+		public Vector2 Size
+		{
+			get => Frame.RectTransform.sizeDelta;
+			set
+			{
+				Frame.Fitter.horizontalFit = value.x >= MinWidth
+					? UUI.ContentSizeFitter.FitMode.Unconstrained
+					: UUI.ContentSizeFitter.FitMode.PreferredSize;
+				Frame.Fitter.verticalFit = value.y >= MinHeight
+					? UUI.ContentSizeFitter.FitMode.Unconstrained
+					: UUI.ContentSizeFitter.FitMode.PreferredSize;
+				Frame.RectTransform.sizeDelta = new Vector2(
+					value.x >= MinWidth ? value.x : Width,
+					value.y >= MinHeight ? -value.y : Height);
+			}
+		}
+		public float Width
+		{
+			get => Size.x;
+			set
+			{
+				Frame.Fitter.horizontalFit = value >= MinWidth
+					? UUI.ContentSizeFitter.FitMode.Unconstrained
+					: UUI.ContentSizeFitter.FitMode.PreferredSize;
+				Frame.RectTransform.sizeDelta = new Vector2(
+					value >= MinWidth ? value : Width, Height);
+			}
+		}
+		public float Height
+		{
+			get => Size.y;
+			set
+			{
+				Frame.Fitter.verticalFit = value >= MinHeight
+					? UUI.ContentSizeFitter.FitMode.Unconstrained
+					: UUI.ContentSizeFitter.FitMode.PreferredSize;
+				Frame.RectTransform.sizeDelta = new Vector2(
+					Width, value >= MinHeight ? -value : Height);
+			}
 		}
 	}
 }

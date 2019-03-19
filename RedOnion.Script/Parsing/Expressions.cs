@@ -172,7 +172,8 @@ namespace RedOnion.Script.Parsing
 				switch (code)
 				{
 				case OpCode.Create:
-					CheckUnary(unary, true);
+					if (!unary)
+						goto autocall;
 					Next();
 					PushOperator(code);
 					ParseType(flags);
@@ -241,6 +242,26 @@ namespace RedOnion.Script.Parsing
 					else
 						Push(OpCode.Undefined);
 					PrepareOperator(OpCode.Var);
+					unary = false;
+					goto next;
+				case OpCode.Generic:    //----------------------------------- generic type or method
+					if (unary)
+						throw new ParseError(lexer, "Unexpected '.[' - nothing to specialize");
+					if (Next().lexer.Curr != ']')
+					{
+						for (; ; )
+						{
+							PushOperator(OpCode.Comma);
+							ParseType(flags &~Flag.LimitedContext);
+							if (lexer.Curr == ']')
+								break;
+							if (lexer.Curr != ',')
+								throw new ParseError(lexer, "Expected ',' or ']'");
+							Next();
+						}
+					}
+					PrepareOperator(OpCode.Generic);
+					Next();
 					unary = false;
 					goto next;
 				}
@@ -313,7 +334,7 @@ namespace RedOnion.Script.Parsing
 					do
 					{
 						PushOperator(OpCode.Comma);
-						Next().ParseExpression(flags &~Flag.LimitedContext);
+						Next(true).ParseExpression(flags &~Flag.LimitedContext);
 					}
 					while (lexer.Curr == ',');
 					if (lexer.Curr != ']')

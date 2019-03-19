@@ -5,7 +5,7 @@ using System.Text;
 
 namespace RedOnion.Script
 {
-	public partial class Engine
+	public partial class Engine<P>
 	{
 		protected virtual void TypeReference(ref int at)
 		{
@@ -14,12 +14,12 @@ namespace RedOnion.Script
 			{
 				if (op == OpCode.Null || (byte)op >= OpCode.String.Code())
 				{
-					Value = Root.Get(op);
+					Value = new Value(Root.GetType(op));
 					return;
 				}
 				if (op == OpCode.Identifier)
 				{
-					Value = Ctx.Get(Strings[CodeInt(ref at)]);
+					Value = Context.Get(Strings[CodeInt(ref at)]);
 					return;
 				}
 				Value = new Value();
@@ -30,7 +30,18 @@ namespace RedOnion.Script
 				if (Code[at++] != 0)
 					throw new NotImplementedException("Fixed and multi-dimensional arrays not implemented");
 				TypeReference(ref at);
-				Value = Root.Get(OpCode.Array, Value);
+				Value = new Value(Root.GetType(OpCode.Array, Value));
+				return;
+			}
+			if (op == OpCode.Dot)
+			{
+				Expression(ref at);
+				var obj = Box(Value);
+				if (obj != null)
+					Value = new Value(obj, Strings[CodeInt(ref at)]);
+				else if (HasOption(EngineOption.Silent))
+					Value = new Value();
+				else throw new InvalidOperationException("Null cannot be dereferenced");
 				return;
 			}
 			throw new NotImplementedException();
@@ -53,17 +64,37 @@ namespace RedOnion.Script
 				Value = true;
 				return;
 			case OpCode.This:
-				Value = new Value(Ctx.Self);
+				Value = new Value(Context.Self);
 				return;
 			case OpCode.Base:
-				Value = new Value(Ctx.Self?.BaseClass);
+				Value = new Value(Context.Self?.BaseClass);
 				return;
 			case OpCode.Identifier:
 				var name = Strings[CodeInt(ref at)];
-				Value = new Value(ValueKind.Reference, Ctx.Which(name) ?? Ctx.Root, name);
+				var which = Context.Which(name);
+				if (which == null && HasOption(EngineOption.Strict))
+				{
+					if (!HasOption(EngineOption.Silent))
+						throw new InvalidOperationException(string.Format(
+							"Variable {0} does not exist", name));
+					Value = new Value();
+					return;
+				}
+				Value = new Value(ValueKind.Reference, which ?? Context.Root, name);
 				return;
 			case OpCode.String:
 				Value = Strings[CodeInt(ref at)];
+				return;
+			case OpCode.Char:
+				Value = (char)Code[at++];
+				return;
+			case OpCode.WideChar:
+				Value = (char)CodeUShort(ref at);
+				return;
+			case OpCode.LongChar:
+				var ch1 = (char)CodeUShort(ref at);
+				var ch2 = (char)CodeUShort(ref at);
+				Value = new string(ch1, ch2);
 				return;
 			case OpCode.Byte:
 				Value = Code[at++];
@@ -108,7 +139,7 @@ namespace RedOnion.Script
 			case OpCode.Create:
 				create = true;
 				op = ((OpCode)Code[at]).Extend();
-				if (op.Kind() == OpKind.Special && (byte)op < OpCode.Generic.Code())
+				if (op.Kind() == OpKind.Special && (byte)op < OpCode.Dot.Code())
 				{
 					at++;
 					goto next;
@@ -116,26 +147,38 @@ namespace RedOnion.Script
 				goto case OpCode.Call0;
 			case OpCode.Call0:
 				CountStatement();
+				IObject self = null;
 				if (create)
 					TypeReference(ref at);
-				else
+				else if (Code[at] != OpCode.Generic.Code())
 					Expression(ref at);
-				IObject self = null;
+				else
+				{
+					at++;
+					self = Generic(ref at);
+				}
 				if (Value.Type == ValueKind.Reference)
 				{
 					self = Value.ptr as IObject;
 					Value = ((IProperties)Value.ptr).Get(Value.str);
 				}
+				if (self == Root && HasOption(EngineOption.Strict))
+					self = null;
 				var fn = Box(Value);
 				Value = create ? new Value(fn.Create(0)) : fn.Call(self, 0);
 				return;
 			case OpCode.Call1:
 				CountStatement();
+				self = null;
 				if (create)
 					TypeReference(ref at);
-				else
+				else if (Code[at] != OpCode.Generic.Code())
 					Expression(ref at);
-				self = null;
+				else
+				{
+					at++;
+					self = Generic(ref at);
+				}
 				if (Value.Type == ValueKind.Reference)
 				{
 					self = Value.ptr as IObject;
@@ -143,17 +186,22 @@ namespace RedOnion.Script
 				}
 				fn = Box(Value);
 				Expression(ref at);
-				Args.Add(Result);
+				Arguments.Add(Result);
 				Value = create ? new Value(fn.Create(1)) : fn.Call(self, 1);
-				Args.Remove(1);
+				Arguments.Remove(1);
 				return;
 			case OpCode.Call2:
 				CountStatement();
+				self = null;
 				if (create)
 					TypeReference(ref at);
-				else
+				else if (Code[at] != OpCode.Generic.Code())
 					Expression(ref at);
-				self = null;
+				else
+				{
+					at++;
+					self = Generic(ref at);
+				}
 				if (Value.Type == ValueKind.Reference)
 				{
 					self = Value.ptr as IObject;
@@ -161,20 +209,25 @@ namespace RedOnion.Script
 				}
 				fn = Box(Value);
 				Expression(ref at);
-				Args.Add(Result);
+				Arguments.Add(Result);
 				Expression(ref at);
-				Args.Add(Result);
+				Arguments.Add(Result);
 				Value = create ? new Value(fn.Create(2)) : fn.Call(self, 2);
-				Args.Remove(2);
+				Arguments.Remove(2);
 				return;
 			case OpCode.CallN:
 				CountStatement();
 				int n = Code[at++];
+				self = null;
 				if (create)
 					TypeReference(ref at);
-				else
+				else if (Code[at] != OpCode.Generic.Code())
 					Expression(ref at);
-				self = null;
+				else
+				{
+					at++;
+					self = Generic(ref at);
+				}
 				if (Value.Type == ValueKind.Reference)
 				{
 					self = Value.ptr as IObject;
@@ -185,10 +238,10 @@ namespace RedOnion.Script
 				while (--n > 0)
 				{
 					Expression(ref at);
-					Args.Add(Result);
+					Arguments.Add(Result);
 				}
 				Value = create ? new Value(fn.Create(argc)) : fn.Call(self, argc);
-				Args.Remove(argc);
+				Arguments.Remove(argc);
 				return;
 			case OpCode.Index:
 			case OpCode.IndexN:
@@ -206,10 +259,10 @@ namespace RedOnion.Script
 				while (--n > 0)
 				{
 					Expression(ref at);
-					Args.Add(Result);
+					Arguments.Add(Result);
 				}
 				Value = fn.Index(self, argc);
-				Args.Remove(argc);
+				Arguments.Remove(argc);
 				return;
 			case OpCode.Var:
 				var name = Strings[CodeInt(ref at)];
@@ -217,22 +270,26 @@ namespace RedOnion.Script
 				if (Value.Type == ValueKind.Undefined)
 				{
 					Expression(ref at);
-					Ctx.Vars.Set(name, Value);
+					Context.Vars.Set(name, Value);
 					return;
 				}
 				CountStatement();
 				fn = Box(Value);
 				Expression(ref at);
-				Args.Add(Result);
+				Arguments.Add(Result);
 				Value = fn.Call(null, 1);
-				Args.Remove(1);
-				Ctx.Vars.Set(name, Value);
+				Arguments.Remove(1);
+				Context.Vars.Set(name, Value);
 				return;
 			case OpCode.Dot:
 				Expression(ref at);
 				fn = Box(Value);
 				name = Strings[CodeInt(ref at)];
-				Value = new Value(fn, name);
+				if (fn != null)
+					Value = new Value(fn, name);
+				else if (HasOption(EngineOption.Silent))
+					Value = new Value();
+				else throw new InvalidOperationException("Null cannot be dereferenced");
 				return;
 			case OpCode.Ternary:
 				Expression(ref at);
@@ -253,6 +310,73 @@ namespace RedOnion.Script
 				return;
 			}
 			throw new NotImplementedException();
+		}
+		private IObject Generic(ref int at)
+		{
+			int n = Code[at++];
+			if (n != 2)
+				throw new NotImplementedException("Generic with more than one parameter");
+			Expression(ref at);
+			IObject self = null;
+			if (Value.Type == ValueKind.Reference)
+			{
+				self = Value.ptr as IObject;
+				Value = ((IProperties)Value.ptr).Get(Value.str);
+			}
+			var fn = Box(Value);
+			TypeReference(ref at);
+			var gtype = Value.Object;
+			if (gtype == null || (gtype.Features & ObjectFeatures.TypeReference) == 0)
+				throw new NotImplementedException("Could not resolve generic argument");
+			//TODO: use some interface for this
+			if (fn is ReflectedObjects.ReflectedFunction rfn)
+			{
+				foreach (var method in rfn.Methods)
+				{
+					if (!method.IsGenericMethod)
+						continue;
+					var gargs = method.GetGenericArguments();
+					if (gargs.Length != 1)
+						continue;
+					try
+					{
+						var mtd = method.MakeGenericMethod(gtype.Type);
+						Value = new ReflectedObjects.ReflectedFunction(
+							this, rfn.Creator, rfn.Name, mtd);
+						return self;
+					}
+					catch
+					{
+						continue;
+					}
+				}
+				throw new NotImplementedException("Did not find suitable generic function");
+			}
+			else if (fn is ReflectedObjects.ReflectedMethod mtd)
+			{
+				foreach (var method in mtd.Methods)
+				{
+					if (!method.IsGenericMethod)
+						continue;
+					var gargs = method.GetGenericArguments();
+					if (gargs.Length != 1)
+						continue;
+					try
+					{
+						var mtd2 = method.MakeGenericMethod(gtype.Type);
+						Value = new ReflectedObjects.ReflectedMethod(
+							this, mtd.Creator, mtd.Name, mtd2);
+						return self;
+					}
+					catch
+					{
+						continue;
+					}
+				}
+				throw new NotImplementedException("Did not find suitable generic function");
+			}
+			throw new NotImplementedException("Unknown type for specialization: "
+				+ (fn?.GetType().Name ?? "null"));
 		}
 
 		protected override void Binary(OpCode op, ref int at)
@@ -275,85 +399,50 @@ namespace RedOnion.Script
 			switch (op)
 			{
 			case OpCode.Assign:
-				left.Set(Value);
-				return;
 			case OpCode.OrAssign:
-				left.Set(Value = left | Value);
-				return;
 			case OpCode.XorAssign:
-				left.Set(Value = left ^ Value);
-				return;
 			case OpCode.AndAssign:
-				left.Set(Value = left & Value);
-				return;
 			case OpCode.LshAssign:
-				left.Set(Value = left.ShiftLeft(Value));
-				return;
 			case OpCode.RshAssign:
-				left.Set(Value = left.ShiftRight(Value));
-				return;
 			case OpCode.AddAssign:
-				left.Set(Value = left + Value);
-				return;
 			case OpCode.SubAssign:
-				left.Set(Value = left - Value);
-				return;
 			case OpCode.MulAssign:
-				left.Set(Value = left * Value);
-				return;
 			case OpCode.DivAssign:
-				left.Set(Value = left / Value);
-				return;
 			case OpCode.ModAssign:
-				left.Set(Value = left % Value);
+				if (left.Type != ValueKind.Reference || left.ptr == null)
+				{
+					if (!HasOption(EngineOption.Silent))
+						throw new InvalidOperationException("Cannot assign to " + left.Name);
+					return;
+				}
+				if (left.ptr == Root && HasOption(EngineOption.Strict) && !Root.Has(left.str))
+					throw new InvalidOperationException(string.Format(
+						"Global variable '{0}' does not exist", left.str));
+				if (op == OpCode.Assign)
+				{
+					left.Set(Value);
+					return;
+				}
+				left.Modify(op, Value);
+				Value = left;
 				return;
 			case OpCode.BitOr:
-				Value = left | Value;
-				return;
 			case OpCode.BitXor:
-				Value = left ^ Value;
-				return;
 			case OpCode.BitAnd:
-				Value = left & Value;
-				return;
 			case OpCode.ShiftLeft:
-				Value = left.ShiftLeft(Value);
-				return;
 			case OpCode.ShiftRight:
-				Value = left.ShiftRight(Value);
-				return;
 			case OpCode.Add:
-				Value = left + Value;
-				return;
 			case OpCode.Sub:
-				Value = left - Value;
-				return;
 			case OpCode.Mul:
-				Value = left * Value;
-				return;
 			case OpCode.Div:
-				Value = left / Value;
-				return;
 			case OpCode.Mod:
-				Value = left % Value;
-				return;
 			case OpCode.Equals:
-				Value = new Value(left == Value);
-				return;
 			case OpCode.Differ:
-				Value = new Value(left != Value);
-				return;
 			case OpCode.Less:
-				Value = new Value(left < Value);
-				return;
 			case OpCode.More:
-				Value = new Value(left > Value);
-				return;
 			case OpCode.LessEq:
-				Value = new Value(left <= Value);
-				return;
 			case OpCode.MoreEq:
-				Value = new Value(left >= Value);
+				Value = left.Binary(op, Value);
 				return;
 			}
 			throw new NotImplementedException();

@@ -16,17 +16,71 @@ namespace RedOnion.Script.BasicObjects
 		/// </summary>
 		public NumberObj Prototype { get; }
 
-		public NumberFun(Engine engine, IObject baseClass, NumberObj prototype)
+		/// <summary>
+		/// Target type (null for no conversion)
+		/// </summary>
+		public override Type Type => _type;
+		private Type _type;
+		/// <summary>
+		/// Target value kind
+		/// </summary>
+		public ValueKind Kind { get; }
+
+		public override ObjectFeatures Features
+			=> Type == null ? ObjectFeatures.Function | ObjectFeatures.Constructor
+			: ObjectFeatures.Function | ObjectFeatures.Constructor
+			| ObjectFeatures.TypeReference; // maybe add converter
+
+		public NumberFun(IEngine engine, IObject baseClass, NumberObj prototype)
 			: base(engine, baseClass, new Properties("prototype", prototype))
+			=> Prototype = prototype;
+		public NumberFun(IEngine engine, IObject baseClass, NumberObj prototype,
+			Type type, ValueKind kind)
+			: this(engine, baseClass, prototype)
 		{
-			Prototype = prototype;
+			_type = type;
+			Kind = kind;
 		}
 
 		public override Value Call(IObject self, int argc)
-			=> argc == 0 ? new Value() : Arg(argc).Number;
+		{
+			if (argc == 0)
+				return new Value();
+			var value = Engine.GetArgument(argc).Number;
+			if (Type == null)
+				return value;
+			switch (Kind)
+			{
+			case ValueKind.Byte:
+				return value.Byte;
+			case ValueKind.UShort:
+				return value.UShort;
+			case ValueKind.UInt:
+				return value.UInt;
+			case ValueKind.ULong:
+				return value.ULong;
+			case ValueKind.SByte:
+				return value.SByte;
+			case ValueKind.Short:
+				return value.Short;
+			case ValueKind.Int:
+				return value.Int;
+			case ValueKind.Long:
+				return value.Long;
+			case ValueKind.Float:
+				return value.Float;
+			case ValueKind.Double:
+				return value.Double;
+			case ValueKind.Bool:
+				return value.Bool;
+			case ValueKind.Char:
+				return value.Char;
+			}
+			throw new NotImplementedException();
+		}
 
 		public override IObject Create(int argc)
-			=> new NumberObj(Engine, Prototype, argc == 0 ? new Value() : Arg(argc).Number);
+			=> new NumberObj(Engine, Prototype, Call(null, argc));
 	}
 
 	/// <summary>
@@ -44,7 +98,7 @@ namespace RedOnion.Script.BasicObjects
 		/// <summary>
 		/// Create Number.prototype
 		/// </summary>
-		public NumberObj(Engine engine, IObject baseClass)
+		public NumberObj(IEngine engine, IObject baseClass)
 			: base(engine, baseClass)
 		{
 		}
@@ -52,7 +106,7 @@ namespace RedOnion.Script.BasicObjects
 		/// <summary>
 		/// Create new number object boxing the value
 		/// </summary>
-		public NumberObj(Engine engine, NumberObj baseClass, Value value)
+		public NumberObj(IEngine engine, NumberObj baseClass, Value value)
 			: base(engine, baseClass, StdProps)
 			=> Number = value;
 

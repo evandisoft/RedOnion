@@ -6,7 +6,7 @@ using System.Text;
 
 namespace RedOnion.Script
 {
-	public partial class Engine
+	public partial class Engine<P>
 	{
 		protected override void Statement(OpCode op, ref int at)
 		{
@@ -17,11 +17,11 @@ namespace RedOnion.Script
 			default:
 				throw new NotImplementedException();
 			case OpCode.Block:
-				if ((Options & Option.BlockScope) != 0)
-					Ctx.Push(this);
+				if (HasOption(EngineOption.BlockScope))
+					Context.Push(this);
 				Block(ref at);
-				if ((Options & Option.BlockScope) != 0)
-					Ctx.Pop();
+				if (HasOption(EngineOption.BlockScope))
+					Context.Pop();
 				return;
 			case OpCode.Return:
 			case OpCode.Raise:
@@ -32,8 +32,8 @@ namespace RedOnion.Script
 				Exit = op;
 				return;
 			case OpCode.For:
-				if ((Options & Option.BlockScope) != 0)
-					Ctx.Push(this);
+				if (HasOption(EngineOption.BlockScope))
+					Context.Push(this);
 				Expression(ref at);
 				var test = at;
 				var notest = Code[at] == 0;
@@ -48,8 +48,8 @@ namespace RedOnion.Script
 				if (Value.Type != ValueKind.Undefined && !Value.Bool)
 				{
 					at = cend;
-					if ((Options & Option.BlockScope) != 0)
-						Ctx.Pop();
+					if (HasOption(EngineOption.BlockScope))
+						Context.Pop();
 					return;
 				}
 				for (;; CountStatement())
@@ -69,15 +69,15 @@ namespace RedOnion.Script
 					}
 				}
 				at = cend;
-				if ((Options & Option.BlockScope) != 0)
-					Ctx.Pop();
+				if (HasOption(EngineOption.BlockScope))
+					Context.Pop();
 				if (Exit == OpCode.Break || Exit == OpCode.Continue)
 					Exit = 0;
 				return;
 			case OpCode.While:
 			case OpCode.Until:
-				if ((Options & Option.BlockScope) != 0)
-					Ctx.Push(this);
+				if (HasOption(EngineOption.BlockScope))
+					Context.Push(this);
 				test = at;
 				for(;; CountStatement())
 				{
@@ -89,15 +89,15 @@ namespace RedOnion.Script
 					if (Exit != 0 && Exit != OpCode.Continue)
 						break;
 				}
-				if ((Options & Option.BlockScope) != 0)
-					Ctx.Pop();
+				if (HasOption(EngineOption.BlockScope))
+					Context.Pop();
 				if (Exit == OpCode.Break || Exit == OpCode.Continue)
 					Exit = 0;
 				return;
 			case OpCode.Do:
 			case OpCode.DoUntil:
-				if ((Options & Option.BlockScope) != 0)
-					Ctx.Push(this);
+				if (HasOption(EngineOption.BlockScope))
+					Context.Push(this);
 				for(var start = at;; CountStatement())
 				{
 					at = start;
@@ -108,14 +108,14 @@ namespace RedOnion.Script
 					if (Value.Bool == (op == OpCode.DoUntil))
 						break;
 				}
-				if ((Options & Option.BlockScope) != 0)
-					Ctx.Pop();
+				if (HasOption(EngineOption.BlockScope))
+					Context.Pop();
 				if (Exit == OpCode.Break || Exit == OpCode.Continue)
 					Exit = 0;
 				return;
 			case OpCode.If:
-				if ((Options & Option.BlockScope) != 0)
-					Ctx.Push(this);
+				if (HasOption(EngineOption.BlockScope))
+					Context.Push(this);
 				Expression(ref at);
 				if (Value.Bool)
 				{
@@ -137,8 +137,8 @@ namespace RedOnion.Script
 						Block(ref at);
 					}
 				}
-				if ((Options & Option.BlockScope) != 0)
-					Ctx.Pop();
+				if (HasOption(EngineOption.BlockScope))
+					Context.Pop();
 				return;
 			}
 		}
@@ -159,7 +159,7 @@ namespace RedOnion.Script
 				var ftsz = CodeInt(ref at);
 				var ftat = at;
 				at += ftsz;
-				var args = argc == 0 ? null : new ArgInfo[argc];
+				var args = argc == 0 ? null : new ArgumentInfo[argc];
 				for (var i = 0; i < argc; i++)
 				{
 					args[i].Name = Strings[CodeInt(ref at)];
@@ -173,9 +173,9 @@ namespace RedOnion.Script
 				Debug.Assert(at == body);
 				at = body;
 				size = CodeInt(ref at);
-				Ctx.Root.Set(fname, new Value(Root.Create(Strings, Code, at, size, ftat, args, null, Ctx.Vars)));
+				Context.Root.Set(fname, new Value(Root.Create(Compiled, at, size, ftat, args, null, Context.Vars)));
 				at += size;
-				Value = new Value(Ctx.Root, fname);
+				Value = new Value(Context.Root, fname);
 				return;
 			}
 		}

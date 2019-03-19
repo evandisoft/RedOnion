@@ -2,17 +2,27 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
+// TODO: Better support for structures in properties (having both get and set)
+// ----- Allow the changes to inner fields/properties be propagated back
+// ----- Will need precise lvalue/rvalue tracking (rvalue does not propagate back)
+
 namespace RedOnion.Script.ReflectedObjects
 {
-	public class ReflectedObject : BasicObjects.SimpleObject, IObjectProxy
+	public class ReflectedObject : BasicObjects.SimpleObject
 	{
-		public object Target { get; }
-		public ReflectedType Creator { get; }
+		public override object Target => _target;
+		private object _target;
 
-		public ReflectedObject(Engine engine, object target, IProperties properties = null)
+		public override ObjectFeatures Features
+			=> ObjectFeatures.Proxy;
+
+		public ReflectedType Creator { get; }
+		public override Type Type => Creator?.Type;
+
+		public ReflectedObject(IEngine engine, object target, IProperties properties = null)
 			: base(engine, properties)
-			=> Target = target;
-		public ReflectedObject(Engine engine, object target, ReflectedType type, IProperties properties = null)
+			=> _target = target;
+		public ReflectedObject(IEngine engine, object target, ReflectedType type, IProperties properties = null)
 			: this(engine, target, properties)
 		{
 			Creator = type;
@@ -69,7 +79,7 @@ namespace RedOnion.Script.ReflectedObjects
 						allMethods == null ? new MethodInfo[] { method } : allMethods.ToArray());
 					if (BaseProps == null)
 						BaseProps = new Properties();
-					BaseProps.Set(name, value = new Value(func));
+					BaseProps.Set(name, value = func);
 					return true;
 				}
 				if (member is FieldInfo field)
@@ -92,6 +102,8 @@ namespace RedOnion.Script.ReflectedObjects
 					value = prop.Get(this);
 					return true;
 				}
+				if (member is EventInfo)
+					return false;
 			}
 			return false;
 		}
@@ -110,6 +122,8 @@ namespace RedOnion.Script.ReflectedObjects
 			{
 				var member = members[i++];
 				if (member is MethodInfo method)
+					return false;
+				if (member is EventInfo)
 					return false;
 				if (member is FieldInfo field)
 				{
@@ -133,9 +147,62 @@ namespace RedOnion.Script.ReflectedObjects
 			return false;
 		}
 
-		public static Value Convert(Engine engine, object value)
+		public override bool Modify(string name, OpCode op, Value value)
+		{
+			if (BaseProps != null && BaseProps.Get(name, out var query))
+			{
+				if (query.Type != ValueKind.Property)
+					return false;
+				var prop = (IProperty)query.ptr;
+				if (prop is IPropertyEx ex)
+					return ex.Modify(this, op, value);
+				var tmp = prop.Get(this);
+				tmp.Modify(op, value);
+				return prop.Set(this, tmp);
+			}
+			var members = GetMembers(name);
+			for (int i = 0; i < members.Length;)
+			{
+				var member = members[i++];
+				if (member is MethodInfo method)
+					return false;
+				if (member is FieldInfo field)
+				{
+					var fld = new Field(field);
+					if (BaseProps == null)
+						BaseProps = new Properties();
+					BaseProps.Set(name, new Value(fld));
+					var tmp = fld.Get(this);
+					tmp.Modify(op, value);
+					return fld.Set(this, tmp);
+				}
+				if (member is PropertyInfo property)
+				{
+					if (property.GetIndexParameters().Length > 0)
+						continue;
+					var prop = new Property(property);
+					if (BaseProps == null)
+						BaseProps = new Properties();
+					BaseProps.Set(name, new Value(prop));
+					var tmp = prop.Get(this);
+					tmp.Modify(op, value);
+					return prop.Set(this, value);
+				}
+				if (member is EventInfo evt)
+				{
+					var devt = new Event(evt);
+					if (BaseProps == null)
+						BaseProps = new Properties();
+					BaseProps.Set(name, new Value(devt));
+					return devt.Modify(this, op, value);
+				}
+			}
+			return false;
+		}
+
+		public static Value Convert(IEngine engine, object value)
 			=> ReflectedType.Convert(engine, value);
-		public static Value Convert(Engine engine, object value, Type type)
+		public static Value Convert(IEngine engine, object value, Type type)
 			=> ReflectedType.Convert(engine, value, type);
 		public static object Convert(Value value, Type type)
 			=> ReflectedType.Convert(value, type);
@@ -145,12 +212,12 @@ namespace RedOnion.Script.ReflectedObjects
 			public FieldInfo Info { get; }
 			public Field(FieldInfo info) => Info = info;
 			public Value Get(IObject self)
-				=> Convert(self.Engine, Info.GetValue(((IObjectProxy)self).Target));
+				=> Convert(self.Engine, Info.GetValue(self.Target));
 			public bool Set(IObject self, Value value)
 			{
 				try
 				{
-					Info.SetValue(((IObjectProxy)self).Target, Convert(value, Info.FieldType));
+					Info.SetValue(self.Target, Convert(value, Info.FieldType));
 					return true;
 				}
 				catch
@@ -165,20 +232,40 @@ namespace RedOnion.Script.ReflectedObjects
 			public Property(PropertyInfo info) => Info = info;
 			public Value Get(IObject self)
 				=> !Info.CanRead ? new Value()
-				: Convert(self.Engine, Info.GetValue(((IObjectProxy)self).Target, new object[0]));
+				: Convert(self.Engine, Info.GetValue(self.Target, new object[0]));
 			public bool Set(IObject self, Value value)
 			{
 				if (!Info.CanWrite)
 					return false;
 				try
 				{
-					Info.SetValue(((IObjectProxy)self).Target, Convert(value, Info.PropertyType), new object[0]);
+					Info.SetValue(self.Target, Convert(value, Info.PropertyType), new object[0]);
 					return true;
 				}
 				catch
 				{
 					return false;
 				}
+			}
+		}
+		public class Event : IPropertyEx
+		{
+			public EventInfo Info { get; }
+			public Event(EventInfo info) => Info = info;
+			public Value Get(IObject self) => new Value();
+			public bool Set(IObject self, Value value) => false;
+			public bool Modify(IObject self, OpCode op, Value value)
+			{
+				switch (op)
+				{
+				case OpCode.AddAssign:
+					Info.AddEventHandler(self.Target, (Delegate)Convert(value, Info.EventHandlerType));
+					return true;
+				case OpCode.SubAssign:
+					Info.RemoveEventHandler(self.Target, (Delegate)Convert(value, Info.EventHandlerType));
+					return true;
+				}
+				return false;
 			}
 		}
 	}

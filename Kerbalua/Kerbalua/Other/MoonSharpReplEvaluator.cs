@@ -4,56 +4,82 @@ using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.REPL;
 using MoonSharp.Interpreter.Interop;
 using UnityEngine;
-using RedOnion.Script;
+//using RedOnion.Script;
+using Kerbalua.MoonSharp;
+using Kerbalua.Completion;
 
 namespace Kerbalua.Other
 {
     public class MoonSharpReplEvaluator:ReplEvaluator
     {
 		SimpleScript scriptEngine;
+
 		CoreModules coreModules;
+		KerbaluaExecutionManager kem = new KerbaluaExecutionManager();
 
 		public MoonSharpReplEvaluator(CoreModules coreModules)
 		{
 			this.coreModules = coreModules;
-			scriptEngine = new SimpleScript(coreModules);
+			InternalResetEngine();
+			//scriptEngine = new SimpleScript(coreModules);
 		}
 
-		public override string Evaluate(string source)
+		protected override bool ProtectedEvaluate(string source,out string output)
 		{
-			string output="";
+			output="";
 			DynValue result;
+			bool isComplete = false;
 			try {
-				result = scriptEngine.DoString(source);
-				output= "\n";
-				if (result.UserData == null) {
-					output += result;
-				} else {
-					output += result.UserData.Object;
-					if (result.UserData.Object == null) {
-						output += " (" + result.UserData.Object.GetType() + ")";
+				if(scriptEngine.EvaluateWithCoroutine(source,out result)) {
+					isComplete = true;
+
+					if (result.UserData == null) {
+						output += result;
+					} else {
+						output += result.UserData.Object;
+						if (result.UserData.Object == null) {
+							output += " (" + result.UserData.Object.GetType() + ")";
+						}
 					}
+
+				} else {
+					output = "";
 				}
+
 			} catch (Exception exception) {
 				Debug.Log(exception);
+				isComplete = true;
 			}
 
-			return output;
+			return isComplete;
 		}
 
-		public override List<string> GetCompletions(string source, int cursorPos)
+		/// <summary>
+		/// See the abstract version for complete comments.
+		/// </summary>
+		public override IList<string> GetCompletions(string source, int cursorPos,out int replaceStart,out int replaceEnd)
 		{
-			throw new NotImplementedException();
+			return LuaIntellisense.GetCompletions(scriptEngine.Globals, source, cursorPos, out replaceStart, out replaceEnd);
 		}
 
-		public override string GetPartialCompletion(string source, int cursorPos)
+
+		void InternalResetEngine()
 		{
-			throw new NotImplementedException();
+			scriptEngine = new SimpleScript(coreModules);
+			scriptEngine.Options.DebugPrint = (string str) => {
+				PrintAction?.Invoke(str);
+			};
+			//scriptEngine.AttachDebugger(kem);
 		}
 
 		public override void ResetEngine()
 		{
-			scriptEngine = new SimpleScript(coreModules);
+			InternalResetEngine();
+		}
+
+		public override void Terminate()
+		{
+			scriptEngine.Terminate();
 		}
 	}
 }

@@ -14,7 +14,12 @@ namespace RedOnion.Script.BasicObjects
 		/// <summary>
 		/// Engine this object belongs to
 		/// </summary>
-		public Engine Engine { get; }
+		public IEngine Engine { get; }
+
+		/// <summary>
+		/// Name of the object (or full name of the type)
+		/// </summary>
+		public virtual string Name => GetType().FullName;
 
 		/// <summary>
 		/// No base class
@@ -32,12 +37,17 @@ namespace RedOnion.Script.BasicObjects
 		public IProperties MoreProps => null;
 
 		public virtual Value Value
-			=> new Value("[internal]");
+			=> new Value(GetType().FullName);
+		public virtual ObjectFeatures Features
+			=> ObjectFeatures.None;
+		public virtual Type Type => null;
+		public virtual object Target => null;
+		public virtual IObject Convert(object value) => null;
 
 		/// <summary>
 		/// Create object with some base properties
 		/// </summary>
-		public SimpleObject(Engine engine, IProperties properties)
+		public SimpleObject(IEngine engine, IProperties properties)
 		{
 			Engine = engine;
 			BaseProps = properties;
@@ -51,7 +61,8 @@ namespace RedOnion.Script.BasicObjects
 
 		public Value Get(string name)
 		{
-			Get(name, out var value);
+			if (!Get(name, out var value) && !Engine.HasOption(EngineOption.Silent))
+				throw new NotImplementedException(name + " does not exist");
 			return value;
 		}
 
@@ -88,6 +99,22 @@ namespace RedOnion.Script.BasicObjects
 			return true;
 		}
 
+		public virtual bool Modify(string name, OpCode op, Value value)
+		{
+			if (BaseProps == null)
+				return false;
+			if (!BaseProps.Get(name, out var query))
+				return false;
+			if (query.Type != ValueKind.Property)
+				return false;
+			var prop = (IProperty)query.ptr;
+			if (prop is IPropertyEx ex)
+				return ex.Modify(this, op, value);
+			var tmp = prop.Get(this);
+			tmp.Modify(op, value);
+			return prop.Set(this, tmp);
+		}
+
 		public bool Delete(string name)
 			=> false;
 
@@ -118,6 +145,6 @@ namespace RedOnion.Script.BasicObjects
 		/// Get n-th argument (for call/create implementation)
 		/// </summary>
 		protected Value Arg(int argc, int n = 0)
-			=> Engine.Args.Arg(argc, n);
+			=> Engine.GetArgument(argc, n);
 	}
 }

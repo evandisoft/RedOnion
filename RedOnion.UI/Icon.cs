@@ -6,12 +6,24 @@ namespace RedOnion.UI
 {
 	public class Icon : Element
 	{
-		protected UUI.RawImage Core { get; private set; }
+		public UUI.RawImage Core { get; private set; }
 
-		public Icon(Element parent = null, string name = null)
-			: base(parent, name)
+		public Icon(string name = null)
+			: base(name)
 		{
 			Core = GameObject.AddComponent<UUI.RawImage>();
+		}
+
+		public Texture Texture
+		{
+			get => Core.texture;
+			set
+			{
+				Core.texture = value;
+				Core.SetNativeSize();
+				MinWidth = value.width;
+				MinHeight = value.height;
+			}
 		}
 	}
 }

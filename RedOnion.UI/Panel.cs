@@ -6,8 +6,7 @@ namespace RedOnion.UI
 {
 	public class Panel : Element
 	{
-		private UUI.RawImage image;
-		protected bool HasImage => image != null;
+		protected UUI.RawImage image;
 		protected UUI.RawImage Image
 		{
 			get
@@ -15,15 +14,15 @@ namespace RedOnion.UI
 				if (image == null)
 				{
 					if (GameObject == null)
-						throw new ObjectDisposedException(GetType().Name);
+						throw new ObjectDisposedException(Name ?? GetType().Name);
 					image = GameObject.AddComponent<UUI.RawImage>();
 				}
 				return image;
 			}
 		}
 
-		public Panel(Element parent = null, string name = null)
-			: base(parent, name)
+		public Panel(string name = null)
+			: base(name)
 		{
 		}
 

@@ -6,12 +6,17 @@ using System.Reflection;
 
 namespace RedOnion.Script.ReflectedObjects
 {
-	public class ReflectedType : BasicObjects.SimpleObject, IObjectAndConverter
+	public class ReflectedType : BasicObjects.SimpleObject
 	{
 		/// <summary>
 		/// Reflected type this object represents
 		/// </summary>
-		public Type Type { get; }
+		public override Type Type => _type;
+		private Type _type;
+
+		public override ObjectFeatures Features
+			=> ObjectFeatures.Function | ObjectFeatures.Constructor
+			| ObjectFeatures.Converter | ObjectFeatures.TypeReference;
 
 		/// <summary>
 		/// Properties of the created object
@@ -22,14 +27,14 @@ namespace RedOnion.Script.ReflectedObjects
 		/// <summary>
 		/// Create object (with some static properties)
 		/// </summary>
-		public ReflectedType(Engine engine, Type type, IProperties staticProps = null)
+		public ReflectedType(IEngine engine, Type type, IProperties staticProps = null)
 			: base(engine, staticProps)
-			=> Type = type;
+			=> _type = type;
 
 		/// <summary>
 		/// Create object with both static and class/instance properties
 		/// </summary>
-		public ReflectedType(Engine engine, Type type,
+		public ReflectedType(IEngine engine, Type type,
 			IProperties staticProps, IProperties typeProps)
 			: this(engine, type, staticProps)
 			=> TypeProps = typeProps;
@@ -43,24 +48,49 @@ namespace RedOnion.Script.ReflectedObjects
 				return null;
 			if (argc == 0)
 			{
+				// Structure/ValueType has implicit default constructor (zero everything)
 				if (Type.IsValueType)
 					return new ReflectedObject(Engine, Activator.CreateInstance(Type), this, TypeProps);
+
+				// try to find constructor with no arguments
 				var ctor = Type.GetConstructor(new Type[0]);
-				if (ctor == null)
-					return null;
-				return new ReflectedObject(Engine, ctor.Invoke(new object[0]), this, TypeProps);
+				if (ctor != null)
+					return new ReflectedObject(Engine, ctor.Invoke(new object[0]), this, TypeProps);
+
+				// try to find constructor with all default values
+				foreach (var ctr in Type.GetConstructors())
+				{
+					var cpars = ctr.GetParameters();
+					if (cpars[0].RawDefaultValue == DBNull.Value)
+						continue;
+					var args = new object[cpars.Length];
+					for (int i = 0; i < args.Length; i++)
+						args[i] = cpars[i].DefaultValue;
+					return new ReflectedObject(Engine, ctr.Invoke(args), this, TypeProps);
+				}
+
+				if (!Engine.HasOption(EngineOption.Silent))
+					throw new NotImplementedException(Type.FullName
+						+ " cannot be constructed with zero arguments");
+				return null;
 			}
+			var value = new Value();
 			foreach (var ctor in Type.GetConstructors())
 			{
-				var para = ctor.GetParameters();
-				if (para.Length != argc)
+				if (!ReflectedFunction.TryCall(Engine, ctor, this, argc, ref value))
 					continue;
-				//TODO
+				var obj = value.Object;
+				if (obj != null)
+					return obj;
+				break;
 			}
+			if (!Engine.HasOption(EngineOption.Silent))
+				throw new NotImplementedException(string.Format(
+					"{0} cannot be constructed with {1} argument(s)", Type.FullName, argc));
 			return null;
 		}
 
-		public IObject Convert(object value)
+		public override IObject Convert(object value)
 			=> new ReflectedObject(Engine, value, this, TypeProps);
 
 		public class MemberComparer : IComparer<MemberInfo>
@@ -97,6 +127,8 @@ namespace RedOnion.Script.ReflectedObjects
 				if (member is MethodInfo method)
 					return this;
 				if (member is FieldInfo field)
+					return this;
+				if (member is EventInfo evt)
 					return this;
 				if (member is PropertyInfo property)
 				{
@@ -135,7 +167,7 @@ namespace RedOnion.Script.ReflectedObjects
 						allMethods == null ? new MethodInfo[] { method } : allMethods.ToArray());
 					if (BaseProps == null)
 						BaseProps = new Properties();
-					BaseProps.Set(name, value = new Value(func));
+					BaseProps.Set(name, value = func);
 					return true;
 				}
 				if (member is FieldInfo field)
@@ -158,6 +190,8 @@ namespace RedOnion.Script.ReflectedObjects
 					value = prop.Get(this);
 					return true;
 				}
+				if (member is EventInfo)
+					return false;
 			}
 			return false;
 		}
@@ -176,6 +210,8 @@ namespace RedOnion.Script.ReflectedObjects
 			{
 				var member = members[i++];
 				if (member is MethodInfo method)
+					return false;
+				if (member is EventInfo)
 					return false;
 				if (member is FieldInfo field)
 				{
@@ -199,10 +235,63 @@ namespace RedOnion.Script.ReflectedObjects
 			return false;
 		}
 
-		public static Value Convert(Engine engine, object value)
+		public override bool Modify(string name, OpCode op, Value value)
+		{
+			if (BaseProps != null && BaseProps.Get(name, out var query))
+			{
+				if (query.Type != ValueKind.Property)
+					return false;
+				var prop = (IProperty)query.ptr;
+				if (prop is IPropertyEx ex)
+					return ex.Modify(this, op, value);
+				var tmp = prop.Get(this);
+				tmp.Modify(op, value);
+				return prop.Set(this, tmp);
+			}
+			var members = GetMembers(Type, name, instance: false);
+			for (int i = 0; i < members.Length;)
+			{
+				var member = members[i++];
+				if (member is MethodInfo method)
+					return false;
+				if (member is FieldInfo field)
+				{
+					var fld = new StaticField(field);
+					if (BaseProps == null)
+						BaseProps = new Properties();
+					BaseProps.Set(name, new Value(fld));
+					var tmp = fld.Get(this);
+					tmp.Modify(op, value);
+					return fld.Set(this, tmp);
+				}
+				if (member is PropertyInfo property)
+				{
+					if (property.GetIndexParameters().Length > 0)
+						continue;
+					var prop = new StaticProperty(property);
+					if (BaseProps == null)
+						BaseProps = new Properties();
+					BaseProps.Set(name, new Value(prop));
+					var tmp = prop.Get(this);
+					tmp.Modify(op, value);
+					return prop.Set(this, value);
+				}
+				if (member is EventInfo evt)
+				{
+					var sevt = new StaticEvent(evt);
+					if (BaseProps == null)
+						BaseProps = new Properties();
+					BaseProps.Set(name, new Value(sevt));
+					return sevt.Modify(this, op, value);
+				}
+			}
+			return false;
+		}
+
+		public static Value Convert(IEngine engine, object value)
 			=> value == null ? new Value((IObject)null)
 			: Convert(engine, value, value.GetType());
-		public static Value Convert(Engine engine, object value, Type type)
+		public static Value Convert(IEngine engine, object value, Type type)
 		{
 			if (type == typeof(void))
 				return new Value();
@@ -249,16 +338,21 @@ namespace RedOnion.Script.ReflectedObjects
 				return value.String;
 			if (type.IsPrimitive || type.IsEnum)
 				return System.Convert.ChangeType(value.Native, type);
+			if (typeof(Delegate).IsAssignableFrom(type))
+			{
+				if (value.Object is BasicObjects.FunctionObj fn)
+					return fn.GetDelegate(type);
+				throw new NotImplementedException();
+			}
 			var val = value.Native;
 			if (val == null)
 				return null;
 			if (type.IsAssignableFrom(val.GetType()))
 				return val;
-			if (val is IObjectProxy proxy)
-				return proxy.Target;
-			// TODO: consider throwing NotImplementedException
-			return null;
+			throw new NotImplementedException();
 		}
+		public static T Convert<T>(Value value)
+			=> (T)Convert(value, typeof(T));
 
 		public class StaticField : IProperty
 		{
@@ -299,6 +393,26 @@ namespace RedOnion.Script.ReflectedObjects
 				{
 					return false;
 				}
+			}
+		}
+		public class StaticEvent : IPropertyEx
+		{
+			public EventInfo Info { get; }
+			public StaticEvent(EventInfo info) => Info = info;
+			public Value Get(IObject self) => new Value();
+			public bool Set(IObject self, Value value) => false;
+			public bool Modify(IObject self, OpCode op, Value value)
+			{
+				switch (op)
+				{
+				case OpCode.AddAssign:
+					Info.AddEventHandler(null, (Delegate)Convert(value, Info.EventHandlerType));
+					return true;
+				case OpCode.SubAssign:
+					Info.RemoveEventHandler(null, (Delegate)Convert(value, Info.EventHandlerType));
+					return true;
+				}
+				return false;
 			}
 		}
 	}

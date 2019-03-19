@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 
 namespace Kerbalua.Gui {
-	public class Button:ILayoutRenderer {
+	public class Button:UIElement {
 		public GUIContent content = new GUIContent("");
 		public Action action;
 
@@ -12,17 +12,29 @@ namespace Kerbalua.Gui {
 			this.action = action;
 		}
 
-		public void Render(Rect rect)
+		protected override void ProtectedUpdate(Rect rect)
 		{
-			if (GUI.Button(rect, content)) {
-				action.Invoke();
+			if (style == null) {
+				if (GUI.Button(rect, content)) {
+					action.Invoke();
+				}
+			} else {
+				if (GUI.Button(rect, content,style)) {
+					action.Invoke();
+				}
 			}
 		}
 
-		public void Render()
+		protected override void ProtectedUpdate()
 		{
-			if (GUILayout.Button(content)) {
-				action.Invoke();
+			if (style == null) {
+				if (GUILayout.Button(content)) {
+					action.Invoke();
+				}
+			} else {
+				if (GUILayout.Button(content, style)) {
+					action.Invoke();
+				}
 			}
 		}
 	}

@@ -50,7 +50,7 @@ namespace Kerbalua.Gui {
 			//scriptEngine.Options.DebugPrint = Print;
 			InputLockManager.ClearControlLocks();
 
-			scriptWindow = new ScriptWindow(new Rect(500, 100, 400, 500));
+			scriptWindow = new ScriptWindow(new Rect(100, 100, 1000, 600));
 		}
 
 		public void Print(string str)
@@ -63,7 +63,7 @@ namespace Kerbalua.Gui {
 			if (!guiActive) return;
 
 			try {
-				scriptWindow.Render();
+				scriptWindow.Update();
 			} catch (Exception e) {
 				Debug.Log(e);
 			}

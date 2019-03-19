@@ -4,12 +4,11 @@ using System.Collections.Generic;
 
 namespace Kerbalua.Gui {
 	public class EditingArea:ScrollableTextArea {
-		int inc = 0;
-		public int cursorIndex = 0;
-		public int selectIndex = 0;
+		//int inc = 0;
 		const int spacesPerTab = 4;
 		public KeyBindings KeyBindings = new KeyBindings();
 		protected TextEditor editor;
+
 
 		/// <summary>
 		/// Setting this to true will not allow any key-down input events
@@ -22,53 +21,114 @@ namespace Kerbalua.Gui {
 			InitializeDefaultKeyBindings();
 		}
 
-		public override void Render(Rect rect, GUIStyle style = null)
+		protected override void ProtectedUpdate(Rect rect)
 		{
+			CommonProtectedUpdateOperations(()=>base.ProtectedUpdate(rect));
+		}
+
+		protected override void ProtectedUpdate()
+		{
+			CommonProtectedUpdateOperations(base.ProtectedUpdate);
+		}
+
+		void CommonProtectedUpdateOperations(Action protectedUpdate)
+		{
+			// Initialize editor
+			if (editor == null) {
+				GrabFocus();
+				int id = GUIUtility.keyboardControl;
+				editor = (TextEditor)GUIUtility.GetStateObject(typeof(TextEditor), id);
+				//Debug.Log("initializing editor");
+			}
+
 			if (style == null) {
 				style = new GUIStyle(GUI.skin.textArea);
 				style.font = GUIUtil.GetMonoSpaceFont();
 				style.hover.textColor
-					=style.normal.textColor
-					=style.active.textColor 
-					=Color.white;
-
+					= style.normal.textColor
+					= style.active.textColor
+					= Color.white;
 			}
 
 			if (HasFocus()) {
+				int id = GUIUtility.keyboardControl;
+				editor = (TextEditor)GUIUtility.GetStateObject(typeof(TextEditor), id);
+				editor.text = content.text;
+				editor.cursorIndex = cursorIndex;
+				editor.selectIndex = selectIndex;
+
 				HandleInput();
 
-				base.Render(rect, style);
+				content.text = editor.text;
+
+				protectedUpdate.Invoke();
 
 				cursorIndex = editor.cursorIndex;
 				selectIndex = editor.selectIndex;
+
+				if (hadKeyDownThisUpdate && Event.current.type == EventType.Used) {
+					//Debug.Log(CursorX() + "," + CursorY() + "," + Event.current.mousePosition);
+					AdjustScrollX();
+					AdjustScrollY();
+				}
+				//Debug.Log(scrollPos);
 			} else {
-				base.Render(rect, style);
+				protectedUpdate.Invoke();
 			}
 		}
 
-		public override void Render()
+		void AdjustScrollX()
 		{
-			if (HasFocus()) {
-				HandleInput();
-
-				base.Render();
-
-				cursorIndex = editor.cursorIndex;
-				selectIndex = editor.selectIndex;
-			} else {
-				base.Render();
+			//Debug.Log("Adjusting scroll x");
+			float cursorX = CursorX();
+			float diff = lastContentVector2.x - lastScrollViewVector2.x;
+			float contentStartX = scrollPos.x;
+			float contentEndX = contentStartX + lastScrollViewVector2.x;
+			if (Math.Max(cursorX - style.lineHeight, 0) < contentStartX) {
+				scrollPos.x = Math.Max(cursorX - style.lineHeight,0);
 			}
+			else if(cursorX + style.lineHeight> contentEndX) {
+				scrollPos.x = cursorX - lastContentVector2.x + style.lineHeight;
+			}
+		}
+
+		void AdjustScrollY()
+		{
+			//Debug.Log("Adjusting scroll y");
+			float cursorY = CursorY();
+			//Debug.Log("CursorY " + cursorY);
+			float diff = lastContentVector2.y - lastScrollViewVector2.y;
+			//Debug.Log("diff " + diff);
+			float contentStartY = scrollPos.y;
+			//Debug.Log("contentStartY " + contentStartY);
+			float contentEndY = contentStartY + lastScrollViewVector2.y;
+			//Debug.Log("contentEndY " + contentEndY);
+			if (cursorY- style.lineHeight < contentStartY) {
+				scrollPos.y = cursorY-style.lineHeight;
+				//Debug.Log("reducing to " + scrollPos.y);
+			} else if (cursorY+style.lineHeight > contentEndY) {
+				scrollPos.y = cursorY - lastContentVector2.y + style.lineHeight;
+				//Debug.Log("expanding to " + scrollPos.y);
+			}
+		}
+
+		float CursorX()
+		{
+			int c = CharsFromLineStart();
+			string startOfLineToCursor = CurrentLine().Substring(0, c);
+			GUIContent tempContent = new GUIContent(startOfLineToCursor);
+			return style.CalcSize(tempContent).x;
+		}
+
+		float CursorY()
+		{
+			string contentToCursor = content.text.Substring(0, cursorIndex);
+			GUIContent tempContent = new GUIContent(contentToCursor);
+			return style.CalcSize(tempContent).y;
 		}
 
 		void HandleInput()
 		{
-			int id = GUIUtility.keyboardControl;
-			editor = (TextEditor)GUIUtility.GetStateObject(typeof(TextEditor), id);
-			//Debug.Log(ControlName+","+inc++);
-			editor.text = content.text;
-			editor.cursorIndex = cursorIndex;
-			editor.selectIndex = selectIndex;
-
 			KeyBindings.ExecuteAndConsumeIfMatched(Event.current);
 
 			// Intercept all keydown events that are about to be processed by the
@@ -76,11 +136,28 @@ namespace Kerbalua.Gui {
 			if (onlyUseKeyBindings && Event.current.type == EventType.KeyDown) {
 				Event.current.Use();
 			}
-			content.text = editor.text;
 		}
 
 		void InitializeDefaultKeyBindings()
 		{
+			KeyBindings.Add(new EventKey(KeyCode.Home, true,true), () => {
+				editor.SelectTextStart();
+			});
+			KeyBindings.Add(new EventKey(KeyCode.End, true,true), () => {
+				editor.SelectTextEnd();
+			});
+			KeyBindings.Add(new EventKey(KeyCode.Home, true), () => {
+				editor.MoveTextStart();
+			});
+			KeyBindings.Add(new EventKey(KeyCode.End, true), () => {
+				editor.MoveTextEnd();
+			});
+			KeyBindings.Add(new EventKey(KeyCode.Insert, true), () => {
+				editor.Copy();
+			});
+			KeyBindings.Add(new EventKey(KeyCode.Insert, false,true), () => {
+				editor.Paste();
+			});
 			KeyBindings.Add(new EventKey(KeyCode.Tab), () => Indent());
 			KeyBindings.Add(new EventKey(KeyCode.Tab, false, true), () => Unindent());
 			KeyBindings.Add(new EventKey(KeyCode.Tab, true), () => IndentToPreviousLine());
@@ -373,6 +450,29 @@ namespace Kerbalua.Gui {
 			MoveToIndex(prevCursorIndex);
 
 			return currentLine;
+		}
+
+
+		protected int CurrentLineNumber()
+		{
+			int prevCursorIndex = editor.cursorIndex;
+			int prevSelectIndex = editor.selectIndex;
+
+			int lineNum = 0;
+			editor.MoveLineStart();
+			//Debug.Log("index is " + editor.cursorIndex);
+			//Debug.Log("lineNum is " + lineNum);
+			while (editor.cursorIndex > 0) {
+				editor.MoveUp();
+				lineNum++;
+				//Debug.Log("index is " + editor.cursorIndex);
+				//Debug.Log("lineNum is " + lineNum);
+			}
+
+			editor.cursorIndex = prevCursorIndex;
+			editor.selectIndex = prevSelectIndex;
+
+			return lineNum;
 		}
 	}
 }

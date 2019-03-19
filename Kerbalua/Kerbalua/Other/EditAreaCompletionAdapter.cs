@@ -20,32 +20,31 @@ namespace Kerbalua.Other {
 
 		public string ControlName => editingArea.ControlName;
 
-		public bool Changed()
-		{
-			throw new NotImplementedException();
-		}
+		public bool ReceivedInput => editingArea.ReceivedInput;
 
 		public void Complete(int index)
 		{
-			var completions = GetCompletionContent();
+			var completions = GetCompletionContent(out int replaceStart,out int replaceEnd);
 			if (completions.Count > index) {
-				string partial = PartialCompletion();
-				int partialStart = editingArea.cursorIndex - partial.Length;
+				int partialLength = replaceEnd - replaceStart;
+				int partialStart = replaceStart;
 				string textPriorToPartial = editingArea.content.text.Substring(0, partialStart);
 				string completion = completions[index];
-				int cursorChange = completion.Length - partial.Length;
-				int newCursor = editingArea.cursorIndex + cursorChange;
-				string textAfterPartial = editingArea.content.text.Substring(partialStart + partial.Length);
+				int cursorChange = completion.Length - partialLength;
+				int newCursor = replaceEnd+cursorChange; //editingArea.cursorIndex + cursorChange;
+				string textAfterPartial = editingArea.content.text.Substring(partialStart + partialLength);
 				editingArea.content.text = textPriorToPartial + completion + textAfterPartial;
 				editingArea.selectIndex=editingArea.cursorIndex = newCursor;
 			}
 		}
 
-		public List<string> GetCompletionContent()
+		public IList<string> GetCompletionContent(out int replaceStart,out int replaceEnd)
 		{
 			return scriptWindow.currentReplEvaluator.GetCompletions(
 				editingArea.content.text,
-				editingArea.cursorIndex
+				editingArea.cursorIndex,
+				out replaceStart,
+				out replaceEnd
 				);
 		}
 
@@ -59,12 +58,5 @@ namespace Kerbalua.Other {
 			return editingArea.HasFocus();
 		}
 
-		public string PartialCompletion()
-		{
-			return scriptWindow.currentReplEvaluator.GetPartialCompletion(
-				editingArea.content.text,
-				editingArea.cursorIndex
-				);
-		}
 	}
 }

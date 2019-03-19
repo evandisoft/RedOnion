@@ -22,6 +22,20 @@ namespace Kerbalua.Gui {
 			return absoluteRect.Contains(Mouse.screenPos);
 		}
 
+		public static Vector2 MouseRelativeToRect(Rect rect)
+		{
+			Rect absoluteRect = new Rect();
+			Vector2 absoluteRectStart = GUIUtility.GUIToScreenPoint(new Vector2(rect.x, rect.y));
+			absoluteRect.x = absoluteRectStart.x;
+			absoluteRect.y = absoluteRectStart.y;
+			absoluteRect.width = rect.width;
+			absoluteRect.height = rect.height;
+
+			Vector2 relativeMousePos = new Vector2(Mouse.screenPos.x - absoluteRect.x, Mouse.screenPos.y - absoluteRect.y);
+			//Debug.Log($"{absoluteRect.Contains(Mouse.screenPos)},{Mouse.screenPos},{absoluteRect}");
+			return relativeMousePos;
+		}
+
 		static Font monoSpaceFont = null;
 		static public Font GetMonoSpaceFont()
 		{

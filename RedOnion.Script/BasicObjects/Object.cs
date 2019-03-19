@@ -16,14 +16,9 @@ namespace RedOnion.Script.BasicObjects
 		/// </summary>
 		public IObject Prototype { get; }
 
-		public Engine.IRoot Root { get; }
-
-		public ObjectFun(Engine engine, IObject baseClass, IObject prototype, Engine.IRoot root)
+		public ObjectFun(IEngine engine, IObject baseClass, IObject prototype)
 			: base(engine, baseClass, new Properties("prototype", prototype))
-		{
-			Prototype = prototype;
-			Root = root;
-		}
+			=> Prototype = prototype;
 
 		public override Value Call(IObject self, int argc)
 			=> new Value(Create(argc));
@@ -32,7 +27,7 @@ namespace RedOnion.Script.BasicObjects
 		{
 			if (argc == 0)
 				return new BasicObject(Engine, Prototype);
-			return Root.Box(Arg(argc));
+			return Engine.Box(Engine.GetArgument(argc));
 		}
 	}
 
@@ -44,13 +39,18 @@ namespace RedOnion.Script.BasicObjects
 	/// and also accessed by indexing (by name)
 	/// which can be used like string-keyed dictionary.
 	/// </remarks>
-	[DebuggerDisplay("{GetType().Name}")]
+	[DebuggerDisplay("{Name}")]
 	public class BasicObject : IObject
 	{
 		/// <summary>
 		/// Engine this object belongs to
 		/// </summary>
-		public Engine Engine { get; }
+		public IEngine Engine { get; }
+
+		/// <summary>
+		/// Name of the object (or full name of the type)
+		/// </summary>
+		public virtual string Name => GetType().FullName;
 
 		/// <summary>
 		/// Base class (to search properties in this object next)
@@ -68,12 +68,17 @@ namespace RedOnion.Script.BasicObjects
 		public IProperties MoreProps { get; protected set; }
 
 		public virtual Value Value
-			=> new Value("[internal]");
+			=> new Value(GetType().FullName);
+		public virtual ObjectFeatures Features
+			=> ObjectFeatures.Collection;
+		public virtual Type Type => null;
+		public virtual object Target => null;
+		public virtual IObject Convert(object value) => null;
 
 		/// <summary>
 		/// Create empty object with no base class
 		/// </summary>
-		public BasicObject(Engine engine)
+		public BasicObject(IEngine engine)
 		{
 			Engine = engine;
 		}
@@ -81,7 +86,7 @@ namespace RedOnion.Script.BasicObjects
 		/// <summary>
 		/// Create empty object with base class
 		/// </summary>
-		public BasicObject(Engine engine, IObject baseClass)
+		public BasicObject(IEngine engine, IObject baseClass)
 		{
 			Engine = engine;
 			BaseClass = baseClass;
@@ -90,7 +95,7 @@ namespace RedOnion.Script.BasicObjects
 		/// <summary>
 		/// Create object with prototype and some base properties
 		/// </summary>
-		public BasicObject(Engine engine, IObject baseClass, IProperties baseProps)
+		public BasicObject(IEngine engine, IObject baseClass, IProperties baseProps)
 		{
 			Engine = engine;
 			BaseClass = baseClass;
@@ -100,7 +105,7 @@ namespace RedOnion.Script.BasicObjects
 		/// <summary>
 		/// Create object with prototype, some base properties and more properties
 		/// </summary>
-		public BasicObject(Engine engine, IObject baseClass, IProperties baseProps, IProperties moreProps)
+		public BasicObject(IEngine engine, IObject baseClass, IProperties baseProps, IProperties moreProps)
 		{
 			Engine = engine;
 			BaseClass = baseClass;
@@ -129,7 +134,8 @@ namespace RedOnion.Script.BasicObjects
 
 		public Value Get(string name)
 		{
-			Get(name, out var value);
+			if (!Get(name, out var value) && !Engine.HasOption(EngineOption.Silent))
+				throw new NotImplementedException(name + " does not exist");
 			return value;
 		}
 
@@ -171,10 +177,7 @@ namespace RedOnion.Script.BasicObjects
 				if (props != null && props.Get(name, out query))
 				{
 					if (query.Type == ValueKind.Property)
-					{
-						((IProperty)query.ptr).Set(obj, value);
-						return true;
-					}
+						return ((IProperty)query.ptr).Set(obj, value);
 					if (obj == this)
 						return false;
 					break;
@@ -190,6 +193,38 @@ namespace RedOnion.Script.BasicObjects
 			return MoreProps.Set(name, value);
 		}
 
+		public virtual bool Modify(string name, OpCode op, Value value)
+		{
+			IProperties props;
+			Value query;
+			for (IObject obj = this; ;)
+			{
+				props = obj.BaseProps;
+				if (props != null && props.Get(name, out query))
+				{
+					if (query.Type == ValueKind.Property)
+					{
+						var prop = (IProperty)query.ptr;
+						if (prop is IPropertyEx ex)
+							return ex.Modify(this, op, value);
+						var tmp = prop.Get(this);
+						tmp.Modify(op, value);
+						return prop.Set(this, tmp);
+					}
+					return false;
+				}
+				props = obj.MoreProps;
+				if (props != null && props.Get(name, out query))
+				{
+					query.Modify(op, value);
+					return props.Set(name, query);
+				}
+				if ((obj = obj.BaseClass) == null)
+					return false;
+			}
+		}
+
+
 		public bool Delete(string name)
 			=> MoreProps == null ? false : MoreProps.Delete(name);
 
@@ -197,10 +232,18 @@ namespace RedOnion.Script.BasicObjects
 			=> MoreProps = null;
 
 		public virtual Value Call(IObject self, int argc)
-			=> new Value();
+		{
+			if (!Engine.HasOption(EngineOption.Silent))
+				throw new NotImplementedException(GetType().FullName + " is not a function");
+			return new Value();
+		}
 
 		public virtual IObject Create(int argc)
-			=> null;
+		{
+			if (!Engine.HasOption(EngineOption.Silent))
+				throw new NotImplementedException(GetType().FullName + " is not a constructor");
+			return null;
+		}
 
 		public virtual Value Index(IObject self, int argc)
 		{
@@ -209,44 +252,11 @@ namespace RedOnion.Script.BasicObjects
 			case 0:
 				return new Value();
 			case 1:
-				return new Value(this, Arg(argc, 0).String);
+				return new Value(this, Engine.GetArgument(argc, 0).String);
 			default:
-				self = Engine.Box(new Value(this, Arg(argc, 0).String));
+				self = Engine.Box(new Value(this, Engine.GetArgument(argc, 0).String));
 				return self.Index(this, argc - 1);
 			}
 		}
-
-		/// <summary>
-		/// Get n-th argument (for call/create implementation)
-		/// </summary>
-		protected Value Arg(int argc, int n = 0)
-			=> Engine.Args.Arg(argc, n);
-
-		/// <summary>
-		/// Activation context
-		/// </summary>
-		protected Engine.Context Ctx => Engine.Ctx;
-
-		/// <summary>
-		/// Create new activation context
-		/// </summary>
-		protected void CreateContext()
-			=> Engine.CreateContext(Ctx.Self);
-		/// <summary>
-		/// Create new activation context
-		/// </summary>
-		protected void CreateContext(IObject self)
-			=> Engine.CreateContext(self);
-		/// <summary>
-		/// Create new activation context
-		/// </summary>
-		protected void CreateContext(IObject self, IObject scope)
-			=> Engine.CreateContext(self, scope);
-
-		/// <summary>
-		/// Destroy activation context
-		/// </summary>
-		protected Value DestroyContext()
-			=> Engine.DestroyContext();
 	}
 }

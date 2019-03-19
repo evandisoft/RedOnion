@@ -23,8 +23,8 @@ namespace RedOnion.Script
 					if (ptr == null)
 						return null;
 					var obj = (IObject)ptr;
-					if (obj is IObjectProxy proxy)
-						return proxy.Target;
+					if ((obj.Features & ObjectFeatures.Proxy) != 0)
+						return obj.Target;
 					return obj.Value.Native;
 				case ValueKind.Reference:
 					return ((IProperties)ptr).Get(str).Native;
@@ -64,19 +64,81 @@ namespace RedOnion.Script
 		public Value RValue => Type == ValueKind.Reference ?
 			((IProperties)ptr).Get(str) : this;
 		/// <summary>
-		/// Get referenced object (if object or reference; null otherwise)
+		/// Get referenced object (if object or reference; null otherwise).
+		/// Returns the object whose property is referenced if reference.
+		/// Consider using Object or Engine.Box instead.
 		/// </summary>
 		public IObject Deref => Type == ValueKind.Reference ?
 			ptr as IObject : Type == ValueKind.Object ? (IObject)ptr : null;
 		/// <summary>
+		/// Get referenced object if it is object (null otherwise).
+		/// Consider using Engine.Box if that was desired.
+		/// </summary>
+		public IObject Object => RValue.Deref;
+		/// <summary>
 		/// Set the value for references
 		/// </summary>
-		public void Set(Value value)
+		public bool Set(Value value)
+		{
+			if (Type != ValueKind.Reference)
+				return false;
+			return ((IProperties)ptr).Set(str, value.Type == ValueKind.Reference ?
+				((IProperties)value.ptr).Get(value.str) : value);
+		}
+		/// <summary>
+		/// Modify the value (compound assignment)
+		/// </summary>
+		public void Modify(OpCode op, Value value)
 		{
 			if (Type == ValueKind.Reference)
 			{
-				((IProperties)ptr).Set(str, value.Type == ValueKind.Reference ?
-					((IProperties)value.ptr).Get(value.str) : value);
+				if (value.Type == ValueKind.Reference)
+					value = ((IProperties)value.ptr).Get(value.str);
+				if (ptr is IObject obj)
+					obj.Modify(str, op, value);
+				else
+				{
+					var tmp = this;
+					tmp.Modify(op, value);
+					((IProperties)ptr).Set(str, tmp);
+				}
+				return;
+			}
+			switch (op)
+			{
+			case OpCode.Assign:
+				this = value;
+				return;
+			case OpCode.OrAssign:
+				this = this | value;
+				return;
+			case OpCode.XorAssign:
+				this = this ^ value;
+				return;
+			case OpCode.AndAssign:
+				this = this & value;
+				return;
+			case OpCode.LshAssign:
+				this = ShiftLeft(value);
+				return;
+			case OpCode.RshAssign:
+				this = ShiftRight(value);
+				return;
+			case OpCode.AddAssign:
+				this = this + value;
+				return;
+			case OpCode.SubAssign:
+				this = this - value;
+				return;
+			case OpCode.MulAssign:
+				this = this * value;
+				return;
+			case OpCode.DivAssign:
+				this = this / value;
+				return;
+			case OpCode.ModAssign:
+				this = this % value;
+				return;
 			}
 		}
 
@@ -107,11 +169,10 @@ namespace RedOnion.Script
 				case ValueKind.String:
 					if (str == "")
 						return new Value();
-					return this.Double;
+					return Double;
 				case ValueKind.Char:
-					return this.UShort;
+					return UShort;
 				case ValueKind.Bool:
-					return this.Byte;
 				case ValueKind.Byte:
 				case ValueKind.UShort:
 				case ValueKind.UInt:
@@ -142,7 +203,15 @@ namespace RedOnion.Script
 			default:
 				return "undefined";
 			case ValueKind.Object:
-				return ptr == null ? "null" : ((IObject)ptr).Value.String;
+				if (ptr == null)
+					return "null";
+				var obj = (IObject)ptr;
+				if (obj.HasFeature(ObjectFeatures.Proxy))
+				{
+					var it = obj.Target;
+					return it == null ? "null" : it.ToString();
+				}
+				return obj.Value.String;
 			case ValueKind.Reference:
 				return ((IProperties)ptr).Get(str).String;
 			case ValueKind.String:
@@ -171,6 +240,27 @@ namespace RedOnion.Script
 				return data.Float.ToString(Culture);
 			case ValueKind.Double:
 				return data.Double.ToString(Culture);
+			}
+		}
+
+		public string Name
+		{
+			get
+			{
+				switch (Type)
+				{
+				default:
+					return String;
+				case ValueKind.Undefined:
+					return "undefined";
+				case ValueKind.Object:
+					return ptr == null ? "null" : ((IObject)ptr).Name;
+				case ValueKind.Reference:
+					var props = (IProperties)ptr;
+					if (props is IObject obj)
+						return obj.Name + "." + str;
+					return (ptr == null ? "null." : "unknown.") + str;
+				}
 			}
 		}
 
@@ -240,7 +330,7 @@ namespace RedOnion.Script
 			{
 				if (Type == ValueKind.String)
 				{
-					if (ptr != null && double.TryParse((string)ptr,
+					if (str != null && double.TryParse(str,
 						NumberStyles.Float, CultureInfo.InvariantCulture,
 						out var v))
 						return v;

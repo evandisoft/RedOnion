@@ -23,9 +23,10 @@ namespace Kerbalua
                 Console.WriteLine(message + " " + o);
             }
         }
+        
+		static Texture2D toolbarTexture=null;
 
-        static Texture2D toolbarTexture;
-        bool guiActive = false;
+		bool guiActive = false;
         KerbaluaRepl repl;
 
         public class KSPRaw {

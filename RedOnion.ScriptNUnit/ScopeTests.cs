@@ -11,7 +11,7 @@ namespace RedOnion.ScriptNUnit
 		[SetUp]
 		public void SetUp()
 		{
-			Options = Option.BlockScope;
+			Options = EngineOption.BlockScope;
 		}
 
 		[Test]
@@ -23,12 +23,46 @@ namespace RedOnion.ScriptNUnit
 				"	return x\r\n" +
 				"f()");
 
-			// this = global here
+			// this = global
+			Options = EngineOption.BlockScope;
 			Test(1,
 				"var x = 1\r\n" +
 				"function f\r\n" +
 				"	return this.x\r\n" +
 				"f()");
+
+			// this = null
+			Options = EngineOption.BlockScope | EngineOption.Strict | EngineOption.Silent;
+			Test(null,
+				"var x = 1\r\n" +
+				"function f\r\n" +
+				"	return this.x\r\n" +
+				"f()");
+
+			Options = EngineOption.BlockScope | EngineOption.Strict;
+			try
+			{
+				ExecutionCountdown = 10;
+				Execute(
+					"var x = 1\r\n" +
+					"function f\r\n" +
+					"	return this.x\r\n" +
+					"f()");
+				Assert.Fail("Should throw exception");
+			}
+			catch(InvalidOperationException)
+			{
+			}
+
+			try
+			{
+				ExecutionCountdown = 10;
+				Execute("y = 2");
+				Assert.Fail("Should throw exception");
+			}
+			catch (InvalidOperationException)
+			{
+			}
 		}
 
 		[Test]
@@ -48,7 +82,6 @@ namespace RedOnion.ScriptNUnit
 				"	var x = 2\r\n" +
 				"	return y\r\n" +
 				"f()");
-
 			/*
 			JavaScript would actually return undefined
 			because it moves all declarations to the top of the scopes
@@ -74,9 +107,9 @@ namespace RedOnion.ScriptNUnit
 				"		var x = 2\r\n" +
 				"	return x\r\n" +
 				"f()";
-			Options = Option.None;
+			Options = EngineOption.None;
 			Test(2, s);
-			Options = Option.BlockScope;
+			Options = EngineOption.BlockScope;
 			Test(1, s);
 		}
 

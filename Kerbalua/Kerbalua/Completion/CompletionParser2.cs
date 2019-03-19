@@ -14,7 +14,7 @@ namespace Kerbalua.Completion {
         public static void AntlrTest()
         {
             String input = "local a=a[a1a].b[b1a](b2.b2a)().c(b3).asdf[a.b";
-            String input1 = "local a=a.asdf";
+            //String input1 = "local a=a.asdf";
 
             var terminalVar = ParseCompletion(input);
             Console.WriteLine(terminalVar == null);

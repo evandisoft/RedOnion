@@ -1,49 +1,67 @@
 using System;
 using System.Collections.Generic;
 using RedOnion.Script;
+using RedOnion.Script.BasicObjects;
+using RedOnion.Script.ReflectedObjects;
 using UnityEngine;
+using Kerbalua.AutoPilot;
+using KSP.UI.Screens;
+using RedOnion.KSP;
 
 namespace Kerbalua.Other {
 	public class RedOnionReplEvaluator:ReplEvaluator {
-		Engine engine;
+		ImmediateEngine engine;
+		ReplHintsEngine hints;
 
 		public RedOnionReplEvaluator()
 		{
-			engine = new Engine();
+			engine = new ImmediateEngine();
+			hints = new ReplHintsEngine(engine);
 		}
 
-		public override string Evaluate(string source)
+		public RedOnionReplEvaluator(Engine engine)
 		{
-			string output = "";
+			engine = new ImmediateEngine();
+		}
+
+		protected override bool ProtectedEvaluate(string source,out string output)
+		{
+			output = "";
 			try {
 				//Debug.Log("Running statement with Execution Countdown at " + engine.ExecutionCountdown);
 				engine.ExecutionCountdown = 10000;
 				engine.Execute(source);
 				Value result = engine.Result;
-				output = "\n";
 				output +=result.ToString();
 			}
 			catch(Exception e) {
 				Debug.Log(e);
 			}
 
-			return output;
+			// TODO: This needs to be replaced when engine can fail to complete in one update
+			bool isComplete = true;
+
+			return isComplete;
 		}
 
-
-		public override List<string> GetCompletions(string source, int cursorPos)
+		/// <summary>
+		/// See the abstract version for complete comments.
+		/// </summary>
+		public override IList<string> GetCompletions(string source, int cursorPos,out int replaceStart,out int replaceEnd)
 		{
-			throw new NotImplementedException();
+			return hints.Complete(source, cursorPos, out replaceStart, out replaceEnd);
 		}
 
-		public override string GetPartialCompletion(string source, int cursorPos)
-		{
-			throw new NotImplementedException();
-		}
 
 		public override void ResetEngine()
 		{
 			engine.Reset();
+			hints.Reset();
+		}
+
+		public override void Terminate()
+		{
+			throw new NotImplementedException();
 		}
 	}
 }

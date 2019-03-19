@@ -73,6 +73,7 @@ namespace RedOnion.ScriptNUnit
 		[Test]
 		public void Expression_04_Variables()
 		{
+			Test(			"var x");		// declare
 			Test(10,		"x = 2*3+4");   // assign
 			Test(10,		"x");           // test
 			Test("x10",		"\"x\" + x");   // string + integer
@@ -87,7 +88,7 @@ namespace RedOnion.ScriptNUnit
 		[Test]
 		public void Expression_05_Properties()
 		{
-			Test("obj = new object");       // object creation
+			Test("var obj = new object");	// object creation
 			Assert.AreEqual(ValueKind.Object, Result.Type, "not object type");
 			Assert.IsNotNull(Result.Deref);
 
@@ -99,10 +100,13 @@ namespace RedOnion.ScriptNUnit
 			Test(3,			"obj.s.length");// test internal property (baseProps)
 
 			// obj.s needs to be boxed first - properties are otherwise lost
+			var options = Options;
+			Options |= EngineOption.Silent; // will otherwise throw exception that `s` does not have `bad`
 			Test(3.14,		"obj.s.bad = obj.x");
 			Test(null,		"obj.s.bad");   // was assigned to boxed value and now lost
+			Options = options;
 
-			Test("s = new string \"hello\"");// box
+			Test("var s = new string \"hello\"");// box
 			Test("s.e = 2.7");              // preserved as s is boxed, not native string
 			Test(2.7,		"s.e");         // test it (moreProps)
 			Test(5,			"s.length");    // internal property (baseProps)

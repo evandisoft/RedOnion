@@ -1,3 +1,4 @@
+using RedOnion.UI.Components;
 using System;
 using UnityEngine;
 using UnityEngine.Events;
@@ -7,33 +8,10 @@ namespace RedOnion.UI
 {
 	public class Button : Element
 	{
-		protected UUI.Image Image { get; private set; }
 		protected UUI.Button Core { get; private set; }
+		protected BackgroundImage Image { get; private set; }
 
-		private Element icon;
-		private Label label;
-		protected bool HasIcon => icon != null;
-		protected bool HasLabel => label != null;
-
-		protected Element Icon
-		{
-			get
-			{
-				if (icon == null)
-				{
-					if (GameObject == null)
-						throw new ObjectDisposedException(GetType().Name);
-					icon = new Element(this, "Icon");
-					if (label == null)
-						icon.Anchors = new Rect(.5f, .5f, .5f, .5f);
-					else
-						icon.Anchors = new Rect(0, .5f, 0, .5f);
-					icon.SizeDelta = new Vector2(13, 13);
-				}
-				return icon;
-			}
-		}
-
+		protected Label label;
 		protected Label LabelCore
 		{
 			get
@@ -41,27 +19,87 @@ namespace RedOnion.UI
 				if (label == null)
 				{
 					if (GameObject == null)
-						throw new ObjectDisposedException(GetType().Name);
-					label = new Label(this, "Label");
+						throw new ObjectDisposedException(Name);
+					label = Add(new Label("Label") { Text = "Button" });
 				}
 				return label;
 			}
 		}
 
-		public Button(Element parent = null, string name = null)
-			: this(UISkinManager.defaultSkin.button, parent, name) { }
-		public Button(UIStyle style, Element parent = null, string name = null)
-			: base(parent, name)
+		protected Icon icon;
+		protected Icon IconCore
 		{
-			Image = GameObject.AddComponent<UUI.Image>();
-			Image.sprite = style.normal.background;
+			get
+			{
+				if (icon == null)
+				{
+					if (GameObject == null)
+						throw new ObjectDisposedException(Name);
+					icon = Add(new Icon("Icon"));
+				}
+				return icon;
+			}
+		}
+
+		public Button(string name = null)
+			: base(name)
+		{
 			Core = GameObject.AddComponent<UUI.Button>();
+			Image = GameObject.AddComponent<BackgroundImage>();
+			Image.sprite = Skin.button.normal.background;
+			Layout = Layout.Horizontal;
+			MinWidth = 19;
+			MinHeight = 19;
+		}
+
+		protected override void Dispose(bool disposing)
+		{
+			if (!disposing || GameObject == null)
+				return;
+			Core = null;
+			Image = null;
+			label = null;
+			icon = null;
+			base.Dispose(true);
 		}
 
 		public event UnityAction Click
 		{
 			add => Core.onClick.AddListener(value);
 			remove => Core.onClick.RemoveListener(value);
+		}
+
+		public string Text
+		{
+			get => label == null ? "" : label.Text;
+			set
+			{
+				if (value == null || value.Length == 0)
+				{
+					if (label == null)
+						return;
+					label.Dispose();
+					label = null;
+					return;
+				}
+				LabelCore.Text = value;
+			}
+		}
+
+		public Texture IconTexture
+		{
+			get => icon?.Texture;
+			set
+			{
+				if (value == null)
+				{
+					if (icon == null)
+						return;
+					icon.Dispose();
+					icon = null;
+				}
+				IconCore.Texture = value;
+			}
 		}
 	}
 }

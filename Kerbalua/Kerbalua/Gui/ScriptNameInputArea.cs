@@ -7,21 +7,45 @@ using System.Diagnostics;
 namespace Kerbalua.Gui {
 	public class ScriptNameInputArea:EditingArea, ICompletable {
 		public bool receivedInput;
-		public string baseFolderPath = "scripts"; 
-		public string defaultScriptFilename = "untitled.b";
-		public new KeyBindings KeyBindings = new KeyBindings();
-		bool hadFocus;
 
-		public override void Render()
+		static string baseFolderPath;
+		static string settingsFile;
+		static string defaultScriptFilename= "untitled.b";
+		static ScriptNameInputArea()
 		{
-			receivedInput = HasFocus() && Event.current.type == EventType.KeyDown;
-			KeyBindings.ExecuteAndConsumeIfMatched(Event.current);
-			base.Render();
+			baseFolderPath = Path.Combine(KSPUtil.ApplicationRootPath, "scripts");
+			settingsFile = Path.Combine(baseFolderPath, ".settings");
+		}
+
+		public ScriptNameInputArea()
+		{
+			content.text = LoadConfig().GetValue("lastScriptName");
+		}
+
+		public new KeyBindings KeyBindings = new KeyBindings();
+
+		ConfigNode LoadConfig()
+		{
+			ConfigNode configNode;
+			if (!File.Exists(settingsFile)) {
+				Directory.CreateDirectory(baseFolderPath);
+				configNode = new ConfigNode();
+				configNode.SetValue("lastScriptName", "", true);
+				configNode.Save(settingsFile);
+				return configNode;
+			} 
+			return ConfigNode.Load(settingsFile);
+		}
+
+		protected override void ProtectedUpdate()
+		{
+			if (HasFocus()) KeyBindings.ExecuteAndConsumeIfMatched(Event.current);
+			base.ProtectedUpdate();
 		}
 
 		public void Complete(int index)
 		{
-			var completionContent = GetCompletionContent();
+			var completionContent = GetCompletionContent(out int replaceStart,out int replaceEnd);
 			if (completionContent.Count > index) {
 				content.text = completionContent[index];
 				selectIndex=cursorIndex = content.text.Length;
@@ -33,16 +57,35 @@ namespace Kerbalua.Gui {
 			return content.text;
 		}
 
+		void CommonSaveLoadActions()
+		{
+			ConfigNode configNode = LoadConfig();
+			configNode.SetValue("lastScriptName", content.text, true);
+			configNode.Save(settingsFile);
+		}
+
 		public void Save(string text)
 		{
-			Directory.CreateDirectory(baseFolderPath);
-			File.WriteAllText(CreateFullPath(), text);
+			try {
+				CommonSaveLoadActions();
+				File.WriteAllText(CreateFullPath(), text);
+			}
+			catch(Exception e) {
+				UnityEngine.Debug.Log(e.StackTrace);
+			}
 		}
 
 		public string Load()
 		{
-			Directory.CreateDirectory(baseFolderPath);
-			return File.ReadAllText(CreateFullPath());
+			string result = "";
+			try { 
+				CommonSaveLoadActions();
+				result=File.ReadAllText(CreateFullPath());
+			}
+			catch(Exception e) {
+				UnityEngine.Debug.Log(e.StackTrace);
+			}
+			return result;
 		}
 
 		string CreateFullPath()
@@ -51,7 +94,8 @@ namespace Kerbalua.Gui {
 				content.text = defaultScriptFilename;
 			}
 
-			string fullPath = baseFolderPath + "/" + content.text;
+			Directory.CreateDirectory(baseFolderPath);
+			string fullPath = Path.Combine(baseFolderPath,content.text);
 
 			if (!File.Exists(fullPath)) {
 				File.WriteAllText(fullPath, "");
@@ -61,14 +105,20 @@ namespace Kerbalua.Gui {
 		}
 
 
-		public List<string> GetCompletionContent()
+		public IList<string> GetCompletionContent(out int replaceStart,out int replaceEnd)
 		{
 			var newList = new List<string>();
-			foreach (var scriptName in GetScriptList()) {
-				if (scriptName.StartsWith(baseFolderPath + "/" + content.text)) {
-					newList.Add(scriptName.Split('/')[1]);
+			foreach (var scriptPathString in GetScriptList()) {
+				string scriptFileName = Path.GetFileName(scriptPathString);
+				if (scriptFileName.StartsWith(".")) {
+					continue;
+				}
+
+				if (scriptFileName.StartsWith(content.text)) {
+					newList.Add(scriptFileName);
 				}
 			}
+			replaceStart = 0;replaceEnd = content.text.Length;
 			return newList;
 		}
 

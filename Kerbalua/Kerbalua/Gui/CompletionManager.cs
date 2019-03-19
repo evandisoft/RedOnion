@@ -13,9 +13,11 @@ namespace Kerbalua.Gui {
 	public class CompletionManager {
 		Dictionary<string,ICompletable> completableMap=new Dictionary<string, ICompletable>();
 		public ICompletionSelector completionSelector;
-		public string lastFocusedControl = "";
-		public string currentlyFocusedControl = "";
+		public string mostRecentlyFocusedCompletable = "";
 		bool focusChanged;// = true;
+
+		//bool completeOnNextUpdate = false;
+
 
 		public CompletionManager(ICompletionSelector completionSelector)
 		{
@@ -28,43 +30,64 @@ namespace Kerbalua.Gui {
 		}
 
 		int inc = 0;
-		public void Update(bool guiChanged)
+		public void Update(bool hadMouseDownLastUpdate)
 		{
-			if (GUI.GetNameOfFocusedControl() != currentlyFocusedControl) {
-				lastFocusedControl = currentlyFocusedControl;
-				currentlyFocusedControl = GUI.GetNameOfFocusedControl();
-				//focusChanged = true;
+			bool newInput= hadMouseDownLastUpdate;
+			//if (hadMouseDownLastUpdate) {
+			//	Debug.Log("mouse down last update");
+			//}
+			foreach (var completable in completableMap.Values) {
+				newInput |= completable.ReceivedInput;
+			}
+
+			string focusedControlName = GUI.GetNameOfFocusedControl();
+			if (GUI.GetNameOfFocusedControl() != mostRecentlyFocusedCompletable &&
+				completableMap.ContainsKey(focusedControlName)) {
+				mostRecentlyFocusedCompletable = focusedControlName;
+				focusChanged = true;
+			}
+
+			if (focusChanged || newInput) {
+				//Debug.Log("GUI/foc: " + newInput + "," + focusChanged + "," + mostRecentlyFocusedCompletable + "," + inc++);
+				focusChanged = false;
+				//Debug.Log("Changed");
+				ICompletable currentCompletable;
+				if (completableMap.TryGetValue(mostRecentlyFocusedCompletable, out currentCompletable)) {
+					//Debug.Log("Displaying completions");
+					DisplayCurrentCompletions(currentCompletable);
+				}
 			}
 
 
-			if (guiChanged || focusChanged) {
-				Debug.Log("GUI/foc: " + guiChanged + "," + focusChanged + "," + currentlyFocusedControl + "," + inc++);
-				if (focusChanged) focusChanged = false;
-				Debug.Log("Changed");
-				ICompletable currentCompletable;
-				if(completableMap.TryGetValue(currentlyFocusedControl,out currentCompletable)) {
-					Debug.Log("Displaying completions");
-					DisplayCurrentCompletions(currentCompletable);
-				}
+		}
+
+		//public void CompleteOnNextUpdate()
+		//{
+		//	completeOnNextUpdate = true;
+		//}
+
+		public void DisplayCurrentCompletions()
+		{
+			ICompletable currentCompletable;
+			if (completableMap.TryGetValue(mostRecentlyFocusedCompletable, out currentCompletable)) {
+				//Debug.Log("Displaying completions");
+				DisplayCurrentCompletions(currentCompletable);
 			}
 		}
 
 		void DisplayCurrentCompletions(ICompletable completable)
 		{
-			completionSelector.SetContentWithStringList(
-				completable.GetCompletionContent(),
-				completable.PartialCompletion()
-				);
+			completionSelector.SetContentFromICompletable(completable);
 		}
 
 		public void Complete()
 		{
+			//Debug.Log("completing");
 			ICompletable completable;
-			if (completableMap.TryGetValue(currentlyFocusedControl,out completable)) {
+			if (completableMap.TryGetValue(mostRecentlyFocusedCompletable,out completable)) {
+				completable.GrabFocus();
 				completable.Complete(completionSelector.SelectionIndex);
-			} else if (completionSelector.HasFocus() && completableMap.TryGetValue(lastFocusedControl, out completable)) {
-				completable.Complete(completionSelector.SelectionIndex);
-			}
+			} 
 		}
 	}
 }

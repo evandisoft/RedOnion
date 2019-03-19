@@ -34,8 +34,10 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CompletionTests.cs" />
     <Compile Include="ExecutionCountdownTests.cs" />
     <Compile Include="ExpressionTests.cs" />
+    <Compile Include="ObjectModelTests.cs" />
     <Compile Include="ObjectReflectionTests.cs" />
     <Compile Include="OpCodeTests.cs" />
     <Compile Include="ParseExpressionTests.cs" />
@@ -46,13 +48,13 @@
     <Compile Include="StatementTests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\RedOnion.Script\RedOnion.Script.csproj">
       <Project>{0D0A04F3-0A82-49CD-8178-7640ACE88BFF}</Project>
       <Name>RedOnion.Script</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

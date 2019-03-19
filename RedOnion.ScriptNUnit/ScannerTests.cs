@@ -113,5 +113,17 @@ namespace RedOnion.ScriptNUnit
 			Test("*/");
 			Assert.True(Normal);
 		}
+
+		[Test]
+		public void Scanner_05_Lines()
+		{
+			Source = "x\ry\r\nz\n";
+			Assert.AreEqual("y", Next(true).Word);
+			Assert.AreEqual(2, CharCounter);
+			Assert.AreEqual("z", Next(true).Word);
+			Assert.AreEqual(5, CharCounter);
+			Assert.IsTrue(Next(true).Eof);
+			Assert.AreEqual(7, CharCounter);
+		}
 	}
 }

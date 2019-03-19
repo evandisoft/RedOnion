@@ -40,8 +40,11 @@
     <Compile Include="BasicObjects\Number.cs" />
     <Compile Include="BasicObjects\Object.cs" />
     <Compile Include="BasicObjects\SimpleObject.cs" />
-    <Compile Include="BasicObjects\Root.cs" />
+    <Compile Include="BasicObjects\BasicRoot.cs" />
     <Compile Include="BasicObjects\String.cs" />
+    <Compile Include="Completion\CompletionEngine.cs" />
+    <Compile Include="Completion\CompletionExec.cs" />
+    <Compile Include="Completion\CompletionRoot.cs" />
     <Compile Include="Execution\ExecStatement.cs" />
     <Compile Include="Execution\Engine.cs" />
     <Compile Include="Execution\Abstract.cs" />
@@ -68,6 +71,9 @@
     <Compile Include="ReflectedObjects\ReflectedMethod.cs" />
     <Compile Include="ReflectedObjects\ReflectedObject.cs" />
     <Compile Include="ReflectedObjects\ReflectedType.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="README.md" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

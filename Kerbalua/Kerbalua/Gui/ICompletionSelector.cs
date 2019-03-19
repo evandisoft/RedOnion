@@ -2,7 +2,7 @@
 
 namespace Kerbalua.Gui {
     public interface ICompletionSelector:IFocusable {
-		void SetContentWithStringList(List<string> contentStrings, string partialCompletion);
+		void SetContentFromICompletable(ICompletable completable);
 		int SelectionIndex { get; }
 	}
 }

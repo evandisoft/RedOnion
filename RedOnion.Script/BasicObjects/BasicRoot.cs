@@ -1,0 +1,227 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+namespace RedOnion.Script.BasicObjects
+{
+	public class BasicRoot : BasicObject, IEngineRoot
+	{
+		public Dictionary<Type, IObject> TypeMap
+		{ get; } = new Dictionary<Type, IObject>();
+
+		public static Value Undefined { get; } = new Value();
+		public static Value Null { get; } = new Value(ValueKind.Object, null);
+		public static Value NaN { get; } = new Value(double.NaN);
+		public static Value Infinity { get; } = new Value(double.PositiveInfinity);
+
+		public FunctionFun Function { get; }
+		public ObjectFun Object { get; }
+		public StringFun String { get; }
+		public NumberFun Number { get; }
+		public NumberFun Float { get; }
+		public NumberFun Double { get; }
+		public NumberFun Long { get; }
+		public NumberFun ULong { get; }
+		public NumberFun Int { get; }
+		public NumberFun UInt { get; }
+		public NumberFun Short { get; }
+		public NumberFun UShort { get; }
+		public NumberFun SByte { get; }
+		public NumberFun Byte { get; }
+		public NumberFun Bool { get; }
+		public NumberFun Char { get; }
+
+		public BasicRoot(IEngine engine)
+			: this(engine, true) { }
+		protected BasicRoot(IEngine engine, bool fill)
+			: base(engine, null, new Properties(), new Properties())
+		{
+			var obj	= new BasicObject(engine);
+			var fun	= new FunctionObj(engine, obj);
+			var str	= new StringObj(engine, obj);
+			var num	= new NumberObj(engine, obj);
+			Function= new FunctionFun(engine, fun, fun);
+			Object	= new ObjectFun(engine, fun, obj);
+			String	= new StringFun(engine, fun, str);
+			Number	= new NumberFun(engine, fun, num);
+			Float	= new NumberFun(engine, fun, num, typeof(float),	ValueKind.Float);
+			Double	= new NumberFun(engine, fun, num, typeof(double),	ValueKind.Double);
+			Long	= new NumberFun(engine, fun, num, typeof(long),		ValueKind.Long);
+			ULong	= new NumberFun(engine, fun, num, typeof(ulong),	ValueKind.ULong);
+			Int		= new NumberFun(engine, fun, num, typeof(int),		ValueKind.Int);
+			UInt	= new NumberFun(engine, fun, num, typeof(uint),		ValueKind.UInt);
+			Short	= new NumberFun(engine, fun, num, typeof(short),	ValueKind.Short);
+			UShort	= new NumberFun(engine, fun, num, typeof(ushort),	ValueKind.UShort);
+			SByte	= new NumberFun(engine, fun, num, typeof(sbyte),	ValueKind.SByte);
+			Byte	= new NumberFun(engine, fun, num, typeof(byte),		ValueKind.Byte);
+			Bool	= new NumberFun(engine, fun, num, typeof(bool),		ValueKind.Bool);
+			Char	= new NumberFun(engine, fun, num, typeof(char),		ValueKind.Char);
+			if (fill)
+				Fill();
+		}
+
+		public override void Reset()
+		{
+			BaseProps.Reset();
+			MoreProps.Reset();
+			TypeMap.Clear();
+			Fill();
+		}
+
+		protected virtual void Fill()
+		{
+			TypeMap[typeof(string)] = String;
+			FillSystem(BaseProps, MoreProps);
+			var sys = new Properties();
+			FillSystem(sys, sys);
+			BaseProps.Set("System", new SimpleObject(Engine, sys));
+		}
+
+		protected void FillSystem(IProperties core, IProperties more)
+		{
+			core.Set("undefined",	Undefined);
+			core.Set("null",		Null);
+			core.Set("nan",			NaN);
+			core.Set("infinity",	Infinity);
+			more.Set("inf",			Infinity);
+			core.Set("Function",	Function);
+			core.Set("Object",		Object);
+			core.Set("String",		String);
+			core.Set("Number",		Number);
+			core.Set("Float",		Float);
+			more.Set("Single",		Float);
+			core.Set("Double",		Double);
+			core.Set("Long",		Long);
+			more.Set("Int64",		Long);
+			core.Set("ULong",		ULong);
+			more.Set("UInt64",		ULong);
+			core.Set("Int",			Int);
+			more.Set("Int32",		Int);
+			core.Set("UInt",		UInt);
+			more.Set("UInt32",		UInt);
+			core.Set("Short",		Short);
+			more.Set("Int16",		Short);
+			core.Set("UShort",		UShort);
+			more.Set("UInt16",		UShort);
+			core.Set("SByte",		SByte);
+			more.Set("Int8",		SByte);
+			core.Set("Byte",		Byte);
+			more.Set("UInt8",		Byte);
+			core.Set("Bool",		Bool);
+			more.Set("Boolean",		Bool);
+			core.Set("Char",		Char);
+		}
+
+		public IObject Box(Value value)
+		{
+			for (;;)
+			{
+				switch (value.Type)
+				{
+				case ValueKind.Undefined:
+					return new BasicObject(Engine, this.Object.Prototype);
+				case ValueKind.Object:
+					return (IObject)value.ptr;
+				case ValueKind.Reference:
+					value = ((IProperties)value.ptr).Get(value.str);
+					continue;
+				case ValueKind.String:
+					return new StringObj(Engine, String.Prototype, value.str);
+				default:
+					if (value.IsNumber)
+						return new NumberObj(Engine, Number.Prototype, value);
+					throw new NotImplementedException();
+				}
+			}
+		}
+
+		public IObject Create(
+			CompiledCode code, int codeAt, int codeSize, int typeAt,
+			ArgumentInfo[] args, string body = null, IObject scope = null)
+		{
+			return new FunctionObj(Engine, Function.Prototype,
+				code, codeAt, codeSize, typeAt,
+				args, body, scope == this ? null : scope);
+		}
+
+		public IObject GetType(OpCode op)
+		{
+			switch(op)
+			{
+			case OpCode.Null:
+			case OpCode.Object:
+				return Object;
+			case OpCode.String:
+				return String;
+			case OpCode.Byte:
+				return Byte;
+			case OpCode.UShort:
+				return UShort;
+			case OpCode.UInt:
+				return UInt;
+			case OpCode.ULong:
+				return ULong;
+			case OpCode.SByte:
+				return SByte;
+			case OpCode.Short:
+				return Short;
+			case OpCode.Int:
+				return Int;
+			case OpCode.Long:
+				return Long;
+			case OpCode.Float:
+				return Float;
+			case OpCode.Double:
+				return Double;
+			case OpCode.Bool:
+				return Bool;
+			case OpCode.Char:
+				return Char;
+			default:
+				return Number;
+			}
+		}
+
+		public IObject GetType(OpCode op, Value value)
+		{
+			//TODO: array object
+			throw new NotImplementedException();
+		}
+
+		public IObject GetType(OpCode op, params Value[] par)
+		{
+			//TODO: multi-dimensional array
+			throw new NotImplementedException();
+		}
+
+		public IObject this[Type type]
+		{
+			get
+			{
+				if (TypeMap.TryGetValue(type, out var value))
+					return value;
+				value = ReflectType(type);
+				if (value != null)
+					TypeMap[type] = value;
+				return value;
+			}
+			set => TypeMap[type] = value;
+		}
+		protected virtual IObject ReflectType(Type type)
+			=> new ReflectedObjects.ReflectedType(Engine, type);
+
+		public void AddType(string name, Type type, IObject creator)
+		{
+			this[type] = creator;
+			Set(name, new Value(creator));
+		}
+		public void AddType(string name, ReflectedObjects.ReflectedType type)
+			=> AddType(name, type.Type, type);
+		public void AddType(string name, Type type)
+			=> AddType(name, type, ReflectType(type));
+		public void AddType(Type type)
+			=> AddType(type.Name, type, ReflectType(type));
+
+	}
+}
