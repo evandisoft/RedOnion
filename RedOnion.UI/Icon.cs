@@ -6,11 +6,7 @@ namespace RedOnion.UI
 {
 	public class Icon : Element
 	{
-#if DEBUG
-		protected UUI.RawImage Core { get; private set; }
-#else
-		protected UUI.RawImage Core { get; private set; }
-#endif
+		public UUI.RawImage Core { get; private set; }
 
 		public Icon(string name = null)
 			: base(name)
@@ -25,6 +21,8 @@ namespace RedOnion.UI
 			{
 				Core.texture = value;
 				Core.SetNativeSize();
+				MinWidth = value.width;
+				MinHeight = value.height;
 			}
 		}
 	}

@@ -6,8 +6,7 @@ namespace RedOnion.UI
 {
 	public class Panel : Element
 	{
-		private UUI.RawImage image;
-		protected bool HasImage => image != null;
+		protected UUI.RawImage image;
 		protected UUI.RawImage Image
 		{
 			get

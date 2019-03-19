@@ -6,27 +6,25 @@ namespace RedOnion.UI
 {
 	public class Label : Element
 	{
-		protected UUI.Text Core { get; private set; }
+		protected internal UUI.Text Core { get; private set; }
 
 		public Label(string name = null)
-			: this(UISkinManager.defaultSkin.label, name) { }
-		public Label(UIStyle style, string name = null)
 			: base(name)
 		{
 			Core = GameObject.AddComponent<UUI.Text>();
-			Core.alignment = TextAnchor.MiddleCenter;
-			Core.font = style.font;
-			Core.fontSize = style.fontSize;
-			Core.fontStyle = style.fontStyle;
-			Core.color = style.normal.textColor;
+			Core.alignment = TextAnchor.MiddleLeft;
+			Core.font = Skin.font;
+			Core.fontSize = 14;
+			Core.fontStyle = FontStyle.Normal;
+			Core.color = Color.black;
 		}
 
 		protected override void Dispose(bool disposing)
 		{
 			if (!disposing || GameObject == null)
 				return;
-			base.Dispose(true);
 			Core = null;
+			base.Dispose(true);
 		}
 
 		public string Text
@@ -43,6 +41,16 @@ namespace RedOnion.UI
 		{
 			get => Core.alignment;
 			set => Core.alignment = value;
+		}
+		public int FontSize
+		{
+			get => Core.fontSize;
+			set => Core.fontSize = value;
+		}
+		public FontStyle FontStyle
+		{
+			get => Core.fontStyle;
+			set => Core.fontStyle = value;
 		}
 	}
 }

@@ -1,3 +1,4 @@
+using RedOnion.UI.Components;
 using System;
 using UnityEngine;
 using UnityEngine.Events;
@@ -7,10 +8,10 @@ namespace RedOnion.UI
 {
 	public class Button : Element
 	{
-		protected UUI.Image Image { get; private set; }
 		protected UUI.Button Core { get; private set; }
+		protected BackgroundImage Image { get; private set; }
 
-		private Label label;
+		protected Label label;
 		protected Label LabelCore
 		{
 			get
@@ -18,14 +19,14 @@ namespace RedOnion.UI
 				if (label == null)
 				{
 					if (GameObject == null)
-						throw new ObjectDisposedException(Name ?? GetType().Name);
-					Add(label = new Label("Label"));
+						throw new ObjectDisposedException(Name);
+					label = Add(new Label("Label") { Text = "Button" });
 				}
 				return label;
 			}
 		}
 
-		private Icon icon;
+		protected Icon icon;
 		protected Icon IconCore
 		{
 			get
@@ -33,23 +34,33 @@ namespace RedOnion.UI
 				if (icon == null)
 				{
 					if (GameObject == null)
-						throw new ObjectDisposedException(Name ?? GetType().Name);
-					icon = new Icon("Icon");
-					icon.Anchors = label == null ? Anchors.Center : Anchors.Left;
-					Add(icon);
+						throw new ObjectDisposedException(Name);
+					icon = Add(new Icon("Icon"));
 				}
 				return icon;
 			}
 		}
 
 		public Button(string name = null)
-			: this(UISkinManager.defaultSkin.button, name) { }
-		public Button(UIStyle style, string name = null)
 			: base(name)
 		{
-			Image = GameObject.AddComponent<UUI.Image>();
-			Image.sprite = style.normal.background;
 			Core = GameObject.AddComponent<UUI.Button>();
+			Image = GameObject.AddComponent<BackgroundImage>();
+			Image.sprite = Skin.button.normal.background;
+			Layout = Layout.Horizontal;
+			MinWidth = 19;
+			MinHeight = 19;
+		}
+
+		protected override void Dispose(bool disposing)
+		{
+			if (!disposing || GameObject == null)
+				return;
+			Core = null;
+			Image = null;
+			label = null;
+			icon = null;
+			base.Dispose(true);
 		}
 
 		public event UnityAction Click
@@ -58,26 +69,37 @@ namespace RedOnion.UI
 			remove => Core.onClick.RemoveListener(value);
 		}
 
-		public bool HasLabel => label != null;
-		public bool HasIcon => icon != null;
-
 		public string Text
 		{
 			get => label == null ? "" : label.Text;
-			set => LabelCore.Text = value;
+			set
+			{
+				if (value == null || value.Length == 0)
+				{
+					if (label == null)
+						return;
+					label.Dispose();
+					label = null;
+					return;
+				}
+				LabelCore.Text = value;
+			}
 		}
 
 		public Texture IconTexture
 		{
 			get => icon?.Texture;
-			set => IconCore.Texture = value;
+			set
+			{
+				if (value == null)
+				{
+					if (icon == null)
+						return;
+					icon.Dispose();
+					icon = null;
+				}
+				IconCore.Texture = value;
+			}
 		}
-
-#if DEBUG
-		public Label DebugGetLabel() => label;
-		public Label DebugEnsureLabel() => LabelCore;
-		public Icon DebugGetIcon() => icon;
-		public Icon DebugEnsureIcon() => IconCore;
-#endif
 	}
 }

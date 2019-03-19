@@ -9,7 +9,18 @@ and inspired by
 / [Boo](http://boo-lang.org/).
 
 ```
-var hello = new string "hello"
-hello.world = "world"
-debug.log hello + " " + hello.world + '!'
+var wnd = new window
+function shutdown
+  wnd.dispose()
+
+var btn = wnd.add new button
+btn.text = "Click Me!"
+var lbl = wnd.add new label
+lbl.text = "Clicked 0x"
+
+var counter = 0
+function click
+  counter++
+  lbl.text = "Clicked " + counter + "x"
+btn.click += click
 ```
