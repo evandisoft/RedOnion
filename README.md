@@ -1,10 +1,10 @@
 # RedOnion and Kerbalua
 
-A joint effort by Evan Dickinson and Luk� Fire� to create
+A joint effort of Evan Dickinson and Lukáš Fireš to create
 unrestricted scripted environment inside Kerbal Space Program
 for all players and even modders wishing to control the game,
 vessels, anything, with own script.
-
+ 
 ## Differences between ROS and LUA
 
 [**LUA**](https://www.lua.org/)
