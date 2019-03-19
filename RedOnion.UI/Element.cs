@@ -5,10 +5,15 @@ using UUI = UnityEngine.UI;
 
 namespace RedOnion.UI
 {
+	/// <summary>
+	/// Basic functionality of UI Element.
+	/// Many methods and properties are protected,
+	/// use Panel if not subclassing.
+	/// </summary>
 	public partial class Element : IDisposable
 	{
-		protected GameObject GameObject { get; private set; }
-		protected RectTransform RectTransform { get; private set; }
+		protected internal GameObject GameObject { get; private set; }
+		protected internal RectTransform RectTransform { get; private set; }
 
 		public string Name
 		{
@@ -34,33 +39,33 @@ namespace RedOnion.UI
 				element.GameObject.transform.SetParent(null);
 		}
 
-		public E Add<E>(E element) where E : Element
+		protected E Add<E>(E element) where E : Element
 		{
 			AddElement(element);
 			return element;
 		}
-		public E Remove<E>(E element) where E : Element
+		protected E Remove<E>(E element) where E : Element
 		{
 			RemoveElement(element);
 			return element;
 		}
 		// to prevent matching the later (params) instead of the above (generic)
-		public Element Add(Element element)
+		protected Element Add(Element element)
 		{
 			AddElement(element);
 			return element;
 		}
-		public Element Remove(Element element)
+		protected Element Remove(Element element)
 		{
 			RemoveElement(element);
 			return element;
 		}
-		public void Add(params Element[] elements)
+		protected void Add(params Element[] elements)
 		{
 			foreach (var element in elements)
 				Add(element);
 		}
-		public void Remove(params Element[] elements)
+		protected void Remove(params Element[] elements)
 		{
 			foreach (var element in elements)
 				Remove(element);
@@ -79,8 +84,8 @@ namespace RedOnion.UI
 			layoutGroup = null;
 		}
 
-		/* TODO: Use our LayoutComponent
-		public Anchors Anchors
+		// TODO: Use our LayoutComponent
+		protected internal Anchors Anchors
 		{
 			get => new Anchors(RectTransform);
 			set
@@ -89,7 +94,6 @@ namespace RedOnion.UI
 				RectTransform.anchorMax = new Vector2(value.right, 1f-value.top);
 			}
 		}
-		*/
 
 		// TODO: Use our LayoutComponent
 		private UUI.LayoutElement layoutElement;
@@ -143,7 +147,7 @@ namespace RedOnion.UI
 		// TODO: Use our LayoutComponent
 		private UUI.HorizontalOrVerticalLayoutGroup layoutGroup;
 		private Layout layout;
-		public Layout Layout
+		protected Layout Layout
 		{
 			get => layout;
 			set
@@ -174,7 +178,7 @@ namespace RedOnion.UI
 		/// <summary>
 		/// Padding and spacing
 		/// </summary>
-		public LayoutPadding LayoutPadding
+		protected LayoutPadding LayoutPadding
 		{
 			get => layoutPadding;
 			set
@@ -198,7 +202,7 @@ namespace RedOnion.UI
 		/// Override anchors of all children
 		/// (use Anchors.Invalid to reset)
 		/// </summary>
-		public Anchors ChildAnchors
+		protected Anchors ChildAnchors
 		{
 			get => childAnchors;
 			set
@@ -217,22 +221,22 @@ namespace RedOnion.UI
 			layoutGroup.childForceExpandHeight = childAnchors.bottom + 1f/3f > childAnchors.top;
 		}
 
-		public Padding InnerPadding
+		protected Padding InnerPadding
 		{
 			get => layoutPadding.Padding;
 			set => layoutPadding.Padding = value;
 		}
-		public Vector2 InnerSpacing
+		protected Vector2 InnerSpacing
 		{
 			get => layoutPadding.Spacing;
 			set => layoutPadding.Spacing = value;
 		}
-		public float Padding
+		protected float Padding
 		{
 			get => layoutPadding.Padding.All;
 			set => layoutPadding.Padding = new Padding(value);
 		}
-		public float Spacing
+		protected float Spacing
 		{
 			get => layoutPadding.xgap == layoutPadding.ygap ? layoutPadding.xgap : float.NaN;
 			set => layoutPadding.Spacing = new Vector2(value, value);

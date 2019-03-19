@@ -17,7 +17,7 @@ namespace RedOnion.UI
 			public new RectTransform RectTransform => base.RectTransform;
 			public CanvasGroup Group { get; }
 			public UUI.ContentSizeFitter Fitter { get; }
-			public Element Header { get; }
+			public Panel Header { get; }
 			public Label Title { get; }
 			public Button Close { get; }
 			public Panel Content { get; }
@@ -36,7 +36,7 @@ namespace RedOnion.UI
 				Color = new Color(.2f, .2f, .2f, .8f);
 				Layout = Layout.Vertical;
 				LayoutPadding = new LayoutPadding(4);
-				Header = Add(new Element("Window Title Row")
+				Header = Add(new Panel("Window Title Row")
 				{
 					Layout = Layout.Horizontal,
 					FlexWidth = 1f,
@@ -74,7 +74,7 @@ namespace RedOnion.UI
 		}
 
 		protected FramePanel Frame { get; private set; }
-		public Panel Content { get; private set; }
+		protected Panel Content { get; private set; }
 
 		public string Name
 		{
@@ -229,6 +229,77 @@ namespace RedOnion.UI
 				Frame.RectTransform.sizeDelta = new Vector2(
 					Width, value >= MinHeight ? -value : Height);
 			}
+		}
+
+		public Color FrameColor
+		{
+			get => Frame.Color;
+			set => Frame.Color = value;
+		}
+		public Texture FrameTexture
+		{
+			get => Frame.Texture;
+			set => Frame.Texture = value;
+		}
+		public Color HeaderColor
+		{
+			get => Frame.Header.Color;
+			set => Frame.Header.Color = value;
+		}
+		public Texture HeaderTexture
+		{
+			get => Frame.Header.Texture;
+			set => Frame.Header.Texture = value;
+		}
+		public Color TitleColor
+		{
+			get => Frame.Title.TextColor;
+			set => Frame.Title.TextColor = value;
+		}
+		public Color ContentColor
+		{
+			get => Content.Color;
+			set => Content.Color = value;
+		}
+		public Texture ContentTexture
+		{
+			get => Content.Texture;
+			set => Content.Texture = value;
+		}
+		public Layout Layout
+		{
+			get => Frame.Layout;
+			set => Frame.Layout = value;
+		}
+		public LayoutPadding LayoutPadding
+		{
+			get => Frame.LayoutPadding;
+			set => Frame.LayoutPadding = value;
+		}
+		public Anchors ChildAnchors
+		{
+			get => Frame.ChildAnchors;
+			set => Frame.ChildAnchors = value;
+		}
+		public Padding InnerPadding
+		{
+			get => Frame.InnerPadding;
+			set => Frame.InnerPadding = value;
+		}
+		public Vector2 InnerSpacing
+		{
+			get => Frame.InnerSpacing;
+			set => Frame.InnerSpacing = value;
+		}
+		public float Padding
+		{
+			get => Frame.Padding;
+			set => Frame.Padding = value;
+		}
+		public float Spacing
+		{
+			get => Frame.Spacing;
+			set => Frame.Spacing = value;
 		}
 	}
 }
