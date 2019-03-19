@@ -347,6 +347,18 @@ public partial class IncompleteLuaBaseListener : IIncompleteLuaListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitIncompleteVarOrExp([NotNull] IncompleteLuaParser.IncompleteVarOrExpContext context) { }
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="IncompleteLuaParser.varName"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterVarName([NotNull] IncompleteLuaParser.VarNameContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="IncompleteLuaParser.varName"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitVarName([NotNull] IncompleteLuaParser.VarNameContext context) { }
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="IncompleteLuaParser.var"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>

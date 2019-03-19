@@ -5,7 +5,7 @@ using Kerbalua.Utility;
 using MoonSharp.Interpreter;
 
 namespace Kerbalua.Completion {
-    public class UserDataCompletion {
+    public class UserDataCompletionOld {
 
         public static List<string> Complete(Table globals, List<LastVarExtracter.Token> tokens)
         {

@@ -1,4 +1,4 @@
-/*
+﻿/*
 BSD License
 
 Copyright (c) 2013, Kazunori Sakamoto
@@ -43,14 +43,14 @@ This grammar file derived from:
     http://www.antlr3.org/grammar/1178608849736/Lua.g
 */
 
-grammar IncompleteLua;
+grammar ExperimentalIncompleteLua;
 
 chunk
     : block EOF
     ;
 
 incompleteChunk
-    : '='? incompleteBlock EOF
+    : incompleteBlock EOF
     ;
 
 block
@@ -58,14 +58,14 @@ block
     ;
 
 incompleteBlock
-    : stat*? incompleteStat
+    : stat* incompleteStat
     | stat* incompleteRetstat
     ;
 
 stat
     : ';'
     | varlist '=' explist
-    | functioncall
+    | functioncallStatement
     | label
     | 'break'
     | 'goto' NAME
@@ -82,7 +82,7 @@ stat
 
 incompleteStat
     : incompleteVarlist | varlist '=' incompleteExplist
-    | incompleteFunctionCall
+    | incompleteFunctioncallStatement
     | 'goto' incompleteName
     | 'do' incompleteBlock
     | 'while' incompleteExp | 'while' exp 'do' incompleteBlock
@@ -151,7 +151,7 @@ exp
     | string
     | '...'
     | functiondef
-    | prefixexp
+    | segmentedExp
     | tableconstructor
     | <assoc=right> exp operatorPower exp
     | operatorUnary exp
@@ -165,29 +165,229 @@ exp
     ;
 
 incompleteExp
-    : incompleteFunctiondef | incompletePrefixexp | incompleteTableconstructor
-    | <assoc=right> exp operatorPower incompleteExp | operatorUnary incompleteExp
-    | exp operatorMulDivMod incompleteExp | exp operatorAddSub incompleteExp
-    | <assoc=right> exp operatorStrcat incompleteExp | exp operatorComparison incompleteExp
-    | exp operatorAnd incompleteExp | exp operatorOr incompleteExp
+    : incompleteFunctiondef 
+    | incompleteSegmentedExp 
+    | incompleteTableconstructor
+    | <assoc=right> exp operatorPower incompleteExp 
+    | operatorUnary incompleteExp
+    | exp operatorMulDivMod incompleteExp 
+    | exp operatorAddSub incompleteExp
+    | <assoc=right> exp operatorStrcat incompleteExp 
+    | exp operatorComparison incompleteExp
+    | exp operatorAnd incompleteExp 
+    | exp operatorOr incompleteExp
     | exp operatorBitwise incompleteExp
     ;
 
-prefixexp
-    : varOrExp nameAndArgs*
+segmentedExp
+    : startSegment extendedSegment*
     ;
 
-incompletePrefixexp
-    : incompleteVarOrExp | varOrExp nameAndArgs* incompleteNameAndArgs
+incompleteSegmentedExp
+    : incompleteStartSegment
+    | startSegment extendedSegment* incompleteExtendedSegment
+    ;
+
+functioncallStatement
+    : startSegment extendedSegment* endCallSegment
+    | onlyCallSegment
+    ;
+
+incompleteFunctioncallStatement
+    : incompleteStartSegment
+    | startSegment extendedSegment* incompleteExtendedSegment
+    | startSegment extendedSegment* incompleteEndCallSegment
+    | incompleteOnlyCallSegment
+    ;
+
+onlyCallSegment
+    : namedArrayAccess anonFunctioncallOrArray* anonFunctioncall
+    | namedFunctioncall anonFunctioncallOrArray* anonFunctioncall
+    | namedFunctioncall
+    ;
+
+incompleteOnlyCallSegment
+    : incompleteNamedArrayAccess
+    | namedArrayAccess anonFunctioncallOrArray* incompleteAnonFunctioncallOrArray
+    | namedArrayAccess anonFunctioncallOrArray* incompleteAnonFunctioncall
+    | incompleteNamedFunctioncall 
+    | namedFunctioncall anonFunctioncallOrArray* incompleteAnonFunctioncallOrArray
+    | namedFunctioncall anonFunctioncallOrArray* incompleteAnonFunctioncall
+    ;
+
+endCallSegment
+    : '.' fieldEndCallSegment
+    | '.' methodEndCallSegment
+    | ':' classMethodEndCallSegment
+    ;
+
+incompleteEndCallSegment
+    : '.' incompleteFieldEndCallSegment
+    | '.' incompleteMethodEndCallSegment
+    | ':' incompleteClassMethodEndCallSegment
+    ;
+
+fieldEndCallSegment
+    : namedArrayAccess anonFunctioncallOrArray* anonFunctioncall
+    ;
+
+incompleteFieldEndCallSegment
+    : incompleteNamedArrayAccess
+    | namedArrayAccess anonFunctioncallOrArray* incompleteAnonFunctioncallOrArray
+    | namedArrayAccess anonFunctioncallOrArray* incompleteAnonFunctioncall
+    ;
+
+methodEndCallSegment
+    : namedFunctioncall 
+    | namedFunctioncall anonFunctioncallOrArray* anonFunctioncall
+    ;
+
+incompleteMethodEndCallSegment
+    : incompleteNamedFunctioncall
+    | namedFunctioncall incompleteAnonFunctioncallOrArray* incompleteAnonFunctioncallOrArray
+    | namedFunctioncall incompleteAnonFunctioncallOrArray* incompleteAnonFunctioncall
+    ;
+
+classMethodEndCallSegment
+    : methodEndCallSegment
+    ;
+
+incompleteClassMethodEndCallSegment
+    : incompleteMethodEndCallSegment
+    ;
+
+startSegment
+    : variableName
+    | namedArrayAccess anonFunctioncallOrArray*
+    | namedFunctioncall anonFunctioncallOrArray*
+    ;
+
+incompleteStartSegment
+    : incompleteVariableName
+    | incompleteNamedArrayAccess
+    | namedArrayAccess anonFunctioncallOrArray* incompleteAnonFunctioncallOrArray
+    | incompleteNamedFunctioncall
+    | namedFunctioncall anonFunctioncallOrArray* incompleteAnonFunctioncallOrArray
+    ;
+
+variableName
+    : NAME
+    ;
+
+incompleteVariableName
+    : incompleteName
+    ;
+
+functionName
+    : NAME
+    ;
+
+incompleteFunctionName
+    : incompleteName
+    ;
+
+anonFunctioncallOrArray
+    : anonFunctioncall | arrayAccess
+    ;
+
+incompleteAnonFunctioncallOrArray
+    : incompleteAnonFunctioncall | incompleteArrayAccess
+    ;
+
+namedArrayAccess
+    : variableName arrayAccess
+    ;
+
+incompleteNamedArrayAccess
+    : incompleteVariableName
+    | variableName incompleteArrayAccess
+    ;
+
+extendedSegment
+    : '.' fieldSegment
+    | '.' methodSegment
+    | ':' classMethodSegment
+    ;
+
+incompleteExtendedSegment
+    : '.' incompleteFieldSegment
+    | '.' incompleteMethodSegment
+    | ':' incompleteClassMethodSegment
+    ;
+
+methodSegment
+    : namedFunctioncall anonFunctioncallOrArray*
+    ;
+
+incompleteMethodSegment
+    : incompleteNamedFunctioncall
+    | namedFunctioncall anonFunctioncallOrArray* incompleteAnonFunctioncallOrArray
+    ;
+
+classMethodSegment
+    : methodSegment
+    ;
+
+incompleteClassMethodSegment
+    : incompleteMethodSegment
+    ;
+
+methodName
+    : NAME
+    ;
+
+fieldSegment
+    : fieldName 
+    | namedArrayAccess anonFunctioncallOrArray*
+    ;
+
+incompleteFieldSegment
+    : incompleteFieldName
+    | incompleteNamedArrayAccess
+    | namedArrayAccess anonFunctioncallOrArray* incompleteAnonFunctioncallOrArray
+    ;
+
+fieldName
+    : NAME
+    ;
+
+incompleteFieldName
+    : incompleteName
+    ;
+
+arrayAccess
+    : '[' arrayArg ']'
+    ;
+
+incompleteArrayAccess
+    : '[' incompleteArrayArg
+    ;
+
+previxedFunctioncall
+    : '.'
     ;
 
 functioncall
-    : varOrExp nameAndArgs+
+    : namedFunctioncall | anonFunctioncall
     ;
 
-incompleteFunctionCall
-    : incompleteVarOrExp | varOrExp nameAndArgs* incompleteNameAndArgs
+namedFunctioncall
+    : NAME args
     ;
+
+incompleteNamedFunctioncall
+    : incompleteName
+    | NAME incompleteArgs
+    ;
+
+anonFunctioncall
+    : args
+    ;
+
+incompleteAnonFunctioncall
+    : incompleteArgs
+    ;
+
 
 varOrExp
     : var | '(' exp ')'
@@ -197,12 +397,8 @@ incompleteVarOrExp
     : incompleteVar | '(' incompleteExp
     ;
 
-varName
-    : NAME
-    ;
-
 var
-    : (varName | '(' exp ')' varSuffix) varSuffix*
+    : (NAME | '(' exp ')' varSuffix) varSuffix*
     ;
 
 incompleteVar
@@ -210,13 +406,31 @@ incompleteVar
     | (varName | '(' exp ')' varSuffix) varSuffix* incompleteVarSuffix
     ;
 
+varName
+    : NAME
+    ;
+
 varSuffix
-    : nameAndArgs* ('[' exp ']' | '.' NAME)
+    : nameAndArgs* ('[' arrayArg ']' | '.' memberName)
+    ;
+
+
+
+memberName
+    : NAME
+    ;
+
+arrayArg
+    : exp
+    ;
+
+incompleteArrayArg
+    : incompleteExp
     ;
 
 incompleteVarSuffix
     : nameAndArgs* incompleteNameAndArgs
-    | nameAndArgs* ('[' incompleteExp | '.' incompleteName?)
+    | nameAndArgs* ('[' incompleteExp | '.' incompleteName)
     ;
 
 nameAndArgs
@@ -244,6 +458,8 @@ functioncall
 args
     : '(' explist? ')' | tableconstructor | string
     ;
+
+
 
 incompleteArgs
     : '(' incompleteExplist | incompleteTableconstructor | incompleteString

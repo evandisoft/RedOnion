@@ -1,6 +1,6 @@
 using System;
-namespace Kerbalua.Completion {
-	public class IntellisenseParts {
+using Antlr4.Runtime.Misc;
 
-	}
+namespace Kerbalua.Completion {
+
 }

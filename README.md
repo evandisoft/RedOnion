@@ -1,6 +1,6 @@
 # RedOnion and Kerbalua
 
-A joined effort of Evan Dickinson and Luk·ö Fireö to create
+A joint effort of Evan Dickinson and Luk√°≈° Fire≈° to create
 unrestricted scripted environment inside Kerbal Space Program
 for all players and even modders wishing to control the game,
 vessels, anything, with own script.

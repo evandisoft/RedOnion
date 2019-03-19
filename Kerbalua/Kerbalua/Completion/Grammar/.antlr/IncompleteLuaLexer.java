@@ -49,7 +49,7 @@ public class IncompleteLuaLexer extends Lexer {
 	};
 
 	private static final String[] _LITERAL_NAMES = {
-		null, "';'", "'='", "'break'", "'goto'", "'do'", "'end'", "'while'", "'repeat'", 
+		null, "'='", "';'", "'break'", "'goto'", "'do'", "'end'", "'while'", "'repeat'", 
 		"'until'", "'if'", "'then'", "'elseif'", "'else'", "'for'", "','", "'in'", 
 		"'function'", "'local'", "'return'", "'::'", "'.'", "':'", "'nil'", "'false'", 
 		"'true'", "'...'", "'('", "')'", "'['", "']'", "'{'", "'}'", "'or'", "'and'", 
@@ -199,7 +199,7 @@ public class IncompleteLuaLexer extends Lexer {
 		"\2\2\u0087\u01f5\3\2\2\2\u0089\u0202\3\2\2\2\u008b\u0204\3\2\2\2\u008d"+
 		"\u0209\3\2\2\2\u008f\u0214\3\2\2\2\u0091\u0216\3\2\2\2\u0093\u0218\3\2"+
 		"\2\2\u0095\u0221\3\2\2\2\u0097\u024b\3\2\2\2\u0099\u0251\3\2\2\2\u009b"+
-		"\u009c\7=\2\2\u009c\4\3\2\2\2\u009d\u009e\7?\2\2\u009e\6\3\2\2\2\u009f"+
+		"\u009c\7?\2\2\u009c\4\3\2\2\2\u009d\u009e\7=\2\2\u009e\6\3\2\2\2\u009f"+
 		"\u00a0\7d\2\2\u00a0\u00a1\7t\2\2\u00a1\u00a2\7g\2\2\u00a2\u00a3\7c\2\2"+
 		"\u00a3\u00a4\7m\2\2\u00a4\b\3\2\2\2\u00a5\u00a6\7i\2\2\u00a6\u00a7\7q"+
 		"\2\2\u00a7\u00a8\7v\2\2\u00a8\u00a9\7q\2\2\u00a9\n\3\2\2\2\u00aa\u00ab"+

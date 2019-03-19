@@ -291,6 +291,16 @@ public interface IIncompleteLuaListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitIncompleteVarOrExp([NotNull] IncompleteLuaParser.IncompleteVarOrExpContext context);
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="IncompleteLuaParser.varName"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterVarName([NotNull] IncompleteLuaParser.VarNameContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="IncompleteLuaParser.varName"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitVarName([NotNull] IncompleteLuaParser.VarNameContext context);
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="IncompleteLuaParser.var"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>

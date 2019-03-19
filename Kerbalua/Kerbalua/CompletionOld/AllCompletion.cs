@@ -98,9 +98,9 @@ namespace Kerbalua.Completion {
                     try {
                         if (rootObject is Table table) {
                             QueueLogger.Completion.Enqueue("Checking table completion");
-                            completions = TableCompletion.Complete(globals, correctTokens);
+                            completions = TableCompletionOld.Complete(globals, correctTokens);
                         } else if (!(rootObject is DynValue)) {
-                            completions = UserDataCompletion.Complete(globals, correctTokens);
+                            completions = UserDataCompletionOld.Complete(globals, correctTokens);
                         }
                     }
                     catch(Exception e) {
