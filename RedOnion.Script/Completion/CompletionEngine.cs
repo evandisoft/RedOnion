@@ -50,7 +50,19 @@ namespace RedOnion.Script.Completion
 			this.replaceAt = at;
 			this.replaceTo = at;
 			lexer.Source = source;
-			Execute();
+
+			try
+			{
+				Execute();
+			}
+			catch (Exception ex)
+			{
+				this.DebugLog("{0} in completion: {1}", ex.GetType().Name, ex.Message);
+				replaceAt = at;
+				replaceTo = at;
+				return new string[0];
+			}
+
 			replaceAt = this.replaceAt;
 			replaceTo = this.replaceTo;
 			if (found != null)

@@ -54,9 +54,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Resources\CloseButtonIcon.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Reference Include="UnityEngine">
       <HintPath>$(KerbalLibs)\UnityEngine.dll</HintPath>
       <Private>False</Private>
@@ -74,13 +71,5 @@
       <Private>False</Private>
     </Reference>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="$(AssemblyName).zip">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Target Name="BeforeBuild">
-    <ZipDirectory SourceDirectory="Resources" Overwrite="True" DestinationFile="$(AssemblyName).zip" />
-  </Target>
 </Project>
