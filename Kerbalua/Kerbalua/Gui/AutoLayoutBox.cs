@@ -16,8 +16,8 @@ namespace Kerbalua.Gui {
 					GUILayout.BeginHorizontal();
 				}
 
-				foreach (var button in renderables) {
-					button.Update();
+				foreach (var renderable in renderables) {
+					renderable.Update();
 				}
 
 				if (vertical) {

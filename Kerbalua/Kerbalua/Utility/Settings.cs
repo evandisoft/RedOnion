@@ -4,27 +4,27 @@ using System.Collections.Generic;
 
 namespace Kerbalua.Utility {
 	static public class Settings {
-		static string baseFolderPath;
-		static string settingsFile;
+		public static string BaseFolderPath;
+		public static string SettingsFile;
 
 		static Settings()
 		{
-			baseFolderPath = Path.Combine(KSPUtil.ApplicationRootPath, "scripts");
-			settingsFile = Path.Combine(baseFolderPath, ".settings");
+			BaseFolderPath = Path.Combine(KSPUtil.ApplicationRootPath, "scripts");
+			SettingsFile = Path.Combine(BaseFolderPath, ".settings");
 		}
 
 		static ConfigNode LoadConfig()
 		{
 			//UnityEngine.Debug.Log("load config");
 			ConfigNode configNode;
-			if (!File.Exists(settingsFile)) {
-				Directory.CreateDirectory(baseFolderPath);
+			if (!File.Exists(SettingsFile)) {
+				Directory.CreateDirectory(BaseFolderPath);
 				configNode = new ConfigNode();
 				configNode.SetValue("settingsFileExists", true,true);
-				configNode.Save(settingsFile);
+				configNode.Save(SettingsFile);
 				return configNode;
 			}
-			return ConfigNode.Load(settingsFile);
+			return ConfigNode.Load(SettingsFile);
 		}
 
 		static public string LoadSetting(string settingName,string defaultValue)
@@ -35,7 +35,7 @@ namespace Kerbalua.Utility {
 			}
 
 			config.SetValue(settingName, defaultValue, true);
-			config.Save(settingsFile);
+			config.Save(SettingsFile);
 			return defaultValue;
 		}
 
@@ -43,7 +43,7 @@ namespace Kerbalua.Utility {
 		{
 			ConfigNode config = LoadConfig();
 			config.SetValue(settingName, settingValue, true);
-			config.Save(settingsFile);
+			config.Save(SettingsFile);
 		}
 
 		static public IList<string> LoadListSetting(string settingName)
@@ -68,7 +68,7 @@ namespace Kerbalua.Utility {
 			}
 
 			config.SetNode(settingName, valuesNode,true);
-			config.Save(settingsFile);
+			config.Save(SettingsFile);
 		}
 	}
 }

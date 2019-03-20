@@ -38,7 +38,7 @@ namespace Kerbalua.Gui {
 				//scriptList.RemoveAll((string str) => !recentFiles.Contains(str));
 
 				renderables.Clear();
-				renderables.Add(new Label("Recent Files:"));
+				//renderables.Add(new Label("Recent Files:"));
 				int i = 0;
 				foreach (var script in scriptList) {
 					string filename = Path.GetFileName(script);

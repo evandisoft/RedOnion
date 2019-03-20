@@ -107,7 +107,6 @@
     <Compile Include="Kerbalua\Gui\IRenderer.cs" />
     <Compile Include="Kerbalua\Gui\RecentFilesList.cs" />
     <Compile Include="Kerbalua\Gui\Label.cs" />
-    <Compile Include="Kerbalua\Gui\LeftAlignedButton.cs" />
     <Compile Include="Kerbalua\AutoPilot\AutoPilotAPI.cs" />
     <Compile Include="Kerbalua\MoonSharp\KerbaluaExecutionManager.cs" />
     <Compile Include="Kerbalua\MoonSharp\ExecutionLimitException.cs" />

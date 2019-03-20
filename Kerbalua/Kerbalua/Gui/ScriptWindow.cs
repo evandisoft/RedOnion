@@ -432,10 +432,53 @@ Any other key gives focus to input box.
 
 			Rect currentWidgetBarRect = GetCurrentWidgetBarRect();
 			widgetBar.Update(currentWidgetBarRect);
-			currentWidgetBarRect.y += widgetBarRect.height;
-			recentFiles.Update(currentWidgetBarRect,
-				currentReplEvaluator == replEvaluators["RedOnion"]? ".ros"
-					:currentReplEvaluator==replEvaluators["MoonSharp"]? ".lua":"");
+			GUILayout.BeginArea(new Rect(
+				currentWidgetBarRect.x,
+				currentWidgetBarRect.height,
+				currentWidgetBarRect.width,
+				25
+				));
+			{
+				GUILayout.BeginHorizontal();
+				{
+					GUILayout.Label("Tabs");
+					if (GUILayout.Button("+")) {
+						List<string> recentFilesList = new List<string>(Settings.LoadListSetting("recentFiles"));
+						if (!recentFilesList.Contains(scriptIOTextArea.content.text)) {
+							recentFilesList.Add(scriptIOTextArea.content.text);
+						}
+						recentFilesList.RemoveAll((string filename) => !File.Exists(Path.Combine(Settings.BaseFolderPath, filename)));
+						recentFilesList.Sort((string s1, string s2) => {
+							var t1 = Directory.GetLastWriteTime(Path.Combine(Settings.BaseFolderPath, s1));
+							var t2 = Directory.GetLastWriteTime(Path.Combine(Settings.BaseFolderPath, s2));
+							if (t1 < t2) return 1;
+							if (t1 > t2) return -1;
+							return 0;
+						});
+						if (recentFilesList.Count > 10) {
+							recentFilesList.RemoveAt(recentFilesList.Count - 1);
+						}
+						Settings.SaveListSetting("recentFiles", recentFilesList);
+					}
+					if (GUILayout.Button("-")) {
+						List<string> recentFilesList = new List<string>(Settings.LoadListSetting("recentFiles"));
+						if (!recentFilesList.Contains(scriptIOTextArea.content.text)) {
+							recentFilesList.Add(scriptIOTextArea.content.text);
+						}
+						recentFilesList.RemoveAll((string filename) => !File.Exists(Path.Combine(Settings.BaseFolderPath, filename)));
+						recentFilesList.Remove(scriptIOTextArea.content.text);
+						if (recentFilesList.Count > 10) {
+							recentFilesList.RemoveAt(recentFilesList.Count - 1);
+						}
+						Settings.SaveListSetting("recentFiles", recentFilesList);
+					}
+				}
+				GUILayout.EndHorizontal();
+			}
+			GUILayout.EndArea();
+			currentWidgetBarRect.y += widgetBarRect.height+20;
+			currentWidgetBarRect.height -= 20;
+			recentFiles.Update(currentWidgetBarRect);
 
 			if (replVisible) {
 				//if(repl.outputBox.HasFocus()) {
