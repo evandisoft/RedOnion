@@ -432,7 +432,9 @@ Any other key gives focus to input box.
 			Rect currentWidgetBarRect = GetCurrentWidgetBarRect();
 			widgetBar.Update(currentWidgetBarRect);
 			currentWidgetBarRect.y += widgetBarRect.height;
-			recentFiles.Update(currentWidgetBarRect);
+			recentFiles.Update(currentWidgetBarRect,
+				currentReplEvaluator == replEvaluators["RedOnion"]? ".ros"
+					:currentReplEvaluator==replEvaluators["MoonSharp"]? ".lua":"");
 
 			if (replVisible) {
 				//if(repl.outputBox.HasFocus()) {

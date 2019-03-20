@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
 
 namespace Kerbalua.Utility {
 	static public class Settings {
@@ -40,6 +41,31 @@ namespace Kerbalua.Utility {
 		{
 			ConfigNode config = LoadConfig();
 			config.SetValue(settingName, settingValue, true);
+			config.Save(settingsFile);
+		}
+
+		static public IList<string> LoadListSetting(string settingName)
+		{
+			ConfigNode config = LoadConfig();
+
+			if (config.HasNode(settingName)) {
+				IList<string> values = config.GetNode(settingName).GetValues();
+				return values;
+			}
+
+			return new List<string>();
+		}
+
+		static public void SaveListSetting(string settingName,IList<string> values)
+		{
+			ConfigNode config = LoadConfig();
+			ConfigNode valuesNode = new ConfigNode();
+
+			foreach(var value in values) {
+				valuesNode.AddValue(settingName, value);
+			}
+
+			config.AddNode(settingName, valuesNode);
 			config.Save(settingsFile);
 		}
 	}

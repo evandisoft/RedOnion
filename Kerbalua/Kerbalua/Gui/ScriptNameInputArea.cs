@@ -47,6 +47,12 @@ namespace Kerbalua.Gui {
 
 		void CommonSaveLoadActions()
 		{
+			//IList<string> recentFiles = Settings.LoadListSetting("recentFiles");
+			//recentFiles.Add(content.text);
+			//if (recentFiles.Count > 10) {
+			//	recentFiles.RemoveAt(0);
+			//}
+			//Settings.SaveListSetting("recentFiles", recentFiles);
 			Settings.SaveSetting("lastScriptName", content.text);
 		}
 
