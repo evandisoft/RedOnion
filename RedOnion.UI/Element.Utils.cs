@@ -1,10 +1,12 @@
-using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.IO;
 using System.Reflection;
 using UnityEngine;
 using Ionic.Zip;
 using System.Globalization;
 using System.Diagnostics;
+
+[assembly: InternalsVisibleTo("RedOnion.KSP")]
 
 namespace RedOnion.UI
 {
@@ -30,30 +32,29 @@ namespace RedOnion.UI
 			set => _Skin = value ?? UISkinManager.defaultSkin;
 		}
 
-		private static ZipFile ResourcesZip;
-		private static byte[] ResourceData(Assembly asm, string path)
+		internal static byte[] ResourceFileData(Assembly asm, string kind, ref ZipFile zip, string path)
 		{
 			// assume asm.Location points to GameData/RedOnion/Plugis/RedOnion.dll (or any other dll)
 			var root = Path.Combine(Path.GetDirectoryName(asm.Location), "..");
-			var filePath = Path.Combine(root, path);
+			var filePath = Path.Combine(root, Path.Combine(kind, path));
 			if (File.Exists(filePath))
 				return File.ReadAllBytes(filePath);
 
 			// if the file does not exists, try GameData/RedOnion/Resources.zip
-			if (ResourcesZip == null)
+			if (zip == null)
 			{
-				var zipPath = Path.Combine(root, "Resources.zip");
+				var zipPath = Path.Combine(root, kind + ".zip");
 				if (!File.Exists(zipPath))
 				{
 					Log("Neither {0} nor {1} exists", path, zipPath);
 					return null;
 				}
-				ResourcesZip = ZipFile.Read(zipPath);
+				zip = ZipFile.Read(zipPath);
 			}
-			var entry = ResourcesZip[path];
+			var entry = zip[path];
 			if (entry == null)
 			{
-				Log("Resource {0} does not exist", path);
+				Log("File {0} does not exist", path);
 				return null;
 			}
 			var stream = new MemoryStream();
@@ -61,6 +62,9 @@ namespace RedOnion.UI
 			return stream.ToArray();
 		}
 
+		private static ZipFile ResourcesZip;
+		private static byte[] ResourceData(Assembly asm, string path)
+			=> ResourceFileData(asm, "Resources", ref ResourcesZip, path);
 		public static Texture2D LoadIcon(int width, int height, string path)
 		{
 			var data = ResourceData(Assembly.GetCallingAssembly(), path);
