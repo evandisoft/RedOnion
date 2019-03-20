@@ -10,7 +10,7 @@ namespace RedOnion.UI
 	/// Many methods and properties are protected,
 	/// use Panel if not subclassing.
 	/// </summary>
-	public partial class Element : IDisposable
+	public abstract partial class Element : IDisposable
 	{
 		protected internal GameObject GameObject { get; private set; }
 		protected internal RectTransform RectTransform { get; private set; }
@@ -20,7 +20,9 @@ namespace RedOnion.UI
 			get => GameObject.name ?? GetType().FullName;
 			set => GameObject.name = value;
 		}
-		public Element(string name = null)
+		public Element Parent { get; internal set; }
+
+		protected Element(string name = null)
 		{
 			GameObject = new GameObject(name);
 			GameObject.layer = UILayer;
@@ -32,11 +34,19 @@ namespace RedOnion.UI
 
 		// virtual so that we can later redirect it in Window (to content panel)
 		protected virtual void AddElement(Element element)
-			=> element.GameObject.transform.SetParent(GameObject.transform, false);
+		{
+			if (element.Parent != null)
+				element.Parent.Remove(element);
+			element.GameObject.transform.SetParent(GameObject.transform, false);
+			element.Parent = this;
+		}
 		protected virtual void RemoveElement(Element element)
 		{
-			if (element.GameObject.transform.parent == GameObject.transform)
+			if (element.Parent == this)
+			{
 				element.GameObject.transform.SetParent(null);
+				element.Parent = null;
+			}
 		}
 
 		protected E Add<E>(E element) where E : Element
