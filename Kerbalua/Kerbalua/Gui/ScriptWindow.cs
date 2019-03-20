@@ -320,6 +320,7 @@ Any other key gives focus to input box.
 		bool hadMouseDownLastUpdate = false;
 		public void Update()
 		{
+			//UnityEngine.Debug.Log("blah");
 			SetOrReleaseInputLock();
 			completionManager.Update(hadMouseDownLastUpdate);
 			hadMouseDownLastUpdate = false;

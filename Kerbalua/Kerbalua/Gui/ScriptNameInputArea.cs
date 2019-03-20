@@ -11,7 +11,7 @@ namespace Kerbalua.Gui {
 
 		static string baseFolderPath;
 		static string settingsFile;
-		static string defaultScriptFilename= "untitled.b";
+		static string defaultScriptFilename= "untitled.ros";
 		static ScriptNameInputArea()
 		{
 			baseFolderPath = Path.Combine(KSPUtil.ApplicationRootPath, "scripts");
@@ -47,20 +47,30 @@ namespace Kerbalua.Gui {
 
 		void CommonSaveLoadActions()
 		{
-			//IList<string> recentFiles = Settings.LoadListSetting("recentFiles");
-			//recentFiles.Add(content.text);
-			//if (recentFiles.Count > 10) {
-			//	recentFiles.RemoveAt(0);
-			//}
-			//Settings.SaveListSetting("recentFiles", recentFiles);
+			List<string> recentFiles = new List<string>(Settings.LoadListSetting("recentFiles"));
+			if (!recentFiles.Contains(content.text)) {
+				recentFiles.Add(content.text);
+			}
+			recentFiles.RemoveAll((string filename) => !File.Exists(Path.Combine(baseFolderPath, filename)));
+			recentFiles.Sort((string s1, string s2) => {
+				var t1 = Directory.GetLastWriteTime(Path.Combine(baseFolderPath, s1));
+				var t2 = Directory.GetLastWriteTime(Path.Combine(baseFolderPath, s2));
+				if (t1 < t2) return 1;
+				if (t1 > t2) return -1;
+				return 0;
+			});
+			if (recentFiles.Count > 10) {
+				recentFiles.RemoveAt(recentFiles.Count - 1);
+			}
+			Settings.SaveListSetting("recentFiles", recentFiles);
 			Settings.SaveSetting("lastScriptName", content.text);
 		}
 
 		public void Save(string text)
 		{
 			try {
-				CommonSaveLoadActions();
 				File.WriteAllText(CreateFullPath(), text);
+				CommonSaveLoadActions();
 			}
 			catch(Exception e) {
 				UnityEngine.Debug.Log(e.StackTrace);

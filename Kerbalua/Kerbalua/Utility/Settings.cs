@@ -15,10 +15,12 @@ namespace Kerbalua.Utility {
 
 		static ConfigNode LoadConfig()
 		{
+			//UnityEngine.Debug.Log("load config");
 			ConfigNode configNode;
 			if (!File.Exists(settingsFile)) {
 				Directory.CreateDirectory(baseFolderPath);
 				configNode = new ConfigNode();
+				configNode.SetValue("settingsFileExists", true,true);
 				configNode.Save(settingsFile);
 				return configNode;
 			}
@@ -65,7 +67,7 @@ namespace Kerbalua.Utility {
 				valuesNode.AddValue(settingName, value);
 			}
 
-			config.AddNode(settingName, valuesNode);
+			config.SetNode(settingName, valuesNode,true);
 			config.Save(settingsFile);
 		}
 	}

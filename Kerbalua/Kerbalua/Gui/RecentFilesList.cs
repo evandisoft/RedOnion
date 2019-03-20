@@ -21,18 +21,20 @@ namespace Kerbalua.Gui {
 		List<string> scriptList;
 		public void Update(Rect rect, string fileExtension="")
 		{
-			if (scriptList == null || ioDelayWatch.ElapsedMilliseconds > ioDelayMillis) {
-				//IList<string> recentFiles = Settings.LoadListSetting("recentFiles");
 
-				scriptList = new List<string>(Directory.GetFiles(baseFolderPath));
+			if (scriptList == null || ioDelayWatch.ElapsedMilliseconds > ioDelayMillis) {
+				List<string> recentFiles = new List<string>(Settings.LoadListSetting("recentFiles"));
+				recentFiles.RemoveAll((string filename) => !File.Exists(Path.Combine(baseFolderPath, filename)));
+				scriptList = recentFiles;
+				////scriptList = new List<string>(Directory.GetFiles(baseFolderPath));
 				scriptList.Sort((string s1, string s2) => {
-					var t1 = Directory.GetLastWriteTime(s1);
-					var t2 = Directory.GetLastWriteTime(s2);
+					var t1 = Directory.GetLastWriteTime(Path.Combine(baseFolderPath, s1));
+					var t2 = Directory.GetLastWriteTime(Path.Combine(baseFolderPath, s2));
 					if (t1 < t2) return 1;
 					if (t1 > t2) return -1;
 					return 0;
 				});
-				//
+				////
 				//scriptList.RemoveAll((string str) => !recentFiles.Contains(str));
 
 				renderables.Clear();
@@ -40,7 +42,7 @@ namespace Kerbalua.Gui {
 				int i = 0;
 				foreach (var script in scriptList) {
 					string filename = Path.GetFileName(script);
-					if (!filename.EndsWith(fileExtension)) continue;
+					//if (!filename.EndsWith(fileExtension)) continue;
 					if (filename.StartsWith(".")) continue;
 					if (++i > MaxFiles) break;
 

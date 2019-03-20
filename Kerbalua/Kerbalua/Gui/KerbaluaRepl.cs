@@ -60,11 +60,13 @@ namespace Kerbalua.Gui {
 
 		public void Render(bool guiActive)
 		{
+
 			if (!guiActive) return;
 
 			try {
 				scriptWindow.Update();
 			} catch (Exception e) {
+				Debug.Log("yes");
 				Debug.Log(e);
 			}
 		}
