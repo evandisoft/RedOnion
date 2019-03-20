@@ -51,6 +51,7 @@ namespace Kerbalua
 
         public void Awake()
         {
+			toolbarTexture = RedOnion.UI.Element.LoadIcon(38, 38, "LiveRepl.png");
             if (ToggleGui == null) {
                 ApplicationLauncher.Instance.AddModApplication(
                     () => { ToggleGui(); },

@@ -15,6 +15,14 @@ namespace Kerbalua.Gui {
 		public ScriptNameInputArea()
 		{
 			content.text = Settings.LoadSetting("lastScriptName",defaultScriptFilename);
+			if (!File.Exists(Path.Combine(Settings.BaseFolderPath, content.text))) {
+				IList<string> recentFiles = Settings.LoadListSetting("recentFiles");
+				if (recentFiles.Count > 0) {
+					content.text = recentFiles[0];
+				} else {
+					content.text = defaultScriptFilename;
+				}
+			}
 		}
 
 		public new KeyBindings KeyBindings = new KeyBindings();
