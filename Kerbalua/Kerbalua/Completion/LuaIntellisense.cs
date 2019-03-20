@@ -20,7 +20,13 @@ namespace Kerbalua.Completion {
 			var processedIncompleteVar = Parse(relevantText);
 			var completionObject = new CompletionObject(globals, processedIncompleteVar.Segments);
 
-			completionObject.ProcessCompletion();
+			try {
+				completionObject.ProcessCompletion();
+			}
+			catch(LuaIntellisenseException e) {
+				replaceStart = replaceEnd = cursorPos;
+				return new List<string>();
+			}
 			string Partial = completionObject.CurrentPartial;
 			replaceStart = cursorPos - Partial.Length;
 			replaceEnd = cursorPos;

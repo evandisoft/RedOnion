@@ -468,10 +468,10 @@ Any other key gives focus to input box.
 						if (!recentFilesList.Contains(scriptIOTextArea.content.text)) {
 							recentFilesList.Add(scriptIOTextArea.content.text);
 						}
-						recentFilesList.RemoveAll((string filename) => !File.Exists(Path.Combine(Settings.BaseFolderPath, filename)));
+						recentFilesList.RemoveAll((string filename) => !File.Exists(Path.Combine(Settings.BaseScriptsPath, filename)));
 						recentFilesList.Sort((string s1, string s2) => {
-							var t1 = Directory.GetLastWriteTime(Path.Combine(Settings.BaseFolderPath, s1));
-							var t2 = Directory.GetLastWriteTime(Path.Combine(Settings.BaseFolderPath, s2));
+							var t1 = Directory.GetLastWriteTime(Path.Combine(Settings.BaseScriptsPath, s1));
+							var t2 = Directory.GetLastWriteTime(Path.Combine(Settings.BaseScriptsPath, s2));
 							if (t1 < t2) return 1;
 							if (t1 > t2) return -1;
 							return 0;
@@ -486,7 +486,7 @@ Any other key gives focus to input box.
 						if (!recentFilesList.Contains(scriptIOTextArea.content.text)) {
 							recentFilesList.Add(scriptIOTextArea.content.text);
 						}
-						recentFilesList.RemoveAll((string filename) => !File.Exists(Path.Combine(Settings.BaseFolderPath, filename)));
+						recentFilesList.RemoveAll((string filename) => !File.Exists(Path.Combine(Settings.BaseScriptsPath, filename)));
 						recentFilesList.Remove(scriptIOTextArea.content.text);
 						if (recentFilesList.Count > 10) {
 							recentFilesList.RemoveAt(recentFilesList.Count - 1);

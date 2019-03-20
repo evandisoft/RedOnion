@@ -4,13 +4,13 @@ using System.Collections.Generic;
 
 namespace Kerbalua.Utility {
 	static public class Settings {
-		public static string BaseFolderPath;
+		public static string BaseScriptsPath;
 		public static string SettingsFile;
 
 		static Settings()
 		{
-			BaseFolderPath = Path.Combine(KSPUtil.ApplicationRootPath, "GameData/RedOnion/Scripts");
-			SettingsFile = Path.Combine(BaseFolderPath, ".settings");
+			BaseScriptsPath = Path.Combine(KSPUtil.ApplicationRootPath, "GameData/RedOnion/Scripts");
+			SettingsFile = Path.Combine(BaseScriptsPath, ".settings");
 		}
 
 		static ConfigNode LoadConfig()
@@ -18,7 +18,7 @@ namespace Kerbalua.Utility {
 			//UnityEngine.Debug.Log("load config");
 			ConfigNode configNode;
 			if (!File.Exists(SettingsFile)) {
-				Directory.CreateDirectory(BaseFolderPath);
+				Directory.CreateDirectory(BaseScriptsPath);
 				configNode = new ConfigNode();
 				configNode.SetValue("settingsFileExists", true,true);
 				configNode.Save(SettingsFile);
