@@ -26,8 +26,8 @@ namespace Kerbalua.Gui {
 
 				scriptList = new List<string>(Directory.GetFiles(baseFolderPath));
 				scriptList.Sort((string s1, string s2) => {
-					var t1 = Directory.GetLastAccessTime(s1);
-					var t2 = Directory.GetLastAccessTime(s2);
+					var t1 = Directory.GetLastWriteTime(s1);
+					var t2 = Directory.GetLastWriteTime(s2);
 					if (t1 < t2) return 1;
 					if (t1 > t2) return -1;
 					return 0;
