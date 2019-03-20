@@ -47,9 +47,16 @@ namespace RedOnion.UI
 			Core = GameObject.AddComponent<UUI.Button>();
 			Image = GameObject.AddComponent<BackgroundImage>();
 			Image.sprite = Skin.button.normal.background;
+			Core.image = Image;
+			Core.spriteState = new UUI.SpriteState()
+			{
+				pressedSprite = Skin.button.active.background,
+				highlightedSprite = Skin.button.highlight.background,
+				disabledSprite = Skin.button.disabled.background
+			};
+			InnerPadding = new Padding(8f, 4f);
+			Spacing = 6f;
 			Layout = Layout.Horizontal;
-			MinWidth = 19;
-			MinHeight = 19;
 		}
 
 		protected override void Dispose(bool disposing)
@@ -100,6 +107,32 @@ namespace RedOnion.UI
 				}
 				IconCore.Texture = value;
 			}
+		}
+
+		public new LayoutPadding LayoutPadding
+		{
+			get => base.LayoutPadding;
+			set => base.LayoutPadding = value;
+		}
+		public new Padding InnerPadding
+		{
+			get => base.InnerPadding;
+			set => base.InnerPadding = value;
+		}
+		public new Vector2 InnerSpacing
+		{
+			get => base.InnerSpacing;
+			set => base.InnerSpacing = value;
+		}
+		public new float Padding
+		{
+			get => base.Padding;
+			set => base.Padding = value;
+		}
+		public new float Spacing
+		{
+			get => base.Spacing;
+			set => base.Spacing = value;
 		}
 	}
 }

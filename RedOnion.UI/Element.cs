@@ -186,12 +186,13 @@ namespace RedOnion.UI
 				if (layoutPadding == value)
 					return;
 				layoutPadding = value;
-				if (layoutGroup != null)
-					ApplyPadding();
+				ApplyPadding();
 			}
 		}
 		private void ApplyPadding()
 		{
+			if (layoutGroup == null)
+				return;
 			layoutGroup.padding = layoutPadding.ToRectOffset();
 			layoutGroup.spacing = layout == Layout.Horizontal
 				? layoutPadding.xgap : layoutPadding.ygap;
@@ -210,12 +211,13 @@ namespace RedOnion.UI
 				if (childAnchors == value)
 					return;
 				childAnchors = value;
-				if (layoutGroup != null)
-					ApplyChildAnchors();
+				ApplyChildAnchors();
 			}
 		}
 		private void ApplyChildAnchors()
 		{
+			if (layoutGroup == null)
+				return;
 			layoutGroup.childAlignment = childAnchors.ToTextAnchor();
 			layoutGroup.childForceExpandWidth = childAnchors.right + 1f/3f > childAnchors.left;
 			layoutGroup.childForceExpandHeight = childAnchors.bottom + 1f/3f > childAnchors.top;
@@ -224,22 +226,37 @@ namespace RedOnion.UI
 		protected Padding InnerPadding
 		{
 			get => layoutPadding.Padding;
-			set => layoutPadding.Padding = value;
+			set
+			{
+				if (layoutPadding.Padding == value)
+					return;
+				layoutPadding.Padding = value;
+				if (layoutGroup != null)
+					layoutGroup.padding = layoutPadding.ToRectOffset();
+			}
 		}
 		protected Vector2 InnerSpacing
 		{
 			get => layoutPadding.Spacing;
-			set => layoutPadding.Spacing = value;
+			set
+			{
+				if (layoutPadding.Spacing == value)
+					return;
+				layoutPadding.Spacing = value;
+				if (layoutGroup != null)
+					layoutGroup.spacing = layout == Layout.Horizontal
+						? layoutPadding.xgap : layoutPadding.ygap;
+			}
 		}
 		protected float Padding
 		{
-			get => layoutPadding.Padding.All;
-			set => layoutPadding.Padding = new Padding(value);
+			get => InnerPadding.All;
+			set => InnerPadding = new Padding(value);
 		}
 		protected float Spacing
 		{
 			get => layoutPadding.xgap == layoutPadding.ygap ? layoutPadding.xgap : float.NaN;
-			set => layoutPadding.Spacing = new Vector2(value, value);
+			set => InnerSpacing = new Vector2(value, value);
 		}
 	}
 }

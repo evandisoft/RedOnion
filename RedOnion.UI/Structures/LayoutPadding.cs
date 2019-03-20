@@ -55,17 +55,6 @@ namespace RedOnion.UI
 			ygap    = vertical;
 			bottom  = vertical;
 		}
-		/* REMOVED to avoid confusion with Padding / RectOffset (without spacing)
-		public LayoutPadding(float xOuter, float xInnter, float yOuter, float yInner)
-		{
-			left   = xOuter;
-			xgap   = xInnter;
-			right  = xOuter;
-			top    = yOuter;
-			ygap   = yInner;
-			bottom = yOuter;
-		}
-		*/
 		public LayoutPadding(float left, float xgap, float right, float top, float ygap, float bottom)
 		{
 			this.left	= left;
@@ -74,6 +63,15 @@ namespace RedOnion.UI
 			this.top	= top;
 			this.ygap   = ygap;
 			this.bottom = bottom;
+		}
+		public LayoutPadding(Padding padding, Vector2 spacing)
+		{
+			left    = padding.left;
+			xgap    = spacing.x;
+			right   = padding.right;
+			top     = padding.top;
+			ygap    = spacing.y;
+			bottom  = padding.bottom;
 		}
 
 		public float All

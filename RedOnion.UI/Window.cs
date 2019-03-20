@@ -50,7 +50,8 @@ namespace RedOnion.UI
 				});
 				Close = Header.Add(new Button("Window Close Button")
 				{
-					IconTexture = DefaultCloseButtonIcon
+					IconTexture = DefaultCloseButtonIcon,
+					Padding = 3f, Spacing = 3f,
 				});
 				Content = Add(new Panel("Window Content Panel")
 				{
