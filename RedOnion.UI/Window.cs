@@ -11,7 +11,7 @@ namespace RedOnion.UI
 	{
 		protected class FramePanel : Panel
 		{
-			static Texture2D DefaultCloseButtonIcon = LoadIcon(13, 13, "CloseButtonIcon.png");
+			static Texture2D DefaultCloseButtonIcon = LoadIcon(13, 13, "WindowCloseButtonIcon.png");
 
 			public new GameObject GameObject => base.GameObject;
 			public new RectTransform RectTransform => base.RectTransform;

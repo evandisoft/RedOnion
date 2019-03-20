@@ -30,7 +30,7 @@ namespace RedOnion
 		private void Start()
 		{
 			if (icon == null)
-				icon = UI.Element.LoadIcon(38, 38, "AppIcon.png");
+				icon = UI.Element.LoadIcon(38, 38, "RedOnionLauncherIcon.png");
 
 			if (adder != null)
 				StopCoroutine(adder);

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -592,13 +593,13 @@ namespace RedOnion.Script
 		public static void Log(this IEngineRoot root, string msg)
 			=> root.Engine.Log(msg);
 		public static void Log(this IEngineRoot root, string msg, params object[] args)
-			=> root.Engine.Log(string.Format(msg, args));
+			=> root.Engine.Log(string.Format(CultureInfo.InvariantCulture, msg, args));
 		[Conditional("DEBUG")]
 		public static void DebugLog(this IEngineRoot root, string msg)
 			=> root.Engine.Log(msg);
 		[Conditional("DEBUG")]
 		public static void DebugLog(this IEngineRoot root, string msg, params object[] args)
-			=> root.Engine.Log(string.Format(msg, args));
+			=> root.Engine.Log(string.Format(CultureInfo.InvariantCulture, msg, args));
 	}
 
 	public static class ObjectExtensions
