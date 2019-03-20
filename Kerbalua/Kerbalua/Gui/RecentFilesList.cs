@@ -8,7 +8,7 @@ using Kerbalua.Utility;
 namespace Kerbalua.Gui {
 	public class RecentFilesList:AutoLayoutBox {
 		private string baseFolderPath = Path.Combine(KSPUtil.ApplicationRootPath, "scripts");
-		const int ioDelayMillis = 5000;
+		const int ioDelayMillis = 1000;
 		public int MaxFiles = 10;
 
 		Action<string> loadAction;

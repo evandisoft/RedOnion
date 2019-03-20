@@ -66,7 +66,7 @@ namespace Kerbalua.Gui {
 			try {
 				scriptWindow.Update();
 			} catch (Exception e) {
-				Debug.Log("yes");
+				//Debug.Log("yes");
 				Debug.Log(e);
 			}
 		}

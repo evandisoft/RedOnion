@@ -9,14 +9,8 @@ namespace Kerbalua.Gui {
 	public class ScriptNameInputArea:EditingArea, ICompletable {
 		public bool receivedInput;
 
-		static string baseFolderPath;
-		static string settingsFile;
+
 		static string defaultScriptFilename= "untitled.ros";
-		static ScriptNameInputArea()
-		{
-			baseFolderPath = Path.Combine(KSPUtil.ApplicationRootPath, "scripts");
-			settingsFile = Path.Combine(baseFolderPath, ".settings");
-		}
 
 		public ScriptNameInputArea()
 		{
@@ -80,8 +74,8 @@ namespace Kerbalua.Gui {
 				content.text = defaultScriptFilename;
 			}
 
-			Directory.CreateDirectory(baseFolderPath);
-			string fullPath = Path.Combine(baseFolderPath,content.text);
+			Directory.CreateDirectory(Settings.BaseFolderPath);
+			string fullPath = Path.Combine(Settings.BaseFolderPath, content.text);
 
 			if (!File.Exists(fullPath)) {
 				File.WriteAllText(fullPath, "");
@@ -117,7 +111,7 @@ namespace Kerbalua.Gui {
 		List<string> GetScriptList()
 		{
 			if (scriptList == null || ioDelayWatch.ElapsedMilliseconds > ioDelayMillis) {
-				scriptList = new List<string>(Directory.GetFiles(baseFolderPath));
+				scriptList = new List<string>(Directory.GetFiles(Settings.BaseFolderPath));
 				ioDelayWatch.Reset();
 				ioDelayWatch.Start();
 			}

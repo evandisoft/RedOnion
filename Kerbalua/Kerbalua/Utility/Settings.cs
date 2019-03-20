@@ -9,7 +9,7 @@ namespace Kerbalua.Utility {
 
 		static Settings()
 		{
-			BaseFolderPath = Path.Combine(KSPUtil.ApplicationRootPath, "scripts");
+			BaseFolderPath = Path.Combine(KSPUtil.ApplicationRootPath, "GameData/RedOnion/scripts");
 			SettingsFile = Path.Combine(BaseFolderPath, ".settings");
 		}
 
