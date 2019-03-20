@@ -33,6 +33,7 @@ namespace Kerbalua.Gui {
 		Rect replRect;
 		Rect completionBoxRect;
 		Rect editorRect;
+		Rect scriptNameRect;
 		ScriptNameInputArea scriptIOTextArea=new ScriptNameInputArea();
 		// Should be a label but I haven't made a label yet.
 		TextArea replEvaluatorLabel = new TextArea();
@@ -112,7 +113,7 @@ namespace Kerbalua.Gui {
 
 			widgetBar.renderables.Add(new Button("<<", () => editorVisible = !editorVisible));
 			widgetBar.renderables.Add(new Button(">>", () => replVisible = !replVisible));
-			widgetBar.renderables.Add(scriptIOTextArea);
+			//widgetBar.renderables.Add(scriptIOTextArea);
 			widgetBar.renderables.Add(new Button("Save", () => {
 				scriptIOTextArea.Save(editor.content.text);
 			}));
@@ -355,6 +356,26 @@ Any other key gives focus to input box.
 			return currentWindowRect;
 		}
 
+		Rect GetCurrentEditorRect()
+		{
+			Rect currentEditorRect = new Rect(editorRect);
+			float scriptNameHeight = GetCurrentScriptNameRect().height;
+			currentEditorRect.y += scriptNameHeight;
+			currentEditorRect.height = currentEditorRect.height - scriptNameHeight;
+
+			return currentEditorRect;
+		}
+
+		Rect GetCurrentScriptNameRect()
+		{
+			Rect currentScriptNameRect = new Rect();
+			currentScriptNameRect.y = titleHeight;
+			currentScriptNameRect.x = 0;
+			currentScriptNameRect.width = editorRect.width;
+			currentScriptNameRect.height = 25;
+			return currentScriptNameRect;
+		}
+
 		Rect GetCurrentWidgetBarRect()
 		{
 			Rect currentWidgetRect = new Rect(widgetBarRect);
@@ -489,7 +510,8 @@ Any other key gives focus to input box.
 
 			if (editorVisible) {
 				//editorRect = UpdateBoxPositionWithWindow(editorRect, -editorRect.width);
-				editor.Update(editorRect,editorVisible);
+				scriptIOTextArea.Update(GetCurrentScriptNameRect(), true);
+				editor.Update(GetCurrentEditorRect(), editorVisible);
 			}
 
 			// Lots of hacks here. I will eventually better understand how this
