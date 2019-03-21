@@ -6,44 +6,47 @@ namespace RedOnion.KSP.Autopilot {
 
 
 	public class FlightControl {
-		public enum Mode {
-			RAW,
-			STOP_SPIN,
+		public enum SpinMode {
 			SET_DIR,
 			SET_SPIN,
-			STABILIZE,
+			RAW,
 			OFF,
 		}
 
-		public Mode CurrentMode { get; private set; }
+		public SpinMode CurrentSpinMode { get; private set; }
 
+		Vector3 targetDir;
 		public Vector3 TargetDir { 
 			get {
-				return TargetDir;
+				return targetDir;
 			}
 			set {
-				CurrentMode = Mode.SET_DIR;
-				TargetDir = value;
+				Enable();
+				CurrentSpinMode = SpinMode.SET_DIR;
+				targetDir = value;
 			}
 		}
 
+		Vector3 targetSpin;
 		public Vector3 TargetSpin {
 			get {
-				return TargetSpin;
+				return targetSpin;
 			}
 			set {
-				CurrentMode = Mode.SET_SPIN;
-				TargetSpin = value;
+				Enable();
+				CurrentSpinMode = SpinMode.SET_SPIN;
+				targetSpin = value;
 			}
 		}
 
-		public void SetTargetSpin(Table table) {
-
+		public void StopSpin()
+		{
+			TargetSpin = new Vector3();
 		}
 
 		public FlightControl()
 		{
-			CurrentMode = Mode.OFF;
+			CurrentSpinMode = SpinMode.OFF;
 		}
 
 		public Vector3 GetAvailableTorque()
@@ -72,24 +75,64 @@ namespace RedOnion.KSP.Autopilot {
 		{
 			Reset();
 			Disable();
-			CurrentMode = Mode.OFF;
+			CurrentSpinMode = SpinMode.OFF;
 		}
 
 		FlightCtrlState userCtrlState = new FlightCtrlState();
 
 		void ControlCallback(FlightCtrlState flightCtrlState)
 		{
-			if (CurrentMode != Mode.STABILIZE) {
-				flightCtrlState.CopyFrom(userCtrlState);
-				switch (CurrentMode) {
-				case Mode.SET_SPIN:
-
-					break;
-				case Mode.SET_DIR:
-					throw new NotImplementedException("SET_DIR mode not yet implemented");
-					break;
-				}
+			//flightCtrlState.CopyFrom(userCtrlState);
+			switch (CurrentSpinMode) {
+			case SpinMode.SET_SPIN:
+				SetSpin(flightCtrlState);
+				break;
+			case SpinMode.SET_DIR:
+				throw new NotImplementedException("SET_DIR mode not yet implemented");
+				break;
+			case SpinMode.RAW:
+				SetPitchRollYaw(flightCtrlState, new Vector3(
+					userCtrlState.pitch, userCtrlState.roll, userCtrlState.yaw));
+				break;
 			}
+		}
+
+		void SetSpin(FlightCtrlState flightCtrlState)
+		{
+			Vessel vessel = FlightGlobals.ActiveVessel;
+			if (vessel == null) {
+				Shutdown();
+				return;
+			}
+
+			Vector3 torque = GetAvailableTorque();
+
+			Vector3 angularSpeed = MathUtil.Vec.Div(vessel.angularMomentum, vessel.MOI);
+			Vector3 accel = MathUtil.Vec.Div(torque, vessel.MOI);
+			Vector3 pry = MathUtil.Vec.Div(angularSpeed-TargetSpin, accel * Time.deltaTime);
+			SetPitchRollYaw(flightCtrlState, pry);
+		}
+
+		/// <summary>
+		/// Set each setting only if they are not already set and clamp the values
+		/// to the accepted -1 to 1 range.
+		/// </summary>
+		/// <param name="flightCtrlState">Flight ctrl state.</param>
+		/// <param name="pry">Pry.</param>
+		void SetPitchRollYaw(FlightCtrlState flightCtrlState,Vector3 pry)
+		{
+#pragma warning disable RECS0018 // Comparison of floating point numbers with equality operator
+			if (flightCtrlState.pitch == 0.0) {
+				flightCtrlState.pitch = Mathf.Clamp(pry.x,-1,1);
+			}
+			if (flightCtrlState.roll == 0.0) {
+				flightCtrlState.roll = Mathf.Clamp(pry.y, -1, 1);
+			}
+			if (flightCtrlState.yaw == 0.0) {
+				flightCtrlState.yaw = Mathf.Clamp(pry.z,-1,1);
+			}
+
+#pragma warning restore RECS0018 // Comparison of floating point numbers with equality operator
 		}
 
 		public void SetWithTable(Table ctrlTable)
@@ -121,7 +164,7 @@ namespace RedOnion.KSP.Autopilot {
 					}
 				}
 			}
-			CurrentMode = Mode.RAW;
+			//CurrentSpinMode = Mode.RAW;
 		}
 
 

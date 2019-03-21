@@ -64,6 +64,7 @@
     <Compile Include="Lua\KerbaluaScript.cs" />
     <Compile Include="Autopilot\FlightControl.cs" />
     <Compile Include="MathUtil\Vec.cs" />
+    <Compile Include="MathUtil\Scalar.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RedOnion.Script\RedOnion.Script.csproj">

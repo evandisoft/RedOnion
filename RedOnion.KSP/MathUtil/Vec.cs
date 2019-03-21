@@ -20,7 +20,7 @@ namespace RedOnion.KSP.MathUtil {
 
 		static public Vector3 New()
 		{
-			return new Vector3(0, 0, 0);
+			return new Vector3();
 		}
 	}
 }
