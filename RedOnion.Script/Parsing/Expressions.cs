@@ -131,7 +131,7 @@ namespace RedOnion.Script.Parsing
 					unary = false;
 					goto next;
 				}
-				if (lexer.White && !lexer.PeekWhite)
+				if (HasOption(Option.AutocallWhenArgs) && lexer.White && !lexer.PeekWhite)
 					goto autocall;
 				goto binary;
 			case OpKind.Logic:
@@ -189,7 +189,7 @@ namespace RedOnion.Script.Parsing
 							unary = false;
 							goto next;
 						}
-						if (unary || (Options & Option.DotThisAfterWhite) != 0)
+						if (unary || HasOption(Option.DotThisAfterWhite))
 						{
 							if ((flags & (Flag.Static | Flag.With)) == Flag.Static)
 								throw new ParseError(lexer, "Dot-shortcut for 'this' not allowed in static method");
@@ -272,7 +272,7 @@ namespace RedOnion.Script.Parsing
 				switch (lexer.Curr)
 				{
 				case '(':			//------------------------------------------------------------ (
-					if (unary || lexer.White)
+					if (unary || (HasOption(Option.AutocallWhenArgs) && lexer.White))
 					{
 						if (!unary)
 							goto autocall;
@@ -371,6 +371,8 @@ namespace RedOnion.Script.Parsing
 
 		//################################################################################ auto call
 		autocall:
+			if (!HasOption(Option.AutocallWhenArgs))
+				throw new ParseError(lexer, "Unexpected literal (autocall is disabled)");
 			Debug.Assert(!unary);
 			ParseExpression(flags);
 			if (lexer.Curr != ',')

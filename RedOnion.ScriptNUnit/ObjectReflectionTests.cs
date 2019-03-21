@@ -202,5 +202,33 @@ namespace RedOnion.ScriptNUnit
 			dict["test"] = "it";
 			Test("it", "test[\"test\"]");
 		}
+
+		public struct MyVector
+		{
+			public float x, y, z;
+			public MyVector(float x, float y, float z)
+			{
+				this.x = x;
+				this.y = y;
+				this.z = z;
+			}
+			public static MyVector operator +(MyVector a, MyVector b)
+				=> new MyVector(a.x + b.x, a.y + b.y, a.z + b.z);
+			public static MyVector operator *(MyVector v, float f)
+				=> new MyVector(v.x * f, v.y * f, v.z * f);
+			public static MyVector operator *(float f, MyVector v)
+				=> new MyVector(v.x * f, v.y * f, v.z * f);
+		}
+		[Test]
+		public void ObjectReflection_09_Operators()
+		{
+			Root.AddType("vector", typeof(MyVector));
+			Test("var v = new vector 1,2f,3.0");
+			var v = (MyVector)Result.Native;
+			Assert.AreEqual(3f, v.z);
+			Test("var u = v * 2");
+			var u = (MyVector)Result.Native;
+			Assert.AreEqual(2f, u.x);
+		}
 	}
 }

@@ -10,42 +10,58 @@ namespace RedOnion.Script
 	{
 		public Value Binary(OpCode op, Value right)
 		{
-			switch(op)
+			var left = RValue;
+			right = right.RValue;
+			if (left.Kind == ValueKind.Object)
+			{
+				var obj = (IObject)left.ptr;
+				if (obj.HasFeature(ObjectFeatures.Operators)
+					&& obj.Operator(op, right, false, out var result))
+					return result;
+			}
+			if (right.Kind == ValueKind.Object)
+			{
+				var obj = (IObject)right.ptr;
+				if (obj.HasFeature(ObjectFeatures.Operators)
+					&& obj.Operator(op, left, true, out var result))
+					return result;
+			}
+			switch (op)
 			{
 			default:
 				return new Value();
 			case OpCode.BitOr:
-				return this | right;
+				return left | right;
 			case OpCode.BitXor:
-				return this ^ right;
+				return left ^ right;
 			case OpCode.BitAnd:
-				return this & right;
+				return left & right;
 			case OpCode.ShiftLeft:
-				return ShiftLeft(right);
+				return left.ShiftLeft(right);
 			case OpCode.ShiftRight:
-				return ShiftRight(right);
+				return left.ShiftRight(right);
 			case OpCode.Add:
-				return this + right;
+				return left + right;
 			case OpCode.Sub:
-				return this - right;
+				return left - right;
 			case OpCode.Mul:
-				return this * right;
+				return left * right;
 			case OpCode.Div:
-				return this / right;
+				return left / right;
 			case OpCode.Mod:
-				return this % right;
+				return left % right;
 			case OpCode.Equals:
-				return new Value(this == right);
+				return new Value(left == right);
 			case OpCode.Differ:
-				return new Value(this != right);
+				return new Value(left != right);
 			case OpCode.Less:
-				return new Value(this < right);
+				return new Value(left < right);
 			case OpCode.More:
-				return new Value(this > right);
+				return new Value(left > right);
 			case OpCode.LessEq:
-				return new Value(this <= right);
+				return new Value(left <= right);
 			case OpCode.MoreEq:
-				return new Value(this >= right);
+				return new Value(left >= right);
 			}
 		}
 

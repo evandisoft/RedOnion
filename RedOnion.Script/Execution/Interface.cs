@@ -126,7 +126,11 @@ namespace RedOnion.Script
 		/// <summary>
 		/// Is proxy/wrapper of native object
 		/// </summary>
-		Proxy = 1 << 6
+		Proxy = 1 << 6,
+		/// <summary>
+		/// Supports operator overloading
+		/// </summary>
+		Operators = 1 << 7,
 	}
 
 	/// <summary>
@@ -424,6 +428,13 @@ namespace RedOnion.Script
 		/// Convert native object into script object Features.Converter
 		/// </summary>
 		IObject Convert(object value);
+		/// <summary>
+		/// Calculate result of operator. Features.Operators
+		/// </summary>
+		/// <param name="op">The operator</param>
+		/// <param name="rhs">Right side for binary operators (undefined for unary)</param>
+		/// <returns></returns>
+		bool Operator(OpCode op, Value arg, bool selfRhs, out Value result);
 	}
 
 	public interface IEngineRoot : IObject

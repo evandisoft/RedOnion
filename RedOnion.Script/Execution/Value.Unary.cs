@@ -7,6 +7,44 @@ namespace RedOnion.Script
 {
 	public partial struct Value
 	{
+		public Value Unary(OpCode op)
+		{
+			var self = RValue;
+			if (self.Kind == ValueKind.Object)
+			{
+				var obj = (IObject)self.ptr;
+				if (obj.HasFeature(ObjectFeatures.Operators)
+					&& obj.Operator(op, new Value(), false, out var result))
+					return result;
+			}
+			switch (op)
+			{
+			case OpCode.Plus:
+				return +self;
+			case OpCode.Neg:
+				return -self;
+			case OpCode.Flip:
+				return ~self;
+			case OpCode.Not:
+				return new Value(!self.Bool);
+			// NOTE: Consider using Value.Modify
+			case OpCode.PostInc:
+				if (IsReference)
+					Self++;
+				return this;
+			case OpCode.PostDec:
+				if (IsReference)
+					Self--;
+				return this;
+			case OpCode.Inc:
+				++Self;
+				return this;
+			case OpCode.Dec:
+				--Self;
+				return this;
+			}
+			throw new InvalidOperationException("Unrecognised unary operator: " + op.Text());
+		}
 		public static Value operator !(Value value)
 			=> !value.Bool;
 

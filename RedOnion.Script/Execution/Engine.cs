@@ -18,7 +18,8 @@ namespace RedOnion.Script
 		internal static Parser.Option DefaultParserOptions
 			= Parsing.Parser.Option.Script
 			| Parsing.Parser.Option.Untyped
-			| Parsing.Parser.Option.Typed;
+			| Parsing.Parser.Option.Typed
+			| Parsing.Parser.Option.Autocall;
 	}
 	/// <summary>
 	/// Runtime engine

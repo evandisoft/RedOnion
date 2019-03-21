@@ -9,7 +9,10 @@ namespace RedOnion.Script.Parsing
 		protected Lexer lexer = new Lexer();
 
 		public CultureInfo Culture { get; set; } = CultureInfo.InvariantCulture;
-		public Option Options { get; set; } = Option.Script | Option.Untyped | Option.Typed;
+		public Option Options { get; set; }
+			= Option.Script | Option.Autocall | Option.Untyped | Option.Typed;
+		public bool HasOption(Option opt)
+			=> (Options & opt) != 0;
 
 		public Parser() { }
 		public Parser(Option opts) => Options = opts;
@@ -24,13 +27,26 @@ namespace RedOnion.Script.Parsing
 			/// </summary>
 			Script = 1 << 0,
 			/// <summary>
-			/// Strongly typed language (require static types)
+			/// Strongly typed language (require static types, unless Untyped is also set)
 			/// </summary>
 			Typed = 1 << 1,
 			/// <summary>
-			/// Untyped language (no static types)
+			/// Untyped language (no static types, unless Typed is also set)
 			/// </summary>
 			Untyped = 1 << 2,
+			/// <summary>
+			/// Translate e.g. `abs -x` into `abs(-x)`.
+			/// </summary>
+			AutocallWhenArgs = 1 << 3,
+			/// <summary>
+			/// Convert simple statements (identifier or root is dot)
+			/// into function call (e.g. `stage` becomes `stage()`).
+			/// </summary>
+			AutocallSimle = 1 << 4,
+			/// <summary>
+			/// Both versions of function call without parentheses
+			/// </summary>
+			Autocall = AutocallWhenArgs | AutocallSimle,
 
 			/// <summary>
 			/// "x .y" => "x(this.y)" if set, "x.y" otherwise
