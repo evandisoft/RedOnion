@@ -10,6 +10,7 @@ using Kerbalua.Completion;
 using MoonSharp.Interpreter.Loaders;
 using Kerbalua.Utility;
 using RedOnion.KSP.Lua;
+using RedOnion.KSP.Autopilot;
 
 namespace Kerbalua.Other
 {
@@ -88,6 +89,7 @@ namespace Kerbalua.Other
 		public override void ResetEngine()
 		{
 			InternalResetEngine();
+			FlightControl.GetInstance().Shutdown();
 		}
 
 		public override void Terminate()

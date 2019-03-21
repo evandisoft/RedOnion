@@ -3,9 +3,16 @@ using MoonSharp.Interpreter;
 using UnityEngine;
 
 namespace RedOnion.KSP.Autopilot {
-
-
 	public class FlightControl {
+		static FlightControl instance;
+		static public FlightControl GetInstance()
+		{
+			if (instance == null) {
+				instance = new FlightControl();
+			}
+			return instance;
+		}
+
 		public enum SpinMode {
 			SET_DIR,
 			SET_SPIN,
@@ -44,7 +51,7 @@ namespace RedOnion.KSP.Autopilot {
 			TargetSpin = new Vector3();
 		}
 
-		public FlightControl()
+		protected FlightControl()
 		{
 			CurrentSpinMode = SpinMode.OFF;
 		}
@@ -131,7 +138,6 @@ namespace RedOnion.KSP.Autopilot {
 			if (flightCtrlState.yaw == 0.0) {
 				flightCtrlState.yaw = Mathf.Clamp(pry.z,-1,1);
 			}
-
 #pragma warning restore RECS0018 // Comparison of floating point numbers with equality operator
 		}
 

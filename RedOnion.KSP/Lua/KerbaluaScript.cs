@@ -7,7 +7,7 @@ using RedOnion.KSP.MathUtil;
 
 namespace RedOnion.KSP.Lua {
 	public class KspApi {
-		public FlightControl FlightControl = new FlightControl();
+		public FlightControl FlightControl = FlightControl.GetInstance();
 		public FlightGlobals FlightGlobals = new FlightGlobals();
 		public Time Time = new Time();
 		public Mathf Mathf = new Mathf();
