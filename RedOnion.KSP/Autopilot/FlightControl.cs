@@ -22,7 +22,7 @@ namespace RedOnion.KSP.Autopilot {
 
 		public SpinMode CurrentSpinMode { get; private set; }
 
-		Vector3 targetDir;
+		Vector3 targetDir=new Vector3();
 		public Vector3 TargetDir { 
 			get {
 				return targetDir;
@@ -34,7 +34,7 @@ namespace RedOnion.KSP.Autopilot {
 			}
 		}
 
-		Vector3 targetSpin;
+		Vector3 targetSpin=new Vector3();
 		public Vector3 TargetSpin {
 			get {
 				return targetSpin;
@@ -115,7 +115,7 @@ namespace RedOnion.KSP.Autopilot {
 		}
 
 		const float maxAngularSpeed = Mathf.PI * 2 / 20;
-		//const float fudgeFactor = 0.9f;
+		const float fudgeFactor = 0.9f;
 		/// <summary>
 		/// Gets spin needed to approach target direction
 		/// </summary>
@@ -127,14 +127,19 @@ namespace RedOnion.KSP.Autopilot {
 			if (vessel == null) {
 				return new Vector3();
 			}
-			Vector3 forward = vessel.transform.up;
+			Vector3 currentDir = vessel.transform.up;
+			Vector3 angularSpeed = GetAngularSpeed(vessel);
+			Vector3 worldSpaceAngularSpeed = vessel.transform.localToWorldMatrix * angularSpeed;
+			Vector3 halfWayDir = Quaternion.AngleAxis(worldSpaceAngularSpeed.magnitude * Time.deltaTime/2, worldSpaceAngularSpeed) * currentDir;
+
+			Vector3 desiredSpinAxis = vessel.transform.worldToLocalMatrix * Vector3.Cross(halfWayDir, target);
+			float angularDistance = Vector3.Angle(halfWayDir, target)/360*2*Mathf.PI;
+			//(d-vt)*2/t^2=a
+			//accel=(angularDistance-angularSpeed*Time.deltaTime)/Time.deltaTime^2
 
 
-			Vector3 spinAxis = vessel.transform.worldToLocalMatrix * Vector3.Cross(forward, target);
-			spinAxis.Normalize();
-			float angularDistance = Vector3.Angle(forward, target)/360*2*Mathf.PI;
 			float spinMagnitude = Math.Min(angularDistance / Time.deltaTime, maxAngularSpeed);
-			return spinAxis * spinMagnitude;
+			return desiredSpinAxis * spinMagnitude; //*fudgeFactor;
 		}
 
 		void SetDir(FlightCtrlState flightCtrlState)
@@ -144,9 +149,24 @@ namespace RedOnion.KSP.Autopilot {
 				Shutdown();
 				return;
 			}
+			Vector3 currentDir = vessel.transform.up;
+			Vector3 angularSpeed = GetAngularSpeed(vessel);
+			float angularDistance = Vector3.Angle(currentDir,targetDir) / 360 * 2 * Mathf.PI;
+			////(d-vt)*2/t^2=a
+			////accel=(angularDistance-angularSpeed*Time.deltaTime)/Time.deltaTime^2
+			Vector3 distanceAxis = vessel.transform.worldToLocalMatrix * Vector3.Cross(currentDir, targetDir);
+			//Vector3 maxAccel = GetMaxAcceleration(vessel);
+			//Vector3 desiredAccel=(-distanceAxis + angularSpeed * Time.deltaTime) * 2 / (float)Math.Pow(Time.deltaTime,2);
+			Vector3 newDistance = (distanceAxis + angularSpeed * Time.deltaTime);
 
+			//Vector3 pry = MathUtil.Vec.Div(desiredAccel, maxAccel);
+			//Debug.Log(pry);
+			//SetPitchRollYaw(flightCtrlState, pry);
 			targetSpin = TargetSpinNeeded(targetDir);
+			//Debug.Log(targetDir+","+targetSpin);
 			SetSpin(flightCtrlState);
+
+
 		}
 
 		void SetSpin(FlightCtrlState flightCtrlState)
