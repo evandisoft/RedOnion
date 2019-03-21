@@ -41,8 +41,8 @@ namespace Kerbalua.Gui {
 		public KerbaluaRepl(KerbaluaMain.KSPRaw kspApi)
 		{
 			this.kspApi = kspApi;
-			scriptEngine = new MoonSharpReplEvaluator(CoreModules.Preset_Complete);
-			UserData.RegistrationPolicy = InteropRegistrationPolicy.Automatic;
+			scriptEngine = new MoonSharpReplEvaluator();
+
 
 			//scriptEngine.Globals["ksp"] = kspApi;
 			//scriptEngine.Globals["flight"] = new FlightControl(FlightGlobals.ActiveVessel, scriptEngine);
@@ -56,6 +56,11 @@ namespace Kerbalua.Gui {
 		public void Print(string str)
 		{
 			scriptWindow.repl.outputBox.content.text += "\n" + str;
+		}
+
+		public void FixedUpdate()
+		{
+			scriptWindow.FixedUpdate();
 		}
 
 		public void Render(bool guiActive)

@@ -10,7 +10,7 @@ using Kerbalua.Gui;
 namespace Kerbalua.Completion {
     public class AllCompletion {
         public static void Main(string[] args){
-            var script = new MoonSharpReplEvaluator(CoreModules.Preset_Default);
+            var script = new MoonSharpReplEvaluator();
             UserData.RegistrationPolicy = InteropRegistrationPolicy.Automatic;
             //script.Globals["Adf"] = new Adf();
             var data = "return adf.asdf().blah[Adf.asdf().blah[Adf.adfs[3]().";

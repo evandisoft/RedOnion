@@ -15,6 +15,14 @@ namespace Kerbalua.Gui {
 		public ScriptNameInputArea()
 		{
 			content.text = Settings.LoadSetting("lastScriptName",defaultScriptFilename);
+			if (!File.Exists(Path.Combine(Settings.BaseScriptsPath, content.text))) {
+				IList<string> recentFiles = Settings.LoadListSetting("recentFiles");
+				if (recentFiles.Count > 0) {
+					content.text = recentFiles[0];
+				} else {
+					content.text = defaultScriptFilename;
+				}
+			}
 		}
 
 		public new KeyBindings KeyBindings = new KeyBindings();
@@ -74,8 +82,8 @@ namespace Kerbalua.Gui {
 				content.text = defaultScriptFilename;
 			}
 
-			Directory.CreateDirectory(Settings.BaseFolderPath);
-			string fullPath = Path.Combine(Settings.BaseFolderPath, content.text);
+			Directory.CreateDirectory(Settings.BaseScriptsPath);
+			string fullPath = Path.Combine(Settings.BaseScriptsPath, content.text);
 
 			if (!File.Exists(fullPath)) {
 				File.WriteAllText(fullPath, "");
@@ -111,7 +119,7 @@ namespace Kerbalua.Gui {
 		List<string> GetScriptList()
 		{
 			if (scriptList == null || ioDelayWatch.ElapsedMilliseconds > ioDelayMillis) {
-				scriptList = new List<string>(Directory.GetFiles(Settings.BaseFolderPath));
+				scriptList = new List<string>(Directory.GetFiles(Settings.BaseScriptsPath));
 				ioDelayWatch.Reset();
 				ioDelayWatch.Start();
 			}
