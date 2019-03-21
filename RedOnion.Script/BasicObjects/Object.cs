@@ -155,14 +155,14 @@ namespace RedOnion.Script.BasicObjects
 				if ((obj = obj.BaseClass) == null)
 					return false;
 			}
-			if (value.Type == ValueKind.Create)
+			if (value.Kind == ValueKind.Create)
 			{
 				value = new Value(((CreateObject)value.ptr)(Engine));
 				props.Set(name, value);
 			}
-			else if (value.Type == ValueKind.Property)
+			else if (value.IsProperty)
 			{
-				value = ((IProperty)value.ptr).Get(obj);
+				value = value.Get(obj);
 			}
 			return true;
 		}
@@ -176,8 +176,8 @@ namespace RedOnion.Script.BasicObjects
 				props = obj.BaseProps;
 				if (props != null && props.Get(name, out query))
 				{
-					if (query.Type == ValueKind.Property)
-						return ((IProperty)query.ptr).Set(obj, value);
+					if (query.IsProperty)
+						return query.Set(obj, value);
 					if (obj == this)
 						return false;
 					break;
@@ -201,18 +201,7 @@ namespace RedOnion.Script.BasicObjects
 			{
 				props = obj.BaseProps;
 				if (props != null && props.Get(name, out query))
-				{
-					if (query.Type == ValueKind.Property)
-					{
-						var prop = (IProperty)query.ptr;
-						if (prop is IPropertyEx ex)
-							return ex.Modify(this, op, value);
-						var tmp = prop.Get(this);
-						tmp.Modify(op, value);
-						return prop.Set(this, tmp);
-					}
-					return false;
-				}
+					return query.Modify(this, op, value);
 				props = obj.MoreProps;
 				if (props != null && props.Get(name, out query))
 				{
@@ -252,11 +241,14 @@ namespace RedOnion.Script.BasicObjects
 			case 0:
 				return new Value();
 			case 1:
-				return new Value(this, Engine.GetArgument(argc, 0).String);
+				return Value.IndexRef(this, Engine.GetArgument(argc, 0));
 			default:
-				self = Engine.Box(new Value(this, Engine.GetArgument(argc, 0).String));
+				self = Engine.Box(Value.IndexRef(this, Engine.GetArgument(argc, 0)));
 				return self.Index(this, argc - 1);
 			}
 		}
+		public Value IndexGet(Value index) => Get(index.String);
+		public bool IndexSet(Value index, Value value) => Set(index.String, value);
+		public bool IndexModify(Value index, OpCode op, Value value) => Modify(index.String, op, value);
 	}
 }

@@ -15,7 +15,9 @@ namespace RedOnion.Script
 		{
 			get
 			{
-				switch (Type)
+				if ((kind & ValueKind.fEnum) != 0)
+					return Enum.ToObject((Type)idx, Long);
+				switch (Kind)
 				{
 				default:
 					return null;
@@ -27,9 +29,10 @@ namespace RedOnion.Script
 						return obj.Target;
 					return obj.Value.Native;
 				case ValueKind.Reference:
-					return ((IProperties)ptr).Get(str).Native;
+				case ValueKind.IndexRef:
+					return RValue.Native;
 				case ValueKind.String:
-					return str;
+					return ptr;
 				case ValueKind.Char:
 					return data.Char;
 				case ValueKind.Bool:
@@ -57,88 +60,202 @@ namespace RedOnion.Script
 				}
 			}
 		}
+		internal Value AdjustForEnum(Value from)
+		{
+			if ((from.Kind & ValueKind.fEnum) != 0)
+			{
+				kind |= ValueKind.fEnum;
+				idx = from.idx;
+			}
+			return this;
+		}
+
+		public bool IsReference
+			=> Kind == ValueKind.Reference
+			|| Kind == ValueKind.IndexRef;
 
 		/// <summary>
 		/// Get right-value (unassignable, dereferenced)
 		/// </summary>
-		public Value RValue => Type == ValueKind.Reference ?
-			((IProperties)ptr).Get(str) : this;
+		public Value RValue
+		{
+			get
+			{
+				switch (Kind)
+				{
+				default:
+					return this;
+				case ValueKind.Reference:
+					return ((IProperties)ptr).Get((string)idx);
+				case ValueKind.IndexRef:
+					return ((IObject)ptr).IndexGet((Value)idx);
+				}
+			}
+		}
 		/// <summary>
 		/// Get referenced object (if object or reference; null otherwise).
 		/// Returns the object whose property is referenced if reference.
 		/// Consider using Object or Engine.Box instead.
 		/// </summary>
-		public IObject Deref => Type == ValueKind.Reference ?
-			ptr as IObject : Type == ValueKind.Object ? (IObject)ptr : null;
+		public IObject RefObj => IsReference || Kind == ValueKind.Object ?
+			ptr as IObject : null;
 		/// <summary>
 		/// Get referenced object if it is object (null otherwise).
 		/// Consider using Engine.Box if that was desired.
 		/// </summary>
-		public IObject Object => RValue.Deref;
+		public IObject Object => RValue.RefObj;
 		/// <summary>
 		/// Set the value for references
 		/// </summary>
 		public bool Set(Value value)
 		{
-			if (Type != ValueKind.Reference)
+			switch (Kind)
+			{
+			default:
 				return false;
-			return ((IProperties)ptr).Set(str, value.Type == ValueKind.Reference ?
-				((IProperties)value.ptr).Get(value.str) : value);
+			case ValueKind.Reference:
+				return ((IProperties)ptr).Set((string)idx, value.RValue);
+			case ValueKind.IndexRef:
+				return ((IObject)ptr).IndexSet((Value)idx, value.RValue);
+			}
 		}
 		/// <summary>
 		/// Modify the value (compound assignment)
 		/// </summary>
-		public void Modify(OpCode op, Value value)
+		public bool Modify(OpCode op, Value value)
 		{
-			if (Type == ValueKind.Reference)
+			value = value.RValue;
+			if (Kind == ValueKind.Reference)
 			{
-				if (value.Type == ValueKind.Reference)
-					value = ((IProperties)value.ptr).Get(value.str);
 				if (ptr is IObject obj)
-					obj.Modify(str, op, value);
-				else
-				{
-					var tmp = this;
-					tmp.Modify(op, value);
-					((IProperties)ptr).Set(str, tmp);
-				}
-				return;
+					return obj.Modify((string)idx, op, value);
+				var tmp = this;
+				tmp.Modify(op, value);
+				return ((IProperties)ptr).Set((string)idx, tmp);
 			}
+			if (Kind == ValueKind.IndexRef)
+				return ((IObject)ptr).IndexModify((Value)idx, op, value);
 			switch (op)
 			{
 			case OpCode.Assign:
 				this = value;
-				return;
+				return true;
 			case OpCode.OrAssign:
 				this = this | value;
-				return;
+				return true;
 			case OpCode.XorAssign:
 				this = this ^ value;
-				return;
+				return true;
 			case OpCode.AndAssign:
 				this = this & value;
-				return;
+				return true;
 			case OpCode.LshAssign:
 				this = ShiftLeft(value);
-				return;
+				return true;
 			case OpCode.RshAssign:
 				this = ShiftRight(value);
-				return;
+				return true;
 			case OpCode.AddAssign:
 				this = this + value;
-				return;
+				return true;
 			case OpCode.SubAssign:
 				this = this - value;
-				return;
+				return true;
 			case OpCode.MulAssign:
 				this = this * value;
-				return;
+				return true;
 			case OpCode.DivAssign:
 				this = this / value;
-				return;
+				return true;
 			case OpCode.ModAssign:
 				this = this % value;
-				return;
+				return true;
+			}
+			return false;
+		}
+
+		public bool IsProperty
+			=> Kind == ValueKind.Property
+			|| Kind == ValueKind.EasyProp;
+		/// <summary>
+		/// Get value of property
+		/// </summary>
+		public Value Get(IObject self)
+		{
+			switch (Kind)
+			{
+			default:
+				if (!self.Engine.HasOption(EngineOption.Silent))
+					throw new InvalidOperationException();
+				return new Value();
+			case ValueKind.Property:
+				return ((IProperty)ptr).Get(self);
+			case ValueKind.EasyProp:
+				if (ptr == null)
+				{
+					if (!self.Engine.HasOption(EngineOption.Silent))
+						throw new InvalidOperationException(Name + " is write only");
+					return new Value();
+				}
+				return ((PropertyGetter)ptr)(self);
+			}
+		}
+		/// <summary>
+		/// Set value of property
+		/// </summary>
+		public bool Set(IObject self, Value value)
+		{
+			switch (Kind)
+			{
+			case ValueKind.Property:
+				if (((IProperty)ptr).Set(self, value))
+					return true;
+				break;
+			case ValueKind.EasyProp:
+				if (idx == null)
+					break;
+				((PropertySetter)idx)(self, value);
+				return true;
+			}
+			if (!self.Engine.HasOption(EngineOption.Silent))
+				throw new InvalidOperationException(Name + " is read only");
+			return false;
+		}
+		/// <summary>
+		/// Modify value of property
+		/// </summary>
+		public bool Modify(IObject self, OpCode op, Value value)
+		{
+			switch (Kind)
+			{
+			default:
+				if (!self.Engine.HasOption(EngineOption.Silent))
+					throw new InvalidOperationException(Name + " is read only");
+				return false;
+			case ValueKind.Property:
+				var prop = (IProperty)ptr;
+				if (prop is IPropertyEx ex)
+					return ex.Modify(self, op, value);
+				var tmp = prop.Get(self);
+				tmp.Modify(op, value);
+				return prop.Set(self, tmp);
+			case ValueKind.EasyProp:
+				if (ptr == null)
+				{
+					if (!self.Engine.HasOption(EngineOption.Silent))
+						throw new InvalidOperationException(Name + " is write only");
+					return new Value();
+				}
+				if (idx == null)
+				{
+					if (!self.Engine.HasOption(EngineOption.Silent))
+						throw new InvalidOperationException(Name + " is read only");
+					return false;
+				}
+				var it = ((PropertyGetter)ptr)(self);
+				it.Modify(op, value);
+				((PropertySetter)idx)(self, it);
+				return true;
 			}
 		}
 
@@ -158,16 +275,18 @@ namespace RedOnion.Script
 		{
 			get
 			{
-				switch (Type)
+				switch (Kind)
 				{
 				default:
 					return new Value();
 				case ValueKind.Object:
 					return ptr == null ? new Value() : ((IObject)ptr).Value.Number;
 				case ValueKind.Reference:
-					return ((IProperties)ptr).Get(str).Number;
+					return ((IProperties)ptr).Get((string)idx).Number;
+				case ValueKind.IndexRef:
+					return ((IObject)ptr).IndexGet((Value)idx).Number;
 				case ValueKind.String:
-					if (str == "")
+					if ((string)ptr == "")
 						return new Value();
 					return Double;
 				case ValueKind.Char:
@@ -198,7 +317,7 @@ namespace RedOnion.Script
 		public string String => ToString();
 		public override string ToString()
 		{
-			switch (Type)
+			switch (Kind)
 			{
 			default:
 				return "undefined";
@@ -213,9 +332,11 @@ namespace RedOnion.Script
 				}
 				return obj.Value.String;
 			case ValueKind.Reference:
-				return ((IProperties)ptr).Get(str).String;
+				return ((IProperties)ptr).Get((string)idx).String;
+			case ValueKind.IndexRef:
+				return ((IObject)ptr).IndexGet((Value)idx).String;
 			case ValueKind.String:
-				return str;
+				return (string)ptr;
 			case ValueKind.Char:
 				return data.Char.ToString(Culture);
 			case ValueKind.Bool:
@@ -247,7 +368,7 @@ namespace RedOnion.Script
 		{
 			get
 			{
-				switch (Type)
+				switch (Kind)
 				{
 				default:
 					return String;
@@ -258,50 +379,58 @@ namespace RedOnion.Script
 				case ValueKind.Reference:
 					var props = (IProperties)ptr;
 					if (props is IObject obj)
-						return obj.Name + "." + str;
-					return (ptr == null ? "null." : "unknown.") + str;
+						return obj.Name + "." + idx;
+					return (ptr == null ? "null." : "unknown.") + idx;
+				case ValueKind.IndexRef:
+					return string.Format(Culture,
+						"{0}[{1}]", ptr == null ? "null" : ((IObject)ptr).Name, idx);
 				}
 			}
 		}
 
-		public ValueKind Type => type;
+		public ValueKind Kind => kind;
 		/// <summary>
 		/// Is string or char
 		/// </summary>
-		public bool IsString => (Type & ValueKind.fStr) != 0;
+		public bool IsString => (Kind & ValueKind.fStr) != 0;
 		/// <summary>
 		/// Is number (primitive type - includes char and bool)
 		/// </summary>
-		public bool IsNumber => (Type & ValueKind.fNum) != 0;
+		public bool IsNumber => (Kind & ValueKind.fNum) != 0;
+		/// <summary>
+		/// Is enum (handled like primitive but converted to enum when converting to Native)
+		/// </summary>
+		public bool IsEnum => (Kind & ValueKind.fEnum) != 0;
 		/// <summary>
 		/// Is 64bit or more (long, ulong and double, more bits not supported yet)
 		/// </summary>
-		public bool Is64 => (Type & ValueKind.f64) != 0;
+		public bool Is64 => (Kind & ValueKind.f64) != 0;
 		/// <summary>
 		/// Number of bytes the number / primitive type uses (zero if not primitive type)
 		/// </summary>
-		public byte NumberSize => (byte)(((ushort)(Type & ValueKind.mSz)) >> 8);
+		public byte NumberSize => (byte)(((ushort)(Kind & ValueKind.mSz)) >> 8);
 		/// <summary>
 		/// Is signed number type (double, float, int, long, short or sbyte)
 		/// </summary>
-		public bool Signed => (Type & ValueKind.fSig) != 0;
+		public bool Signed => (Kind & ValueKind.fSig) != 0;
 		/// <summary>
 		/// Is foating point number (double or float)
 		/// </summary>
-		public bool IsFloatigPoint => (Type & ValueKind.fFp) != 0;
+		public bool IsFloatigPoint => (Kind & ValueKind.fFp) != 0;
 		/// <summary>
 		/// Is floating point number with not-a-number value
 		/// </summary>
-		public bool IsNaN => (Type & ValueKind.fFp) != 0 && double.IsNaN(data.Double);
+		public bool IsNaN => (Kind & ValueKind.fFp) != 0 && double.IsNaN(data.Double);
 
 		public static implicit operator bool(Value value)
 			=> value.Bool;
 		public bool Bool => IsNumber ? IsFloatigPoint ?
 			data.Double != 0 && !double.IsNaN(data.Double) :
 			data.Long != 0 :
-			Type == ValueKind.Object ? ptr != null :
-			Type == ValueKind.String ? ptr != null && ((string)ptr).Length > 0 :
-			Type == ValueKind.Reference ? ((IProperties)ptr).Get(str).Bool :
+			Kind == ValueKind.Object ? ptr != null :
+			Kind == ValueKind.String ? ptr != null && ((string)ptr).Length > 0 :
+			Kind == ValueKind.Reference ? ((IProperties)ptr).Get((string)idx).Bool :
+			Kind == ValueKind.IndexRef ? ((IObject)ptr).IndexGet((Value)idx).Bool :
 			false;
 
 		public static implicit operator char(Value value)
@@ -310,14 +439,15 @@ namespace RedOnion.Script
 		{
 			get
 			{
-				if (Type == ValueKind.String)
+				if (Kind == ValueKind.String)
 				{
 					var s = ptr as string;
 					return s == null || s.Length == 0 ? '\0' : s[0];
 				}
 				return IsNumber ? IsFloatigPoint ?
 					(char)data.Double : (char)data.Long :
-					Type == ValueKind.Reference ? ((IProperties)ptr).Get(str).Char :
+					Kind == ValueKind.Reference ? ((IProperties)ptr).Get((string)idx).Char :
+					Kind == ValueKind.IndexRef ? ((IObject)ptr).IndexGet((Value)idx).Char :
 					'\0';
 			}
 		}
@@ -328,17 +458,18 @@ namespace RedOnion.Script
 		{
 			get
 			{
-				if (Type == ValueKind.String)
+				if (Kind == ValueKind.String)
 				{
-					if (str != null && double.TryParse(str,
-						NumberStyles.Float, CultureInfo.InvariantCulture,
+					if (ptr != null && double.TryParse((string)ptr,
+						NumberStyles.Float, Culture,
 						out var v))
 						return v;
 					return double.NaN;
 				}
 				return IsNumber ? IsFloatigPoint ?
 					data.Double : data.Long :
-					Type == ValueKind.Reference ? ((IProperties)ptr).Get(str).Double :
+					Kind == ValueKind.Reference ? ((IProperties)ptr).Get((string)idx).Double :
+					Kind == ValueKind.IndexRef ? ((IObject)ptr).IndexGet((Value)idx).Double :
 					double.NaN;
 			}
 		}
@@ -349,17 +480,18 @@ namespace RedOnion.Script
 		{
 			get
 			{
-				if (Type == ValueKind.String)
+				if (Kind == ValueKind.String)
 				{
 					if (ptr != null && long.TryParse((string)ptr,
-						NumberStyles.Number, CultureInfo.InvariantCulture,
+						NumberStyles.Number, Culture,
 						out var v))
 						return v;
 					return 0;
 				}
 				return IsNumber ? IsFloatigPoint ?
 					(long)data.Double : data.Long :
-					Type == ValueKind.Reference ? ((IProperties)ptr).Get(str).Long :
+					Kind == ValueKind.Reference ? ((IProperties)ptr).Get((string)idx).Long :
+					Kind == ValueKind.IndexRef ? ((IObject)ptr).IndexGet((Value)idx).Long :
 					0;
 			}
 		}
@@ -370,17 +502,18 @@ namespace RedOnion.Script
 		{
 			get
 			{
-				if (Type == ValueKind.String)
+				if (Kind == ValueKind.String)
 				{
 					if (ptr != null && ulong.TryParse((string)ptr,
-						NumberStyles.Number, CultureInfo.InvariantCulture,
+						NumberStyles.Number, Culture,
 						out var v))
 						return v;
 					return 0;
 				}
 				return IsNumber ? IsFloatigPoint ?
 					(ulong)data.Double : (ulong)data.Long :
-					Type == ValueKind.Reference ? ((IProperties)ptr).Get(str).ULong :
+					Kind == ValueKind.Reference ? ((IProperties)ptr).Get((string)idx).ULong :
+					Kind == ValueKind.IndexRef ? ((IObject)ptr).IndexGet((Value)idx).ULong :
 					0;
 			}
 		}
@@ -392,5 +525,48 @@ namespace RedOnion.Script
 		public ushort	UShort	=> (ushort)	ULong;
 		public sbyte	SByte	=> (sbyte)	Long;
 		public byte		Byte	=> (byte)	ULong;
+
+		public static Value FromPrimitive(object value)
+		{
+			if (value == null)
+				return new Value((IObject)null);
+			if (value is string || value is StringBuilder)
+				return value.ToString();
+			if (value is Enum)
+			{
+				var type = value.GetType();
+				var result = Value.FromPrimitive(
+					Convert.ChangeType(value,
+					Enum.GetUnderlyingType(type)));
+				result.kind |= ValueKind.fEnum;
+				result.idx = type;
+				return result;
+			}
+			if (value is bool bval)
+				return bval;
+			if (value is int ival)
+				return ival;
+			if (value is float fval)
+				return fval;
+			if (value is double dval)
+				return dval;
+			if (value is uint uval)
+				return uval;
+			if (value is long i64)
+				return i64;
+			if (value is ulong u64)
+				return u64;
+			if (value is short i16)
+				return i16;
+			if (value is ushort u16)
+				return u16;
+			if (value is byte u8)
+				return u8;
+			if (value is sbyte i8)
+				return i8;
+			if (value is char c)
+				return c;
+			return new Value();
+		}
 	}
 }

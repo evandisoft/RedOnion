@@ -112,12 +112,7 @@ namespace RedOnion.Script.ReflectedObjects
 		public override bool Set(string name, Value value)
 		{
 			if (BaseProps != null && BaseProps.Get(name, out var query))
-			{
-				if (query.Type != ValueKind.Property)
-					return false;
-				((IProperty)query.ptr).Set(this, value);
-				return true;
-			}
+				return query.Set(this, value);
 			var members = GetMembers(name);
 			for (int i = 0; i < members.Length;)
 			{
@@ -151,16 +146,7 @@ namespace RedOnion.Script.ReflectedObjects
 		public override bool Modify(string name, OpCode op, Value value)
 		{
 			if (BaseProps != null && BaseProps.Get(name, out var query))
-			{
-				if (query.Type != ValueKind.Property)
-					return false;
-				var prop = (IProperty)query.ptr;
-				if (prop is IPropertyEx ex)
-					return ex.Modify(this, op, value);
-				var tmp = prop.Get(this);
-				tmp.Modify(op, value);
-				return prop.Set(this, tmp);
-			}
+				return query.Modify(this, op, value);
 			var members = GetMembers(name);
 			for (int i = 0; i < members.Length;)
 			{

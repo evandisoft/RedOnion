@@ -45,7 +45,7 @@ namespace RedOnion.Script
 				var last = at;
 				var stts = at + size;
 				var cend = (stts + 4) + BitConverter.ToInt32(Code, stts);
-				if (Value.Type != ValueKind.Undefined && !Value.Bool)
+				if (Value.Kind != ValueKind.Undefined && !Value.Bool)
 				{
 					at = cend;
 					if (HasOption(EngineOption.BlockScope))

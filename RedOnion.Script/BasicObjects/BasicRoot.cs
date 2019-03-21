@@ -115,24 +115,25 @@ namespace RedOnion.Script.BasicObjects
 
 		public IObject Box(Value value)
 		{
-			for (;;)
+			value = value.RValue;
+			switch (value.Kind)
 			{
-				switch (value.Type)
+			case ValueKind.Undefined:
+				if (Engine.HasOption(EngineOption.Strict))
 				{
-				case ValueKind.Undefined:
-					return new BasicObject(Engine, this.Object.Prototype);
-				case ValueKind.Object:
-					return (IObject)value.ptr;
-				case ValueKind.Reference:
-					value = ((IProperties)value.ptr).Get(value.str);
-					continue;
-				case ValueKind.String:
-					return new StringObj(Engine, String.Prototype, value.str);
-				default:
-					if (value.IsNumber)
-						return new NumberObj(Engine, Number.Prototype, value);
-					throw new NotImplementedException();
+					if (!Engine.HasOption(EngineOption.Silent))
+						throw new InvalidOperationException("Undefined value cannot be boxed into object");
+					return null;
 				}
+				return new BasicObject(Engine, this.Object.Prototype);
+			case ValueKind.Object:
+				return (IObject)value.ptr;
+			case ValueKind.String:
+				return new StringObj(Engine, String.Prototype, (string)value.ptr);
+			default:
+				if (value.IsNumber)
+					return new NumberObj(Engine, Number.Prototype, value);
+				throw new NotImplementedException();
 			}
 		}
 

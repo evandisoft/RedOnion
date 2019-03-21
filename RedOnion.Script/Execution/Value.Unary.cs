@@ -12,27 +12,23 @@ namespace RedOnion.Script
 
 		public static Value operator +(Value value)
 		{
-		again:
+			value = value.RValue;
 			if (value.IsNumber)
 				return value;
-			if (value.Type == ValueKind.Reference)
-			{
-				value = ((IProperties)value.ptr).Get(value.str);
-				goto again;
-			}
+			if (value.Kind == ValueKind.String)
+				return value.Number;
 			return new Value();
 		}
 
 		public static Value operator -(Value value)
 		{
-		again:
-			switch (value.Type)
+			value = value.RValue;
+			if (value.Kind == ValueKind.String)
+				value = value.Number;
+			switch (value.Kind)
 			{
 			default:
 				return new Value();
-			case ValueKind.Reference:
-				value = ((IProperties)value.ptr).Get(value.str);
-				goto again;
 			case ValueKind.Char:
 				return new Value(-value.data.Char);
 			case ValueKind.Bool:
@@ -62,14 +58,13 @@ namespace RedOnion.Script
 
 		public static Value operator ~(Value value)
 		{
-		again:
-			switch (value.Type)
+			value = value.RValue;
+			if (value.Kind == ValueKind.String)
+				value = value.Number;
+			switch (value.Kind)
 			{
 			default:
 				return new Value();
-			case ValueKind.Reference:
-				value = ((IProperties)value.ptr).Get(value.str);
-				goto again;
 			case ValueKind.Char:
 				return new Value(~value.data.Char);
 			case ValueKind.Bool:
@@ -99,14 +94,13 @@ namespace RedOnion.Script
 
 		public static Value operator ++(Value value)
 		{
-		again:
-			switch (value.Type)
+			value = value.RValue;
+			if (value.Kind == ValueKind.String)
+				value = value.Number;
+			switch (value.Kind)
 			{
 			default:
 				return new Value();
-			case ValueKind.Reference:
-				value = ((IProperties)value.ptr).Get(value.str);
-				goto again;
 			case ValueKind.Char:
 				return new Value((char)(value.data.Char + 1));
 			case ValueKind.Bool:
@@ -136,14 +130,13 @@ namespace RedOnion.Script
 
 		public static Value operator --(Value value)
 		{
-		again:
-			switch (value.Type)
+			value = value.RValue;
+			if (value.Kind == ValueKind.String)
+				value = value.Number;
+			switch (value.Kind)
 			{
 			default:
 				return new Value();
-			case ValueKind.Reference:
-				value = ((IProperties)value.ptr).Get(value.str);
-				goto again;
 			case ValueKind.Char:
 				return new Value((char)(value.data.Char - 1));
 			case ValueKind.Bool:

@@ -54,7 +54,7 @@ namespace RedOnion.Script.ReflectedObjects
 				{
 					var arg = Arg(argc, i);
 					var native = arg.Native;
-					Engine.DebugLog("#{0} {1} -> {2} {4}", i, arg.Type, arg.String,
+					Engine.DebugLog("#{0} {1} -> {2} {4}", i, arg.Kind, arg.String,
 						native?.GetType().FullName ?? "null", native?.ToString() ?? "null");
 				}
 				var sb = new System.Text.StringBuilder();
