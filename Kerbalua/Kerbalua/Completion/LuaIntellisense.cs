@@ -23,7 +23,7 @@ namespace Kerbalua.Completion {
 			try {
 				completionObject.ProcessCompletion();
 			}
-			catch(LuaIntellisenseException e) {
+			catch(LuaIntellisenseException) {
 				replaceStart = replaceEnd = cursorPos;
 				return new List<string>();
 			}

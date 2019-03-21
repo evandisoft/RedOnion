@@ -56,13 +56,8 @@ namespace RedOnion.KSP.Autopilot {
 			CurrentSpinMode = SpinMode.OFF;
 		}
 
-		public Vector3 GetAvailableTorque()
+		public Vector3 GetAvailableTorque(Vessel vessel)
 		{
-			Vessel vessel = FlightGlobals.ActiveVessel;
-			if (vessel == null) {
-				return new Vector3();
-			}
-
 			Vector3 torque = new Vector3();
 
 			foreach(var part in vessel.Parts) {
@@ -96,7 +91,7 @@ namespace RedOnion.KSP.Autopilot {
 				break;
 			case SpinMode.SET_DIR:
 				throw new NotImplementedException("SET_DIR mode not yet implemented");
-				break;
+				//break;
 			case SpinMode.RAW:
 				SetPitchRollYaw(flightCtrlState, new Vector3(
 					userCtrlState.pitch, userCtrlState.roll, userCtrlState.yaw));
@@ -112,12 +107,23 @@ namespace RedOnion.KSP.Autopilot {
 				return;
 			}
 
-			Vector3 torque = GetAvailableTorque();
-
-			Vector3 angularSpeed = MathUtil.Vec.Div(vessel.angularMomentum, vessel.MOI);
-			Vector3 accel = MathUtil.Vec.Div(torque, vessel.MOI);
+			Vector3 angularSpeed = GetAngularSpeed(vessel);
+			Vector3 accel = GetMaxAcceleration(vessel);
 			Vector3 pry = MathUtil.Vec.Div(angularSpeed-TargetSpin, accel * Time.deltaTime);
 			SetPitchRollYaw(flightCtrlState, pry);
+		}
+
+
+
+		Vector3 GetMaxAcceleration(Vessel vessel)
+		{
+			Vector3 torque = GetAvailableTorque(vessel);
+			return MathUtil.Vec.Div(torque, vessel.MOI);
+		}
+
+		Vector3 GetAngularSpeed(Vessel vessel)
+		{
+			return MathUtil.Vec.Div(vessel.angularMomentum, vessel.MOI);
 		}
 
 		/// <summary>

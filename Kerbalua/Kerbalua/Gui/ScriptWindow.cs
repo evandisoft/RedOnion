@@ -33,7 +33,7 @@ namespace Kerbalua.Gui {
 		Rect replRect;
 		Rect completionBoxRect;
 		Rect editorRect;
-		Rect scriptNameRect;
+		//Rect scriptNameRect;
 		ScriptNameInputArea scriptIOTextArea=new ScriptNameInputArea();
 		// Should be a label but I haven't made a label yet.
 		TextArea replEvaluatorLabel = new TextArea();
@@ -44,7 +44,7 @@ namespace Kerbalua.Gui {
 
 		Evaluation currentEvaluation = null;
 		bool inputIsLocked;
-		bool evaluationNotFinished = false;
+		//bool evaluationNotFinished = false;
 
 		public KeyBindings GlobalKeyBindings = new KeyBindings();
 
