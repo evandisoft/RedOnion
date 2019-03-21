@@ -229,6 +229,9 @@ namespace RedOnion.ScriptNUnit
 			Test("var u = v * 2");
 			var u = (MyVector)Result.Native;
 			Assert.AreEqual(2f, u.x);
+			Test("var w = 3 * v");
+			var w = (MyVector)Result.Native;
+			Assert.AreEqual(6f, w.y);
 		}
 	}
 }

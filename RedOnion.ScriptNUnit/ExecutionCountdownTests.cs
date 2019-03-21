@@ -46,22 +46,22 @@ namespace RedOnion.ScriptNUnit
 		[Test]
 		public void ExecutionCountdown_03_DoWhileTrue()
 		{
-			Test("do undefined while true");
+			Test("do while true");
 			Test("do continue while true");
 		}
 
 		[Test]
 		public void ExecutionCountdown_04_DoUntilFalse()
 		{
-			Test("do null until false");
+			Test("do until false");
 			Test("do continue until false");
 		}
 
 		[Test]
 		public void ExecutionCountdown_05_ForLoop()
 		{
-			Test("for\r\n\tnull");
-			Test("for var i = 1; i > 0; i++; undefined");
+			Test("for\r\n\tcontinue");
+			Test("for var i = 1; i > 0; i++; continue");
 		}
 	}
 }

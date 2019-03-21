@@ -42,11 +42,11 @@ namespace RedOnion.Script.Parsing
 			/// Convert simple statements (identifier or root is dot)
 			/// into function call (e.g. `stage` becomes `stage()`).
 			/// </summary>
-			AutocallSimle = 1 << 4,
+			AutocallSimple = 1 << 4,
 			/// <summary>
 			/// Both versions of function call without parentheses
 			/// </summary>
-			Autocall = AutocallWhenArgs | AutocallSimle,
+			Autocall = AutocallWhenArgs | AutocallSimple,
 
 			/// <summary>
 			/// "x .y" => "x(this.y)" if set, "x.y" otherwise

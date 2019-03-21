@@ -7,6 +7,11 @@ namespace RedOnion.ScriptNUnit
 {
 	public class EngineTestsBase : Engine
 	{
+		public EngineTestsBase()
+		{
+			if (HasOption(EngineOption.Autocall))
+				Options |= EngineOption.ReplAutocall;
+		}
 		public void Test(string script, int countdown = 100)
 		{
 			try
@@ -148,6 +153,12 @@ namespace RedOnion.ScriptNUnit
 			Test(true,		"true ? true : false");
 			Test(false,		"false ? true : false");
 			Test(2,			"0 != 0 ? 1 : 2");
+		}
+
+		[Test]
+		public void Expression_08_Autocall()
+		{
+			Expect<InvalidOperationException>("true; false");
 		}
 	}
 }

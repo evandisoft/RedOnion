@@ -27,6 +27,22 @@ namespace RedOnion.Script
 		/// </summary>
 		Strict = 1 << 2,
 		/// <summary>
+		/// Simple expression-statements (identifier or dot-access)
+		/// must result in function (which is then called with no arguments)
+		/// or produce and error.
+		/// </summary>
+		Autocall = 1 << 3,
+		/// <summary>
+		/// Weaker version of Autocall
+		/// (Will execute function but won't produce error if not a function)
+		/// </summary>
+		WeakAutocall = 1 << 4,
+		/// <summary>
+		/// Special autocall handling for REPL
+		/// - works as WeakAutocall for single statement
+		/// </summary>
+		ReplAutocall = 1 << 5,
+		/// <summary>
 		/// Anonymous functions (created by Function(args, body))
 		/// expose their body (script code).
 		/// </summary>

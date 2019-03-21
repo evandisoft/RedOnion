@@ -191,7 +191,18 @@ namespace RedOnion.Script.Parsing
 					Label(flags);
 					return;
 				}
+				var exprStart = CodeAt;
 				FullExpression(flags);
+				if (HasOption(Option.AutocallSimple) && CodeAt > exprStart)
+				{
+					var root = ((OpCode)Code[exprStart]).Extend();
+					if (root == OpCode.Dot || root.Kind() <= OpKind.Number)
+					{
+						Array.Copy(Code, exprStart, Code, exprStart+1, CodeAt-exprStart);
+						Code[exprStart] = OpCode.Autocall.Code();
+						CodeAt++;
+					}
+				}
 				return;
 			case OpCode.Goto:
 				Next();
