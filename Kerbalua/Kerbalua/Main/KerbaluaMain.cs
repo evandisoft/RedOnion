@@ -113,7 +113,12 @@ namespace Kerbalua
         }
 
 
-        public void OnGUI()
+		void FixedUpdate()
+		{
+
+		}
+
+		void OnGUI()
         {
 
 			repl.Render(guiActive);

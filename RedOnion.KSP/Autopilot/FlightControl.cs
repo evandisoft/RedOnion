@@ -4,6 +4,27 @@ using UnityEngine;
 
 namespace RedOnion.KSP.Autopilot {
 	public class FlightControl {
+		public Vector3 GetAvailableTorque()
+		{
+			Vessel vessel = FlightGlobals.ActiveVessel;
+			if (vessel == null) {
+				return new Vector3();
+			}
+
+			Vector3 torque = new Vector3();
+			foreach(var part in vessel.Parts) {
+				foreach(var module in part.Modules) {
+					if(module is ITorqueProvider torqueProvider) {
+						Vector3 pos, neg;
+						torqueProvider.GetPotentialTorque(out pos, out neg);
+						torque += pos;
+					}
+				}
+			}
+
+			return torque;
+		}
+
 		FlightCtrlState userCtrlState = new FlightCtrlState();
 
 		void RawControlCallback(FlightCtrlState flightCtrlState)

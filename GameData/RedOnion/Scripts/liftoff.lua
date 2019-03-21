@@ -1,5 +1,13 @@
 vessel=ksp.flightGlobals.ActiveVessel
 ctrl=ksp.flightControl
-ctrl.SetWithTable{roll=1}
+ctrl.Reset()
+-- ctrl.SetWithTable{roll=1}
 ctrl.Enable()
-while true do end
+local previousTime=os.time()
+while true do
+    -- print(ctrl.GetAvailableTorque())
+    local newTime=os.time()
+    print(newTime-previousTime)
+    previousTime=newTime
+    coroutine.yield()
+end
