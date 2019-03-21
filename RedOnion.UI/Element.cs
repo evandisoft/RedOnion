@@ -166,7 +166,7 @@ namespace RedOnion.UI
 					return;
 				if (layout == Layout.Horizontal || layout == Layout.Vertical)
 				{
-					GameObject.Destroy(layoutGroup);
+					GameObject.DestroyImmediate(layoutGroup);
 					layoutGroup = null;
 				}
 				layout = value;
