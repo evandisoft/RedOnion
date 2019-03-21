@@ -5,13 +5,13 @@ ctrl.Reset()
 ctrl.Enable()
 local previousTime=os.time()
 local ctrlTable={roll=0,pitch=0,yaw=0,mainThrottle=1}
-torque=ctrl.GetAvailableTorque()
-yTorque=torque.y
-xTorque=torque.x
-zTorque=torque.z
-
 
 while true do
+    torque=ctrl.GetAvailableTorque()
+    yTorque=torque.y
+    xTorque=torque.x
+    zTorque=torque.z
+
     moi=vessel.MOI
     yInertia=moi.y
     yMomentum=vessel.angularMomentum.y
@@ -45,9 +45,9 @@ while true do
     
     ctrl.SetWithTable(ctrlTable)
     
-    print(vessel.ctrlState.roll)
-    print(vessel.ctrlState.yaw)
-    print(vessel.ctrlState.pitch)
+    --print(vessel.ctrlState.roll)
+    --print(vessel.ctrlState.yaw)
+    --print(vessel.ctrlState.pitch)
     
     coroutine.yield()
 end

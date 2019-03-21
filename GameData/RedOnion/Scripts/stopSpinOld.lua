@@ -31,7 +31,6 @@ while true do
     zAccel=zTorque/zInertia
     ctrlTable.yaw=zAngularSpeed/(zAccel*ksp.time.deltaTime)
 
-    
     ctrl.SetWithTable(ctrlTable)
     
     if(math.abs(zAngularSpeed)<0.001 and math.abs(xAngularSpeed)<0.001 and math.abs(yAngularSpeed)<0.001) then
