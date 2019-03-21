@@ -1,5 +1,6 @@
 using System;
 using MoonSharp.Interpreter;
+using UnityEngine;
 
 namespace RedOnion.KSP.Autopilot {
 	public class FlightControl {
@@ -7,14 +8,38 @@ namespace RedOnion.KSP.Autopilot {
 
 		void RawControlCallback(FlightCtrlState flightCtrlState)
 		{
-			if (userCtrlState != null) {
-				flightCtrlState.CopyFrom(userCtrlState);
-			}
+			flightCtrlState.CopyFrom(userCtrlState);
 		}
 
 		public void SetWithTable(Table ctrlTable)
 		{
-			//userCtrlState.pitch=ctrlTable["pitch"]
+			foreach(var setting in ctrlTable.Keys) {
+				if(setting.Type==DataType.String && ctrlTable[setting] is Double value) {
+					switch (setting.String) {
+					case "roll":
+						userCtrlState.roll = Mathf.Clamp((float)value, -1, 1);
+						break;
+					case "pitch":
+						userCtrlState.pitch = Mathf.Clamp((float)value, -1, 1);
+						break;
+					case "yaw":
+						userCtrlState.yaw = Mathf.Clamp((float)value, -1, 1);
+						break;
+					case "X":
+						userCtrlState.X = Mathf.Clamp((float)value, -1, 1);
+						break;
+					case "Y":
+						userCtrlState.Y = Mathf.Clamp((float)value, -1, 1);
+						break;
+					case "Z":
+						userCtrlState.Z = Mathf.Clamp((float)value, -1, 1);
+						break;
+					case "mainThrottle":
+						userCtrlState.mainThrottle = Mathf.Clamp((float)value, 0, 1);
+						break;
+					}
+				}
+			}
 		}
 
 		public void SetCtrlState(FlightCtrlState flightCtrlState)

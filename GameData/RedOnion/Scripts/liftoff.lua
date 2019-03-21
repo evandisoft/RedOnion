@@ -1,5 +1,5 @@
 vessel=ksp.flightGlobals.ActiveVessel
-ctrlState=vessel.ctrlState
-while true do
-    ctrlState.roll=1
-end
+ctrl=ksp.flightControl
+ctrl.SetWithTable{roll=1}
+ctrl.Enable()
+while true do end
