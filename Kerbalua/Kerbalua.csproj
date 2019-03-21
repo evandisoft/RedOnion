@@ -94,7 +94,7 @@
     <Compile Include="Kerbalua\Gui\EditingArea.cs" />
     <Compile Include="Kerbalua\Other\ReplEvaluator.cs" />
     <Compile Include="Kerbalua\Other\RedOnionReplEvaluator.cs" />
-    <Compile Include="Kerbalua\Other\SimpleScript.cs" />
+    <Compile Include="Kerbalua\Other\KSPMoonSharpScript.cs" />
     <Compile Include="Kerbalua\Gui\EventKey.cs" />
     <Compile Include="Kerbalua\Gui\KeyBindings.cs" />
     <Compile Include="Kerbalua\Gui\ScriptNameInputArea.cs" />

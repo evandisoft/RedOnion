@@ -6,6 +6,7 @@ using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.REPL;
 using MoonSharp.Interpreter.Interop;
 using Kerbalua.Other;
+using RedOnion.KSP.Lua;
 
 namespace KerbaluaNUnit {
 	[TestFixture()]
@@ -27,7 +28,7 @@ namespace KerbaluaNUnit {
 		[Test()]
 		public void TestCase()
 		{
-			script= new SimpleScript(CoreModules.Preset_Complete);
+			script= new KerbaluaScript();
 			var completion= GetCompletionObject(script.Globals,
 				@"os."
 				);

@@ -3,9 +3,14 @@ using UnityEngine;
 
 namespace Kerbalua.Gui {
 	public class OutputBox:ScrollableTextArea {
+		public const int OUTPUT_LENGTH_LIMIT = 8000;
+
 		void CommonOutputProcessing()
 		{
 			ResetScroll();
+			if (content.text.Length > OUTPUT_LENGTH_LIMIT) {
+				content.text = content.text.Substring(content.text.Length - OUTPUT_LENGTH_LIMIT, OUTPUT_LENGTH_LIMIT);
+			}
 		}
 
 		public void AddReturnValue(string str)

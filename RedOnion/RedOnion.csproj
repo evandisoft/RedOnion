@@ -79,9 +79,6 @@
     <ItemGroup>
       <OutputFiles Include="$(OutDir)**\*"></OutputFiles>
     </ItemGroup>
-    <Copy
-      SourceFiles="@(OutputFiles)"
-      DestinationFolder="..\GameData\RedOnion\Plugins\%(RecursiveDir)" 
-      OverwriteReadOnlyFiles="true" />
+    <Copy SourceFiles="@(OutputFiles)" DestinationFolder="..\GameData\RedOnion\Plugins\%(RecursiveDir)" OverwriteReadOnlyFiles="true" />
   </Target>
 </Project>

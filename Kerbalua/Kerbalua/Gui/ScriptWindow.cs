@@ -63,7 +63,7 @@ namespace Kerbalua.Gui {
 		public ScriptWindow(Rect param_mainWindowRect)
 		{
 			replEvaluators["RedOnion"] = new RedOnionReplEvaluator();
-			replEvaluators["MoonSharp"] = new MoonSharpReplEvaluator(CoreModules.Preset_Complete);
+			replEvaluators["MoonSharp"] = new MoonSharpReplEvaluator();
 			replEvaluators["MoonSharp"].PrintAction = (str) => {
 				repl.outputBox.AddOutput(str);
 			};
