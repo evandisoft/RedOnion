@@ -94,7 +94,6 @@
     <Compile Include="Kerbalua\Gui\EditingArea.cs" />
     <Compile Include="Kerbalua\Other\ReplEvaluator.cs" />
     <Compile Include="Kerbalua\Other\RedOnionReplEvaluator.cs" />
-    <Compile Include="Kerbalua\Other\KSPMoonSharpScript.cs" />
     <Compile Include="Kerbalua\Gui\EventKey.cs" />
     <Compile Include="Kerbalua\Gui\KeyBindings.cs" />
     <Compile Include="Kerbalua\Gui\ScriptNameInputArea.cs" />
@@ -133,6 +132,7 @@
     <Compile Include="Kerbalua\CompletionOld\TableCompletionOld.cs" />
     <Compile Include="Kerbalua\CompletionOld\UserDataCompletionOld.cs" />
     <Compile Include="Kerbalua\Utility\Settings.cs" />
+    <Compile Include="Kerbalua\Other\Evaluation.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

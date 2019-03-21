@@ -58,6 +58,11 @@ namespace Kerbalua.Gui {
 			scriptWindow.repl.outputBox.content.text += "\n" + str;
 		}
 
+		public void FixedUpdate()
+		{
+			scriptWindow.FixedUpdate();
+		}
+
 		public void Render(bool guiActive)
 		{
 

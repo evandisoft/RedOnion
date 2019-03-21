@@ -22,6 +22,7 @@ namespace RedOnion.KSP.Lua {
 			if (coroutine == null) {
 				SetCoroutine(source);
 			}
+			coroutine.Coroutine.AutoYieldCounter = 1000;
 			result = coroutine.Coroutine.Resume();
 			//Debug.Log("result is " + result);
 			//if (coroutine.Coroutine.State == CoroutineState.ForceSuspended) {
@@ -62,7 +63,7 @@ namespace RedOnion.KSP.Lua {
 				//Debug.Log("Coroutine is " + coroutine);
 				throw e;
 			}
-			coroutine.Coroutine.AutoYieldCounter = 1000;
+
 		}
 
 		public void Terminate()

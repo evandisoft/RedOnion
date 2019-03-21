@@ -115,7 +115,7 @@ namespace Kerbalua
 
 		void FixedUpdate()
 		{
-
+			repl.FixedUpdate();
 		}
 
 		void OnGUI()

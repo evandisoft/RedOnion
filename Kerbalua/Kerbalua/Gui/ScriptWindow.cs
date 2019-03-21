@@ -42,6 +42,7 @@ namespace Kerbalua.Gui {
 
 		const float titleHeight = 20;
 
+		Evaluation currentEvaluation = null;
 		bool inputIsLocked;
 		bool evaluationNotFinished = false;
 
@@ -58,6 +59,18 @@ namespace Kerbalua.Gui {
 		{
 			currentReplEvaluator = replEvaluators[evaluatorName];
 			replEvaluatorLabel.content.text = evaluatorName;
+		}
+
+
+
+		public void FixedUpdate()
+		{
+			if (currentEvaluation != null) {
+				if (currentEvaluation.Evaluate()) {
+					repl.outputBox.AddReturnValue(currentEvaluation.Result);
+					currentEvaluation = null;
+				}
+			}
 		}
 
 		public ScriptWindow(Rect param_mainWindowRect)
@@ -123,11 +136,7 @@ namespace Kerbalua.Gui {
 			widgetBar.renderables.Add(new Button("Evaluate", () => {
 				scriptIOTextArea.Save(editor.content.text);
 				repl.outputBox.AddFileContent(scriptIOTextArea.content.text);
-				if (currentReplEvaluator.Evaluate(editor.content.text, out string output)) {
-					repl.outputBox.AddReturnValue(output);
-				} else {
-					evaluationNotFinished = true;
-				}
+				currentEvaluation = new Evaluation(editor.content.text, currentReplEvaluator);
 			}));
 			widgetBar.renderables.Add(new Button("Reset Engine", () => {
 				currentReplEvaluator.ResetEngine();
@@ -250,27 +259,15 @@ Any other key gives focus to input box.
 			editor.KeyBindings.Add(new EventKey(KeyCode.E, true), () => {
 				scriptIOTextArea.Save(editor.content.text);
 				repl.outputBox.AddFileContent(scriptIOTextArea.content.text);
-				if (currentReplEvaluator.Evaluate(editor.content.text, out string output)) {
-					repl.outputBox.AddReturnValue(output);
-				} else {
-					evaluationNotFinished = true;
-				}
+				currentEvaluation = new Evaluation(editor.content.text, currentReplEvaluator);
 			});
 			repl.inputBox.KeyBindings.Add(new EventKey(KeyCode.E, true), () => {
 				repl.outputBox.AddSourceString(repl.inputBox.content.text);
-				if (currentReplEvaluator.Evaluate(repl.inputBox.content.text, out string output)) {
-					repl.outputBox.AddReturnValue(output);
-				} else {
-					evaluationNotFinished = true;
-				}
+				currentEvaluation = new Evaluation(repl.inputBox.content.text, currentReplEvaluator);
 			});
 			repl.inputBox.KeyBindings.Add(new EventKey(KeyCode.Return), () => {
 				repl.outputBox.AddSourceString(repl.inputBox.content.text);
-				if (currentReplEvaluator.Evaluate(repl.inputBox.content.text, out string output,true)) {
-					repl.outputBox.AddReturnValue(output);
-				} else {
-					evaluationNotFinished = true;
-				}
+				currentEvaluation = new Evaluation(repl.inputBox.content.text, currentReplEvaluator,true);
 				repl.inputBox.content.text = "";
 				completionBox.content.text = "";
 			});
@@ -417,29 +414,20 @@ Any other key gives focus to input box.
 		/// <param name="id">Identifier.</param>
 		void MainWindow(int id)
 		{
-			if (evaluationNotFinished
+			if (currentEvaluation!=null
 					&& Event.current.type == EventType.KeyDown
 					&& Event.current.keyCode == KeyCode.C
 					&& Event.current.control) {
 				GUIUtil.ConsumeAndMarkNextCharEvent(Event.current);
-				currentReplEvaluator.Terminate();
-				evaluationNotFinished = false;
+				currentEvaluation.Terminate();
+				currentEvaluation = null;
 				repl.outputBox.AddError("Execution Manually Terminated");
 			}
 
-			if (evaluationNotFinished) {
-				//Debug.Log("Evaluation Not Finished");
-				string output;
-				if (currentReplEvaluator.Evaluate("", out output)) {
-					//Debug.Log("Evaluation Finally Finished");
-					evaluationNotFinished = false;
-					repl.outputBox.AddReturnValue(output);
-				} else {
-					//Debug.Log("Evaluation Still Not Finished");
-					if (Event.current.type == EventType.KeyDown ||
-						Event.current.type == EventType.MouseDown) {
-						Event.current.Use();
-					}
+			if (currentEvaluation != null) {
+				EventType t = Event.current.type;
+				if(t==EventType.KeyDown || t == EventType.MouseDown) {
+					Event.current.Use();
 				}
 			}
 
