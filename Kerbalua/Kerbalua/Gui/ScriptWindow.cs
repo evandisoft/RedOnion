@@ -61,8 +61,6 @@ namespace Kerbalua.Gui {
 			replEvaluatorLabel.content.text = evaluatorName;
 		}
 
-
-
 		public void FixedUpdate()
 		{
 			if (currentEvaluation != null) {

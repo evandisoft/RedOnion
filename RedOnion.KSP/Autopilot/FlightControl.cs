@@ -46,6 +46,16 @@ namespace RedOnion.KSP.Autopilot {
 			}
 		}
 
+		public void SetSpin(float x, float y, float z)
+		{
+			TargetSpin = new Vector3(x, y, z);
+		}
+
+		public void SetSpin(Vector3 vector)
+		{
+			TargetSpin = vector;
+		}
+
 		public void StopSpin()
 		{
 			TargetSpin = new Vector3();
@@ -56,6 +66,11 @@ namespace RedOnion.KSP.Autopilot {
 			CurrentSpinMode = SpinMode.OFF;
 		}
 
+		/// <summary>
+		/// TODO: WE don't propery handle both possible torque situations
+		/// </summary>
+		/// <returns>The available torque.</returns>
+		/// <param name="vessel">Vessel.</param>
 		public Vector3 GetAvailableTorque(Vessel vessel)
 		{
 			Vector3 torque = new Vector3();
@@ -90,13 +105,48 @@ namespace RedOnion.KSP.Autopilot {
 				SetSpin(flightCtrlState);
 				break;
 			case SpinMode.SET_DIR:
-				throw new NotImplementedException("SET_DIR mode not yet implemented");
-				//break;
+				SetDir(flightCtrlState);
+				break;
 			case SpinMode.RAW:
 				SetPitchRollYaw(flightCtrlState, new Vector3(
 					userCtrlState.pitch, userCtrlState.roll, userCtrlState.yaw));
 				break;
 			}
+		}
+
+		const float maxAngularSpeed = Mathf.PI * 2 / 20;
+		//const float fudgeFactor = 0.9f;
+		/// <summary>
+		/// Gets spin needed to approach target direction
+		/// </summary>
+		/// <returns>The needed spin.</returns>
+		/// <param name="target">Target dir.</param>
+		public Vector3 TargetSpinNeeded(Vector3 target)
+		{
+			Vessel vessel = FlightGlobals.ActiveVessel;
+			if (vessel == null) {
+				return new Vector3();
+			}
+			Vector3 forward = vessel.transform.up;
+
+
+			Vector3 spinAxis = vessel.transform.worldToLocalMatrix * Vector3.Cross(forward, target);
+			spinAxis.Normalize();
+			float angularDistance = Vector3.Angle(forward, target)/360*2*Mathf.PI;
+			float spinMagnitude = Math.Min(angularDistance / Time.deltaTime, maxAngularSpeed);
+			return spinAxis * spinMagnitude;
+		}
+
+		void SetDir(FlightCtrlState flightCtrlState)
+		{
+			Vessel vessel = FlightGlobals.ActiveVessel;
+			if (vessel == null) {
+				Shutdown();
+				return;
+			}
+
+			targetSpin = TargetSpinNeeded(targetDir);
+			SetSpin(flightCtrlState);
 		}
 
 		void SetSpin(FlightCtrlState flightCtrlState)
@@ -109,7 +159,7 @@ namespace RedOnion.KSP.Autopilot {
 
 			Vector3 angularSpeed = GetAngularSpeed(vessel);
 			Vector3 accel = GetMaxAcceleration(vessel);
-			Vector3 pry = MathUtil.Vec.Div(angularSpeed-TargetSpin, accel * Time.deltaTime);
+			Vector3 pry = MathUtil.Vec.Div(angularSpeed-targetSpin, accel * Time.deltaTime);
 			SetPitchRollYaw(flightCtrlState, pry);
 		}
 
@@ -176,7 +226,7 @@ namespace RedOnion.KSP.Autopilot {
 					}
 				}
 			}
-			//CurrentSpinMode = Mode.RAW;
+			CurrentSpinMode = SpinMode.RAW;
 		}
 
 
