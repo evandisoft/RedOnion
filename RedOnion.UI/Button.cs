@@ -47,6 +47,7 @@ namespace RedOnion.UI
 			Core = GameObject.AddComponent<UUI.Button>();
 			Image = GameObject.AddComponent<BackgroundImage>();
 			Image.sprite = Skin.button.normal.background;
+			Image.type = UUI.Image.Type.Sliced;
 			Core.image = Image;
 			Core.spriteState = new UUI.SpriteState()
 			{
