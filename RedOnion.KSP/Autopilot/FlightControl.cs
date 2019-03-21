@@ -70,6 +70,8 @@ namespace RedOnion.KSP.Autopilot {
 			}
 		}
 
+
+
 		public void SetCtrlState(FlightCtrlState flightCtrlState)
 		{
 			userCtrlState.CopyFrom(flightCtrlState);

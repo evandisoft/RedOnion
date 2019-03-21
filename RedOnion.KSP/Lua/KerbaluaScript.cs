@@ -3,6 +3,7 @@ using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
 using RedOnion.KSP.Autopilot;
 using UnityEngine;
+using RedOnion.KSP.Math;
 
 namespace RedOnion.KSP.Lua {
 	public class KspApi {
@@ -10,6 +11,7 @@ namespace RedOnion.KSP.Lua {
 		public FlightGlobals flightGlobals = new FlightGlobals();
 		public Time time = new Time();
 		public Mathf mathf = new Mathf();
+		public Vec vec = new Vec();
 	}
 
 	public class KerbaluaScript : MoonSharp.Interpreter.Script {

@@ -63,6 +63,7 @@
     <Compile Include="Script.cs" />
     <Compile Include="Lua\KerbaluaScript.cs" />
     <Compile Include="Autopilot\FlightControl.cs" />
+    <Compile Include="MathUtil\Vec.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RedOnion.Script\RedOnion.Script.csproj">
@@ -80,6 +81,7 @@
   <ItemGroup>
     <Folder Include="Lua\" />
     <Folder Include="Autopilot\" />
+    <Folder Include="MathUtil\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
