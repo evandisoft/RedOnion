@@ -3,22 +3,22 @@ using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
 using RedOnion.KSP.Autopilot;
 using UnityEngine;
-using RedOnion.KSP.Math;
+using RedOnion.KSP.MathUtil;
 
 namespace RedOnion.KSP.Lua {
 	public class KspApi {
-		public FlightControl flightControl = new FlightControl();
-		public FlightGlobals flightGlobals = new FlightGlobals();
-		public Time time = new Time();
-		public Mathf mathf = new Mathf();
-		public Vec vec = new Vec();
+		public FlightControl FlightControl = new FlightControl();
+		public FlightGlobals FlightGlobals = new FlightGlobals();
+		public Time Time = new Time();
+		public Mathf Mathf = new Mathf();
+		public Vec Vec = new Vec();
 	}
 
 	public class KerbaluaScript : MoonSharp.Interpreter.Script {
 		public KerbaluaScript() : base(CoreModules.Preset_Complete)
 		{
 			UserData.RegistrationPolicy = InteropRegistrationPolicy.Automatic;
-			Globals["ksp"] = new KspApi();
+			Globals["Ksp"] = new KspApi();
 		}
 
 		DynValue coroutine;

@@ -3,7 +3,49 @@ using MoonSharp.Interpreter;
 using UnityEngine;
 
 namespace RedOnion.KSP.Autopilot {
+
+
 	public class FlightControl {
+		public enum Mode {
+			RAW,
+			STOP_SPIN,
+			SET_DIR,
+			SET_SPIN,
+			STABILIZE,
+			OFF,
+		}
+
+		public Mode CurrentMode { get; private set; }
+
+		public Vector3 TargetDir { 
+			get {
+				return TargetDir;
+			}
+			set {
+				CurrentMode = Mode.SET_DIR;
+				TargetDir = value;
+			}
+		}
+
+		public Vector3 TargetSpin {
+			get {
+				return TargetSpin;
+			}
+			set {
+				CurrentMode = Mode.SET_SPIN;
+				TargetSpin = value;
+			}
+		}
+
+		public void SetTargetSpin(Table table) {
+
+		}
+
+		public FlightControl()
+		{
+			CurrentMode = Mode.OFF;
+		}
+
 		public Vector3 GetAvailableTorque()
 		{
 			Vessel vessel = FlightGlobals.ActiveVessel;
@@ -26,17 +68,28 @@ namespace RedOnion.KSP.Autopilot {
 			return torque;
 		}
 
-		public void Init()
+		public void Shutdown()
 		{
 			Reset();
 			Disable();
+			CurrentMode = Mode.OFF;
 		}
 
 		FlightCtrlState userCtrlState = new FlightCtrlState();
 
-		void RawControlCallback(FlightCtrlState flightCtrlState)
+		void ControlCallback(FlightCtrlState flightCtrlState)
 		{
-			flightCtrlState.CopyFrom(userCtrlState);
+			if (CurrentMode != Mode.STABILIZE) {
+				flightCtrlState.CopyFrom(userCtrlState);
+				switch (CurrentMode) {
+				case Mode.SET_SPIN:
+
+					break;
+				case Mode.SET_DIR:
+					throw new NotImplementedException("SET_DIR mode not yet implemented");
+					break;
+				}
+			}
 		}
 
 		public void SetWithTable(Table ctrlTable)
@@ -68,6 +121,7 @@ namespace RedOnion.KSP.Autopilot {
 					}
 				}
 			}
+			CurrentMode = Mode.RAW;
 		}
 
 
@@ -89,8 +143,8 @@ namespace RedOnion.KSP.Autopilot {
 				return false;
 			}
 
-			vessel.OnFlyByWire -= RawControlCallback;
-			vessel.OnFlyByWire += RawControlCallback;
+			vessel.OnFlyByWire -= ControlCallback;
+			vessel.OnFlyByWire += ControlCallback;
 			return true;
 		}
 
@@ -101,7 +155,7 @@ namespace RedOnion.KSP.Autopilot {
 				return false;
 			}
 
-			vessel.OnFlyByWire -= RawControlCallback;
+			vessel.OnFlyByWire -= ControlCallback;
 			return true;
 		}
 	}

@@ -12,5 +12,15 @@ namespace RedOnion.KSP.MathUtil {
 		{
 			return new Vector3(Math.Abs(vec.x), Math.Abs(vec.y), Math.Abs(vec.z));
 		}
+
+		static public Vector3 New(float x,float y,float z)
+		{
+			return new Vector3(x, y, z);
+		}
+
+		static public Vector3 New()
+		{
+			return new Vector3(0, 0, 0);
+		}
 	}
 }
