@@ -4,7 +4,7 @@ ctrl.Reset()
 -- ctrl.SetWithTable{roll=1}
 ctrl.Enable()
 local previousTime=os.time()
-local ctrlTable={roll=0,pitch=0,yaw=0}
+local ctrlTable={roll=0,pitch=0,yaw=0,mainThrottle=1}
 torque=ctrl.GetAvailableTorque()
 yTorque=torque.y
 xTorque=torque.x
@@ -45,11 +45,9 @@ while true do
     
     ctrl.SetWithTable(ctrlTable)
     
-    if((vessel.angularMomentum/vessel.MOI).magnitude<0.01) then
-        ctrl.Reset()
-        ctrl.Disable()
-        break
-    end
+    print(vessel.ctrlState.roll)
+    print(vessel.ctrlState.yaw)
+    print(vessel.ctrlState.pitch)
     
     coroutine.yield()
 end

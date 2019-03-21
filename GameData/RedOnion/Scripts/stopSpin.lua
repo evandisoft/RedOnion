@@ -45,9 +45,8 @@ while true do
     
     ctrl.SetWithTable(ctrlTable)
     
-    if((vessel.angularMomentum/vessel.MOI).magnitude<0.01) then
-        ctrl.Reset()
-        ctrl.Disable()
+    if(math.abs(zAngularSpeed)<0.01 and math.abs(xAngularSpeed)<0.01 and math.abs(yAngularSpeed)<0.01) then
+        ctrl.Init()
         break
     end
     

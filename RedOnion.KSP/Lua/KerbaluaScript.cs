@@ -2,11 +2,14 @@ using System;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
 using RedOnion.KSP.Autopilot;
+using UnityEngine;
 
 namespace RedOnion.KSP.Lua {
 	public class KspApi {
 		public FlightControl flightControl = new FlightControl();
 		public FlightGlobals flightGlobals = new FlightGlobals();
+		public Time time = new Time();
+		public Mathf mathf = new Mathf();
 	}
 
 	public class KerbaluaScript : MoonSharp.Interpreter.Script {
@@ -22,6 +25,7 @@ namespace RedOnion.KSP.Lua {
 			if (coroutine == null) {
 				SetCoroutine(source);
 			}
+
 			coroutine.Coroutine.AutoYieldCounter = 1000;
 			result = coroutine.Coroutine.Resume();
 			//Debug.Log("result is " + result);

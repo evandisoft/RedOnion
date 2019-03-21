@@ -12,6 +12,7 @@ namespace RedOnion.KSP.Autopilot {
 			}
 
 			Vector3 torque = new Vector3();
+
 			foreach(var part in vessel.Parts) {
 				foreach(var module in part.Modules) {
 					if(module is ITorqueProvider torqueProvider) {
@@ -23,6 +24,12 @@ namespace RedOnion.KSP.Autopilot {
 			}
 
 			return torque;
+		}
+
+		public void Init()
+		{
+			Reset();
+			Disable();
 		}
 
 		FlightCtrlState userCtrlState = new FlightCtrlState();
