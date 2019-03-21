@@ -16,7 +16,7 @@ using UnityEngine.UI;
 
 namespace RedOnion.UI.Components
 {
-	[AddComponentMenu("Layout/RedOnion"), RequireComponent(typeof(RectTransform))]
+	[RequireComponent(typeof(RectTransform))]
 	public class LayoutComponent : UIBehaviour, ILayoutGroup, ILayoutElement
 	{
 		[NonSerialized]

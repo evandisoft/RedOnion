@@ -4,7 +4,7 @@ using UUI = UnityEngine.UI;
 
 namespace RedOnion.UI
 {
-	public class Panel : Element
+	public partial class Panel : Element
 	{
 		protected UUI.RawImage image;
 		protected UUI.RawImage Image
@@ -52,19 +52,6 @@ namespace RedOnion.UI
 			get => image?.texture;
 			set => Image.texture = value;
 		}
-
-		public new E Add<E>(E element) where E : Element
-			=> base.Add(element);
-		public new E Remove<E>(E element) where E : Element
-			=> base.Remove(element);
-		public new Element Add(Element element)
-			=> base.Add(element);
-		public new Element Remove(Element element)
-			=> base.Remove(element);
-		public new void Add(params Element[] elements)
-			=> base.Add(elements);
-		public new void Remove(params Element[] elements)
-			=> base.Remove(elements);
 
 		public new Layout Layout
 		{

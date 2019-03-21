@@ -41,7 +41,7 @@ namespace RedOnion.ScriptNUnit
 		{
 			var creator = new ReflectedType(this, typeof(StaticClass));
 			Assert.IsTrue(creator.Get("simpleAction", out var simpleAction));
-			var simple = simpleAction.Deref as ReflectedFunction;
+			var simple = simpleAction.RefObj as ReflectedFunction;
 			Assert.NotNull(simple);
 			StaticClass.WasExecuted = false;
 			simple.Call(null, 0);
@@ -56,17 +56,15 @@ namespace RedOnion.ScriptNUnit
 		[Test]
 		public void StaticReflection_02_SimpleFunctions()
 		{
-			Root.Set("testClass", new ReflectedType(this,
-				typeof(StaticClass)));
-			Test(true, "testClass.returnTrue()");
-			Test(false, "testClass.returnFalse()");
+			Root.AddType(typeof(StaticClass));
+			Test(true, "StaticClass.returnTrue()");
+			Test(false, "staticClass.ReturnFalse()");
 		}
 
 		[Test]
 		public void StaticReflection_03_ComplexFunctions()
 		{
-			Root.Set("testClass", new ReflectedType(this,
-				typeof(StaticClass)));
+			Root.AddType("testClass", typeof(StaticClass));
 			Test("hello", "testClass.passThrough(\"hello\")");
 			Test(3+4, "testClass.sumTwoInts(3,4)");
 			Test(1, "testClass.overloaded()");
@@ -77,8 +75,7 @@ namespace RedOnion.ScriptNUnit
 		[Test]
 		public void StaticReflection_04_FieldAndProperties()
 		{
-			Root.Set("testClass", new ReflectedType(this,
-				typeof(StaticClass)));
+			Root.AddType("testClass", typeof(StaticClass));
 			Test(true, "testClass.wasExecuted = true");
 			Assert.IsTrue(StaticClass.WasExecuted);
 
@@ -96,8 +93,7 @@ namespace RedOnion.ScriptNUnit
 		[Test]
 		public void StaticReflection_05_Delegate()
 		{
-			Root.Set("testClass", new ReflectedType(this,
-				typeof(StaticClass)));
+			Root.AddType("testClass", typeof(StaticClass));
 			StaticClass.WasExecuted = false;
 			Test(
 				"function action\n" +
@@ -119,8 +115,7 @@ namespace RedOnion.ScriptNUnit
 		[Test]
 		public void StaticReflection_06_GenericFunction()
 		{
-			Root.Set("test", new ReflectedType(this,
-				typeof(GenericTest)));
+			Root.AddType("test", typeof(GenericTest));
 			Test(1, "test.pass 1");
 			Test(2u, "test.pass.[uint] 2");
 		}
@@ -136,8 +131,7 @@ namespace RedOnion.ScriptNUnit
 		[Test]
 		public void StaticReflection_07_Events()
 		{
-			Root.Set("test", new ReflectedType(this,
-				typeof(EventTest)));
+			Root.AddType("test", typeof(EventTest));
 			Test("var counter = 0");
 			Test("function action\n\tcounter++");
 			Test(0, "test.numberOfActions");

@@ -20,22 +20,18 @@ namespace RedOnion.Script.Completion
 
 		public IObject Box(Value value)
 		{
-			for (; ; )
+			switch (value.Kind)
 			{
-				switch (value.Type)
-				{
-				case ValueKind.Object:
-					return (IObject)value.ptr;
-				case ValueKind.Reference:
-					value = ((IProperties)value.ptr).Get(value.str);
-					continue;
-				case ValueKind.String:
-					return new StringObj(Engine, null, value.str);
-				default:
-					if (value.IsNumber)
-						return new NumberObj(Engine, null, value);
-					throw new NotImplementedException();
-				}
+			case ValueKind.Undefined:
+				return null;
+			case ValueKind.Object:
+				return (IObject)value.ptr;
+			case ValueKind.String:
+				return new StringObj(Engine, null, (string)value.ptr);
+			default:
+				if (value.IsNumber)
+					return new NumberObj(Engine, null, value);
+				throw new NotImplementedException();
 			}
 		}
 

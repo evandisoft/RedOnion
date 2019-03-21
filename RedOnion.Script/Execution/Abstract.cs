@@ -51,12 +51,12 @@ namespace RedOnion.Script
 
 		public virtual void Log(string msg) { }
 		public void Log(string msg, params object[] args)
-			=> Log(string.Format(msg, args));
+			=> Log(string.Format(Value.Culture, msg, args));
 		[Conditional("DEBUG")]
 		public void DebugLog(string msg) => Log(msg);
 		[Conditional("DEBUG")]
 		public void DebugLog(string msg, params object[] args)
-			=> Log(string.Format(msg, args));
+			=> Log(string.Format(Value.Culture, msg, args));
 
 		/// <summary>
 		/// Run script

@@ -21,6 +21,15 @@ namespace RedOnion.KSP
 		public override void Log(string msg)
 			=> UE.Debug.Log("[RedOnion] " + msg);
 
+
+		private static Ionic.Zip.ZipFile ScriptsZip;
+		public static string LoadScript(string path)
+		{
+			var data = UI.Element.ResourceFileData(System.Reflection.Assembly.GetCallingAssembly(),
+				"Scripts", ref ScriptsZip, path);
+			return data == null ? null : System.Text.Encoding.UTF8.GetString(data);
+		}
+
 		public static void FillRoot(IEngineRoot root, bool repl)
 		{
 #if DEBUG

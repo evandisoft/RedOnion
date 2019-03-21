@@ -7,30 +7,23 @@ using System.Text;
 
 namespace RedOnion.Script
 {
-	/// <summary>
-	/// Method of creating objects,
-	/// usually for late/lazy creation of objects and properties.
-	/// </summary>
-	/// <param name="engine">The engine to associate the object with</param>
-	/// <returns>The object</returns>
-	public delegate IObject CreateObject(IEngine engine);
-
 	[Flags]
 	public enum EngineOption
 	{
 		None = 0,
 		/// <summary>
 		/// Variables live only inside blocks
-		/// (otherwise inside script or function)
+		/// (otherwise inside script or function).
 		/// </summary>
 		BlockScope = 1 << 0,
 		/// <summary>
 		/// Make errors/exceptions produce undefined value where possible
-		/// (throw exception otherwise)
+		/// (throw exception otherwise).
 		/// </summary>
 		Silent = 1 << 1,
 		/// <summary>
 		/// Strict mode sets `this` in functions (not called as method) to null (global otherwise)
+		/// and prevents automatic boxing of undefined values (creates new object otherwise).
 		/// </summary>
 		Strict = 1 << 2,
 		/// <summary>
@@ -242,10 +235,43 @@ namespace RedOnion.Script
 		/// <summary>
 		/// Set the specified property to IProperty implementation
 		/// </summary>
-		public bool Set(string name, IProperty prop)
+		public Properties Set(string name, IProperty prop)
 		{
 			this[name] = new Value(prop);
-			return true;
+			return this;
+		}
+		/// <summary>
+		/// Set the specified property to ValueKind.EasyProp implementation
+		/// </summary>
+		public Properties Set(string name, PropertyGetter getter, PropertySetter setter = null)
+		{
+			this[name] = new Value(getter, setter);
+			return this;
+		}
+		/// <summary>
+		/// Set the specified property to ValueKind.EasyProp implementation
+		/// </summary>
+		public Properties Set<Obj>(string name,
+			PropertyGetter<Obj> getter, PropertySetter<Obj> setter = null) where Obj : IObject
+		{
+			this[name] = Value.Property<Obj>(getter, setter);
+			return this;
+		}
+		/// <summary>
+		/// Set the specified property to ValueKind.EasyProp implementation
+		/// </summary>
+		public Properties Set(string name, PropertySetter setter)
+		{
+			this[name] = new Value((PropertyGetter)null, setter);
+			return this;
+		}
+		/// <summary>
+		/// Set the specified property to ValueKind.EasyProp implementation
+		/// </summary>
+		public Properties Set<Obj>(string name, PropertySetter<Obj> setter) where Obj : IObject
+		{
+			this[name] = Value.Property<Obj>(null, setter);
+			return this;
 		}
 
 		/// <summary>
@@ -296,7 +322,7 @@ namespace RedOnion.Script
 	public interface IObject : IProperties
 	{
 		/// <summary>
-		/// Engine this object belongs to
+		/// Engine this object belongs to.
 		/// </summary>
 		IEngine Engine { get; }
 		/// <summary>
@@ -309,15 +335,18 @@ namespace RedOnion.Script
 		/// </summary>
 		string Name { get; }
 		/// <summary>
-		/// Base class (to search properties in this object next)
+		/// Base class (to search properties in this object next).
+		/// Used to implement inheritance (accessible as `prototype` in BasicObject).
 		/// </summary>
 		IObject BaseClass { get; }
 		/// <summary>
-		/// Basic properties - not enumerable, not writable unless IProperty with set returning true
+		/// Basic properties - not enumerable, not writable unless IProperty with set returning true.
+		/// These are usually shared by all instances of same type.
 		/// </summary>
 		IProperties BaseProps { get; }
 		/// <summary>
-		/// Added properties - enumerable and writable (unless same exist in baseProps)
+		/// Added properties - enumerable and writable (unless same exist in baseProps).
+		/// These are specific to the instance (and do not exist at all in SimpleObject).
 		/// </summary>
 		IProperties MoreProps { get; }
 		/// <summary>
@@ -369,6 +398,27 @@ namespace RedOnion.Script
 		/// but redirecting to Call may be valid as well
 		/// </remarks>
 		Value Index(IObject self, int argc);
+		/// <summary>
+		/// Get value (RValue) at index. This can only ever be called if Index created ValueKind.IndexRef.
+		/// </summary>
+		/// <param name="index">Value used for ValueKind.IndexRef creation</param>
+		/// <returns>The value at provided index</returns>
+		Value IndexGet(Value index);
+		/// <summary>
+		/// Set value at index. This can only ever be called if Index created ValueKind.IndexRef.
+		/// </summary>
+		/// <param name="index">Value used for ValueKind.IndexRef creation</param>
+		/// <param name="value">The value to set at provided index</param>
+		/// <returns>True on success</returns>
+		bool IndexSet(Value index, Value value);
+		/// <summary>
+		/// Modify the value at specified index (compound assignment)
+		/// </summary>
+		/// <param name="index">Value used for ValueKind.IndexRef creation</param>
+		/// <param name="op">The operation (compound assignment) to perform</param>
+		/// <param name="value">The value to use to modify the value at provided index</param>
+		/// <returns>True on success</returns>
+		bool IndexModify(Value index, OpCode op, Value value);
 
 		/// <summary>
 		/// Convert native object into script object Features.Converter
@@ -562,13 +612,13 @@ namespace RedOnion.Script
 			=> engine.Arguments.Get(argc, index);
 
 		public static void Log(this IEngine engine, string msg, params object[] args)
-			=> engine.Log(string.Format(msg, args));
+			=> engine.Log(string.Format(Value.Culture, msg, args));
 		[Conditional("DEBUG")]
 		public static void DebugLog(this IEngine engine, string msg)
 			=> engine.Log(msg);
 		[Conditional("DEBUG")]
 		public static void DebugLog(this IEngine engine, string msg, params object[] args)
-			=> engine.Log(string.Format(msg, args));
+			=> engine.Log(string.Format(Value.Culture, msg, args));
 	}
 
 	public static class EngineRootExtensions
@@ -593,13 +643,13 @@ namespace RedOnion.Script
 		public static void Log(this IEngineRoot root, string msg)
 			=> root.Engine.Log(msg);
 		public static void Log(this IEngineRoot root, string msg, params object[] args)
-			=> root.Engine.Log(string.Format(CultureInfo.InvariantCulture, msg, args));
+			=> root.Engine.Log(string.Format(Value.Culture, msg, args));
 		[Conditional("DEBUG")]
 		public static void DebugLog(this IEngineRoot root, string msg)
 			=> root.Engine.Log(msg);
 		[Conditional("DEBUG")]
 		public static void DebugLog(this IEngineRoot root, string msg, params object[] args)
-			=> root.Engine.Log(string.Format(CultureInfo.InvariantCulture, msg, args));
+			=> root.Engine.Log(string.Format(Value.Culture, msg, args));
 	}
 
 	public static class ObjectExtensions

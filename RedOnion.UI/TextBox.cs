@@ -17,11 +17,13 @@ namespace RedOnion.UI
 		{
 			Image = GameObject.AddComponent<BackgroundImage>();
 			Image.sprite = Skin.textField.normal.background;
+			Image.type = UUI.Image.Type.Sliced;
 			Core = GameObject.AddComponent<InputField>();
 			Label = Add(new Label()
 			{
 				Anchors = Anchors.Fill,
-				TextColor = Skin.textField.normal.textColor
+				TextColor = Skin.textField.normal.textColor,
+				TextAlign = TextAnchor.UpperLeft
 			});
 			Core.textComponent = Label.Core;
 		}

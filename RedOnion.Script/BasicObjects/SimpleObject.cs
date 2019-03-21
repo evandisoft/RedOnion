@@ -75,14 +75,14 @@ namespace RedOnion.Script.BasicObjects
 			}
 			if (!BaseProps.Get(name, out value))
 				return false;
-			if (value.Type == ValueKind.Create)
+			if (value.Kind == ValueKind.Create)
 			{
 				value = new Value(((CreateObject)value.ptr)(Engine));
 				BaseProps.Set(name, value);
 			}
-			else if (value.Type == ValueKind.Property)
+			else if (value.IsProperty)
 			{
-				value = ((IProperty)value.ptr).Get(this);
+				value = value.Get(this);
 			}
 			return true;
 		}
@@ -93,10 +93,7 @@ namespace RedOnion.Script.BasicObjects
 				return false;
 			if (!BaseProps.Get(name, out var query))
 				return false;
-			if (query.Type != ValueKind.Property)
-				return false;
-			((IProperty)query.ptr).Set(this, value);
-			return true;
+			return query.Set(this, value);
 		}
 
 		public virtual bool Modify(string name, OpCode op, Value value)
@@ -105,14 +102,7 @@ namespace RedOnion.Script.BasicObjects
 				return false;
 			if (!BaseProps.Get(name, out var query))
 				return false;
-			if (query.Type != ValueKind.Property)
-				return false;
-			var prop = (IProperty)query.ptr;
-			if (prop is IPropertyEx ex)
-				return ex.Modify(this, op, value);
-			var tmp = prop.Get(this);
-			tmp.Modify(op, value);
-			return prop.Set(this, tmp);
+			return query.Modify(this, op, value);
 		}
 
 		public bool Delete(string name)
@@ -134,12 +124,15 @@ namespace RedOnion.Script.BasicObjects
 			case 0:
 				return new Value();
 			case 1:
-				return new Value(this, Arg(argc, 0).String);
+				return Value.IndexRef(this, Engine.GetArgument(argc, 0));
 			default:
-				self = Engine.Box(new Value(this, Arg(argc, 0).String));
+				self = Engine.Box(Value.IndexRef(this, Engine.GetArgument(argc, 0)));
 				return self.Index(this, argc - 1);
 			}
 		}
+		public Value IndexGet(Value index) => Get(index.String);
+		public bool IndexSet(Value index, Value value) => Set(index.String, value);
+		public bool IndexModify(Value index, OpCode op, Value value) => Modify(index.String, op, value);
 
 		/// <summary>
 		/// Get n-th argument (for call/create implementation)

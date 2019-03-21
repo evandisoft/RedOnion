@@ -51,30 +51,28 @@ namespace RedOnion.Script
 
 		public static Value operator +(Value lhs, Value rhs)
 		{
-			if (lhs.Type == ValueKind.Reference)
-				lhs = ((IProperties)lhs.ptr).Get(lhs.str);
-			if (rhs.Type == ValueKind.Reference)
-				rhs = ((IProperties)rhs.ptr).Get(rhs.str);
-			if (lhs.Type == ValueKind.String)
-				return new Value(lhs.str + rhs.String);
-			if (rhs.Type == ValueKind.String)
-				return new Value(lhs.String + rhs.str);
+			lhs = lhs.RValue;
+			rhs = rhs.RValue;
+			if (lhs.Kind == ValueKind.String)
+				return new Value((string)lhs.ptr + rhs.String);
+			if (rhs.Kind == ValueKind.String)
+				return new Value(lhs.String + (string)rhs.ptr);
 			if (lhs.IsNumber && rhs.IsNumber)
 			{
 				if (lhs.IsFloatigPoint)
 				{
-					if (lhs.Type == ValueKind.Float && !rhs.Is64)
+					if (lhs.Kind == ValueKind.Float && !rhs.Is64)
 						return new Value(lhs.data.Float + rhs.Float);
 					return new Value(lhs.data.Double + rhs.Double);
 				}
 				if (rhs.IsFloatigPoint)
 				{
-					if (rhs.Type == ValueKind.Float && !lhs.Is64)
+					if (rhs.Kind == ValueKind.Float && !lhs.Is64)
 						return new Value(lhs.Float + rhs.data.Float);
 					return new Value(lhs.Double + rhs.data.Double);
 				}
 				if (lhs.Is64 || rhs.Is64)
-					return new Value(lhs.Is64 ? lhs.Type : rhs.Type, lhs.Long + rhs.Long);
+					return new Value(lhs.Is64 ? lhs.Kind : rhs.Kind, lhs.Long + rhs.Long);
 				if (lhs.Signed)
 				{
 					if (rhs.Signed || rhs.NumberSize < 4)
@@ -90,26 +88,24 @@ namespace RedOnion.Script
 
 		public static Value operator -(Value lhs, Value rhs)
 		{
-			if (lhs.Type == ValueKind.Reference)
-				lhs = ((IProperties)lhs.ptr).Get(lhs.str);
-			if (rhs.Type == ValueKind.Reference)
-				rhs = ((IProperties)rhs.ptr).Get(rhs.str);
+			lhs = lhs.RValue;
+			rhs = rhs.RValue;
 			if (lhs.IsNumber && rhs.IsNumber)
 			{
 				if (lhs.IsFloatigPoint)
 				{
-					if (lhs.Type == ValueKind.Float && !rhs.Is64)
+					if (lhs.Kind == ValueKind.Float && !rhs.Is64)
 						return new Value(lhs.data.Float - rhs.Float);
 					return new Value(lhs.data.Double - rhs.Double);
 				}
 				if (rhs.IsFloatigPoint)
 				{
-					if (rhs.Type == ValueKind.Float && !lhs.Is64)
+					if (rhs.Kind == ValueKind.Float && !lhs.Is64)
 						return new Value(lhs.Float - rhs.data.Float);
 					return new Value(lhs.Double - rhs.data.Double);
 				}
 				if (lhs.Is64 || rhs.Is64)
-					return new Value(lhs.Is64 ? lhs.Type : rhs.Type, lhs.Long - rhs.Long);
+					return new Value(lhs.Is64 ? lhs.Kind : rhs.Kind, lhs.Long - rhs.Long);
 				if (lhs.Signed)
 				{
 					if (rhs.Signed || rhs.NumberSize < 4)
@@ -125,26 +121,24 @@ namespace RedOnion.Script
 
 		public static Value operator *(Value lhs, Value rhs)
 		{
-			if (lhs.Type == ValueKind.Reference)
-				lhs = ((IProperties)lhs.ptr).Get(lhs.str);
-			if (rhs.Type == ValueKind.Reference)
-				rhs = ((IProperties)rhs.ptr).Get(rhs.str);
+			lhs = lhs.RValue;
+			rhs = rhs.RValue;
 			if (lhs.IsNumber && rhs.IsNumber)
 			{
 				if (lhs.IsFloatigPoint)
 				{
-					if (lhs.Type == ValueKind.Float && !rhs.Is64)
+					if (lhs.Kind == ValueKind.Float && !rhs.Is64)
 						return new Value(lhs.data.Float * rhs.Float);
 					return new Value(lhs.data.Double * rhs.Double);
 				}
 				if (rhs.IsFloatigPoint)
 				{
-					if (rhs.Type == ValueKind.Float && !lhs.Is64)
+					if (rhs.Kind == ValueKind.Float && !lhs.Is64)
 						return new Value(lhs.Float * rhs.data.Float);
 					return new Value(lhs.Double * rhs.data.Double);
 				}
 				if (lhs.Is64 || rhs.Is64)
-					return new Value(lhs.Is64 ? lhs.Type : rhs.Type, lhs.Long * rhs.Long);
+					return new Value(lhs.Is64 ? lhs.Kind : rhs.Kind, lhs.Long * rhs.Long);
 				if (lhs.Signed)
 				{
 					if (rhs.Signed || rhs.NumberSize < 4)
@@ -160,21 +154,19 @@ namespace RedOnion.Script
 
 		public static Value operator /(Value lhs, Value rhs)
 		{
-			if (lhs.Type == ValueKind.Reference)
-				lhs = ((IProperties)lhs.ptr).Get(lhs.str);
-			if (rhs.Type == ValueKind.Reference)
-				rhs = ((IProperties)rhs.ptr).Get(rhs.str);
+			lhs = lhs.RValue;
+			rhs = rhs.RValue;
 			if (lhs.IsNumber && rhs.IsNumber)
 			{
 				if (lhs.IsFloatigPoint)
 				{
-					if (lhs.Type == ValueKind.Float && !rhs.Is64)
+					if (lhs.Kind == ValueKind.Float && !rhs.Is64)
 						return new Value(lhs.data.Float / rhs.Float);
 					return new Value(lhs.data.Double / rhs.Double);
 				}
 				if (rhs.IsFloatigPoint)
 				{
-					if (rhs.Type == ValueKind.Float && !lhs.Is64)
+					if (rhs.Kind == ValueKind.Float && !lhs.Is64)
 						return new Value(lhs.Float / rhs.data.Float);
 					return new Value(lhs.Double / rhs.data.Double);
 				}
@@ -183,7 +175,7 @@ namespace RedOnion.Script
 					var v = rhs.Long;
 					if (v == 0)
 						return new Value();
-					return new Value(lhs.Is64 ? lhs.Type : rhs.Type, lhs.Long / v);
+					return new Value(lhs.Is64 ? lhs.Kind : rhs.Kind, lhs.Long / v);
 				}
 				if (lhs.Signed)
 				{
@@ -216,21 +208,19 @@ namespace RedOnion.Script
 
 		public static Value operator %(Value lhs, Value rhs)
 		{
-			if (lhs.Type == ValueKind.Reference)
-				lhs = ((IProperties)lhs.ptr).Get(lhs.str);
-			if (rhs.Type == ValueKind.Reference)
-				rhs = ((IProperties)rhs.ptr).Get(rhs.str);
+			lhs = lhs.RValue;
+			rhs = rhs.RValue;
 			if (lhs.IsNumber && rhs.IsNumber)
 			{
 				if (lhs.IsFloatigPoint)
 				{
-					if (lhs.Type == ValueKind.Float && !rhs.Is64)
+					if (lhs.Kind == ValueKind.Float && !rhs.Is64)
 						return new Value(lhs.data.Float % rhs.Float);
 					return new Value(lhs.data.Double % rhs.Double);
 				}
 				if (rhs.IsFloatigPoint)
 				{
-					if (rhs.Type == ValueKind.Float && !lhs.Is64)
+					if (rhs.Kind == ValueKind.Float && !lhs.Is64)
 						return new Value(lhs.Float % rhs.data.Float);
 					return new Value(lhs.Double % rhs.data.Double);
 				}
@@ -239,7 +229,7 @@ namespace RedOnion.Script
 					var v = rhs.Long;
 					if (v == 0)
 						return new Value();
-					return new Value(lhs.Is64 ? lhs.Type : rhs.Type, lhs.Long % v);
+					return new Value(lhs.Is64 ? lhs.Kind : rhs.Kind, lhs.Long % v);
 				}
 				if (lhs.Signed)
 				{
@@ -272,95 +262,89 @@ namespace RedOnion.Script
 
 		public static Value operator &(Value lhs, Value rhs)
 		{
-			if (lhs.Type == ValueKind.Reference)
-				lhs = ((IProperties)lhs.ptr).Get(lhs.str);
-			if (rhs.Type == ValueKind.Reference)
-				rhs = ((IProperties)rhs.ptr).Get(rhs.str);
-			if (lhs.Type == ValueKind.String)
-				return new Value(lhs.str + rhs.String);
-			if (rhs.Type == ValueKind.String)
-				return new Value(lhs.String + rhs.str);
+			lhs = lhs.RValue;
+			rhs = rhs.RValue;
+			if (lhs.Kind == ValueKind.String)
+				return new Value((string)lhs.ptr + rhs.String);
+			if (rhs.Kind == ValueKind.String)
+				return new Value(lhs.String + (string)rhs.ptr);
 			if (lhs.IsNumber && rhs.IsNumber)
 			{
 				if (lhs.IsFloatigPoint || rhs.IsFloatigPoint)
 					return new Value(lhs.Long & rhs.Long);
 				if (lhs.Is64 || rhs.Is64)
-					return new Value(lhs.Is64 ? lhs.Type : rhs.Type, lhs.Long & rhs.Long);
+					return new Value(lhs.Is64 ? lhs.Kind : rhs.Kind, lhs.Long & rhs.Long).AdjustForEnum(lhs);
 				if (lhs.Signed)
 				{
 					if (rhs.Signed || rhs.NumberSize < 4)
-						return new Value(lhs.Int & rhs.Int);
-					return new Value(lhs.Long & rhs.Long);
+						return new Value(lhs.Int & rhs.Int).AdjustForEnum(lhs);
+					return new Value(lhs.Long & rhs.Long).AdjustForEnum(lhs);
 				}
 				if (!rhs.Signed || rhs.NumberSize < 4)
-					return new Value(lhs.UInt & rhs.UInt);
-				return new Value(lhs.ULong & rhs.ULong);
+					return new Value(lhs.UInt & rhs.UInt).AdjustForEnum(lhs);
+				return new Value(lhs.ULong & rhs.ULong).AdjustForEnum(lhs);
 			}
 			return new Value();
 		}
 
 		public static Value operator |(Value lhs, Value rhs)
 		{
-			if (lhs.Type == ValueKind.Reference)
-				lhs = ((IProperties)lhs.ptr).Get(lhs.str);
-			if (rhs.Type == ValueKind.Reference)
-				rhs = ((IProperties)rhs.ptr).Get(rhs.str);
-			if (lhs.Type == ValueKind.String)
-				return new Value(lhs.str + rhs.String);
-			if (rhs.Type == ValueKind.String)
-				return new Value(lhs.String + rhs.str);
+			lhs = lhs.RValue;
+			rhs = rhs.RValue;
+			if (lhs.Kind == ValueKind.String)
+				return new Value((string)lhs.ptr + rhs.String);
+			if (rhs.Kind == ValueKind.String)
+				return new Value(lhs.String + (string)rhs.ptr);
 			if (lhs.IsNumber && rhs.IsNumber)
 			{
 				if (lhs.IsFloatigPoint || rhs.IsFloatigPoint)
 					return new Value(lhs.Long | rhs.Long);
 				if (lhs.Is64 || rhs.Is64)
-					return new Value(lhs.Is64 ? lhs.Type : rhs.Type, lhs.Long | rhs.Long);
+					return new Value(lhs.Is64 ? lhs.Kind : rhs.Kind, lhs.Long | rhs.Long).AdjustForEnum(lhs);
 				if (lhs.Signed)
 				{
 					if (rhs.Signed || rhs.NumberSize < 4)
-						return new Value(lhs.Int | rhs.Int);
-					return new Value(lhs.Long | rhs.Long);
+						return new Value(lhs.Int | rhs.Int).AdjustForEnum(lhs);
+					return new Value(lhs.Long | rhs.Long).AdjustForEnum(lhs);
 				}
 				if (!rhs.Signed || rhs.NumberSize < 4)
-					return new Value(lhs.UInt | rhs.UInt);
-				return new Value(lhs.ULong | rhs.ULong);
+					return new Value(lhs.UInt | rhs.UInt).AdjustForEnum(lhs);
+				return new Value(lhs.ULong | rhs.ULong).AdjustForEnum(lhs);
 			}
 			return new Value();
 		}
 
 		public static Value operator ^(Value lhs, Value rhs)
 		{
-			if (lhs.Type == ValueKind.Reference)
-				lhs = ((IProperties)lhs.ptr).Get(lhs.str);
-			if (rhs.Type == ValueKind.Reference)
-				rhs = ((IProperties)rhs.ptr).Get(rhs.str);
+			lhs = lhs.RValue;
+			rhs = rhs.RValue;
 			if (lhs.IsNumber && rhs.IsNumber)
 			{
 				if (lhs.IsFloatigPoint)
 				{
-					if (lhs.Type == ValueKind.Float && !rhs.Is64)
+					if (lhs.Kind == ValueKind.Float && !rhs.Is64)
 						return new Value(Math.Pow(lhs.data.Float, rhs.Float));
 					return new Value(Math.Pow(lhs.data.Double, rhs.Double));
 				}
 				if (rhs.IsFloatigPoint)
 				{
-					if (rhs.Type == ValueKind.Float && !lhs.Is64)
+					if (rhs.Kind == ValueKind.Float && !lhs.Is64)
 						return new Value(Math.Pow(lhs.Float, rhs.data.Float));
 					return new Value(Math.Pow(lhs.Double, rhs.data.Double));
 				}
 				if (lhs.IsFloatigPoint || rhs.IsFloatigPoint)
 					return new Value(lhs.Long ^ rhs.Long);
 				if (lhs.Is64 || rhs.Is64)
-					return new Value(lhs.Is64 ? lhs.Type : rhs.Type, lhs.Long ^ rhs.Long);
+					return new Value(lhs.Is64 ? lhs.Kind : rhs.Kind, lhs.Long ^ rhs.Long).AdjustForEnum(lhs);
 				if (lhs.Signed)
 				{
 					if (rhs.Signed || rhs.NumberSize < 4)
-						return new Value(lhs.Int ^ rhs.Int);
-					return new Value(lhs.Long ^ rhs.Long);
+						return new Value(lhs.Int ^ rhs.Int).AdjustForEnum(lhs);
+					return new Value(lhs.Long ^ rhs.Long).AdjustForEnum(lhs);
 				}
 				if (!rhs.Signed || rhs.NumberSize < 4)
-					return new Value(lhs.UInt ^ rhs.UInt);
-				return new Value(lhs.ULong ^ rhs.ULong);
+					return new Value(lhs.UInt ^ rhs.UInt).AdjustForEnum(lhs);
+				return new Value(lhs.ULong ^ rhs.ULong).AdjustForEnum(lhs);
 			}
 			return new Value();
 		}
@@ -369,20 +353,18 @@ namespace RedOnion.Script
 			=> ShiftLeft(this, by);
 		public static Value ShiftLeft(Value lhs, Value rhs)
 		{
-			if (lhs.Type == ValueKind.Reference)
-				lhs = ((IProperties)lhs.ptr).Get(lhs.str);
-			if (rhs.Type == ValueKind.Reference)
-				rhs = ((IProperties)rhs.ptr).Get(rhs.str);
-			if (lhs.Type == ValueKind.String)
-				return new Value(lhs.str + rhs.String);
-			if (rhs.Type == ValueKind.String)
-				return new Value(lhs.String + rhs.str);
+			lhs = lhs.RValue;
+			rhs = rhs.RValue;
+			if (lhs.Kind == ValueKind.String)
+				return new Value((string)lhs.ptr + rhs.String);
+			if (rhs.Kind == ValueKind.String)
+				return new Value(lhs.String + (string)rhs.ptr);
 			if (lhs.IsNumber && rhs.IsNumber)
 			{
 				if (lhs.IsFloatigPoint || rhs.IsFloatigPoint)
 					return new Value(lhs.Long << rhs.Int);
 				if (lhs.Is64 || rhs.Is64)
-					return new Value(lhs.Is64 ? lhs.Type : rhs.Type, lhs.Long << rhs.Int);
+					return new Value(lhs.Is64 ? lhs.Kind : rhs.Kind, lhs.Long << rhs.Int);
 				if (lhs.Signed)
 				{
 					if (rhs.Signed || rhs.NumberSize < 4)
@@ -400,16 +382,14 @@ namespace RedOnion.Script
 			=> ShiftLeft(this, by);
 		public static Value ShiftRight(Value lhs, Value rhs)
 		{
-			if (lhs.Type == ValueKind.Reference)
-				lhs = ((IProperties)lhs.ptr).Get(lhs.str);
-			if (rhs.Type == ValueKind.Reference)
-				rhs = ((IProperties)rhs.ptr).Get(rhs.str);
+			lhs = lhs.RValue;
+			rhs = rhs.RValue;
 			if (lhs.IsNumber && rhs.IsNumber)
 			{
 				if (lhs.IsFloatigPoint || rhs.IsFloatigPoint)
 					return new Value(lhs.Long >> rhs.Int);
 				if (lhs.Is64 || rhs.Is64)
-					return new Value(lhs.Is64 ? lhs.Type : rhs.Type, lhs.Long >> rhs.Int);
+					return new Value(lhs.Is64 ? lhs.Kind : rhs.Kind, lhs.Long >> rhs.Int);
 				if (lhs.Signed)
 				{
 					if (rhs.Signed || rhs.NumberSize < 4)
@@ -425,10 +405,8 @@ namespace RedOnion.Script
 
 		public static bool operator ==(Value lhs, Value rhs)
 		{
-			if (lhs.Type == ValueKind.Reference)
-				lhs = ((IProperties)lhs.ptr).Get(lhs.str);
-			if (rhs.Type == ValueKind.Reference)
-				rhs = ((IProperties)rhs.ptr).Get(rhs.str);
+			lhs = lhs.RValue;
+			rhs = rhs.RValue;
 			if (lhs.IsNumber && rhs.IsNumber)
 			{
 				if (lhs.IsFloatigPoint || rhs.IsFloatigPoint)
@@ -445,18 +423,18 @@ namespace RedOnion.Script
 					return lhs.UInt == rhs.UInt;
 				return lhs.ULong == rhs.ULong;
 			}
-			switch (lhs.Type)
+			switch (lhs.Kind)
 			{
 			case ValueKind.Undefined:
 				// undefined == null (equality) but undefined !== null (not identical)
-				return rhs.Type == ValueKind.Undefined
-					|| (rhs.Type == ValueKind.Object && rhs.ptr == null);
+				return rhs.Kind == ValueKind.Undefined
+					|| (rhs.Kind == ValueKind.Object && rhs.ptr == null);
 			case ValueKind.Object:
 				// ptr is null for ValueType.Undefined
-				return (rhs.Type == ValueKind.Object || rhs.Type == ValueKind.Undefined)
+				return (rhs.Kind == ValueKind.Object || rhs.Kind == ValueKind.Undefined)
 					&& lhs.ptr == rhs.ptr;
 			}
-			switch (rhs.Type)
+			switch (rhs.Kind)
 			{
 			case ValueKind.Undefined:
 			case ValueKind.Object:
@@ -474,16 +452,18 @@ namespace RedOnion.Script
 		{
 			if (rhs is Value)
 				return this == (Value)rhs;
-			switch (Type)
+			switch (Kind)
 			{
 			default:
 				return false;
 			case ValueKind.Object:
 				return ptr == rhs;
 			case ValueKind.Reference:
-				return ((IProperties)ptr).Get(str).Equals(rhs);
+				return ((IProperties)ptr).Get((string)idx).Equals(rhs);
+			case ValueKind.IndexRef:
+				return ((IObject)ptr).IndexGet((Value)idx).Equals(rhs);
 			case ValueKind.String:
-				return rhs is string	&& str			== (string)rhs;
+				return rhs is string	&& (string)ptr	== (string)rhs;
 			case ValueKind.Char:
 				return rhs is char		&& data.Char	== (char)rhs;
 			case ValueKind.Bool:
@@ -513,16 +493,15 @@ namespace RedOnion.Script
 
 		public override int GetHashCode()
 		{
-			switch (Type)
+			if (IsReference)
+				return RValue.GetHashCode();
+			switch (Kind)
 			{
 			default:
 				return ~0;
 			case ValueKind.Object:
-				return ptr == null ? 0 : ptr.GetHashCode();
-			case ValueKind.Reference:
-				return ((IProperties)ptr).Get(str).GetHashCode();
 			case ValueKind.String:
-				return str.GetHashCode();
+				return ptr == null ? 0 : ptr.GetHashCode();
 			case ValueKind.Char:
 			case ValueKind.Bool:
 			case ValueKind.Byte:
@@ -542,32 +521,30 @@ namespace RedOnion.Script
 
 		public static bool operator <(Value lhs, Value rhs)
 		{
-			if (lhs.Type == ValueKind.Reference)
-				lhs = ((IProperties)lhs.ptr).Get(lhs.str);
-			if (rhs.Type == ValueKind.Reference)
-				rhs = ((IProperties)rhs.ptr).Get(rhs.str);
-			if (lhs.Type == ValueKind.String)
-				return string.Compare(lhs.str, rhs.String, Culture, CompareOptions.None) < 0;
-			if (rhs.Type == ValueKind.String)
-				return string.Compare(lhs.String, rhs.str, Culture, CompareOptions.None) < 0;
+			lhs = lhs.RValue;
+			rhs = rhs.RValue;
+			if (lhs.Kind == ValueKind.String)
+				return string.Compare((string)lhs.ptr, rhs.String, Culture, CompareOptions.None) < 0;
+			if (rhs.Kind == ValueKind.String)
+				return string.Compare(lhs.String, (string)rhs.ptr, Culture, CompareOptions.None) < 0;
 			if (lhs.IsNumber && rhs.IsNumber)
 			{
 				if (lhs.IsFloatigPoint)
 				{
-					if (lhs.Type == ValueKind.Float && !rhs.Is64)
+					if (lhs.Kind == ValueKind.Float && !rhs.Is64)
 						return lhs.data.Float < rhs.Float;
 					return lhs.data.Double < rhs.Double;
 				}
 				if (rhs.IsFloatigPoint)
 				{
-					if (rhs.Type == ValueKind.Float && !lhs.Is64)
+					if (rhs.Kind == ValueKind.Float && !lhs.Is64)
 						return lhs.Float < rhs.data.Float;
 					return lhs.Double < rhs.data.Double;
 				}
 				if (lhs.Is64 || rhs.Is64)
-					return lhs.Type == ValueKind.ULong ?
-						lhs.data.ULong < rhs.data.ULong && (rhs.Type == ValueKind.ULong || rhs.data.Long >= 0) :
-						lhs.data.Long < rhs.data.Long || (rhs.Type == ValueKind.ULong && lhs.data.Long < 0);
+					return lhs.Kind == ValueKind.ULong ?
+						lhs.data.ULong < rhs.data.ULong && (rhs.Kind == ValueKind.ULong || rhs.data.Long >= 0) :
+						lhs.data.Long < rhs.data.Long || (rhs.Kind == ValueKind.ULong && lhs.data.Long < 0);
 				if (lhs.Signed)
 				{
 					if (rhs.Signed || rhs.NumberSize < 4)
@@ -583,32 +560,30 @@ namespace RedOnion.Script
 
 		public static bool operator <=(Value lhs, Value rhs)
 		{
-			if (lhs.Type == ValueKind.Reference)
-				lhs = ((IProperties)lhs.ptr).Get(lhs.str);
-			if (rhs.Type == ValueKind.Reference)
-				rhs = ((IProperties)rhs.ptr).Get(rhs.str);
-			if (lhs.Type == ValueKind.String)
-				return string.Compare(lhs.str, rhs.String, Culture, CompareOptions.None) <= 0;
-			if (rhs.Type == ValueKind.String)
-				return string.Compare(lhs.String, rhs.str, Culture, CompareOptions.None) <= 0;
+			lhs = lhs.RValue;
+			rhs = rhs.RValue;
+			if (lhs.Kind == ValueKind.String)
+				return string.Compare((string)lhs.ptr, rhs.String, Culture, CompareOptions.None) <= 0;
+			if (rhs.Kind == ValueKind.String)
+				return string.Compare(lhs.String, (string)rhs.ptr, Culture, CompareOptions.None) <= 0;
 			if (lhs.IsNumber && rhs.IsNumber)
 			{
 				if (lhs.IsFloatigPoint)
 				{
-					if (lhs.Type == ValueKind.Float && !rhs.Is64)
+					if (lhs.Kind == ValueKind.Float && !rhs.Is64)
 						return lhs.data.Float <= rhs.Float;
 					return lhs.data.Double <= rhs.Double;
 				}
 				if (rhs.IsFloatigPoint)
 				{
-					if (rhs.Type == ValueKind.Float && !lhs.Is64)
+					if (rhs.Kind == ValueKind.Float && !lhs.Is64)
 						return lhs.Float <= rhs.data.Float;
 					return lhs.Double <= rhs.data.Double;
 				}
 				if (lhs.Is64 || rhs.Is64)
-					return lhs.Type == ValueKind.ULong ?
-						lhs.data.ULong <= rhs.data.ULong && (rhs.Type == ValueKind.ULong || rhs.data.Long >= 0) :
-						lhs.data.Long <= rhs.data.Long || (rhs.Type == ValueKind.ULong && lhs.data.Long < 0);
+					return lhs.Kind == ValueKind.ULong ?
+						lhs.data.ULong <= rhs.data.ULong && (rhs.Kind == ValueKind.ULong || rhs.data.Long >= 0) :
+						lhs.data.Long <= rhs.data.Long || (rhs.Kind == ValueKind.ULong && lhs.data.Long < 0);
 				if (lhs.Signed)
 				{
 					if (rhs.Signed || rhs.NumberSize < 4)
@@ -624,32 +599,30 @@ namespace RedOnion.Script
 
 		public static bool operator >(Value lhs, Value rhs)
 		{
-			if (lhs.Type == ValueKind.Reference)
-				lhs = ((IProperties)lhs.ptr).Get(lhs.str);
-			if (rhs.Type == ValueKind.Reference)
-				rhs = ((IProperties)rhs.ptr).Get(rhs.str);
-			if (lhs.Type == ValueKind.String)
-				return string.Compare(lhs.str, rhs.String, Culture, CompareOptions.None) > 0;
-			if (rhs.Type == ValueKind.String)
-				return string.Compare(lhs.String, rhs.str, Culture, CompareOptions.None) > 0;
+			lhs = lhs.RValue;
+			rhs = rhs.RValue;
+			if (lhs.Kind == ValueKind.String)
+				return string.Compare((string)lhs.ptr, rhs.String, Culture, CompareOptions.None) > 0;
+			if (rhs.Kind == ValueKind.String)
+				return string.Compare(lhs.String, (string)rhs.ptr, Culture, CompareOptions.None) > 0;
 			if (lhs.IsNumber && rhs.IsNumber)
 			{
 				if (lhs.IsFloatigPoint)
 				{
-					if (lhs.Type == ValueKind.Float && !rhs.Is64)
+					if (lhs.Kind == ValueKind.Float && !rhs.Is64)
 						return lhs.data.Float > rhs.Float;
 					return lhs.data.Double > rhs.Double;
 				}
 				if (rhs.IsFloatigPoint)
 				{
-					if (rhs.Type == ValueKind.Float && !lhs.Is64)
+					if (rhs.Kind == ValueKind.Float && !lhs.Is64)
 						return lhs.Float > rhs.data.Float;
 					return lhs.Double > rhs.data.Double;
 				}
 				if (lhs.Is64 || rhs.Is64)
-					return lhs.Type == ValueKind.ULong ?
-						lhs.data.ULong > rhs.data.ULong && (rhs.Type == ValueKind.ULong || rhs.data.Long < 0) :
-						lhs.data.Long > rhs.data.Long || (rhs.Type == ValueKind.ULong && lhs.data.Long >= 0);
+					return lhs.Kind == ValueKind.ULong ?
+						lhs.data.ULong > rhs.data.ULong && (rhs.Kind == ValueKind.ULong || rhs.data.Long < 0) :
+						lhs.data.Long > rhs.data.Long || (rhs.Kind == ValueKind.ULong && lhs.data.Long >= 0);
 				if (lhs.Signed)
 				{
 					if (rhs.Signed || rhs.NumberSize > 4)
@@ -665,32 +638,30 @@ namespace RedOnion.Script
 
 		public static bool operator >=(Value lhs, Value rhs)
 		{
-			if (lhs.Type == ValueKind.Reference)
-				lhs = ((IProperties)lhs.ptr).Get(lhs.str);
-			if (rhs.Type == ValueKind.Reference)
-				rhs = ((IProperties)rhs.ptr).Get(rhs.str);
-			if (lhs.Type == ValueKind.String)
-				return string.Compare(lhs.str, rhs.String, Culture, CompareOptions.None) >= 0;
-			if (rhs.Type == ValueKind.String)
-				return string.Compare(lhs.String, rhs.str, Culture, CompareOptions.None) >= 0;
+			lhs = lhs.RValue;
+			rhs = rhs.RValue;
+			if (lhs.Kind == ValueKind.String)
+				return string.Compare((string)lhs.ptr, rhs.String, Culture, CompareOptions.None) >= 0;
+			if (rhs.Kind == ValueKind.String)
+				return string.Compare(lhs.String, (string)rhs.ptr, Culture, CompareOptions.None) >= 0;
 			if (lhs.IsNumber && rhs.IsNumber)
 			{
 				if (lhs.IsFloatigPoint)
 				{
-					if (lhs.Type == ValueKind.Float && !rhs.Is64)
+					if (lhs.Kind == ValueKind.Float && !rhs.Is64)
 						return lhs.data.Float >= rhs.Float;
 					return lhs.data.Double >= rhs.Double;
 				}
 				if (rhs.IsFloatigPoint)
 				{
-					if (rhs.Type == ValueKind.Float && !lhs.Is64)
+					if (rhs.Kind == ValueKind.Float && !lhs.Is64)
 						return lhs.Float >= rhs.data.Float;
 					return lhs.Double >= rhs.data.Double;
 				}
 				if (lhs.Is64 || rhs.Is64)
-					return lhs.Type == ValueKind.ULong ?
-						lhs.data.ULong >= rhs.data.ULong && (rhs.Type == ValueKind.ULong || rhs.data.Long < 0) :
-						lhs.data.Long >= rhs.data.Long || (rhs.Type == ValueKind.ULong && lhs.data.Long >= 0);
+					return lhs.Kind == ValueKind.ULong ?
+						lhs.data.ULong >= rhs.data.ULong && (rhs.Kind == ValueKind.ULong || rhs.data.Long < 0) :
+						lhs.data.Long >= rhs.data.Long || (rhs.Kind == ValueKind.ULong && lhs.data.Long >= 0);
 				if (lhs.Signed)
 				{
 					if (rhs.Signed || rhs.NumberSize > 4)
@@ -708,12 +679,10 @@ namespace RedOnion.Script
 			=> Identical(this, rhs);
 		public static bool Identical(Value lhs, Value rhs)
 		{
-			if (lhs.Type == ValueKind.Reference)
-				lhs = ((IProperties)lhs.ptr).Get(lhs.str);
-			if (rhs.Type == ValueKind.Reference)
-				rhs = ((IProperties)rhs.ptr).Get(rhs.str);
-			return lhs.Type == rhs.Type && lhs.ptr == rhs.ptr
-				&& lhs.str == rhs.str && lhs.data.Long == rhs.data.Long;
+			lhs = lhs.RValue;
+			rhs = rhs.RValue;
+			return lhs.Kind == rhs.Kind && lhs.ptr == rhs.ptr
+				&& lhs.idx == rhs.idx && lhs.data.Long == rhs.data.Long;
 		}
 	}
 }

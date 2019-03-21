@@ -75,7 +75,7 @@ namespace RedOnion.Script
 				if (which == null && HasOption(EngineOption.Strict))
 				{
 					if (!HasOption(EngineOption.Silent))
-						throw new InvalidOperationException(string.Format(
+						throw new InvalidOperationException(string.Format(Value.Culture,
 							"Variable {0} does not exist", name));
 					Value = new Value();
 					return;
@@ -157,10 +157,10 @@ namespace RedOnion.Script
 					at++;
 					self = Generic(ref at);
 				}
-				if (Value.Type == ValueKind.Reference)
+				if (Value.IsReference)
 				{
 					self = Value.ptr as IObject;
-					Value = ((IProperties)Value.ptr).Get(Value.str);
+					Value = Result;
 				}
 				if (self == Root && HasOption(EngineOption.Strict))
 					self = null;
@@ -179,10 +179,10 @@ namespace RedOnion.Script
 					at++;
 					self = Generic(ref at);
 				}
-				if (Value.Type == ValueKind.Reference)
+				if (Value.IsReference)
 				{
 					self = Value.ptr as IObject;
-					Value = ((IProperties)Value.ptr).Get(Value.str);
+					Value = Result;
 				}
 				fn = Box(Value);
 				Expression(ref at);
@@ -202,10 +202,10 @@ namespace RedOnion.Script
 					at++;
 					self = Generic(ref at);
 				}
-				if (Value.Type == ValueKind.Reference)
+				if (Value.IsReference)
 				{
 					self = Value.ptr as IObject;
-					Value = ((IProperties)Value.ptr).Get(Value.str);
+					Value = Result;
 				}
 				fn = Box(Value);
 				Expression(ref at);
@@ -228,10 +228,10 @@ namespace RedOnion.Script
 					at++;
 					self = Generic(ref at);
 				}
-				if (Value.Type == ValueKind.Reference)
+				if (Value.IsReference)
 				{
 					self = Value.ptr as IObject;
-					Value = ((IProperties)Value.ptr).Get(Value.str);
+					Value = Result;
 				}
 				fn = Box(Value);
 				var argc = n - 1;
@@ -249,10 +249,10 @@ namespace RedOnion.Script
 				n = op == OpCode.Index ? 2 : Code[at++];
 				Expression(ref at);
 				self = null;
-				if (Value.Type == ValueKind.Reference)
+				if (Value.IsReference)
 				{
 					self = Value.ptr as IObject;
-					Value = ((IProperties)Value.ptr).Get(Value.str);
+					Value = Result;
 				}
 				fn = Box(Value);
 				argc = n - 1;
@@ -267,7 +267,7 @@ namespace RedOnion.Script
 			case OpCode.Var:
 				var name = Strings[CodeInt(ref at)];
 				TypeReference(ref at);
-				if (Value.Type == ValueKind.Undefined)
+				if (Value.Kind == ValueKind.Undefined)
 				{
 					Expression(ref at);
 					Context.Vars.Set(name, Value);
@@ -318,10 +318,10 @@ namespace RedOnion.Script
 				throw new NotImplementedException("Generic with more than one parameter");
 			Expression(ref at);
 			IObject self = null;
-			if (Value.Type == ValueKind.Reference)
+			if (Value.IsReference)
 			{
 				self = Value.ptr as IObject;
-				Value = ((IProperties)Value.ptr).Get(Value.str);
+				Value = Result;
 			}
 			var fn = Box(Value);
 			TypeReference(ref at);
@@ -409,21 +409,24 @@ namespace RedOnion.Script
 			case OpCode.MulAssign:
 			case OpCode.DivAssign:
 			case OpCode.ModAssign:
-				if (left.Type != ValueKind.Reference || left.ptr == null)
+				if (!left.IsReference || left.ptr == null)
 				{
 					if (!HasOption(EngineOption.Silent))
 						throw new InvalidOperationException("Cannot assign to " + left.Name);
 					return;
 				}
-				if (left.ptr == Root && HasOption(EngineOption.Strict) && !Root.Has(left.str))
-					throw new InvalidOperationException(string.Format(
-						"Global variable '{0}' does not exist", left.str));
+				if (left.Kind == ValueKind.Reference && left.ptr == Root
+					&& HasOption(EngineOption.Strict) && !Root.Has((string)left.idx))
+					throw new InvalidOperationException(string.Format(Value.Culture,
+						"Global variable '{0}' does not exist", left.idx));
 				if (op == OpCode.Assign)
 				{
-					left.Set(Value);
-					return;
+					if (left.Set(Value) || HasOption(EngineOption.Silent))
+						return;
+					throw new InvalidOperationException(left.Name + " is read only");
 				}
-				left.Modify(op, Value);
+				if (!left.Modify(op, Value) && !HasOption(EngineOption.Silent))
+					throw new InvalidOperationException(left.Name + " is read only"); ;
 				Value = left;
 				return;
 			case OpCode.BitOr:
@@ -465,12 +468,13 @@ namespace RedOnion.Script
 			case OpCode.Not:
 				Value = new Value(!Value.Bool);
 				return;
+			// NOTE: Consider using Value.Modify
 			case OpCode.PostInc:
-				if (Value.Type == ValueKind.Reference)
+				if (Value.IsReference)
 					Value = Value.Self++;
 				return;
 			case OpCode.PostDec:
-				if (Value.Type == ValueKind.Reference)
+				if (Value.IsReference)
 					Value = Value.Self--;
 				return;
 			case OpCode.Inc:

@@ -9,7 +9,7 @@ namespace RedOnion.UI
 {
 	public class Window : IDisposable
 	{
-		protected class FramePanel : Panel
+		public class FramePanel : Panel
 		{
 			static Texture2D DefaultCloseButtonIcon = LoadIcon(13, 13, "WindowCloseButtonIcon.png");
 
@@ -50,7 +50,8 @@ namespace RedOnion.UI
 				});
 				Close = Header.Add(new Button("Window Close Button")
 				{
-					IconTexture = DefaultCloseButtonIcon
+					IconTexture = DefaultCloseButtonIcon,
+					Padding = 3f, Spacing = 3f,
 				});
 				Content = Add(new Panel("Window Content Panel")
 				{
@@ -73,8 +74,8 @@ namespace RedOnion.UI
 			}
 		}
 
-		protected FramePanel Frame { get; private set; }
-		protected Panel Content { get; private set; }
+		public FramePanel Frame { get; private set; }
+		public Panel Content { get; private set; }
 
 		public string Name
 		{
@@ -268,38 +269,38 @@ namespace RedOnion.UI
 		}
 		public Layout Layout
 		{
-			get => Frame.Layout;
-			set => Frame.Layout = value;
+			get => Content.Layout;
+			set => Content.Layout = value;
 		}
 		public LayoutPadding LayoutPadding
 		{
-			get => Frame.LayoutPadding;
-			set => Frame.LayoutPadding = value;
+			get => Content.LayoutPadding;
+			set => Content.LayoutPadding = value;
 		}
 		public Anchors ChildAnchors
 		{
-			get => Frame.ChildAnchors;
-			set => Frame.ChildAnchors = value;
+			get => Content.ChildAnchors;
+			set => Content.ChildAnchors = value;
 		}
 		public Padding InnerPadding
 		{
-			get => Frame.InnerPadding;
-			set => Frame.InnerPadding = value;
+			get => Content.InnerPadding;
+			set => Content.InnerPadding = value;
 		}
 		public Vector2 InnerSpacing
 		{
-			get => Frame.InnerSpacing;
-			set => Frame.InnerSpacing = value;
+			get => Content.InnerSpacing;
+			set => Content.InnerSpacing = value;
 		}
 		public float Padding
 		{
-			get => Frame.Padding;
-			set => Frame.Padding = value;
+			get => Content.Padding;
+			set => Content.Padding = value;
 		}
 		public float Spacing
 		{
-			get => Frame.Spacing;
-			set => Frame.Spacing = value;
+			get => Content.Spacing;
+			set => Content.Spacing = value;
 		}
 	}
 }

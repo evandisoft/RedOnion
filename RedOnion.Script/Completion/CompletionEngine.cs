@@ -132,19 +132,11 @@ namespace RedOnion.Script.Completion
 		/// </summary>
 		public virtual IObject Box(Value value)
 		{
-			for (; ; )
-			{
-				switch (value.Type)
-				{
-				default:
-					return Root.Box(value);
-				case ValueKind.Object:
-					return (IObject)value.ptr;
-				case ValueKind.Reference:
-					value = ((IProperties)value.ptr).Get(value.str);
-					continue;
-				}
-			}
+			if (value.IsReference)
+				value = value.RValue;
+			if (value.Kind == ValueKind.Object)
+				return (IObject)value.ptr;
+			return Root.Box(value);
 		}
 		/// <summary>
 		/// Current context (method)

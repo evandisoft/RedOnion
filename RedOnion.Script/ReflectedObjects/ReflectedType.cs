@@ -85,7 +85,7 @@ namespace RedOnion.Script.ReflectedObjects
 				break;
 			}
 			if (!Engine.HasOption(EngineOption.Silent))
-				throw new NotImplementedException(string.Format(
+				throw new NotImplementedException(string.Format(Value.Culture,
 					"{0} cannot be constructed with {1} argument(s)", Type.FullName, argc));
 			return null;
 		}
@@ -199,12 +199,7 @@ namespace RedOnion.Script.ReflectedObjects
 		public override bool Set(string name, Value value)
 		{
 			if (BaseProps != null && BaseProps.Get(name, out var query))
-			{
-				if (query.Type != ValueKind.Property)
-					return false;
-				((IProperty)query.ptr).Set(this, value);
-				return true;
-			}
+				return query.Set(this, value);
 			var members = GetMembers(Type, name, instance: false);
 			for (int i = 0; i < members.Length;)
 			{
@@ -238,16 +233,7 @@ namespace RedOnion.Script.ReflectedObjects
 		public override bool Modify(string name, OpCode op, Value value)
 		{
 			if (BaseProps != null && BaseProps.Get(name, out var query))
-			{
-				if (query.Type != ValueKind.Property)
-					return false;
-				var prop = (IProperty)query.ptr;
-				if (prop is IPropertyEx ex)
-					return ex.Modify(this, op, value);
-				var tmp = prop.Get(this);
-				tmp.Modify(op, value);
-				return prop.Set(this, tmp);
-			}
+				return query.Modify(this, op, value);
 			var members = GetMembers(Type, name, instance: false);
 			for (int i = 0; i < members.Length;)
 			{
@@ -301,32 +287,10 @@ namespace RedOnion.Script.ReflectedObjects
 				return value.ToString();
 			if (type.IsPrimitive || type.IsEnum)
 			{
-				if (value is Enum e)
-					value = System.Convert.ChangeType(value, Enum.GetUnderlyingType(type));
-				if (value is bool bval)
-					return bval;
-				if (value is int ival)
-					return ival;
-				if (value is float fval)
-					return fval;
-				if (value is double dval)
-					return dval;
-				if (value is uint uval)
-					return uval;
-				if (value is long i64)
-					return i64;
-				if (value is ulong u64)
-					return u64;
-				if (value is short i16)
-					return i16;
-				if (value is ushort u16)
-					return u16;
-				if (value is byte u8)
-					return u8;
-				if (value is sbyte i8)
-					return i8;
-				if (value is char c)
-					return c;
+				if (type.IsEnum && type != value.GetType())
+					value = Enum.ToObject(type, System.Convert.ChangeType(
+						value, Enum.GetUnderlyingType(type)));
+				return Value.FromPrimitive(value);
 			}
 			var converter = engine.Root[type];
 			return converter == null ? new Value()

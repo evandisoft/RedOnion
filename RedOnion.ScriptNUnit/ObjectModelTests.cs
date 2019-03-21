@@ -46,5 +46,26 @@ namespace RedOnion.ScriptNUnit
 			Test("var it = new space.thing");
 			Assert.AreEqual(typeof(Thing), Result.Native.GetType());
 		}
+
+		[Test]
+		public void ObjectModel_04_EasyProp()
+		{
+			var test = "hello";
+			Root.Set("it", new SimpleObject(this, new Properties()
+				.Set("one", dummy => 1)
+				.Set("test", dummy => test, (dummy, value) => test = value.String)));
+			Test(1, "it.one");
+			Test("it.test = \"blah\"");
+			Test("blah", "it.test");
+			Expect<InvalidOperationException>("it.one = 2");
+		}
+
+		[Test]
+		public void ObjectModel_05_Enums()
+		{
+			Root.AddType("kind", typeof(ValueKind));
+			Test(ValueKind.Long, "kind.long");
+			Test(ValueKind.Int|ValueKind.fEnum, "kind.int | kind.fEnum");
+		}
 	}
 }

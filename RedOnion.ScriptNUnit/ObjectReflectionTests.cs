@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using NUnit.Framework;
 using RedOnion.Script;
@@ -188,6 +189,18 @@ namespace RedOnion.ScriptNUnit
 			Test(0, "test.numberOfActions");
 			Test("test.action += action");
 			Test(1, "test.numberOfActions");
+		}
+
+		[Test]
+		public void ObjectReflection_08_Dictionary()
+		{
+			var creator = new ReflectedType(this, typeof(Dictionary<string, string>));
+			Root[typeof(Dictionary<string, string>)] = creator;
+			Root.Set("dict", creator);
+			Test("var test = new dict");
+			var dict = Result.Native as Dictionary<string, string>;
+			dict["test"] = "it";
+			Test("it", "test[\"test\"]");
 		}
 	}
 }

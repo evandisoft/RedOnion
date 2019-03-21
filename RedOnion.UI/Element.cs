@@ -10,7 +10,7 @@ namespace RedOnion.UI
 	/// Many methods and properties are protected,
 	/// use Panel if not subclassing.
 	/// </summary>
-	public partial class Element : IDisposable
+	public abstract partial class Element : IDisposable
 	{
 		protected internal GameObject GameObject { get; private set; }
 		protected internal RectTransform RectTransform { get; private set; }
@@ -20,7 +20,9 @@ namespace RedOnion.UI
 			get => GameObject.name ?? GetType().FullName;
 			set => GameObject.name = value;
 		}
-		public Element(string name = null)
+		public Element Parent { get; internal set; }
+
+		protected Element(string name = null)
 		{
 			GameObject = new GameObject(name);
 			GameObject.layer = UILayer;
@@ -32,11 +34,19 @@ namespace RedOnion.UI
 
 		// virtual so that we can later redirect it in Window (to content panel)
 		protected virtual void AddElement(Element element)
-			=> element.GameObject.transform.SetParent(GameObject.transform, false);
+		{
+			if (element.Parent != null)
+				element.Parent.Remove(element);
+			element.GameObject.transform.SetParent(GameObject.transform, false);
+			element.Parent = this;
+		}
 		protected virtual void RemoveElement(Element element)
 		{
-			if (element.GameObject.transform.parent == GameObject.transform)
+			if (element.Parent == this)
+			{
 				element.GameObject.transform.SetParent(null);
+				element.Parent = null;
+			}
 		}
 
 		protected E Add<E>(E element) where E : Element
@@ -156,7 +166,7 @@ namespace RedOnion.UI
 					return;
 				if (layout == Layout.Horizontal || layout == Layout.Vertical)
 				{
-					GameObject.Destroy(layoutGroup);
+					GameObject.DestroyImmediate(layoutGroup);
 					layoutGroup = null;
 				}
 				layout = value;
@@ -186,12 +196,13 @@ namespace RedOnion.UI
 				if (layoutPadding == value)
 					return;
 				layoutPadding = value;
-				if (layoutGroup != null)
-					ApplyPadding();
+				ApplyPadding();
 			}
 		}
 		private void ApplyPadding()
 		{
+			if (layoutGroup == null)
+				return;
 			layoutGroup.padding = layoutPadding.ToRectOffset();
 			layoutGroup.spacing = layout == Layout.Horizontal
 				? layoutPadding.xgap : layoutPadding.ygap;
@@ -210,12 +221,13 @@ namespace RedOnion.UI
 				if (childAnchors == value)
 					return;
 				childAnchors = value;
-				if (layoutGroup != null)
-					ApplyChildAnchors();
+				ApplyChildAnchors();
 			}
 		}
 		private void ApplyChildAnchors()
 		{
+			if (layoutGroup == null)
+				return;
 			layoutGroup.childAlignment = childAnchors.ToTextAnchor();
 			layoutGroup.childForceExpandWidth = childAnchors.right + 1f/3f > childAnchors.left;
 			layoutGroup.childForceExpandHeight = childAnchors.bottom + 1f/3f > childAnchors.top;
@@ -224,22 +236,37 @@ namespace RedOnion.UI
 		protected Padding InnerPadding
 		{
 			get => layoutPadding.Padding;
-			set => layoutPadding.Padding = value;
+			set
+			{
+				if (layoutPadding.Padding == value)
+					return;
+				layoutPadding.Padding = value;
+				if (layoutGroup != null)
+					layoutGroup.padding = layoutPadding.ToRectOffset();
+			}
 		}
 		protected Vector2 InnerSpacing
 		{
 			get => layoutPadding.Spacing;
-			set => layoutPadding.Spacing = value;
+			set
+			{
+				if (layoutPadding.Spacing == value)
+					return;
+				layoutPadding.Spacing = value;
+				if (layoutGroup != null)
+					layoutGroup.spacing = layout == Layout.Horizontal
+						? layoutPadding.xgap : layoutPadding.ygap;
+			}
 		}
 		protected float Padding
 		{
-			get => layoutPadding.Padding.All;
-			set => layoutPadding.Padding = new Padding(value);
+			get => InnerPadding.All;
+			set => InnerPadding = new Padding(value);
 		}
 		protected float Spacing
 		{
 			get => layoutPadding.xgap == layoutPadding.ygap ? layoutPadding.xgap : float.NaN;
-			set => layoutPadding.Spacing = new Vector2(value, value);
+			set => InnerSpacing = new Vector2(value, value);
 		}
 	}
 }
