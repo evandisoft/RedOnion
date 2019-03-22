@@ -8,10 +8,10 @@ using RedOnion.Script.Completion;
 namespace RedOnion.ScriptNUnit
 {
 	[TestFixture]
-	public class CompletionTests : EngineTestsBase
+	public class ROS_CompletionTests : EngineTestsBase
 	{
 		CompletionEngine Hints { get; }
-		public CompletionTests()
+		public ROS_CompletionTests()
 			=> Hints = new CompletionEngine(this);
 		protected IList<string> Complete(string source, int at)
 			=> Hints.Complete(source, at, out var from, out var to);
@@ -23,14 +23,14 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void Completion_01_GlobalVar()
+		public void ROS_Compl01_GlobalVar()
 		{
 			Test("var x");
 			Assert.IsTrue(Complete("", 0).Contains("x"));
 		}
 
 		[Test]
-		public void Completion_02_StringLength()
+		public void ROS_Compl02_StringLength()
 		{
 			// easier - we create object
 			Test("var s = new string \"hello\"");
@@ -42,7 +42,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void Completion_03_Nested()
+		public void ROS_Compl03_Nested()
 		{
 			Test("var space = new object");
 			Test("space.thing = new object");
@@ -54,7 +54,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void Completion_04_Partial()
+		public void ROS_Compl04_Partial()
 		{
 			Test("var it = new object");
 			Test("it.aaa = 1");

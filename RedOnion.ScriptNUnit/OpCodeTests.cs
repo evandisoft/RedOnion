@@ -7,10 +7,10 @@ using RedOnion.Script;
 namespace RedOnion.ScriptNUnit
 {
 	[TestFixture]
-	public class OpCodeTests
+	public class ROS_OpCodeTests
 	{
 		[Test]
-		public void OpCode_01_BasicExtend()
+		public void ROS_OpCode01_BasicExtend()
 		{
 			Assert.AreEqual(OpCode.Undefined, (OpCode)0);
 			Assert.AreEqual(OpCode.Undefined, ((OpCode)0).Extend());
@@ -31,7 +31,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void OpCode_02_BasicText()
+		public void ROS_OpCode02_BasicText()
 		{
 			Assert.AreEqual("undefined", OpCode.Undefined.Text());
 			Assert.AreEqual("=", OpCode.Assign.Text());
@@ -48,7 +48,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void OpCode_03_Priority()
+		public void ROS_OpCode03_Priority()
 		{
 			Assert.True(OpCode.Mul.Priority() > OpCode.Add.Priority());
 			Assert.True(OpCode.Sub.Priority() > OpCode.ShiftRight.Priority());
@@ -62,7 +62,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void OpCode_04_TableTest()
+		public void ROS_OpCode04_TableTest()
 		{
 			var flags = true;
 			var prev = OpCode.Undefined;
