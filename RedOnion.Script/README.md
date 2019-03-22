@@ -124,3 +124,19 @@ obj.counter = 10
 obj.action      // now obj.counter is 11
 obj.getTotal    // returns 1
 ```
+
+## Inheritance by `prototype`
+
+Inheritance can be achieved by pointing `MyClass.prototype` to base class,
+just like in JavaScript:
+
+```
+function BaseClass
+    this.name = "Base Class"
+    function setCounter value
+        this.counter = value
+    this.setCounter = setCounter
+MyClass.prototype = new BaseClass
+var obj = new MyClass
+obj.setCounter 123
+```
