@@ -7,6 +7,7 @@ using UnityEngine;
 using Kerbalua.AutoPilot;
 using KSP.UI.Screens;
 using RedOnion.KSP;
+using RedOnion.KSP.Autopilot;
 
 namespace Kerbalua.Other {
 	public class RedOnionReplEvaluator:ReplEvaluator {
@@ -64,6 +65,7 @@ namespace Kerbalua.Other {
 		{
 			engine.Reset();
 			hints.Reset();
+			FlightControl.GetInstance().Shutdown();
 		}
 
 		public override void Terminate()

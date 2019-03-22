@@ -90,6 +90,7 @@ namespace Kerbalua.Other
 		{
 			InternalResetEngine();
 			FlightControl.GetInstance().Shutdown();
+			Terminate();
 		}
 
 		public override void Terminate()

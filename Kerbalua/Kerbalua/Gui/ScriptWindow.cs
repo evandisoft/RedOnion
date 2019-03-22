@@ -7,6 +7,7 @@ using System.IO;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
 using Kerbalua.Utility;
+using RedOnion.KSP.Autopilot;
 //using RedOnion.Script;
 
 namespace Kerbalua.Gui {
@@ -150,6 +151,7 @@ namespace Kerbalua.Gui {
 				}));
 			}
 			widgetBar.renderables.Add(replEvaluatorLabel);
+			widgetBar.renderables.Add(new Button("Kill Ctrl", () => { FlightControl.GetInstance().Shutdown(); }));
 
 			InitializeKeyBindings();
 		}

@@ -7,6 +7,7 @@ using UE = UnityEngine;
 using UUI = UnityEngine.UI;
 using KUI = KSP.UI;
 using ROC = RedOnion.UI.Components;
+using RedOnion.KSP.Autopilot;
 
 namespace RedOnion.KSP
 {
@@ -148,6 +149,7 @@ namespace RedOnion.KSP
 					{ "Vessel",         root[typeof(Vessel)] },
 					{ "FlightGlobals",  root[typeof(FlightGlobals)] },
 					{ "FlightCtrlState",root[typeof(FlightCtrlState)] },
+					{ "FlightControl", root[typeof(FlightControl)]},
 					{ "HighLogic",      root[typeof(HighLogic)] },
 					{ "InputLockManager", root[typeof(InputLockManager)] },
 					{ "InputLock",		root[typeof(InputLockManager)] },
