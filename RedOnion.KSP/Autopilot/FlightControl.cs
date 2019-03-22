@@ -114,7 +114,7 @@ namespace RedOnion.KSP.Autopilot {
 			}
 		}
 
-		const float maxAngularSpeed = Mathf.PI * 2 / 20;
+		const float maxAngularSpeed = Mathf.PI * 2 / 15;
 		const float fudgeFactor = 0.9f;
 		/// <summary>
 		/// Gets spin needed to approach target direction
@@ -128,43 +128,99 @@ namespace RedOnion.KSP.Autopilot {
 				return new Vector3();
 			}
 			Vector3 currentDir = vessel.transform.up;
-			Vector3 angularSpeed = GetAngularSpeed(vessel);
+			Vector3 angularSpeed = GetAngularVelocity(vessel);
 			Vector3 worldSpaceAngularSpeed = vessel.transform.localToWorldMatrix * angularSpeed;
 			Vector3 halfWayDir = Quaternion.AngleAxis(worldSpaceAngularSpeed.magnitude * Time.deltaTime/2, worldSpaceAngularSpeed) * currentDir;
 
-			Vector3 desiredSpinAxis = vessel.transform.worldToLocalMatrix * Vector3.Cross(halfWayDir, target);
+			Vector3 currentDistanceAxis = vessel.transform.worldToLocalMatrix * Vector3.Cross(halfWayDir, target);
 			float angularDistance = Vector3.Angle(halfWayDir, target)/360*2*Mathf.PI;
 			//(d-vt)*2/t^2=a
 			//accel=(angularDistance-angularSpeed*Time.deltaTime)/Time.deltaTime^2
+			// angularSpeedFinal/2*Time.deltaTime=angularDistanceFinal
+			// angularSpeedFinal=angularSpeedStart+accel*Time.deltaTime
+			// 0=angularSpeedFinal=angularSpeedStart+accel*Time.deltaTime
+			// 0=angularDistanceFinal=desiredSpinAxis+angularSpeedStart*Time.deltaTime+1/2*accel*Time.deltaTime*Time.deltaTime
+			// currentDistance=angularSpeedStart/2*Time.deltaTime
+			// if(maxAccel*Time.deltaTime>angularSpeed and 
+			// v.x+a.x*t=0, v.y+a.y*t=0, v.z+a.z*t=0 
+			// d.x+v.x*t+
+
 
 
 			float spinMagnitude = Math.Min(angularDistance / Time.deltaTime, maxAngularSpeed);
-			return desiredSpinAxis * spinMagnitude; //*fudgeFactor;
+			return currentDistanceAxis * spinMagnitude; //*fudgeFactor;
+		}
+
+		float Accel(float distance, float velocity)
+		{
+			return (distance-velocity*Time.deltaTime)*2/Mathf.Pow(Time.deltaTime,2);
+		}
+
+
+		float MinStoppingDistance(float speed,float maxAccel)
+		{
+			float absSpeed = Math.Abs(speed);
+			float minStoppingTime = absSpeed / maxAccel;
+			return absSpeed / 2 * minStoppingTime;
+		}
+
+		float InputNeeded(float distance,float angularSpeed,float maxAccel)
+		{
+			if (distance * angularSpeed > 0) {
+				float minStopDistance = MinStoppingDistance(angularSpeed, maxAccel);
+				if (minStopDistance > Math.Abs(distance) / 2) {
+					return minStopDistance / distance;
+				}
+			}
+
+			return (angularSpeed - maxAngularSpeed * Mathf.Sign(distance)) / (maxAccel * Time.deltaTime);
 		}
 
 		void SetDir(FlightCtrlState flightCtrlState)
 		{
+			//Debug.Log("SetDir");
 			Vessel vessel = FlightGlobals.ActiveVessel;
 			if (vessel == null) {
 				Shutdown();
 				return;
 			}
 			Vector3 currentDir = vessel.transform.up;
-			Vector3 angularSpeed = GetAngularSpeed(vessel);
+			Vector3 angularVelocity = GetAngularVelocity(vessel);
 			float angularDistance = Vector3.Angle(currentDir,targetDir) / 360 * 2 * Mathf.PI;
 			////(d-vt)*2/t^2=a
 			////accel=(angularDistance-angularSpeed*Time.deltaTime)/Time.deltaTime^2
-			Vector3 distanceAxis = vessel.transform.worldToLocalMatrix * Vector3.Cross(currentDir, targetDir);
-			//Vector3 maxAccel = GetMaxAcceleration(vessel);
+			Vector3 distanceAxis = vessel.transform.worldToLocalMatrix * Vector3.Cross(currentDir.normalized, targetDir.normalized);
+			Vector3 maxAccel = GetMaxAcceleration(vessel);
 			//Vector3 desiredAccel=(-distanceAxis + angularSpeed * Time.deltaTime) * 2 / (float)Math.Pow(Time.deltaTime,2);
-			Vector3 newDistance = (distanceAxis + angularSpeed * Time.deltaTime);
+
+			Vector3 pryNeeded = new Vector3();
+
+			pryNeeded.x = InputNeeded(distanceAxis.x, angularVelocity.x, maxAccel.x);
+			pryNeeded.y = InputNeeded(distanceAxis.y, angularVelocity.y, maxAccel.y);
+			pryNeeded.z = InputNeeded(distanceAxis.z, angularVelocity.z, maxAccel.z);
+
+			//Debug.Log(distanceAxis+","+angularVelocity+","+pryNeeded);
+			SetPitchRollYaw(flightCtrlState, pryNeeded);
+			//Debug.Log(flightCtrlState.pitch + "," + flightCtrlState.roll + "," + flightCtrlState.yaw);
+			//if (angularVelocity.magnitude < maxAngularSpeed+0.01) {
+
+			//} else {
+			//	targetSpin = TargetSpinNeeded(targetDir);
+			//	SetSpin(flightCtrlState);
+			//}
+			//float pitch = Accel(distanceAxis.x, angularVelocity.x) / maxAccel.x;
+			//if(Accel(distanceAxis.x, angularVelocity.x) <= maxAccel.x) {
+
+			//}
+			//float roll = Accel(distanceAxis.y, angularVelocity.y) / maxAccel.y;
+			//float yaw = Accel(distanceAxis.z, angularVelocity.z) / maxAccel.z;
 
 			//Vector3 pry = MathUtil.Vec.Div(desiredAccel, maxAccel);
 			//Debug.Log(pry);
 			//SetPitchRollYaw(flightCtrlState, pry);
-			targetSpin = TargetSpinNeeded(targetDir);
+			//targetSpin = TargetSpinNeeded(targetDir);
 			//Debug.Log(targetDir+","+targetSpin);
-			SetSpin(flightCtrlState);
+			//SetSpin(flightCtrlState);
 
 
 		}
@@ -177,7 +233,7 @@ namespace RedOnion.KSP.Autopilot {
 				return;
 			}
 
-			Vector3 angularSpeed = GetAngularSpeed(vessel);
+			Vector3 angularSpeed = GetAngularVelocity(vessel);
 			Vector3 accel = GetMaxAcceleration(vessel);
 			Vector3 pry = MathUtil.Vec.Div(angularSpeed-targetSpin, accel * Time.deltaTime);
 			SetPitchRollYaw(flightCtrlState, pry);
@@ -191,7 +247,7 @@ namespace RedOnion.KSP.Autopilot {
 			return MathUtil.Vec.Div(torque, vessel.MOI);
 		}
 
-		Vector3 GetAngularSpeed(Vessel vessel)
+		Vector3 GetAngularVelocity(Vessel vessel)
 		{
 			return MathUtil.Vec.Div(vessel.angularMomentum, vessel.MOI);
 		}
