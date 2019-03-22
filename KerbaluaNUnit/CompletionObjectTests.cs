@@ -28,7 +28,7 @@ namespace KerbaluaNUnit {
 		[Test()]
 		public void TestCase()
 		{
-			script= new KerbaluaScript();
+			script= new Script();
 			var completion= GetCompletionObject(script.Globals,
 				@"os."
 				);

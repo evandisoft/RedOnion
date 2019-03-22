@@ -67,7 +67,8 @@ namespace RedOnion.KSP.Autopilot {
 		}
 
 		/// <summary>
-		/// TODO: WE don't propery handle both possible torque situations
+		/// TODO: We don't propery handle both possible torque situations
+		/// (pos/neg)
 		/// </summary>
 		/// <returns>The available torque.</returns>
 		/// <param name="vessel">Vessel.</param>

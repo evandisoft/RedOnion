@@ -33,6 +33,9 @@
     <Reference Include="MoonSharp.Interpreter">
       <HintPath>..\packages\MoonSharp.2.0.0.0\lib\net40-client\MoonSharp.Interpreter.dll</HintPath>
     </Reference>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>..\..\..\..\..\..\programs\KSPDev\KerbaluaDev\KSP_Data\Managed\Assembly-CSharp.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ProcessedIncompleteVarTests.cs" />

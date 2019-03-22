@@ -342,7 +342,13 @@ incompleteString
     ;
 
 incompleteName
-    : NAME
+    : NAME | keyword
+    ;
+
+keyword
+    : 'not' | 'and' | 'or' | 'nil' | 'false' | 'true' 
+    | 'elseif' | 'if' | 'break' | 'goto' | 'function' | 'end' 
+    | 'in' | 'local' | 'repeat'  | 'while' | 'else' | 'then'
     ;
 
 // LEXER

@@ -15,10 +15,19 @@ namespace Kerbalua.Completion {
 			ProcessIncompleteVar(incompleteVar);
 		}
 
+		string ProcessIncompleteName(IncompleteLuaParser.IncompleteNameContext incompleteName)
+		{
+			if (incompleteName.NAME() == null) {
+				return incompleteName.keyword().GetText();
+			}
+			return incompleteName.NAME().ToString();
+		}
+
 		void ProcessIncompleteVar(IncompleteLuaParser.IncompleteVarContext incompleteVar)
 		{
 			if (incompleteVar.incompleteName()!=null) {
-				Segments.Add(new Segment() { Name = incompleteVar.incompleteName().NAME().ToString() });
+				Segments.Add(new Segment() { Name = ProcessIncompleteName(incompleteVar.incompleteName()) });
+
 				Success = true;
 				return;
 			}
@@ -70,7 +79,7 @@ namespace Kerbalua.Completion {
 			if (incompleteVarSuffix.incompleteName() == null) {
 				Segments.Add(new Segment() { Name = "" });
 			} else {
-				Segments.Add(new Segment() { Name = incompleteVarSuffix.incompleteName().NAME().ToString() });
+				Segments.Add(new Segment() { Name = ProcessIncompleteName(incompleteVarSuffix.incompleteName()) });
 			}
 			Success = true;
 		}
