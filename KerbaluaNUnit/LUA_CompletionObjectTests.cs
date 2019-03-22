@@ -10,7 +10,7 @@ using RedOnion.KSP.Lua;
 
 namespace KerbaluaNUnit {
 	[TestFixture()]
-	public class CompletionObjectTests {
+	public class LUA_CompletionObjectTests {
 		public CompletionObject GetCompletionObject(Table globals,string source)
 		{
 			var processed = LuaIntellisense.Parse(source);
@@ -19,7 +19,7 @@ namespace KerbaluaNUnit {
 		}
 
 		Script script = new Script(CoreModules.Preset_Complete);
-		public CompletionObjectTests()
+		public LUA_CompletionObjectTests()
 		{
 			UserData.RegistrationPolicy = InteropRegistrationPolicy.Automatic;
 		}
