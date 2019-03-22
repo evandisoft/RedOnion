@@ -27,6 +27,22 @@ namespace RedOnion.Script
 		/// </summary>
 		Strict = 1 << 2,
 		/// <summary>
+		/// Simple expression-statements (identifier or dot-access)
+		/// must result in function (which is then called with no arguments)
+		/// or produce and error.
+		/// </summary>
+		Autocall = 1 << 3,
+		/// <summary>
+		/// Weaker version of Autocall
+		/// (Will execute function but won't produce error if not a function)
+		/// </summary>
+		WeakAutocall = 1 << 4,
+		/// <summary>
+		/// Special autocall handling for REPL
+		/// - works as WeakAutocall for single statement
+		/// </summary>
+		ReplAutocall = 1 << 5,
+		/// <summary>
 		/// Anonymous functions (created by Function(args, body))
 		/// expose their body (script code).
 		/// </summary>
@@ -126,7 +142,11 @@ namespace RedOnion.Script
 		/// <summary>
 		/// Is proxy/wrapper of native object
 		/// </summary>
-		Proxy = 1 << 6
+		Proxy = 1 << 6,
+		/// <summary>
+		/// Supports operator overloading
+		/// </summary>
+		Operators = 1 << 7,
 	}
 
 	/// <summary>
@@ -424,6 +444,13 @@ namespace RedOnion.Script
 		/// Convert native object into script object Features.Converter
 		/// </summary>
 		IObject Convert(object value);
+		/// <summary>
+		/// Calculate result of operator. Features.Operators
+		/// </summary>
+		/// <param name="op">The operator</param>
+		/// <param name="rhs">Right side for binary operators (undefined for unary)</param>
+		/// <returns></returns>
+		bool Operator(OpCode op, Value arg, bool selfRhs, out Value result);
 	}
 
 	public interface IEngineRoot : IObject

@@ -14,6 +14,9 @@ namespace RedOnion.Script.ReflectedObjects
 		public override Type Type => _type;
 		private Type _type;
 
+		internal KeyValuePair<PropertyInfo, ParameterInfo[]>[] indexers;
+		internal Dictionary<OpCode, MethodInfo[]> operators;
+
 		public override ObjectFeatures Features
 			=> ObjectFeatures.Function | ObjectFeatures.Constructor
 			| ObjectFeatures.Converter | ObjectFeatures.TypeReference;

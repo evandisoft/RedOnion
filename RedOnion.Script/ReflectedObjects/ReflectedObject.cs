@@ -11,7 +11,7 @@ namespace RedOnion.Script.ReflectedObjects
 	public class ReflectedObject : BasicObjects.SimpleObject
 	{
 		public override ObjectFeatures Features
-			=> ObjectFeatures.Proxy;
+			=> ObjectFeatures.Proxy | ObjectFeatures.Operators;
 
 		private object _target;
 		private Type _type;
@@ -194,6 +194,8 @@ namespace RedOnion.Script.ReflectedObjects
 			{
 				if (indexers == null)
 				{
+					if (Creator != null && Creator.indexers != null)
+						return indexers = Creator.indexers;
 					List<KeyValuePair<PropertyInfo, ParameterInfo[]>> list = null;
 					foreach (var info in Type.GetProperties())
 					{
@@ -205,6 +207,8 @@ namespace RedOnion.Script.ReflectedObjects
 						list.Add(new KeyValuePair<PropertyInfo, ParameterInfo[]>(info, pars));
 					}
 					indexers = list?.ToArray() ?? new KeyValuePair<PropertyInfo, ParameterInfo[]>[0];
+					if (Creator != null)
+						Creator.indexers = indexers;
 				}
 				return indexers;
 			}
@@ -229,6 +233,100 @@ namespace RedOnion.Script.ReflectedObjects
 			value = new Value(this, value.String);
 			return argc == 1 ? value
 				: Engine.Box(new Value(this, value.String)).Index(this, argc - 1);
+		}
+
+		internal static readonly Dictionary<OpCode, string> OperatorNames = new Dictionary<OpCode, string>()
+		{
+			{ OpCode.Plus,		"op_UnaryPlus" },
+			{ OpCode.Neg,		"op_UnaryNegation" },
+			{ OpCode.Inc,		"op_Increment" },
+			{ OpCode.Dec,		"op_Decrement" },
+			{ OpCode.Not,		"op_LogicalNot" },
+			{ OpCode.Add,		"op_Addition" },
+			{ OpCode.Sub,		"op_Subtraction" },
+			{ OpCode.Mul,		"op_Multiply" },
+			{ OpCode.Div,		"op_Division" },
+			{ OpCode.BitAnd,	"op_BitwiseAnd" },
+			{ OpCode.BitOr,		"op_BitwiseOr" },
+			{ OpCode.BitXor,	"op_ExclusiveOr" },
+			{ OpCode.Equals,	"op_Equality" },
+			{ OpCode.Differ,	"op_Inequality" },
+			{ OpCode.Less,		"op_LessThan" },
+			{ OpCode.More,		"op_GreaterThan" },
+			{ OpCode.LessEq,	"op_LessThanOrEqual" },
+			{ OpCode.MoreEq,	"op_GreaterThanOrEqual" },
+			{ OpCode.ShiftLeft,	"op_LeftShift" },
+			{ OpCode.ShiftRight,"op_RightShift" },
+			{ OpCode.Mod,		"op_Modulus" },
+			// cast: op_Implicit/op_Explicit, bool: op_True/op_False
+		};
+		Dictionary<OpCode, MethodInfo[]> operators;
+		protected MethodInfo[] GetOperators(OpCode op)
+		{
+			if (operators == null)
+			{
+				if (Creator != null)
+					operators = Creator.operators;
+				if (operators == null)
+				{
+					operators = new Dictionary<OpCode, MethodInfo[]>();
+					if (Creator != null)
+						Creator.operators = operators;
+				}
+			}
+			if (operators.TryGetValue(op, out var it))
+				return it;
+			if (!OperatorNames.TryGetValue(op, out var name))
+				return null;
+			var members = ReflectedType.GetMembers(Type, name, instance: false);
+			var methods = new MethodInfo[members.Length];
+			Array.Copy(members, methods, members.Length);
+			return operators[op] = methods;
+		}
+		public override bool Operator(OpCode op, Value arg, bool selfRhs, out Value result)
+		{
+			result = new Value();
+			var methods = GetOperators(op);
+			if (methods == null || methods.Length == 0)
+				return false;
+			if (op.Unary())
+			{
+				var arguments = Engine.Arguments;
+				var startLength = arguments.Length;
+				try
+				{
+					arguments.Add(new Value(this));
+					foreach (var method in methods)
+						if (ReflectedFunction.TryCall(Engine, method, null, 1, ref result))
+							return true;
+				}
+				finally
+				{
+					arguments.Remove(arguments.Length - startLength);
+				}
+				return false;
+			}
+			else
+			{
+				var arguments = Engine.Arguments;
+				var startLength = arguments.Length;
+				try
+				{
+					if (!selfRhs)
+						arguments.Add(new Value(this));
+					arguments.Add(arg);
+					if (selfRhs)
+						arguments.Add(new Value(this));
+					foreach (var method in methods)
+						if (ReflectedFunction.TryCall(Engine, method, null, 2, ref result))
+							return true;
+				}
+				finally
+				{
+					arguments.Remove(arguments.Length - startLength);
+				}
+				return false;
+			}
 		}
 
 		public static Value Convert(IEngine engine, object value)

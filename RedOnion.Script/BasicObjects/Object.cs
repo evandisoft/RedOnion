@@ -247,8 +247,13 @@ namespace RedOnion.Script.BasicObjects
 				return self.Index(this, argc - 1);
 			}
 		}
-		public Value IndexGet(Value index) => Get(index.String);
-		public bool IndexSet(Value index, Value value) => Set(index.String, value);
-		public bool IndexModify(Value index, OpCode op, Value value) => Modify(index.String, op, value);
+		public virtual Value IndexGet(Value index) => Get(index.String);
+		public virtual bool IndexSet(Value index, Value value) => Set(index.String, value);
+		public virtual bool IndexModify(Value index, OpCode op, Value value) => Modify(index.String, op, value);
+		public virtual bool Operator(OpCode op, Value arg, bool selfRhs, out Value result)
+		{
+			result = new Value();
+			return false;
+		}
 	}
 }

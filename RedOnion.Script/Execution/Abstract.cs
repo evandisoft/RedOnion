@@ -13,6 +13,16 @@ namespace RedOnion.Script
 	public abstract class AbstractEngine
 	{
 		/// <summary>
+		/// Engine options
+		/// </summary>
+		public EngineOption Options { get; set; }
+			= DefaultOptions;
+		public static EngineOption DefaultOptions
+			= EngineOption.BlockScope | EngineOption.Strict | EngineOption.Autocall;
+		public bool HasOption(EngineOption option)
+			=> (Options & option) != 0;
+
+		/// <summary>
 		/// Exit code (of last statement, code block or whole program)
 		/// </summary>
 		public OpCode Exit { get; protected set; }
@@ -73,6 +83,13 @@ namespace RedOnion.Script
 				Current = 0;
 				Inside = 0;
 				var end = at + size;
+				if (HasOption(EngineOption.ReplAutocall) && at < end
+					&& ((OpCode)Code[at]).Extend() == OpCode.Autocall)
+				{
+					at++;
+					Process(ref at);
+					Autocall(at == end);
+				}
 				while (at < end)
 				{
 					Process(ref at);
@@ -92,7 +109,7 @@ namespace RedOnion.Script
 			=> Execute(code, 0, code.Code.Length);
 
 		/// <summary>
-		/// Run script
+		/// Evaluate single expression
 		/// </summary>
 		public virtual Value Evaluate(CompiledCode code, int at)
 		{
@@ -134,6 +151,8 @@ namespace RedOnion.Script
 		protected abstract void Statement(OpCode op, ref int at);
 
 		protected abstract void Other(OpCode op, ref int at);
+
+		protected abstract void Autocall(bool weak = false);
 
 		protected virtual void Block(ref int at)
 		{
