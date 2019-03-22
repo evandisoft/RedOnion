@@ -75,11 +75,24 @@ namespace Kerbalua.Gui {
 		public ScriptWindow(Rect param_mainWindowRect)
 		{
 			replEvaluators["RedOnion"] = new RedOnionReplEvaluator();
-			replEvaluators["MoonSharp"] = new MoonSharpReplEvaluator();
-			replEvaluators["MoonSharp"].PrintAction = (str) => {
+			replEvaluators["Lua"] = new MoonSharpReplEvaluator();
+			replEvaluators["Lua"].PrintAction = (str) => {
 				repl.outputBox.AddOutput(str);
 			};
-			SetCurrentEvaluator(Settings.LoadSetting("lastEngine","RedOnion"));
+			string lastEngineName = Settings.LoadSetting("lastEngine", "RedOnion");
+			if(replEvaluators.ContainsKey(lastEngineName)){
+				currentReplEvaluator = replEvaluators[lastEngineName];
+				replEvaluatorLabel.content.text =lastEngineName;
+			} else {
+				foreach(var evaluatorName in replEvaluators.Keys) {
+					currentReplEvaluator = replEvaluators[evaluatorName];
+					replEvaluatorLabel.content.text = evaluatorName;
+					Settings.SaveSetting("lastEngine", evaluatorName);
+					break;
+				}
+			}
+
+
 			recentFiles = new RecentFilesList((string filename) => {
 				scriptIOTextArea.content.text = filename;
 				editor.content.text = scriptIOTextArea.Load();
