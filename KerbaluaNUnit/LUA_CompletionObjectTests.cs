@@ -26,7 +26,7 @@ namespace KerbaluaNUnit {
 
 
 		[Test()]
-		public void TestCase()
+		public void LUA_TestCase()
 		{
 			script= new Script();
 			var completion= GetCompletionObject(script.Globals,
@@ -51,7 +51,7 @@ namespace KerbaluaNUnit {
 		}
 
 		[Test()]
-		public void TestCase_2()
+		public void LUA_TestCase_2()
 		{
 			script = new Script(CoreModules.Preset_Complete);
 			script.Globals["ADF"] = new Adf();
@@ -67,7 +67,7 @@ namespace KerbaluaNUnit {
 		}
 
 		[Test()]
-		public void TestCase_3()
+		public void LUA_TestCase_3()
 		{
 			script = new Script(CoreModules.Preset_Complete);
 			script.Globals["ADF"] = new Adf();
