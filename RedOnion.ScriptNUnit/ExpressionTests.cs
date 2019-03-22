@@ -50,10 +50,10 @@ namespace RedOnion.ScriptNUnit
 	}
 
 	[TestFixture]
-	public class ExpressionTests : EngineTestsBase
+	public class ROS_ExpressionTests : EngineTestsBase
 	{
 		[Test]
-		public void Expression_01_Simple()
+		public void ROS_Expr01_Simple()
 		{
 			Test("onion",	"\"onion\"");	// string
 			Test(1,			"1");           // integer
@@ -67,7 +67,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void Expression_02_AddMul()
+		public void ROS_Expr02_AddMul()
 		{
 			Test(3,			"1+2");			// simple +
 			Test(12,		"3*4");         // simple *
@@ -81,7 +81,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void Expression_03_DivideAndNaN()
+		public void ROS_Expr03_DivideAndNaN()
 		{
 			Test(12 / 5,	"12/5");        // integer division
 			Test(12f / 5,	"12f/5");		// float division
@@ -92,7 +92,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void Expression_04_Variables()
+		public void ROS_Expr04_Variables()
 		{
 			Test(			"var x");		// declare
 			Test(10,		"x = 2*3+4");   // assign
@@ -107,7 +107,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void Expression_05_Properties()
+		public void ROS_Expr05_Properties()
 		{
 			Test("var obj = new object");	// object creation
 			Assert.AreEqual(ValueKind.Object, Result.Kind, "not object type");
@@ -140,7 +140,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void Expression_06_Compare()
+		public void ROS_Expr06_Compare()
 		{
 			Test(true,		"1 < 2");       // integers
 			Test(true,		"1 > .1");      // integer vs. double - less
@@ -148,7 +148,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void Expression_07_Ternary()
+		public void ROS_Expr07_Ternary()
 		{
 			Test(true,		"true ? true : false");
 			Test(false,		"false ? true : false");
@@ -156,7 +156,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void Expression_08_Autocall()
+		public void ROS_Expr08_Autocall()
 		{
 			Expect<InvalidOperationException>("true; false");
 		}

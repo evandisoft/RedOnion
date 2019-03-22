@@ -16,10 +16,10 @@ namespace RedOnion.ScriptNUnit
 	}
 
 	[TestFixture]
-	public class StatementTests : StatementTestsBase
+	public class ROS_StatementTests : StatementTestsBase
 	{
 		[Test]
-		public void Statement_01_Return()
+		public void ROS_EStts01_Return()
 		{
 			Test(OpCode.Return, null, "return");
 			Test(OpCode.Return, 1234, "return 1234");
@@ -27,7 +27,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void Statement_02_For()
+		public void ROS_EStts02_For()
 		{
 			Test(OpCode.Return, "321",
 				"var s = \"\"\r\n" +
@@ -36,14 +36,14 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void Statement_03_If()
+		public void ROS_EStts03_If()
 		{
 			Test(OpCode.Return, true, "if true then return true");
 			Test(OpCode.Return, false, "if false: return true else: return false");
 		}
 
 		[Test]
-		public void Statement_04_FunctionFromStr()
+		public void ROS_EStts04_FunctionFromStr()
 		{
 			// lowercase `function` may mean delegate or lambda
 			// => either `Function` or `new function` for this
@@ -52,7 +52,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void Statement_05_FunctionInScript()
+		public void ROS_EStts05_FunctionInScript()
 		{
 			Test("function sum2 a,b\r\n\treturn a+b");
 			Test(3, "sum2 1,2");

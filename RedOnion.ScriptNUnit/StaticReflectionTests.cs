@@ -6,7 +6,7 @@ using RedOnion.Script.ReflectedObjects;
 namespace RedOnion.ScriptNUnit
 {
 	[TestFixture]
-	public class StaticReflectionTests : EngineTestsBase
+	public class ROS_StaticReflectionTests : EngineTestsBase
 	{
 		[TearDown]
 		public void ResetEngine() => Reset();
@@ -37,7 +37,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void StaticReflection_01_SimpleAction()
+		public void ROS_SRefl01_SimpleAction()
 		{
 			var creator = new ReflectedType(this, typeof(StaticClass));
 			Assert.IsTrue(creator.Get("simpleAction", out var simpleAction));
@@ -54,7 +54,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void StaticReflection_02_SimpleFunctions()
+		public void ROS_SRefl02_SimpleFunctions()
 		{
 			Root.AddType(typeof(StaticClass));
 			Test(true, "StaticClass.returnTrue()");
@@ -62,7 +62,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void StaticReflection_03_ComplexFunctions()
+		public void ROS_SRefl03_ComplexFunctions()
 		{
 			Root.AddType("testClass", typeof(StaticClass));
 			Test("hello", "testClass.passThrough(\"hello\")");
@@ -73,7 +73,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void StaticReflection_04_FieldAndProperties()
+		public void ROS_SRefl04_FieldAndProperties()
 		{
 			Root.AddType("testClass", typeof(StaticClass));
 			Test(true, "testClass.wasExecuted = true");
@@ -91,7 +91,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void StaticReflection_05_Delegate()
+		public void ROS_SRefl05_Delegate()
 		{
 			Root.AddType("testClass", typeof(StaticClass));
 			StaticClass.WasExecuted = false;
@@ -113,7 +113,7 @@ namespace RedOnion.ScriptNUnit
 			public static T Pass<T>(T value) => value;
 		}
 		[Test]
-		public void StaticReflection_06_GenericFunction()
+		public void ROS_SRefl06_GenericFunction()
 		{
 			Root.AddType("test", typeof(GenericTest));
 			Test(1, "test.pass 1");
@@ -129,7 +129,7 @@ namespace RedOnion.ScriptNUnit
 			public static int NumberOfActions => action?.GetInvocationList().Length ?? 0;
 		}
 		[Test]
-		public void StaticReflection_07_Events()
+		public void ROS_SRefl07_Events()
 		{
 			Root.AddType("test", typeof(EventTest));
 			Test("var counter = 0");
