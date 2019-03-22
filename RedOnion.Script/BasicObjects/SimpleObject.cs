@@ -53,11 +53,8 @@ namespace RedOnion.Script.BasicObjects
 			BaseProps = properties;
 		}
 
-		public bool Has(string name)
-			=> Which(name) != null;
-
-		public virtual IObject Which(string name)
-			=> BaseProps.Has(name) ? this : null;
+		public virtual bool Has(string name)
+			=> BaseProps.Has(name);
 
 		public Value Get(string name)
 		{

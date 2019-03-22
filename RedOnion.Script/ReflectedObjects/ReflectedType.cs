@@ -121,26 +121,26 @@ namespace RedOnion.Script.ReflectedObjects
 			return members;
 		}
 
-		public override IObject Which(string name)
+		public override bool Has(string name)
 		{
 			if (BaseProps?.Has(name) == true)
-				return this;
+				return true;
 			foreach (var member in GetMembers(Type, name, instance: false))
 			{
 				if (member is MethodInfo method)
-					return this;
+					return true;
 				if (member is FieldInfo field)
-					return this;
+					return true;
 				if (member is EventInfo evt)
-					return this;
+					return true;
 				if (member is PropertyInfo property)
 				{
 					if (property.GetIndexParameters().Length > 0)
 						continue;
-					return this;
+					return true;
 				}
 			}
-			return null;
+			return false;
 		}
 
 		public override bool Get(string name, out Value value)

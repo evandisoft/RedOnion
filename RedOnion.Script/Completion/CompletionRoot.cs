@@ -35,9 +35,9 @@ namespace RedOnion.Script.Completion
 			}
 		}
 
-		public IObject Create(
+		public IObject Create(string name,
 			CompiledCode code, int codeAt, int codeSize, int typeAt,
-			ArgumentInfo[] args, string body = null, IObject scope = null)
+			ArgumentInfo[] args, string body = null, IScope scope = null)
 			=> null;
 		public IObject GetType(OpCode OpCode)
 			=> null;

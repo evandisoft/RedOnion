@@ -72,20 +72,18 @@ namespace RedOnion.Script.BasicObjects
 			var body = Engine.GetArgument(argc, argc - 1).String;
 			var code = Engine.Compile(body);
 			return new FunctionObj(Engine, Prototype,
-				code, 0, code.Code.Length, -1, args?.ToArray(),
-				(Engine.Options & EngineOption.FuncText) == 0 ? null :
-				"function anonymous(" +
-				(args == null ? "" : string.Join(", ", args.Select(x => x.Name).ToArray())) +
-				") {\n" + body + "\n}");
+				code, 0, code.Code.Length, -1, args?.ToArray());
 		}
 	}
 
 	/// <summary>
 	/// Function object (callable, can construct)
 	/// </summary>
-	[DebuggerDisplay("{GetType().Name}: {String}")]
+	[DebuggerDisplay("function {Name} {ArgsString}")]
 	public class FunctionObj : BasicObject
 	{
+		protected string name;
+		public override string Name => name ?? "anonymous";
 		/// <summary>
 		/// Shared code
 		/// </summary>
@@ -120,7 +118,7 @@ namespace RedOnion.Script.BasicObjects
 		public string ArgumentName(int i)
 			=> i >= ArgumentCount ? null : Arguments[i].Name;
 		/// <summary>
-		/// Full function code as string
+		/// Full function code as string or at least name and arguments
 		/// </summary>
 		public string String { get; protected set; }
 		/// <summary>
@@ -130,7 +128,7 @@ namespace RedOnion.Script.BasicObjects
 		/// <summary>
 		/// Private variables/fields
 		/// </summary>
-		public IObject Scope { get; protected set; }
+		public IScope Scope { get; protected set; }
 
 		public override ObjectFeatures Features
 			=> ObjectFeatures.Function | ObjectFeatures.Constructor;
@@ -148,16 +146,29 @@ namespace RedOnion.Script.BasicObjects
 		/// </summary>
 		public FunctionObj(IEngine engine, FunctionObj baseClass,
 			CompiledCode code, int codeAt, int codeSize, int typeAt,
-			ArgumentInfo[] args, string body = null, IObject scope = null)
+			ArgumentInfo[] args, string body = null, IScope scope = null)
+			:
+			this(engine, null, baseClass,
+			code, codeAt, codeSize, typeAt,
+			args, body, scope)
+		{ }
+		/// <summary>
+		/// Create new function object
+		/// </summary>
+		public FunctionObj(IEngine engine, string name, FunctionObj baseClass,
+			CompiledCode code, int codeAt, int codeSize, int typeAt,
+			ArgumentInfo[] args, string body = null, IScope scope = null)
 			: base(engine, baseClass, StdProps)
 		{
+			this.name = name;
 			Code = code;
 			CodeAt = codeAt;
 			CodeSize = codeSize;
 			TypeAt = typeAt;
 			Arguments = args;
 			ArgsString = args == null ? "" : string.Join(", ", args.Select(x => x.Name).ToArray());
-			String = body ?? "function";
+			String = body ?? (args == null ? "function " + Name
+				: string.Format(Value.Culture, "function {0} {1}", Name, ArgsString));
 			Scope = scope;
 		}
 
@@ -180,7 +191,10 @@ namespace RedOnion.Script.BasicObjects
 
 		public override IObject Create(int argc)
 		{
-			var it = new BasicObject(Engine, Engine.Box(Get("prototype")));
+			IObject baseClass = null;
+			if (Get("prototype", out var proto))
+				baseClass = Engine.Box(proto);
+			var it = new BasicObject(Engine, baseClass);
 			var args = Engine.CreateContext(it, Scope);
 			if (this.Arguments != null)
 			{

@@ -12,7 +12,12 @@ namespace RedOnion.Script.Parsing
 		/// Test if there is expression at current position
 		/// </summary>
 		protected virtual bool PeekExpression(Flag flags)
-			=> !lexer.Eol && lexer.Curr != ';' && lexer.Code.Kind() < OpKind.Statement;
+			=> !lexer.Eol
+			&& lexer.Curr != ';'
+			&& lexer.Curr != ','
+			&& lexer.Curr != ':'
+			&& (lexer.Word == null
+			|| lexer.Code.Kind() < OpKind.Statement);
 
 		/// <summary>
 		/// Full/required expression (e.g. condition of while)

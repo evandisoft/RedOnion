@@ -166,7 +166,7 @@ namespace RedOnion.KSP
 		public ImmediateEngine()
 			: base(engine => new RuntimeRoot(engine, root =>
 			RuntimeEngine.FillRoot(root, repl: true)))
-			=> Options |= EngineOption.ReplAutocall;
+			=> Options |= EngineOption.Repl;
 		public override void Log(string msg)
 			=> UE.Debug.Log("[RedOnion.REPL] " + msg);
 	}

@@ -36,7 +36,7 @@ namespace RedOnion.Script
 			if (op == OpCode.Autocall)
 			{
 				Expression(ref at);
-				if (!HasOption(EngineOption.Autocall|EngineOption.WeakAutocall|EngineOption.ReplAutocall))
+				if (!HasOption(EngineOption.Autocall|EngineOption.WeakAutocall|EngineOption.Repl))
 					return;
 				Autocall();
 				return;
@@ -182,6 +182,10 @@ namespace RedOnion.Script
 				throw new NotImplementedException();
 			case OpCode.Function:
 				var fname = Strings[CodeInt(ref at)];
+				if (HasOption(EngineOption.Strict)
+					&& !HasOption(EngineOption.Silent|EngineOption.Repl)
+					&& Root.Has(fname))
+					throw new InvalidOperationException("Function " + fname + " already exists");
 				var size = CodeInt(ref at);
 				var body = at + size;
 				Debug.Assert(Code[at + 2] == 0); // not generic
@@ -204,7 +208,8 @@ namespace RedOnion.Script
 				Debug.Assert(at == body);
 				at = body;
 				size = CodeInt(ref at);
-				Context.Root.Set(fname, new Value(Root.Create(Compiled, at, size, ftat, args, null, Context.Vars)));
+				Context.Root.Set(fname, new Value(Root.Create(fname,
+					Compiled, at, size, ftat, args, null, Context.Vars)));
 				at += size;
 				Value = new Value(Context.Root, fname);
 				return;

@@ -33,24 +33,24 @@ namespace RedOnion.Script.ReflectedObjects
 		protected MemberInfo[] GetMembers(string name)
 			=> ReflectedType.GetMembers(Type, name, instance: true);
 
-		public override IObject Which(string name)
+		public override bool Has(string name)
 		{
 			if (BaseProps?.Has(name) == true)
-				return this;
+				return true;
 			foreach (var member in GetMembers(name))
 			{
 				if (member is MethodInfo method)
-					return this;
+					return true;
 				if (member is FieldInfo field)
-					return this;
+					return true;
 				if (member is PropertyInfo property)
 				{
 					if (property.GetIndexParameters().Length > 0)
 						continue;
-					return this;
+					return true;
 				}
 			}
-			return null;
+			return false;
 		}
 
 		public override bool Get(string name, out Value value)

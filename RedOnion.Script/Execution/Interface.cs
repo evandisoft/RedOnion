@@ -12,41 +12,45 @@ namespace RedOnion.Script
 	{
 		None = 0,
 		/// <summary>
-		/// Variables live only inside blocks
-		/// (otherwise inside script or function).
-		/// </summary>
-		BlockScope = 1 << 0,
-		/// <summary>
 		/// Make errors/exceptions produce undefined value where possible
 		/// (throw exception otherwise).
 		/// </summary>
-		Silent = 1 << 1,
+		Silent = 1 << 0,
 		/// <summary>
-		/// Strict mode sets `this` in functions (not called as method) to null (global otherwise)
-		/// and prevents automatic boxing of undefined values (creates new object otherwise).
+		/// Strict mode sets `this` in functions (not called as method) to undefined (global otherwise),
+		/// prevents automatic boxing of undefined value (creates new object otherwise)
+		/// and forbids function overwrite.
 		/// </summary>
-		Strict = 1 << 2,
+		Strict = 1 << 1,
 		/// <summary>
-		/// Simple expression-statements (identifier or dot-access)
+		/// Variables live inside blocks
+		/// (otherwise inside script or function).
+		/// </summary>
+		BlockScope = 1 << 2,
+		/// <summary>
+		/// Import properties of this-object into scope of methods.
+		/// </summary>
+		SelfScope = 1 << 3,
+		/// <summary>
+		/// Simple expression-statements (identifier or ending with dot+identifier)
 		/// must result in function (which is then called with no arguments)
-		/// or produce and error.
+		/// or produce an error.
 		/// </summary>
-		Autocall = 1 << 3,
+		Autocall = 1 << 4,
 		/// <summary>
 		/// Weaker version of Autocall
-		/// (Will execute function but won't produce error if not a function)
+		/// (Will invoke the function but won't produce error if not a function)
 		/// </summary>
-		WeakAutocall = 1 << 4,
+		WeakAutocall = 1 << 5,
+
 		/// <summary>
-		/// Special autocall handling for REPL
-		/// - works as WeakAutocall for single statement
+		/// Special handling for REPL
 		/// </summary>
-		ReplAutocall = 1 << 5,
-		/// <summary>
-		/// Anonymous functions (created by Function(args, body))
-		/// expose their body (script code).
-		/// </summary>
-		FuncText = 1 << 31,
+		/// <remarks>
+		/// - Autocall works as WeakAutocall for single statement.
+		/// - Strict allows function overwrite.
+		/// </remarks>
+		Repl = 1 << 31,
 	}
 
 	public interface IEngine
@@ -98,11 +102,11 @@ namespace RedOnion.Script
 		/// <summary>
 		/// Create new variables holder object
 		/// </summary>
-		IObject CreateVars(IObject vars);
+		IScope CreateVars(IObject baseClass);
 		/// <summary>
 		/// Create new execution/activation context (for function call)
 		/// </summary>
-		IObject CreateContext(IObject self, IObject scope = null);
+		IObject CreateContext(IObject self, IScope scope = null);
 		/// <summary>
 		/// Destroy last execution/activation context
 		/// </summary>
@@ -370,14 +374,6 @@ namespace RedOnion.Script
 		/// </summary>
 		IProperties MoreProps { get; }
 		/// <summary>
-		/// Find the object containing the property
-		/// </summary>
-		/// <remarks>
-		/// This is actually used only by Engine.Context (to handle OpCode.Identifier).
-		/// It may be removed in the future - we only need Has and even that is questionable.
-		/// </remarks>
-		IObject Which(string name);
-		/// <summary>
 		/// Modify the value of specified property (compound assignment)
 		/// </summary>
 		bool Modify(string name, OpCode op, Value value);
@@ -453,7 +449,23 @@ namespace RedOnion.Script
 		bool Operator(OpCode op, Value arg, bool selfRhs, out Value result);
 	}
 
-	public interface IEngineRoot : IObject
+	public interface IScope : IObject
+	{
+		/// <summary>
+		/// Add / overwrite specified property
+		/// (goes to MoreProps ignoring BaseProps and BaseClass)
+		/// </summary>
+		/// <remarks>
+		/// Used by engine to handle `var`.
+		/// </remarks>
+		void Add(string name, Value value);
+		/// <summary>
+		/// Find the object containing the property
+		/// </summary>
+		IObject Which(string name);
+	}
+
+	public interface IEngineRoot : IScope
 	{
 		/// <summary>
 		/// Box value (StringObj, NumberObj, ...)
@@ -463,7 +475,9 @@ namespace RedOnion.Script
 		/// <summary>
 		/// Create new function
 		/// </summary>
-		IObject Create(CompiledCode code, int codeAt, int codeSize, int typeAt, ArgumentInfo[] args, string body = null, IObject scope = null);
+		IObject Create(string name,
+			CompiledCode code, int codeAt, int codeSize, int typeAt,
+			ArgumentInfo[] args, string body = null, IScope scope = null);
 
 		/// <summary>
 		/// Get type reference (StringFun, NumberFun, ...)
@@ -557,33 +571,45 @@ namespace RedOnion.Script
 			var idx = Count - argc + index;
 			return idx < Count ? this[idx] : new Value();
 		}
+
+		public struct AddGuard : IDisposable
+		{
+			ArgumentList arglist;
+			int startSize;
+			public AddGuard(ArgumentList arglist)
+				=> startSize = (this.arglist = arglist).Count;
+			public void Dispose()
+				=> arglist.RemoveRange(startSize, arglist.Count - startSize);
+		}
+		public AddGuard Guard()
+			=> new AddGuard(this);
 	}
 
 	/// <summary>
 	/// Stack of blocks of current function/method
 	/// </summary>
-	public struct EngineContext : IProperties
+	public struct EngineContext /*: IProperties*/
 	{
+		/// <summary>
+		/// Variables of current block (previous block/scope is in baseClass)
+		/// </summary>
+		public IScope Vars { get; private set; }
+		/// <summary>
+		/// Root (activation) object (new variables not declared with var will be created here)
+		/// </summary>
+		public IScope Root { get; }
 		/// <summary>
 		/// Current object accessible by 'this' keyword
 		/// </summary>
 		public IObject Self { get; }
-		/// <summary>
-		/// Variables of current block (previous block/scope is in baseClass)
-		/// </summary>
-		public IObject Vars { get; private set; }
-		/// <summary>
-		/// Root (activation) object (new variables not declared with var will be created here)
-		/// </summary>
-		public IObject Root { get; }
 
 		/// <summary>
 		/// Root context
 		/// </summary>
 		public EngineContext(IEngine engine)
 		{
-			Vars = Root = engine.Root;
-			Self = engine.HasOption(EngineOption.Strict) ? null : Root;
+			Root = Vars = engine.Root;
+			Self = null;
 		}
 
 		/// <summary>
@@ -591,29 +617,32 @@ namespace RedOnion.Script
 		/// </summary>
 		public EngineContext(IEngine engine, IObject self, IObject scope)
 		{
-			Self = self ?? (engine.HasOption(EngineOption.Strict) ? null : engine.Root);
-			Root = Vars = engine.CreateVars(engine.CreateVars(scope ?? engine.Root));
-			Vars.Set("arguments", new Value(Vars.BaseClass));
+			// Vars -> ... -> Root -> Arguments -> Scope
+			// -> Self -> Self.BaseClass -> ... (EngineOption.SelfScope)
+			// -> Globals (engine.Root)
+			Root = Vars = engine.CreateVars(engine.CreateVars(scope));
+			Self = self;
+			Vars.Add("arguments", new Value(Vars.BaseClass));
 		}
 
 		public void Push(IEngine engine)
 			=> Vars = engine.CreateVars(Vars);
 		public void Pop()
-			=> Vars = Vars.BaseClass;
+			=> Vars = (IScope)Vars.BaseClass;
 		public bool Has(string name)
-			=> Vars.Has(name);
+			=> Vars.Has(name)
+			|| (Vars.Engine.HasOption(EngineOption.SelfScope) && Self?.Has(name) == true)
+			|| Vars.Engine.Root.Has(name);
 		public IObject Which(string name)
-			=> Vars.Which(name);
+			=> Vars.Which(name)
+			?? (Vars.Engine.HasOption(EngineOption.SelfScope) && Self?.Has(name) == true ? Self : null)
+			?? Vars.Engine.Root.Which(name);
 		public Value Get(string name)
-			=> Vars.Get(name);
+			=> Get(name, out var value) ? value : new Value();
 		public bool Get(string name, out Value value)
-			=> Vars.Get(name, out value);
-		public bool Set(string name, Value value)
-			=> Vars.Set(name, value);
-		public bool Delete(string name)
-			=> Vars.Delete(name);
-		public void Reset()
-			=> Vars.Reset();
+			=> Vars.Get(name, out value)
+			|| (Vars.Engine.HasOption(EngineOption.SelfScope) && Self?.Get(name, out value) == true)
+			|| Vars.Engine.Root.Get(name, out value);
 	}
 
 	public static class EngineExtensions

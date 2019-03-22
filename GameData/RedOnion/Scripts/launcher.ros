@@ -1,6 +1,6 @@
 var wnd = new window
 function shutdown
-  wnd.dispose()
+  wnd.dispose
 
 wnd.layout = layout.horizontal
 var left = wnd.add new panel
@@ -24,3 +24,5 @@ function click
   counter++
   lbl.text = "Clicked " + counter + "x"
 btn.click += click
+
+wnd.y -= unity.screen.height / 3
