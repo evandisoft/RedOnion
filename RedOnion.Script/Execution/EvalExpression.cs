@@ -315,6 +315,9 @@ namespace RedOnion.Script
 					Expression(ref at);
 				}
 				return;
+			case OpCode.Function:
+				Value = new Value(Function(null, ref at));
+				return;
 			}
 			throw new NotImplementedException();
 		}

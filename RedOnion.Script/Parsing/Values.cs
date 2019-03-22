@@ -377,6 +377,14 @@ namespace RedOnion.Script.Parsing
 			ValuesReserve(bytes.Length);
 			ValuesPush(bytes);
 		}
+		/// <summary>
+		/// Push sequence of bytes
+		/// </summary>
+		protected void Push(byte[] bytes, int i, int n)
+		{
+			ValuesReserve(n);
+			ValuesPush(bytes, i, n);
+		}
 
 		/// <summary>
 		/// Push single unsigned integer to value buffer/stack
@@ -471,6 +479,11 @@ namespace RedOnion.Script.Parsing
 		{
 			Array.Copy(bytes, 0, Values, ValuesAt, bytes.Length);
 			ValuesAt += bytes.Length;
+		}
+		internal void ValuesPush(byte[] bytes, int i, int n)
+		{
+			Array.Copy(bytes, i, Values, ValuesAt, n);
+			ValuesAt += n;
 		}
 
 		internal void ValuesPush(uint value)

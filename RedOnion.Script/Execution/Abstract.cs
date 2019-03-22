@@ -210,17 +210,18 @@ namespace RedOnion.Script
 				Special(op, ref at);
 				break;
 			default:
-				if (kind >= OpKind.Statement)
-					throw new InvalidOperationException();
-				if (op.Binary())
+				if (kind < OpKind.Statement)
 				{
-					Binary(op, ref at);
-					break;
-				}
-				if (op.Unary())
-				{
-					Unary(op, ref at);
-					break;
+					if (op.Binary())
+					{
+						Binary(op, ref at);
+						break;
+					}
+					if (op.Unary())
+					{
+						Unary(op, ref at);
+						break;
+					}
 				}
 				Special(op, ref at);
 				break;

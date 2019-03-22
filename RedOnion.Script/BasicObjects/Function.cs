@@ -174,7 +174,7 @@ namespace RedOnion.Script.BasicObjects
 
 		public override Value Call(IObject self, int argc)
 		{
-			var args = Engine.CreateContext(self, Scope);
+			var args = Engine.CreateContext(self, Scope, argc);
 			if (Arguments != null)
 			{
 				for (var i = 0; i < Arguments.Length; i++)
@@ -195,19 +195,7 @@ namespace RedOnion.Script.BasicObjects
 			if (Get("prototype", out var proto))
 				baseClass = Engine.Box(proto);
 			var it = new BasicObject(Engine, baseClass);
-			var args = Engine.CreateContext(it, Scope);
-			if (this.Arguments != null)
-			{
-				for (var i = 0; i < this.Arguments.Length; i++)
-				{
-					//TODO: cast/convert to argument type
-					args.Set(Arguments[i].Name, i < argc ? Engine.GetArgument(argc, i) :
-						Arguments[i].Value < 0 ? new Value() :
-						Engine.Evaluate(Code, Arguments[i].Value));
-				}
-			}
-			Engine.Execute(Code, CodeAt, CodeSize);
-			Engine.DestroyContext();
+			Call(it, argc);
 			return it;
 		}
 

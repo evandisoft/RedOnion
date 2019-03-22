@@ -106,7 +106,7 @@ namespace RedOnion.Script
 		/// <summary>
 		/// Create new execution/activation context (for function call)
 		/// </summary>
-		IObject CreateContext(IObject self, IScope scope = null);
+		IObject CreateContext(IObject self, IScope scope, int argc);
 		/// <summary>
 		/// Destroy last execution/activation context
 		/// </summary>
@@ -588,7 +588,7 @@ namespace RedOnion.Script
 	/// <summary>
 	/// Stack of blocks of current function/method
 	/// </summary>
-	public struct EngineContext /*: IProperties*/
+	public struct EngineContext
 	{
 		/// <summary>
 		/// Variables of current block (previous block/scope is in baseClass)
@@ -615,14 +615,16 @@ namespace RedOnion.Script
 		/// <summary>
 		/// Function execution context
 		/// </summary>
-		public EngineContext(IEngine engine, IObject self, IObject scope)
+		public EngineContext(IEngine engine, IObject self, IObject scope, int argc)
 		{
 			// Vars -> ... -> Root -> Arguments -> Scope
 			// -> Self -> Self.BaseClass -> ... (EngineOption.SelfScope)
 			// -> Globals (engine.Root)
-			Root = Vars = engine.CreateVars(engine.CreateVars(scope));
+			var args = engine.CreateVars(scope);
+			Root = Vars = engine.CreateVars(args);
 			Self = self;
-			Vars.Add("arguments", new Value(Vars.BaseClass));
+			Vars.Add("arguments", new Value(args));
+			args.Add("length", argc);
 		}
 
 		public void Push(IEngine engine)

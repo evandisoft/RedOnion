@@ -21,8 +21,39 @@ namespace RedOnion.ScriptNUnit
 		[Test]
 		public void ROS_Func02_InScript()
 		{
-			Test("function sum2 a,b\r\n\treturn a+b");
+			Lines(
+				"function sum2 a,b",
+				"	return a+b");
 			Test(3, "sum2 1,2");
+		}
+
+		[Test]
+		public void ROS_Func03_ArgsLength()
+		{
+			Lines(3,
+				"function test",
+				"	return arguments.length",
+				"test 0,1,2");
+		}
+
+		[Test]
+		public void ROS_Func04_InlineFunc()
+		{
+			Lines(3.14,
+				"var test = function",
+				"	return 3.14",
+				"test");
+			Lines(1f,
+				"var v = 1f",
+				"var test = function",
+				"	return v",
+				"test");
+			Lines(3u,
+				"var sum = function x, y",
+				"	return x + y",
+				"var a = 1u",
+				"var b = 2u",
+				"sum a, b");
 		}
 	}
 }

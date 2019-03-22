@@ -136,10 +136,10 @@ namespace RedOnion.Script
 		/// <summary>
 		/// Create new execution/activation context (for function call)
 		/// </summary>
-		public IObject CreateContext(IObject self, IScope scope = null)
+		public IObject CreateContext(IObject self, IScope scope, int argc)
 		{
 			ContextStack.Push(Context);
-			Context = new EngineContext(this, self, scope);
+			Context = new EngineContext(this, self, scope, argc);
 			return Context.Vars.BaseClass;
 		}
 

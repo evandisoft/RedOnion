@@ -186,34 +186,39 @@ namespace RedOnion.Script
 					&& !HasOption(EngineOption.Silent|EngineOption.Repl)
 					&& Root.Has(fname))
 					throw new InvalidOperationException("Function " + fname + " already exists");
-				var size = CodeInt(ref at);
-				var body = at + size;
-				Debug.Assert(Code[at + 2] == 0); // not generic
-				at += 3;
-				var argc = Code[at++];
-				var ftsz = CodeInt(ref at);
-				var ftat = at;
-				at += ftsz;
-				var args = argc == 0 ? null : new ArgumentInfo[argc];
-				for (var i = 0; i < argc; i++)
-				{
-					args[i].Name = Strings[CodeInt(ref at)];
-					var tsz = CodeInt(ref at);
-					args[i].Type = at;
-					at += tsz;
-					var vsz = CodeInt(ref at);
-					args[i].Value = at;
-					at += vsz;
-				}
-				Debug.Assert(at == body);
-				at = body;
-				size = CodeInt(ref at);
-				Context.Root.Set(fname, new Value(Root.Create(fname,
-					Compiled, at, size, ftat, args, null, Context.Vars)));
-				at += size;
+				Context.Root.Set(fname, Function(fname, ref at));
 				Value = new Value(Context.Root, fname);
 				return;
 			}
+		}
+
+		protected IObject Function(string name, ref int at)
+		{
+			var size = CodeInt(ref at);
+			var body = at + size;
+			Debug.Assert(Code[at + 2] == 0); // not generic
+			at += 3;
+			var argc = Code[at++];
+			var ftsz = CodeInt(ref at);
+			var ftat = at;
+			at += ftsz;
+			var args = argc == 0 ? null : new ArgumentInfo[argc];
+			for (var i = 0; i < argc; i++)
+			{
+				args[i].Name = Strings[CodeInt(ref at)];
+				var tsz = CodeInt(ref at);
+				args[i].Type = at;
+				at += tsz;
+				var vsz = CodeInt(ref at);
+				args[i].Value = at;
+				at += vsz;
+			}
+			Debug.Assert(at == body);
+			at = body;
+			size = CodeInt(ref at);
+			var it = Root.Create(name, Compiled, at, size, ftat, args, null, Context.Vars);
+			at += size;
+			return it;
 		}
 	}
 }

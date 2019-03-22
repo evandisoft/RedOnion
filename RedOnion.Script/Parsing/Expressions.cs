@@ -52,7 +52,7 @@ namespace RedOnion.Script.Parsing
 		/// <summary>
 		/// Parse expression
 		/// </summary>
-		protected virtual void ParseExpression(Flag flags = Flag.None)
+		protected virtual bool ParseExpression(Flag flags = Flag.None)
 		{
 			var bottom = OperatorAt;
 		unext:
@@ -69,6 +69,20 @@ namespace RedOnion.Script.Parsing
 					goto autocall;
 				if (lexer.Word.Length > 127)
 					throw new ParseError(lexer, "Identifier name too long");
+				if (code == OpCode.Function)
+				{
+					var fnat = CodeAt;
+					ParseFunction(null, flags);
+					var start = ValuesAt;
+					ValuesReserve(5+CodeAt-fnat);
+					ValuesPush(Code, fnat, CodeAt-fnat);
+					ValuesPush((byte)code);
+					ValuesPush(start);
+					CodeAt = fnat;
+					while (OperatorAt > bottom)
+						PrepareOperator(PopOperator());
+					return true;
+				}
 				Push(OpCode.Identifier, lexer.Word);
 				if (lexer.Peek == '!')
 				{
@@ -237,11 +251,18 @@ namespace RedOnion.Script.Parsing
 						&& Next().lexer.Word == null)
 						throw new ParseError(lexer, "Expected variable type");
 					ParseType(flags);
+					var wasBlock = false;
 					if (lexer.Code == OpCode.Assign)
-						Next().ParseExpression(flags);
+						wasBlock = Next().ParseExpression(flags);
 					else
 						Push(OpCode.Undefined);
 					PrepareOperator(OpCode.Var);
+					if (wasBlock)
+					{
+						while (OperatorAt > bottom)
+							PrepareOperator(PopOperator());
+						return true;
+					}
 					unary = false;
 					goto next;
 				case OpCode.Generic:    //----------------------------------- generic type or method
@@ -367,7 +388,7 @@ namespace RedOnion.Script.Parsing
 			}
 			while (OperatorAt > bottom)
 				PrepareOperator(PopOperator());
-			return;
+			return false;
 
 		//################################################################################ auto call
 		autocall:
