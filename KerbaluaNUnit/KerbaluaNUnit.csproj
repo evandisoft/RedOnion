@@ -38,8 +38,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ProcessedIncompleteVarTests.cs" />
-    <Compile Include="CompletionObjectTests.cs" />
+    <Compile Include="LUA_ProcessedIncompleteVarTests.cs" />
+    <Compile Include="LUA_CompletionObjectTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Kerbalua\Kerbalua.csproj">

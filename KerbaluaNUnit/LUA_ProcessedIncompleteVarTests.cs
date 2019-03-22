@@ -3,7 +3,7 @@ using Kerbalua.Completion;
 using System;
 namespace KerbaluaNUnit {
 	[TestFixture()]
-	public class ProcessedIncompleteVarTests {
+	public class LUA_ProcessedIncompleteVarTests {
 		public ProcessedIncompleteVar Parse(string source)
 		{
 			return LuaIntellisense.Parse(source);
