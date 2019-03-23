@@ -29,7 +29,7 @@ namespace Kerbalua.Gui {
 			completableMap[source.ControlName] = source;
 		}
 
-		int inc = 0;
+		//int inc = 0;
 		public void Update(bool hadMouseDownLastUpdate)
 		{
 			bool newInput= hadMouseDownLastUpdate;

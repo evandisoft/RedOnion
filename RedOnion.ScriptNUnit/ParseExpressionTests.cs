@@ -151,7 +151,7 @@ namespace RedOnion.ScriptNUnit
 	}
 
 	[TestFixture]
-	public class ParseExpressionTests : ParseTestsBase
+	public class ROS_ParseExpressionTests : ParseTestsBase
 	{
 		public void Test(string line)
 		{
@@ -169,7 +169,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void ParseExpression_01_Add()
+		public void ROS_PExpr01_Add()
 		{
 			Test("x + 1");
 
@@ -193,7 +193,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void ParseExpression_02_AddMul()
+		public void ROS_PExpr02_AddMul()
 		{
 			Test("1u + x * 3f");
 
@@ -225,7 +225,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void ParseExpression_03_Parenthesis()
+		public void ROS_PExpr03_Parenthesis()
 		{
 			Test("(1L + x) * 3.0");
 
@@ -257,7 +257,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void ParseExpression_04_Ternary()
+		public void ROS_PExpr04_Ternary()
 		{
 			Test("cond ? true : false");
 
@@ -284,7 +284,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void ParseExpression_05_PreAndPost()
+		public void ROS_PExpr05_PreAndPost()
 		{
 			Test("++x--");
 
@@ -304,7 +304,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void ParseExpression_06_StringAndChar()
+		public void ROS_PExpr06_StringAndChar()
 		{
 			Test("\"string\" + 'c'");
 
@@ -328,34 +328,34 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void ParseExpression_07_CallWithUnary_v1()
+		public void ROS_PExpr07_CallWithUnary_v1()
 		{
 			Test("abs(-1)");
-			ParseExpression_07_CallWithUnary();
+			ROS_PExpr07_CallWithUnary();
 		}
 
 		[Test]
-		public void ParseExpression_07_CallWithUnary_v2()
+		public void ROS_PExpr07_CallWithUnary_v2()
 		{
 			Test("abs -1");
-			ParseExpression_07_CallWithUnary();
+			ROS_PExpr07_CallWithUnary();
 		}
 
 		[Test]
-		public void ParseExpression_07_CallWithUnary_v3()
+		public void ROS_PExpr07_CallWithUnary_v3()
 		{
 			Test("abs(-x)");
-			ParseExpression_07_CallWithUnary2();
+			ROS_PExpr07_CallWithUnary2();
 		}
 
 		[Test]
-		public void ParseExpression_07_CallWithUnary_v4()
+		public void ROS_PExpr07_CallWithUnary_v4()
 		{
 			Test("abs -x");
-			ParseExpression_07_CallWithUnary2();
+			ROS_PExpr07_CallWithUnary2();
 		}
 
-		public void ParseExpression_07_CallWithUnary()
+		public void ROS_PExpr07_CallWithUnary()
 		{
 			ValueCheck	( 0, 0, "abs");
 			ValueCheck	( 4, OpCode.Identifier);
@@ -375,7 +375,7 @@ namespace RedOnion.ScriptNUnit
 			CodeCheck( 7, -1);
 			CodeCheck(11);
 		}
-		public void ParseExpression_07_CallWithUnary2()
+		public void ROS_PExpr07_CallWithUnary2()
 		{
 			ValueCheck	( 0, 0, "abs");
 			ValueCheck	( 4, OpCode.Identifier);
@@ -399,20 +399,20 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void ParseExpression_08_CallTwoArgs_v1()
+		public void ROS_PExpr08_CallTwoArgs_v1()
 		{
 			Test("fn(x,y)");
-			ParseExpression_08_CallTwoArgs();
+			ROS_PExpr08_CallTwoArgs();
 		}
 
 		[Test]
-		public void ParseExpression_08_CallTwoArgs_v2()
+		public void ROS_PExpr08_CallTwoArgs_v2()
 		{
 			Test("fn x,y");
-			ParseExpression_08_CallTwoArgs();
+			ROS_PExpr08_CallTwoArgs();
 		}
 
-		public void ParseExpression_08_CallTwoArgs()
+		public void ROS_PExpr08_CallTwoArgs()
 		{
 			ValueCheck	( 0, 0, "fn");
 			ValueCheck	( 4, OpCode.Identifier);
@@ -439,20 +439,20 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void ParseExpression_09_CallManyArgs_v1()
+		public void ROS_PExpr09_CallManyArgs_v1()
 		{
 			Test("fn(null, this, base.field)");
-			ParseExpression_09_CallManyArgs();
+			ROS_PExpr09_CallManyArgs();
 		}
 
 		[Test]
-		public void ParseExpression_09_CallManyArgs_v2()
+		public void ROS_PExpr09_CallManyArgs_v2()
 		{
 			Test("fn null, this, base.field");
-			ParseExpression_09_CallManyArgs();
+			ROS_PExpr09_CallManyArgs();
 		}
 
-		public void ParseExpression_09_CallManyArgs()
+		public void ROS_PExpr09_CallManyArgs()
 		{
 			ValueCheck	( 0, 0, "fn");
 			ValueCheck	( 4, OpCode.Identifier);
@@ -487,7 +487,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void ParseExpression_10_NestedCalls()
+		public void ROS_PExpr10_NestedCalls()
 		{
 			Test("f g(x), h x");
 
@@ -532,7 +532,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void ParseExpression_11_MoreCalls()
+		public void ROS_PExpr11_MoreCalls()
 		{
 			Test("f (g x, y), z, h()");
 
@@ -583,7 +583,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void ParseExpression_12_AutocallWithNew()
+		public void ROS_PExpr12_AutocallWithNew()
 		{
 			Test("fn new pt 1, 2");
 
@@ -622,7 +622,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void ParseExpression_13_Variable()
+		public void ROS_PExpr13_Variable()
 		{
 			Test("var x");
 
@@ -646,7 +646,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void ParseExpression_14_TypedVariable()
+		public void ROS_PExpr14_TypedVariable()
 		{
 			Test("var x int"); // pure style
 
@@ -670,7 +670,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void ParseExpression_15_ArrayVariable()
+		public void ROS_PExpr15_ArrayVariable()
 		{
 			Test("var a:byte[]"); // ActionScript
 
@@ -699,7 +699,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void ParseExpression_16_CreateArray()
+		public void ROS_PExpr16_CreateArray()
 		{
 			Test("var a = new byte[n]");
 
@@ -735,7 +735,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void ParseExpression_17_GenericType()
+		public void ROS_PExpr17_GenericType()
 		{
 			Test("var a as list.[byte]"); // Boo/Python type-spec (var x as type)
 
@@ -769,7 +769,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void ParseExpression_18_GenericCall()
+		public void ROS_PExpr18_GenericCall()
 		{
 			Test("fn.[int] 1");
 

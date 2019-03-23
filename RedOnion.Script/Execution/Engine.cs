@@ -15,26 +15,21 @@ namespace RedOnion.Script
 			: this(engine => new BasicObjects.BasicRoot(engine)) { }
 		public Engine(Func<IEngine, IEngineRoot> createRoot)
 			: base(createRoot, new Parser(DefaultParserOptions)) { }
-		internal static Parser.Option DefaultParserOptions
+		public static readonly Parser.Option DefaultParserOptions
 			= Parsing.Parser.Option.Script
 			| Parsing.Parser.Option.Untyped
-			| Parsing.Parser.Option.Typed;
+			| Parsing.Parser.Option.Typed
+			| Parsing.Parser.Option.Autocall;
+		public Engine(Parser.Option parserOptions)
+			: base(engine => new BasicObjects.BasicRoot(engine), new Parser(parserOptions)) { }
+		public Engine(Func<IEngine, IEngineRoot> createRoot, Parser.Option parserOptions)
+			: base(createRoot, new Parser(parserOptions)) { }
 	}
 	/// <summary>
 	/// Runtime engine
 	/// </summary>
 	public partial class Engine<P> : AbstractEngine, IEngine where P : Parser
 	{
-		/// <summary>
-		/// Engine options
-		/// </summary>
-		public EngineOption Options { get; set; }
-			= DefaultOptions;
-		internal static EngineOption DefaultOptions
-			= EngineOption.BlockScope | EngineOption.Strict;
-		public bool HasOption(EngineOption option)
-			=> (Options & option) != 0;
-
 		/// <summary>
 		/// Root object (global namespace)
 		/// </summary>
@@ -67,7 +62,10 @@ namespace RedOnion.Script
 		/// Run script in a string
 		/// </summary>
 		public void Execute(string source)
-			=> Execute(Compile(source));
+		{
+			var compiled = Compile(source);
+			Execute(compiled);
+		}
 
 		/// <summary>
 		/// Reset engine
@@ -110,19 +108,11 @@ namespace RedOnion.Script
 		/// </summary>
 		public virtual IObject Box(Value value)
 		{
-			for (;;)
-			{
-				switch (value.Type)
-				{
-				default:
-					return Root.Box(value);
-				case ValueKind.Object:
-					return (IObject)value.ptr;
-				case ValueKind.Reference:
-					value = ((IProperties)value.ptr).Get(value.str);
-					continue;
-				}
-			}
+			if (value.IsReference)
+				value = value.RValue;
+			if (value.Kind == ValueKind.Object)
+				return (IObject)value.ptr;
+			return Root.Box(value);
 		}
 
 		/// <summary>

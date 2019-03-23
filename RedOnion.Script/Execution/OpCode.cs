@@ -214,6 +214,7 @@ namespace RedOnion.Script
 
 	//	statements
 		Block			= 0x0080, // block with its own scope
+		Autocall		= 0x0081, // expression that should be called (like Call0) if it is a function
 		Return			= 0x0082, // return
 		Raise			= 0x0083, // throw/raise (Python uses raise)
 		Throw			= 0x0183, // throw (alternative to raise from Python)

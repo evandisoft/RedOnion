@@ -140,9 +140,21 @@ namespace Kerbalua.Completion {
 			string currentName = currentSegment.Name;
 			IList<Part> parts = currentSegment.Parts;
 			if(parts.Count>0 && parts[0] is CallPart) {
-				MethodInfo mi = CurrentType.GetMethod(currentName);
+				MethodInfo mi=null;
+				try {
+					mi = CurrentType.GetMethod(currentName);
+
+				} catch(AmbiguousMatchException) {
+					MethodInfo[] mis=CurrentType.GetMethods();
+					foreach(var methodInfo in mis) {
+						if (methodInfo.Name == currentName) {
+							mi = methodInfo;
+							break;
+						}
+					}
+				}
 				if (mi != null) {
-					CurrentType=mi.ReturnType;
+					CurrentType = mi.ReturnType;
 					parts.RemoveAt(0);
 					ProcessCurrentParts();
 					Index++;

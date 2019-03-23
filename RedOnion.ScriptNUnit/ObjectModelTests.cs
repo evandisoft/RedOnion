@@ -7,13 +7,13 @@ using RedOnion.Script.ReflectedObjects;
 namespace RedOnion.ScriptNUnit
 {
 	[TestFixture]
-	public class ObjectModelTests : EngineTestsBase
+	public class ROS_ObjectModelTests : EngineTestsBase
 	{
 		[TearDown]
 		public void ResetEngine() => Reset();
 
 		[Test]
-		public void ObjectModel_01_LazyCreate()
+		public void ROS_Root01_LazyCreate()
 		{
 			var created = false;
 			Root.Set("test", new Value(engine =>
@@ -29,7 +29,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void ObjectModel_02_NumberConvert()
+		public void ROS_Root02_NumberConvert()
 		{
 			Test(3.14f, "float 3.14");
 			Test(123, "int \"123\"");
@@ -37,7 +37,7 @@ namespace RedOnion.ScriptNUnit
 
 		public class Thing { }
 		[Test]
-		public void ObjectModel_03_NewWithNamespace()
+		public void ROS_Root03_NewWithNamespace()
 		{
 			Root.Set("space", new SimpleObject(this, new Properties()
 			{
@@ -45,6 +45,27 @@ namespace RedOnion.ScriptNUnit
 			}));
 			Test("var it = new space.thing");
 			Assert.AreEqual(typeof(Thing), Result.Native.GetType());
+		}
+
+		[Test]
+		public void ROS_Root04_EasyProp()
+		{
+			var test = "hello";
+			Root.Set("it", new SimpleObject(this, new Properties()
+				.Set("one", dummy => 1)
+				.Set("test", dummy => test, (dummy, value) => test = value.String)));
+			Test(1, "it.one");
+			Test("it.test = \"blah\"");
+			Test("blah", "it.test");
+			Expect<InvalidOperationException>("it.one = 2");
+		}
+
+		[Test]
+		public void ROS_Root05_Enums()
+		{
+			Root.AddType("kind", typeof(ValueKind));
+			Test(ValueKind.Long, "kind.long");
+			Test(ValueKind.Int|ValueKind.fEnum, "kind.int | kind.fEnum");
 		}
 	}
 }

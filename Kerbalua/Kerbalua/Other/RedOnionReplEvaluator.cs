@@ -1,12 +1,9 @@
 using System;
 using System.Collections.Generic;
 using RedOnion.Script;
-using RedOnion.Script.BasicObjects;
-using RedOnion.Script.ReflectedObjects;
 using UnityEngine;
-using Kerbalua.AutoPilot;
-using KSP.UI.Screens;
 using RedOnion.KSP;
+using RedOnion.KSP.Autopilot;
 
 namespace Kerbalua.Other {
 	public class RedOnionReplEvaluator:ReplEvaluator {
@@ -49,7 +46,14 @@ namespace Kerbalua.Other {
 		/// </summary>
 		public override IList<string> GetCompletions(string source, int cursorPos,out int replaceStart,out int replaceEnd)
 		{
-			return hints.Complete(source, cursorPos, out replaceStart, out replaceEnd);
+			try {
+				return hints.Complete(source, cursorPos, out replaceStart, out replaceEnd);
+			}
+			catch(Exception e) {
+				Debug.Log(e);
+				replaceStart = replaceEnd = cursorPos;
+				return new List<string>();
+			}
 		}
 
 
@@ -57,6 +61,7 @@ namespace Kerbalua.Other {
 		{
 			engine.Reset();
 			hints.Reset();
+			FlightControl.GetInstance().Shutdown();
 		}
 
 		public override void Terminate()

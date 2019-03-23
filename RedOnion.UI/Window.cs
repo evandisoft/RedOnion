@@ -9,15 +9,15 @@ namespace RedOnion.UI
 {
 	public class Window : IDisposable
 	{
-		protected class FramePanel : Panel
+		public class FramePanel : Panel
 		{
-			static Texture2D DefaultCloseButtonIcon = LoadIcon(13, 13, "CloseButtonIcon.png");
+			static Texture2D DefaultCloseButtonIcon = LoadIcon(13, 13, "WindowCloseButtonIcon.png");
 
 			public new GameObject GameObject => base.GameObject;
 			public new RectTransform RectTransform => base.RectTransform;
 			public CanvasGroup Group { get; }
 			public UUI.ContentSizeFitter Fitter { get; }
-			public Element Header { get; }
+			public Panel Header { get; }
 			public Label Title { get; }
 			public Button Close { get; }
 			public Panel Content { get; }
@@ -36,7 +36,7 @@ namespace RedOnion.UI
 				Color = new Color(.2f, .2f, .2f, .8f);
 				Layout = Layout.Vertical;
 				LayoutPadding = new LayoutPadding(4);
-				Header = Add(new Element("Window Title Row")
+				Header = Add(new Panel("Window Title Row")
 				{
 					Layout = Layout.Horizontal,
 					FlexWidth = 1f,
@@ -50,7 +50,8 @@ namespace RedOnion.UI
 				});
 				Close = Header.Add(new Button("Window Close Button")
 				{
-					IconTexture = DefaultCloseButtonIcon
+					IconTexture = DefaultCloseButtonIcon,
+					Padding = 3f, Spacing = 3f,
 				});
 				Content = Add(new Panel("Window Content Panel")
 				{
@@ -73,7 +74,7 @@ namespace RedOnion.UI
 			}
 		}
 
-		protected FramePanel Frame { get; private set; }
+		public FramePanel Frame { get; private set; }
 		public Panel Content { get; private set; }
 
 		public string Name
@@ -229,6 +230,77 @@ namespace RedOnion.UI
 				Frame.RectTransform.sizeDelta = new Vector2(
 					Width, value >= MinHeight ? -value : Height);
 			}
+		}
+
+		public Color FrameColor
+		{
+			get => Frame.Color;
+			set => Frame.Color = value;
+		}
+		public Texture FrameTexture
+		{
+			get => Frame.Texture;
+			set => Frame.Texture = value;
+		}
+		public Color HeaderColor
+		{
+			get => Frame.Header.Color;
+			set => Frame.Header.Color = value;
+		}
+		public Texture HeaderTexture
+		{
+			get => Frame.Header.Texture;
+			set => Frame.Header.Texture = value;
+		}
+		public Color TitleColor
+		{
+			get => Frame.Title.TextColor;
+			set => Frame.Title.TextColor = value;
+		}
+		public Color ContentColor
+		{
+			get => Content.Color;
+			set => Content.Color = value;
+		}
+		public Texture ContentTexture
+		{
+			get => Content.Texture;
+			set => Content.Texture = value;
+		}
+		public Layout Layout
+		{
+			get => Content.Layout;
+			set => Content.Layout = value;
+		}
+		public LayoutPadding LayoutPadding
+		{
+			get => Content.LayoutPadding;
+			set => Content.LayoutPadding = value;
+		}
+		public Anchors ChildAnchors
+		{
+			get => Content.ChildAnchors;
+			set => Content.ChildAnchors = value;
+		}
+		public Padding InnerPadding
+		{
+			get => Content.InnerPadding;
+			set => Content.InnerPadding = value;
+		}
+		public Vector2 InnerSpacing
+		{
+			get => Content.InnerSpacing;
+			set => Content.InnerSpacing = value;
+		}
+		public float Padding
+		{
+			get => Content.Padding;
+			set => Content.Padding = value;
+		}
+		public float Spacing
+		{
+			get => Content.Spacing;
+			set => Content.Spacing = value;
 		}
 	}
 }

@@ -18,3 +18,8 @@ access to every public method of KSP and Unity.
 **ROS** was created anew and may contain bugs,
 **LUA** may have some limitations
 but should be much safer to use.
+
+## Contributing
+We welcome people of all skill levels to contribute or give feedback, ask questions, etc.
+
+Here is more information about [contributing](Contributing.md).

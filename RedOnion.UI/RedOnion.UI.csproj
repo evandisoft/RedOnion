@@ -37,11 +37,13 @@
     <Compile Include="Button.cs" />
     <Compile Include="Components\BackgroundImage.cs" />
     <Compile Include="Components\DragHandler.cs" />
+    <Compile Include="Components\InputField.cs" />
     <Compile Include="Icon.cs" />
     <Compile Include="Label.cs" />
     <Compile Include="Element.cs" />
     <Compile Include="Enums.cs" />
     <Compile Include="Components\LayoutComponent.cs" />
+    <Compile Include="Panel.Children.cs" />
     <Compile Include="Structures\Anchors.cs" />
     <Compile Include="Structures\LayoutPadding.cs" />
     <Compile Include="Panel.cs" />
@@ -51,9 +53,6 @@
     <Compile Include="TextBox.cs" />
     <Compile Include="Window.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Resources\CloseButtonIcon.png" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -73,13 +72,5 @@
       <Private>False</Private>
     </Reference>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="$(AssemblyName).zip">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Target Name="BeforeBuild">
-    <ZipDirectory SourceDirectory="Resources" Overwrite="True" DestinationFile="$(AssemblyName).zip" />
-  </Target>
 </Project>

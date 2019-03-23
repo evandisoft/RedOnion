@@ -7,6 +7,11 @@ namespace RedOnion.ScriptNUnit
 {
 	public class EngineTestsBase : Engine
 	{
+		public EngineTestsBase()
+		{
+			if (HasOption(EngineOption.Autocall))
+				Options |= EngineOption.ReplAutocall;
+		}
 		public void Test(string script, int countdown = 100)
 		{
 			try
@@ -20,19 +25,35 @@ namespace RedOnion.ScriptNUnit
 					e.GetType().ToString(), e.Message, script), e);
 			}
 		}
-
-		public void Test(object value, string script)
+		public void Test(object value, string script, int countdown = 100)
 		{
 			Test(script);
 			Assert.AreEqual(value, Result.Native, "Test: <{0}>", script);
 		}
+		public void Expect<Ex>(string script, int countdown = 100) where Ex : Exception
+		{
+			try
+			{
+				ExecutionCountdown = countdown;
+				Execute(script);
+				Assert.Fail("Should throw " + typeof(Ex).Name);
+			}
+			catch (Ex)
+			{
+			}
+			catch (Exception e)
+			{
+				throw new Exception(String.Format("{0} in Eval: {1}; IN: <{2}>",
+					e.GetType().ToString(), e.Message, script), e);
+			}
+		}
 	}
 
 	[TestFixture]
-	public class ExpressionTests : EngineTestsBase
+	public class ROS_ExpressionTests : EngineTestsBase
 	{
 		[Test]
-		public void Expression_01_Simple()
+		public void ROS_Expr01_Simple()
 		{
 			Test("onion",	"\"onion\"");	// string
 			Test(1,			"1");           // integer
@@ -46,7 +67,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void Expression_02_AddMul()
+		public void ROS_Expr02_AddMul()
 		{
 			Test(3,			"1+2");			// simple +
 			Test(12,		"3*4");         // simple *
@@ -54,24 +75,24 @@ namespace RedOnion.ScriptNUnit
 			Test(7,			"1+2*3");       // operator priority
 			Test(8.5,		"1+2.5*3");     // mixed double and ints
 			Test((long)2,	"1+1u");        // signed + unsigned integer
-			Assert.AreEqual(ValueKind.Long, Result.Type, "not long");
+			Assert.AreEqual(ValueKind.Long, Result.Kind, "not long");
 			Test((ulong)2,	"1u+1");        // unsigned + signed integer
-			Assert.AreEqual(ValueKind.ULong, Result.Type, "not ulong");
+			Assert.AreEqual(ValueKind.ULong, Result.Kind, "not ulong");
 		}
 
 		[Test]
-		public void Expression_03_DivideAndNaN()
+		public void ROS_Expr03_DivideAndNaN()
 		{
 			Test(12 / 5,	"12/5");        // integer division
 			Test(12f / 5,	"12f/5");		// float division
 			Test(null,		"0/0");         // undefined (althought JScript may return NaN)
-			Assert.AreEqual(ValueKind.Undefined, Result.Type, "not undefined");
+			Assert.AreEqual(ValueKind.Undefined, Result.Kind, "not undefined");
 			Test(double.NaN, "0/.0");       // division by zero in float/double is NaN
-			Assert.AreEqual(ValueKind.Double, Result.Type, "not double");
+			Assert.AreEqual(ValueKind.Double, Result.Kind, "not double");
 		}
 
 		[Test]
-		public void Expression_04_Variables()
+		public void ROS_Expr04_Variables()
 		{
 			Test(			"var x");		// declare
 			Test(10,		"x = 2*3+4");   // assign
@@ -86,11 +107,11 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void Expression_05_Properties()
+		public void ROS_Expr05_Properties()
 		{
 			Test("var obj = new object");	// object creation
-			Assert.AreEqual(ValueKind.Object, Result.Type, "not object type");
-			Assert.IsNotNull(Result.Deref);
+			Assert.AreEqual(ValueKind.Object, Result.Kind, "not object type");
+			Assert.IsNotNull(Result.RefObj);
 
 			Test("obj.x = 3.14");           // assign property (moreProps)
 			Test(3.14,		"obj.x");       // test property
@@ -119,7 +140,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void Expression_06_Compare()
+		public void ROS_Expr06_Compare()
 		{
 			Test(true,		"1 < 2");       // integers
 			Test(true,		"1 > .1");      // integer vs. double - less
@@ -127,11 +148,17 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void Expression_07_Ternary()
+		public void ROS_Expr07_Ternary()
 		{
 			Test(true,		"true ? true : false");
 			Test(false,		"false ? true : false");
 			Test(2,			"0 != 0 ? 1 : 2");
+		}
+
+		[Test]
+		public void ROS_Expr08_Autocall()
+		{
+			Expect<InvalidOperationException>("true; false");
 		}
 	}
 }

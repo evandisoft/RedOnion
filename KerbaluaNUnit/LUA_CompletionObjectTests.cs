@@ -6,10 +6,11 @@ using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.REPL;
 using MoonSharp.Interpreter.Interop;
 using Kerbalua.Other;
+using RedOnion.KSP.Lua;
 
 namespace KerbaluaNUnit {
 	[TestFixture()]
-	public class CompletionObjectTests {
+	public class LUA_CompletionObjectTests {
 		public CompletionObject GetCompletionObject(Table globals,string source)
 		{
 			var processed = LuaIntellisense.Parse(source);
@@ -18,16 +19,16 @@ namespace KerbaluaNUnit {
 		}
 
 		Script script = new Script(CoreModules.Preset_Complete);
-		public CompletionObjectTests()
+		public LUA_CompletionObjectTests()
 		{
 			UserData.RegistrationPolicy = InteropRegistrationPolicy.Automatic;
 		}
 
 
 		[Test()]
-		public void TestCase()
+		public void LUA_TestCase()
 		{
-			script= new SimpleScript(CoreModules.Preset_Complete);
+			script= new Script();
 			var completion= GetCompletionObject(script.Globals,
 				@"os."
 				);
@@ -50,7 +51,7 @@ namespace KerbaluaNUnit {
 		}
 
 		[Test()]
-		public void TestCase_2()
+		public void LUA_TestCase_2()
 		{
 			script = new Script(CoreModules.Preset_Complete);
 			script.Globals["ADF"] = new Adf();
@@ -66,7 +67,7 @@ namespace KerbaluaNUnit {
 		}
 
 		[Test()]
-		public void TestCase_3()
+		public void LUA_TestCase_3()
 		{
 			script = new Script(CoreModules.Preset_Complete);
 			script.Globals["ADF"] = new Adf();

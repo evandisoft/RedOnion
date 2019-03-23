@@ -3,9 +3,12 @@ using UnityEngine;
 
 namespace Kerbalua.Gui {
 	public class OutputBox:ScrollableTextArea {
+		public const int OUTPUT_LENGTH_LIMIT = 10000;
+
 		void CommonOutputProcessing()
 		{
 			ResetScroll();
+
 		}
 
 		public void AddReturnValue(string str)
@@ -44,6 +47,9 @@ namespace Kerbalua.Gui {
 				alignment = TextAnchor.LowerLeft,
 				font = GUIUtil.GetMonoSpaceFont()
 			};
+			if (content.text.Length > OUTPUT_LENGTH_LIMIT) {
+				content.text = content.text.Substring(content.text.Length - OUTPUT_LENGTH_LIMIT, OUTPUT_LENGTH_LIMIT);
+			}
 			///Debug.Log("cursor index is " + cursorIndex);
 
 			base.ProtectedUpdate(rect);

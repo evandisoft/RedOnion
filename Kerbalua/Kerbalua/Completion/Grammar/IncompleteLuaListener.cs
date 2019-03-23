@@ -640,4 +640,14 @@ public interface IIncompleteLuaListener : IParseTreeListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	void ExitIncompleteName([NotNull] IncompleteLuaParser.IncompleteNameContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="IncompleteLuaParser.keyword"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterKeyword([NotNull] IncompleteLuaParser.KeywordContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="IncompleteLuaParser.keyword"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitKeyword([NotNull] IncompleteLuaParser.KeywordContext context);
 }

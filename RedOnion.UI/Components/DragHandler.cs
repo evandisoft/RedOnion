@@ -33,7 +33,7 @@ namespace RedOnion.UI.Components
 		{
 			if (locked)
 			{
-				InputLockManager.RemoveControlLock("RedOnion.DragHandler");
+				InputLockManager.RemoveControlLock(lockID);
 				locked = false;
 			}
 		}

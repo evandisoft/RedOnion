@@ -3,39 +3,29 @@ using System.IO;
 using UnityEngine;
 using System.Collections.Generic;
 using System.Diagnostics;
+using Kerbalua.Utility;
 
 namespace Kerbalua.Gui {
 	public class ScriptNameInputArea:EditingArea, ICompletable {
 		public bool receivedInput;
 
-		static string baseFolderPath;
-		static string settingsFile;
-		static string defaultScriptFilename= "untitled.b";
-		static ScriptNameInputArea()
-		{
-			baseFolderPath = Path.Combine(KSPUtil.ApplicationRootPath, "scripts");
-			settingsFile = Path.Combine(baseFolderPath, ".settings");
-		}
+
+		static string defaultScriptFilename= "untitled.ros";
 
 		public ScriptNameInputArea()
 		{
-			content.text = LoadConfig().GetValue("lastScriptName");
+			content.text = Settings.LoadSetting("lastScriptName",defaultScriptFilename);
+			if (!File.Exists(Path.Combine(Settings.BaseScriptsPath, content.text))) {
+				IList<string> recentFiles = Settings.LoadListSetting("recentFiles");
+				if (recentFiles.Count > 0) {
+					content.text = recentFiles[0];
+				} else {
+					content.text = defaultScriptFilename;
+				}
+			}
 		}
 
 		public new KeyBindings KeyBindings = new KeyBindings();
-
-		ConfigNode LoadConfig()
-		{
-			ConfigNode configNode;
-			if (!File.Exists(settingsFile)) {
-				Directory.CreateDirectory(baseFolderPath);
-				configNode = new ConfigNode();
-				configNode.SetValue("lastScriptName", "", true);
-				configNode.Save(settingsFile);
-				return configNode;
-			} 
-			return ConfigNode.Load(settingsFile);
-		}
 
 		protected override void ProtectedUpdate()
 		{
@@ -59,16 +49,14 @@ namespace Kerbalua.Gui {
 
 		void CommonSaveLoadActions()
 		{
-			ConfigNode configNode = LoadConfig();
-			configNode.SetValue("lastScriptName", content.text, true);
-			configNode.Save(settingsFile);
+			Settings.SaveSetting("lastScriptName", content.text);
 		}
 
 		public void Save(string text)
 		{
 			try {
-				CommonSaveLoadActions();
 				File.WriteAllText(CreateFullPath(), text);
+				CommonSaveLoadActions();
 			}
 			catch(Exception e) {
 				UnityEngine.Debug.Log(e.StackTrace);
@@ -94,8 +82,8 @@ namespace Kerbalua.Gui {
 				content.text = defaultScriptFilename;
 			}
 
-			Directory.CreateDirectory(baseFolderPath);
-			string fullPath = Path.Combine(baseFolderPath,content.text);
+			Directory.CreateDirectory(Settings.BaseScriptsPath);
+			string fullPath = Path.Combine(Settings.BaseScriptsPath, content.text);
 
 			if (!File.Exists(fullPath)) {
 				File.WriteAllText(fullPath, "");
@@ -131,7 +119,7 @@ namespace Kerbalua.Gui {
 		List<string> GetScriptList()
 		{
 			if (scriptList == null || ioDelayWatch.ElapsedMilliseconds > ioDelayMillis) {
-				scriptList = new List<string>(Directory.GetFiles(baseFolderPath));
+				scriptList = new List<string>(Directory.GetFiles(Settings.BaseScriptsPath));
 				ioDelayWatch.Reset();
 				ioDelayWatch.Start();
 			}

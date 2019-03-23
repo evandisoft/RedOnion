@@ -1,13 +1,24 @@
 using System;
-using UnityEngine;
 using MoonSharp.Interpreter;
-using MoonSharp.Interpreter.REPL;
 using MoonSharp.Interpreter.Interop;
+using RedOnion.KSP.Autopilot;
+using UnityEngine;
+using RedOnion.KSP.MathUtil;
 
-namespace Kerbalua.Other {
-	public class SimpleScript:Script {
-		public SimpleScript(CoreModules coreModules) : base(coreModules)
+namespace RedOnion.KSP.Lua {
+	public class KspApi {
+		public FlightControl FlightControl = FlightControl.GetInstance();
+		public FlightGlobals FlightGlobals = new FlightGlobals();
+		public Time Time = new Time();
+		public Mathf Mathf = new Mathf();
+		public Vec Vec = new Vec();
+	}
+
+	public class KerbaluaScript : MoonSharp.Interpreter.Script {
+		public KerbaluaScript() : base(CoreModules.Preset_Complete)
 		{
+			UserData.RegistrationPolicy = InteropRegistrationPolicy.Automatic;
+			Globals["Ksp"] = new KspApi();
 		}
 
 		DynValue coroutine;
@@ -15,7 +26,9 @@ namespace Kerbalua.Other {
 		{
 			if (coroutine == null) {
 				SetCoroutine(source);
-			} 
+			}
+
+			coroutine.Coroutine.AutoYieldCounter = 1000;
 			result = coroutine.Coroutine.Resume();
 			//Debug.Log("result is " + result);
 			//if (coroutine.Coroutine.State == CoroutineState.ForceSuspended) {
@@ -47,8 +60,7 @@ namespace Kerbalua.Other {
 				//Debug.Log("Main function is "+mainFunction);
 				coroutine = CreateCoroutine(mainFunction);
 				//Debug.Log("Coroutine is " + coroutine);
-			}
-			catch(SyntaxErrorException e) {
+			} catch (SyntaxErrorException e) {
 				//Doesn't work in general
 				//DynValue mainFunction = base.DoString("return function () return " + source + " end");
 				//Debug.Log("Main function is "+mainFunction);
@@ -57,7 +69,7 @@ namespace Kerbalua.Other {
 				//Debug.Log("Coroutine is " + coroutine);
 				throw e;
 			}
-			coroutine.Coroutine.AutoYieldCounter = 1000;
+
 		}
 
 		public void Terminate()

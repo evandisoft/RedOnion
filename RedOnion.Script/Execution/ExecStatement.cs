@@ -8,8 +8,39 @@ namespace RedOnion.Script
 {
 	public partial class Engine<P>
 	{
+		protected override void Autocall(bool weak = false)
+		{
+			IObject self = null;
+			if (Value.IsReference)
+			{
+				self = Value.ptr as IObject;
+				Value = Result;
+			}
+			if (self == Root && HasOption(EngineOption.Strict))
+				self = null;
+			if (Value.Kind == ValueKind.Object)
+			{
+				var obj = (IObject)Value.ptr;
+				if (obj.HasFeature(ObjectFeatures.Function))
+					Value = obj.Call(self, 0);
+				return;
+			}
+			if (weak || HasOption(EngineOption.WeakAutocall))
+				return;
+			throw new InvalidOperationException(string.Format(Value.Culture,
+				"Expression as statement with no effect (weak autocall disabled, {0} is not a function)",
+				Value.Name));
+		}
 		protected override void Statement(OpCode op, ref int at)
 		{
+			if (op == OpCode.Autocall)
+			{
+				Expression(ref at);
+				if (!HasOption(EngineOption.Autocall|EngineOption.WeakAutocall|EngineOption.ReplAutocall))
+					return;
+				Autocall();
+				return;
+			}
 			CountStatement();
 			Debug.Assert(op.Kind() == OpKind.Statement || op.Kind() == OpKind.Statement2);
 			switch (op)
@@ -45,7 +76,7 @@ namespace RedOnion.Script
 				var last = at;
 				var stts = at + size;
 				var cend = (stts + 4) + BitConverter.ToInt32(Code, stts);
-				if (Value.Type != ValueKind.Undefined && !Value.Bool)
+				if (Value.Kind != ValueKind.Undefined && !Value.Bool)
 				{
 					at = cend;
 					if (HasOption(EngineOption.BlockScope))

@@ -7,6 +7,7 @@ using UE = UnityEngine;
 using UUI = UnityEngine.UI;
 using KUI = KSP.UI;
 using ROC = RedOnion.UI.Components;
+using RedOnion.KSP.Autopilot;
 
 namespace RedOnion.KSP
 {
@@ -20,6 +21,15 @@ namespace RedOnion.KSP
 			FillRoot(root, repl: false))) { }
 		public override void Log(string msg)
 			=> UE.Debug.Log("[RedOnion] " + msg);
+
+
+		private static Ionic.Zip.ZipFile ScriptsZip;
+		public static string LoadScript(string path)
+		{
+			var data = UI.Element.ResourceFileData(System.Reflection.Assembly.GetCallingAssembly(),
+				"Scripts", ref ScriptsZip, path);
+			return data == null ? null : System.Text.Encoding.UTF8.GetString(data);
+		}
 
 		public static void FillRoot(IEngineRoot root, bool repl)
 		{
@@ -139,6 +149,7 @@ namespace RedOnion.KSP
 					{ "Vessel",         root[typeof(Vessel)] },
 					{ "FlightGlobals",  root[typeof(FlightGlobals)] },
 					{ "FlightCtrlState",root[typeof(FlightCtrlState)] },
+					{ "FlightControl", root[typeof(FlightControl)]},
 					{ "HighLogic",      root[typeof(HighLogic)] },
 					{ "InputLockManager", root[typeof(InputLockManager)] },
 					{ "InputLock",		root[typeof(InputLockManager)] },
@@ -154,7 +165,8 @@ namespace RedOnion.KSP
 	{
 		public ImmediateEngine()
 			: base(engine => new RuntimeRoot(engine, root =>
-			RuntimeEngine.FillRoot(root, repl: true))) { }
+			RuntimeEngine.FillRoot(root, repl: true)))
+			=> Options |= EngineOption.ReplAutocall;
 		public override void Log(string msg)
 			=> UE.Debug.Log("[RedOnion.REPL] " + msg);
 	}

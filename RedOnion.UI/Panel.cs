@@ -4,7 +4,7 @@ using UUI = UnityEngine.UI;
 
 namespace RedOnion.UI
 {
-	public class Panel : Element
+	public partial class Panel : Element
 	{
 		protected UUI.RawImage image;
 		protected UUI.RawImage Image
@@ -14,10 +14,18 @@ namespace RedOnion.UI
 				if (image == null)
 				{
 					if (GameObject == null)
-						throw new ObjectDisposedException(Name ?? GetType().Name);
+						throw new ObjectDisposedException(Name);
 					image = GameObject.AddComponent<UUI.RawImage>();
 				}
 				return image;
+			}
+			set
+			{
+				if (image == value)
+					return;
+				if (image != null)
+					GameObject.Destroy(image);
+				image = value;
 			}
 		}
 
@@ -30,8 +38,8 @@ namespace RedOnion.UI
 		{
 			if (!disposing || GameObject == null)
 				return;
-			base.Dispose(disposing);
 			image = null;
+			base.Dispose(disposing);
 		}
 
 		public Color Color
@@ -43,6 +51,42 @@ namespace RedOnion.UI
 		{
 			get => image?.texture;
 			set => Image.texture = value;
+		}
+
+		public new Layout Layout
+		{
+			get => base.Layout;
+			set => base.Layout = value;
+		}
+		public new LayoutPadding LayoutPadding
+		{
+			get => base.LayoutPadding;
+			set => base.LayoutPadding = value;
+		}
+		public new Anchors ChildAnchors
+		{
+			get => base.ChildAnchors;
+			set => base.ChildAnchors = value;
+		}
+		public new Padding InnerPadding
+		{
+			get => base.InnerPadding;
+			set => base.InnerPadding = value;
+		}
+		public new Vector2 InnerSpacing
+		{
+			get => base.InnerSpacing;
+			set => base.InnerSpacing = value;
+		}
+		public new float Padding
+		{
+			get => base.Padding;
+			set => base.Padding = value;
+		}
+		public new float Spacing
+		{
+			get => base.Spacing;
+			set => base.Spacing = value;
 		}
 	}
 }

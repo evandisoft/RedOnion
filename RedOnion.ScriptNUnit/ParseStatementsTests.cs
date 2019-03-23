@@ -25,7 +25,7 @@ using RedOnion.Script;
 namespace RedOnion.ScriptNUnit
 {
 	[TestFixture]
-	public class ParseStatementsTests : ParseTestsBase
+	public class ROS_ParseStatementsTests : ParseTestsBase
 	{
 		public void Test(string value)
 		{
@@ -41,7 +41,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void ParseStatements_01_Return()
+		public void ROS_PStts01_Return()
 		{
 			Test("return");
 			CodeCheck(0, OpCode.Return);
@@ -50,7 +50,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void ParseStatements_02_ReturnExpression()
+		public void ROS_PStts02_ReturnExpression()
 		{
 			Test("return a && b");
 			CodeCheck( 0, OpCode.Return);
@@ -64,7 +64,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void ParseStatements_03_IfThenBreak()
+		public void ROS_PStts03_IfThenBreak()
 		{
 			Test("if cond then break");
 			CodeCheck( 0, OpCode.If);
@@ -76,7 +76,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void ParseStatements_04_IfElse()
+		public void ROS_PStts04_IfElse()
 		{
 			Test("if cond: v = true\nelse v = false");
 			CodeCheck( 0, OpCode.If);
@@ -97,7 +97,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void ParseStatements_05_Variables()
+		public void ROS_PStts05_Variables()
 		{
 			Test(
 				"var x = 1\n" +
@@ -133,7 +133,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void ParseStatements_06_WhileDo()
+		public void ROS_PStts06_WhileDo()
 		{
 			Test("while loop do loop = action()");
 			CodeCheck( 0, OpCode.While);
@@ -150,27 +150,27 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void ParseStatements_07_DoUntil_v1()
+		public void ROS_PStts07_DoUntil_v1()
 		{
 			Test("do stop = action()\nuntil stop");
-			ParseStatements_07_DoUntil();
+			ROS_PStts07_DoUntil();
 		}
 
 		[Test]
-		public void ParseStatements_07_DoUntil_v2()
+		public void ROS_PStts07_DoUntil_v2()
 		{
 			Test("do stop = action() until stop");
-			ParseStatements_07_DoUntil();
+			ROS_PStts07_DoUntil();
 		}
 
 		[Test]
-		public void ParseStatements_07_DoUntil_v3()
+		public void ROS_PStts07_DoUntil_v3()
 		{
 			Test("do stop = action(); until stop");
-			ParseStatements_07_DoUntil();
+			ROS_PStts07_DoUntil();
 		}
 
-		public void ParseStatements_07_DoUntil()
+		public void ROS_PStts07_DoUntil()
 		{
 			CodeCheck( 0, OpCode.DoUntil);
 			CodeCheck( 1, 12); // do-block size
@@ -186,7 +186,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void ParseStatements_08_For()
+		public void ROS_PStts08_For()
 		{
 			Test("for var i = 0; i < 5; i++; action()");
 			CodeCheck( 0, OpCode.For);
@@ -212,7 +212,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void ParseStatements_09_TryCatchFinally()
+		public void ROS_PStts09_TryCatchFinally()
 		{
 			Test("try it(); catch: print exception; finally: fin()");
 			CodeCheck( 0, OpCode.Try);
@@ -236,7 +236,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void ParseStatements_10_SwitchCase()
+		public void ROS_PStts10_SwitchCase()
 		{
 			Test("switch x: case 0: break; case 1: return; default: continue");
 			CodeCheck( 0, OpCode.Switch);

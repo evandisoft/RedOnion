@@ -1,13 +1,28 @@
-using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.IO;
 using System.Reflection;
 using UnityEngine;
 using Ionic.Zip;
+using System.Globalization;
+using System.Diagnostics;
+
+[assembly: InternalsVisibleTo("RedOnion.KSP")]
 
 namespace RedOnion.UI
 {
 	public partial class Element
 	{
+		internal static void Log(string msg)
+			=> Debug.Log("[RedOnion] " + msg);
+		public static void Log(string msg, params object[] args)
+			=> Debug.Log(string.Format(CultureInfo.InvariantCulture, "[RedOnion] " + msg, args));
+		[Conditional("DEBUG")]
+		public static void DebugLog(string msg)
+			=> Log(msg);
+		[Conditional("DEBUG")]
+		public static void DebugLog(string msg, params object[] args)
+			=> Log(msg, args);
+
 		protected static readonly int UILayer = LayerMask.NameToLayer("UI");
 
 		private static UISkinDef _Skin = UISkinManager.defaultSkin;
@@ -17,42 +32,44 @@ namespace RedOnion.UI
 			set => _Skin = value ?? UISkinManager.defaultSkin;
 		}
 
-		private static readonly Dictionary<string, ZipFile>
-			ResourceZipFilesCache = new Dictionary<string, ZipFile>();
-		private static MemoryStream ResourceStream(Assembly asm, string path)
+		internal static byte[] ResourceFileData(Assembly asm, string kind, ref ZipFile zip, string path)
 		{
-			var zipPath = asm.Location;
-			var lastDot = zipPath.LastIndexOf('.');
-			if (lastDot >= 0) zipPath = zipPath.Substring(0, lastDot);
-			zipPath = zipPath + ".zip";
-			if (!ResourceZipFilesCache.TryGetValue(zipPath, out var zip))
+			// assume asm.Location points to GameData/RedOnion/Plugis/RedOnion.dll (or any other dll)
+			var root = Path.Combine(Path.GetDirectoryName(asm.Location), "..");
+			var filePath = Path.Combine(root, Path.Combine(kind, path));
+			if (File.Exists(filePath))
+				return File.ReadAllBytes(filePath);
+
+			// if the file does not exists, try GameData/RedOnion/Resources.zip
+			if (zip == null)
 			{
+				var zipPath = Path.Combine(root, kind + ".zip");
 				if (!File.Exists(zipPath))
 				{
-					Debug.Log("[RedOnion] File does not exist: " + zipPath);
+					Log("Neither {0} nor {1} exists", path, zipPath);
 					return null;
 				}
 				zip = ZipFile.Read(zipPath);
-				ResourceZipFilesCache[zipPath] = zip;
 			}
 			var entry = zip[path];
 			if (entry == null)
 			{
-				Debug.Log("[RedOnion] Entry " + path + " does not exist in " + zipPath);
+				Log("File {0} does not exist", path);
 				return null;
 			}
 			var stream = new MemoryStream();
 			entry.Extract(stream);
-			return stream;
+			return stream.ToArray();
 		}
 
+		private static ZipFile ResourcesZip;
+		private static byte[] ResourceData(Assembly asm, string path)
+			=> ResourceFileData(asm, "Resources", ref ResourcesZip, path);
 		public static Texture2D LoadIcon(int width, int height, string path)
 		{
-			var stream = ResourceStream(Assembly.GetCallingAssembly(), path);
-			if (stream == null)
-				return null;
+			var data = ResourceData(Assembly.GetCallingAssembly(), path);
 			var icon = new Texture2D(width, height, TextureFormat.BGRA32, false);
-			icon.LoadImage(stream.ToArray());
+			icon.LoadImage(data);
 			return icon;
 		}
 	}

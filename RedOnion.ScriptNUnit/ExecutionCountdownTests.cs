@@ -8,7 +8,7 @@ using RedOnion.Script;
 namespace RedOnion.ScriptNUnit
 {
 	[TestFixture]
-	public class ExecutionCountdownTests : EngineTestsBase
+	public class ROS_ExecutionCountdownTests : EngineTestsBase
 	{
 		public void Test(string script)
 		{
@@ -30,38 +30,38 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void ExecutionCountdown_01_WhileTrue()
+		public void ROS_Loop01_WhileTrue()
 		{
 			Test("while true");
 			Test("while true continue");
 		}
 
 		[Test]
-		public void ExecutionCountdown_02_UntilFalse()
+		public void ROS_Loop02_UntilFalse()
 		{
 			Test("until false");
 			Test("until false continue");
 		}
 
 		[Test]
-		public void ExecutionCountdown_03_DoWhileTrue()
+		public void ROS_Loop03_DoWhileTrue()
 		{
-			Test("do undefined while true");
+			Test("do while true");
 			Test("do continue while true");
 		}
 
 		[Test]
-		public void ExecutionCountdown_04_DoUntilFalse()
+		public void ROS_Loop04_DoUntilFalse()
 		{
-			Test("do null until false");
+			Test("do until false");
 			Test("do continue until false");
 		}
 
 		[Test]
-		public void ExecutionCountdown_05_ForLoop()
+		public void ROS_Loop05_ForLoop()
 		{
-			Test("for\r\n\tnull");
-			Test("for var i = 1; i > 0; i++; undefined");
+			Test("for\r\n\tcontinue");
+			Test("for var i = 1; i > 0; i++; continue");
 		}
 	}
 }

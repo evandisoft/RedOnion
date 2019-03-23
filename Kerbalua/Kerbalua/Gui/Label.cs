@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Kerbalua.Gui {
 	public class Label:UIElement {
-		GUIContent content = new GUIContent("");
+		public GUIContent content = new GUIContent("");
 		public Label(string text)
 		{
 			content.text = text;

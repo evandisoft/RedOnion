@@ -7,32 +7,66 @@ namespace RedOnion.Script
 {
 	public partial struct Value
 	{
+		public Value Unary(OpCode op)
+		{
+			var self = RValue;
+			if (self.Kind == ValueKind.Object)
+			{
+				var obj = (IObject)self.ptr;
+				if (obj.HasFeature(ObjectFeatures.Operators)
+					&& obj.Operator(op, new Value(), false, out var result))
+					return result;
+			}
+			switch (op)
+			{
+			case OpCode.Plus:
+				return +self;
+			case OpCode.Neg:
+				return -self;
+			case OpCode.Flip:
+				return ~self;
+			case OpCode.Not:
+				return new Value(!self.Bool);
+			// NOTE: Consider using Value.Modify
+			case OpCode.PostInc:
+				if (IsReference)
+					Self++;
+				return this;
+			case OpCode.PostDec:
+				if (IsReference)
+					Self--;
+				return this;
+			case OpCode.Inc:
+				++Self;
+				return this;
+			case OpCode.Dec:
+				--Self;
+				return this;
+			}
+			throw new InvalidOperationException("Unrecognised unary operator: " + op.Text());
+		}
 		public static Value operator !(Value value)
 			=> !value.Bool;
 
 		public static Value operator +(Value value)
 		{
-		again:
+			value = value.RValue;
 			if (value.IsNumber)
 				return value;
-			if (value.Type == ValueKind.Reference)
-			{
-				value = ((IProperties)value.ptr).Get(value.str);
-				goto again;
-			}
+			if (value.Kind == ValueKind.String)
+				return value.Number;
 			return new Value();
 		}
 
 		public static Value operator -(Value value)
 		{
-		again:
-			switch (value.Type)
+			value = value.RValue;
+			if (value.Kind == ValueKind.String)
+				value = value.Number;
+			switch (value.Kind)
 			{
 			default:
 				return new Value();
-			case ValueKind.Reference:
-				value = ((IProperties)value.ptr).Get(value.str);
-				goto again;
 			case ValueKind.Char:
 				return new Value(-value.data.Char);
 			case ValueKind.Bool:
@@ -62,14 +96,13 @@ namespace RedOnion.Script
 
 		public static Value operator ~(Value value)
 		{
-		again:
-			switch (value.Type)
+			value = value.RValue;
+			if (value.Kind == ValueKind.String)
+				value = value.Number;
+			switch (value.Kind)
 			{
 			default:
 				return new Value();
-			case ValueKind.Reference:
-				value = ((IProperties)value.ptr).Get(value.str);
-				goto again;
 			case ValueKind.Char:
 				return new Value(~value.data.Char);
 			case ValueKind.Bool:
@@ -99,14 +132,13 @@ namespace RedOnion.Script
 
 		public static Value operator ++(Value value)
 		{
-		again:
-			switch (value.Type)
+			value = value.RValue;
+			if (value.Kind == ValueKind.String)
+				value = value.Number;
+			switch (value.Kind)
 			{
 			default:
 				return new Value();
-			case ValueKind.Reference:
-				value = ((IProperties)value.ptr).Get(value.str);
-				goto again;
 			case ValueKind.Char:
 				return new Value((char)(value.data.Char + 1));
 			case ValueKind.Bool:
@@ -136,14 +168,13 @@ namespace RedOnion.Script
 
 		public static Value operator --(Value value)
 		{
-		again:
-			switch (value.Type)
+			value = value.RValue;
+			if (value.Kind == ValueKind.String)
+				value = value.Number;
+			switch (value.Kind)
 			{
 			default:
 				return new Value();
-			case ValueKind.Reference:
-				value = ((IProperties)value.ptr).Get(value.str);
-				goto again;
 			case ValueKind.Char:
 				return new Value((char)(value.data.Char - 1));
 			case ValueKind.Bool:

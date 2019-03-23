@@ -3,6 +3,7 @@ using UnityEngine;
 using KSP.UI.Screens;
 using Kerbalua.Gui;
 using System.Collections.Generic;
+using Kerbalua.Utility;
 
 namespace Kerbalua
 {
@@ -50,6 +51,7 @@ namespace Kerbalua
 
         public void Awake()
         {
+			toolbarTexture = RedOnion.UI.Element.LoadIcon(38, 38, "LiveRepl.png");
             if (ToggleGui == null) {
                 ApplicationLauncher.Instance.AddModApplication(
                     () => { ToggleGui(); },
@@ -88,17 +90,35 @@ namespace Kerbalua
 
 		void LocalToggleGui()
         {
-            //if (guiActive) {
-            //    InputLockManager.ClearControlLocks();
-            //} else {
-            //    InputLockManager.SetControlLock(ControlTypes.KEYBOARDINPUT, "kerbalua");
-            //}
+			//if (guiActive) {
+			//    InputLockManager.ClearControlLocks();
+			//} else {
+			//    InputLockManager.SetControlLock(ControlTypes.KEYBOARDINPUT, "kerbalua");
+			//}
+			//IList<string> newSettings = new List<string>();
+			//newSettings.Add("asdf");
+			//newSettings.Add("fdas");
+			//newSettings.Add("asdf1");
+			//newSettings.Add("fdas1");
+			//newSettings.Add("asdf2");
+			//newSettings.Add("fdas2");
+			//IList<string> settings = Settings.LoadListSetting("recentFiles");
+			//Debug.Log("OldSettings");
+			//foreach(var setting in settings) {
+			//	Debug.Log(setting);
+			//}
+			//Settings.SaveListSetting("recentFiles", newSettings);
 
-            guiActive = !guiActive;
+			guiActive = !guiActive;
         }
 
 
-        public void OnGUI()
+		void FixedUpdate()
+		{
+			repl.FixedUpdate();
+		}
+
+		void OnGUI()
         {
 
 			repl.Render(guiActive);

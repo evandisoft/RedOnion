@@ -23,6 +23,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documents", "Documents", "{
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KerbaluaNUnit", "KerbaluaNUnit\KerbaluaNUnit.csproj", "{756350DA-DC41-438F-A3E1-B09BCEBB7DBE}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Resources", "Resources", "{54E3F385-C4B1-4A7E-9299-DD5BF5D19204}"
+	ProjectSection(SolutionItems) = preProject
+		GameData\RedOnion\Resources\RedOnionLauncherIcon.png = GameData\RedOnion\Resources\RedOnionLauncherIcon.png
+		GameData\RedOnion\Resources\WindowCloseButtonIcon.png = GameData\RedOnion\Resources\WindowCloseButtonIcon.png
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

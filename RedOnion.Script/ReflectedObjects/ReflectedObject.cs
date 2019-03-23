@@ -10,27 +10,28 @@ namespace RedOnion.Script.ReflectedObjects
 {
 	public class ReflectedObject : BasicObjects.SimpleObject
 	{
-		public override object Target => _target;
-		private object _target;
-
 		public override ObjectFeatures Features
-			=> ObjectFeatures.Proxy;
+			=> ObjectFeatures.Proxy | ObjectFeatures.Operators;
 
+		private object _target;
+		private Type _type;
 		public ReflectedType Creator { get; }
-		public override Type Type => Creator?.Type;
+
+		public override object Target => _target;
+		public override Type Type => _type;
 
 		public ReflectedObject(IEngine engine, object target, IProperties properties = null)
 			: base(engine, properties)
-			=> _target = target;
+			=> _type = (_target = target)?.GetType();
 		public ReflectedObject(IEngine engine, object target, ReflectedType type, IProperties properties = null)
 			: this(engine, target, properties)
 		{
-			Creator = type;
+			_type = (Creator = type)?.Type ?? target.GetType();
 			BaseProps = type.TypeProps;
 		}
 
 		protected MemberInfo[] GetMembers(string name)
-			=> ReflectedType.GetMembers(Target.GetType(), name, instance: true);
+			=> ReflectedType.GetMembers(Type, name, instance: true);
 
 		public override IObject Which(string name)
 		{
@@ -111,12 +112,7 @@ namespace RedOnion.Script.ReflectedObjects
 		public override bool Set(string name, Value value)
 		{
 			if (BaseProps != null && BaseProps.Get(name, out var query))
-			{
-				if (query.Type != ValueKind.Property)
-					return false;
-				((IProperty)query.ptr).Set(this, value);
-				return true;
-			}
+				return query.Set(this, value);
 			var members = GetMembers(name);
 			for (int i = 0; i < members.Length;)
 			{
@@ -150,16 +146,7 @@ namespace RedOnion.Script.ReflectedObjects
 		public override bool Modify(string name, OpCode op, Value value)
 		{
 			if (BaseProps != null && BaseProps.Get(name, out var query))
-			{
-				if (query.Type != ValueKind.Property)
-					return false;
-				var prop = (IProperty)query.ptr;
-				if (prop is IPropertyEx ex)
-					return ex.Modify(this, op, value);
-				var tmp = prop.Get(this);
-				tmp.Modify(op, value);
-				return prop.Set(this, tmp);
-			}
+				return query.Modify(this, op, value);
 			var members = GetMembers(name);
 			for (int i = 0; i < members.Length;)
 			{
@@ -198,6 +185,148 @@ namespace RedOnion.Script.ReflectedObjects
 				}
 			}
 			return false;
+		}
+
+		private KeyValuePair<PropertyInfo, ParameterInfo[]>[] indexers;
+		protected KeyValuePair<PropertyInfo, ParameterInfo[]>[] Indexers
+		{
+			get
+			{
+				if (indexers == null)
+				{
+					if (Creator != null && Creator.indexers != null)
+						return indexers = Creator.indexers;
+					List<KeyValuePair<PropertyInfo, ParameterInfo[]>> list = null;
+					foreach (var info in Type.GetProperties())
+					{
+						var pars = info.GetIndexParameters();
+						if (pars.Length == 0)
+							continue;
+						if (list == null)
+							list = new List<KeyValuePair<PropertyInfo, ParameterInfo[]>>();
+						list.Add(new KeyValuePair<PropertyInfo, ParameterInfo[]>(info, pars));
+					}
+					indexers = list?.ToArray() ?? new KeyValuePair<PropertyInfo, ParameterInfo[]>[0];
+					if (Creator != null)
+						Creator.indexers = indexers;
+				}
+				return indexers;
+			}
+		}
+		public override Value Index(IObject self, int argc)
+		{
+			if (argc <= 0)
+				return new Value();
+			var indexers = Indexers;
+			var value = Arg(argc, 0);
+			if (indexers != null && argc == 1) // TODO multi-indexers
+			{
+				foreach (var pair in indexers)
+				{
+					if (pair.Value.Length != argc || !pair.Key.CanRead)
+						continue;
+					if (value.IsString && pair.Value[0].ParameterType == typeof(string))
+						return Convert(Engine, pair.Key.GetGetMethod()
+							.Invoke(Target, new object[] { value.String }));
+				}
+			}
+			value = new Value(this, value.String);
+			return argc == 1 ? value
+				: Engine.Box(new Value(this, value.String)).Index(this, argc - 1);
+		}
+
+		internal static readonly Dictionary<OpCode, string> OperatorNames = new Dictionary<OpCode, string>()
+		{
+			{ OpCode.Plus,		"op_UnaryPlus" },
+			{ OpCode.Neg,		"op_UnaryNegation" },
+			{ OpCode.Inc,		"op_Increment" },
+			{ OpCode.Dec,		"op_Decrement" },
+			{ OpCode.Not,		"op_LogicalNot" },
+			{ OpCode.Add,		"op_Addition" },
+			{ OpCode.Sub,		"op_Subtraction" },
+			{ OpCode.Mul,		"op_Multiply" },
+			{ OpCode.Div,		"op_Division" },
+			{ OpCode.BitAnd,	"op_BitwiseAnd" },
+			{ OpCode.BitOr,		"op_BitwiseOr" },
+			{ OpCode.BitXor,	"op_ExclusiveOr" },
+			{ OpCode.Equals,	"op_Equality" },
+			{ OpCode.Differ,	"op_Inequality" },
+			{ OpCode.Less,		"op_LessThan" },
+			{ OpCode.More,		"op_GreaterThan" },
+			{ OpCode.LessEq,	"op_LessThanOrEqual" },
+			{ OpCode.MoreEq,	"op_GreaterThanOrEqual" },
+			{ OpCode.ShiftLeft,	"op_LeftShift" },
+			{ OpCode.ShiftRight,"op_RightShift" },
+			{ OpCode.Mod,		"op_Modulus" },
+			// cast: op_Implicit/op_Explicit, bool: op_True/op_False
+		};
+		Dictionary<OpCode, MethodInfo[]> operators;
+		protected MethodInfo[] GetOperators(OpCode op)
+		{
+			if (operators == null)
+			{
+				if (Creator != null)
+					operators = Creator.operators;
+				if (operators == null)
+				{
+					operators = new Dictionary<OpCode, MethodInfo[]>();
+					if (Creator != null)
+						Creator.operators = operators;
+				}
+			}
+			if (operators.TryGetValue(op, out var it))
+				return it;
+			if (!OperatorNames.TryGetValue(op, out var name))
+				return null;
+			var members = ReflectedType.GetMembers(Type, name, instance: false);
+			var methods = new MethodInfo[members.Length];
+			Array.Copy(members, methods, members.Length);
+			return operators[op] = methods;
+		}
+		public override bool Operator(OpCode op, Value arg, bool selfRhs, out Value result)
+		{
+			result = new Value();
+			var methods = GetOperators(op);
+			if (methods == null || methods.Length == 0)
+				return false;
+			if (op.Unary())
+			{
+				var arguments = Engine.Arguments;
+				var startLength = arguments.Length;
+				try
+				{
+					arguments.Add(new Value(this));
+					foreach (var method in methods)
+						if (ReflectedFunction.TryCall(Engine, method, null, 1, ref result))
+							return true;
+				}
+				finally
+				{
+					arguments.Remove(arguments.Length - startLength);
+				}
+				return false;
+			}
+			else
+			{
+				var arguments = Engine.Arguments;
+				var startLength = arguments.Length;
+				try
+				{
+					if (!selfRhs)
+						arguments.Add(new Value(this));
+					arguments.Add(arg);
+					if (selfRhs)
+						arguments.Add(new Value(this));
+					foreach (var method in methods)
+						if (ReflectedFunction.TryCall(Engine, method, null, 2, ref result))
+							return true;
+				}
+				finally
+				{
+					arguments.Remove(arguments.Length - startLength);
+				}
+				return false;
+			}
 		}
 
 		public static Value Convert(IEngine engine, object value)

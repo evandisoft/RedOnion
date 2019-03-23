@@ -6,12 +6,14 @@ using System;
 using System.IO;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
+using Kerbalua.Utility;
+using RedOnion.KSP.Autopilot;
 //using RedOnion.Script;
 
 namespace Kerbalua.Gui {
 	public class ScriptWindow {
 		const int maxOutputBytes = 80000;
-		public string Title = "Live Code";
+		public string Title = "Live REPL";
 
 		public Editor editor = new Editor();
 		public Repl repl = new Repl();
@@ -32,6 +34,7 @@ namespace Kerbalua.Gui {
 		Rect replRect;
 		Rect completionBoxRect;
 		Rect editorRect;
+		//Rect scriptNameRect;
 		ScriptNameInputArea scriptIOTextArea=new ScriptNameInputArea();
 		// Should be a label but I haven't made a label yet.
 		TextArea replEvaluatorLabel = new TextArea();
@@ -40,8 +43,9 @@ namespace Kerbalua.Gui {
 
 		const float titleHeight = 20;
 
+		Evaluation currentEvaluation = null;
 		bool inputIsLocked;
-		bool evaluationNotFinished = false;
+		//bool evaluationNotFinished = false;
 
 		public KeyBindings GlobalKeyBindings = new KeyBindings();
 
@@ -58,14 +62,37 @@ namespace Kerbalua.Gui {
 			replEvaluatorLabel.content.text = evaluatorName;
 		}
 
+		public void FixedUpdate()
+		{
+			if (currentEvaluation != null) {
+				if (currentEvaluation.Evaluate()) {
+					repl.outputBox.AddReturnValue(currentEvaluation.Result);
+					currentEvaluation = null;
+				}
+			}
+		}
+
 		public ScriptWindow(Rect param_mainWindowRect)
 		{
 			replEvaluators["RedOnion"] = new RedOnionReplEvaluator();
-			replEvaluators["MoonSharp"] = new MoonSharpReplEvaluator(CoreModules.Preset_Complete);
-			replEvaluators["MoonSharp"].PrintAction = (str) => {
+			replEvaluators["Lua"] = new MoonSharpReplEvaluator();
+			replEvaluators["Lua"].PrintAction = (str) => {
 				repl.outputBox.AddOutput(str);
 			};
-			SetCurrentEvaluator("RedOnion");
+			string lastEngineName = Settings.LoadSetting("lastEngine", "RedOnion");
+			if(replEvaluators.ContainsKey(lastEngineName)){
+				currentReplEvaluator = replEvaluators[lastEngineName];
+				replEvaluatorLabel.content.text =lastEngineName;
+			} else {
+				foreach(var evaluatorName in replEvaluators.Keys) {
+					currentReplEvaluator = replEvaluators[evaluatorName];
+					replEvaluatorLabel.content.text = evaluatorName;
+					Settings.SaveSetting("lastEngine", evaluatorName);
+					break;
+				}
+			}
+
+
 			recentFiles = new RecentFilesList((string filename) => {
 				scriptIOTextArea.content.text = filename;
 				editor.content.text = scriptIOTextArea.Load();
@@ -111,7 +138,7 @@ namespace Kerbalua.Gui {
 
 			widgetBar.renderables.Add(new Button("<<", () => editorVisible = !editorVisible));
 			widgetBar.renderables.Add(new Button(">>", () => replVisible = !replVisible));
-			widgetBar.renderables.Add(scriptIOTextArea);
+			//widgetBar.renderables.Add(scriptIOTextArea);
 			widgetBar.renderables.Add(new Button("Save", () => {
 				scriptIOTextArea.Save(editor.content.text);
 			}));
@@ -121,11 +148,7 @@ namespace Kerbalua.Gui {
 			widgetBar.renderables.Add(new Button("Evaluate", () => {
 				scriptIOTextArea.Save(editor.content.text);
 				repl.outputBox.AddFileContent(scriptIOTextArea.content.text);
-				if (currentReplEvaluator.Evaluate(editor.content.text, out string output)) {
-					repl.outputBox.AddReturnValue(output);
-				} else {
-					evaluationNotFinished = true;
-				}
+				currentEvaluation = new Evaluation(editor.content.text, currentReplEvaluator);
 			}));
 			widgetBar.renderables.Add(new Button("Reset Engine", () => {
 				currentReplEvaluator.ResetEngine();
@@ -137,9 +160,11 @@ namespace Kerbalua.Gui {
 			foreach (var evaluatorName in replEvaluators.Keys) {
 				widgetBar.renderables.Add(new Button(evaluatorName, () => {
 					SetCurrentEvaluator(evaluatorName);
+					Settings.SaveSetting("lastEngine", evaluatorName);
 				}));
 			}
 			widgetBar.renderables.Add(replEvaluatorLabel);
+			widgetBar.renderables.Add(new Button("Kill Ctrl", () => { FlightControl.GetInstance().Shutdown(); }));
 
 			InitializeKeyBindings();
 		}
@@ -247,27 +272,15 @@ Any other key gives focus to input box.
 			editor.KeyBindings.Add(new EventKey(KeyCode.E, true), () => {
 				scriptIOTextArea.Save(editor.content.text);
 				repl.outputBox.AddFileContent(scriptIOTextArea.content.text);
-				if (currentReplEvaluator.Evaluate(editor.content.text, out string output)) {
-					repl.outputBox.AddReturnValue(output);
-				} else {
-					evaluationNotFinished = true;
-				}
+				currentEvaluation = new Evaluation(editor.content.text, currentReplEvaluator);
 			});
 			repl.inputBox.KeyBindings.Add(new EventKey(KeyCode.E, true), () => {
 				repl.outputBox.AddSourceString(repl.inputBox.content.text);
-				if (currentReplEvaluator.Evaluate(repl.inputBox.content.text, out string output)) {
-					repl.outputBox.AddReturnValue(output);
-				} else {
-					evaluationNotFinished = true;
-				}
+				currentEvaluation = new Evaluation(repl.inputBox.content.text, currentReplEvaluator);
 			});
 			repl.inputBox.KeyBindings.Add(new EventKey(KeyCode.Return), () => {
 				repl.outputBox.AddSourceString(repl.inputBox.content.text);
-				if (currentReplEvaluator.Evaluate(repl.inputBox.content.text, out string output,true)) {
-					repl.outputBox.AddReturnValue(output);
-				} else {
-					evaluationNotFinished = true;
-				}
+				currentEvaluation = new Evaluation(repl.inputBox.content.text, currentReplEvaluator,true);
 				repl.inputBox.content.text = "";
 				completionBox.content.text = "";
 			});
@@ -318,6 +331,7 @@ Any other key gives focus to input box.
 		bool hadMouseDownLastUpdate = false;
 		public void Update()
 		{
+			//UnityEngine.Debug.Log("blah");
 			SetOrReleaseInputLock();
 			completionManager.Update(hadMouseDownLastUpdate);
 			hadMouseDownLastUpdate = false;
@@ -350,6 +364,26 @@ Any other key gives focus to input box.
 				currentWindowRect.width -= completionBoxRect.width;
 			}
 			return currentWindowRect;
+		}
+
+		Rect GetCurrentEditorRect()
+		{
+			Rect currentEditorRect = new Rect(editorRect);
+			float scriptNameHeight = GetCurrentScriptNameRect().height;
+			currentEditorRect.y += scriptNameHeight;
+			currentEditorRect.height = currentEditorRect.height - scriptNameHeight;
+
+			return currentEditorRect;
+		}
+
+		Rect GetCurrentScriptNameRect()
+		{
+			Rect currentScriptNameRect = new Rect();
+			currentScriptNameRect.y = titleHeight;
+			currentScriptNameRect.x = 0;
+			currentScriptNameRect.width = editorRect.width;
+			currentScriptNameRect.height = 25;
+			return currentScriptNameRect;
 		}
 
 		Rect GetCurrentWidgetBarRect()
@@ -393,29 +427,20 @@ Any other key gives focus to input box.
 		/// <param name="id">Identifier.</param>
 		void MainWindow(int id)
 		{
-			if (evaluationNotFinished
+			if (currentEvaluation!=null
 					&& Event.current.type == EventType.KeyDown
 					&& Event.current.keyCode == KeyCode.C
 					&& Event.current.control) {
 				GUIUtil.ConsumeAndMarkNextCharEvent(Event.current);
-				currentReplEvaluator.Terminate();
-				evaluationNotFinished = false;
+				currentEvaluation.Terminate();
+				currentEvaluation = null;
 				repl.outputBox.AddError("Execution Manually Terminated");
 			}
 
-			if (evaluationNotFinished) {
-				//Debug.Log("Evaluation Not Finished");
-				string output;
-				if (currentReplEvaluator.Evaluate("", out output)) {
-					//Debug.Log("Evaluation Finally Finished");
-					evaluationNotFinished = false;
-					repl.outputBox.AddReturnValue(output);
-				} else {
-					//Debug.Log("Evaluation Still Not Finished");
-					if (Event.current.type == EventType.KeyDown ||
-						Event.current.type == EventType.MouseDown) {
-						Event.current.Use();
-					}
+			if (currentEvaluation != null) {
+				EventType t = Event.current.type;
+				if(t==EventType.KeyDown || t == EventType.MouseDown) {
+					Event.current.Use();
 				}
 			}
 
@@ -429,7 +454,52 @@ Any other key gives focus to input box.
 
 			Rect currentWidgetBarRect = GetCurrentWidgetBarRect();
 			widgetBar.Update(currentWidgetBarRect);
-			currentWidgetBarRect.y += widgetBarRect.height;
+			GUILayout.BeginArea(new Rect(
+				currentWidgetBarRect.x,
+				currentWidgetBarRect.height,
+				currentWidgetBarRect.width,
+				25
+				));
+			{
+				GUILayout.BeginHorizontal();
+				{
+					GUILayout.Label("Tabs");
+					if (GUILayout.Button("+")) {
+						List<string> recentFilesList = new List<string>(Settings.LoadListSetting("recentFiles"));
+						if (!recentFilesList.Contains(scriptIOTextArea.content.text)) {
+							recentFilesList.Add(scriptIOTextArea.content.text);
+						}
+						recentFilesList.RemoveAll((string filename) => !File.Exists(Path.Combine(Settings.BaseScriptsPath, filename)));
+						recentFilesList.Sort((string s1, string s2) => {
+							var t1 = Directory.GetLastWriteTime(Path.Combine(Settings.BaseScriptsPath, s1));
+							var t2 = Directory.GetLastWriteTime(Path.Combine(Settings.BaseScriptsPath, s2));
+							if (t1 < t2) return 1;
+							if (t1 > t2) return -1;
+							return 0;
+						});
+						if (recentFilesList.Count > 10) {
+							recentFilesList.RemoveAt(recentFilesList.Count - 1);
+						}
+						Settings.SaveListSetting("recentFiles", recentFilesList);
+					}
+					if (GUILayout.Button("-")) {
+						List<string> recentFilesList = new List<string>(Settings.LoadListSetting("recentFiles"));
+						if (!recentFilesList.Contains(scriptIOTextArea.content.text)) {
+							recentFilesList.Add(scriptIOTextArea.content.text);
+						}
+						recentFilesList.RemoveAll((string filename) => !File.Exists(Path.Combine(Settings.BaseScriptsPath, filename)));
+						recentFilesList.Remove(scriptIOTextArea.content.text);
+						if (recentFilesList.Count > 10) {
+							recentFilesList.RemoveAt(recentFilesList.Count - 1);
+						}
+						Settings.SaveListSetting("recentFiles", recentFilesList);
+					}
+				}
+				GUILayout.EndHorizontal();
+			}
+			GUILayout.EndArea();
+			currentWidgetBarRect.y += widgetBarRect.height+20;
+			currentWidgetBarRect.height -= 20;
 			recentFiles.Update(currentWidgetBarRect);
 
 			if (replVisible) {
@@ -441,7 +511,8 @@ Any other key gives focus to input box.
 
 			if (editorVisible) {
 				//editorRect = UpdateBoxPositionWithWindow(editorRect, -editorRect.width);
-				editor.Update(editorRect,editorVisible);
+				scriptIOTextArea.Update(GetCurrentScriptNameRect(), true);
+				editor.Update(GetCurrentEditorRect(), editorVisible);
 			}
 
 			// Lots of hacks here. I will eventually better understand how this

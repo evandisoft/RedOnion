@@ -30,7 +30,7 @@ namespace RedOnion
 		private void Start()
 		{
 			if (icon == null)
-				icon = UI.Element.LoadIcon(38, 38, "AppIcon.png");
+				icon = UI.Element.LoadIcon(38, 38, "RedOnionLauncherIcon.png");
 
 			if (adder != null)
 				StopCoroutine(adder);
@@ -72,16 +72,17 @@ namespace RedOnion
 		RuntimeEngine engine;
 		private void RunScript()
 		{
-			if(!File.Exists("scripts/launcher.ros"))
+			var script = RuntimeEngine.LoadScript("launcher.ros");
+			if (script == null)
 			{
-				Log("Script scripts/launcher.ros does not exist");
+				Log("Could not load launcher.ros script");
 				return;
 			}
 			try
 			{
 				engine = new RuntimeEngine();
 				engine.ExecutionCountdown = 10000;
-				engine.Execute(File.ReadAllText("scripts/launcher.ros"));
+				engine.Execute(script);
 			}
 			catch(Script.Parsing.ParseError err)
 			{

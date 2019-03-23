@@ -50,7 +50,19 @@ namespace RedOnion.Script.Completion
 			this.replaceAt = at;
 			this.replaceTo = at;
 			lexer.Source = source;
-			Execute();
+
+			try
+			{
+				Execute();
+			}
+			catch (Exception ex)
+			{
+				this.DebugLog("{0} in completion: {1}", ex.GetType().Name, ex.Message);
+				replaceAt = at;
+				replaceTo = at;
+				return new string[0];
+			}
+
 			replaceAt = this.replaceAt;
 			replaceTo = this.replaceTo;
 			if (found != null)
@@ -120,19 +132,11 @@ namespace RedOnion.Script.Completion
 		/// </summary>
 		public virtual IObject Box(Value value)
 		{
-			for (; ; )
-			{
-				switch (value.Type)
-				{
-				default:
-					return Root.Box(value);
-				case ValueKind.Object:
-					return (IObject)value.ptr;
-				case ValueKind.Reference:
-					value = ((IProperties)value.ptr).Get(value.str);
-					continue;
-				}
-			}
+			if (value.IsReference)
+				value = value.RValue;
+			if (value.Kind == ValueKind.Object)
+				return (IObject)value.ptr;
+			return Root.Box(value);
 		}
 		/// <summary>
 		/// Current context (method)

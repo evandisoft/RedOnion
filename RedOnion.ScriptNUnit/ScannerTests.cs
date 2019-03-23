@@ -6,13 +6,13 @@ using RedOnion.Script.Parsing;
 namespace RedOnion.ScriptNUnit
 {
 	[TestFixture]
-	public class ScannerTests: Scanner
+	public class ROS_ScannerTests: Scanner
 	{
 		public void Test(string line)
 			=> Line = line;
 
 		[Test]
-		public void Scanner_01_Words()
+		public void ROS_Scan01_Words()
 		{
 			Test("word");
 			Assert.AreEqual("word", Word);
@@ -38,7 +38,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void Scanner_02_String()
+		public void ROS_Scan02_String()
 		{
 			Test("\"string\"");
 			Assert.AreEqual('"', Curr);
@@ -77,7 +77,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void Scanner_03_Number()
+		public void ROS_Scan03_Number()
 		{
 			Test("12345");
 			Assert.AreEqual('1', Curr);
@@ -98,7 +98,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void Scanner_04_Comments()
+		public void ROS_Scan04_Comments()
 		{
 			Test("first /* comment */ second");
 			Assert.AreEqual(Word, "first");
@@ -115,7 +115,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void Scanner_05_Lines()
+		public void ROS_Scan05_Lines()
 		{
 			Source = "x\ry\r\nz\n";
 			Assert.AreEqual("y", Next(true).Word);

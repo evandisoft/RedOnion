@@ -6,7 +6,7 @@ using RedOnion.Script;
 namespace RedOnion.ScriptNUnit
 {
 	[TestFixture]
-	public class ScopeTests: StatementTestsBase
+	public class ROS_ScopeTests: StatementTestsBase
 	{
 		[SetUp]
 		public void SetUp()
@@ -15,7 +15,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void Scope_01_Global()
+		public void ROS_Scope01_Global()
 		{
 			Test(1,
 				"var x = 1\r\n" +
@@ -66,7 +66,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void Scope_02_Local()
+		public void ROS_Scope02_Local()
 		{
 			Test(2,
 				"var x = 1\r\n" +
@@ -98,7 +98,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void Scope_03_Block()
+		public void ROS_Scope03_Block()
 		{
 			var s =
 				"var x = 1\r\n" +
@@ -114,7 +114,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void Scope_04_Closure()
+		public void ROS_Scope04_Closure()
 		{
 			Test(2,
 				"var x = 1\r\n" +
@@ -136,7 +136,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void Scope_05_Prototype()
+		public void ROS_Scope05_Prototype()
 		{
 			Test(2,
 				"var x = 1\r\n" +

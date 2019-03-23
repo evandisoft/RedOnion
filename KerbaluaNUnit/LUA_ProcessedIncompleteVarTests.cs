@@ -3,14 +3,14 @@ using Kerbalua.Completion;
 using System;
 namespace KerbaluaNUnit {
 	[TestFixture()]
-	public class ProcessedIncompleteVarTests {
+	public class LUA_ProcessedIncompleteVarTests {
 		public ProcessedIncompleteVar Parse(string source)
 		{
 			return LuaIntellisense.Parse(source);
 		}
 
 		[Test()]
-		public void TestCase_1()
+		public void LUA_TestCase_1()
 		{
 			var parsed = Parse(
 				@"
@@ -24,7 +24,7 @@ namespace KerbaluaNUnit {
 		}
 
 		[Test()]
-		public void TestCase_2()
+		public void LUA_TestCase_2()
 		{
 			var parsed = Parse(
 			@"
@@ -39,7 +39,7 @@ namespace KerbaluaNUnit {
 		}
 
 		[Test()]
-		public void TestCase_3()
+		public void LUA_TestCase_3()
 		{
 			var parsed = Parse("return asdf");
 
@@ -50,7 +50,7 @@ namespace KerbaluaNUnit {
 		}
 
 		[Test()]
-		public void TestCase_4()
+		public void LUA_TestCase_4()
 		{
 			var parsed = LuaIntellisense.Parse("return asdf.qwer[1]().");
 
@@ -59,7 +59,7 @@ namespace KerbaluaNUnit {
 		}
 
 		[Test()]
-		public void TestCase_5()
+		public void LUA_TestCase_5()
 		{
 			var parsed = Parse(
 			@"
@@ -78,7 +78,7 @@ namespace KerbaluaNUnit {
 		}
 
 		[Test()]
-		public void TestCase_6_IncompleteVarlist()
+		public void LUA_TestCase_6_IncompleteVarlist()
 		{
 			var parsed = Parse(
 			@"
@@ -91,7 +91,7 @@ namespace KerbaluaNUnit {
 		}
 
 		[Test()]
-		public void TestCase_7_IncompleteExplist()
+		public void LUA_TestCase_7_IncompleteExplist()
 		{
 			var parsed = Parse(
 			@"
@@ -100,6 +100,19 @@ namespace KerbaluaNUnit {
 
 			Assert.AreEqual(2, parsed.Segments.Count);
 			Assert.AreEqual("blah2", parsed.Segments[0].Name);
+			Assert.AreEqual(0, parsed.Segments[0].Parts.Count);
+		}
+
+		[Test()]
+		public void LUA_TestCase_8_KeywordTest()
+		{
+			var parsed = Parse(
+			@"
+				a,b=blah1.b,blah2.while
+			");
+
+			Assert.AreEqual(2, parsed.Segments.Count);
+			Assert.AreEqual("while", parsed.Segments[1].Name);
 			Assert.AreEqual(0, parsed.Segments[0].Parts.Count);
 		}
 	}

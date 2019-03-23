@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using NUnit.Framework;
 using RedOnion.Script;
@@ -7,7 +8,7 @@ using RedOnion.Script.ReflectedObjects;
 namespace RedOnion.ScriptNUnit
 {
 	[TestFixture]
-	public class ObjectReflectionTests : EngineTestsBase
+	public class ROS_ObjectReflectionTests : EngineTestsBase
 	{
 		[TearDown]
 		public void ResetEngine() => Reset();
@@ -27,7 +28,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void ObjectReflection_01_Methods()
+		public void ROS_DRefl01_Methods()
 		{
 			var creator = new ReflectedType(this, typeof(PointClass));
 			Root[typeof(PointClass)] = creator;
@@ -45,7 +46,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void ObjectReflection_02_FieldsAndProps()
+		public void ROS_DRefl02_FieldsAndProps()
 		{
 			var creator = new ReflectedType(this, typeof(PointClass));
 			Root[typeof(PointClass)] = creator;
@@ -80,7 +81,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void ObjectReflection_03_Structure()
+		public void ROS_DRefl03_Structure()
 		{
 			var creator = new ReflectedType(this, typeof(Rect));
 			Root[typeof(Rect)] = creator;
@@ -109,7 +110,7 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void ObjectReflection_04_ComplexArguments()
+		public void ROS_DRefl04_ComplexArguments()
 		{
 			var creator = new ReflectedType(this, typeof(Rect));
 			Root[typeof(Rect)] = creator;
@@ -137,7 +138,7 @@ namespace RedOnion.ScriptNUnit
 				=> Name = name;
 		}
 		[Test]
-		public void ObjectReflection_05_CtorWithDefaultArgs()
+		public void ROS_DRefl05_CtorWithDefaultArgs()
 		{
 			var creator = new ReflectedType(this, typeof(DefaultConstruct));
 			Root[typeof(DefaultConstruct)] = creator;
@@ -152,7 +153,7 @@ namespace RedOnion.ScriptNUnit
 			public T Pass<T>(T value) => value;
 		}
 		[Test]
-		public void ObjectReflection_06_GenericFunction()
+		public void ROS_DRefl06_GenericFunction()
 		{
 			var creator = new ReflectedType(this, typeof(GenericTest));
 			Root[typeof(GenericTest)] = creator;
@@ -171,7 +172,7 @@ namespace RedOnion.ScriptNUnit
 			public int NumberOfActions => action?.GetInvocationList().Length ?? 0;
 		}
 		[Test]
-		public void ObjectReflection_07_Events()
+		public void ROS_DRefl07_Events()
 		{
 			var creator = new ReflectedType(this, typeof(EventTest));
 			Root[typeof(EventTest)] = creator;
@@ -188,6 +189,49 @@ namespace RedOnion.ScriptNUnit
 			Test(0, "test.numberOfActions");
 			Test("test.action += action");
 			Test(1, "test.numberOfActions");
+		}
+
+		[Test]
+		public void ROS_DRefl08_Dictionary()
+		{
+			var creator = new ReflectedType(this, typeof(Dictionary<string, string>));
+			Root[typeof(Dictionary<string, string>)] = creator;
+			Root.Set("dict", creator);
+			Test("var test = new dict");
+			var dict = Result.Native as Dictionary<string, string>;
+			dict["test"] = "it";
+			Test("it", "test[\"test\"]");
+		}
+
+		public struct MyVector
+		{
+			public float x, y, z;
+			public MyVector(float x, float y, float z)
+			{
+				this.x = x;
+				this.y = y;
+				this.z = z;
+			}
+			public static MyVector operator +(MyVector a, MyVector b)
+				=> new MyVector(a.x + b.x, a.y + b.y, a.z + b.z);
+			public static MyVector operator *(MyVector v, float f)
+				=> new MyVector(v.x * f, v.y * f, v.z * f);
+			public static MyVector operator *(float f, MyVector v)
+				=> new MyVector(v.x * f, v.y * f, v.z * f);
+		}
+		[Test]
+		public void ROS_DRefl09_Operators()
+		{
+			Root.AddType("vector", typeof(MyVector));
+			Test("var v = new vector 1,2f,3.0");
+			var v = (MyVector)Result.Native;
+			Assert.AreEqual(3f, v.z);
+			Test("var u = v * 2");
+			var u = (MyVector)Result.Native;
+			Assert.AreEqual(2f, u.x);
+			Test("var w = 3 * v");
+			var w = (MyVector)Result.Native;
+			Assert.AreEqual(6f, w.y);
 		}
 	}
 }

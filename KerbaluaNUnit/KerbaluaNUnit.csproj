@@ -33,15 +33,22 @@
     <Reference Include="MoonSharp.Interpreter">
       <HintPath>..\packages\MoonSharp.2.0.0.0\lib\net40-client\MoonSharp.Interpreter.dll</HintPath>
     </Reference>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>..\..\..\..\..\..\programs\KSPDev\KerbaluaDev\KSP_Data\Managed\Assembly-CSharp.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ProcessedIncompleteVarTests.cs" />
-    <Compile Include="CompletionObjectTests.cs" />
+    <Compile Include="LUA_ProcessedIncompleteVarTests.cs" />
+    <Compile Include="LUA_CompletionObjectTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Kerbalua\Kerbalua.csproj">
       <Project>{F590B1DB-8F33-4986-8383-180952D63CDA}</Project>
       <Name>Kerbalua</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RedOnion.KSP\RedOnion.KSP.csproj">
+      <Project>{DEC12E09-29AD-4666-9954-8C8A1D7BF454}</Project>
+      <Name>RedOnion.KSP</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

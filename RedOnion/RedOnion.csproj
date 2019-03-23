@@ -73,16 +73,12 @@
       <Name>RedOnion.UI</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\AppIcon.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="$(AssemblyName).zip">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Target Name="BeforeBuild">
-    <ZipDirectory SourceDirectory="Resources" Overwrite="True" DestinationFile="$(AssemblyName).zip" />
+  <Target Name="AfterBuild">
+    <ZipDirectory SourceDirectory="..\GameData\RedOnion\Resources" Overwrite="True" DestinationFile="..\GameData\RedOnion\Resources.zip" />
+    <ItemGroup>
+      <OutputFiles Include="$(OutDir)**\*"></OutputFiles>
+    </ItemGroup>
+    <Copy SourceFiles="@(OutputFiles)" DestinationFolder="..\GameData\RedOnion\Plugins\%(RecursiveDir)" OverwriteReadOnlyFiles="true" />
   </Target>
 </Project>
