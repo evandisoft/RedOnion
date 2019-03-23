@@ -13,7 +13,7 @@ using RedOnion.KSP.Autopilot;
 namespace Kerbalua.Gui {
 	public class ScriptWindow {
 		const int maxOutputBytes = 80000;
-		public string Title = "Live Code";
+		public string Title = "Live REPL";
 
 		public Editor editor = new Editor();
 		public Repl repl = new Repl();
