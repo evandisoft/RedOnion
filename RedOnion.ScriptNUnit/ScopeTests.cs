@@ -138,14 +138,14 @@ namespace RedOnion.ScriptNUnit
 				"var x = 1",
 				"function f",
 				"	this.x = 2",
-				"f.prototype = new object",
+			//	"f.prototype = new object", // prototype is now autocreated when accessed
 				"f.prototype.x = 3",
 				"return (new f).x");
 			Lines(2,
 				"var x = 1",
 				"function f",
 				"	x = 2",
-				"f.prototype = new object",
+			//	"f.prototype = new object",
 				"f.prototype.x = 3",
 				"return (new f).x");
 		}
@@ -180,15 +180,13 @@ namespace RedOnion.ScriptNUnit
     var _total = 0
 
     // some method
-    function action
+    this.action = function
         counter++   // this.counter++
         _total++    // that private _total
-    this.action = action
 
     // read-only access to total
-    function getTotal
+    this.getTotal = function
         return _total
-    this.getTotal = getTotal
 
 var obj = new MyClass
 obj.counter = 10

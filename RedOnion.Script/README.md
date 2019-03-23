@@ -109,15 +109,13 @@ function MyClass
     var _total = 0
 
     // some method
-    function action
+    this.action = function
         counter++   // this.counter++
         _total++    // that private _total
-    this.action = action
 
     // read-only access to total
-    function getTotal
+    this.getTotal = function
         return _total
-    this.getTotal = getTotal
 
 var obj = new MyClass
 obj.counter = 10

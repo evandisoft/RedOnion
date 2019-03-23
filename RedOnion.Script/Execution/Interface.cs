@@ -541,6 +541,7 @@ namespace RedOnion.Script
 		/// <summary>
 		/// Line of source content (with position and text)
 		/// </summary>
+		[DebuggerDisplay("{Position}: {Text}")]
 		public struct SourceLine
 		{
 			public int Position;
