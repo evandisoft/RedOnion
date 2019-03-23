@@ -43,6 +43,8 @@ namespace RedOnion.ScriptNUnit
 				"var test = function",
 				"	return 3.14",
 				"test");
+			Test("return test");
+			Assert.IsTrue(Result.RefObj is Script.BasicObjects.FunctionObj);
 			Lines(1f,
 				"var v = 1f",
 				"var test = function",

@@ -33,6 +33,7 @@ namespace RedOnion.ScriptNUnit
 		{
 			Test(3.14f, "float 3.14");
 			Test(123, "int \"123\"");
+			Test(7.0, "double \"7\"");
 		}
 
 		public class Thing { }
