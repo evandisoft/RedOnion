@@ -245,8 +245,15 @@ namespace RedOnion.Script.Parsing
 			var create = false;
 		next:
 			var op = ((OpCode)Values[--top]).Extend();
-			Debug.Assert(op.Kind() < OpKind.Statement);
-			if (op.Kind() <= OpKind.Number)
+			var kind = op.Kind();
+			if (kind >= OpKind.Statement)
+			{
+				Debug.Assert(op == OpCode.Function);
+				Write(op);
+				Copy(top, start);
+				return;
+			}
+			if (kind <= OpKind.Number)
 			{
 				if (!type && !create)
 				{

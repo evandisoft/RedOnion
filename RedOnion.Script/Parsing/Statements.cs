@@ -12,7 +12,12 @@ namespace RedOnion.Script.Parsing
 		/// Test if there is expression at current position
 		/// </summary>
 		protected virtual bool PeekExpression(Flag flags)
-			=> !lexer.Eol && lexer.Curr != ';' && lexer.Code.Kind() < OpKind.Statement;
+			=> !lexer.Eol
+			&& lexer.Curr != ';'
+			&& lexer.Curr != ','
+			&& lexer.Curr != ':'
+			&& (lexer.Word == null
+			|| lexer.Code.Kind() < OpKind.Statement);
 
 		/// <summary>
 		/// Full/required expression (e.g. condition of while)
@@ -386,61 +391,66 @@ namespace RedOnion.Script.Parsing
 				var fname = lexer.Word;
 				if (fname.Length > 127)
 					throw new ParseError(lexer, "Function name too long");
-
 				Write(OpCode.Function);
-				Write(fname);		// function name (index to string table)
-				Write(0);			// header size
-				mark = CodeAt;
-				Write((ushort)0);   // type flags
-				Write((byte)0);     // number of generic parameters
-				Write((byte)0);     // number of arguments
-
-				Write(0);			// return type size
-				var typeMark = CodeAt;
-				Next().OptionalType(flags);
-				Write(CodeAt - typeMark, typeMark-4);
-
-				var argc = 0;
-				var paren = lexer.Curr == '(';
-				if (paren || lexer.Curr == ',')
-					Next(true);
-				while ((paren || !lexer.Eol) && !lexer.Eof)
-				{
-					if (lexer.Word == null)
-						throw new ParseError(lexer, "Expected argument name");
-					if (argc > 127)
-						throw new ParseError(lexer, "Too many arguments");
-
-					Write(lexer.Word);	// argument name (index to string table)
-
-					Write(0);			// argument type size
-					var argMark = CodeAt;
-					Next().OptionalType(flags);
-					Write(CodeAt - argMark, argMark-4);
-
-					Write(0);           // argument default value size
-					argMark = CodeAt;
-					OptionalExpression(flags);
-					Write(CodeAt - argMark, argMark-4);
-					argc++;
-
-					if (paren && lexer.Curr == ')')
-					{
-						Next();
-						break;
-					}
-					if (lexer.Curr == ',')
-						Next(true);
-				}
-
-				Write(CodeAt - mark, mark-4);	// header size
-				Code[mark + 3] = (byte)argc;	// number of arguments
-
-				var labels = StoreLabels();
-				ParseBlock(flags);
-				RestoreLabels(labels);
+				ParseFunction(fname, flags);
 				return;
 			}
+		}
+
+		protected virtual void ParseFunction(string name, Flag flags)
+		{
+			if (name != null)	// null if parsing lambda / inline function
+				Write(name);    // function name (index to string table)
+			Write(0);           // header size
+			int mark = CodeAt;
+			Write((ushort)0);   // type flags
+			Write((byte)0);     // number of generic parameters
+			Write((byte)0);     // number of arguments
+
+			Write(0);           // return type size
+			var typeMark = CodeAt;
+			Next().OptionalType(flags);
+			Write(CodeAt - typeMark, typeMark-4);
+
+			var argc = 0;
+			var paren = lexer.Curr == '(';
+			if (paren || lexer.Curr == ',')
+				Next(true);
+			while ((paren || !lexer.Eol) && !lexer.Eof)
+			{
+				if (lexer.Word == null)
+					throw new ParseError(lexer, "Expected argument name");
+				if (argc > 127)
+					throw new ParseError(lexer, "Too many arguments");
+
+				Write(lexer.Word);  // argument name (index to string table)
+
+				Write(0);           // argument type size
+				var argMark = CodeAt;
+				Next().OptionalType(flags);
+				Write(CodeAt - argMark, argMark-4);
+
+				Write(0);           // argument default value size
+				argMark = CodeAt;
+				OptionalExpression(flags);
+				Write(CodeAt - argMark, argMark-4);
+				argc++;
+
+				if (paren && lexer.Curr == ')')
+				{
+					Next();
+					break;
+				}
+				if (lexer.Curr == ',')
+					Next(true);
+			}
+
+			Write(CodeAt - mark, mark-4);   // header size
+			Code[mark + 3] = (byte)argc;    // number of arguments
+
+			var labels = StoreLabels();
+			ParseBlock(flags);
+			RestoreLabels(labels);
 		}
 	}
 }

@@ -36,7 +36,7 @@ namespace RedOnion.Script
 			if (op == OpCode.Autocall)
 			{
 				Expression(ref at);
-				if (!HasOption(EngineOption.Autocall|EngineOption.WeakAutocall|EngineOption.ReplAutocall))
+				if (!HasOption(EngineOption.Autocall|EngineOption.WeakAutocall|EngineOption.Repl))
 					return;
 				Autocall();
 				return;
@@ -182,33 +182,43 @@ namespace RedOnion.Script
 				throw new NotImplementedException();
 			case OpCode.Function:
 				var fname = Strings[CodeInt(ref at)];
-				var size = CodeInt(ref at);
-				var body = at + size;
-				Debug.Assert(Code[at + 2] == 0); // not generic
-				at += 3;
-				var argc = Code[at++];
-				var ftsz = CodeInt(ref at);
-				var ftat = at;
-				at += ftsz;
-				var args = argc == 0 ? null : new ArgumentInfo[argc];
-				for (var i = 0; i < argc; i++)
-				{
-					args[i].Name = Strings[CodeInt(ref at)];
-					var tsz = CodeInt(ref at);
-					args[i].Type = at;
-					at += tsz;
-					var vsz = CodeInt(ref at);
-					args[i].Value = at;
-					at += vsz;
-				}
-				Debug.Assert(at == body);
-				at = body;
-				size = CodeInt(ref at);
-				Context.Root.Set(fname, new Value(Root.Create(Compiled, at, size, ftat, args, null, Context.Vars)));
-				at += size;
+				if (HasOption(EngineOption.Strict)
+					&& !HasOption(EngineOption.Silent|EngineOption.Repl)
+					&& Root.Has(fname))
+					throw new InvalidOperationException("Function " + fname + " already exists");
+				Context.Root.Set(fname, Function(fname, ref at));
 				Value = new Value(Context.Root, fname);
 				return;
 			}
+		}
+
+		protected IObject Function(string name, ref int at)
+		{
+			var size = CodeInt(ref at);
+			var body = at + size;
+			Debug.Assert(Code[at + 2] == 0); // not generic
+			at += 3;
+			var argc = Code[at++];
+			var ftsz = CodeInt(ref at);
+			var ftat = at;
+			at += ftsz;
+			var args = argc == 0 ? null : new ArgumentInfo[argc];
+			for (var i = 0; i < argc; i++)
+			{
+				args[i].Name = Strings[CodeInt(ref at)];
+				var tsz = CodeInt(ref at);
+				args[i].Type = at;
+				at += tsz;
+				var vsz = CodeInt(ref at);
+				args[i].Value = at;
+				at += vsz;
+			}
+			Debug.Assert(at == body);
+			at = body;
+			size = CodeInt(ref at);
+			var it = Root.Create(name, Compiled, at, size, ftat, args, null, Context.Vars);
+			at += size;
+			return it;
 		}
 	}
 }

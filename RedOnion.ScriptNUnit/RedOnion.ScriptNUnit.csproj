@@ -37,6 +37,7 @@
     <Compile Include="CompletionTests.cs" />
     <Compile Include="ExecutionCountdownTests.cs" />
     <Compile Include="ExpressionTests.cs" />
+    <Compile Include="FunctionTests.cs" />
     <Compile Include="ObjectModelTests.cs" />
     <Compile Include="ObjectReflectionTests.cs" />
     <Compile Include="OpCodeTests.cs" />

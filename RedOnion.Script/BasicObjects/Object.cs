@@ -40,7 +40,7 @@ namespace RedOnion.Script.BasicObjects
 	/// which can be used like string-keyed dictionary.
 	/// </remarks>
 	[DebuggerDisplay("{Name}")]
-	public class BasicObject : IObject
+	public class BasicObject : IScope
 	{
 		/// <summary>
 		/// Engine this object belongs to
@@ -191,6 +191,12 @@ namespace RedOnion.Script.BasicObjects
 			if (MoreProps == null)
 				MoreProps = new Properties();
 			return MoreProps.Set(name, value);
+		}
+		public void Add(string name, Value value)
+		{
+			if (MoreProps == null)
+				MoreProps = new Properties();
+			MoreProps.Set(name, value);
 		}
 
 		public virtual bool Modify(string name, OpCode op, Value value)

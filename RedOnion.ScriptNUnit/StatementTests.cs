@@ -1,5 +1,3 @@
-using System;
-using System.Linq;
 using NUnit.Framework;
 using RedOnion.Script;
 
@@ -18,6 +16,9 @@ namespace RedOnion.ScriptNUnit
 	[TestFixture]
 	public class ROS_StatementTests : StatementTestsBase
 	{
+		[TearDown]
+		public void ResetEngine() => Reset();
+
 		[Test]
 		public void ROS_EStts01_Return()
 		{
@@ -40,22 +41,6 @@ namespace RedOnion.ScriptNUnit
 		{
 			Test(OpCode.Return, true, "if true then return true");
 			Test(OpCode.Return, false, "if false: return true else: return false");
-		}
-
-		[Test]
-		public void ROS_EStts04_FunctionFromStr()
-		{
-			// lowercase `function` may mean delegate or lambda
-			// => either `Function` or `new function` for this
-			Test("var sum1 = Function \"a,b\", \"return a+b\"");
-			Test(3, "sum1 1,2");
-		}
-
-		[Test]
-		public void ROS_EStts05_FunctionInScript()
-		{
-			Test("function sum2 a,b\r\n\treturn a+b");
-			Test(3, "sum2 1,2");
 		}
 	}
 }

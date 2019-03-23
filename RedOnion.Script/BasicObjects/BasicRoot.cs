@@ -80,6 +80,7 @@ namespace RedOnion.Script.BasicObjects
 
 		protected void FillSystem(IProperties core, IProperties more)
 		{
+			core.Set("global",		this);
 			core.Set("undefined",	Undefined);
 			core.Set("null",		Null);
 			core.Set("nan",			NaN);
@@ -137,11 +138,11 @@ namespace RedOnion.Script.BasicObjects
 			}
 		}
 
-		public IObject Create(
+		public IObject Create(string name,
 			CompiledCode code, int codeAt, int codeSize, int typeAt,
-			ArgumentInfo[] args, string body = null, IObject scope = null)
+			ArgumentInfo[] args, string body = null, IScope scope = null)
 		{
-			return new FunctionObj(Engine, Function.Prototype,
+			return new FunctionObj(Engine, name, Function.Prototype,
 				code, codeAt, codeSize, typeAt,
 				args, body, scope == this ? null : scope);
 		}

@@ -18,7 +18,10 @@ namespace RedOnion.Script
 		public EngineOption Options { get; set; }
 			= DefaultOptions;
 		public static EngineOption DefaultOptions
-			= EngineOption.BlockScope | EngineOption.Strict | EngineOption.Autocall;
+			= EngineOption.Strict
+			| EngineOption.BlockScope
+			| EngineOption.SelfScope
+			| EngineOption.Autocall;
 		public bool HasOption(EngineOption option)
 			=> (Options & option) != 0;
 
@@ -83,7 +86,7 @@ namespace RedOnion.Script
 				Current = 0;
 				Inside = 0;
 				var end = at + size;
-				if (HasOption(EngineOption.ReplAutocall) && at < end
+				if (HasOption(EngineOption.Repl) && at < end
 					&& ((OpCode)Code[at]).Extend() == OpCode.Autocall)
 				{
 					at++;
@@ -207,17 +210,18 @@ namespace RedOnion.Script
 				Special(op, ref at);
 				break;
 			default:
-				if (kind >= OpKind.Statement)
-					throw new InvalidOperationException();
-				if (op.Binary())
+				if (kind < OpKind.Statement)
 				{
-					Binary(op, ref at);
-					break;
-				}
-				if (op.Unary())
-				{
-					Unary(op, ref at);
-					break;
+					if (op.Binary())
+					{
+						Binary(op, ref at);
+						break;
+					}
+					if (op.Unary())
+					{
+						Unary(op, ref at);
+						break;
+					}
 				}
 				Special(op, ref at);
 				break;

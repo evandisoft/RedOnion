@@ -1,9 +1,10 @@
 using System;
+using System.Diagnostics;
 using System.Globalization;
-using System.IO;
 
 namespace RedOnion.Script.Parsing
 {
+	[DebuggerDisplay("{lexer.LineNumber}:{lexer.At}: {lexer.Code}; {lexer.Curr}; {lexer.Word}; {lexer.Line}")]
 	public partial class Parser
 	{
 		protected Lexer lexer = new Lexer();

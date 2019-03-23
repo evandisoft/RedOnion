@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using NUnit.Framework;
 using RedOnion.Script;
 
@@ -10,7 +9,7 @@ namespace RedOnion.ScriptNUnit
 		public EngineTestsBase()
 		{
 			if (HasOption(EngineOption.Autocall))
-				Options |= EngineOption.ReplAutocall;
+				Options |= EngineOption.Repl;
 		}
 		public void Test(string script, int countdown = 100)
 		{
@@ -47,6 +46,12 @@ namespace RedOnion.ScriptNUnit
 					e.GetType().ToString(), e.Message, script), e);
 			}
 		}
+		public void Lines(params string[] lines)
+			=> Test(string.Join(Environment.NewLine, lines));
+		public void Lines(object value, params string[] lines)
+			=> Test(value, string.Join(Environment.NewLine, lines));
+		public void Expect<Ex>(params string[] lines) where Ex : Exception
+			=> Expect<Ex>(string.Join(Environment.NewLine, lines));
 	}
 
 	[TestFixture]

@@ -15,14 +15,14 @@ namespace RedOnion.Script
 			if (left.Kind == ValueKind.Object)
 			{
 				var obj = (IObject)left.ptr;
-				if (obj.HasFeature(ObjectFeatures.Operators)
+				if (obj?.HasFeature(ObjectFeatures.Operators) == true
 					&& obj.Operator(op, right, false, out var result))
 					return result;
 			}
 			if (right.Kind == ValueKind.Object)
 			{
 				var obj = (IObject)right.ptr;
-				if (obj.HasFeature(ObjectFeatures.Operators)
+				if (obj?.HasFeature(ObjectFeatures.Operators) == true
 					&& obj.Operator(op, left, true, out var result))
 					return result;
 			}

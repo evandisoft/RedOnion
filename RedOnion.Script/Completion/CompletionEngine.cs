@@ -150,18 +150,18 @@ namespace RedOnion.Script.Completion
 		/// <summary>
 		/// Create new execution/activation context (for function call)
 		/// </summary>
-		public IObject CreateContext(IObject self, IObject scope = null)
+		public IObject CreateContext(IObject self, IScope scope, int argc)
 		{
 			ContextStack.Push(Context);
-			Context = new EngineContext(this, self, scope);
+			Context = new EngineContext(this, self, scope, argc);
 			return Context.Vars.BaseClass;
 		}
 
 		/// <summary>
 		/// Create new variables holder object
 		/// </summary>
-		public virtual IObject CreateVars(IObject vars)
-			=> new BasicObjects.BasicObject(this, vars);
+		public virtual IScope CreateVars(IObject baseClass)
+			=> new BasicObjects.BasicObject(this, baseClass);
 
 		/// <summary>
 		/// Destroy last execution/activation context

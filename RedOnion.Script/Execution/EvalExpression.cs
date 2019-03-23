@@ -64,7 +64,9 @@ namespace RedOnion.Script
 				Value = true;
 				return;
 			case OpCode.This:
-				Value = new Value(Context.Self);
+				// this = undefined in methods and undefined == null (but undefined !== null)
+				Value = Context.Self != null ? new Value(Context.Self)
+					: HasOption(EngineOption.Strict) ? new Value() : new Value(Root);
 				return;
 			case OpCode.Base:
 				Value = new Value(Context.Self?.BaseClass);
@@ -256,13 +258,15 @@ namespace RedOnion.Script
 				}
 				fn = Box(Value);
 				argc = n - 1;
-				while (--n > 0)
+				using (Arguments.Guard())
 				{
-					Expression(ref at);
-					Arguments.Add(Result);
+					while (--n > 0)
+					{
+						Expression(ref at);
+						Arguments.Add(Result);
+					}
+					Value = fn.Index(self, argc);
 				}
-				Value = fn.Index(self, argc);
-				Arguments.Remove(argc);
 				return;
 			case OpCode.Var:
 				var name = Strings[CodeInt(ref at)];
@@ -270,16 +274,19 @@ namespace RedOnion.Script
 				if (Value.Kind == ValueKind.Undefined)
 				{
 					Expression(ref at);
-					Context.Vars.Set(name, Value);
+					Context.Vars.Add(name, Value);
 					return;
 				}
+				// strongly typed variable - have to call converter
 				CountStatement();
 				fn = Box(Value);
 				Expression(ref at);
-				Arguments.Add(Result);
-				Value = fn.Call(null, 1);
-				Arguments.Remove(1);
-				Context.Vars.Set(name, Value);
+				using (Arguments.Guard())
+				{
+					Arguments.Add(Result);
+					Value = fn.Call(null, 1);
+				}
+				Context.Vars.Add(name, Value);
 				return;
 			case OpCode.Dot:
 				Expression(ref at);
@@ -307,6 +314,9 @@ namespace RedOnion.Script
 					at += 4;
 					Expression(ref at);
 				}
+				return;
+			case OpCode.Function:
+				Value = new Value(Function(null, ref at));
 				return;
 			}
 			throw new NotImplementedException();

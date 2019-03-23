@@ -9,78 +9,67 @@ namespace RedOnion.ScriptNUnit
 	public class ROS_ScopeTests: StatementTestsBase
 	{
 		[SetUp]
-		public void SetUp()
-		{
-			Options = EngineOption.BlockScope;
-		}
+		public void SetUp() // Repl mode so that we can overwrite functions
+			=> Options = DefaultOptions | EngineOption.Repl;
+		[TearDown]
+		public void ResetEngine() => Reset();
 
 		[Test]
 		public void ROS_Scope01_Global()
 		{
-			Test(1,
-				"var x = 1\r\n" +
-				"function f\r\n" +
-				"	return x\r\n" +
+			Lines(1,
+				"var x = 1",
+				"function f",
+				"	return x",
 				"f()");
 
 			// this = global
-			Options = EngineOption.BlockScope;
-			Test(1,
-				"var x = 1\r\n" +
-				"function f\r\n" +
-				"	return this.x\r\n" +
+			Options = EngineOption.BlockScope | EngineOption.Repl;
+			Lines(1,
+				"var x = 1",
+				"function f",
+				"	return this.x",
 				"f()");
 
-			// this = null
+			// this = undefined => null
 			Options = EngineOption.BlockScope | EngineOption.Strict | EngineOption.Silent;
-			Test(null,
-				"var x = 1\r\n" +
-				"function f\r\n" +
-				"	return this.x\r\n" +
+			Lines(null,
+				"var x = 1",
+				"function f",
+				"	return this.x",
 				"f()");
 
-			Options = EngineOption.BlockScope | EngineOption.Strict;
-			try
-			{
-				ExecutionCountdown = 10;
-				Execute(
-					"var x = 1\r\n" +
-					"function f\r\n" +
-					"	return this.x\r\n" +
-					"f()");
-				Assert.Fail("Should throw exception");
-			}
-			catch(InvalidOperationException)
-			{
-			}
-
-			try
-			{
-				ExecutionCountdown = 10;
-				Execute("y = 2");
-				Assert.Fail("Should throw exception");
-			}
-			catch (InvalidOperationException)
-			{
-			}
+			Options = EngineOption.BlockScope | EngineOption.Strict | EngineOption.Repl;
+			Expect<InvalidOperationException>(
+				"var x = 1",
+				"function f",
+				"	return this.x",
+				"f()");
+			// just to test sctrict mode
+			Expect<InvalidOperationException>(
+				"y = 2");
+			Options &= ~EngineOption.Repl;
+			Expect<InvalidOperationException>(
+				"function f",
+				"	return");
 		}
 
 		[Test]
 		public void ROS_Scope02_Local()
 		{
-			Test(2,
-				"var x = 1\r\n" +
-				"function f\r\n" +
-				"	var x = 2\r\n" +
-				"	return x\r\n" +
+			Lines(2,
+				"var x = 1",
+				"function f",
+				"	var x = 2",
+				"	return x",
 				"f()");
 
-			Test(1,
-				"var x = 1\r\n" +
-				"function f\r\n" +
-				"	var y = x\r\n" +
-				"	var x = 2\r\n" +
-				"	return y\r\n" +
+			Lines(1,
+				"var x = 1",
+				"function f",
+				"	var y = x",
+				"	var x = 2",
+				"	return y",
 				"f()");
 			/*
 			JavaScript would actually return undefined
@@ -94,6 +83,8 @@ namespace RedOnion.ScriptNUnit
 					y = x
 					x = 2
 					return y
+			
+			it is called hoisting
 			*/
 		}
 
@@ -116,42 +107,95 @@ namespace RedOnion.ScriptNUnit
 		[Test]
 		public void ROS_Scope04_Closure()
 		{
-			Test(2,
-				"var x = 1\r\n" +
-				"function f\r\n" +
-				"	var x = 2\r\n" +
-				"	function g\r\n" +
-				"		return x\r\n" +
-				"	return g()\r\n" +
+			Lines(2,
+				"var x = 1",
+				"function f",
+				"	var x = 2",
+				"	function g",
+				"		return x",
+				"	return g()",
 				"f()");
 
-			Test(2,
-				"var x = 1\r\n" +
-				"function f\r\n" +
-				"	var x = 2\r\n" +
-				"	function g\r\n" +
-				"		return x\r\n" +
-				"	return g\r\n" +
+			Lines(2,
+				"var x = 1",
+				"function f",
+				"	var x = 2",
+				"	function g",
+				"		return x",
+				"	return g",
 				"f()()");
 		}
 
 		[Test]
 		public void ROS_Scope05_Prototype()
 		{
-			Test(2,
-				"var x = 1\r\n" +
-				"function f\r\n" +
-				"	this.x = 2\r\n" +
-				"f.prototype = new object\r\n" +
-				"f.prototype.x = 3\r\n" +
-				"(new f).x");
-			Test(3,
-				"var x = 1\r\n" +
-				"function f\r\n" +
-				"	x = 2\r\n" +
-				"f.prototype = new object\r\n" +
-				"f.prototype.x = 3\r\n" +
-				"(new f).x");
+			Lines(1,
+				"function f",
+				"f.prototype = new object",
+				"f.prototype.x = 1",
+				"return (new f).x");
+			Lines(2,
+				"var x = 1",
+				"function f",
+				"	this.x = 2",
+				"f.prototype = new object",
+				"f.prototype.x = 3",
+				"return (new f).x");
+			Lines(2,
+				"var x = 1",
+				"function f",
+				"	x = 2",
+				"f.prototype = new object",
+				"f.prototype.x = 3",
+				"return (new f).x");
+		}
+
+		[Test]
+		public void ROS_Scope06_SelfScope()
+		{
+			Lines(1,
+				"var obj = new object",
+				"obj.counter = 0",
+				"function action",
+				"	counter++",
+				"obj.action = action",
+				"obj.action",
+				"return obj.counter");
+		}
+
+		[Test]
+		public void ROS_Scope07_DocExample()
+		{
+			Test(1,
+@"function MyClass
+    // to allow MyClass() be used like new MyClass
+    if this == null // or this === undefined
+        return new MyClass
+
+    // create some properties
+    this.name = ""My Class""
+    this.counter = 0
+
+    // private properties
+    var _total = 0
+
+    // some method
+    function action
+        counter++   // this.counter++
+        _total++    // that private _total
+    this.action = action
+
+    // read-only access to total
+    function getTotal
+        return _total
+    this.getTotal = getTotal
+
+var obj = new MyClass
+obj.counter = 10
+obj.action      // now obj.counter is 11
+obj.getTotal    // returns 1
+");
+			Test(11, "obj.counter");
 		}
 	}
 }
