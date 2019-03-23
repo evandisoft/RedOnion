@@ -33,9 +33,9 @@ namespace RedOnion.KSP
 
 		public static void FillRoot(IEngineRoot root, bool repl)
 		{
-#if DEBUG
+//#if DEBUG
 			repl = false; // FOR NOW!
-#endif
+//#endif
 			// neutral types first
 			// aliases in global namespace are in MoreProps = overwrittable,
 			// while names under "System" namespace are read-only (BaseProps)
