@@ -1,4 +1,4 @@
-vessel=ksp.flightGlobals.ActiveVessel
+vessel=Ksp.FlightGlobals.ActiveVessel
 while true do
     print(vessel.ctrlState.roll)
     print(vessel.ctrlState.yaw)

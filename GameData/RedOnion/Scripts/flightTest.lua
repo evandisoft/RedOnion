@@ -8,7 +8,7 @@ local ctrlTable={roll=0,pitch=0,yaw=0,mainThrottle=1}
 local Vec=Ksp.Vec
 
 while true do
-    torque=ctrl.GetAvailableTorque()
+    local torque=ctrl.GetAvailableTorque()
     local angularSpeed=Vec.Div(vessel.angularMomentum,vessel.MOI)
     local accel=Vec.Div(torque,vessel.MOI)
 

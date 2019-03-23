@@ -74,7 +74,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Kerbalua\Main\KerbaluaMain.cs" />
     <Compile Include="Kerbalua\Other\MoonSharpReplEvaluator.cs" />
-    <Compile Include="Kerbalua\Other\Trie.cs" />
     <Compile Include="Kerbalua\Gui\KerbaluaRepl.cs" />
     <Compile Include="Kerbalua\Utility\prin.cs" />
     <Compile Include="Kerbalua\Utility\QueueLogger.cs" />
@@ -106,7 +105,6 @@
     <Compile Include="Kerbalua\Gui\IRenderer.cs" />
     <Compile Include="Kerbalua\Gui\RecentFilesList.cs" />
     <Compile Include="Kerbalua\Gui\Label.cs" />
-    <Compile Include="Kerbalua\AutoPilot\AutoPilotAPI.cs" />
     <Compile Include="Kerbalua\MoonSharp\KerbaluaExecutionManager.cs" />
     <Compile Include="Kerbalua\MoonSharp\ExecutionLimitException.cs" />
     <Compile Include="Kerbalua\Completion\LuaIntellisense.cs" />
@@ -124,13 +122,8 @@
     <Compile Include="Kerbalua\Completion\Grammar\StandardLuaParser.cs" />
     <Compile Include="Kerbalua\Completion\Grammar\StandardLuaVisitor.cs" />
     <Compile Include="Kerbalua\Completion\ProcessedIncompleteVar.cs" />
-    <Compile Include="Kerbalua\CompletionOld\AllCompletion.cs" />
-    <Compile Include="Kerbalua\CompletionOld\LuaIntellisenseListener.cs" />
-    <Compile Include="Kerbalua\CompletionOld\LastVarExtracter.cs" />
     <Compile Include="Kerbalua\Completion\LuaIntellisenseException.cs" />
     <Compile Include="Kerbalua\Completion\CompletionObject.cs" />
-    <Compile Include="Kerbalua\CompletionOld\TableCompletionOld.cs" />
-    <Compile Include="Kerbalua\CompletionOld\UserDataCompletionOld.cs" />
     <Compile Include="Kerbalua\Utility\Settings.cs" />
     <Compile Include="Kerbalua\Other\Evaluation.cs" />
   </ItemGroup>
@@ -149,7 +142,6 @@
     <None Include="Kerbalua\Completion\Grammar\StandardLuaLexer.interp" />
     <None Include="Kerbalua\Completion\Grammar\StandardLuaLexer.tokens" />
     <None Include="Kerbalua\Completion\Grammar\IncompleteLua.g4" />
-    <None Include="Kerbalua\CompletionOld\UserDataCompletion.cs.old" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Kerbalua\" />
@@ -158,10 +150,8 @@
     <Folder Include="Kerbalua\Gui\" />
     <Folder Include="Kerbalua\Utility\" />
     <Folder Include="Kerbalua\Completion\" />
-    <Folder Include="Kerbalua\AutoPilot\" />
     <Folder Include="Kerbalua\MoonSharp\" />
     <Folder Include="Kerbalua\Completion\Grammar\" />
-    <Folder Include="Kerbalua\CompletionOld\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RedOnion.KSP\RedOnion.KSP.csproj">

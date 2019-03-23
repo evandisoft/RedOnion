@@ -1,11 +1,7 @@
 using System;
 using System.Collections.Generic;
 using RedOnion.Script;
-using RedOnion.Script.BasicObjects;
-using RedOnion.Script.ReflectedObjects;
 using UnityEngine;
-using Kerbalua.AutoPilot;
-using KSP.UI.Screens;
 using RedOnion.KSP;
 using RedOnion.KSP.Autopilot;
 

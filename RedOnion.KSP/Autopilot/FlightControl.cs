@@ -307,6 +307,7 @@ namespace RedOnion.KSP.Autopilot {
 				}
 			}
 			CurrentSpinMode = SpinMode.RAW;
+			Enable();
 		}
 
 
