@@ -24,7 +24,7 @@ The link should link to your KSP game install.
 
 On Windows, you can make symbolic links using [mklink](https://www.howtogeek.com/howto/16226/complete-guide-to-symbolic-links-symlinks-on-windows-or-linux/). Use the version that has the "/D" option.
 
-Once you have that set up, you can build the project. The output will go into RedOnion/bin/Debug. In order for your KSP install to see these resulting dll's, you can create a folder in the GameData folder of your KSP install, call it RedOnion, and then make a symbolic link inside that folder pointing to the RedOnion/bin/Debug folder of your project folder.
+Once you have that set up, you can build the project. The output will go into GameData/RedOnion/Plugins. In order for your KSP install to see these resulting dll's, you can create a link in the GameData folder of your ksp install called "RedOnion" that links to GameData/RedOnion in your project folder.
 
 Firda has created a cmd script (create-links.cmd) for windows that will create these links assuming that you have set your ksp install directory in the environment variable "ksp". If you have not, it assumes ksp is installed in the default location it would be installed under steam.
 ("C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program")
