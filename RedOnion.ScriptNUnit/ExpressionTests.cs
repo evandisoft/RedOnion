@@ -42,6 +42,8 @@ namespace RedOnion.ScriptNUnit
 			}
 			catch (Exception e)
 			{
+				if (e is RuntimeError re && re.InnerException is Ex)
+					return;
 				throw new Exception(String.Format("{0} in Eval: {1}; IN: <{2}>",
 					e.GetType().ToString(), e.Message, script), e);
 			}

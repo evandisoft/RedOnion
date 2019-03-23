@@ -100,6 +100,14 @@ namespace RedOnion.Script
 						break;
 				}
 			}
+			catch (RuntimeError)
+			{
+				throw;
+			}
+			catch (Exception ex)
+			{
+				throw new RuntimeError(code, at, ex);
+			}
 			finally
 			{
 				Compiled = prev;

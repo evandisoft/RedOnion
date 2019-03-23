@@ -5,6 +5,37 @@ using System.Diagnostics;
 
 namespace RedOnion.Script.Parsing
 {
+	partial class Parser
+	{
+		protected class Lexer : Parsing.Lexer
+		{
+			protected Parser Parser { get; }
+			public Lexer(Parser parser) => Parser = parser;
+
+			protected CompiledCode.SourceLine[] _lines = new CompiledCode.SourceLine[64];
+			public CompiledCode.SourceLine[] Lines => _lines;
+			public int LinesAt { get; set; }
+
+			public override void SetLine(string value)
+			{
+				base.SetLine(value);
+				if (Line == null)
+					return;
+				if (LinesAt == _lines.Length)
+					Array.Resize(ref _lines, _lines.Length << 1);
+				_lines[LinesAt++] = new CompiledCode.SourceLine(CharCounter, Line);
+				Parser.RecordLine();
+			}
+
+			public CompiledCode.SourceLine[] LinesToArray()
+			{
+				var arr = new CompiledCode.SourceLine[LinesAt];
+				Array.Copy(_lines, 0, arr, 0, arr.Length);
+				return arr;
+			}
+		}
+	}
+
 	[DebuggerDisplay("{LineNumber}:{At}: {Code}; {Curr}; {Word}; {Line}")]
 	public class Lexer : Scanner
 	{

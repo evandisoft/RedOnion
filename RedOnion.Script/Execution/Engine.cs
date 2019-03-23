@@ -87,19 +87,24 @@ namespace RedOnion.Script
 		{
 			string[] strings;
 			byte[] code;
+			int[] lineMap;
+			CompiledCode.SourceLine[] lines;
 			try
 			{
 				Parser.Unit(source);
 				code = Parser.CodeToArray();
 				strings = Parser.StringsToArray();
+				lineMap = Parser.LineMapToArray();
+				lines = Parser.LinesToArray();
 			}
 			finally
 			{
 				Parser.Reset();
 			}
-			return new CompiledCode(strings, code)
+			return new CompiledCode(strings, code, lineMap)
 			{
-				Source = source
+				Source = source,
+				Lines = lines
 			};
 		}
 

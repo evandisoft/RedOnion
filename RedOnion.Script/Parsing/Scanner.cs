@@ -25,8 +25,9 @@ namespace RedOnion.Script.Parsing
 			{
 				_reader = value;
 				_source = null;
+				LineNumber = -1;
 				SetLine(null);
-				LineNumber = 0;
+				LineNumber = -1;
 				CharCounter = 0;
 				State = 0;
 				NextLine();
@@ -44,8 +45,9 @@ namespace RedOnion.Script.Parsing
 			{
 				_reader = null;
 				_source = value;
+				LineNumber = -1;
 				SetLine(null);
-				LineNumber = 0;
+				LineNumber = -1;
 				CharCounter = 0;
 				State = 0;
 				NextLine();
