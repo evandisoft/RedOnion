@@ -39,6 +39,14 @@ namespace RedOnion.UI
 			base.Dispose(true);
 		}
 
+		public bool MultiLine
+		{
+			get => Core.multiLine;
+			set => Core.lineType = value
+				? UUI.InputField.LineType.MultiLineNewline
+				: UUI.InputField.LineType.SingleLine;
+		}
+
 		public string Text
 		{
 			get => Core.text ?? "";
@@ -55,12 +63,16 @@ namespace RedOnion.UI
 			set => Label.TextAlign = value;
 		}
 
-		public bool MultiLine
+		public int FontSize
 		{
-			get => Core.multiLine;
-			set => Core.lineType = value
-				? UUI.InputField.LineType.MultiLineNewline
-				: UUI.InputField.LineType.SingleLine;
+			get => Label.FontSize;
+			set => Label.FontSize = value;
 		}
+		public FontStyle FontStyle
+		{
+			get => Label.FontStyle;
+			set => Label.FontStyle = value;
+		}
+
 	}
 }

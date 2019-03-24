@@ -28,6 +28,10 @@ it is set to `Layout.None` when the panel is created).
 * `Texture` - texture of the panel (background, no texture by default).
 * `LayoutPadding` - the combined inner padding and spacing (6 floats in total, all set to `3f` by default).
 * `InnerPadding` (4 floats), `InnerSpacing` (2), `Padding` (1) and `Spacing` (1) access the above.
+* `ChildAnchors` - this currently controls layout's `childAlignment` and
+  `childForceExpandWidth/Height`, but plan is to use custom `LayoutComponent`.
+  You can try `Anchors.Fill` (to make all inner elements fill their cell)
+  or `Anchors.MiddleLeft/MiddleCenter/UpperLeft...`
 
 **Methods**
 * `Panel(string name = null)` - create the panel, optionally providing its name.
@@ -41,7 +45,7 @@ it is set to `Layout.None` when the panel is created).
 ## Window
 
 `UI.Window` is the root element that will host all inner elements.
-It integrates frame with heather (title and close button) and content panel.
+It integrates frame with header (title and close button) and content panel.
 It is the only UI element that is not derived from `UI.Element` (which may change)
 and redirects most methods and properties to its content panel
 (`Parent` of contained elements currently point here, which may change),
@@ -50,18 +54,18 @@ initially set to `FitMode.PreferredSize` for both height and width,
 which means it will autosize to fit the content (with minimal W:160,H:120 by default).
 
 * `Name` - optional name of the window (redirected to `Frame.Name`).
-* `Title` - the text in the title of the window.
+* `Title` - the text in the header/title of the window.
 * `Alpha` - alpha/transparency for the whole window (1f = solid, 0f = invisible, .9f by default).
 * `Position`, `X` and `Y` - position of the center of the window relative to the center of the screen,
   Y is inverted from Unity, so that positive values move down (negative move up).
   It uses `Frame.RectTransform.anchoredPosition`, so,
   if you change the pivot/anchors, you change this as well.
 * `Size`, `Width` and `Height` - this not only changes the size of the window,
-  but also switchest the `ContentFitter` between `Unconstrained` and `PreferredSize` modes.
+  but also switchest the `ContentSizeFitter` between `Unconstrained` and `PreferredSize` modes.
   `Unconstrained` is selected if the value is at least current `MinWidth`/`MinHeight`,
   `PreferredSize` otherwise (when you e.g. set it to zero or even negative, the
   `MinWidth`/`MinHeight` will be used instead).
-* `MinWidth` and `MinHeight - minimal width and height (160/120 by default, 80 is total minimum).
+* `MinWidth` and `MinHeight` - minimal width and height (160x120 by default, 80x80 is total minimum).
 * `PreferWidth` and `PreferHeight` - redirects to `Frame`, may be redundant.
 * `FrameColor`, `FrameTexture`, `HeaderColor`, `HeaderTexture`, `TitleColor`, `ContentColor`, `ContentTexture`
 * `Layout`, `LayoutPadding`, `InnerPadding`, `InnerSpacing`, `Padding`, `Spacing` - content panel.
@@ -79,12 +83,30 @@ which means it will autosize to fit the content (with minimal W:160,H:120 by def
 
 ## Label
 
-TODO
+`UI.Label` is simple line of text used to label other elements.
+
+* `Text` - text of the label.
+* `TextColor` - color of the text (foreground, `Color.black` by default).
+* `TextAlign` - align of the text (`TextAnchor.MiddleLeft` by default).
+* `FontSize` - the size of the font (`14` by default).
+* `FontStyle` - font style (`FontStyle.Normal` by default).
 
 ## Button
 
-TODO
+`UI.Button` is there to perform actions when clicked.
+
+* `Text` - optional text on the button.
+* `IconTexture` - optional icon on the button.
+* `LayoutPadding`, `InnerPadding`, `InnerSpacing`, `Padding`, `Spacing` - the usual.
+
+**Events**
+* `Click` - invoked when clicked.
 
 ## TextBox
 
-TODO
+`UI.TextBox` is there to get some input from the user.
+
+* `Text`, `TextColor`, `TextAlign`, `FontSize`, `FontStyle` - as in `Label`.
+* `Multiline` - multi/single-line switch (single line by default).
+
+**WIP ;)**
