@@ -287,8 +287,6 @@ namespace RedOnion.Script
 		Pkg				= 0x02D3, // namespace - alias (short)
 
 		Class			= 0x00D4, // ref-class
-		Def				= 0x01D4, // define class or method/lambda - short
-		Define			= 0x02D4, // define class or method/lambda - long
 		Struct			= 0x00D5, // value-type
 		Enum			= 0x00D6, // integer with named values
 
@@ -298,6 +296,7 @@ namespace RedOnion.Script
 		Attribute		= 0x00DA, // attribute
 
 		Function		= 0x00DB, // method (function, procedure)
+		Def				= 0x01DB, // define method/lambda (Python)
 		Operator		= 0x00DC, // operator (type conversion or +-*/% ...)
 
 		Field			= 0x00DD, // var in class

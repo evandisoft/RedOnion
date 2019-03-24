@@ -131,21 +131,18 @@ namespace RedOnion.ScriptNUnit
 		{
 			Lines(1,
 				"function f",
-				"f.prototype = new object",
 				"f.prototype.x = 1",
 				"return (new f).x");
 			Lines(2,
 				"var x = 1",
 				"function f",
 				"	this.x = 2",
-			//	"f.prototype = new object", // prototype is now autocreated when accessed
 				"f.prototype.x = 3",
 				"return (new f).x");
 			Lines(2,
 				"var x = 1",
 				"function f",
 				"	x = 2",
-			//	"f.prototype = new object",
 				"f.prototype.x = 3",
 				"return (new f).x");
 		}

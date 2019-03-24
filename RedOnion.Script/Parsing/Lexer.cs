@@ -389,14 +389,13 @@ namespace RedOnion.Script.Parsing
 			{ "package",	OpCode.Package },
 			//{ "pkg",		OpCode.Pkg },// too short
 			{ "class",		OpCode.Class },
-			//{ "def",		OpCode.Def },// too short
-			//{ "define",	OpCode.Define },// unnecessary
 			{ "struct",		OpCode.Struct },
 			{ "enum",		OpCode.Enum },
 			{ "interface",	OpCode.Interface },
 			{ "delegate",	OpCode.Delegate },
 			{ "where",		OpCode.Where },
 			{ "function",	OpCode.Function },
+			{ "def",		OpCode.Def },// like function (from Python/Ruby)
 			{ "event",		OpCode.Event },
 			{ "get",		OpCode.Get },
 			{ "set",		OpCode.Set },

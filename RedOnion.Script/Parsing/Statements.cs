@@ -16,8 +16,12 @@ namespace RedOnion.Script.Parsing
 			&& lexer.Curr != ';'
 			&& lexer.Curr != ','
 			&& lexer.Curr != ':'
-			&& (lexer.Word == null
-			|| lexer.Code.Kind() < OpKind.Statement);
+			&& (lexer.Code.Kind() <= OpKind.Number
+			&& (lexer.Code != OpCode.Undefined || lexer.Word == null)
+			|| lexer.Code.Kind() == OpKind.Unary || lexer.Code.Kind() == OpKind.PreOrPost
+			|| lexer.Code == OpCode.Add || lexer.Code == OpCode.Sub
+			|| lexer.Code == OpCode.Var || lexer.Code == OpCode.Create
+			|| lexer.Curr == '(');
 
 		/// <summary>
 		/// Full/required expression (e.g. condition of while)
@@ -37,7 +41,7 @@ namespace RedOnion.Script.Parsing
 		protected bool OptionalExpression(Flag flags)
 		{
 			var state = StartExpression();
-			if (lexer.Curr == '=' || lexer.Curr == ':')
+			if (lexer.Code == OpCode.Assign)
 				Next(true);
 			else if (!PeekExpression(flags))
 				goto skip;
@@ -84,8 +88,8 @@ namespace RedOnion.Script.Parsing
 		/// <summary>
 		/// Parse block of statements
 		/// </summary>
-		/// <returns>True if there was at least one statement</returns>
-		protected virtual bool ParseBlock(Flag flags)
+		/// <returns>Number of statements</returns>
+		protected virtual int ParseBlock(Flag flags)
 		{
 			var ind = lexer.Indent;
 			if (ind == 0 && lexer.First)
@@ -100,7 +104,7 @@ namespace RedOnion.Script.Parsing
 				Write(0);
 				block = CodeAt;
 			}
-			while (!lexer.Eof)
+			while (!lexer.Eof && lexer.Curr != ')' && lexer.Curr != '}' && lexer.Curr != ']')
 			{
 				while (lexer.Indent >= ind && lexer.Peek == ':' && lexer.Code == OpCode.Identifier)
 				{
@@ -131,7 +135,7 @@ namespace RedOnion.Script.Parsing
 			}
 			if (!nosize)
 				Write(CodeAt - block, block - 4);
-			return count > 0;
+			return count;
 		}
 
 		protected Dictionary<string, int> LabelTable;
@@ -384,6 +388,7 @@ namespace RedOnion.Script.Parsing
 
 			//--------------------------------------------------------------------------------------
 			case OpCode.Function:
+			case OpCode.Def:
 				if ((Options & Option.Script) == 0)
 					goto default; // TODO: local functions
 				if (Next().lexer.Word == null)
@@ -416,7 +421,8 @@ namespace RedOnion.Script.Parsing
 			var paren = lexer.Curr == '(';
 			if (paren || lexer.Curr == ',')
 				Next(true);
-			while ((paren || !lexer.Eol) && !lexer.Eof)
+			bool lambda = false;
+			while ((paren || (!lexer.Eol && lexer.Curr != ';')) && !lexer.Eof)
 			{
 				if (lexer.Word == null)
 					throw new ParseError(lexer, "Expected argument name");
@@ -441,6 +447,12 @@ namespace RedOnion.Script.Parsing
 					Next();
 					break;
 				}
+				if (!paren && lexer.Code == OpCode.Lambda)
+				{
+					lambda = true;
+					Next();
+					break;
+				}
 				if (lexer.Curr == ',')
 					Next(true);
 			}
@@ -449,7 +461,16 @@ namespace RedOnion.Script.Parsing
 			Code[mark + 3] = (byte)argc;    // number of arguments
 
 			var labels = StoreLabels();
-			ParseBlock(flags);
+			var blockAt = CodeAt;
+			var count = ParseBlock(flags);
+			if (lambda && count == 1 && ((OpCode)Code[blockAt+4]).Extend().Kind() < OpKind.Statement)
+			{
+				var sz = BitConverter.ToInt32(Code, blockAt);
+				Write(++sz, blockAt);
+				Array.Copy(Code, blockAt+4, Code, blockAt+5, CodeAt-blockAt-5);
+				Write(OpCode.Return.Code(), blockAt+4);
+				CodeAt++;
+			}
 			RestoreLabels(labels);
 		}
 	}

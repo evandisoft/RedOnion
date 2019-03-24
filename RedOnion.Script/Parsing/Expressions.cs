@@ -63,13 +63,14 @@ namespace RedOnion.Script.Parsing
 			if (code == OpCode.Identifier   //------------------------------------------- identifier
 				|| kind == OpKind.Number    // type specifier (byte, bool, int, ...)
 				|| code == OpCode.String || code == OpCode.Char	// type names
-				|| code == OpCode.Function || code == OpCode.Object)
+				|| code.Code() == OpCode.Function.Code() // function or def
+				|| code == OpCode.Object)
 			{
 				if (!unary)
 					goto autocall;
 				if (lexer.Word.Length > 127)
 					throw new ParseError(lexer, "Identifier name too long");
-				if (code == OpCode.Function)
+				if (code.Code() == OpCode.Function.Code())
 				{
 					var fnat = CodeAt;
 					ParseFunction(null, flags);
