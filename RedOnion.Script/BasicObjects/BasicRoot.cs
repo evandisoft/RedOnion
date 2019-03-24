@@ -18,6 +18,8 @@ namespace RedOnion.Script.BasicObjects
 		public FunctionFun Function { get; }
 		public ObjectFun Object { get; }
 		public StringFun String { get; }
+		public ArrayFun  Array { get; }
+		public ListFun   List { get; }
 		public NumberFun Number { get; }
 		public NumberFun Float { get; }
 		public NumberFun Double { get; }
@@ -42,10 +44,14 @@ namespace RedOnion.Script.BasicObjects
 			var obj	= new BasicObject(engine);
 			var fun	= new FunctionObj(engine, obj);
 			var str	= new StringObj(engine, obj);
+			var arr = new ArrayObj(engine, obj);
+			var list= new ListObj(engine, obj);
 			var num	= new NumberObj(engine, obj);
 			Function= new FunctionFun(engine, fun, fun);
 			Object	= new ObjectFun(engine, fun, obj);
 			String	= new StringFun(engine, fun, str);
+			Array   = new ArrayFun(engine, fun, arr);
+			List    = new ListFun(engine, fun, list);
 			Number	= new NumberFun(engine, fun, num);
 			Float	= new NumberFun(engine, fun, num, typeof(float),	ValueKind.Float);
 			Double	= new NumberFun(engine, fun, num, typeof(double),	ValueKind.Double);
@@ -94,6 +100,8 @@ namespace RedOnion.Script.BasicObjects
 			core.Set("Function",	Function);
 			core.Set("Object",		Object);
 			core.Set("String",		String);
+			core.Set("Array",		Array);
+			core.Set("List",		List);
 			core.Set("Number",		Number);
 			core.Set("Float",		Float);
 			more.Set("Single",		Float);
@@ -137,6 +145,7 @@ namespace RedOnion.Script.BasicObjects
 			case ValueKind.Object:
 				return (IObject)value.ptr;
 			case ValueKind.String:
+				// TODO: ValueKind.BoxedString to delay the boxing (to speed things up)
 				return new StringObj(Engine, String.Prototype, (string)value.ptr);
 			default:
 				if (value.IsNumber)
@@ -194,6 +203,8 @@ namespace RedOnion.Script.BasicObjects
 
 		public IObject GetType(OpCode op, Value value)
 		{
+			if (op == OpCode.Array)
+				return Array;
 			//TODO: array object
 			throw new NotImplementedException();
 		}

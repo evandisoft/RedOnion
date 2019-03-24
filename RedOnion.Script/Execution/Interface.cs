@@ -355,6 +355,11 @@ namespace RedOnion.Script
 			=> Add(name, Value.FromObject(obj));
 	}
 
+	public interface IArray : IObject, IList<Value>
+	{
+		new bool IsReadOnly { get; }
+		bool IsFixedSize { get; }
+	}
 	public interface IObject : IProperties
 	{
 		/// <summary>

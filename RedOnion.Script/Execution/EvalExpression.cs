@@ -28,7 +28,7 @@ namespace RedOnion.Script
 			if (op == OpCode.Array)
 			{
 				if (Code[at++] != 0)
-					throw new NotImplementedException("Fixed and multi-dimensional arrays not implemented");
+					throw new NotImplementedException("Fixed-typed and multi-dimensional arrays not implemented");
 				TypeReference(ref at);
 				Value = new Value(Root.GetType(OpCode.Array, Value));
 				return;
