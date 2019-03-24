@@ -158,6 +158,11 @@ namespace Kerbalua.Gui {
 			KeyBindings.Add(new EventKey(KeyCode.Insert, false,true), () => {
 				editor.Paste();
 			});
+			KeyBindings.Add(new EventKey(KeyCode.Backspace, true), () => {
+				for (int i = 0;i < spacesPerTab;i++) {
+					editor.Backspace();
+				}
+			});
 			KeyBindings.Add(new EventKey(KeyCode.Tab), () => Indent());
 			KeyBindings.Add(new EventKey(KeyCode.Tab, false, true), () => Unindent());
 			KeyBindings.Add(new EventKey(KeyCode.Tab, true), () => IndentToPreviousLine());

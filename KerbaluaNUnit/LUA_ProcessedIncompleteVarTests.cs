@@ -115,5 +115,18 @@ namespace KerbaluaNUnit {
 			Assert.AreEqual("while", parsed.Segments[1].Name);
 			Assert.AreEqual(0, parsed.Segments[0].Parts.Count);
 		}
+
+		[Test()]
+		public void LUA_TestCase_9_GenericFor()
+		{
+			var parsed = Parse(
+@"
+for	a
+");
+
+			Assert.AreEqual(1, parsed.Segments.Count);
+			Assert.AreEqual("a", parsed.Segments[0].Name);
+			Assert.AreEqual(0, parsed.Segments[0].Parts.Count);
+		}
 	}
 }

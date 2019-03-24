@@ -75,12 +75,15 @@ namespace Kerbalua.Gui {
 		public ScriptWindow(Rect param_mainWindowRect)
 		{
 			replEvaluators["RedOnion"] = new RedOnionReplEvaluator();
+			replEvaluators["RedOnion"].PrintAction = (str) => {
+				repl.outputBox.AddOutput(str);
+			};
 			replEvaluators["Lua"] = new MoonSharpReplEvaluator();
 			replEvaluators["Lua"].PrintAction = (str) => {
 				repl.outputBox.AddOutput(str);
 			};
 			string lastEngineName = Settings.LoadSetting("lastEngine", "RedOnion");
-			if(replEvaluators.ContainsKey(lastEngineName)){
+			if (replEvaluators.ContainsKey(lastEngineName)){
 				currentReplEvaluator = replEvaluators[lastEngineName];
 				replEvaluatorLabel.content.text =lastEngineName;
 			} else {
@@ -186,11 +189,12 @@ ctrl + k: move cursor down
 ctrl + l: move cursor up
 ctrl +;: move cursor right
 ctrl + m: move cursor to next tab left
+ctrl + backspace: delete to next tab left
 ctrl + comma: move cursor 4 lines down
 ctrl + period: move cursor 4 lines up
 ctrl +/: move cursor to next tab right
 ctrl + Home: move cursor to start
-ctrl + End: mvoe cursor to end
+ctrl + End: move cursor to end
 Shift plus movement commands selects text.
 ctrl + insert: copy selected text
 shift + insert: paste selected text

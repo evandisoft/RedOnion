@@ -90,6 +90,8 @@ incompleteStat
     | 'if' incompleteExp | 'if' exp 'then' incompleteBlock | 'if' exp 'then' block incompleteElse
     | 'for' incompleteName | 'for' NAME '=' incompleteExp | 'for' NAME '=' exp ',' incompleteExp
     | 'for' NAME '=' exp ',' exp ',' incompleteExp | | 'for' NAME '=' exp ',' exp (',' exp)? 'do' incompleteBlock
+    | 'for' incompleteNamelist | 'for' namelist 'in' incompleteExplist
+    | 'for' namelist 'in' explist 'do' incompleteBlock
     | 'function' incompleteFuncname | 'function' funcname incompleteFuncbody
     | 'local' 'function' incompleteName | 'local' 'function' NAME incompleteFuncbody 
     | 'local' incompleteNamelist | 'local' namelist '=' incompleteExplist
@@ -113,12 +115,12 @@ label
     ;
 
 funcname
-    : NAME ('.' NAME)* (':' NAME)?
+    : NAME ('.' NAME)*? (':' NAME)?
     ;
 
 incompleteFuncname
-    : (NAME '.')* incompleteName
-    | NAME ('.' NAME)* ':' incompleteName
+    : (NAME '.')*? incompleteName
+    | NAME ('.' NAME)*? ':' incompleteName
     ;
 
 varlist
@@ -126,7 +128,7 @@ varlist
     ;
 
 incompleteVarlist
-    :  (var ',')* incompleteVar
+    :  (var ',')*? incompleteVar
     ;
 
 namelist
@@ -134,7 +136,7 @@ namelist
     ;
 
 incompleteNamelist
-    : (NAME ',')* incompleteName
+    : (NAME ',')*? incompleteName
     ;
 
 explist
@@ -142,7 +144,7 @@ explist
     ;
 
 incompleteExplist
-    : (exp ',')* incompleteExp
+    : (exp ',')*? incompleteExp
     ;
 
 exp
@@ -215,8 +217,8 @@ varSuffix
     ;
 
 incompleteVarSuffix
-    : nameAndArgs* incompleteNameAndArgs
-    | nameAndArgs* ('[' incompleteExp | '.' incompleteName?)
+    : nameAndArgs*? incompleteNameAndArgs
+    | nameAndArgs*? ('[' incompleteExp | '.' incompleteName?)
     ;
 
 nameAndArgs
@@ -287,7 +289,7 @@ fieldlist
     ;
 
 incompleteFieldlist
-    : (field fieldsep)* incompleteField
+    : (field fieldsep)*? incompleteField
     ;
 
 field

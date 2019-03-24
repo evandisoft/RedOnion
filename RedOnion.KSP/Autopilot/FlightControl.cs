@@ -185,6 +185,7 @@ namespace RedOnion.KSP.Autopilot {
 				Shutdown();
 				return;
 			}
+
 			Vector3 currentDir = vessel.transform.up;
 			Vector3 angularVelocity = GetAngularVelocity(vessel);
 			float angularDistance = Vector3.Angle(currentDir,targetDir) / 360 * 2 * Mathf.PI;

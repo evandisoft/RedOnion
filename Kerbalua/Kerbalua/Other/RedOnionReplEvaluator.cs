@@ -59,6 +59,9 @@ namespace Kerbalua.Other {
 			engine.Reset();
 			hints.Reset();
 			FlightControl.GetInstance().Shutdown();
+			if (PrintAction != null) {
+				engine.Printing += PrintAction;
+			}
 		}
 
 		public override void Terminate()
