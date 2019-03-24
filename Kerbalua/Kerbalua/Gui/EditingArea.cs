@@ -2,8 +2,10 @@ using System;
 using UnityEngine;
 using System.Collections.Generic;
 
-namespace Kerbalua.Gui {
-	public class EditingArea:ScrollableTextArea {
+namespace Kerbalua.Gui
+{
+	public class EditingArea : ScrollableTextArea
+	{
 		//int inc = 0;
 		const int spacesPerTab = 4;
 		public KeyBindings KeyBindings = new KeyBindings();
@@ -23,7 +25,7 @@ namespace Kerbalua.Gui {
 
 		protected override void ProtectedUpdate(Rect rect)
 		{
-			CommonProtectedUpdateOperations(()=>base.ProtectedUpdate(rect));
+			CommonProtectedUpdateOperations(() => base.ProtectedUpdate(rect));
 		}
 
 		protected override void ProtectedUpdate()
@@ -34,14 +36,16 @@ namespace Kerbalua.Gui {
 		void CommonProtectedUpdateOperations(Action protectedUpdate)
 		{
 			// Initialize editor
-			if (editor == null) {
+			if (editor == null)
+			{
 				GrabFocus();
 				int id = GUIUtility.keyboardControl;
 				editor = (TextEditor)GUIUtility.GetStateObject(typeof(TextEditor), id);
 				//Debug.Log("initializing editor");
 			}
 
-			if (style == null) {
+			if (style == null)
+			{
 				style = new GUIStyle(GUI.skin.textArea);
 				style.font = GUIUtil.GetMonoSpaceFont();
 				style.hover.textColor
@@ -50,7 +54,8 @@ namespace Kerbalua.Gui {
 					= Color.white;
 			}
 
-			if (HasFocus()) {
+			if (HasFocus())
+			{
 				int id = GUIUtility.keyboardControl;
 				editor = (TextEditor)GUIUtility.GetStateObject(typeof(TextEditor), id);
 				editor.text = content.text;
@@ -66,13 +71,16 @@ namespace Kerbalua.Gui {
 				cursorIndex = editor.cursorIndex;
 				selectIndex = editor.selectIndex;
 
-				if (hadKeyDownThisUpdate && Event.current.type == EventType.Used) {
+				if (hadKeyDownThisUpdate && Event.current.type == EventType.Used)
+				{
 					//Debug.Log(CursorX() + "," + CursorY() + "," + Event.current.mousePosition);
 					AdjustScrollX();
 					AdjustScrollY();
 				}
 				//Debug.Log(scrollPos);
-			} else {
+			}
+			else
+			{
 				protectedUpdate.Invoke();
 			}
 		}
@@ -84,10 +92,12 @@ namespace Kerbalua.Gui {
 			float diff = lastContentVector2.x - lastScrollViewVector2.x;
 			float contentStartX = scrollPos.x;
 			float contentEndX = contentStartX + lastScrollViewVector2.x;
-			if (Math.Max(cursorX - style.lineHeight, 0) < contentStartX) {
-				scrollPos.x = Math.Max(cursorX - style.lineHeight,0);
+			if (Math.Max(cursorX - style.lineHeight, 0) < contentStartX)
+			{
+				scrollPos.x = Math.Max(cursorX - style.lineHeight, 0);
 			}
-			else if(cursorX + style.lineHeight> contentEndX) {
+			else if (cursorX + style.lineHeight > contentEndX)
+			{
 				scrollPos.x = cursorX - lastContentVector2.x + style.lineHeight;
 			}
 		}
@@ -103,10 +113,13 @@ namespace Kerbalua.Gui {
 			//Debug.Log("contentStartY " + contentStartY);
 			float contentEndY = contentStartY + lastScrollViewVector2.y;
 			//Debug.Log("contentEndY " + contentEndY);
-			if (cursorY- style.lineHeight < contentStartY) {
-				scrollPos.y = cursorY-style.lineHeight;
+			if (cursorY - style.lineHeight < contentStartY)
+			{
+				scrollPos.y = cursorY - style.lineHeight;
 				//Debug.Log("reducing to " + scrollPos.y);
-			} else if (cursorY+style.lineHeight > contentEndY) {
+			}
+			else if (cursorY + style.lineHeight > contentEndY)
+			{
 				scrollPos.y = cursorY - lastContentVector2.y + style.lineHeight;
 				//Debug.Log("expanding to " + scrollPos.y);
 			}
@@ -133,33 +146,43 @@ namespace Kerbalua.Gui {
 
 			// Intercept all keydown events that are about to be processed by the
 			// control itself if onlyUseKeyBindings is set to true.
-			if (onlyUseKeyBindings && Event.current.type == EventType.KeyDown) {
+			if (onlyUseKeyBindings && Event.current.type == EventType.KeyDown)
+			{
 				Event.current.Use();
 			}
 		}
 
 		void InitializeDefaultKeyBindings()
 		{
-			KeyBindings.Add(new EventKey(KeyCode.Home, true,true), () => {
+			KeyBindings.Add(new EventKey(KeyCode.Home, true, true), () =>
+			{
 				editor.SelectTextStart();
 			});
-			KeyBindings.Add(new EventKey(KeyCode.End, true,true), () => {
+			KeyBindings.Add(new EventKey(KeyCode.End, true, true), () =>
+			{
 				editor.SelectTextEnd();
 			});
-			KeyBindings.Add(new EventKey(KeyCode.Home, true), () => {
+			KeyBindings.Add(new EventKey(KeyCode.Home, true), () =>
+			{
 				editor.MoveTextStart();
 			});
-			KeyBindings.Add(new EventKey(KeyCode.End, true), () => {
+			KeyBindings.Add(new EventKey(KeyCode.End, true), () =>
+			{
 				editor.MoveTextEnd();
 			});
-			KeyBindings.Add(new EventKey(KeyCode.Insert, true), () => {
+			KeyBindings.Add(new EventKey(KeyCode.Insert, true), () =>
+			{
 				editor.Copy();
 			});
-			KeyBindings.Add(new EventKey(KeyCode.Insert, false,true), () => {
+			KeyBindings.Add(new EventKey(KeyCode.Insert, false, true), () =>
+			{
 				editor.Paste();
 			});
-			KeyBindings.Add(new EventKey(KeyCode.Backspace, true), () => {
-				for (int i = 0;i < spacesPerTab;i++) {
+			KeyBindings.Add(new EventKey(KeyCode.Backspace, true), () =>
+			{
+				int toMove = NextTabLeft(cursorIndex);
+				for (int i = 0; i < toMove; i++)
+				{
 					editor.Backspace();
 				}
 			});
@@ -174,59 +197,78 @@ namespace Kerbalua.Gui {
 			KeyBindings.Add(new EventKey(KeyCode.L, true, true), () => editor.SelectUp());
 			KeyBindings.Add(new EventKey(KeyCode.Semicolon, true), () => editor.MoveRight());
 			KeyBindings.Add(new EventKey(KeyCode.Semicolon, true, true), () => editor.SelectRight());
-			KeyBindings.Add(new EventKey(KeyCode.M, true), () => {
+			KeyBindings.Add(new EventKey(KeyCode.M, true), () =>
+			{
 				int toMove = NextTabLeft(cursorIndex);
-				for (int i = 0;i < toMove;i++) {
+				for (int i = 0; i < toMove; i++)
+				{
 					editor.MoveLeft();
 				}
 			});
-			KeyBindings.Add(new EventKey(KeyCode.M, true, true), () => {
+			KeyBindings.Add(new EventKey(KeyCode.M, true, true), () =>
+			{
 				int toMove = NextTabLeft(selectIndex);
-				for (int i = 0;i < toMove;i++) {
+				for (int i = 0; i < toMove; i++)
+				{
 					editor.MoveLeft();
 				}
 			});
-			KeyBindings.Add(new EventKey(KeyCode.Comma, true), () => {
-				for (int i = 0;i < 4;i++) {
+			KeyBindings.Add(new EventKey(KeyCode.Comma, true), () =>
+			{
+				for (int i = 0; i < 4; i++)
+				{
 					editor.MoveDown();
 				}
 			});
-			KeyBindings.Add(new EventKey(KeyCode.Comma, true, true), () => {
-				for (int i = 0;i < 4;i++) {
+			KeyBindings.Add(new EventKey(KeyCode.Comma, true, true), () =>
+			{
+				for (int i = 0; i < 4; i++)
+				{
 					editor.SelectDown();
 				}
 			});
-			KeyBindings.Add(new EventKey(KeyCode.Period, true), () => {
-				for (int i = 0;i < 4;i++) {
+			KeyBindings.Add(new EventKey(KeyCode.Period, true), () =>
+			{
+				for (int i = 0; i < 4; i++)
+				{
 					editor.MoveUp();
 				}
 			});
-			KeyBindings.Add(new EventKey(KeyCode.Period, true, true), () => {
-				for (int i = 0;i < 4;i++) {
+			KeyBindings.Add(new EventKey(KeyCode.Period, true, true), () =>
+			{
+				for (int i = 0; i < 4; i++)
+				{
 					editor.SelectUp();
 				}
 			});
-			KeyBindings.Add(new EventKey(KeyCode.Slash, true), () => {
+			KeyBindings.Add(new EventKey(KeyCode.Slash, true), () =>
+			{
 				int toMove = NextTabRight(cursorIndex);
-				for (int i = 0;i < toMove;i++) {
+				for (int i = 0; i < toMove; i++)
+				{
 					editor.MoveRight();
 				}
 			});
-			KeyBindings.Add(new EventKey(KeyCode.Slash, true, true), () => {
+			KeyBindings.Add(new EventKey(KeyCode.Slash, true, true), () =>
+			{
 				int toMove = NextTabRight(selectIndex);
-				for (int i = 0;i < toMove;i++) {
+				for (int i = 0; i < toMove; i++)
+				{
 					editor.MoveRight();
 				}
 			});
-			KeyBindings.Add(new EventKey(KeyCode.H, true), () => {
+			KeyBindings.Add(new EventKey(KeyCode.H, true), () =>
+			{
 				InsertLineBefore();
 				IndentToPreviousLine();
 			});
-			KeyBindings.Add(new EventKey(KeyCode.N, true), () => {
+			KeyBindings.Add(new EventKey(KeyCode.N, true), () =>
+			{
 				InsertLineAfter();
 				IndentToPreviousLine();
 			});
-			KeyBindings.Add(new EventKey(KeyCode.Return), () => {
+			KeyBindings.Add(new EventKey(KeyCode.Return), () =>
+			{
 				editor.ReplaceSelection("\n");
 				IndentToPreviousLine();
 			});
@@ -242,12 +284,14 @@ namespace Kerbalua.Gui {
 			int charsFromStart = CharsFromLineStart();
 
 			// Don't spill over to next line
-			if (charsFromStart == 0) {
+			if (charsFromStart == 0)
+			{
 				return 0;
 			}
 
 			int charsToMove = charsFromStart % spacesPerTab;
-			if (charsToMove == 0) {
+			if (charsToMove == 0)
+			{
 				charsToMove = spacesPerTab;
 			}
 			//Debug.Log("Chars to move is " + charsToMove);
@@ -269,12 +313,14 @@ namespace Kerbalua.Gui {
 
 			// Don't run over to next line
 			int charsFromEnd = CharsFromLineEnd();
-			if (charsFromEnd < spacesPerTab) {
+			if (charsFromEnd < spacesPerTab)
+			{
 				return charsFromEnd;
 			}
 
 			int charsToMove = spacesPerTab - charsFromStart % spacesPerTab;
-			if (charsToMove == 0) {
+			if (charsToMove == 0)
+			{
 				charsToMove = spacesPerTab;
 			}
 			//Debug.Log("Chars to move is " + charsToMove);
@@ -307,7 +353,8 @@ namespace Kerbalua.Gui {
 			editor.MoveDown();
 			editor.MoveLineStart();
 
-			for(int i=0; i<indentation; i++) {
+			for (int i = 0; i < indentation; i++)
+			{
 				editor.Insert(' ');
 			}
 
@@ -319,9 +366,10 @@ namespace Kerbalua.Gui {
 		protected void RemoveIndentation()
 		{
 			int indentation = StartingSpaces();
-			int newIndex = Math.Max(editor.cursorIndex-indentation,0);
+			int newIndex = Math.Max(editor.cursorIndex - indentation, 0);
 			editor.MoveLineStart();
-			for(int i = 0;i < indentation;i++) {
+			for (int i = 0; i < indentation; i++)
+			{
 				editor.Delete();
 			}
 
@@ -337,9 +385,10 @@ namespace Kerbalua.Gui {
 			int charsNeeded = spacesPerTab - startingSpaces % spacesPerTab;
 			//Debug.Log("Chars needed " + charsNeeded);
 
-			int prevCursorIndex = editor.cursorIndex+spacesPerTab;
+			int prevCursorIndex = editor.cursorIndex + spacesPerTab;
 			editor.MoveLineStart();
-			for (int i = 0;i < charsNeeded;i++) {
+			for (int i = 0; i < charsNeeded; i++)
+			{
 				editor.Insert(' ');
 			}
 
@@ -353,12 +402,14 @@ namespace Kerbalua.Gui {
 		{
 			int startingSpaces = StartingSpaces();
 
-			if (startingSpaces == 0) {
+			if (startingSpaces == 0)
+			{
 				return;
 			}
 
 			int charsToDelete = startingSpaces % spacesPerTab;
-			if (charsToDelete == 0) {
+			if (charsToDelete == 0)
+			{
 				charsToDelete = spacesPerTab;
 			}
 
@@ -369,7 +420,8 @@ namespace Kerbalua.Gui {
 			int lineStartIndex = editor.cursorIndex;
 			int newIndex = Math.Max(lineStartIndex, prevCursorIndex - charsToDelete);
 
-			for (int i = 0;i < charsToDelete;i++) {
+			for (int i = 0; i < charsToDelete; i++)
+			{
 				editor.Delete();
 			}
 			MoveToIndex(newIndex);
@@ -397,7 +449,7 @@ namespace Kerbalua.Gui {
 			//Debug.Log("chars from line start is " + chars);
 
 			MoveToIndex(prevCursorIndex);
-			
+
 			return chars;
 		}
 
@@ -407,7 +459,7 @@ namespace Kerbalua.Gui {
 			editor.MoveLineEnd();
 			int endIndex = editor.cursorIndex;
 
-			int chars = endIndex-prevCursorIndex;
+			int chars = endIndex - prevCursorIndex;
 
 			//Debug.Log("chars from line start is " + chars);
 
@@ -422,12 +474,16 @@ namespace Kerbalua.Gui {
 		/// <returns>The spaces.</returns>
 		protected int StartingSpaces()
 		{
-			string currentLine=CurrentLine();
+			string currentLine = CurrentLine();
 			int i = 0;
-			foreach(char c in currentLine) {
-				if(c==' ') {
+			foreach (char c in currentLine)
+			{
+				if (c == ' ')
+				{
 					i++;
-				} else {
+				}
+				else
+				{
 					break;
 				}
 			}
@@ -467,7 +523,8 @@ namespace Kerbalua.Gui {
 			editor.MoveLineStart();
 			//Debug.Log("index is " + editor.cursorIndex);
 			//Debug.Log("lineNum is " + lineNum);
-			while (editor.cursorIndex > 0) {
+			while (editor.cursorIndex > 0)
+			{
 				editor.MoveUp();
 				lineNum++;
 				//Debug.Log("index is " + editor.cursorIndex);

@@ -1,8 +1,10 @@
 using System;
 using UnityEngine;
 
-namespace Kerbalua.Gui {
-	public class TextArea:UIElement {
+namespace Kerbalua.Gui
+{
+	public class TextArea : UIElement
+	{
 		public GUIContent content = new GUIContent("");
 		// 
 		public int cursorIndex = 0;
@@ -10,10 +12,14 @@ namespace Kerbalua.Gui {
 
 		protected override void ProtectedUpdate(Rect rect)
 		{
-			if (Visible) {
-				if (style != null) {
+			if (Visible)
+			{
+				if (style != null)
+				{
 					content.text = GUI.TextArea(rect, content.text, style);
-				} else {
+				}
+				else
+				{
 					content.text = GUI.TextArea(rect, content.text);
 				}
 			}
@@ -21,10 +27,14 @@ namespace Kerbalua.Gui {
 
 		protected override void ProtectedUpdate()
 		{
-			if (Visible) {
-				if (style != null) {
+			if (Visible)
+			{
+				if (style != null)
+				{
 					content.text = GUILayout.TextArea(content.text, style);
-				} else {
+				}
+				else
+				{
 					content.text = GUILayout.TextArea(content.text);
 				}
 			}
