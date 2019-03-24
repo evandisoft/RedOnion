@@ -257,5 +257,11 @@ namespace RedOnion.Script.Completion
 			}
 			_suggestionsCount = i + 1;
 		}
+
+#pragma warning disable 67
+		public event Action<string> Printing;
+#pragma warning restore 67
+		void IEngine.Print(string msg) { }
+		void IEngine.Print(string msg, params object[] args) { }
 	}
 }

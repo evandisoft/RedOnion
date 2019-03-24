@@ -32,6 +32,8 @@ namespace RedOnion.Script.BasicObjects
 		public NumberFun Bool { get; }
 		public NumberFun Char { get; }
 
+		public PrintFun Print { get; }
+
 		public BasicRoot(IEngine engine)
 			: this(engine, true) { }
 		protected BasicRoot(IEngine engine, bool fill)
@@ -57,6 +59,9 @@ namespace RedOnion.Script.BasicObjects
 			Byte	= new NumberFun(engine, fun, num, typeof(byte),		ValueKind.Byte);
 			Bool	= new NumberFun(engine, fun, num, typeof(bool),		ValueKind.Bool);
 			Char	= new NumberFun(engine, fun, num, typeof(char),		ValueKind.Char);
+
+			Print   = new PrintFun(engine);
+
 			if (fill)
 				Fill();
 		}
@@ -112,6 +117,8 @@ namespace RedOnion.Script.BasicObjects
 			core.Set("Bool",		Bool);
 			more.Set("Boolean",		Bool);
 			core.Set("Char",		Char);
+
+			core.Set("print",		Print);
 		}
 
 		public IObject Box(Value value)

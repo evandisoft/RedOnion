@@ -116,6 +116,18 @@ namespace RedOnion.Script
 		/// Log message
 		/// </summary>
 		void Log(string msg);
+		/// <summary>
+		/// Callback for print function
+		/// </summary>
+		event Action<string> Printing;
+		/// <summary>
+		/// Basic implementation for print function
+		/// </summary>
+		void Print(string msg);
+		/// <summary>
+		/// Print with arguments (formatting)
+		/// </summary>
+		void Print(string msg, params object[] args);
 	}
 
 	[Flags]

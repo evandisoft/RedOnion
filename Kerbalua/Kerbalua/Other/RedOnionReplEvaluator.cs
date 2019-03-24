@@ -14,11 +14,8 @@ namespace Kerbalua.Other {
 		{
 			engine = new ImmediateEngine();
 			hints = new ReplHintsEngine(engine);
-		}
 
-		public RedOnionReplEvaluator(Engine engine)
-		{
-			engine = new ImmediateEngine();
+			engine.Printing += msg => PrintAction?.Invoke(msg);
 		}
 
 		protected override bool ProtectedEvaluate(string source,out string output)
