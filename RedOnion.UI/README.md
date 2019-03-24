@@ -108,5 +108,10 @@ which means it will autosize to fit the content (with minimal W:160,H:120 by def
 
 * `Text`, `TextColor`, `TextAlign`, `FontSize`, `FontStyle` - as in `Label`.
 * `Multiline` - multi/single-line switch (single line by default).
+* `ReadOnly`, `Focused`, `CaretPosition`, `SelectionStart`, `SelectionEnd`, `CharacterLimit`
+
+**Events**
+* `Changed` - the text got changed.
+* `Submitted` - the text got submitted (ENTER).
 
 **WIP ;)**
