@@ -61,36 +61,28 @@ namespace RedOnion.ScriptNUnit
 		[Test]
 		public void ROS_Func05_ShortLambda()
 		{
+			Lines(3.14,
+				"var pi = 3.14",
+				"var get = def => pi",
+				"get");
+			Lines(3.14,
+				"def get => pi",
+				"get");
 			Lines(3u,
 				"var sum = def x, y => x + y",
-				"var a = 1u",
-				"var b = 2u",
-				"sum a, b");
-			Reset();
+				"sum 1u, 2u");
 			Lines(3u,
 				"var sum = (def x, y => x + y)",
-				"var a = 1u",
-				"var b = 2u",
-				"sum a, b");
-			Reset();
+				"sum 1u, 2u");
 			Lines(3u,
-				"var sum = (def x, y; return x + y)",
-				"var a = 1u",
-				"var b = 2u",
-				"sum a, b");
-			Reset();
-			Lines(3u, // def/function is hungry for statements
+				"(def x, y; return x + y) 1u, 2u");
+			Lines(3u,
 				"var sum = def x, y; return x + y",
-				"var a = 1u",
-				"var b = 2u",
-				"sum a, b");
-			Reset();
+				"sum 1u, 2u");
 			Lines(3u,
 				"var sum = (def x, y",
 				"	return x + y)",
-				"var a = 1u",
-				"var b = 2u",
-				"sum a, b");
+				"sum 1u, 2u");
 		}
 	}
 }

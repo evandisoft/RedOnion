@@ -19,10 +19,9 @@ var lbl = wnd.add new label
 lbl.text = "Clicked 0x"
 
 var counter = 0
-function click
+btn.click += def // def and function are the same
     counter++
     lbl.text = "Clicked " + counter + "x"
-btn.click += click
 ```
 
 ## Invoke without parentheses
@@ -66,16 +65,14 @@ z = fn (x)      // warning! it works but means fn((x))
 z = sum (x,y)   // problem! (x,y) as one argument does not have meaning (yet)
 z = sum(x, y)   // ok, this works as expected
 
-function click
-    x++
+def click => x++
 button.click += click // no call to click
 click           // yes, this calls click()
 
 var obj = new object
 obj.x = 0
 obj.action = click
-function get
-    return obj
+def get => obj
 get().action    // calls obj.action() and increments obj.x
 ```
 
@@ -96,7 +93,7 @@ properties of the object after that (if method)
 and global variables last.
 
 ```
-function MyClass
+def MyClass
     // to allow MyClass() be used like new MyClass
     if this == null // or this === undefined
         return new MyClass
@@ -109,13 +106,12 @@ function MyClass
     var _total = 0
 
     // some method
-    this.action = function
+    this.action = def
         counter++   // this.counter++
         _total++    // that private _total
 
     // read-only access to total
-    this.getTotal = function
-        return _total
+    this.getTotal = def => _total
 
 var obj = new MyClass
 obj.counter = 10
@@ -129,11 +125,9 @@ Inheritance can be achieved by pointing `MyClass.prototype` to base class,
 just like in JavaScript:
 
 ```
-function BaseClass
+def BaseClass
     this.name = "Base Class"
-    function setCounter value
-        this.counter = value
-    this.setCounter = setCounter
+    this.setCounter = def value => this.counter = value
 MyClass.prototype = new BaseClass
 var obj = new MyClass
 obj.setCounter 123

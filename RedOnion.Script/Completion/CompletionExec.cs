@@ -38,7 +38,11 @@ namespace RedOnion.Script.Completion
 				char c = source[i-1];
 				if (!char.IsWhiteSpace(c)
 					&& c != '(' && c != '['
-					&& c != '=')
+					&& c != '=' && c != '{'
+					&& c != '+' && c != '-'
+					&& c != '*' && c != '/'
+					&& c != '|' && c != '&'
+					&& c != '<' && c != '>')
 					return;
 			}
 			replaceAt = firstAt < 0 ? i : firstAt + 1;

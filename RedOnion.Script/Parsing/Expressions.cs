@@ -64,7 +64,8 @@ namespace RedOnion.Script.Parsing
 				|| kind == OpKind.Number    // type specifier (byte, bool, int, ...)
 				|| code == OpCode.String || code == OpCode.Char	// type names
 				|| code.Code() == OpCode.Function.Code() // function or def
-				|| code == OpCode.Object)
+				|| code == OpCode.Object
+				|| code == OpCode.Get || code == OpCode.Set)
 			{
 				if (!unary)
 					goto autocall;

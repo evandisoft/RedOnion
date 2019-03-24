@@ -421,8 +421,8 @@ namespace RedOnion.Script.Parsing
 			var paren = lexer.Curr == '(';
 			if (paren || lexer.Curr == ',')
 				Next(true);
-			bool lambda = false;
-			while ((paren || (!lexer.Eol && lexer.Curr != ';')) && !lexer.Eof)
+			bool lambda = !paren && lexer.Code == OpCode.Lambda;
+			while ((paren || (!lexer.Eol && lexer.Curr != ';')) && !lexer.Eof && !lambda)
 			{
 				if (lexer.Word == null)
 					throw new ParseError(lexer, "Expected argument name");
@@ -450,12 +450,13 @@ namespace RedOnion.Script.Parsing
 				if (!paren && lexer.Code == OpCode.Lambda)
 				{
 					lambda = true;
-					Next();
 					break;
 				}
 				if (lexer.Curr == ',')
 					Next(true);
 			}
+			if (lambda)
+				Next();
 
 			Write(CodeAt - mark, mark-4);   // header size
 			Code[mark + 3] = (byte)argc;    // number of arguments
@@ -463,13 +464,19 @@ namespace RedOnion.Script.Parsing
 			var labels = StoreLabels();
 			var blockAt = CodeAt;
 			var count = ParseBlock(flags);
-			if (lambda && count == 1 && ((OpCode)Code[blockAt+4]).Extend().Kind() < OpKind.Statement)
+			if (lambda && count == 1)
 			{
-				var sz = BitConverter.ToInt32(Code, blockAt);
-				Write(++sz, blockAt);
-				Array.Copy(Code, blockAt+4, Code, blockAt+5, CodeAt-blockAt-5);
-				Write(OpCode.Return.Code(), blockAt+4);
-				CodeAt++;
+				var op = ((OpCode)Code[blockAt+4]).Extend();
+				if (op == OpCode.Autocall)
+					Code[blockAt+4] = OpCode.Return.Code();
+				else if (op.Kind() < OpKind.Statement)
+				{
+					var sz = BitConverter.ToInt32(Code, blockAt);
+					Write(++sz, blockAt);
+					Array.Copy(Code, blockAt+4, Code, blockAt+5, CodeAt-blockAt-5);
+					Write(OpCode.Return.Code(), blockAt+4);
+					CodeAt++;
+				}
 			}
 			RestoreLabels(labels);
 		}
