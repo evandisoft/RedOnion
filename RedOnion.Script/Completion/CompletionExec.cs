@@ -36,7 +36,9 @@ namespace RedOnion.Script.Completion
 			if (i > 0)
 			{
 				char c = source[i-1];
-				if (!char.IsWhiteSpace(c) && c != '(' && c != '[')
+				if (!char.IsWhiteSpace(c)
+					&& c != '(' && c != '['
+					&& c != '=')
 					return;
 			}
 			replaceAt = firstAt < 0 ? i : firstAt + 1;
