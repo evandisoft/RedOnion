@@ -316,7 +316,8 @@ namespace RedOnion.Script.ReflectedObjects
 				return null;
 			if (type.IsAssignableFrom(val.GetType()))
 				return val;
-			throw new NotImplementedException();
+			return type.GetMethod("op_Implicit", new Type[] { val.GetType() })
+				.Invoke(null, new object[] { val });
 		}
 		public static T Convert<T>(Value value)
 			=> (T)Convert(value, typeof(T));

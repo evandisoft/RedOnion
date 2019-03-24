@@ -173,7 +173,7 @@ namespace RedOnion.Script.ReflectedObjects
 					BaseProps.Set(name, new Value(prop));
 					var tmp = prop.Get(this);
 					tmp.Modify(op, value);
-					return prop.Set(this, value);
+					return prop.Set(this, tmp);
 				}
 				if (member is EventInfo evt)
 				{

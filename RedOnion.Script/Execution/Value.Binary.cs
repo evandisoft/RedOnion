@@ -10,58 +10,42 @@ namespace RedOnion.Script
 	{
 		public Value Binary(OpCode op, Value right)
 		{
-			var left = RValue;
-			right = right.RValue;
-			if (left.Kind == ValueKind.Object)
-			{
-				var obj = (IObject)left.ptr;
-				if (obj?.HasFeature(ObjectFeatures.Operators) == true
-					&& obj.Operator(op, right, false, out var result))
-					return result;
-			}
-			if (right.Kind == ValueKind.Object)
-			{
-				var obj = (IObject)right.ptr;
-				if (obj?.HasFeature(ObjectFeatures.Operators) == true
-					&& obj.Operator(op, left, true, out var result))
-					return result;
-			}
 			switch (op)
 			{
 			default:
 				return new Value();
 			case OpCode.BitOr:
-				return left | right;
+				return this | right;
 			case OpCode.BitXor:
-				return left ^ right;
+				return this ^ right;
 			case OpCode.BitAnd:
-				return left & right;
+				return this & right;
 			case OpCode.ShiftLeft:
-				return left.ShiftLeft(right);
+				return ShiftLeft(right);
 			case OpCode.ShiftRight:
-				return left.ShiftRight(right);
+				return ShiftRight(right);
 			case OpCode.Add:
-				return left + right;
+				return this + right;
 			case OpCode.Sub:
-				return left - right;
+				return this - right;
 			case OpCode.Mul:
-				return left * right;
+				return this * right;
 			case OpCode.Div:
-				return left / right;
+				return this / right;
 			case OpCode.Mod:
-				return left % right;
+				return this % right;
 			case OpCode.Equals:
-				return new Value(left == right);
+				return new Value(this == right);
 			case OpCode.Differ:
-				return new Value(left != right);
+				return new Value(this != right);
 			case OpCode.Less:
-				return new Value(left < right);
+				return new Value(this < right);
 			case OpCode.More:
-				return new Value(left > right);
+				return new Value(this > right);
 			case OpCode.LessEq:
-				return new Value(left <= right);
+				return new Value(this <= right);
 			case OpCode.MoreEq:
-				return new Value(left >= right);
+				return new Value(this >= right);
 			}
 		}
 
@@ -99,6 +83,20 @@ namespace RedOnion.Script
 					return new Value(lhs.UInt + rhs.UInt);
 				return new Value(lhs.ULong + rhs.ULong);
 			}
+			if (lhs.Kind == ValueKind.Object)
+			{
+				var obj = (IObject)lhs.ptr;
+				if (obj?.HasFeature(ObjectFeatures.Operators) == true
+					&& obj.Operator(OpCode.Add, rhs, false, out var result))
+					return result;
+			}
+			if (rhs.Kind == ValueKind.Object)
+			{
+				var obj = (IObject)rhs.ptr;
+				if (obj?.HasFeature(ObjectFeatures.Operators) == true
+					&& obj.Operator(OpCode.Add, lhs, true, out var result))
+					return result;
+			}
 			return new Value();
 		}
 
@@ -132,6 +130,20 @@ namespace RedOnion.Script
 					return new Value(lhs.UInt - rhs.UInt);
 				return new Value(lhs.ULong - rhs.ULong);
 			}
+			if (lhs.Kind == ValueKind.Object)
+			{
+				var obj = (IObject)lhs.ptr;
+				if (obj?.HasFeature(ObjectFeatures.Operators) == true
+					&& obj.Operator(OpCode.Sub, rhs, false, out var result))
+					return result;
+			}
+			if (rhs.Kind == ValueKind.Object)
+			{
+				var obj = (IObject)rhs.ptr;
+				if (obj?.HasFeature(ObjectFeatures.Operators) == true
+					&& obj.Operator(OpCode.Sub, lhs, true, out var result))
+					return result;
+			}
 			return new Value();
 		}
 
@@ -164,6 +176,20 @@ namespace RedOnion.Script
 				if (!rhs.Signed || rhs.NumberSize < 4)
 					return new Value(lhs.UInt * rhs.UInt);
 				return new Value(lhs.ULong * rhs.ULong);
+			}
+			if (lhs.Kind == ValueKind.Object)
+			{
+				var obj = (IObject)lhs.ptr;
+				if (obj?.HasFeature(ObjectFeatures.Operators) == true
+					&& obj.Operator(OpCode.Mul, rhs, false, out var result))
+					return result;
+			}
+			if (rhs.Kind == ValueKind.Object)
+			{
+				var obj = (IObject)rhs.ptr;
+				if (obj?.HasFeature(ObjectFeatures.Operators) == true
+					&& obj.Operator(OpCode.Mul, lhs, true, out var result))
+					return result;
 			}
 			return new Value();
 		}
@@ -219,6 +245,20 @@ namespace RedOnion.Script
 					return new Value();
 				return new Value(lhs.ULong / u);
 			}
+			if (lhs.Kind == ValueKind.Object)
+			{
+				var obj = (IObject)lhs.ptr;
+				if (obj?.HasFeature(ObjectFeatures.Operators) == true
+					&& obj.Operator(OpCode.Div, rhs, false, out var result))
+					return result;
+			}
+			if (rhs.Kind == ValueKind.Object)
+			{
+				var obj = (IObject)rhs.ptr;
+				if (obj?.HasFeature(ObjectFeatures.Operators) == true
+					&& obj.Operator(OpCode.Div, lhs, true, out var result))
+					return result;
+			}
 			return new Value();
 		}
 
@@ -273,6 +313,20 @@ namespace RedOnion.Script
 					return new Value();
 				return new Value(lhs.ULong % u);
 			}
+			if (lhs.Kind == ValueKind.Object)
+			{
+				var obj = (IObject)lhs.ptr;
+				if (obj?.HasFeature(ObjectFeatures.Operators) == true
+					&& obj.Operator(OpCode.Mod, rhs, false, out var result))
+					return result;
+			}
+			if (rhs.Kind == ValueKind.Object)
+			{
+				var obj = (IObject)rhs.ptr;
+				if (obj?.HasFeature(ObjectFeatures.Operators) == true
+					&& obj.Operator(OpCode.Mod, lhs, true, out var result))
+					return result;
+			}
 			return new Value();
 		}
 
@@ -300,6 +354,20 @@ namespace RedOnion.Script
 					return new Value(lhs.UInt & rhs.UInt).AdjustForEnum(lhs);
 				return new Value(lhs.ULong & rhs.ULong).AdjustForEnum(lhs);
 			}
+			if (lhs.Kind == ValueKind.Object)
+			{
+				var obj = (IObject)lhs.ptr;
+				if (obj?.HasFeature(ObjectFeatures.Operators) == true
+					&& obj.Operator(OpCode.BitAnd, rhs, false, out var result))
+					return result;
+			}
+			if (rhs.Kind == ValueKind.Object)
+			{
+				var obj = (IObject)rhs.ptr;
+				if (obj?.HasFeature(ObjectFeatures.Operators) == true
+					&& obj.Operator(OpCode.BitAnd, lhs, true, out var result))
+					return result;
+			}
 			return new Value();
 		}
 
@@ -326,6 +394,20 @@ namespace RedOnion.Script
 				if (!rhs.Signed || rhs.NumberSize < 4)
 					return new Value(lhs.UInt | rhs.UInt).AdjustForEnum(lhs);
 				return new Value(lhs.ULong | rhs.ULong).AdjustForEnum(lhs);
+			}
+			if (lhs.Kind == ValueKind.Object)
+			{
+				var obj = (IObject)lhs.ptr;
+				if (obj?.HasFeature(ObjectFeatures.Operators) == true
+					&& obj.Operator(OpCode.BitOr, rhs, false, out var result))
+					return result;
+			}
+			if (rhs.Kind == ValueKind.Object)
+			{
+				var obj = (IObject)rhs.ptr;
+				if (obj?.HasFeature(ObjectFeatures.Operators) == true
+					&& obj.Operator(OpCode.BitOr, lhs, true, out var result))
+					return result;
 			}
 			return new Value();
 		}
@@ -362,6 +444,20 @@ namespace RedOnion.Script
 					return new Value(lhs.UInt ^ rhs.UInt).AdjustForEnum(lhs);
 				return new Value(lhs.ULong ^ rhs.ULong).AdjustForEnum(lhs);
 			}
+			if (lhs.Kind == ValueKind.Object)
+			{
+				var obj = (IObject)lhs.ptr;
+				if (obj?.HasFeature(ObjectFeatures.Operators) == true
+					&& obj.Operator(OpCode.BitXor, rhs, false, out var result))
+					return result;
+			}
+			if (rhs.Kind == ValueKind.Object)
+			{
+				var obj = (IObject)rhs.ptr;
+				if (obj?.HasFeature(ObjectFeatures.Operators) == true
+					&& obj.Operator(OpCode.BitXor, lhs, true, out var result))
+					return result;
+			}
 			return new Value();
 		}
 
@@ -391,6 +487,20 @@ namespace RedOnion.Script
 					return new Value(lhs.UInt << rhs.Int);
 				return new Value(lhs.ULong << rhs.Int);
 			}
+			if (lhs.Kind == ValueKind.Object)
+			{
+				var obj = (IObject)lhs.ptr;
+				if (obj?.HasFeature(ObjectFeatures.Operators) == true
+					&& obj.Operator(OpCode.ShiftLeft, rhs, false, out var result))
+					return result;
+			}
+			if (rhs.Kind == ValueKind.Object)
+			{
+				var obj = (IObject)rhs.ptr;
+				if (obj?.HasFeature(ObjectFeatures.Operators) == true
+					&& obj.Operator(OpCode.ShiftLeft, lhs, true, out var result))
+					return result;
+			}
 			return new Value();
 		}
 
@@ -415,6 +525,20 @@ namespace RedOnion.Script
 				if (!rhs.Signed || rhs.NumberSize < 4)
 					return new Value(lhs.UInt >> rhs.Int);
 				return new Value(lhs.ULong >> rhs.Int);
+			}
+			if (lhs.Kind == ValueKind.Object)
+			{
+				var obj = (IObject)lhs.ptr;
+				if (obj?.HasFeature(ObjectFeatures.Operators) == true
+					&& obj.Operator(OpCode.ShiftRight, rhs, false, out var result))
+					return result;
+			}
+			if (rhs.Kind == ValueKind.Object)
+			{
+				var obj = (IObject)rhs.ptr;
+				if (obj?.HasFeature(ObjectFeatures.Operators) == true
+					&& obj.Operator(OpCode.ShiftRight, lhs, true, out var result))
+					return result;
 			}
 			return new Value();
 		}
@@ -446,6 +570,10 @@ namespace RedOnion.Script
 				return rhs.Kind == ValueKind.Undefined
 					|| (rhs.Kind == ValueKind.Object && rhs.ptr == null);
 			case ValueKind.Object:
+				var obj = (IObject)lhs.ptr;
+				if (obj?.HasFeature(ObjectFeatures.Operators) == true
+					&& obj.Operator(OpCode.Equals, rhs, false, out var result))
+					return result;
 				// ptr is null for ValueType.Undefined
 				return (rhs.Kind == ValueKind.Object || rhs.Kind == ValueKind.Undefined)
 					&& lhs.ptr == rhs.ptr;
@@ -453,10 +581,14 @@ namespace RedOnion.Script
 			switch (rhs.Kind)
 			{
 			case ValueKind.Undefined:
+				return false;
 			case ValueKind.Object:
+				var obj = (IObject)rhs.ptr;
+				if (obj?.HasFeature(ObjectFeatures.Operators) == true
+					&& obj.Operator(OpCode.Add, lhs, true, out var result))
+					return result;
 				return false;
 			}
-
 			// for now, may get changed for side-effects
 			return lhs.String == rhs.String;
 		}
@@ -571,6 +703,20 @@ namespace RedOnion.Script
 					return new Value(lhs.UInt < rhs.UInt);
 				return new Value(lhs.ULong < rhs.ULong);
 			}
+			if (lhs.Kind == ValueKind.Object)
+			{
+				var obj = (IObject)lhs.ptr;
+				if (obj?.HasFeature(ObjectFeatures.Operators) == true
+					&& obj.Operator(OpCode.Less, rhs, false, out var result))
+					return result;
+			}
+			if (rhs.Kind == ValueKind.Object)
+			{
+				var obj = (IObject)rhs.ptr;
+				if (obj?.HasFeature(ObjectFeatures.Operators) == true
+					&& obj.Operator(OpCode.Less, lhs, true, out var result))
+					return result;
+			}
 			return false;
 		}
 
@@ -609,6 +755,20 @@ namespace RedOnion.Script
 				if (!rhs.Signed || rhs.NumberSize < 4)
 					return new Value(lhs.UInt <= rhs.UInt);
 				return new Value(lhs.ULong <= rhs.ULong);
+			}
+			if (lhs.Kind == ValueKind.Object)
+			{
+				var obj = (IObject)lhs.ptr;
+				if (obj?.HasFeature(ObjectFeatures.Operators) == true
+					&& obj.Operator(OpCode.LessEq, rhs, false, out var result))
+					return result;
+			}
+			if (rhs.Kind == ValueKind.Object)
+			{
+				var obj = (IObject)rhs.ptr;
+				if (obj?.HasFeature(ObjectFeatures.Operators) == true
+					&& obj.Operator(OpCode.LessEq, lhs, true, out var result))
+					return result;
 			}
 			return false;
 		}
@@ -649,6 +809,20 @@ namespace RedOnion.Script
 					return new Value(lhs.UInt > rhs.UInt);
 				return new Value(lhs.ULong > rhs.ULong);
 			}
+			if (lhs.Kind == ValueKind.Object)
+			{
+				var obj = (IObject)lhs.ptr;
+				if (obj?.HasFeature(ObjectFeatures.Operators) == true
+					&& obj.Operator(OpCode.More, rhs, false, out var result))
+					return result;
+			}
+			if (rhs.Kind == ValueKind.Object)
+			{
+				var obj = (IObject)rhs.ptr;
+				if (obj?.HasFeature(ObjectFeatures.Operators) == true
+					&& obj.Operator(OpCode.More, lhs, true, out var result))
+					return result;
+			}
 			return false;
 		}
 
@@ -687,6 +861,20 @@ namespace RedOnion.Script
 				if (!rhs.Signed || rhs.NumberSize < 4)
 					return new Value(lhs.UInt >= rhs.UInt);
 				return new Value(lhs.ULong >= rhs.ULong);
+			}
+			if (lhs.Kind == ValueKind.Object)
+			{
+				var obj = (IObject)lhs.ptr;
+				if (obj?.HasFeature(ObjectFeatures.Operators) == true
+					&& obj.Operator(OpCode.MoreEq, rhs, false, out var result))
+					return result;
+			}
+			if (rhs.Kind == ValueKind.Object)
+			{
+				var obj = (IObject)rhs.ptr;
+				if (obj?.HasFeature(ObjectFeatures.Operators) == true
+					&& obj.Operator(OpCode.MoreEq, lhs, true, out var result))
+					return result;
 			}
 			return false;
 		}

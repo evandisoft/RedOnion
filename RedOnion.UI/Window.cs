@@ -116,11 +116,16 @@ namespace RedOnion.UI
 			Frame.Visible = false;
 		}
 
-		public event UnityAction Closed;
+		readonly Event closed = new Event(new UnityEvent());
+		public Event Closed
+		{
+			get => closed;
+			set { }
+		}
 		public virtual void Close()
 		{
 			Hide();
-			Closed?.Invoke();
+			Closed.Invoke();
 		}
 
 		public string Title
@@ -189,7 +194,7 @@ namespace RedOnion.UI
 		public float Y
 		{
 			get => -Frame.RectTransform.anchoredPosition.y;
-			set => Position = new Vector2(X, -value);
+			set => Position = new Vector2(X, value);
 		}
 		public Vector2 Size
 		{

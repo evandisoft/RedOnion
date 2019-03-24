@@ -233,5 +233,86 @@ namespace RedOnion.ScriptNUnit
 			var w = (MyVector)Result.Native;
 			Assert.AreEqual(6f, w.y);
 		}
+
+		public struct MyEvent
+		{
+			public List<Action> it;
+			public MyEvent(bool dummy) => it = new List<Action>();
+			public void Add(Action call) => it.Add(call);
+			public void Remove(Action call) => it.Remove(call);
+			public void Clear() => it.Clear();
+			public void Invoke()
+			{
+				foreach (var action in it)
+					action();
+			}
+			public void Set(Action call)
+			{
+				Clear();
+				Add(call);
+			}
+
+			public struct AddProxy
+			{
+				internal readonly MyEvent Event;
+				internal readonly Action Action;
+				public AddProxy(MyEvent e, Action a)
+				{
+					Event = e;
+					Action = a;
+				}
+			}
+			public struct RemoveProxy
+			{
+				internal readonly MyEvent Event;
+				internal readonly Action Action;
+				public RemoveProxy(MyEvent e, Action a)
+				{
+					Event = e;
+					Action = a;
+				}
+			}
+			public static AddProxy operator +(MyEvent e, Action a)
+				=> new AddProxy(e, a);
+			public static RemoveProxy operator -(MyEvent e, Action a)
+				=> new RemoveProxy(e, a);
+			public MyEvent(AddProxy add)
+			{
+				it = add.Event.it;
+				Add(add.Action);
+			}
+			public MyEvent(RemoveProxy remove)
+			{
+				it = remove.Event.it;
+				Remove(remove.Action);
+			}
+			public static implicit operator MyEvent(AddProxy add)
+				=> new MyEvent(add);
+			public static implicit operator MyEvent(RemoveProxy remove)
+				=> new MyEvent(remove);
+
+			public MyEvent Click
+			{
+				get => this;
+				set { }
+			}
+		}
+		[Test]
+		public void ROS_DRefl10_CustomEvent()
+		{
+			var myEvent = new MyEvent(true);
+			int counter = 0;
+			myEvent += () => counter++;
+			Assert.AreEqual(1, myEvent.it.Count);
+			myEvent.Invoke();
+			Assert.AreEqual(1, counter);
+
+			Root.AddType(typeof(MyEvent));
+			Test("var e = new myEvent true");
+			Test("var c = 0");
+			Test("e.click += def => c++");
+			Test("e.click.invoke");
+			Test(1, "c");
+		}
 	}
 }
