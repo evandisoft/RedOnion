@@ -9,7 +9,7 @@ namespace RedOnion.UI
 {
 	public class Window : IDisposable
 	{
-		public class FramePanel : Panel
+		protected class FramePanel : Panel
 		{
 			static Texture2D DefaultCloseButtonIcon = LoadIcon(13, 13, "WindowCloseButtonIcon.png");
 
@@ -74,8 +74,8 @@ namespace RedOnion.UI
 			}
 		}
 
-		public FramePanel Frame { get; private set; }
-		public Panel Content { get; private set; }
+		protected FramePanel Frame { get; private set; }
+		protected Panel Content { get; private set; }
 
 		public string Name
 		{

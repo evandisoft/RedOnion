@@ -129,6 +129,20 @@ namespace RedOnion.Script.BasicObjects
 		/// Private variables/fields
 		/// </summary>
 		public IScope Scope { get; protected set; }
+		/// <summary>
+		/// Prototype of this function object (base class for created objects)
+		/// </summary>
+		public IObject Prototype
+		{
+			get
+			{
+				if (prototype == null)
+					prototype = new BasicObject(Engine);
+				return prototype;
+			}
+			protected set => prototype = value;
+		}
+		IObject prototype;
 
 		public override ObjectFeatures Features
 			=> ObjectFeatures.Function | ObjectFeatures.Constructor;
@@ -199,7 +213,12 @@ namespace RedOnion.Script.BasicObjects
 			return it;
 		}
 
-		public static Properties StdProps { get; } = new Properties();
+		public static Properties StdProps { get; } = new Properties()
+		{
+			{ "prototype", Value.Property<FunctionObj>(
+				fn => new Value(fn.Prototype),
+				(fn, value) => fn.Prototype = fn.Engine.Box(value)) }
+		};
 
 		private Dictionary<Type, Delegate> DelegateCache;
 		public Delegate GetDelegate(Type type)

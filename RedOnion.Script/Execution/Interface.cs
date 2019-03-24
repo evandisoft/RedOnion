@@ -506,10 +506,11 @@ namespace RedOnion.Script
 	/// </summary>
 	public class CompiledCode
 	{
-		public CompiledCode(string[] strings, byte[] code)
+		public CompiledCode(string[] strings, byte[] code, int[] lineMap)
 		{
 			Strings = strings;
 			Code = code;
+			LineMap = lineMap;
 		}
 		/// <summary>
 		/// String table
@@ -519,6 +520,10 @@ namespace RedOnion.Script
 		/// Compiled code
 		/// </summary>
 		public byte[] Code { get; }
+		/// <summary>
+		/// Index to Code for each line
+		/// </summary>
+		public int[] LineMap { get; }
 
 		/// <summary>
 		/// Path to source file
@@ -528,6 +533,7 @@ namespace RedOnion.Script
 		/// Source content
 		/// </summary>
 		public string Source { get; set; }
+
 		/// <summary>
 		/// Source content separated to lines
 		/// </summary>
@@ -535,6 +541,7 @@ namespace RedOnion.Script
 		/// <summary>
 		/// Line of source content (with position and text)
 		/// </summary>
+		[DebuggerDisplay("{Position}: {Text}")]
 		public struct SourceLine
 		{
 			public int Position;

@@ -49,6 +49,7 @@
     <Compile Include="Execution\Engine.cs" />
     <Compile Include="Execution\Abstract.cs" />
     <Compile Include="Execution\OpCode.cs" />
+    <Compile Include="Execution\RuntimeError.cs" />
     <Compile Include="Execution\Value.Main.cs" />
     <Compile Include="Execution\Interface.cs" />
     <Compile Include="Execution\EvalExpression.cs" />

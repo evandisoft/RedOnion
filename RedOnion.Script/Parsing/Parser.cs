@@ -7,7 +7,7 @@ namespace RedOnion.Script.Parsing
 	[DebuggerDisplay("{lexer.LineNumber}:{lexer.At}: {lexer.Code}; {lexer.Curr}; {lexer.Word}; {lexer.Line}")]
 	public partial class Parser
 	{
-		protected Lexer lexer = new Lexer();
+		protected Lexer lexer;
 
 		public CultureInfo Culture { get; set; } = CultureInfo.InvariantCulture;
 		public Option Options { get; set; }
@@ -15,9 +15,9 @@ namespace RedOnion.Script.Parsing
 		public bool HasOption(Option opt)
 			=> (Options & opt) != 0;
 
-		public Parser() { }
-		public Parser(Option opts) => Options = opts;
-		public Parser(Option opton, Option optoff) => Options = (Options | opton) &~ optoff;
+		public Parser() => lexer = new Lexer(this);
+		public Parser(Option opts) : this() => Options = opts;
+		public Parser(Option optOn, Option optOff) : this() => Options = (Options | optOn) &~ optOff;
 
 		[Flags]
 		public enum Option : uint
@@ -139,12 +139,18 @@ namespace RedOnion.Script.Parsing
 				StringValuesAt = 0;
 			}
 			_stringMap.Clear();
-			CodeAt = 0;
+			if (CodeAt > 0)
+			{
+				Array.Clear(_code, 0, CodeAt);
+				CodeAt = 0;
+			}
 			OperatorAt = 0;
 			ValuesAt = 0;
+			LineMapAt = 0;
 			LabelTable?.Clear();
 			GotoTable?.Clear();
 			ParentIndent = -1;
+			lexer.LinesAt = 0;
 			return this;
 		}
 

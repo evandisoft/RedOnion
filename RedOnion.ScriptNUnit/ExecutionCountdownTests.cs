@@ -24,7 +24,9 @@ namespace RedOnion.ScriptNUnit
 			}
 			catch (Exception e)
 			{
-				throw new Exception(String.Format("{0} in Eval: {1}; IN: <{2}>",
+				if (e is RuntimeError re && re.InnerException is TookTooLong)
+					return;
+				throw new Exception(string.Format("{0} in Eval: {1}; IN: <{2}>",
 					e.GetType().ToString(), e.Message, script), e);
 			}
 		}

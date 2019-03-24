@@ -11,6 +11,7 @@ namespace RedOnion.Script.Parsing
 		private byte[] _code = new byte[256];
 		private string[] _stringTable = new string[64];
 		private Dictionary<string, int> _stringMap = new Dictionary<string, int>();
+		private int[] _lineMap = new int[64];
 
 		/// <summary>
 		/// Buffer for final code (statements and expressions)
@@ -24,11 +25,20 @@ namespace RedOnion.Script.Parsing
 		/// <summary>
 		/// Strings table for code
 		/// </summary>
-		protected string[] Strings => _stringTable;
+		public string[] Strings => _stringTable;
 		/// <summary>
 		/// Write position (top) for string table
 		/// </summary>
-		protected int StringsAt { get; set; }
+		public int StringsAt { get; protected set; }
+
+		/// <summary>
+		/// Index into Code for each line
+		/// </summary>
+		public int[] LineMap => _lineMap;
+		/// <summary>
+		/// Write position (top) for line map
+		/// </summary>
+		public int LineMapAt { get; protected set; }
 
 		/// <summary>
 		/// Copy code to separate byte array
@@ -47,6 +57,21 @@ namespace RedOnion.Script.Parsing
 			var arr = new string[StringsAt];
 			Array.Copy(Strings, 0, arr, 0, arr.Length);
 			return arr;
+		}
+		public int[] LineMapToArray()
+		{
+			var arr = new int[LineMapAt];
+			Array.Copy(LineMap, 0, arr, 0, arr.Length);
+			return arr;
+		}
+		public CompiledCode.SourceLine[] LinesToArray()
+			=> lexer.LinesToArray();
+
+		internal void RecordLine()
+		{
+			if (LineMapAt == _lineMap.Length)
+				Array.Resize(ref _lineMap, _lineMap.Length << 1);
+			_lineMap[LineMapAt++] = CodeAt;
 		}
 
 		/// <summary>
@@ -168,39 +193,6 @@ namespace RedOnion.Script.Parsing
 			Write((byte)code);
 			Write(value);
 		}
-
-		/*	NOTE: THIS MAY NOT BE NEEDED IN THIS VERSION
-			(probably relict from Bee without string tables)
-
-		/// <summary>
-		/// Write string literal or identifier to code buffer
-		/// @OpCode	leading code (type of literal or identifier)
-		/// @blen	true for byte-length (e.g. identifier), false for short/int length (string literal)
-		/// @bytes	array of bytes to write to code buffer
-		/// </summary>
-		protected void Write(OpCode code, bool blen, byte[] bytes)
-		{
-			if (blen)
-			{
-				if (bytes.Length > 255)
-					throw new InvalidOperationException("Byte array too long");
-				Reserve(2 + bytes.Length);
-				Code[CodeAt++] = (byte)code;
-				Code[CodeAt++] = (byte)bytes.Length;
-			}
-			else
-			{
-				Reserve(5 + bytes.Length);
-				Code[CodeAt++] = (byte)code;
-				Code[CodeAt++] = (byte)bytes.Length;
-				Code[CodeAt++] = (byte)(bytes.Length >> 8);
-				Code[CodeAt++] = (byte)(bytes.Length >> 16);
-				Code[CodeAt++] = (byte)(bytes.Length >> 24);
-			}
-			Array.Copy(bytes, 0, Code, CodeAt, bytes.Length);
-			CodeAt += bytes.Length;
-		}
-		*/
 
 		/// <summary>
 		/// Copy string literal or identifier from vals to code buffer
