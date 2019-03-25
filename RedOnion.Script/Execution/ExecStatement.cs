@@ -62,6 +62,7 @@ namespace RedOnion.Script
 			case OpCode.Continue:
 				Exit = op;
 				return;
+
 			case OpCode.For:
 				if (HasOption(EngineOption.BlockScope))
 					Context.Push(this);
@@ -105,6 +106,39 @@ namespace RedOnion.Script
 				if (Exit == OpCode.Break || Exit == OpCode.Continue)
 					Exit = 0;
 				return;
+			case OpCode.ForEach:
+				if (HasOption(EngineOption.BlockScope))
+					Context.Push(this);
+				Expression(ref at);
+				var element = Value;
+				Expression(ref at);
+				var list = Value.Object as IEnumerable<Value>;
+				if (list == null)
+				{
+					if (HasOption(EngineOption.Silent))
+					{
+						Value = new Value();
+						goto end_foreach;
+					}
+					throw new InvalidOperationException("Not enumerable: " + Value.Name);
+				}
+				stts = at;
+				foreach (var value in list)
+				{
+					at = stts;
+					element.Set(value);
+					Block(ref at);
+					if (Exit != 0 && Exit != OpCode.Continue)
+						break;
+					CountStatement();
+				}
+			end_foreach:
+				if (HasOption(EngineOption.BlockScope))
+					Context.Pop();
+				if (Exit == OpCode.Break || Exit == OpCode.Continue)
+					Exit = 0;
+				return;
+
 			case OpCode.While:
 			case OpCode.Until:
 				if (HasOption(EngineOption.BlockScope))
@@ -144,6 +178,7 @@ namespace RedOnion.Script
 				if (Exit == OpCode.Break || Exit == OpCode.Continue)
 					Exit = 0;
 				return;
+
 			case OpCode.If:
 				if (HasOption(EngineOption.BlockScope))
 					Context.Push(this);

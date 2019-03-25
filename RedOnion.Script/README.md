@@ -19,9 +19,17 @@ var lbl = wnd.add new label
 lbl.text = "Clicked 0x"
 
 var counter = 0
-btn.click += def // def and function are the same
+btn.click += def
     counter++
     lbl.text = "Clicked " + counter + "x"
+
+// def and function are the same
+function abs x
+    return x < 0 ? -x : x
+def sum x,y
+    return x+y
+// lambda
+var sum3 = def a,b,c => a+b+c
 ```
 
 ## Invoke without parentheses
