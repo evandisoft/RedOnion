@@ -4,17 +4,23 @@ using MoonSharp.Interpreter.Interop;
 using RedOnion.KSP.Autopilot;
 using UnityEngine;
 using RedOnion.KSP.MathUtil;
+using KSP.UI.Screens;
 
-namespace RedOnion.KSP.Lua {
-	public class KspApi {
+namespace RedOnion.KSP.Lua
+{
+	public class KspApi
+	{
 		public FlightControl FlightControl = FlightControl.GetInstance();
 		public FlightGlobals FlightGlobals = new FlightGlobals();
 		public Time Time = new Time();
 		public Mathf Mathf = new Mathf();
 		public Vec Vec = new Vec();
+		public EditorPanels EditorPanels = EditorPanels.Instance;
+		public EditorLogic EditorLogic = EditorLogic.fetch;
 	}
 
-	public class KerbaluaScript : MoonSharp.Interpreter.Script {
+	public class KerbaluaScript : MoonSharp.Interpreter.Script
+	{
 		public KerbaluaScript() : base(CoreModules.Preset_Complete)
 		{
 			UserData.RegistrationPolicy = InteropRegistrationPolicy.Automatic;
@@ -24,7 +30,8 @@ namespace RedOnion.KSP.Lua {
 		DynValue coroutine;
 		public bool EvaluateWithCoroutine(string source, out DynValue result)
 		{
-			if (coroutine == null) {
+			if (coroutine == null)
+			{
 				SetCoroutine(source);
 			}
 
@@ -36,13 +43,16 @@ namespace RedOnion.KSP.Lua {
 			//}
 
 			bool isComplete = false;
-			if (coroutine.Coroutine.State == CoroutineState.Dead) {
+			if (coroutine.Coroutine.State == CoroutineState.Dead)
+			{
 				//Debug.Log("It's dead jim " + result);
 
 				//Debug.Log("Coroutine state is" + coroutine.Coroutine.State + ", result is " + result);
 				isComplete = true;
 				coroutine = null;
-			} else {
+			}
+			else
+			{
 				//Debug.Log("Coroutine state is" + coroutine.Coroutine.State + ", result is incomplete");
 			}
 
@@ -52,15 +62,19 @@ namespace RedOnion.KSP.Lua {
 
 		void SetCoroutine(string source)
 		{
-			try {
-				if (source.StartsWith("=")) {
+			try
+			{
+				if (source.StartsWith("="))
+				{
 					source = "return " + source.Substring(1);
 				}
 				DynValue mainFunction = base.DoString("return function () " + source + " end");
 				//Debug.Log("Main function is "+mainFunction);
 				coroutine = CreateCoroutine(mainFunction);
 				//Debug.Log("Coroutine is " + coroutine);
-			} catch (SyntaxErrorException e) {
+			}
+			catch (SyntaxErrorException e)
+			{
 				//Doesn't work in general
 				//DynValue mainFunction = base.DoString("return function () return " + source + " end");
 				//Debug.Log("Main function is "+mainFunction);
