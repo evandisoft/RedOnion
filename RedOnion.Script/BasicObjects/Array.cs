@@ -21,9 +21,9 @@ namespace RedOnion.Script.BasicObjects
 		public ArrayObj Empty { get; }
 
 		public override ObjectFeatures Features
-			=> ObjectFeatures.Function | ObjectFeatures.Constructor
-			| ObjectFeatures.Converter | ObjectFeatures.TypeReference;
-		public override Type Type => typeof(Value[]);
+			=> ObjectFeatures.Function | ObjectFeatures.Constructor;
+		//	| ObjectFeatures.Converter | ObjectFeatures.TypeReference;
+		//public override Type Type => typeof(Value[]);
 
 		public ArrayFun(IEngine engine, IObject baseClass, ArrayObj prototype)
 			: base(engine, baseClass, new Properties("prototype", prototype))

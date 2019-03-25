@@ -17,9 +17,9 @@ namespace RedOnion.Script.BasicObjects
 		public ListObj Prototype { get; }
 
 		public override ObjectFeatures Features
-			=> ObjectFeatures.Function | ObjectFeatures.Constructor
-			| ObjectFeatures.Converter | ObjectFeatures.TypeReference;
-		public override Type Type => typeof(List<Value>);
+			=> ObjectFeatures.Function | ObjectFeatures.Constructor;
+		//	| ObjectFeatures.Converter | ObjectFeatures.TypeReference;
+		//public override Type Type => typeof(List<Value>);
 
 		public ListFun(IEngine engine, IObject baseClass, ListObj prototype)
 			: base(engine, baseClass, new Properties("prototype", prototype))
