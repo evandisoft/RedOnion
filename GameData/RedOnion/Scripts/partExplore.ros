@@ -1,12 +1,14 @@
-var vessel=KSP.FlightGlobals.ActiveVessel
+var vessel=ksp.flightglobals.activevessel
 
-function freach lst,action
-    for var i=0; i<lst.Count; i++; action lst[i]
+def each lst,action
+    for var i=0;i<lst.count;i++;action lst[i]
 
-vessel.parts.foreach function part
-    freach part.modules, function module
-        print module
-        
-print "testing new stuff"
-
-for var part in vessel.parts; print part
+for var part in vessel.parts
+    each(part.Modules,def o;print o)
+    
+for var part in vessel.parts
+    print part
+    
+each vessel.parts,function o=>print o
+    
+print 2

@@ -1,0 +1,3 @@
+var ship = KSP.FlightGlobals.ActiveVessel
+var parts = ship.parts
+for var p in parts; print p

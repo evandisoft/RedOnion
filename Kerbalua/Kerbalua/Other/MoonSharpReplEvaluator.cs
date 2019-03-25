@@ -64,7 +64,6 @@ namespace Kerbalua.Other
 			try {
 				return LuaIntellisense.GetCompletions(scriptEngine.Globals, source, cursorPos, out replaceStart, out replaceEnd);
 			} catch (Exception e) {
-
 				Debug.Log(e);
 				replaceStart = replaceEnd = cursorPos;
 				return new List<string>();
