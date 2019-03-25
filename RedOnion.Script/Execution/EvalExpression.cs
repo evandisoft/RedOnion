@@ -275,6 +275,7 @@ namespace RedOnion.Script
 				{
 					Expression(ref at);
 					Context.Vars.Add(name, Value);
+					Value = new Value(Context.Vars, name);
 					return;
 				}
 				// strongly typed variable - have to call converter
@@ -287,6 +288,7 @@ namespace RedOnion.Script
 					Value = fn.Call(null, 1);
 				}
 				Context.Vars.Add(name, Value);
+				Value = new Value(Context.Vars, name);
 				return;
 			case OpCode.Dot:
 				Expression(ref at);

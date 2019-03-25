@@ -92,6 +92,11 @@ namespace RedOnion.ScriptNUnit
 			Test(0, "a.length");
 			Test("a.add \"zero\"");
 			Test("zero", "a[0]");
+
+			Lines(1,
+				"var c = 0",
+				"for var e in a; c++",
+				"return c");
 		}
 	}
 }
