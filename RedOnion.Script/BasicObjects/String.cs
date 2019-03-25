@@ -58,7 +58,7 @@ namespace RedOnion.Script.BasicObjects
 		/// Create new string object boxing the string
 		/// </summary>
 		public StringObj(IEngine engine, StringObj baseClass, string value)
-			: base(engine, baseClass, StdProps)
+			: base(engine, baseClass, new Properties(StdProps))
 			=> String = value;
 
 		public override Value Index(IObject self, int argc)
@@ -74,7 +74,7 @@ namespace RedOnion.Script.BasicObjects
 
 		public int Count => String.Length;
 		bool ICollection<Value>.IsReadOnly => true;
-		bool IArray.IsReadOnly => true;
+		bool IArray.IsWritable => false;
 		bool IArray.IsFixedSize => true;
 
 		public bool Contains(char c)
@@ -113,9 +113,9 @@ namespace RedOnion.Script.BasicObjects
 		void IList<Value>.Insert(int index, Value item) => throw new NotImplementedException();
 		void IList<Value>.RemoveAt(int index) => throw new NotImplementedException();
 
-		public static Properties StdProps { get; } = new Properties()
+		public static IDictionary<string, Value> StdProps { get; } = new Dictionary<string, Value>()
 		{
-			{ "length", new Value(new ArrayObj.LengthProp()) }
+			{ "length", ArrayObj.LengthProp.Value }
 		};
 	}
 }

@@ -68,7 +68,7 @@ namespace RedOnion.Script.BasicObjects
 	{
 		public static readonly Value[] Empty = new Value[0];
 		public List<Value> List { get; protected set; }
-		public override Value Value => new Value(this);
+		public override Value Value => Name;
 
 		/// <summary>
 		/// Create List.prototype
@@ -81,7 +81,7 @@ namespace RedOnion.Script.BasicObjects
 		/// Create new string object boxing the string
 		/// </summary>
 		public ListObj(IEngine engine, ListObj baseClass, List<Value> value)
-			: base(engine, baseClass, StdProps)
+			: base(engine, baseClass, new Properties(StdProps))
 			=> List = value;
 
 		public override Value Index(IObject self, int argc)
@@ -108,7 +108,7 @@ namespace RedOnion.Script.BasicObjects
 		public IEnumerator<Value> GetEnumerator()
 			=> List.GetEnumerator();
 
-		bool IArray.IsReadOnly => false;
+		bool IArray.IsWritable => true;
 		bool IArray.IsFixedSize => false;
 		Value IList<Value>.this[int index]
 		{
@@ -118,28 +118,20 @@ namespace RedOnion.Script.BasicObjects
 
 		public void Add(Value item) => List.Add(item);
 		public void Clear() => List.Clear();
-		public bool Remove(Value item) => List.Remove(item);
 		public int IndexOf(Value item) => List.IndexOf(item);
 		public void Insert(int index, Value item) => List.Insert(index, item);
+		public bool Remove(Value item) => List.Remove(item);
 		public void RemoveAt(int index) => List.RemoveAt(index);
 
-		public static Properties StdProps { get; } = new Properties()
+		public static IDictionary<string, Value> StdProps { get; } = new Dictionary<string, Value>()
 		{
-			{ "length",	new Value(new LengthProp()) },
+			{ "length",	ArrayObj.LengthProp.Value },
 			{ "add",	Value.Method<ListObj>((list, item) => list.Add(item)) },
-			{ "remove",	Value.Func<ListObj>((list, item) => list.Remove(item)) },
-			{ "clear",	Value.Method<ListObj>(list => list.Clear()) },
+			{ "clear",  Value.Method<ListObj>(list => list.Clear()) },
+			{ "indexOf", Value.Method<ListObj>((list, index) => list.IndexOf(index.Int)) },
 			{ "insert", Value.Method<ListObj>((list, index, item) => list.Insert(index.Int, item)) },
+			{ "remove",	Value.Func<ListObj>((list, item) => list.Remove(item)) },
 			{ "removeAt", Value.Method<ListObj>((list, index) => list.RemoveAt(index.Int)) },
 		};
-
-		// also used in StringObj!
-		public class LengthProp : IProperty
-		{
-			public Value Get(IObject obj)
-				=> new Value(((ICollection<Value>)obj).Count);
-			public bool Set(IObject obj, Value value)
-				=> false;
-		}
 	}
 }
