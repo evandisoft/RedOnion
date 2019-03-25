@@ -1,5 +1,5 @@
 def fn
     return
-fn def arg
+fn def arg
     print arg
-print 3
+print 3

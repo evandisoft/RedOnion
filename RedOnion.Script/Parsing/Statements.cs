@@ -457,7 +457,10 @@ namespace RedOnion.Script.Parsing
 					Next(true);
 			}
 			if (lambda)
+			{
 				Next();
+				flags |= Flag.LimitedContext;
+			}
 
 			Write(CodeAt - mark, mark-4);   // header size
 			Code[mark + 3] = (byte)argc;    // number of arguments

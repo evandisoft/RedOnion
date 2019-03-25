@@ -295,17 +295,34 @@ namespace RedOnion.ScriptNUnit
 
 			Reset();
 			Lines(
-				"for e in a; def e",
-				"	print e",
+				"fn def e => print e",
 				"print true");
-
-			Reset();
-			Lines(
-				"def fn",
-				"	return",
-				"fn def arg",
-				"	print arg",
-				"print 3");
+			CodeCheck(0, OpCode.Call1);
+			CodeCheck(1, OpCode.Identifier);
+			CodeCheck(2, 2, "fn");
+			CodeCheck(6, OpCode.Function);
+			CodeCheck(7, 23);
+			CodeCheck(14, (byte)1); // one arg (e)
+			CodeCheck(15, 1); // undefined return type
+			CodeCheck(19, OpCode.Undefined);
+			CodeCheck(20, 0, "e");
+			CodeCheck(24, 1);
+			CodeCheck(28, OpCode.Undefined); // no type
+			CodeCheck(29, 1);
+			CodeCheck(33, OpCode.Undefined); // no default
+			CodeCheck(34, 12); // block size
+			CodeCheck(38, OpCode.Return); // lambda uses return
+			CodeCheck(39, OpCode.Call1);
+			CodeCheck(40, OpCode.Identifier);
+			CodeCheck(41, 1, "print");
+			CodeCheck(45, OpCode.Identifier);
+			CodeCheck(46, 0, "e");
+			// important: 50-38 = 12 - the block size @34
+			CodeCheck(50, OpCode.Call1);
+			CodeCheck(51, OpCode.Identifier);
+			CodeCheck(52, 1, "print");
+			CodeCheck(56, OpCode.True);
+			CodeCheck(57);
 		}
 	}
 }
