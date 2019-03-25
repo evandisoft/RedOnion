@@ -9,6 +9,7 @@ for var part in vessel.parts
 for var part in vessel.parts
     print part
     
-each vessel.parts,function o=>print o
+each vessel.parts,function o
+    print o
     
 print 2

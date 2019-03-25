@@ -29,6 +29,7 @@ namespace Kerbalua.Other {
 				output +=result.ToString();
 			}
 			catch(Exception e) {
+				PrintErrorAction?.Invoke(e.Message);
 				Debug.Log(e);
 			}
 
