@@ -225,6 +225,9 @@ namespace RedOnion.Script.ReflectedObjects
 				{
 					if (pair.Value.Length != argc || !pair.Key.CanRead)
 						continue;
+					if (value.IsNumber && pair.Value[0].ParameterType == typeof(int))
+						return Convert(Engine, pair.Key.GetGetMethod()
+							.Invoke(Target, new object[] { value.Int }));
 					if (value.IsString && pair.Value[0].ParameterType == typeof(string))
 						return Convert(Engine, pair.Key.GetGetMethod()
 							.Invoke(Target, new object[] { value.String }));
