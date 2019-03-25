@@ -64,7 +64,7 @@ namespace RedOnion.Script.BasicObjects
 	/// String object (string box)
 	/// </summary>
 	[DebuggerDisplay("{Name}")]
-	public class ListObj : BasicObject, IArray
+	public class ListObj : BasicObject, IListObject
 	{
 		public static readonly Value[] Empty = new Value[0];
 		public List<Value> List { get; protected set; }
@@ -108,8 +108,8 @@ namespace RedOnion.Script.BasicObjects
 		public IEnumerator<Value> GetEnumerator()
 			=> List.GetEnumerator();
 
-		bool IArray.IsWritable => true;
-		bool IArray.IsFixedSize => false;
+		bool IListObject.IsWritable => true;
+		bool IListObject.IsFixedSize => false;
 		Value IList<Value>.this[int index]
 		{
 			get => List[index];

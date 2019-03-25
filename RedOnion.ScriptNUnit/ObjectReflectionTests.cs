@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using NUnit.Framework;
@@ -308,16 +309,32 @@ namespace RedOnion.ScriptNUnit
 			Assert.AreEqual(1, counter);
 
 			Root.AddType(typeof(MyEvent));
-			Test("var e = new myEvent true");
-			Test("var c = 0");
-			Test("e.click += def => c++");
-			Test("e.click.invoke");
-			Test(1, "c");
+			Lines(1,
+				"var e = new myEvent true",
+				"var c = 0",
+				"e.click += def => c++",
+				"e.click.invoke",
+				"return c");
 		}
 
+		public class ExtraEnumerable : IEnumerable
+		{
+			public IEnumerator GetEnumerator()
+			{
+				yield return 1;
+				yield return 2f;
+				yield return 3.0;
+			}
+		}
 		public static class ListHolder
 		{
 			public static List<string> List { get; } = new List<string>();
+			public static List<IEnumerable> Complex = new List<IEnumerable>(new[] { "hello" });
+			public static List<IEnumerable> Extra = new List<IEnumerable>(new IEnumerable[] {
+				"hello",
+				new byte[0],
+				new ulong[] { 1,2 },
+				new ExtraEnumerable() });
 		}
 		[Test]
 		public void ROS_DRefl11_List()
@@ -329,8 +346,22 @@ namespace RedOnion.ScriptNUnit
 				"list.add \"it\"",
 				"var result = \"none\"",
 				"for var e in list; result = e",
-				"return result"
-			);
+				"return result");
+			Lines(
+				'h',
+				"var complex = listHolder.complex",
+				"var it",
+				"for var x in complex",
+				"	for var y in x",
+				"		it = y",
+				"		break",
+				"return it");
+			Lines(
+				3.0,
+				"for var x in listHolder.extra",
+				"	for var y in x",
+				"		it = y",
+				"return it");
 		}
 	}
 }

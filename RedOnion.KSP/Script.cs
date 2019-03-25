@@ -54,6 +54,9 @@ namespace RedOnion.KSP
 			if (system == null)
 				root.BaseProps.Set("System", new SimpleObject(root.Engine, sys));
 
+			var ship = Value.ReadOnly(dummy => ReflectedType.Convert(root.Engine, FlightGlobals.ActiveVessel));
+			root.Add("ship", ship);
+
 			// safe types next (TODO: ref-count or bind to engine to dispose with engine reset)
 			root.BaseProps.Set("UI", new Value(engine =>
 			new SimpleObject(engine, new Properties()
@@ -154,6 +157,8 @@ namespace RedOnion.KSP
 					{ "InputLockManager", root[typeof(InputLockManager)] },
 					{ "InputLock",		root[typeof(InputLockManager)] },
 					{ "StageManager",   root[typeof(KUI.Screens.StageManager)] },
+
+					{ "ship", ship }
 				})));
 			}
 		}

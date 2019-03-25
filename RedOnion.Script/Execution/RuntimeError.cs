@@ -17,21 +17,40 @@ namespace RedOnion.Script
 			{
 				if (_lineNumber < 0)
 				{
-					int it = Array.BinarySearch(Code.LineMap, CodeAt-1);
-					if (it < 0)
+					_lineNumber = 0;
+					if (Code?.LineMap != null && Code.LineMap.Length > 0)
 					{
-						it = ~it;
-						if (it > 0)
-							it--;
-						_lineNumber = it;
+						int it = Array.BinarySearch(Code.LineMap, CodeAt-1);
+						if (it < 0)
+						{
+							it = ~it;
+							if (it > 0)
+								it--;
+							_lineNumber = it;
+						}
 					}
 				}
 				return _lineNumber;
 			}
 		}
 
-		public string Line => Code.Lines[LineNumber].Text;
-		public int Position => Code.Lines[LineNumber].Position;
+		private CompiledCode.SourceLine? sourceLine;
+		public CompiledCode.SourceLine SourceLine
+		{
+			get
+			{
+				if (!sourceLine.HasValue)
+				{
+					var i = LineNumber;
+					if (i >= 0 && Code?.Lines != null && i < Code.Lines.Count)
+						sourceLine = Code.Lines[i];
+					else sourceLine = new CompiledCode.SourceLine();
+				}
+				return sourceLine.Value;
+			}
+		}
+		public string Line => SourceLine.Text;
+		public int Position => SourceLine.Position;
 
 		public RuntimeError(CompiledCode code, int at, Exception innerException, string message)
 			: base(message ?? innerException.Message, innerException)

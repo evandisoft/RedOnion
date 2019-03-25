@@ -362,7 +362,8 @@ namespace RedOnion.Script
 			=> Add(name, Value.FromObject(obj));
 	}
 
-	public interface IArray : IObject, IList<Value>
+	public interface IEnumerableObject : IObject, IEnumerable<Value> { }
+	public interface IListObject : IEnumerableObject, IList<Value>
 	{
 		bool IsWritable { get; }
 		bool IsFixedSize { get; }

@@ -182,9 +182,10 @@ namespace RedOnion.ScriptNUnit
 			CodeCheck(11, OpCode.Call0);
 			CodeCheck(12, OpCode.Identifier);
 			CodeCheck(13, 1, "action");
-			CodeCheck(17, OpCode.Identifier);
-			CodeCheck(18, 0, "stop");
-			CodeCheck(22);
+			CodeCheck(17, 5);
+			CodeCheck(21, OpCode.Identifier);
+			CodeCheck(22, 0, "stop");
+			CodeCheck(26);
 		}
 
 		[Test]

@@ -8,22 +8,32 @@ using System.Reflection;
 
 namespace RedOnion.Script.ReflectedObjects
 {
-	public class ReflectedObject : BasicObjects.SimpleObject
+	public class ReflectedObject : ReflectedObject<object>
+	{
+		public ReflectedObject(IEngine engine, object target, IProperties properties = null)
+			: base(engine, target, properties) { }
+		public ReflectedObject(IEngine engine, object target, ReflectedType type, IProperties properties = null)
+			: base(engine, target, type, properties) { }
+	}
+	public class ReflectedObject<T> : BasicObjects.SimpleObject
 	{
 		public override ObjectFeatures Features
 			=> ObjectFeatures.Proxy | ObjectFeatures.Operators;
 
-		private object _target;
+		private T _target;
 		private Type _type;
 		public ReflectedType Creator { get; }
 
+		public T It => _target;
 		public override object Target => _target;
 		public override Type Type => _type;
+		public override string Name => PureName;
+		protected string PureName => (_target?.GetType() ?? _type)?.Name ?? base.Name;
 
-		public ReflectedObject(IEngine engine, object target, IProperties properties = null)
+		public ReflectedObject(IEngine engine, T target, IProperties properties = null)
 			: base(engine, properties)
 			=> _type = (_target = target)?.GetType();
-		public ReflectedObject(IEngine engine, object target, ReflectedType type, IProperties properties = null)
+		public ReflectedObject(IEngine engine, T target, ReflectedType type, IProperties properties = null)
 			: this(engine, target, properties)
 		{
 			_type = (Creator = type)?.Type ?? target.GetType();

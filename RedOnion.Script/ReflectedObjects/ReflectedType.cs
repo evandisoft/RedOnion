@@ -14,6 +14,7 @@ namespace RedOnion.Script.ReflectedObjects
 		/// </summary>
 		public override Type Type => _type;
 		private Type _type;
+		public override string Name => _type?.GetType().FullName + " [static]";
 
 		internal KeyValuePair<PropertyInfo, ParameterInfo[]>[] indexers;
 		internal Dictionary<OpCode, MethodInfo[]> operators;
@@ -96,8 +97,12 @@ namespace RedOnion.Script.ReflectedObjects
 
 		public override IObject Convert(object value)
 		{
-			if (value is IList list)
-				return new ReflectedList(Engine, list, this, TypeProps);
+			if (value is IEnumerable e)
+			{
+				if (e is IList list)
+					return new ReflectedList(Engine, list, this, TypeProps);
+				return new ReflectedEnumerable(Engine, e, this, TypeProps);
+			}
 			return new ReflectedObject(Engine, value, this, TypeProps);
 		}
 

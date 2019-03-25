@@ -39,7 +39,7 @@ namespace RedOnion.Script.BasicObjects
 	/// String object (string box)
 	/// </summary>
 	[DebuggerDisplay("{Name}: {String}")]
-	public class StringObj : BasicObject, IArray
+	public class StringObj : BasicObject, IListObject
 	{
 		/// <summary>
 		/// Boxed value
@@ -74,8 +74,8 @@ namespace RedOnion.Script.BasicObjects
 
 		public int Count => String.Length;
 		bool ICollection<Value>.IsReadOnly => true;
-		bool IArray.IsWritable => false;
-		bool IArray.IsFixedSize => true;
+		bool IListObject.IsWritable => false;
+		bool IListObject.IsFixedSize => true;
 
 		public bool Contains(char c)
 			=> String.Contains(c);

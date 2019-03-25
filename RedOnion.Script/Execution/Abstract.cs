@@ -184,10 +184,14 @@ namespace RedOnion.Script
 			{
 				Process(ref at);
 				if (Exit != 0)
-				{
 					break;
-				}
 			}
+			at = end;
+		}
+		protected void SkipBlock(ref int at)
+		{
+			var size = CodeInt(ref at);
+			var end = at + size;
 			at = end;
 		}
 

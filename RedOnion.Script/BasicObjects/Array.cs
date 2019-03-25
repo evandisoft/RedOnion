@@ -69,7 +69,7 @@ namespace RedOnion.Script.BasicObjects
 	/// String object (string box)
 	/// </summary>
 	[DebuggerDisplay("{Name}")]
-	public class ArrayObj : BasicObject, IArray
+	public class ArrayObj : BasicObject, IListObject
 	{
 		public static readonly Value[] Empty = new Value[0];
 		public Value[] Array { get; protected set; }
@@ -116,8 +116,8 @@ namespace RedOnion.Script.BasicObjects
 				yield return v;
 		}
 
-		bool IArray.IsWritable => true;
-		bool IArray.IsFixedSize => true;
+		bool IListObject.IsWritable => true;
+		bool IListObject.IsFixedSize => true;
 		public Value this[int index]
 		{
 			get => Array[index];

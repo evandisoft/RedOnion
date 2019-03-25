@@ -72,6 +72,7 @@
     <Compile Include="Execution\Value.Unary.cs" />
     <Compile Include="Execution\Value.Binary.cs" />
     <Compile Include="Execution\Value.Convert.cs" />
+    <Compile Include="ReflectedObjects\ReflectedEnumerable.cs" />
     <Compile Include="ReflectedObjects\ReflectedFunction.cs" />
     <Compile Include="ReflectedObjects\ReflectedList.cs" />
     <Compile Include="ReflectedObjects\ReflectedMethod.cs" />

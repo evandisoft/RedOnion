@@ -279,7 +279,9 @@ namespace RedOnion.Script.Parsing
 						throw new ParseError(lexer, "Expected 'while' or 'until' for 'do'");
 					Code[doat] = OpCode.DoUntil.Code();
 				}
+				var condAt = Write(0);
 				Next().FullExpression(flags);
+				Write(CodeAt-condAt-4, condAt);
 				return;
 
 			case OpCode.For:
