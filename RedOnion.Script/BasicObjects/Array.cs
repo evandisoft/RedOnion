@@ -86,7 +86,7 @@ namespace RedOnion.Script.BasicObjects
 		/// Create new string object boxing the string
 		/// </summary>
 		public ArrayObj(IEngine engine, ArrayObj baseClass, Value[] value)
-			: base(engine, baseClass, StdProps)
+			: base(engine, baseClass, new Properties(StdProps))
 			=> Array = value;
 
 		public override Value Index(IObject self, int argc)
@@ -116,7 +116,7 @@ namespace RedOnion.Script.BasicObjects
 				yield return v;
 		}
 
-		bool IArray.IsReadOnly => false;
+		bool IArray.IsWritable => true;
 		bool IArray.IsFixedSize => true;
 		public Value this[int index]
 		{
@@ -131,14 +131,15 @@ namespace RedOnion.Script.BasicObjects
 		void IList<Value>.Insert(int index, Value item) => throw new NotImplementedException();
 		void IList<Value>.RemoveAt(int index) => throw new NotImplementedException();
 
-		public static Properties StdProps { get; } = new Properties()
+		public static IDictionary<string, Value> StdProps { get; } = new Dictionary<string, Value>()
 		{
-			{ "length", new Value(new LengthProp()) }
+			{ "length", LengthProp.Value }
 		};
 
 		// also used in StringObj and ListObj
 		public class LengthProp : IProperty
 		{
+			public static Value Value { get; } = new Value(new LengthProp());
 			public Value Get(IObject obj)
 				=> new Value(((ICollection<Value>)obj).Count);
 			public bool Set(IObject obj, Value value)

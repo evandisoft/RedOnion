@@ -340,6 +340,13 @@ namespace RedOnion.Script
 		public Properties()
 			: base(StringComparer.OrdinalIgnoreCase)
 		{ }
+		/// <summary>
+		/// Create by cloning dictionary
+		/// </summary>
+		public Properties(IDictionary<string, Value> src)
+			: base(src, StringComparer.OrdinalIgnoreCase)
+		{ }
+
 
 		/// <summary>
 		/// Create with one object-reference property (usually "prototype")
@@ -357,7 +364,7 @@ namespace RedOnion.Script
 
 	public interface IArray : IObject, IList<Value>
 	{
-		new bool IsReadOnly { get; }
+		bool IsWritable { get; }
 		bool IsFixedSize { get; }
 	}
 	public interface IObject : IProperties
