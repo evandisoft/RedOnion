@@ -11,6 +11,7 @@ namespace Kerbalua.Gui
 		public KeyBindings KeyBindings = new KeyBindings();
 		protected TextEditor editor;
 		public int LineNumber { get; private set; } = 1;
+		public int ColumnNumber { get; private set; } = 1;
 
 		/// <summary>
 		/// Setting this to true will not allow any key-down input events
@@ -67,6 +68,7 @@ namespace Kerbalua.Gui
 				HandleInput();
 
 				LineNumber = CurrentLineNumber()+1;
+				ColumnNumber = CharsFromLineStart();
 
 				content.text = editor.text;
 
@@ -445,6 +447,7 @@ namespace Kerbalua.Gui
 		protected int CharsFromLineStart()
 		{
 			int prevCursorIndex = editor.cursorIndex;
+			int prevSelectIndex = editor.selectIndex;
 			editor.MoveLineStart();
 			int startIndex = editor.cursorIndex;
 
@@ -452,7 +455,10 @@ namespace Kerbalua.Gui
 
 			//Debug.Log("chars from line start is " + chars);
 
-			MoveToIndex(prevCursorIndex);
+			//MoveToIndex(prevCursorIndex);
+
+			editor.cursorIndex = prevCursorIndex;
+			editor.selectIndex = prevSelectIndex;
 
 			return chars;
 		}
@@ -460,14 +466,16 @@ namespace Kerbalua.Gui
 		protected int CharsFromLineEnd()
 		{
 			int prevCursorIndex = editor.cursorIndex;
+			int prevSelectIndex = editor.selectIndex;
 			editor.MoveLineEnd();
 			int endIndex = editor.cursorIndex;
 
 			int chars = endIndex - prevCursorIndex;
 
 			//Debug.Log("chars from line start is " + chars);
-
-			MoveToIndex(prevCursorIndex);
+			editor.cursorIndex = prevCursorIndex;
+			editor.selectIndex = prevSelectIndex;
+			//MoveToIndex(prevCursorIndex);
 
 			return chars;
 		}
@@ -504,6 +512,7 @@ namespace Kerbalua.Gui
 		protected string CurrentLine()
 		{
 			int prevCursorIndex = editor.cursorIndex;
+			int prevSelectIndex = editor.selectIndex;
 			editor.MoveLineEnd();
 			int endIndex = editor.cursorIndex;
 			editor.MoveLineStart();
@@ -512,7 +521,9 @@ namespace Kerbalua.Gui
 
 			//Debug.Log("The Line is " + currentLine);
 
-			MoveToIndex(prevCursorIndex);
+			//MoveToIndex(prevCursorIndex);
+			editor.cursorIndex = prevCursorIndex;
+			editor.selectIndex = prevSelectIndex;
 
 			return currentLine;
 		}

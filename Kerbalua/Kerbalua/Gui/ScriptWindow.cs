@@ -580,7 +580,7 @@ Any other key gives focus to input box.
 				scriptIOTextArea.Update(scriptIORect, true);
 				var editorInfoRect = new Rect(scriptIORect);
 				editorInfoRect.x = scriptIORect.x + scriptIORect.width;
-				GUI.Label(editorInfoRect, "Line: " + editor.LineNumber);
+				GUI.Label(editorInfoRect, "Line: " + editor.LineNumber+", Column: "+editor.ColumnNumber);
 				editor.Update(GetCurrentEditorRect(), editorVisible);
 			}
 
