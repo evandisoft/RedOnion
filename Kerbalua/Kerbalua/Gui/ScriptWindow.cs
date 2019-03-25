@@ -575,7 +575,12 @@ Any other key gives focus to input box.
 			if (editorVisible)
 			{
 				//editorRect = UpdateBoxPositionWithWindow(editorRect, -editorRect.width);
-				scriptIOTextArea.Update(GetCurrentScriptNameRect(), true);
+				var scriptIORect = GetCurrentScriptNameRect();
+				scriptIORect.width /= 2;
+				scriptIOTextArea.Update(scriptIORect, true);
+				var editorInfoRect = new Rect(scriptIORect);
+				editorInfoRect.x = scriptIORect.x + scriptIORect.width;
+				GUI.Label(editorInfoRect, "Line: " + editor.LineNumber);
 				editor.Update(GetCurrentEditorRect(), editorVisible);
 			}
 

@@ -47,7 +47,15 @@ namespace Kerbalua.Other
 				}
 
 			} catch (Exception exception) {
-				PrintErrorAction?.Invoke(exception.Message);
+				if(exception is InterpreterException interExcept)
+				{
+					PrintErrorAction?.Invoke(interExcept.DecoratedMessage);
+				}
+				else
+				{
+					PrintErrorAction?.Invoke(exception.Message);
+				}
+
 				Debug.Log(exception);
 				Terminate();
 				isComplete = true;

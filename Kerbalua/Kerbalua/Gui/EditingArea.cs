@@ -10,7 +10,7 @@ namespace Kerbalua.Gui
 		const int spacesPerTab = 4;
 		public KeyBindings KeyBindings = new KeyBindings();
 		protected TextEditor editor;
-
+		public int LineNumber { get; private set; } = 1;
 
 		/// <summary>
 		/// Setting this to true will not allow any key-down input events
@@ -56,6 +56,8 @@ namespace Kerbalua.Gui
 
 			if (HasFocus())
 			{
+
+
 				int id = GUIUtility.keyboardControl;
 				editor = (TextEditor)GUIUtility.GetStateObject(typeof(TextEditor), id);
 				editor.text = content.text;
@@ -63,6 +65,8 @@ namespace Kerbalua.Gui
 				editor.selectIndex = selectIndex;
 
 				HandleInput();
+
+				LineNumber = CurrentLineNumber()+1;
 
 				content.text = editor.text;
 

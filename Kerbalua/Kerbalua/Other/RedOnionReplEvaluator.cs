@@ -4,6 +4,7 @@ using RedOnion.Script;
 using UnityEngine;
 using RedOnion.KSP;
 using RedOnion.KSP.Autopilot;
+using RedOnion.Script.Parsing;
 
 namespace Kerbalua.Other {
 	public class RedOnionReplEvaluator:ReplEvaluator {
@@ -29,10 +30,15 @@ namespace Kerbalua.Other {
 				output +=result.ToString();
 			}
 			catch(Exception e) {
-				if(e is RuntimeError error)
+				if(e is RuntimeError runError)
 				{
 					PrintErrorAction?.Invoke(e.Message); 
-					PrintErrorAction?.Invoke("At line "+error.LineNumber+": "+"\""+error.Line+"\"");
+					PrintErrorAction?.Invoke("At line "+runError.LineNumber+": "+"\""+runError.Line+"\"");
+				}
+				else if(e is ParseError parseError)
+				{
+					PrintErrorAction?.Invoke(e.Message);
+					PrintErrorAction?.Invoke("At line " + parseError.LineNumber + ": " + "\"" + parseError.Line + "\"");
 				}
 				else
 				{
