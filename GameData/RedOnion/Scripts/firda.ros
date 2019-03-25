@@ -1,0 +1,5 @@
+def fn
+    return
+fn def arg
+    print arg
+print 3

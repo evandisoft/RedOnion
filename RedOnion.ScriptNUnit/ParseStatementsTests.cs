@@ -39,6 +39,8 @@ namespace RedOnion.ScriptNUnit
 					e.GetType().ToString(), e.Message, value), e);
 			}
 		}
+		public void Lines(params string[] lines)
+			=> Test(string.Join(Environment.NewLine, lines));
 
 		[Test]
 		public void ROS_PStts01_Return()
@@ -256,6 +258,54 @@ namespace RedOnion.ScriptNUnit
 			CodeCheck(32, 1); // default block size
 			CodeCheck(36, OpCode.Continue);
 			CodeCheck(37);
+		}
+
+		[Test]
+		public void ROS_PStts11_Lambda()
+		{
+			Lines(
+				"fn def e",
+				"	print e",
+				"print true");
+			CodeCheck( 0, OpCode.Call1);
+			CodeCheck( 1, OpCode.Identifier);
+			CodeCheck( 2, 2, "fn");
+			CodeCheck( 6, OpCode.Function);
+			CodeCheck( 7, 23);
+			CodeCheck(14, (byte)1); // one arg (e)
+			CodeCheck(15, 1); // undefined return type
+			CodeCheck(19, OpCode.Undefined);
+			CodeCheck(20, 0, "e");
+			CodeCheck(24, 1);
+			CodeCheck(28, OpCode.Undefined); // no type
+			CodeCheck(29, 1);
+			CodeCheck(33, OpCode.Undefined); // no default
+			CodeCheck(34, 11); // block size
+			CodeCheck(38, OpCode.Call1);
+			CodeCheck(39, OpCode.Identifier);
+			CodeCheck(40, 1, "print");
+			CodeCheck(44, OpCode.Identifier);
+			CodeCheck(45, 0, "e");
+			// important: 49-38 = 11 - the block size @34
+			CodeCheck(49, OpCode.Call1);
+			CodeCheck(50, OpCode.Identifier);
+			CodeCheck(51, 1, "print");
+			CodeCheck(55, OpCode.True);
+			CodeCheck(56);
+
+			Reset();
+			Lines(
+				"for e in a; def e",
+				"	print e",
+				"print true");
+
+			Reset();
+			Lines(
+				"def fn",
+				"	return",
+				"fn def arg",
+				"	print arg",
+				"print 3");
 		}
 	}
 }

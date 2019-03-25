@@ -92,7 +92,7 @@ namespace RedOnion.Script.Parsing
 		protected virtual int ParseBlock(Flag flags)
 		{
 			var ind = lexer.Indent;
-			if (ind == 0 && lexer.First)
+			if (ind == 0 && lexer.First && (flags & Flag.LimitedContext) == 0)
 				ind = -1;
 			var nosize = (flags & Flag.NoSize) != 0;
 			var member = (flags & Flag.Member) != 0;
@@ -404,8 +404,9 @@ namespace RedOnion.Script.Parsing
 
 		protected virtual void ParseFunction(string name, Flag flags)
 		{
-			if (name != null)	// null if parsing lambda / inline function
+			if (name != null)   // null if parsing lambda / inline function
 				Write(name);    // function name (index to string table)
+			else flags |= Flag.LimitedContext;
 			Write(0);           // header size
 			int mark = CodeAt;
 			Write((ushort)0);   // type flags

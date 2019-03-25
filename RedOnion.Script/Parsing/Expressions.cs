@@ -55,6 +55,7 @@ namespace RedOnion.Script.Parsing
 		protected virtual bool ParseExpression(Flag flags = Flag.None)
 		{
 			var bottom = OperatorAt;
+			bool wasBlock = false;
 		unext:
 			var unary = true;
 		next:
@@ -253,18 +254,14 @@ namespace RedOnion.Script.Parsing
 						&& Next().lexer.Word == null)
 						throw new ParseError(lexer, "Expected variable type");
 					ParseType(flags);
-					var wasBlock = false;
+					wasBlock = false;
 					if (lexer.Code == OpCode.Assign)
 						wasBlock = Next().ParseExpression(flags);
 					else
 						Push(OpCode.Undefined);
 					PrepareOperator(OpCode.Var);
 					if (wasBlock)
-					{
-						while (OperatorAt > bottom)
-							PrepareOperator(PopOperator());
-						return true;
-					}
+						goto blockend;
 					unary = false;
 					goto next;
 				case OpCode.Generic:    //----------------------------------- generic type or method
@@ -392,15 +389,22 @@ namespace RedOnion.Script.Parsing
 				PrepareOperator(PopOperator());
 			return false;
 
+		blockend:
+			while (OperatorAt > bottom)
+				PrepareOperator(PopOperator());
+			return true;
+
 		//################################################################################ auto call
 		autocall:
 			if (!HasOption(Option.AutocallWhenArgs))
 				throw new ParseError(lexer, "Unexpected literal (autocall is disabled)");
 			Debug.Assert(!unary);
-			ParseExpression(flags);
+			wasBlock = ParseExpression(flags | Flag.LimitedContext);
 			if (lexer.Curr != ',')
 			{
 				PrepareOperator(OpCode.Call1);
+				if (wasBlock)
+					goto blockend;
 				unary = false;
 				goto next;
 			}
@@ -411,6 +415,8 @@ namespace RedOnion.Script.Parsing
 			}
 			while (lexer.Curr == ',');
 			PrepareOperator(OpCode.CallN);
+			if (wasBlock)
+				goto blockend;
 			unary = false;
 			goto next;
 		}
