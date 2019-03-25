@@ -73,6 +73,7 @@
     <Compile Include="Execution\Value.Binary.cs" />
     <Compile Include="Execution\Value.Convert.cs" />
     <Compile Include="ReflectedObjects\ReflectedFunction.cs" />
+    <Compile Include="ReflectedObjects\ReflectedList.cs" />
     <Compile Include="ReflectedObjects\ReflectedMethod.cs" />
     <Compile Include="ReflectedObjects\ReflectedObject.cs" />
     <Compile Include="ReflectedObjects\ReflectedType.cs" />

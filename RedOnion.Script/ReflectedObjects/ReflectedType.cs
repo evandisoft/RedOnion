@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -53,12 +54,12 @@ namespace RedOnion.Script.ReflectedObjects
 			{
 				// Structure/ValueType has implicit default constructor (zero everything)
 				if (Type.IsValueType)
-					return new ReflectedObject(Engine, Activator.CreateInstance(Type), this, TypeProps);
+					return Convert(Activator.CreateInstance(Type));
 
 				// try to find constructor with no arguments
 				var ctor = Type.GetConstructor(new Type[0]);
 				if (ctor != null)
-					return new ReflectedObject(Engine, ctor.Invoke(new object[0]), this, TypeProps);
+					return Convert(ctor.Invoke(new object[0]));
 
 				// try to find constructor with all default values
 				foreach (var ctr in Type.GetConstructors())
@@ -69,7 +70,7 @@ namespace RedOnion.Script.ReflectedObjects
 					var args = new object[cpars.Length];
 					for (int i = 0; i < args.Length; i++)
 						args[i] = cpars[i].DefaultValue;
-					return new ReflectedObject(Engine, ctr.Invoke(args), this, TypeProps);
+					return Convert(ctr.Invoke(args));
 				}
 
 				if (!Engine.HasOption(EngineOption.Silent))
@@ -94,7 +95,11 @@ namespace RedOnion.Script.ReflectedObjects
 		}
 
 		public override IObject Convert(object value)
-			=> new ReflectedObject(Engine, value, this, TypeProps);
+		{
+			if (value is IList list)
+				return new ReflectedList(Engine, list, this, TypeProps);
+			return new ReflectedObject(Engine, value, this, TypeProps);
+		}
 
 		public class MemberComparer : IComparer<MemberInfo>
 		{

@@ -314,5 +314,23 @@ namespace RedOnion.ScriptNUnit
 			Test("e.click.invoke");
 			Test(1, "c");
 		}
+
+		public static class ListHolder
+		{
+			public static List<string> List { get; } = new List<string>();
+		}
+		[Test]
+		public void ROS_DRefl11_List()
+		{
+			Root.AddType(typeof(ListHolder));
+			Lines(
+				(object)"it",
+				"var list = listHolder.list",
+				"list.add \"it\"",
+				"var result = \"none\"",
+				"for var e in list; result = e",
+				"return result"
+			);
+		}
 	}
 }

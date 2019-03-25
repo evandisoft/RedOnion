@@ -100,9 +100,9 @@ namespace RedOnion.Script.BasicObjects
 			core.Set("Function",	Function);
 			core.Set("Object",		Object);
 			core.Set("String",		String);
-			core.Set("Array",		Array);
-			core.Set("List",		List);
-			core.Set("Number",		Number);
+			more.Set("Array",		Array);
+			more.Set("List",		List);
+			more.Set("Number",		Number);
 			core.Set("Float",		Float);
 			more.Set("Single",		Float);
 			core.Set("Double",		Double);
