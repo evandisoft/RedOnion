@@ -47,6 +47,7 @@ namespace Kerbalua.Other
 				}
 
 			} catch (Exception exception) {
+				PrintErrorAction?.Invoke(exception.Message);
 				Debug.Log(exception);
 				Terminate();
 				isComplete = true;
@@ -63,6 +64,7 @@ namespace Kerbalua.Other
 			try {
 				return LuaIntellisense.GetCompletions(scriptEngine.Globals, source, cursorPos, out replaceStart, out replaceEnd);
 			} catch (Exception e) {
+
 				Debug.Log(e);
 				replaceStart = replaceEnd = cursorPos;
 				return new List<string>();
@@ -76,6 +78,7 @@ namespace Kerbalua.Other
 			scriptEngine.Options.DebugPrint = (string str) => {
 				PrintAction?.Invoke(str);
 			};
+			
 			scriptEngine.Options.ScriptLoader = new FileSystemScriptLoader();
 			((ScriptLoaderBase)scriptEngine.Options.ScriptLoader).IgnoreLuaPathGlobal = true;
 			((ScriptLoaderBase)scriptEngine.Options.ScriptLoader).ModulePaths = new string[] { Settings.BaseScriptsPath+"/?.lua" };

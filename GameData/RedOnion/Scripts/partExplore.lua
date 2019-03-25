@@ -6,3 +6,10 @@ function printModules(part)
         print(module)
     end
 end 
+
+for part in vessel.parts do
+    printModules(part)
+    print(part.persistentId)
+end
+
+module=part.Modules[0]

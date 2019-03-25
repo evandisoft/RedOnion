@@ -11,6 +11,7 @@ namespace Kerbalua.Other {
 	public abstract class ReplEvaluator {
 		const int maxHistorySize = 1000;
 		public Action<string> PrintAction;
+		public Action<string> PrintErrorAction;
 
 		LinkedListNode<string> currentHistoryItem=null;
 		/// <summary>

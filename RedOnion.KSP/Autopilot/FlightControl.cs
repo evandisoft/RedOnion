@@ -2,18 +2,22 @@ using System;
 using MoonSharp.Interpreter;
 using UnityEngine;
 
-namespace RedOnion.KSP.Autopilot {
-	public class FlightControl {
+namespace RedOnion.KSP.Autopilot
+{
+	public class FlightControl
+	{
 		static FlightControl instance;
 		static public FlightControl GetInstance()
 		{
-			if (instance == null) {
+			if (instance == null)
+			{
 				instance = new FlightControl();
 			}
 			return instance;
 		}
 
-		public enum SpinMode {
+		public enum SpinMode
+		{
 			SET_DIR,
 			SET_SPIN,
 			RAW,
@@ -22,24 +26,30 @@ namespace RedOnion.KSP.Autopilot {
 
 		public SpinMode CurrentSpinMode { get; private set; }
 
-		Vector3 targetDir=new Vector3();
-		public Vector3 TargetDir { 
-			get {
+		Vector3 targetDir = new Vector3();
+		public Vector3 TargetDir
+		{
+			get
+			{
 				return targetDir;
 			}
-			set {
+			set
+			{
 				Enable();
 				CurrentSpinMode = SpinMode.SET_DIR;
 				targetDir = value;
 			}
 		}
 
-		Vector3 targetSpin=new Vector3();
-		public Vector3 TargetSpin {
-			get {
+		Vector3 targetSpin = new Vector3();
+		public Vector3 TargetSpin
+		{
+			get
+			{
 				return targetSpin;
 			}
-			set {
+			set
+			{
 				Enable();
 				CurrentSpinMode = SpinMode.SET_SPIN;
 				targetSpin = value;
@@ -76,9 +86,12 @@ namespace RedOnion.KSP.Autopilot {
 		{
 			Vector3 torque = new Vector3();
 
-			foreach(var part in vessel.Parts) {
-				foreach(var module in part.Modules) {
-					if(module is ITorqueProvider torqueProvider) {
+			foreach (var part in vessel.Parts)
+			{
+				foreach (var module in part.Modules)
+				{
+					if (module is ITorqueProvider torqueProvider)
+					{
 						Vector3 pos, neg;
 						torqueProvider.GetPotentialTorque(out pos, out neg);
 						torque += pos;
@@ -101,17 +114,18 @@ namespace RedOnion.KSP.Autopilot {
 		void ControlCallback(FlightCtrlState flightCtrlState)
 		{
 			//flightCtrlState.CopyFrom(userCtrlState);
-			switch (CurrentSpinMode) {
-			case SpinMode.SET_SPIN:
-				SetSpin(flightCtrlState);
-				break;
-			case SpinMode.SET_DIR:
-				SetDir(flightCtrlState);
-				break;
-			case SpinMode.RAW:
-				SetPitchRollYaw(flightCtrlState, new Vector3(
-					userCtrlState.pitch, userCtrlState.roll, userCtrlState.yaw));
-				break;
+			switch (CurrentSpinMode)
+			{
+				case SpinMode.SET_SPIN:
+					SetSpin(flightCtrlState);
+					break;
+				case SpinMode.SET_DIR:
+					SetDir(flightCtrlState);
+					break;
+				case SpinMode.RAW:
+					SetPitchRollYaw(flightCtrlState, new Vector3(
+						userCtrlState.pitch, userCtrlState.roll, userCtrlState.yaw));
+					break;
 			}
 		}
 
@@ -125,16 +139,17 @@ namespace RedOnion.KSP.Autopilot {
 		public Vector3 TargetSpinNeeded(Vector3 target)
 		{
 			Vessel vessel = FlightGlobals.ActiveVessel;
-			if (vessel == null) {
+			if (vessel == null)
+			{
 				return new Vector3();
 			}
 			Vector3 currentDir = vessel.transform.up;
 			Vector3 angularSpeed = GetAngularVelocity(vessel);
 			Vector3 worldSpaceAngularSpeed = vessel.transform.localToWorldMatrix * angularSpeed;
-			Vector3 halfWayDir = Quaternion.AngleAxis(worldSpaceAngularSpeed.magnitude * Time.deltaTime/2, worldSpaceAngularSpeed) * currentDir;
+			Vector3 halfWayDir = Quaternion.AngleAxis(worldSpaceAngularSpeed.magnitude * Time.deltaTime / 2, worldSpaceAngularSpeed) * currentDir;
 
 			Vector3 currentDistanceAxis = vessel.transform.worldToLocalMatrix * Vector3.Cross(halfWayDir, target);
-			float angularDistance = Vector3.Angle(halfWayDir, target)/360*2*Mathf.PI;
+			float angularDistance = Vector3.Angle(halfWayDir, target) / 360 * 2 * Mathf.PI;
 			//(d-vt)*2/t^2=a
 			//accel=(angularDistance-angularSpeed*Time.deltaTime)/Time.deltaTime^2
 			// angularSpeedFinal/2*Time.deltaTime=angularDistanceFinal
@@ -154,22 +169,24 @@ namespace RedOnion.KSP.Autopilot {
 
 		float Accel(float distance, float velocity)
 		{
-			return (distance-velocity*Time.deltaTime)*2/Mathf.Pow(Time.deltaTime,2);
+			return (distance - velocity * Time.deltaTime) * 2 / Mathf.Pow(Time.deltaTime, 2);
 		}
 
 
-		float MinStoppingDistance(float speed,float maxAccel)
+		float MinStoppingDistance(float speed, float maxAccel)
 		{
 			float absSpeed = Math.Abs(speed);
 			float minStoppingTime = absSpeed / maxAccel;
 			return absSpeed / 2 * minStoppingTime;
 		}
 
-		float InputNeeded(float distance,float angularSpeed,float maxAccel)
+		float InputNeeded(float distance, float angularSpeed, float maxAccel)
 		{
-			if (distance * angularSpeed > 0) {
+			if (distance * angularSpeed > 0)
+			{
 				float minStopDistance = MinStoppingDistance(angularSpeed, maxAccel);
-				if (minStopDistance > Math.Abs(distance) / 2) {
+				if (minStopDistance > Math.Abs(distance) / 2)
+				{
 					return minStopDistance / distance;
 				}
 			}
@@ -181,21 +198,22 @@ namespace RedOnion.KSP.Autopilot {
 		{
 			//Debug.Log("SetDir");
 			Vessel vessel = FlightGlobals.ActiveVessel;
-			if (vessel == null) {
+			if (vessel == null)
+			{
 				Shutdown();
 				return;
 			}
 
 			Vector3 currentDir = vessel.transform.up;
 			Vector3 angularVelocity = GetAngularVelocity(vessel);
-			float angularDistance = Vector3.Angle(currentDir,targetDir) / 360 * 2 * Mathf.PI;
+			float angularDistance = Vector3.Angle(currentDir, targetDir) / 360 * 2 * Mathf.PI;
 			////(d-vt)*2/t^2=a
 			////accel=(angularDistance-angularSpeed*Time.deltaTime)/Time.deltaTime^2
 			Vector3 distanceAxis = vessel.transform.worldToLocalMatrix * Vector3.Cross(currentDir.normalized, targetDir.normalized);
 			Vector3 maxAccel = GetMaxAcceleration(vessel);
 			//Vector3 desiredAccel=(-distanceAxis + angularSpeed * Time.deltaTime) * 2 / (float)Math.Pow(Time.deltaTime,2);
 
-			
+
 			Vector3 inputNeeded = new Vector3();
 
 			inputNeeded.x = InputNeeded(distanceAxis.x, angularVelocity.x, maxAccel.x);
@@ -233,14 +251,15 @@ namespace RedOnion.KSP.Autopilot {
 		void SetSpin(FlightCtrlState flightCtrlState)
 		{
 			Vessel vessel = FlightGlobals.ActiveVessel;
-			if (vessel == null) {
+			if (vessel == null)
+			{
 				Shutdown();
 				return;
 			}
 
 			Vector3 angularVelocity = GetAngularVelocity(vessel);
 			Vector3 maxAccel = GetMaxAcceleration(vessel);
-			Vector3 pry = MathUtil.Vec.Div(angularVelocity-targetSpin, maxAccel * Time.deltaTime);
+			Vector3 pry = MathUtil.Vec.Div(angularVelocity - targetSpin, maxAccel * Time.deltaTime);
 			SetPitchRollYaw(flightCtrlState, pry);
 		}
 
@@ -263,55 +282,59 @@ namespace RedOnion.KSP.Autopilot {
 		/// </summary>
 		/// <param name="flightCtrlState">Flight ctrl state.</param>
 		/// <param name="pry">Pry.</param>
-		void SetPitchRollYaw(FlightCtrlState flightCtrlState,Vector3 pry)
+		void SetPitchRollYaw(FlightCtrlState flightCtrlState, Vector3 pry)
 		{
 #pragma warning disable RECS0018 // Comparison of floating point numbers with equality operator
-			if (flightCtrlState.pitch == 0.0) {
-				flightCtrlState.pitch = Mathf.Clamp(pry.x,-1,1);
+			if (flightCtrlState.pitch == 0.0)
+			{
+				flightCtrlState.pitch = Mathf.Clamp(pry.x, -1, 1);
 			}
-			if (flightCtrlState.roll == 0.0) {
+			if (flightCtrlState.roll == 0.0)
+			{
 				flightCtrlState.roll = Mathf.Clamp(pry.y, -1, 1);
 			}
-			if (flightCtrlState.yaw == 0.0) {
-				flightCtrlState.yaw = Mathf.Clamp(pry.z,-1,1);
+			if (flightCtrlState.yaw == 0.0)
+			{
+				flightCtrlState.yaw = Mathf.Clamp(pry.z, -1, 1);
 			}
 #pragma warning restore RECS0018 // Comparison of floating point numbers with equality operator
 		}
 
 		public void SetWithTable(Table ctrlTable)
 		{
-			foreach(var setting in ctrlTable.Keys) {
-				if(setting.Type==DataType.String && ctrlTable[setting] is Double value) {
-					switch (setting.String) {
-					case "roll":
-						userCtrlState.roll = Mathf.Clamp((float)value, -1, 1);
-						break;
-					case "pitch":
-						userCtrlState.pitch = Mathf.Clamp((float)value, -1, 1);
-						break;
-					case "yaw":
-						userCtrlState.yaw = Mathf.Clamp((float)value, -1, 1);
-						break;
-					case "X":
-						userCtrlState.X = Mathf.Clamp((float)value, -1, 1);
-						break;
-					case "Y":
-						userCtrlState.Y = Mathf.Clamp((float)value, -1, 1);
-						break;
-					case "Z":
-						userCtrlState.Z = Mathf.Clamp((float)value, -1, 1);
-						break;
-					case "mainThrottle":
-						userCtrlState.mainThrottle = Mathf.Clamp((float)value, 0, 1);
-						break;
+			foreach (var setting in ctrlTable.Keys)
+			{
+				if (setting.Type == DataType.String && ctrlTable[setting] is Double value)
+				{
+					switch (setting.String)
+					{
+						case "roll":
+							userCtrlState.roll = Mathf.Clamp((float)value, -1, 1);
+							break;
+						case "pitch":
+							userCtrlState.pitch = Mathf.Clamp((float)value, -1, 1);
+							break;
+						case "yaw":
+							userCtrlState.yaw = Mathf.Clamp((float)value, -1, 1);
+							break;
+						case "X":
+							userCtrlState.X = Mathf.Clamp((float)value, -1, 1);
+							break;
+						case "Y":
+							userCtrlState.Y = Mathf.Clamp((float)value, -1, 1);
+							break;
+						case "Z":
+							userCtrlState.Z = Mathf.Clamp((float)value, -1, 1);
+							break;
+						case "mainThrottle":
+							userCtrlState.mainThrottle = Mathf.Clamp((float)value, 0, 1);
+							break;
 					}
 				}
 			}
 			CurrentSpinMode = SpinMode.RAW;
 			Enable();
 		}
-
-
 
 		public void SetCtrlState(FlightCtrlState flightCtrlState)
 		{
@@ -326,7 +349,8 @@ namespace RedOnion.KSP.Autopilot {
 		public bool Enable()
 		{
 			var vessel = FlightGlobals.ActiveVessel;
-			if (vessel == null) {
+			if (vessel == null)
+			{
 				return false;
 			}
 
@@ -338,7 +362,8 @@ namespace RedOnion.KSP.Autopilot {
 		public bool Disable()
 		{
 			var vessel = FlightGlobals.ActiveVessel;
-			if (vessel == null) {
+			if (vessel == null)
+			{
 				return false;
 			}
 
