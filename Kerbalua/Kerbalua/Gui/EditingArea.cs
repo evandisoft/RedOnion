@@ -68,7 +68,7 @@ namespace Kerbalua.Gui
 				HandleInput();
 
 				LineNumber = CurrentLineNumber()+1;
-				ColumnNumber = CharsFromLineStart();
+				ColumnNumber = CharsFromLineStart()+1;
 
 				content.text = editor.text;
 
