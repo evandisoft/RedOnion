@@ -411,7 +411,7 @@ namespace RedOnion.Script.Parsing
 			do
 			{
 				PushOperator(OpCode.Comma);
-				Next().ParseExpression(flags);
+				wasBlock = Next().ParseExpression(flags | Flag.LimitedContext);
 			}
 			while (lexer.Curr == ',');
 			PrepareOperator(OpCode.CallN);

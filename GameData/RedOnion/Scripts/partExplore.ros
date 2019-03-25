@@ -11,5 +11,5 @@ for var part in vessel.parts
     
 each vessel.parts,function o
     print o
-    
+
 print 2
