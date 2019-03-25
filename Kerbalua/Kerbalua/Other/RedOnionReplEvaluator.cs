@@ -29,7 +29,15 @@ namespace Kerbalua.Other {
 				output +=result.ToString();
 			}
 			catch(Exception e) {
-				PrintErrorAction?.Invoke(e.Message);
+				if(e is RuntimeError error)
+				{
+					PrintErrorAction?.Invoke(e.Message); 
+					PrintErrorAction?.Invoke("At line "+error.LineNumber+": "+"\""+error.Line+"\"");
+				}
+				else
+				{
+					PrintErrorAction?.Invoke(e.Message);
+				}
 				Debug.Log(e);
 			}
 
