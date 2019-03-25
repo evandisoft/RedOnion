@@ -78,10 +78,17 @@ namespace Kerbalua.Gui {
 			replEvaluators["RedOnion"].PrintAction = (str) => {
 				repl.outputBox.AddOutput(str);
 			};
+			replEvaluators["RedOnion"].PrintErrorAction = (str) => {
+				repl.outputBox.AddError(str);
+			};
 			replEvaluators["Lua"] = new MoonSharpReplEvaluator();
 			replEvaluators["Lua"].PrintAction = (str) => {
 				repl.outputBox.AddOutput(str);
 			};
+			replEvaluators["Lua"].PrintErrorAction = (str) =>
+			 {
+				 repl.outputBox.AddError(str);
+			 };
 			string lastEngineName = Settings.LoadSetting("lastEngine", "RedOnion");
 			if (replEvaluators.ContainsKey(lastEngineName)){
 				currentReplEvaluator = replEvaluators[lastEngineName];
