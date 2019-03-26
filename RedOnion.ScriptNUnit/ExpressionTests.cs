@@ -1,6 +1,7 @@
 using System;
 using NUnit.Framework;
 using RedOnion.Script;
+using RedOnion.Script.BasicObjects;
 
 namespace RedOnion.ScriptNUnit
 {
@@ -166,6 +167,27 @@ namespace RedOnion.ScriptNUnit
 		public void ROS_Expr08_Autocall()
 		{
 			Expect<InvalidOperationException>("true; false");
+		}
+
+		[Test]
+		public void ROS_Expr09_ArrayLiteral()
+		{
+			Test("[1,2]");
+			var arr = Result.RefObj as ArrayObj;
+			Assert.NotNull(arr);
+			Assert.AreEqual(2, arr.Length);
+			Assert.AreEqual(1, arr[0].Native);
+			Assert.AreEqual(2, arr[1].Native);
+
+			Test("[]");
+			arr = Result.RefObj as ArrayObj;
+			Assert.NotNull(arr);
+			Assert.AreEqual(0, arr.Length);
+			Test("[true]");
+			arr = Result.RefObj as ArrayObj;
+			Assert.NotNull(arr);
+			Assert.AreEqual(1, arr.Length);
+			Assert.AreEqual(true, arr[0].Native);
 		}
 	}
 }

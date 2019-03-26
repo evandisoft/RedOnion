@@ -304,5 +304,9 @@ namespace RedOnion.Script.Completion
 #pragma warning restore 67
 		void IEngine.Print(string msg) { }
 		void IEngine.Print(string msg, params object[] args) { }
+
+		~CompletionEngine() => Dispose(false);
+		public void Dispose() => Dispose(true);
+		protected virtual void Dispose(bool disposing) { }
 	}
 }

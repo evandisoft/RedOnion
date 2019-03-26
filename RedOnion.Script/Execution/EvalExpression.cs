@@ -188,9 +188,11 @@ namespace RedOnion.Script
 				}
 				fn = Box(Value);
 				Expression(ref at);
-				Arguments.Add(Result);
-				Value = create ? new Value(fn.Create(1)) : fn.Call(self, 1);
-				Arguments.Remove(1);
+				using (Arguments.Guard())
+				{
+					Arguments.Add(Result);
+					Value = create ? new Value(fn.Create(1)) : fn.Call(self, 1);
+				}
 				return;
 			case OpCode.Call2:
 				CountStatement();
@@ -211,11 +213,13 @@ namespace RedOnion.Script
 				}
 				fn = Box(Value);
 				Expression(ref at);
-				Arguments.Add(Result);
-				Expression(ref at);
-				Arguments.Add(Result);
-				Value = create ? new Value(fn.Create(2)) : fn.Call(self, 2);
-				Arguments.Remove(2);
+				using (Arguments.Guard())
+				{
+					Arguments.Add(Result);
+					Expression(ref at);
+					Arguments.Add(Result);
+					Value = create ? new Value(fn.Create(2)) : fn.Call(self, 2);
+				}
 				return;
 			case OpCode.CallN:
 				CountStatement();
@@ -237,13 +241,15 @@ namespace RedOnion.Script
 				}
 				fn = Box(Value);
 				var argc = n - 1;
-				while (--n > 0)
+				using (Arguments.Guard())
 				{
-					Expression(ref at);
-					Arguments.Add(Result);
+					while (--n > 0)
+					{
+						Expression(ref at);
+						Arguments.Add(Result);
+					}
+					Value = create ? new Value(fn.Create(argc)) : fn.Call(self, argc);
 				}
-				Value = create ? new Value(fn.Create(argc)) : fn.Call(self, argc);
-				Arguments.Remove(argc);
 				return;
 			case OpCode.Index:
 			case OpCode.IndexN:
@@ -319,6 +325,27 @@ namespace RedOnion.Script
 				return;
 			case OpCode.Function:
 				Value = new Value(Function(null, ref at));
+				return;
+			case OpCode.Array:
+				n = Code[at++];
+				TypeReference(ref at);
+				var arrCreator = Root.GetType(OpCode.Array, Result);
+				if (arrCreator == null)
+					throw new NotImplementedException("Array");
+				if (n <= 1)
+				{
+					Value = new Value(arrCreator.Create(0));
+					return;
+				}
+				using (Arguments.Guard())
+				{
+					for (int i = 1; i < n; i++)
+					{
+						Expression(ref at);
+						Arguments.Add(Result);
+					}
+					Value = new Value(arrCreator.Create(n-1));
+				}
 				return;
 			}
 			throw new NotImplementedException();

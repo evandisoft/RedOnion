@@ -334,9 +334,30 @@ namespace RedOnion.Script.Parsing
 					PrepareOperator(OpCode.CallN);
 					unary = false;
 					goto next;
-				case '[':			//------------------------------------------------------------ [
+				case '[':           //------------------------------------------------------------ [
 					if (unary)
-						throw new ParseError(lexer, "Unexpected '[' - nothing to index");
+					{
+						if (!HasOption(Option.ArrayLiteral))
+							throw new ParseError(lexer, "Unexpected '[' - nothing to index");
+						Push(OpCode.Undefined);
+						if (Next().lexer.Curr != ']')
+						{
+							for (; ; )
+							{
+								PushOperator(OpCode.Comma);
+								ParseExpression(flags &~Flag.LimitedContext);
+								if (lexer.Curr == ']')
+									break;
+								if (lexer.Curr != ',')
+									throw new ParseError(lexer, "Expected ',' or ']'");
+								Next();
+							}
+						}
+						PrepareOperator(OpCode.Array);
+						Next();
+						unary = false;
+						goto next;
+					}
 					if (Next().lexer.Curr == ']')
 						throw new ParseError(lexer, "Unexpected ']' - missing index");
 

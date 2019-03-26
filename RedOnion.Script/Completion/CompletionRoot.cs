@@ -45,5 +45,9 @@ namespace RedOnion.Script.Completion
 			=> null;
 		public IObject GetType(OpCode OpCode, params Value[] par)
 			=> null;
+
+		~CompletionRoot() => Dispose(false);
+		public void Dispose() => Dispose(true);
+		protected virtual void Dispose(bool disposing) { }
 	}
 }

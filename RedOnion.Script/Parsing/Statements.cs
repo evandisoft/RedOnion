@@ -391,8 +391,6 @@ namespace RedOnion.Script.Parsing
 			//--------------------------------------------------------------------------------------
 			case OpCode.Function:
 			case OpCode.Def:
-				if ((Options & Option.Script) == 0)
-					goto default; // TODO: local functions
 				if (Next().lexer.Word == null)
 					throw new ParseError(lexer, "Expected function name");
 				var fname = lexer.Word;

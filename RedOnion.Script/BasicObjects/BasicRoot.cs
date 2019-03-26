@@ -7,6 +7,10 @@ namespace RedOnion.Script.BasicObjects
 {
 	public class BasicRoot : BasicObject, IEngineRoot
 	{
+		~BasicRoot() => Dispose(false);
+		public void Dispose() => Dispose(true);
+		protected virtual void Dispose(bool disposing) { }
+
 		public Dictionary<Type, IObject> TypeMap
 		{ get; } = new Dictionary<Type, IObject>();
 
@@ -205,7 +209,6 @@ namespace RedOnion.Script.BasicObjects
 		{
 			if (op == OpCode.Array)
 				return Array;
-			//TODO: array object
 			throw new NotImplementedException();
 		}
 
