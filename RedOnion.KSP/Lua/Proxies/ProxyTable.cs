@@ -13,6 +13,10 @@ namespace RedOnion.KSP.Lua.Proxies
 		}
 	}
 
+	/// <summary>
+	/// A table that can act as if it were the proxied object.
+	/// Works with intellisense via ProxiedObject reference.
+	/// </summary>
 	public class ProxyTable : Table
 	{
 		public object ProxiedObject;
@@ -21,7 +25,7 @@ namespace RedOnion.KSP.Lua.Proxies
 		{
 			this.script = script;
 			ProxiedObject = proxied;
-			Init();
+
 			var metatable = new Table(script);
 			metatable["__index"] = new Func<Table, DynValue, object>(IndexFunc);
 			metatable["__tostring"] = new Func<Table, DynValue>(ToString);
@@ -33,10 +37,6 @@ namespace RedOnion.KSP.Lua.Proxies
 			return key;
 		}
 
-		void Init()
-		{
-
-		}
 
 		DynValue ToString(Table table)
 		{
@@ -82,11 +82,36 @@ namespace RedOnion.KSP.Lua.Proxies
 				}
 			}
 
+			InvokerClass invokerObject = new InvokerClass(mi, ProxiedObject);
+			object o = new Invoker(invokerObject.HandleInvoker);
 			if (mi != null)
 			{
-				return new ProxyCallTable(script, ProxiedObject, memberName);
+				return o;
+				//return new ProxyCallTable(script, ProxiedObject, memberName);
 			}
 			throw new NotImplementedException("Member "+memberName+" was not in proxied object "+ProxiedObject.GetType());
 		}
+
+		class InvokerClass
+		{
+			MethodInfo mi;
+			object ProxiedObject;
+
+			public InvokerClass(MethodInfo mi,object ProxiedObject)
+			{
+				this.mi = mi;
+				this.ProxiedObject = ProxiedObject;
+			}
+
+			public object HandleInvoker(params object[] args)
+			{
+				return mi.Invoke(ProxiedObject, args);
+			}
+		}
+
+
+
+
+		delegate object Invoker(params object[] args);
 	}
 }

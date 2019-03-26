@@ -5,7 +5,9 @@ using System.Collections.Generic;
 
 namespace RedOnion.KSP.Lua.Proxies
 {
-
+	/// <summary>
+	/// Not needed anymore.
+	/// </summary>
 	public class ProxyCallTable : Table
 	{
 		public object ProxiedObject;
@@ -30,7 +32,6 @@ namespace RedOnion.KSP.Lua.Proxies
 			var metatable = new Table(script);
 			metatable["__call"] = invoker;
 			MetaTable = metatable;
-
 		}
 
 
