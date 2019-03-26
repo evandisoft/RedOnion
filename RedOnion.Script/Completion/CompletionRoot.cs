@@ -31,7 +31,7 @@ namespace RedOnion.Script.Completion
 			default:
 				if (value.IsNumber)
 					return new NumberObj(Engine, null, value);
-				throw new NotImplementedException();
+				throw new NotImplementedException("Boxing of " + value.Name);
 			}
 		}
 

@@ -319,7 +319,7 @@ namespace RedOnion.Script.ReflectedObjects
 			{
 				if (value.Object is BasicObjects.FunctionObj fn)
 					return fn.GetDelegate(type);
-				throw new NotImplementedException();
+				throw new NotImplementedException("Unable to convert " + value.Name + " to delegate");
 			}
 			var val = value.Native;
 			if (val == null)

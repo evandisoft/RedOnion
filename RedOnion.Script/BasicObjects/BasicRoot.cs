@@ -154,7 +154,7 @@ namespace RedOnion.Script.BasicObjects
 			default:
 				if (value.IsNumber)
 					return new NumberObj(Engine, Number.Prototype, value);
-				throw new NotImplementedException();
+				throw new NotImplementedException("Boxing of " + value.Name);
 			}
 		}
 
@@ -209,13 +209,14 @@ namespace RedOnion.Script.BasicObjects
 		{
 			if (op == OpCode.Array)
 				return Array;
-			throw new NotImplementedException();
+			throw new NotImplementedException(string.Format(Value.Culture,
+				"Unknown type opcode: {0:04X} {1}", (ushort)op, op));
 		}
 
 		public IObject GetType(OpCode op, params Value[] par)
 		{
-			//TODO: multi-dimensional array
-			throw new NotImplementedException();
+			throw new NotImplementedException(string.Format(Value.Culture,
+				"Unknown type opcode: {0:04X} {1}", (ushort)op, op));
 		}
 
 		public IObject this[Type type]

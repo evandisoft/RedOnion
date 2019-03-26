@@ -57,7 +57,8 @@ namespace RedOnion.Script
 			switch (op)
 			{
 			default:
-				throw new NotImplementedException();
+				throw new NotImplementedException(string.Format(Value.Culture,
+					"Unknown statement opcode: {0:04X} {1}", (ushort)op, op));
 			case OpCode.Block:
 				using (BlockGuard())
 					Block(ref at);
@@ -226,7 +227,8 @@ namespace RedOnion.Script
 			switch (op)
 			{
 			default:
-				throw new NotImplementedException();
+				throw new NotImplementedException(string.Format(Value.Culture,
+					"Unknown statement: {0:04X} {1}", (ushort)op, op));
 			case OpCode.Function:
 				var fname = Strings[CodeInt(ref at)];
 				if (HasOption(EngineOption.Strict)

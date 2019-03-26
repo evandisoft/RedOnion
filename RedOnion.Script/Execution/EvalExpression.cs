@@ -44,7 +44,8 @@ namespace RedOnion.Script
 				else throw new InvalidOperationException("Null cannot be dereferenced");
 				return;
 			}
-			throw new NotImplementedException();
+			throw new NotImplementedException(string.Format(Value.Culture,
+				"Unknown type reference: {0:04X} {1}", (ushort)op, op));
 		}
 
 		protected override void Literal(OpCode op, ref int at)
@@ -129,7 +130,8 @@ namespace RedOnion.Script
 				Value = CodeDouble(ref at);
 				return;
 			}
-			throw new NotImplementedException();
+			throw new NotImplementedException(string.Format(Value.Culture,
+				"Unknown literal: {0:04X} {1}", (ushort)op, op));
 		}
 
 		protected override void Special(OpCode op, ref int at)
@@ -348,7 +350,8 @@ namespace RedOnion.Script
 				}
 				return;
 			}
-			throw new NotImplementedException();
+			throw new NotImplementedException(string.Format(Value.Culture,
+				"Unknown special opcode: {0:04X} {1}", (ushort)op, op));
 		}
 		private IObject Generic(ref int at)
 		{
@@ -487,7 +490,8 @@ namespace RedOnion.Script
 				Value = left.Binary(op, Value);
 				return;
 			}
-			throw new NotImplementedException();
+			throw new NotImplementedException(string.Format(Value.Culture,
+				"Unknown binary operator: {0:04X} {1}", (ushort)op, op));
 		}
 
 		protected override void Unary(OpCode op, ref int at)
@@ -523,7 +527,8 @@ namespace RedOnion.Script
 				--Value.Self;
 				return;
 			}
-			throw new NotImplementedException();
+			throw new NotImplementedException(string.Format(Value.Culture,
+				"Unknown unary operator: {0:04X} {1}", (ushort)op, op));
 		}
 	}
 }
