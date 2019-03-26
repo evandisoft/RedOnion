@@ -78,6 +78,11 @@ namespace RedOnion.Script
 		/// </summary>
 		void Reset();
 		/// <summary>
+		/// Event executed on reset (before the root is cleared)
+		/// </summary>
+		event Action<IEngine> Resetting;
+
+		/// <summary>
 		/// Compile source to code
 		/// </summary>
 		CompiledCode Compile(string source);
@@ -718,15 +723,14 @@ namespace RedOnion.Script
 			if (creator == null)
 				creator = root[type];
 			else root[type] = creator;
-			root.Set(name, new Value(creator));
-			root.DebugLog("{0} = {1}", name, type.FullName);
+			if (name != null)
+				root.Set(name, new Value(creator));
 			return creator;
 		}
 		public static IObject AddType(this IEngineRoot root, Type type)
 		{
 			var creator = root[type];
 			root.Set(type.Name, new Value(creator));
-			root.DebugLog("{0} = {1}", type.Name, type.FullName);
 			return creator;
 		}
 

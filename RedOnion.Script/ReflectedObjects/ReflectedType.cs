@@ -100,10 +100,10 @@ namespace RedOnion.Script.ReflectedObjects
 			if (value is IEnumerable e)
 			{
 				if (e is IList list)
-					return new ReflectedList(Engine, list, this, TypeProps);
-				return new ReflectedEnumerable(Engine, e, this, TypeProps);
+					return new ReflectedList(Engine, list, this);
+				return new ReflectedEnumerable(Engine, e, this);
 			}
-			return new ReflectedObject(Engine, value, this, TypeProps);
+			return new ReflectedObject(Engine, value, this);
 		}
 
 		public class MemberComparer : IComparer<MemberInfo>
@@ -340,6 +340,11 @@ namespace RedOnion.Script.ReflectedObjects
 				=> Convert(self.Engine, Info.GetValue(null));
 			public bool Set(IObject self, Value value)
 			{
+				if (!self.Engine.HasOption(EngineOption.Silent))
+				{
+					Info.SetValue(null, Convert(value, Info.FieldType));
+					return true;
+				}
 				try
 				{
 					Info.SetValue(null, Convert(value, Info.FieldType));
@@ -362,6 +367,11 @@ namespace RedOnion.Script.ReflectedObjects
 			{
 				if (!Info.CanWrite)
 					return false;
+				if (!self.Engine.HasOption(EngineOption.Silent))
+				{
+					Info.SetValue(null, Convert(value, Info.PropertyType), new object[0]);
+					return true;
+				}
 				try
 				{
 					Info.SetValue(null, Convert(value, Info.PropertyType), new object[0]);

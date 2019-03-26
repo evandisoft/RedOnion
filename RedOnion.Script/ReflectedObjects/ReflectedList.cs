@@ -8,16 +8,16 @@ namespace RedOnion.Script.ReflectedObjects
 	{
 		public ReflectedList(IEngine engine, IList target, IProperties properties = null)
 			: base(engine, target, properties) { }
-		public ReflectedList(IEngine engine, IList target, ReflectedType type, IProperties properties = null)
-			: base(engine, target, type, properties) { }
+		public ReflectedList(IEngine engine, IList target, ReflectedType type)
+			: base(engine, target, type) { }
 
 	}
 	public class ReflectedList<T> : ReflectedEnumerable<T>, IListObject where T: IList
 	{
 		public ReflectedList(IEngine engine, T target, IProperties properties = null)
 			: base(engine, target, properties) { }
-		public ReflectedList(IEngine engine, T target, ReflectedType type, IProperties properties = null)
-			: base(engine, target, type, properties) { }
+		public ReflectedList(IEngine engine, T target, ReflectedType type)
+			: base(engine, target, type) { }
 
 		public override string Name => PureName + " [list]";
 

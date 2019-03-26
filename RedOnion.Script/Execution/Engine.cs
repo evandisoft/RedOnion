@@ -72,6 +72,22 @@ namespace RedOnion.Script
 		/// </summary>
 		public virtual void Reset()
 		{
+			var reset = Resetting?.GetInvocationList();
+			if (reset != null)
+			{
+				foreach (var action in reset)
+				{
+					try
+					{
+						action.DynamicInvoke(this);
+					}
+					catch (Exception ex)
+					{
+						DebugLog("Exception in Engine.Reset: " + ex.Message);
+						Resetting -= (Action<IEngine>)action;
+					}
+				}
+			}
 			Exit = 0;
 			Root.Reset();
 			Parser.Reset();
@@ -79,6 +95,10 @@ namespace RedOnion.Script
 			Context = new EngineContext(this);
 			ContextStack.Clear();
 		}
+		/// <summary>
+		/// Event executed on reset (before the root is cleared)
+		/// </summary>
+		public event Action<IEngine> Resetting;
 
 		/// <summary>
 		/// Compile source to code

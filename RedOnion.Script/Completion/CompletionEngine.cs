@@ -108,6 +108,22 @@ namespace RedOnion.Script.Completion
 		/// </summary>
 		public virtual void Reset()
 		{
+			var reset = Resetting?.GetInvocationList();
+			if (reset != null)
+			{
+				foreach (var action in reset)
+				{
+					try
+					{
+						action.DynamicInvoke(this);
+					}
+					catch (Exception ex)
+					{
+						this.DebugLog("Exception in Engine.Reset: " + ex.Message);
+						Resetting -= (Action<IEngine>)action;
+					}
+				}
+			}
 			Exit = 0;
 			Root.Reset();
 			Arguments.Clear();
@@ -119,6 +135,7 @@ namespace RedOnion.Script.Completion
 				_suggestionsCount = 0;
 			}
 		}
+		public event Action<IEngine> Resetting;
 
 		CompiledCode IEngine.Compile(string source)
 			=> throw new NotImplementedException();

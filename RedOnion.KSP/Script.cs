@@ -11,14 +11,171 @@ using RedOnion.KSP.Autopilot;
 
 namespace RedOnion.KSP
 {
+	public class RuntimeRoot : BasicRoot
+	{
+		public bool IsRepl { get; }
+		public RuntimeRoot(IEngine engine, bool repl)
+			: base(engine, fill: false)
+		{
+			IsRepl = repl;
+			Fill();
+		}
+		// note: for now we ignore IsRepl
+		protected override void Fill()
+		{
+			base.Fill();
+			var hard = BaseProps; // will resist overwrite and shadowing in global scope
+			var soft = MoreProps; // can be easily overwritten or shadowed
+
+			// core types (added to both "System" namespace and "soft" global)
+			var system = Get("System").Object;
+			var sys = system?.BaseProps ?? new Properties();
+			sys.Set("Delegate", AddType(typeof(Delegate)));
+			sys.Set("Debug", AddType(typeof(UE.Debug)));
+			sys.Set("Color", AddType(typeof(UE.Color)));
+			sys.Set("Rect", AddType(typeof(UE.Rect)));
+			sys.Set("Vector2", AddType(typeof(UE.Vector2)));
+			var vector = AddType(typeof(UE.Vector3));
+			soft.Set("Vector", vector);
+			sys.Set("Vector", vector);
+			sys.Set("Vector3", vector);
+			sys.Set("Vector4", AddType(typeof(UE.Vector4)));
+			if (system == null)
+				BaseProps.Set("System", new SimpleObject(Engine, sys));
+
+			// soft properties that will later also be added into "KSP" namespace
+			var ship = Value.ReadOnly(dummy => ReflectedType.Convert(Engine,
+				HighLogic.LoadedSceneIsFlight ? (object)FlightGlobals.ActiveVessel :
+				HighLogic.LoadedSceneIsEditor ? EditorLogic.fetch.ship : null));
+			soft.Set("ship", ship);
+
+			// UI namespace
+			hard.Set("UI", new Value(new SimpleObject(Engine, new Properties()
+			{
+				{ "Window",         new Value(e => _window.Get(e)) },
+				{ "Anchors",        this[typeof(UI.Anchors)] },
+				{ "Padding",        this[typeof(UI.Padding)] },
+				{ "Layout",         this[typeof(UI.Layout)] },
+				{ "LayoutPadding",  this[typeof(UI.LayoutPadding)] },
+				{ "SizeConstraint", this[typeof(UI.SizeConstraint)] },
+				{ "SizeConstraints",this[typeof(UI.SizeConstraints)] },
+				{ "Constraint",     this[typeof(UI.SizeConstraint)] },
+				{ "Constraints",    this[typeof(UI.SizeConstraints)] },
+				{ "Element",        this[typeof(UI.Element)] },
+				{ "Panel",          this[typeof(UI.Panel)] },
+				{ "Label",          this[typeof(UI.Label)] },
+				{ "Button",         this[typeof(UI.Button)] },
+				{ "TextBox",        this[typeof(UI.TextBox)] },
+			})));
+			soft.Set("Window",		new Value(e => _window.Get(e)));
+			soft.Set("Anchors",		this[typeof(UI.Anchors)]);
+			soft.Set("Padding",		this[typeof(UI.Padding)]);
+			soft.Set("Layout",		this[typeof(UI.Layout)]);
+			soft.Set("Panel",		this[typeof(UI.Panel)]);
+			soft.Set("Label",		this[typeof(UI.Label)]);
+			soft.Set("Button",		this[typeof(UI.Button)]);
+			soft.Set("TextBox",		this[typeof(UI.TextBox)]);
+
+			// KSP stuff
+			hard.Set("KSP", new Value(engine =>
+			new SimpleObject(engine, new Properties()
+			{
+				{ "ship", ship },
+				{ "Vessel",				this[typeof(Vessel)] },
+				{ "FlightGlobals",		this[typeof(FlightGlobals)] },
+				{ "FlightCtrlState",	this[typeof(FlightCtrlState)] },
+				{ "FlightControl",		this[typeof(FlightControl)]},
+				{ "HighLogic",			this[typeof(HighLogic)] },
+				{ "InputLockManager",	this[typeof(InputLockManager)] },
+				{ "InputLock",			this[typeof(InputLockManager)] },
+				{ "StageManager",		this[typeof(KUI.Screens.StageManager)] },
+				{ "EditorLogic",		this[typeof(EditorLogic)] },
+				{ "ShipConstruction",	this[typeof(ShipConstruction)]},
+				{ "FlightDriver",		this[typeof(FlightDriver)] },
+				{ "GameScenes",         this[typeof(GameScenes)] },
+				{ "PartLoader",         this[typeof(PartLoader)] },
+			})));
+
+			// Unity and UI-related stuff
+			hard.Set("Unity", new Value(engine =>
+			new SimpleObject(engine, new Properties()
+			{
+				{ "Object",				this[typeof(UE.Object)] },
+				{ "GameObject",			this[typeof(UE.GameObject)] },
+				{ "Canvas",				this[typeof(UE.Canvas)] },
+				{ "CanvasGroup",		this[typeof(UE.CanvasGroup)] },
+				{ "RectTransform",		this[typeof(UE.RectTransform)] },
+				{ "LayerMask",			this[typeof(UE.LayerMask)] },
+
+				{ "DefaultControls",	this[typeof(UUI.DefaultControls)] },
+				{ "GridLayout",			this[typeof(UUI.GridLayoutGroup)] },
+				{ "HorizontalLayout",	this[typeof(UUI.HorizontalLayoutGroup)] },
+				{ "VerticalLayout",		this[typeof(UUI.VerticalLayoutGroup)] },
+				{ "LayoutRebuilder",	this[typeof(UUI.LayoutRebuilder)] },
+				{ "LayoutUtility",		this[typeof(UUI.LayoutUtility)] },
+				{ "ContentSizeFitter",	this[typeof(UUI.ContentSizeFitter)] },
+				{ "AspectRatioFitter",	this[typeof(UUI.AspectRatioFitter)] },
+				{ "SizeFitter",			this[typeof(UUI.ContentSizeFitter)] },
+				{ "RatioFitter",		this[typeof(UUI.AspectRatioFitter)] },
+
+				{ "Text",				this[typeof(UUI.Text)] },
+				{ "Button",				this[typeof(UUI.Button)] },
+				{ "Image",				this[typeof(UUI.Image)] },
+				{ "RawImage",			this[typeof(UUI.RawImage)] },
+				{ "BackgroundImage",	this[typeof(ROC.BackgroundImage)] },
+				{ "DragHandler",		this[typeof(ROC.DragHandler)] },
+				{ "LayoutComponent",	this[typeof(ROC.LayoutComponent)] },
+
+				{ "Screen",				this[typeof(UE.Screen)] },
+				{ "Sprite",				this[typeof(UE.Sprite)] },
+				{ "Texture",			this[typeof(UE.Texture)] },
+				{ "Texture2D",			this[typeof(UE.Texture2D)] },
+
+				{ "UIMaster",			this[typeof(KUI.UIMasterController)] },
+				{ "UISkinDef",			this[typeof(UISkinDef)] },
+				{ "UISkinManager",		this[typeof(UISkinManager)] },
+				{ "UIStyle",			this[typeof(UIStyle)] },
+				{ "UIStyleState",		this[typeof(UIStyleState)] },
+			})));
+
+			// IMGUI (can only be used from onGUI!)
+			hard.Set("IMGUI", new Value(engine =>
+			this[typeof(UE.GUI)] = new ReflectedType(engine, typeof(UE.GUI), new Properties()
+			{
+				{ "GUISkin",			this[typeof(UE.GUISkin)] },
+				{ "GUIStyle",			this[typeof(UE.GUIStyle)] },
+				{ "GUIStyleState",		this[typeof(UE.GUIStyleState)] },
+				{ "GUIContent",			this[typeof(UE.GUIContent)] },
+				{ "GUIElement",			this[typeof(UE.GUIElement)] },
+				{ "GUILayer",			this[typeof(UE.GUILayer)] },
+				{ "GUILayout",			this[typeof(UE.GUILayout)] },
+				{ "GUIText",			this[typeof(UE.GUIText)] },
+				{ "GUIUtility",			this[typeof(UE.GUIUtility)] },
+			})));
+		}
+
+		struct LazyGet
+		{
+			IObject it;
+			CreateObject creator;
+			public LazyGet(CreateObject creator)
+			{
+				it = null;
+				this.creator = creator;
+			}
+			public IObject Get(IEngine e)
+				=> it ?? (it = creator(e));
+		}
+		LazyGet _window = new LazyGet(e => new ROS_UI.WindowFun(e));
+	}
+
 	/// <summary>
 	/// Runtime engine with all the features
 	/// </summary>
 	public class RuntimeEngine : Engine
 	{
 		public RuntimeEngine()
-			: base(engine => new RuntimeRoot(engine, root =>
-			FillRoot(root, repl: false))) { }
+			: base(engine => new RuntimeRoot(engine, repl: false)) { }
 		public override void Log(string msg)
 			=> UE.Debug.Log("[RedOnion] " + msg);
 
@@ -30,138 +187,6 @@ namespace RedOnion.KSP
 				"Scripts", ref ScriptsZip, path);
 			return data == null ? null : System.Text.Encoding.UTF8.GetString(data);
 		}
-
-		public static void FillRoot(IEngineRoot root, bool repl)
-		{
-//#if DEBUG
-			repl = false; // FOR NOW!
-//#endif
-			// neutral types first
-			// aliases in global namespace are in MoreProps = overwrittable,
-			// while names under "System" namespace are read-only (BaseProps)
-			var system = root.Get("System").Object;
-			var sys = system?.BaseProps ?? new Properties();
-			sys.Set("Delegate",	root.AddType(typeof(Delegate)));
-			sys.Set("Debug",	root.AddType(typeof(UE.Debug)));
-			sys.Set("Color",	root.AddType(typeof(UE.Color)));
-			sys.Set("Rect",		root.AddType(typeof(UE.Rect)));
-			sys.Set("Vector2",	root.AddType(typeof(UE.Vector2)));
-			var vector = root.AddType(typeof(UE.Vector3));
-			root.MoreProps.Set("Vector", vector);
-			sys.Set("Vector",	vector);
-			sys.Set("Vector3",	vector);
-			sys.Set("Vector4",	root.AddType(typeof(UE.Vector4)));
-			if (system == null)
-				root.BaseProps.Set("System", new SimpleObject(root.Engine, sys));
-
-			var ship = Value.ReadOnly(dummy => ReflectedType.Convert(root.Engine, FlightGlobals.ActiveVessel));
-			root.Add("ship", ship);
-
-			// safe types next (TODO: ref-count or bind to engine to dispose with engine reset)
-			root.BaseProps.Set("UI", new Value(engine =>
-			new SimpleObject(engine, new Properties()
-			{
-				{ "Anchors",        root[typeof(UI.Anchors)] },
-				{ "Padding",        root[typeof(UI.Padding)] },
-				{ "Layout",			root[typeof(UI.Layout)] },
-				{ "LayoutPadding",	root[typeof(UI.LayoutPadding)] },
-				{ "SizeConstraint",	root[typeof(UI.SizeConstraint)] },
-				{ "SizeConstraints",root[typeof(UI.SizeConstraints)] },
-				{ "Constraint",		root[typeof(UI.SizeConstraint)] },
-				{ "Constraints",	root[typeof(UI.SizeConstraints)] },
-				{ "Element",        root[typeof(UI.Element)] },
-				{ "Panel",          root[typeof(UI.Panel)] },
-				{ "Window",         root[typeof(UI.Window)] },
-				{ "Label",          root[typeof(UI.Label)] },
-				{ "Button",         root[typeof(UI.Button)] },
-				{ "TextBox",		root[typeof(UI.TextBox)] },
-			})));
-			root.Set("Anchors", root[typeof(UI.Anchors)]);
-			root.Set("Padding",	root[typeof(UI.Padding)]);
-			root.Set("Layout",	root[typeof(UI.Layout)]);
-			root.Set("Window",	root[typeof(UI.Window)]);
-			root.Set("Panel",	root[typeof(UI.Panel)]);
-			root.Set("Label",	root[typeof(UI.Label)]);
-			root.Set("Button",	root[typeof(UI.Button)]);
-			root.Set("TextBox",	root[typeof(UI.TextBox)]);
-
-			// things that are dangerous in immediate / REPL mode
-			if (!repl)
-			{
-				// definitely dangerous, IMGUI is not for REPL
-				root.BaseProps.Set("IMGUI", new Value(engine =>
-				root[typeof(UE.GUI)] = new ReflectedType(engine, typeof(UE.GUI), new Properties()
-				{
-					{ "GUISkin",        root[typeof(UE.GUISkin)] },
-					{ "GUIStyle",       root[typeof(UE.GUIStyle)] },
-					{ "GUIStyleState",  root[typeof(UE.GUIStyleState)] },
-					{ "GUIContent",     root[typeof(UE.GUIContent)] },
-					{ "GUIElement",     root[typeof(UE.GUIElement)] },
-					{ "GUILayer",       root[typeof(UE.GUILayer)] },
-					{ "GUILayout",      root[typeof(UE.GUILayout)] },
-					{ "GUIText",        root[typeof(UE.GUIText)] },
-					{ "GUIUtility",     root[typeof(UE.GUIUtility)] },
-				})));
-
-				// potentionally dangerous (could stay without a way to destroy)
-				root.BaseProps.Set("Unity", new Value(engine =>
-				new SimpleObject(engine, new Properties()
-				{
-					{ "Object",         root[typeof(UE.Object)] },
-					{ "GameObject",     root[typeof(UE.GameObject)] },
-					{ "Canvas",         root[typeof(UE.Canvas)] },
-					{ "CanvasGroup",    root[typeof(UE.CanvasGroup)] },
-					{ "RectTransform",  root[typeof(UE.RectTransform)] },
-					{ "LayerMask",      root[typeof(UE.LayerMask)] },
-
-					{ "DefaultControls",root[typeof(UUI.DefaultControls)] },
-					{ "GridLayout",		root[typeof(UUI.GridLayoutGroup)] },
-					{ "HorizontalLayout", root[typeof(UUI.HorizontalLayoutGroup)] },
-					{ "VerticalLayout",	root[typeof(UUI.VerticalLayoutGroup)] },
-					{ "LayoutRebuilder",root[typeof(UUI.LayoutRebuilder)] },
-					{ "LayoutUtility",	root[typeof(UUI.LayoutUtility)] },
-					{ "ContentSizeFitter", root[typeof(UUI.ContentSizeFitter)] },
-					{ "AspectRatioFitter", root[typeof(UUI.AspectRatioFitter)] },
-					{ "SizeFitter",		root[typeof(UUI.ContentSizeFitter)] },
-					{ "RatioFitter",	root[typeof(UUI.AspectRatioFitter)] },
-
-					{ "Text",           root[typeof(UUI.Text)] },
-					{ "Button",         root[typeof(UUI.Button)] },
-					{ "Image",          root[typeof(UUI.Image)] },
-					{ "RawImage",       root[typeof(UUI.RawImage)] },
-					{ "BackgroundImage",root[typeof(ROC.BackgroundImage)] },
-					{ "DragHandler",	root[typeof(ROC.DragHandler)] },
-					{ "LayoutComponent",root[typeof(ROC.LayoutComponent)] },
-
-					{ "Screen",			root[typeof(UE.Screen)] },
-					{ "Sprite",         root[typeof(UE.Sprite)] },
-					{ "Texture",        root[typeof(UE.Texture)] },
-					{ "Texture2D",      root[typeof(UE.Texture2D)] },
-
-					{ "UIMaster",       root[typeof(KUI.UIMasterController)] },
-					{ "UISkinDef",      root[typeof(UISkinDef)] },
-					{ "UISkinManager",  root[typeof(UISkinManager)] },
-					{ "UIStyle",        root[typeof(UIStyle)] },
-					{ "UIStyleState",   root[typeof(UIStyleState)] },
-				})));
-
-				// potentionally dangerous (who the heck knows, we need our own safe API)
-				root.BaseProps.Set("KSP", new Value(engine =>
-				new SimpleObject(engine, new Properties()
-				{
-					{ "Vessel",         root[typeof(Vessel)] },
-					{ "FlightGlobals",  root[typeof(FlightGlobals)] },
-					{ "FlightCtrlState",root[typeof(FlightCtrlState)] },
-					{ "FlightControl", root[typeof(FlightControl)]},
-					{ "HighLogic",      root[typeof(HighLogic)] },
-					{ "InputLockManager", root[typeof(InputLockManager)] },
-					{ "InputLock",		root[typeof(InputLockManager)] },
-					{ "StageManager",   root[typeof(KUI.Screens.StageManager)] },
-
-					{ "ship", ship }
-				})));
-			}
-		}
 	}
 	/// <summary>
 	/// Limited engine whith what is safe in REPL / Immediate Mode
@@ -169,27 +194,10 @@ namespace RedOnion.KSP
 	public class ImmediateEngine : Engine
 	{
 		public ImmediateEngine()
-			: base(engine => new RuntimeRoot(engine, root =>
-			RuntimeEngine.FillRoot(root, repl: true)))
+			: base(engine => new RuntimeRoot(engine, repl: true))
 			=> Options |= EngineOption.Repl;
 		public override void Log(string msg)
 			=> UE.Debug.Log("[RedOnion.REPL] " + msg);
-	}
-
-	public class RuntimeRoot : BasicRoot
-	{
-		protected Action<IEngineRoot> FillMe;
-		protected override void Fill()
-		{
-			base.Fill();
-			FillMe?.Invoke(this);
-		}
-		public RuntimeRoot(IEngine engine, Action<IEngineRoot> fill)
-			: base(engine, fill: false)
-		{
-			FillMe = fill;
-			Fill();
-		}
 	}
 
 	/// <summary>

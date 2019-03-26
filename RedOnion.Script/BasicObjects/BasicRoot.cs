@@ -231,16 +231,13 @@ namespace RedOnion.Script.BasicObjects
 		protected virtual IObject ReflectType(Type type)
 			=> new ReflectedObjects.ReflectedType(Engine, type);
 
-		public void AddType(string name, Type type, IObject creator)
-		{
-			this[type] = creator;
-			Set(name, new Value(creator));
-		}
-		public void AddType(string name, ReflectedObjects.ReflectedType type)
+		public IObject AddType(string name, Type type, IObject creator = null)
+			=> EngineRootExtensions.AddType(this, name, type, creator);
+		public IObject AddType(string name, ReflectedObjects.ReflectedType type)
 			=> AddType(name, type.Type, type);
-		public void AddType(string name, Type type)
+		public IObject AddType(string name, Type type)
 			=> AddType(name, type, ReflectType(type));
-		public void AddType(Type type)
+		public IObject AddType(Type type)
 			=> AddType(type.Name, type, ReflectType(type));
 
 	}

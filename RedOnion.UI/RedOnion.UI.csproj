@@ -45,6 +45,7 @@
     <Compile Include="Enums.cs" />
     <Compile Include="Components\LayoutComponent.cs" />
     <Compile Include="Panel.Children.cs" />
+    <Compile Include="ScrollBox.cs" />
     <Compile Include="Structures\Anchors.cs" />
     <Compile Include="Structures\LayoutPadding.cs" />
     <Compile Include="Panel.cs" />

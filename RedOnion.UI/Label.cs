@@ -6,7 +6,7 @@ namespace RedOnion.UI
 {
 	public class Label : Element
 	{
-		protected internal UUI.Text Core { get; private set; }
+		public UUI.Text Core { get; private set; }
 
 		public Label(string name = null)
 			: base(name)

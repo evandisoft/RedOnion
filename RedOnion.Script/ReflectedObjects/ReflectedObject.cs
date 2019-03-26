@@ -12,8 +12,8 @@ namespace RedOnion.Script.ReflectedObjects
 	{
 		public ReflectedObject(IEngine engine, object target, IProperties properties = null)
 			: base(engine, target, properties) { }
-		public ReflectedObject(IEngine engine, object target, ReflectedType type, IProperties properties = null)
-			: base(engine, target, type, properties) { }
+		public ReflectedObject(IEngine engine, object target, ReflectedType type)
+			: base(engine, target, type) { }
 	}
 	public class ReflectedObject<T> : BasicObjects.SimpleObject
 	{
@@ -33,8 +33,8 @@ namespace RedOnion.Script.ReflectedObjects
 		public ReflectedObject(IEngine engine, T target, IProperties properties = null)
 			: base(engine, properties)
 			=> _type = (_target = target)?.GetType();
-		public ReflectedObject(IEngine engine, T target, ReflectedType type, IProperties properties = null)
-			: this(engine, target, properties)
+		public ReflectedObject(IEngine engine, T target, ReflectedType type)
+			: this(engine, target, type?.TypeProps)
 		{
 			_type = (Creator = type)?.Type ?? target.GetType();
 			BaseProps = type.TypeProps;
@@ -357,6 +357,11 @@ namespace RedOnion.Script.ReflectedObjects
 				=> Convert(self.Engine, Info.GetValue(self.Target));
 			public bool Set(IObject self, Value value)
 			{
+				if (!self.Engine.HasOption(EngineOption.Silent))
+				{
+					Info.SetValue(self.Target, Convert(value, Info.FieldType));
+					return true;
+				}
 				try
 				{
 					Info.SetValue(self.Target, Convert(value, Info.FieldType));
@@ -379,6 +384,11 @@ namespace RedOnion.Script.ReflectedObjects
 			{
 				if (!Info.CanWrite)
 					return false;
+				if (!self.Engine.HasOption(EngineOption.Silent))
+				{
+					Info.SetValue(self.Target, Convert(value, Info.PropertyType), new object[0]);
+					return true;
+				}
 				try
 				{
 					Info.SetValue(self.Target, Convert(value, Info.PropertyType), new object[0]);
