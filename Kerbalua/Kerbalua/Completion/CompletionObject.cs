@@ -4,6 +4,7 @@ using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.REPL;
 using MoonSharp.Interpreter.Interop;
 using System.Reflection;
+using RedOnion.KSP.Lua.Proxies;
 
 namespace Kerbalua.Completion {
 	public class CompletionObject {
@@ -72,6 +73,15 @@ namespace Kerbalua.Completion {
 			object newObject = CurrentTable[name];
 			if (newObject == null) {
 				throw new KeyNotInTableException();
+			}
+
+			if (newObject is ProxyTable proxyTable)
+			{
+				CurrentTable = null;
+				CurrentType = proxyTable.ProxiedObject.GetType();
+				ProcessCurrentParts();
+				Index++;
+				return;
 			}
 
 			if (newObject is Table newTable) {
@@ -186,7 +196,7 @@ namespace Kerbalua.Completion {
 			List<string> completions = new List<string>();
 			string partial = CurrentPartial;
 			foreach (var memberName in ListAllMembers(CurrentType)) {
-				if (memberName.StartsWith(partial)) {
+				if (memberName.Contains(partial)) {
 					completions.Add(memberName);
 				}
 			}
@@ -205,7 +215,7 @@ namespace Kerbalua.Completion {
 					continue;
 				}
 
-				if (entry.String.StartsWith(partial)) {
+				if (entry.String.Contains(partial)) {
 					completions.Add(entry.String);
 				}
 			}

@@ -1,15 +1,16 @@
 vessel=Ksp.FlightGlobals.ActiveVessel
-part=vessel.parts[0]
+part=vessel.parts[8]
+m=part.Modules[0]
 
-function printModules(part)
-    for module in part.Modules do
-        print(module)
+function each(lst,action) 
+    for i in lst do
+        action(i)
     end
-end 
-
-for part in vessel.parts do
-    printModules(part)
-    print(part.persistentId)
 end
 
-module=part.Modules[0]
+for part in vessel.parts do
+    --printModules(part)
+    each(part.Modules,function(m)
+        print(m)
+    end)
+end

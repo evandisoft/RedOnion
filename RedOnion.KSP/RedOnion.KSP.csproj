@@ -66,6 +66,11 @@
     <Compile Include="Autopilot\FlightControl.cs" />
     <Compile Include="MathUtil\Vec.cs" />
     <Compile Include="MathUtil\Scalar.cs" />
+    <Compile Include="PartsAPI\PartsExploration.cs" />
+    <Compile Include="Lua\Proxies\ModuleControlSurfaceProxy.cs" />
+    <Compile Include="Lua\Proxies\ExperimentalProxy.cs" />
+    <Compile Include="Lua\Proxies\ProxyTable.cs" />
+    <Compile Include="Lua\Proxies\ProxyCallTable.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RedOnion.Script\RedOnion.Script.csproj">
@@ -81,5 +86,8 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Lua\Proxies\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

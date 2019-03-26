@@ -1,0 +1,19 @@
+var editor=ksp.editorlogic.fetch
+var vessel=ksp.flightglobals.activevessel
+
+var parts=vessel.parts
+var part=parts[0]
+var m=part.modules[0]
+
+var crew=new list
+
+var hasPilot=false
+for var part in vessel.parts
+    for var module in part.modules
+        if module.gettype().ToString()=="ModuleCommand"
+            for var crewman in part.protoModuleCrew
+                if crewman.getlocalizedtrait()=="Pilot"
+                    hasPilot=true
+if hasPilot
+    print "We have a pilot!"
+    
