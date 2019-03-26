@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using RedOnion.Script.Parsing;
 
@@ -7,6 +8,63 @@ namespace RedOnion.Script.Completion
 {
 	public partial class CompletionEngine : IEngine
 	{
+		protected bool Matches(string suggestion)
+		{
+			if (partial == null || partial.Length == 0)
+				return true;
+			if (partial.Length <= 2)
+				return suggestion.StartsWith(partial, StringComparison.OrdinalIgnoreCase);
+			if (partial.Length <= 4)
+			{
+				if (suggestion.Length < partial.Length)
+					return false;
+				for (int i = 0, n = suggestion.Length - partial.Length; i <= n; i++)
+					if (string.Compare(partial,
+						suggestion.Substring(i, partial.Length),
+						StringComparison.OrdinalIgnoreCase) == 0)
+						return true;
+				return false;
+			}
+			suggestion = suggestion.ToLowerInvariant();
+			var dist = 1 + (lowerPartial.Length-3)/5;
+			if (lowerPartial.Length >= suggestion.Length)
+				return DamerauLevenshtein(lowerPartial, suggestion) <= dist;
+
+			for (int i = 0, n = suggestion.Length - lowerPartial.Length; i <= n; i++)
+				if (DamerauLevenshtein(lowerPartial, suggestion.Substring(i, lowerPartial.Length)) <= dist)
+					return true;
+			return false;
+
+		}
+		static int DamerauLevenshtein(string original, string modified)
+		{
+			int len_orig = original.Length;
+			int len_diff = modified.Length;
+
+			var matrix = new int[len_orig + 1, len_diff + 1];
+			for (int i = 0; i <= len_orig; i++)
+				matrix[i, 0] = i;
+			for (int j = 0; j <= len_diff; j++)
+				matrix[0, j] = j;
+
+			for (int i = 1; i <= len_orig; i++)
+			{
+				for (int j = 1; j <= len_diff; j++)
+				{
+					int cost = modified[j - 1] == original[i - 1] ? 0 : 1;
+					var vals = new int[] {
+							matrix[i - 1, j] + 1,
+							matrix[i, j - 1] + 1,
+							matrix[i - 1, j - 1] + cost
+						};
+					matrix[i, j] = vals.Min();
+					if (i > 1 && j > 1 && original[i - 1] == modified[j - 2] && original[i - 2] == modified[j - 1])
+						matrix[i, j] = Math.Min(matrix[i, j], matrix[i - 2, j - 2] + cost);
+				}
+			}
+			return matrix[len_orig, len_diff];
+		}
+
 		/// <summary>
 		/// Completion/replacement suggestions for point of interest
 		/// </summary>
@@ -16,6 +74,8 @@ namespace RedOnion.Script.Completion
 		protected int _suggestionsCount;
 		protected void AddSuggestion(string name)
 		{
+			if (!Matches(name))
+				return;
 			if (_suggestionsCount == _suggestions.Length)
 				Array.Resize(ref _suggestions, _suggestions.Length << 1);
 			_suggestions[_suggestionsCount++] = name;
@@ -41,6 +101,7 @@ namespace RedOnion.Script.Completion
 		protected Lexer lexer = new Lexer();
 		protected int interest, replaceAt, replaceTo;
 		protected object found;
+		protected string partial, lowerPartial;
 
 		public virtual IList<string> Complete(
 			string source, int at, out int replaceAt, out int replaceTo)
@@ -67,8 +128,10 @@ namespace RedOnion.Script.Completion
 			replaceTo = this.replaceTo;
 			if (found != null)
 			{
+				partial = at == replaceAt ? null : source.Substring(replaceAt, at-replaceAt);
+				lowerPartial = at == replaceAt ? null : partial.ToLowerInvariant();
 				FillFrom(found);
-				RemoveDuplicates(at == replaceAt ? null : source.Substring(replaceAt, at-replaceAt));
+				RemoveDuplicates();
 			}
 			return GetSuggestions();
 		}
@@ -250,19 +313,9 @@ namespace RedOnion.Script.Completion
 					return;
 			}
 		}
-		private void RemoveDuplicates(string prefix = null)
+		private void RemoveDuplicates()
 		{
 			int i, j;
-			if (prefix != null && prefix.Length > 0)
-			{
-				for (i = 0, j = 0; j < _suggestionsCount; j++)
-				{
-					if (_suggestions[j].StartsWith(prefix,
-						StringComparison.OrdinalIgnoreCase))
-						_suggestions[i++] = _suggestions[j];
-				}
-				_suggestionsCount = i;
-			}
 			if (_suggestionsCount <= 1)
 				return;
 			Array.Sort(_suggestions, 0, _suggestionsCount, StringComparer.OrdinalIgnoreCase);
