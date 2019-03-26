@@ -296,14 +296,16 @@ namespace RedOnion.Script.Parsing
 					{
 						if (!unary)
 							goto autocall;
-						Next().ParseExpression(flags &~Flag.LimitedContext);
+						Next(true).ParseExpression(flags &~Flag.LimitedContext);
+						if (lexer.Eol)
+							Next(true);
 						if (lexer.Curr != ')')
 							throw new ParseError(lexer, "Expected matching ')'");
 						Next();
 						unary = false;
 						goto next;
 					}
-					if (Next().lexer.Curr == ')')
+					if (Next(true).lexer.Curr == ')')
 					{
 						PrepareOperator(OpCode.Call0);
 						Next();
@@ -313,6 +315,8 @@ namespace RedOnion.Script.Parsing
 
 					ParseExpression(flags &~Flag.LimitedContext);
 
+					if (lexer.Eol)
+						Next(true);
 					if (lexer.Curr == ')')
 					{
 						PrepareOperator(OpCode.Call1);
@@ -325,9 +329,13 @@ namespace RedOnion.Script.Parsing
 					do
 					{
 						PushOperator(OpCode.Comma);
-						Next().ParseExpression(flags &~Flag.LimitedContext);
+						Next(true).ParseExpression(flags &~Flag.LimitedContext);
+						if (lexer.Eol)
+							Next(true);
 					}
 					while (lexer.Curr == ',');
+					if (lexer.Eol)
+						Next(true);
 					if (lexer.Curr != ')')
 						throw new ParseError(lexer, "Expected matching ')'");
 					Next();
@@ -340,12 +348,14 @@ namespace RedOnion.Script.Parsing
 						if (!HasOption(Option.ArrayLiteral))
 							throw new ParseError(lexer, "Unexpected '[' - nothing to index");
 						Push(OpCode.Undefined);
-						if (Next().lexer.Curr != ']')
+						if (Next(true).lexer.Curr != ']')
 						{
 							for (; ; )
 							{
 								PushOperator(OpCode.Comma);
 								ParseExpression(flags &~Flag.LimitedContext);
+								if (lexer.Eol)
+									Next(true);
 								if (lexer.Curr == ']')
 									break;
 								if (lexer.Curr != ',')
@@ -354,11 +364,11 @@ namespace RedOnion.Script.Parsing
 							}
 						}
 						PrepareOperator(OpCode.Array);
-						Next();
+						Next(true);
 						unary = false;
 						goto next;
 					}
-					if (Next().lexer.Curr == ']')
+					if (Next(true).lexer.Curr == ']')
 						throw new ParseError(lexer, "Unexpected ']' - missing index");
 
 					ParseExpression(flags &~Flag.LimitedContext);

@@ -9,8 +9,7 @@ namespace RedOnion.ScriptNUnit
 	{
 		public EngineTestsBase()
 		{
-			if (HasOption(EngineOption.Autocall))
-				Options |= EngineOption.Repl;
+			Options |= EngineOption.Repl;
 		}
 		public void Test(string script, int countdown = 100)
 		{
@@ -172,22 +171,43 @@ namespace RedOnion.ScriptNUnit
 		[Test]
 		public void ROS_Expr09_ArrayLiteral()
 		{
-			Test("[1,2]");
-			var arr = Result.RefObj as ArrayObj;
-			Assert.NotNull(arr);
-			Assert.AreEqual(2, arr.Length);
-			Assert.AreEqual(1, arr[0].Native);
-			Assert.AreEqual(2, arr[1].Native);
+			foreach (var s in new[] { "[1,2]", "[\n1\n,\n2\n]" })
+			{
+				Test(s);
+				var arr = Result.RefObj as ArrayObj;
+				Assert.NotNull(arr);
+				Assert.AreEqual(2, arr.Length);
+				Assert.AreEqual(1, arr[0].Native);
+				Assert.AreEqual(2, arr[1].Native);
+			}
+			foreach (var s in new[] { "[]", "[\n]" })
+			{
+				Test(s);
+				var arr = Result.RefObj as ArrayObj;
+				Assert.NotNull(arr);
+				Assert.AreEqual(0, arr.Length);
+			}
+			foreach (var s in new[] { "[true]", "[\ntrue\n]" })
+			{
+				Test(s);
+				var arr = Result.RefObj as ArrayObj;
+				Assert.NotNull(arr);
+				Assert.AreEqual(1, arr.Length);
+				Assert.AreEqual(true, arr[0].Native);
+			}
+		}
 
-			Test("[]");
-			arr = Result.RefObj as ArrayObj;
-			Assert.NotNull(arr);
-			Assert.AreEqual(0, arr.Length);
-			Test("[true]");
-			arr = Result.RefObj as ArrayObj;
-			Assert.NotNull(arr);
-			Assert.AreEqual(1, arr.Length);
-			Assert.AreEqual(true, arr[0].Native);
+		[Test]
+		public void ROS_Expr10_NewLines()
+		{
+			foreach (var s in new[]
+			{
+				"(\n+1\n)",
+				"def pass x => x\npass(\n1\n)"
+			})
+			{
+				Test(1, s);
+			}
 		}
 	}
 }
