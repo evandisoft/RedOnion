@@ -161,6 +161,7 @@ namespace RedOnion.KSP
 					{ "ShipConstruction", root[typeof(ShipConstruction)]},
 					{ "FlightDriver" , root[typeof(FlightDriver)]},
 					{ "GameScenes" , root[typeof(GameScenes)]},
+					{ "PartLoader" , root[typeof(PartLoader)]},
 					{ "ship", ship }
 				})));
 			}

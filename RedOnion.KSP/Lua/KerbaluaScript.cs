@@ -19,7 +19,7 @@ namespace RedOnion.KSP.Lua
 		public EditorPanels EditorPanels = EditorPanels.Instance;
 		public EditorLogic EditorLogic = EditorLogic.fetch;
 		public ShipConstruction ShipConstruction = new ShipConstruction();
-
+		public Random Random = new Random();
 	}
 
 	public class KerbaluaScript : MoonSharp.Interpreter.Script

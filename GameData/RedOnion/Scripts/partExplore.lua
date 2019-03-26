@@ -2,12 +2,15 @@ vessel=Ksp.FlightGlobals.ActiveVessel
 part=vessel.parts[8]
 m=part.Modules[0]
 
-function printModules(part)
-    for module in part.Modules do
-        print(module.moduleName)
+function each(lst,action) 
+    for i in lst do
+        action(i)
     end
-end 
+end
 
 for part in vessel.parts do
-    printModules(part)
+    --printModules(part)
+    each(part.Modules,function(m)
+        print(m)
+    end)
 end

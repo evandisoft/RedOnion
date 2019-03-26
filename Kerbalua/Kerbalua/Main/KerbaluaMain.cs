@@ -61,6 +61,7 @@ namespace Kerbalua
                 toolbarTexture
                 );
             }
+
             // We have to connect it with a function that has relevance in this
             // particular scene. If ToggleGui was already set, it was with
             // a delegate from another scene.
