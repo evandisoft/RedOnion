@@ -19,6 +19,7 @@ namespace RedOnion.KSP.Lua
 		public EditorPanels EditorPanels = EditorPanels.Instance;
 		public EditorLogic EditorLogic = EditorLogic.fetch;
 		public ShipConstruction ShipConstruction = new ShipConstruction();
+
 	}
 
 	public class KerbaluaScript : MoonSharp.Interpreter.Script
@@ -27,8 +28,19 @@ namespace RedOnion.KSP.Lua
 		{
 			UserData.RegistrationPolicy = InteropRegistrationPolicy.Automatic;
 			//UserData.RegisterProxyType<ModuleProxy, PartModule>(m => new ModuleProxy(m));
-			UserData.RegisterProxyType<ModuleProxy, ModuleControlSurface>(m => new ModuleProxy(m));
-			
+
+			//UserData.RegisterProxyType<ModuleControlSurfaceProxy, ModuleControlSurface>(m => new ModuleControlSurfaceProxy(m));
+			GlobalOptions.CustomConverters
+				.SetClrToScriptCustomConversion(
+					(MoonSharp.Interpreter.Script script, ModuleControlSurface m)
+						=> DynValue.NewTable(new ProxyTable(this, m))
+					);
+			//var a = new Table(this);
+			//UserData.
+			//var d=UserData.RegisterType<ModuleControlSurface>();
+			//Debug.Log(d);
+			//descr.RemoveMember("transformName");
+
 			Globals["Ksp"] = new KspApi();
 		}
 

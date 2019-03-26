@@ -159,6 +159,8 @@ namespace RedOnion.KSP
 					{ "StageManager",   root[typeof(KUI.Screens.StageManager)] },
 					{ "EditorLogic", root[typeof(EditorLogic)]},
 					{ "ShipConstruction", root[typeof(ShipConstruction)]},
+					{ "FlightDriver" , root[typeof(FlightDriver)]},
+					{ "GameScenes" , root[typeof(GameScenes)]},
 					{ "ship", ship }
 				})));
 			}
