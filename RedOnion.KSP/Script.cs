@@ -157,7 +157,8 @@ namespace RedOnion.KSP
 					{ "InputLockManager", root[typeof(InputLockManager)] },
 					{ "InputLock",		root[typeof(InputLockManager)] },
 					{ "StageManager",   root[typeof(KUI.Screens.StageManager)] },
-
+					{ "EditorLogic", root[typeof(EditorLogic)]},
+					{ "ShipConstruction", root[typeof(ShipConstruction)]},
 					{ "ship", ship }
 				})));
 			}

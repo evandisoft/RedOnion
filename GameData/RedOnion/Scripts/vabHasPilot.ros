@@ -1,0 +1,9 @@
+var editor=ksp.editorlogic.fetch
+var vessel=ksp.editorlogic.fetch.ship
+
+var crew=ksp.ShipConstruction.ShipManifest.GetAllCrew(false)
+
+for var crewman in crew
+    if crewman.GetLocalizedTrait()=="Pilot"
+        print "We have a pilot"
+    

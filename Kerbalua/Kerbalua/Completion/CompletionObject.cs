@@ -186,7 +186,7 @@ namespace Kerbalua.Completion {
 			List<string> completions = new List<string>();
 			string partial = CurrentPartial;
 			foreach (var memberName in ListAllMembers(CurrentType)) {
-				if (memberName.StartsWith(partial)) {
+				if (memberName.Contains(partial)) {
 					completions.Add(memberName);
 				}
 			}
@@ -205,7 +205,7 @@ namespace Kerbalua.Completion {
 					continue;
 				}
 
-				if (entry.String.StartsWith(partial)) {
+				if (entry.String.Contains(partial)) {
 					completions.Add(entry.String);
 				}
 			}

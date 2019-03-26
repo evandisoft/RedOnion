@@ -1,10 +1,11 @@
-using System;
+using System.Runtime.Remoting.Proxies;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
 using RedOnion.KSP.Autopilot;
 using UnityEngine;
 using RedOnion.KSP.MathUtil;
 using KSP.UI.Screens;
+using RedOnion.KSP.Lua.Proxies;
 
 namespace RedOnion.KSP.Lua
 {
@@ -17,6 +18,7 @@ namespace RedOnion.KSP.Lua
 		public Vec Vec = new Vec();
 		public EditorPanels EditorPanels = EditorPanels.Instance;
 		public EditorLogic EditorLogic = EditorLogic.fetch;
+		public ShipConstruction ShipConstruction = new ShipConstruction();
 	}
 
 	public class KerbaluaScript : MoonSharp.Interpreter.Script
@@ -24,6 +26,9 @@ namespace RedOnion.KSP.Lua
 		public KerbaluaScript() : base(CoreModules.Preset_Complete)
 		{
 			UserData.RegistrationPolicy = InteropRegistrationPolicy.Automatic;
+			//UserData.RegisterProxyType<ModuleProxy, PartModule>(m => new ModuleProxy(m));
+			UserData.RegisterProxyType<ModuleProxy, ModuleControlSurface>(m => new ModuleProxy(m));
+			
 			Globals["Ksp"] = new KspApi();
 		}
 
