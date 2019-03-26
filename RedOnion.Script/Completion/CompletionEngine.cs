@@ -21,6 +21,19 @@ namespace RedOnion.Script.Completion
 					return true;
 			return false;
 		}
+		protected class Comparer : IComparer<string>
+		{
+			public string partial;
+			public Comparer(string partial) => this.partial = partial;
+			public int Compare(string x, string y)
+			{
+				bool a = x.StartsWith(partial, StringComparison.OrdinalIgnoreCase);
+				bool b = y.StartsWith(partial, StringComparison.OrdinalIgnoreCase);
+				if (a && !b) return -1;
+				if (b && !a) return +1;
+				return string.Compare(x, y, StringComparison.OrdinalIgnoreCase);
+			}
+		}
 
 		/// <summary>
 		/// Completion/replacement suggestions for point of interest
@@ -58,7 +71,7 @@ namespace RedOnion.Script.Completion
 		protected Lexer lexer = new Lexer();
 		protected int interest, replaceAt, replaceTo;
 		protected object found;
-		protected string partial, lowerPartial;
+		protected string partial;
 
 		public virtual IList<string> Complete(
 			string source, int at, out int replaceAt, out int replaceTo)
@@ -86,7 +99,6 @@ namespace RedOnion.Script.Completion
 			if (found != null)
 			{
 				partial = at == replaceAt ? null : source.Substring(replaceAt, at-replaceAt);
-				lowerPartial = at == replaceAt ? null : partial.ToLowerInvariant();
 				FillFrom(found);
 				RemoveDuplicates();
 			}
@@ -268,19 +280,6 @@ namespace RedOnion.Script.Completion
 				value = linked;
 				if (value == null)
 					return;
-			}
-		}
-		private class Comparer : IComparer<string>
-		{
-			public string partial;
-			public Comparer(string partial) => this.partial = partial;
-			public int Compare(string x, string y)
-			{
-				bool a = x.StartsWith(partial, StringComparison.OrdinalIgnoreCase);
-				bool b = y.StartsWith(partial, StringComparison.OrdinalIgnoreCase);
-				if (a && !b) return -1;
-				if (b && !a) return +1;
-				return string.Compare(x, y, StringComparison.OrdinalIgnoreCase);
 			}
 		}
 		private void RemoveDuplicates()
