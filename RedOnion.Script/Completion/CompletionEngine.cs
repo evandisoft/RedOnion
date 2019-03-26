@@ -12,57 +12,14 @@ namespace RedOnion.Script.Completion
 		{
 			if (partial == null || partial.Length == 0)
 				return true;
-			if (partial.Length <= 2)
-				return suggestion.StartsWith(partial, StringComparison.OrdinalIgnoreCase);
-			if (partial.Length <= 4)
-			{
-				if (suggestion.Length < partial.Length)
-					return false;
-				for (int i = 0, n = suggestion.Length - partial.Length; i <= n; i++)
-					if (string.Compare(partial,
-						suggestion.Substring(i, partial.Length),
-						StringComparison.OrdinalIgnoreCase) == 0)
-						return true;
+			if (suggestion.Length < partial.Length)
 				return false;
-			}
-			suggestion = suggestion.ToLowerInvariant();
-			var dist = 1 + (lowerPartial.Length-3)/5;
-			if (lowerPartial.Length >= suggestion.Length)
-				return DamerauLevenshtein(lowerPartial, suggestion) <= dist;
-
-			for (int i = 0, n = suggestion.Length - lowerPartial.Length; i <= n; i++)
-				if (DamerauLevenshtein(lowerPartial, suggestion.Substring(i, lowerPartial.Length)) <= dist)
+			for (int i = 0, n = suggestion.Length - partial.Length; i <= n; i++)
+				if (string.Compare(partial,
+					suggestion.Substring(i, partial.Length),
+					StringComparison.OrdinalIgnoreCase) == 0)
 					return true;
 			return false;
-
-		}
-		static int DamerauLevenshtein(string original, string modified)
-		{
-			int len_orig = original.Length;
-			int len_diff = modified.Length;
-
-			var matrix = new int[len_orig + 1, len_diff + 1];
-			for (int i = 0; i <= len_orig; i++)
-				matrix[i, 0] = i;
-			for (int j = 0; j <= len_diff; j++)
-				matrix[0, j] = j;
-
-			for (int i = 1; i <= len_orig; i++)
-			{
-				for (int j = 1; j <= len_diff; j++)
-				{
-					int cost = modified[j - 1] == original[i - 1] ? 0 : 1;
-					var vals = new int[] {
-							matrix[i - 1, j] + 1,
-							matrix[i, j - 1] + 1,
-							matrix[i - 1, j - 1] + cost
-						};
-					matrix[i, j] = vals.Min();
-					if (i > 1 && j > 1 && original[i - 1] == modified[j - 2] && original[i - 2] == modified[j - 1])
-						matrix[i, j] = Math.Min(matrix[i, j], matrix[i - 2, j - 2] + cost);
-				}
-			}
-			return matrix[len_orig, len_diff];
 		}
 
 		/// <summary>
@@ -313,12 +270,27 @@ namespace RedOnion.Script.Completion
 					return;
 			}
 		}
+		private class Comparer : IComparer<string>
+		{
+			public string partial;
+			public Comparer(string partial) => this.partial = partial;
+			public int Compare(string x, string y)
+			{
+				bool a = x.StartsWith(partial, StringComparison.OrdinalIgnoreCase);
+				bool b = y.StartsWith(partial, StringComparison.OrdinalIgnoreCase);
+				if (a && !b) return -1;
+				if (b && !a) return +1;
+				return string.Compare(x, y, StringComparison.OrdinalIgnoreCase);
+			}
+		}
 		private void RemoveDuplicates()
 		{
 			int i, j;
 			if (_suggestionsCount <= 1)
 				return;
-			Array.Sort(_suggestions, 0, _suggestionsCount, StringComparer.OrdinalIgnoreCase);
+			if (partial == null || partial.Length == 0)
+				Array.Sort(_suggestions, 0, _suggestionsCount, StringComparer.OrdinalIgnoreCase);
+			else Array.Sort(_suggestions, 0, _suggestionsCount, new Comparer(partial));
 			for (i = 0, j = 1; j < _suggestionsCount; j++)
 			{
 				if (string.Compare(_suggestions[j], _suggestions[i],
