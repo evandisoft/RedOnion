@@ -184,12 +184,35 @@ namespace Kerbalua.Gui
 			{
 				editor.Paste();
 			});
+			KeyBindings.Add(new EventKey(KeyCode.Backspace, false, true), () =>
+			 {
+				 int toMove = NextTabLeft(cursorIndex);
+				 for (int i = 0; i < toMove; i++)
+				 {
+					 editor.Backspace();
+				 }
+			 });
 			KeyBindings.Add(new EventKey(KeyCode.Backspace, true), () =>
 			{
-				int toMove = NextTabLeft(cursorIndex);
-				for (int i = 0; i < toMove; i++)
+				while (true)
 				{
+					if (editor.cursorIndex <= 0)
+					{
+						break;
+					}
+
+					if (editor.text[editor.cursorIndex - 1] == '\n')
+					{
+						break;
+					}
+
 					editor.Backspace();
+
+					if (editor.text[editor.cursorIndex - 1] == '.')
+					{
+						break;
+					}
+
 				}
 			});
 			KeyBindings.Add(new EventKey(KeyCode.Tab), () => Indent());
@@ -279,7 +302,6 @@ namespace Kerbalua.Gui
 				IndentToPreviousLine();
 			});
 		}
-
 
 		protected int NextTabLeft(int fromIndex)
 		{
