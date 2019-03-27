@@ -47,4 +47,4 @@ Here is more information about [contributing](Contributing.md).
 [CommonScriptApi](CommonScriptApi.md) - Our tentative, WIP API shared by Lua and ROS for interacting with the game in various ways. May be changed dramatically in the future.
 
 ## Videos
-Videos about this mod will on [this channel](https://www.youtube.com/channel/UChduoYTVOtAH0NA-Lj8EiKA).
+Demonstration videos for this mod are on [this channel](https://www.youtube.com/channel/UChduoYTVOtAH0NA-Lj8EiKA).
