@@ -457,5 +457,19 @@ namespace RedOnion.Script
 			data = new ValueData();
 			data.Double = value;
 		}
+
+		public static Value Method<Obj>(Action<Obj> action) where Obj: IObject
+			=> new Value(engine => new BasicObjects.SimpleMethod0<Obj>(engine, action));
+		public static Value Method<Obj>(Action<Obj, Value> action) where Obj : IObject
+			=> new Value(engine => new BasicObjects.SimpleMethod1<Obj>(engine, action));
+		public static Value Method<Obj>(Action<Obj, Value, Value> action) where Obj : IObject
+			=> new Value(engine => new BasicObjects.SimpleMethod2<Obj>(engine, action));
+
+		public static Value Func<Obj>(Func<Obj, Value> func) where Obj : IObject
+			=> new Value(engine => new BasicObjects.SimpleFunction0<Obj>(engine, func));
+		public static Value Func<Obj>(Func<Obj, Value, Value> func) where Obj : IObject
+			=> new Value(engine => new BasicObjects.SimpleFunction1<Obj>(engine, func));
+		public static Value Func<Obj>(Func<Obj, Value, Value, Value> func) where Obj : IObject
+			=> new Value(engine => new BasicObjects.SimpleFunction2<Obj>(engine, func));
 	}
 }

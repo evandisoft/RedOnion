@@ -1,8 +1,10 @@
 using System;
 using UnityEngine;
 
-namespace Kerbalua.Gui {
-	public class GUIUtil {
+namespace Kerbalua.Gui
+{
+	public class GUIUtil
+	{
 		/// <summary>
 		/// Checks whether the mouse is currently in the given local rect coordinates
 		/// using the less buggy Mouse.screenPos rather than Event.current.mousePosition
@@ -16,7 +18,7 @@ namespace Kerbalua.Gui {
 			absoluteRect.x = absoluteRectStart.x;
 			absoluteRect.y = absoluteRectStart.y;
 			absoluteRect.width = rect.width;
-			absoluteRect.height = rect.height; 
+			absoluteRect.height = rect.height;
 
 			//Debug.Log($"{absoluteRect.Contains(Mouse.screenPos)},{Mouse.screenPos},{absoluteRect}");
 			return absoluteRect.Contains(Mouse.screenPos);
@@ -39,18 +41,21 @@ namespace Kerbalua.Gui {
 		static Font monoSpaceFont = null;
 		static public Font GetMonoSpaceFont()
 		{
-			if (monoSpaceFont == null) {
+			if (monoSpaceFont == null)
+			{
 				string[] fonts = Font.GetOSInstalledFontNames();
-				foreach (var fontName in fonts) {
+				foreach (var fontName in fonts)
+				{
 					// Accept Courier New if available
-					if (fontName=="Courier New") {
+					if (fontName == "Courier New")
+					{
 						monoSpaceFont = Font.CreateDynamicFontFromOSFont(fontName, 12);
 						return monoSpaceFont;
 					}
 					// Accept the last listed Mono font if Courier New is not available
 					else if (fontName.Contains("Mono"))
 					{
-						monoSpaceFont= Font.CreateDynamicFontFromOSFont(fontName, 12);
+						monoSpaceFont = Font.CreateDynamicFontFromOSFont(fontName, 12);
 					}
 				}
 			}
@@ -65,7 +70,8 @@ namespace Kerbalua.Gui {
 		/// <param name="event1">Event1.</param>
 		static public void ConsumeAndMarkNextCharEvent(Event event1)
 		{
-			if (event1.keyCode != KeyCode.None) {
+			if (event1.keyCode != KeyCode.None)
+			{
 				event1.Use();
 				consumeNextCharEvent = true;
 			}
@@ -80,8 +86,9 @@ namespace Kerbalua.Gui {
 		/// <param name="event1">Event1.</param>
 		static public void ConsumeMarkedCharEvent(Event event1)
 		{
-			
-			if (consumeNextCharEvent && event1.keyCode == KeyCode.None) {
+
+			if (consumeNextCharEvent && event1.keyCode == KeyCode.None)
+			{
 				event1.Use();
 			}
 			if (event1.type != EventType.Used)

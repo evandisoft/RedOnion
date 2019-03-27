@@ -7,13 +7,17 @@ namespace RedOnion.Script.Parsing
 	[DebuggerDisplay("{lexer.LineNumber}:{lexer.At}: {lexer.Code}; {lexer.Curr}; {lexer.Word}; {lexer.Line}")]
 	public partial class Parser
 	{
-		protected Lexer lexer;
+		public static readonly Option DefaultParserOptions
+			= Option.Autocall
+			| Option.Untyped | Option.Typed	// both typed and untyped variables allowed
+			| Option.ArrayLiteral;
 
 		public CultureInfo Culture { get; set; } = CultureInfo.InvariantCulture;
-		public Option Options { get; set; }
-			= Option.Script | Option.Autocall | Option.Untyped | Option.Typed;
+		public Option Options { get; set; } = DefaultParserOptions;
 		public bool HasOption(Option opt)
 			=> (Options & opt) != 0;
+
+		protected Lexer lexer;
 
 		public Parser() => lexer = new Lexer(this);
 		public Parser(Option opts) : this() => Options = opts;
@@ -24,30 +28,30 @@ namespace RedOnion.Script.Parsing
 		{
 			None = 0,
 			/// <summary>
-			/// Targeting stript engine (not .NET)
-			/// </summary>
-			Script = 1 << 0,
-			/// <summary>
 			/// Strongly typed language (require static types, unless Untyped is also set)
 			/// </summary>
-			Typed = 1 << 1,
+			Typed = 1 << 0,
 			/// <summary>
 			/// Untyped language (no static types, unless Typed is also set)
 			/// </summary>
-			Untyped = 1 << 2,
+			Untyped = 1 << 1,
 			/// <summary>
 			/// Translate e.g. `abs -x` into `abs(-x)`.
 			/// </summary>
-			AutocallWhenArgs = 1 << 3,
+			AutocallWhenArgs = 1 << 2,
 			/// <summary>
 			/// Convert simple statements (identifier or root is dot)
 			/// into function call (e.g. `stage` becomes `stage()`).
 			/// </summary>
-			AutocallSimple = 1 << 4,
+			AutocallSimple = 1 << 3,
 			/// <summary>
 			/// Both versions of function call without parentheses
 			/// </summary>
 			Autocall = AutocallWhenArgs | AutocallSimple,
+			/// <summary>
+			/// Array literal like in JavaScript: var a = [1, 2, 3]
+			/// </summary>
+			ArrayLiteral = 1 << 4,
 
 			/// <summary>
 			/// "x .y" => "x(this.y)" if set, "x.y" otherwise

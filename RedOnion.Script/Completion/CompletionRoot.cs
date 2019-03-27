@@ -31,7 +31,7 @@ namespace RedOnion.Script.Completion
 			default:
 				if (value.IsNumber)
 					return new NumberObj(Engine, null, value);
-				throw new NotImplementedException();
+				throw new NotImplementedException("Boxing of " + value.Name);
 			}
 		}
 
@@ -45,5 +45,9 @@ namespace RedOnion.Script.Completion
 			=> null;
 		public IObject GetType(OpCode OpCode, params Value[] par)
 			=> null;
+
+		~CompletionRoot() => Dispose(false);
+		public void Dispose() => Dispose(true);
+		protected virtual void Dispose(bool disposing) { }
 	}
 }

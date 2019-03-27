@@ -68,5 +68,35 @@ namespace RedOnion.ScriptNUnit
 			Test(ValueKind.Long, "kind.long");
 			Test(ValueKind.Int|ValueKind.fEnum, "kind.int | kind.fEnum");
 		}
+
+		[Test]
+		public void ROS_Root06_Array()
+		{
+			Test("var a = new array 0, 1f, 2.0, \"three\"");
+			var a = Result.Object as ArrayObj;
+			Assert.NotNull(a);
+			Assert.AreEqual(0, a[0].Native);
+			Assert.AreEqual(1f, a[1].Native);
+			Assert.AreEqual(2.0, a[2].Native);
+			Assert.AreEqual("three", a[3].Native);
+			Test("three", "a[3]");
+			Test(4, "a.length");
+		}
+
+		[Test]
+		public void ROS_Root07_List()
+		{
+			Test("var a = new list");
+			var a = Result.Object as ListObj;
+			Assert.NotNull(a);
+			Test(0, "a.length");
+			Test("a.add \"zero\"");
+			Test("zero", "a[0]");
+
+			Lines(1,
+				"var c = 0",
+				"for var e in a; c++",
+				"return c");
+		}
 	}
 }

@@ -66,7 +66,6 @@ which means it will autosize to fit the content (with minimal W:160,H:120 by def
   `PreferredSize` otherwise (when you e.g. set it to zero or even negative, the
   `MinWidth`/`MinHeight` will be used instead).
 * `MinWidth` and `MinHeight` - minimal width and height (160x120 by default, 80x80 is total minimum).
-* `PreferWidth` and `PreferHeight` - redirects to `Frame`, may be redundant.
 * `FrameColor`, `FrameTexture`, `HeaderColor`, `HeaderTexture`, `TitleColor`, `ContentColor`, `ContentTexture`
 * `Layout`, `LayoutPadding`, `InnerPadding`, `InnerSpacing`, `Padding`, `Spacing` - content panel.
 
@@ -108,5 +107,10 @@ which means it will autosize to fit the content (with minimal W:160,H:120 by def
 
 * `Text`, `TextColor`, `TextAlign`, `FontSize`, `FontStyle` - as in `Label`.
 * `Multiline` - multi/single-line switch (single line by default).
+* `ReadOnly`, `Focused`, `CaretPosition`, `SelectionStart`, `SelectionEnd`, `CharacterLimit`
+
+**Events**
+* `Changed` - the text got changed.
+* `Submitted` - the text got submitted (ENTER).
 
 **WIP ;)**

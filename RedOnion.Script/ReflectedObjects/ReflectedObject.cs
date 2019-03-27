@@ -8,23 +8,33 @@ using System.Reflection;
 
 namespace RedOnion.Script.ReflectedObjects
 {
-	public class ReflectedObject : BasicObjects.SimpleObject
+	public class ReflectedObject : ReflectedObject<object>
+	{
+		public ReflectedObject(IEngine engine, object target, IProperties properties = null)
+			: base(engine, target, properties) { }
+		public ReflectedObject(IEngine engine, object target, ReflectedType type)
+			: base(engine, target, type) { }
+	}
+	public class ReflectedObject<T> : BasicObjects.SimpleObject
 	{
 		public override ObjectFeatures Features
 			=> ObjectFeatures.Proxy | ObjectFeatures.Operators;
 
-		private object _target;
+		private T _target;
 		private Type _type;
 		public ReflectedType Creator { get; }
 
+		public T It => _target;
 		public override object Target => _target;
 		public override Type Type => _type;
+		public override string Name => PureName;
+		protected string PureName => (_target?.GetType() ?? _type)?.Name ?? base.Name;
 
-		public ReflectedObject(IEngine engine, object target, IProperties properties = null)
+		public ReflectedObject(IEngine engine, T target, IProperties properties = null)
 			: base(engine, properties)
 			=> _type = (_target = target)?.GetType();
-		public ReflectedObject(IEngine engine, object target, ReflectedType type, IProperties properties = null)
-			: this(engine, target, properties)
+		public ReflectedObject(IEngine engine, T target, ReflectedType type)
+			: this(engine, target, type?.TypeProps)
 		{
 			_type = (Creator = type)?.Type ?? target.GetType();
 			BaseProps = type.TypeProps;
@@ -173,7 +183,7 @@ namespace RedOnion.Script.ReflectedObjects
 					BaseProps.Set(name, new Value(prop));
 					var tmp = prop.Get(this);
 					tmp.Modify(op, value);
-					return prop.Set(this, value);
+					return prop.Set(this, tmp);
 				}
 				if (member is EventInfo evt)
 				{
@@ -225,6 +235,9 @@ namespace RedOnion.Script.ReflectedObjects
 				{
 					if (pair.Value.Length != argc || !pair.Key.CanRead)
 						continue;
+					if (value.IsNumber && pair.Value[0].ParameterType == typeof(int))
+						return Convert(Engine, pair.Key.GetGetMethod()
+							.Invoke(Target, new object[] { value.Int }));
 					if (value.IsString && pair.Value[0].ParameterType == typeof(string))
 						return Convert(Engine, pair.Key.GetGetMethod()
 							.Invoke(Target, new object[] { value.String }));
@@ -292,26 +305,19 @@ namespace RedOnion.Script.ReflectedObjects
 			if (op.Unary())
 			{
 				var arguments = Engine.Arguments;
-				var startLength = arguments.Length;
-				try
+				using (arguments.Guard())
 				{
 					arguments.Add(new Value(this));
 					foreach (var method in methods)
 						if (ReflectedFunction.TryCall(Engine, method, null, 1, ref result))
 							return true;
 				}
-				finally
-				{
-					arguments.Remove(arguments.Length - startLength);
-				}
 				return false;
 			}
 			else
 			{
 				var arguments = Engine.Arguments;
-				var startLength = arguments.Length;
-				try
-				{
+				using (arguments.Guard()) {
 					if (!selfRhs)
 						arguments.Add(new Value(this));
 					arguments.Add(arg);
@@ -320,10 +326,6 @@ namespace RedOnion.Script.ReflectedObjects
 					foreach (var method in methods)
 						if (ReflectedFunction.TryCall(Engine, method, null, 2, ref result))
 							return true;
-				}
-				finally
-				{
-					arguments.Remove(arguments.Length - startLength);
 				}
 				return false;
 			}
@@ -344,6 +346,11 @@ namespace RedOnion.Script.ReflectedObjects
 				=> Convert(self.Engine, Info.GetValue(self.Target));
 			public bool Set(IObject self, Value value)
 			{
+				if (!self.Engine.HasOption(EngineOption.Silent))
+				{
+					Info.SetValue(self.Target, Convert(value, Info.FieldType));
+					return true;
+				}
 				try
 				{
 					Info.SetValue(self.Target, Convert(value, Info.FieldType));
@@ -366,6 +373,11 @@ namespace RedOnion.Script.ReflectedObjects
 			{
 				if (!Info.CanWrite)
 					return false;
+				if (!self.Engine.HasOption(EngineOption.Silent))
+				{
+					Info.SetValue(self.Target, Convert(value, Info.PropertyType), new object[0]);
+					return true;
+				}
 				try
 				{
 					Info.SetValue(self.Target, Convert(value, Info.PropertyType), new object[0]);

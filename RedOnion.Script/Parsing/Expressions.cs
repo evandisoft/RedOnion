@@ -55,6 +55,7 @@ namespace RedOnion.Script.Parsing
 		protected virtual bool ParseExpression(Flag flags = Flag.None)
 		{
 			var bottom = OperatorAt;
+			bool wasBlock = false;
 		unext:
 			var unary = true;
 		next:
@@ -63,13 +64,15 @@ namespace RedOnion.Script.Parsing
 			if (code == OpCode.Identifier   //------------------------------------------- identifier
 				|| kind == OpKind.Number    // type specifier (byte, bool, int, ...)
 				|| code == OpCode.String || code == OpCode.Char	// type names
-				|| code == OpCode.Function || code == OpCode.Object)
+				|| code.Code() == OpCode.Function.Code() // function or def
+				|| code == OpCode.Object
+				|| code == OpCode.Get || code == OpCode.Set)
 			{
 				if (!unary)
 					goto autocall;
 				if (lexer.Word.Length > 127)
 					throw new ParseError(lexer, "Identifier name too long");
-				if (code == OpCode.Function)
+				if (code.Code() == OpCode.Function.Code())
 				{
 					var fnat = CodeAt;
 					ParseFunction(null, flags);
@@ -251,18 +254,14 @@ namespace RedOnion.Script.Parsing
 						&& Next().lexer.Word == null)
 						throw new ParseError(lexer, "Expected variable type");
 					ParseType(flags);
-					var wasBlock = false;
+					wasBlock = false;
 					if (lexer.Code == OpCode.Assign)
 						wasBlock = Next().ParseExpression(flags);
 					else
 						Push(OpCode.Undefined);
 					PrepareOperator(OpCode.Var);
 					if (wasBlock)
-					{
-						while (OperatorAt > bottom)
-							PrepareOperator(PopOperator());
-						return true;
-					}
+						goto blockend;
 					unary = false;
 					goto next;
 				case OpCode.Generic:    //----------------------------------- generic type or method
@@ -297,14 +296,16 @@ namespace RedOnion.Script.Parsing
 					{
 						if (!unary)
 							goto autocall;
-						Next().ParseExpression(flags &~Flag.LimitedContext);
+						Next(true).ParseExpression(flags &~Flag.LimitedContext);
+						if (lexer.Eol)
+							Next(true);
 						if (lexer.Curr != ')')
 							throw new ParseError(lexer, "Expected matching ')'");
 						Next();
 						unary = false;
 						goto next;
 					}
-					if (Next().lexer.Curr == ')')
+					if (Next(true).lexer.Curr == ')')
 					{
 						PrepareOperator(OpCode.Call0);
 						Next();
@@ -314,6 +315,8 @@ namespace RedOnion.Script.Parsing
 
 					ParseExpression(flags &~Flag.LimitedContext);
 
+					if (lexer.Eol)
+						Next(true);
 					if (lexer.Curr == ')')
 					{
 						PrepareOperator(OpCode.Call1);
@@ -326,19 +329,46 @@ namespace RedOnion.Script.Parsing
 					do
 					{
 						PushOperator(OpCode.Comma);
-						Next().ParseExpression(flags &~Flag.LimitedContext);
+						Next(true).ParseExpression(flags &~Flag.LimitedContext);
+						if (lexer.Eol)
+							Next(true);
 					}
 					while (lexer.Curr == ',');
+					if (lexer.Eol)
+						Next(true);
 					if (lexer.Curr != ')')
 						throw new ParseError(lexer, "Expected matching ')'");
 					Next();
 					PrepareOperator(OpCode.CallN);
 					unary = false;
 					goto next;
-				case '[':			//------------------------------------------------------------ [
+				case '[':           //------------------------------------------------------------ [
 					if (unary)
-						throw new ParseError(lexer, "Unexpected '[' - nothing to index");
-					if (Next().lexer.Curr == ']')
+					{
+						if (!HasOption(Option.ArrayLiteral))
+							throw new ParseError(lexer, "Unexpected '[' - nothing to index");
+						Push(OpCode.Undefined);
+						if (Next(true).lexer.Curr != ']')
+						{
+							for (; ; )
+							{
+								PushOperator(OpCode.Comma);
+								ParseExpression(flags &~Flag.LimitedContext);
+								if (lexer.Eol)
+									Next(true);
+								if (lexer.Curr == ']')
+									break;
+								if (lexer.Curr != ',')
+									throw new ParseError(lexer, "Expected ',' or ']'");
+								Next();
+							}
+						}
+						PrepareOperator(OpCode.Array);
+						Next(true);
+						unary = false;
+						goto next;
+					}
+					if (Next(true).lexer.Curr == ']')
 						throw new ParseError(lexer, "Unexpected ']' - missing index");
 
 					ParseExpression(flags &~Flag.LimitedContext);
@@ -390,25 +420,34 @@ namespace RedOnion.Script.Parsing
 				PrepareOperator(PopOperator());
 			return false;
 
+		blockend:
+			while (OperatorAt > bottom)
+				PrepareOperator(PopOperator());
+			return true;
+
 		//################################################################################ auto call
 		autocall:
 			if (!HasOption(Option.AutocallWhenArgs))
 				throw new ParseError(lexer, "Unexpected literal (autocall is disabled)");
 			Debug.Assert(!unary);
-			ParseExpression(flags);
+			wasBlock = ParseExpression(flags | Flag.LimitedContext);
 			if (lexer.Curr != ',')
 			{
 				PrepareOperator(OpCode.Call1);
+				if (wasBlock)
+					goto blockend;
 				unary = false;
 				goto next;
 			}
 			do
 			{
 				PushOperator(OpCode.Comma);
-				Next().ParseExpression(flags);
+				wasBlock = Next().ParseExpression(flags | Flag.LimitedContext);
 			}
 			while (lexer.Curr == ',');
 			PrepareOperator(OpCode.CallN);
+			if (wasBlock)
+				goto blockend;
 			unary = false;
 			goto next;
 		}

@@ -1,8 +1,8 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 
 namespace RedOnion.Script.BasicObjects
 {
@@ -38,13 +38,13 @@ namespace RedOnion.Script.BasicObjects
 	/// <summary>
 	/// String object (string box)
 	/// </summary>
-	[DebuggerDisplay("{GetType().Name}: {String}")]
-	public class StringObj : BasicObject
+	[DebuggerDisplay("{Name}: {String}")]
+	public class StringObj : BasicObject, IListObject
 	{
 		/// <summary>
 		/// Boxed value
 		/// </summary>
-		public String String { get; protected set; }
+		public string String { get; protected set; }
 		public override Value Value => new Value(String);
 
 		/// <summary>
@@ -58,21 +58,64 @@ namespace RedOnion.Script.BasicObjects
 		/// Create new string object boxing the string
 		/// </summary>
 		public StringObj(IEngine engine, StringObj baseClass, string value)
-			: base(engine, baseClass, StdProps)
+			: base(engine, baseClass, new Properties(StdProps))
 			=> String = value;
 
-		public static Properties StdProps { get; } = new Properties();
-		static StringObj()
+		public override Value Index(IObject self, int argc)
 		{
-			StdProps.Set("length", new Length());
+			if (argc == 1)
+			{
+				var i = Engine.GetArgument(argc);
+				if (i.IsNumber)
+					return String[i.Int];
+			}
+			return base.Index(self, argc);
 		}
 
-		public class Length : IProperty
+		public int Count => String.Length;
+		bool ICollection<Value>.IsReadOnly => true;
+		bool IListObject.IsWritable => false;
+		bool IListObject.IsFixedSize => true;
+
+		public bool Contains(char c)
+			=> String.Contains(c);
+		public bool Contains(Value item)
+			=> String.Contains(item.Char);
+
+		void ICollection<Value>.CopyTo(Value[] array, int arrayIndex)
 		{
-			public Value Get(IObject obj)
-				=> new Value(((StringObj)obj).String.Length);
-			public bool Set(IObject obj, Value value)
-				=> false;
+			foreach (char c in String)
+				array[arrayIndex++] = c;
 		}
+
+		IEnumerator IEnumerable.GetEnumerator()
+			=> GetEnumerator();
+		public IEnumerator<Value> GetEnumerator()
+		{
+			foreach (char c in String)
+				yield return c;
+		}
+
+		public int IndexOf(char c)
+			=> String.IndexOf(c);
+		public int IndexOf(Value item)
+			=> String.IndexOf(item.Char);
+		Value IList<Value>.this[int index]
+		{
+			get => String[index];
+			set => throw new NotImplementedException();
+		}
+		public char this[int index] => String[index];
+
+		void ICollection<Value>.Add(Value item) => throw new NotImplementedException();
+		void ICollection<Value>.Clear() => throw new NotImplementedException();
+		bool ICollection<Value>.Remove(Value item) => throw new NotImplementedException();
+		void IList<Value>.Insert(int index, Value item) => throw new NotImplementedException();
+		void IList<Value>.RemoveAt(int index) => throw new NotImplementedException();
+
+		public static IDictionary<string, Value> StdProps { get; } = new Dictionary<string, Value>()
+		{
+			{ "length", ArrayObj.LengthProp.Value }
+		};
 	}
 }

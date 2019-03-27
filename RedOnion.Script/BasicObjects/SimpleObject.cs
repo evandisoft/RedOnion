@@ -19,7 +19,7 @@ namespace RedOnion.Script.BasicObjects
 		/// <summary>
 		/// Name of the object (or full name of the type)
 		/// </summary>
-		public virtual string Name => GetType().FullName;
+		public virtual string Name => GetType().Name;
 
 		/// <summary>
 		/// No base class

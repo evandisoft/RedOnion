@@ -44,7 +44,7 @@ namespace Kerbalua.Completion {
 			};
 
 			IParseTree tree = parser.incompleteChunk();
-			
+
 			var lastIncompleteVarExtractor = new LastIncompleteVarExtractor();
 			ParseTreeWalker.Default.Walk(lastIncompleteVarExtractor, tree);
 			var lastIncompleteVar = lastIncompleteVarExtractor.LastIncompleteVar;

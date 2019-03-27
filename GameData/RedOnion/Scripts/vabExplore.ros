@@ -1,0 +1,10 @@
+var vessel=ksp.EditorLogic.fetch.ship
+
+var parts=vessel.parts
+var part=parts[0]
+var m=part.modules[0]
+
+for var part in vessel.parts
+    for var module in part.modules
+        print module
+    

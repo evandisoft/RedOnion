@@ -10,4 +10,3 @@ if not exist ..\ksp mklink /D ..\ksp %ksp%
 if not exist "%data%" mkdir "%data%"
 if not exist "..\ksp\GameData\%name%" mklink /D "..\ksp\GameData\%name%" "%~dp0%data%"
 
-

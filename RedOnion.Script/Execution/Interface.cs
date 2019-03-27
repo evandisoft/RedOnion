@@ -53,7 +53,7 @@ namespace RedOnion.Script
 		Repl = 1 << 31,
 	}
 
-	public interface IEngine
+	public interface IEngine : IDisposable
 	{
 		/// <summary>
 		/// Engine options
@@ -77,6 +77,11 @@ namespace RedOnion.Script
 		/// Reset engine
 		/// </summary>
 		void Reset();
+		/// <summary>
+		/// Event executed on reset (before the root is cleared)
+		/// </summary>
+		event Action<IEngine> Resetting;
+
 		/// <summary>
 		/// Compile source to code
 		/// </summary>
@@ -116,6 +121,18 @@ namespace RedOnion.Script
 		/// Log message
 		/// </summary>
 		void Log(string msg);
+		/// <summary>
+		/// Callback for print function
+		/// </summary>
+		event Action<string> Printing;
+		/// <summary>
+		/// Basic implementation for print function
+		/// </summary>
+		void Print(string msg);
+		/// <summary>
+		/// Print with arguments (formatting)
+		/// </summary>
+		void Print(string msg, params object[] args);
 	}
 
 	[Flags]
@@ -328,6 +345,13 @@ namespace RedOnion.Script
 		public Properties()
 			: base(StringComparer.OrdinalIgnoreCase)
 		{ }
+		/// <summary>
+		/// Create by cloning dictionary
+		/// </summary>
+		public Properties(IDictionary<string, Value> src)
+			: base(src, StringComparer.OrdinalIgnoreCase)
+		{ }
+
 
 		/// <summary>
 		/// Create with one object-reference property (usually "prototype")
@@ -343,6 +367,12 @@ namespace RedOnion.Script
 			=> Add(name, Value.FromObject(obj));
 	}
 
+	public interface IEnumerableObject : IObject, IEnumerable<Value> { }
+	public interface IListObject : IEnumerableObject, IList<Value>
+	{
+		bool IsWritable { get; }
+		bool IsFixedSize { get; }
+	}
 	public interface IObject : IProperties
 	{
 		/// <summary>
@@ -465,7 +495,7 @@ namespace RedOnion.Script
 		IObject Which(string name);
 	}
 
-	public interface IEngineRoot : IScope
+	public interface IEngineRoot : IScope, IDisposable
 	{
 		/// <summary>
 		/// Box value (StringObj, NumberObj, ...)
@@ -693,15 +723,14 @@ namespace RedOnion.Script
 			if (creator == null)
 				creator = root[type];
 			else root[type] = creator;
-			root.Set(name, new Value(creator));
-			root.DebugLog("{0} = {1}", name, type.FullName);
+			if (name != null)
+				root.Set(name, new Value(creator));
 			return creator;
 		}
 		public static IObject AddType(this IEngineRoot root, Type type)
 		{
 			var creator = root[type];
 			root.Set(type.Name, new Value(creator));
-			root.DebugLog("{0} = {1}", type.Name, type.FullName);
 			return creator;
 		}
 

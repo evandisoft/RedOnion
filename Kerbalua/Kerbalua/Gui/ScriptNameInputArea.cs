@@ -55,7 +55,7 @@ namespace Kerbalua.Gui {
 		public void Save(string text)
 		{
 			try {
-				File.WriteAllText(CreateFullPath(), text);
+				File.WriteAllText(CreateFullPath(), text.Replace("\n",Environment.NewLine));
 				CommonSaveLoadActions();
 			}
 			catch(Exception e) {
@@ -68,7 +68,7 @@ namespace Kerbalua.Gui {
 			string result = "";
 			try { 
 				CommonSaveLoadActions();
-				result=File.ReadAllText(CreateFullPath());
+				result=File.ReadAllText(CreateFullPath()).Replace("\r","");
 			}
 			catch(Exception e) {
 				UnityEngine.Debug.Log(e.StackTrace);

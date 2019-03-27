@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -13,6 +14,7 @@ namespace RedOnion.Script.ReflectedObjects
 		/// </summary>
 		public override Type Type => _type;
 		private Type _type;
+		public override string Name => _type?.GetType().FullName + " [static]";
 
 		internal KeyValuePair<PropertyInfo, ParameterInfo[]>[] indexers;
 		internal Dictionary<OpCode, MethodInfo[]> operators;
@@ -53,12 +55,12 @@ namespace RedOnion.Script.ReflectedObjects
 			{
 				// Structure/ValueType has implicit default constructor (zero everything)
 				if (Type.IsValueType)
-					return new ReflectedObject(Engine, Activator.CreateInstance(Type), this, TypeProps);
+					return Convert(Activator.CreateInstance(Type));
 
 				// try to find constructor with no arguments
 				var ctor = Type.GetConstructor(new Type[0]);
 				if (ctor != null)
-					return new ReflectedObject(Engine, ctor.Invoke(new object[0]), this, TypeProps);
+					return Convert(ctor.Invoke(new object[0]));
 
 				// try to find constructor with all default values
 				foreach (var ctr in Type.GetConstructors())
@@ -69,7 +71,7 @@ namespace RedOnion.Script.ReflectedObjects
 					var args = new object[cpars.Length];
 					for (int i = 0; i < args.Length; i++)
 						args[i] = cpars[i].DefaultValue;
-					return new ReflectedObject(Engine, ctr.Invoke(args), this, TypeProps);
+					return Convert(ctr.Invoke(args));
 				}
 
 				if (!Engine.HasOption(EngineOption.Silent))
@@ -94,7 +96,15 @@ namespace RedOnion.Script.ReflectedObjects
 		}
 
 		public override IObject Convert(object value)
-			=> new ReflectedObject(Engine, value, this, TypeProps);
+		{
+			if (value is IEnumerable e)
+			{
+				if (e is IList list)
+					return new ReflectedList(Engine, list, this);
+				return new ReflectedEnumerable(Engine, e, this);
+			}
+			return new ReflectedObject(Engine, value, this);
+		}
 
 		public class MemberComparer : IComparer<MemberInfo>
 		{
@@ -309,14 +319,15 @@ namespace RedOnion.Script.ReflectedObjects
 			{
 				if (value.Object is BasicObjects.FunctionObj fn)
 					return fn.GetDelegate(type);
-				throw new NotImplementedException();
+				throw new NotImplementedException("Unable to convert " + value.Name + " to delegate");
 			}
 			var val = value.Native;
 			if (val == null)
 				return null;
 			if (type.IsAssignableFrom(val.GetType()))
 				return val;
-			throw new NotImplementedException();
+			return type.GetMethod("op_Implicit", new Type[] { val.GetType() })
+				.Invoke(null, new object[] { val });
 		}
 		public static T Convert<T>(Value value)
 			=> (T)Convert(value, typeof(T));
@@ -329,6 +340,11 @@ namespace RedOnion.Script.ReflectedObjects
 				=> Convert(self.Engine, Info.GetValue(null));
 			public bool Set(IObject self, Value value)
 			{
+				if (!self.Engine.HasOption(EngineOption.Silent))
+				{
+					Info.SetValue(null, Convert(value, Info.FieldType));
+					return true;
+				}
 				try
 				{
 					Info.SetValue(null, Convert(value, Info.FieldType));
@@ -351,6 +367,11 @@ namespace RedOnion.Script.ReflectedObjects
 			{
 				if (!Info.CanWrite)
 					return false;
+				if (!self.Engine.HasOption(EngineOption.Silent))
+				{
+					Info.SetValue(null, Convert(value, Info.PropertyType), new object[0]);
+					return true;
+				}
 				try
 				{
 					Info.SetValue(null, Convert(value, Info.PropertyType), new object[0]);

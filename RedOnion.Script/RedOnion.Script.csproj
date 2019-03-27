@@ -36,9 +36,13 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BasicObjects\Array.cs" />
     <Compile Include="BasicObjects\Function.cs" />
+    <Compile Include="BasicObjects\List.cs" />
     <Compile Include="BasicObjects\Number.cs" />
     <Compile Include="BasicObjects\Object.cs" />
+    <Compile Include="BasicObjects\Print.cs" />
+    <Compile Include="BasicObjects\SimpleMethod.cs" />
     <Compile Include="BasicObjects\SimpleObject.cs" />
     <Compile Include="BasicObjects\BasicRoot.cs" />
     <Compile Include="BasicObjects\String.cs" />
@@ -68,7 +72,9 @@
     <Compile Include="Execution\Value.Unary.cs" />
     <Compile Include="Execution\Value.Binary.cs" />
     <Compile Include="Execution\Value.Convert.cs" />
+    <Compile Include="ReflectedObjects\ReflectedEnumerable.cs" />
     <Compile Include="ReflectedObjects\ReflectedFunction.cs" />
+    <Compile Include="ReflectedObjects\ReflectedList.cs" />
     <Compile Include="ReflectedObjects\ReflectedMethod.cs" />
     <Compile Include="ReflectedObjects\ReflectedObject.cs" />
     <Compile Include="ReflectedObjects\ReflectedType.cs" />

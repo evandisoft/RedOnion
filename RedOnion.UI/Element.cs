@@ -12,7 +12,7 @@ namespace RedOnion.UI
 	/// </summary>
 	public abstract partial class Element : IDisposable
 	{
-		protected internal GameObject GameObject { get; private set; }
+		public GameObject GameObject { get; private set; }
 		protected internal RectTransform RectTransform { get; private set; }
 
 		public string Name

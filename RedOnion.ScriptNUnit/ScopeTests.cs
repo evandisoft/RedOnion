@@ -131,21 +131,18 @@ namespace RedOnion.ScriptNUnit
 		{
 			Lines(1,
 				"function f",
-				"f.prototype = new object",
 				"f.prototype.x = 1",
 				"return (new f).x");
 			Lines(2,
 				"var x = 1",
 				"function f",
 				"	this.x = 2",
-			//	"f.prototype = new object", // prototype is now autocreated when accessed
 				"f.prototype.x = 3",
 				"return (new f).x");
 			Lines(2,
 				"var x = 1",
 				"function f",
 				"	x = 2",
-			//	"f.prototype = new object",
 				"f.prototype.x = 3",
 				"return (new f).x");
 		}
@@ -166,8 +163,8 @@ namespace RedOnion.ScriptNUnit
 		[Test]
 		public void ROS_Scope07_DocExample()
 		{
-			Test(1,
-@"function MyClass
+			Test(1, @"
+def MyClass
     // to allow MyClass() be used like new MyClass
     if this == null // or this === undefined
         return new MyClass
@@ -180,13 +177,12 @@ namespace RedOnion.ScriptNUnit
     var _total = 0
 
     // some method
-    this.action = function
+    this.action = def
         counter++   // this.counter++
         _total++    // that private _total
 
     // read-only access to total
-    this.getTotal = function
-        return _total
+    this.getTotal = def => _total
 
 var obj = new MyClass
 obj.counter = 10

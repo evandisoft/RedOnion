@@ -8,6 +8,17 @@ namespace RedOnion.Script
 {
 	public partial class Engine<P>
 	{
+		protected struct ContextGuard : IDisposable
+		{
+			Engine<P> engine;
+			public ContextGuard(Engine<P> engine)
+				=> (this.engine = engine)?.Context.Push(engine);
+			public void Dispose()
+				=> engine?.Context.Pop();
+		}
+		protected ContextGuard BlockGuard()
+			=> new ContextGuard(HasOption(EngineOption.BlockScope) ? this : null);
+
 		protected override void Autocall(bool weak = false)
 		{
 			IObject self = null;
@@ -46,13 +57,11 @@ namespace RedOnion.Script
 			switch (op)
 			{
 			default:
-				throw new NotImplementedException();
+				throw new NotImplementedException(string.Format(Value.Culture,
+					"Unknown statement opcode: {0:04X} {1}", (ushort)op, op));
 			case OpCode.Block:
-				if (HasOption(EngineOption.BlockScope))
-					Context.Push(this);
-				Block(ref at);
-				if (HasOption(EngineOption.BlockScope))
-					Context.Pop();
+				using (BlockGuard())
+					Block(ref at);
 				return;
 			case OpCode.Return:
 			case OpCode.Raise:
@@ -62,114 +71,153 @@ namespace RedOnion.Script
 			case OpCode.Continue:
 				Exit = op;
 				return;
+
 			case OpCode.For:
-				if (HasOption(EngineOption.BlockScope))
-					Context.Push(this);
-				Expression(ref at);
-				var test = at;
-				var notest = Code[at] == 0;
-				if (notest)
-					++at;
-				else
-					Expression(ref at);
-				var size = CodeInt(ref at);
-				var last = at;
-				var stts = at + size;
-				var cend = (stts + 4) + BitConverter.ToInt32(Code, stts);
-				if (Value.Kind != ValueKind.Undefined && !Value.Bool)
+				using (BlockGuard())
 				{
+					Expression(ref at);
+					var test = at;
+					var notest = Code[at] == 0;
+					if (notest)
+						++at;
+					else
+						Expression(ref at);
+					var size = CodeInt(ref at);
+					var last = at;
+					var stts = at + size;
+					var cend = (stts + 4) + BitConverter.ToInt32(Code, stts);
+					if (Value.Kind != ValueKind.Undefined && !Value.Bool)
+					{
+						at = cend;
+						return;
+					}
+					for (; ; CountStatement())
+					{
+						at = stts;
+						Block(ref at);
+						if (Exit != 0 && Exit != OpCode.Continue)
+							break;
+						at = last;
+						Expression(ref at);
+						if (!notest)
+						{
+							at = test;
+							Expression(ref at);
+							if (!Value.Bool)
+								break;
+						}
+					}
 					at = cend;
-					if (HasOption(EngineOption.BlockScope))
-						Context.Pop();
-					return;
+					if (Exit == OpCode.Break || Exit == OpCode.Continue)
+						Exit = 0;
 				}
-				for (;; CountStatement())
+				return;
+			case OpCode.ForEach:
+				using (BlockGuard())
 				{
-					at = stts;
-					Block(ref at);
-					if (Exit != 0 && Exit != OpCode.Continue)
-						break;
-					at = last;
 					Expression(ref at);
-					if (!notest)
+					var element = Value;
+					Expression(ref at);
+					var obj = Box(Result);
+					var wasBlock = false;
+					if (!(obj is IEnumerable<Value> list))
+					{
+						if (HasOption(EngineOption.Silent))
+						{
+							Value = new Value();
+							goto end_foreach;
+						}
+						throw new InvalidOperationException("Not enumerable: " + (obj?.Name ?? Value.Name));
+					}
+					var stts = at;
+					foreach (var value in list)
+					{
+						at = stts;
+						element.Set(value);
+						Block(ref at);
+						wasBlock = true;
+						if (Exit != 0 && Exit != OpCode.Continue)
+							break;
+						CountStatement();
+					}
+				end_foreach:
+					if (!wasBlock)
+						SkipBlock(ref at);
+					if (Exit == OpCode.Break || Exit == OpCode.Continue)
+						Exit = 0;
+				}
+				return;
+
+			case OpCode.While:
+			case OpCode.Until:
+				using (BlockGuard())
+				{
+					var test = at;
+					bool wasBlock = false;
+					for (; ; CountStatement())
 					{
 						at = test;
 						Expression(ref at);
-						if (!Value.Bool)
+						wasBlock = false;
+						if (Value.Bool == (op == OpCode.Until))
+							break;
+						Block(ref at);
+						wasBlock = true;
+						if (Exit != 0 && Exit != OpCode.Continue)
 							break;
 					}
+					if (Exit == OpCode.Break || Exit == OpCode.Continue)
+						Exit = 0;
+					if (!wasBlock)
+						SkipBlock(ref at);
 				}
-				at = cend;
-				if (HasOption(EngineOption.BlockScope))
-					Context.Pop();
-				if (Exit == OpCode.Break || Exit == OpCode.Continue)
-					Exit = 0;
-				return;
-			case OpCode.While:
-			case OpCode.Until:
-				if (HasOption(EngineOption.BlockScope))
-					Context.Push(this);
-				test = at;
-				for(;; CountStatement())
-				{
-					at = test;
-					Expression(ref at);
-					if (Value.Bool == (op == OpCode.Until))
-						break;
-					Block(ref at);
-					if (Exit != 0 && Exit != OpCode.Continue)
-						break;
-				}
-				if (HasOption(EngineOption.BlockScope))
-					Context.Pop();
-				if (Exit == OpCode.Break || Exit == OpCode.Continue)
-					Exit = 0;
 				return;
 			case OpCode.Do:
 			case OpCode.DoUntil:
-				if (HasOption(EngineOption.BlockScope))
-					Context.Push(this);
-				for(var start = at;; CountStatement())
+				using (BlockGuard())
 				{
-					at = start;
-					Block(ref at);
-					if (Exit != 0 && Exit != OpCode.Continue)
-						break;
-					Expression(ref at);
-					if (Value.Bool == (op == OpCode.DoUntil))
-						break;
-				}
-				if (HasOption(EngineOption.BlockScope))
-					Context.Pop();
-				if (Exit == OpCode.Break || Exit == OpCode.Continue)
-					Exit = 0;
-				return;
-			case OpCode.If:
-				if (HasOption(EngineOption.BlockScope))
-					Context.Push(this);
-				Expression(ref at);
-				if (Value.Bool)
-				{
-					Block(ref at);
-					if (at < Code.Length && Code[at] == OpCode.Else.Code())
+					for (var start = at; ; CountStatement())
 					{
-						at++;
-						size = CodeInt(ref at);
-						at += size;
-					}
-				}
-				else
-				{
-					size = CodeInt(ref at);
-					at += size;
-					if (at < Code.Length && Code[at] == OpCode.Else.Code())
-					{
-						at++;
+						at = start;
 						Block(ref at);
+						var tsz = CodeInt(ref at);
+						if (Exit != 0 && Exit != OpCode.Continue)
+						{
+							at += tsz;
+							break;
+						}
+						Expression(ref at);
+						if (Value.Bool == (op == OpCode.DoUntil))
+							break;
+					}
+					if (Exit == OpCode.Break || Exit == OpCode.Continue)
+						Exit = 0;
+				}
+				return;
+
+			case OpCode.If:
+				using (BlockGuard())
+				{
+					Expression(ref at);
+					if (Value.Bool)
+					{
+						Block(ref at);
+						if (at < Code.Length && Code[at] == OpCode.Else.Code())
+						{
+							at++;
+							SkipBlock(ref at);
+						}
+					}
+					else
+					{
+						SkipBlock(ref at);
+						if (at < Code.Length && Code[at] == OpCode.Else.Code())
+						{
+							at++;
+							Block(ref at);
+						}
 					}
 				}
-				if (HasOption(EngineOption.BlockScope))
-					Context.Pop();
 				return;
 			}
 		}
@@ -179,7 +227,8 @@ namespace RedOnion.Script
 			switch (op)
 			{
 			default:
-				throw new NotImplementedException();
+				throw new NotImplementedException(string.Format(Value.Culture,
+					"Unknown statement: {0:04X} {1}", (ushort)op, op));
 			case OpCode.Function:
 				var fname = Strings[CodeInt(ref at)];
 				if (HasOption(EngineOption.Strict)

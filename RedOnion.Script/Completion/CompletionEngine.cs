@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using RedOnion.Script.Parsing;
 
@@ -7,6 +8,33 @@ namespace RedOnion.Script.Completion
 {
 	public partial class CompletionEngine : IEngine
 	{
+		protected bool Matches(string suggestion)
+		{
+			if (partial == null || partial.Length == 0)
+				return true;
+			if (suggestion.Length < partial.Length)
+				return false;
+			for (int i = 0, n = suggestion.Length - partial.Length; i <= n; i++)
+				if (string.Compare(partial,
+					suggestion.Substring(i, partial.Length),
+					StringComparison.OrdinalIgnoreCase) == 0)
+					return true;
+			return false;
+		}
+		protected class Comparer : IComparer<string>
+		{
+			public string partial;
+			public Comparer(string partial) => this.partial = partial;
+			public int Compare(string x, string y)
+			{
+				bool a = x.StartsWith(partial, StringComparison.OrdinalIgnoreCase);
+				bool b = y.StartsWith(partial, StringComparison.OrdinalIgnoreCase);
+				if (a && !b) return -1;
+				if (b && !a) return +1;
+				return string.Compare(x, y, StringComparison.OrdinalIgnoreCase);
+			}
+		}
+
 		/// <summary>
 		/// Completion/replacement suggestions for point of interest
 		/// </summary>
@@ -16,6 +44,8 @@ namespace RedOnion.Script.Completion
 		protected int _suggestionsCount;
 		protected void AddSuggestion(string name)
 		{
+			if (!Matches(name))
+				return;
 			if (_suggestionsCount == _suggestions.Length)
 				Array.Resize(ref _suggestions, _suggestions.Length << 1);
 			_suggestions[_suggestionsCount++] = name;
@@ -41,6 +71,7 @@ namespace RedOnion.Script.Completion
 		protected Lexer lexer = new Lexer();
 		protected int interest, replaceAt, replaceTo;
 		protected object found;
+		protected string partial;
 
 		public virtual IList<string> Complete(
 			string source, int at, out int replaceAt, out int replaceTo)
@@ -67,8 +98,9 @@ namespace RedOnion.Script.Completion
 			replaceTo = this.replaceTo;
 			if (found != null)
 			{
+				partial = at == replaceAt ? null : source.Substring(replaceAt, at-replaceAt);
 				FillFrom(found);
-				RemoveDuplicates(at == replaceAt ? null : source.Substring(replaceAt, at-replaceAt));
+				RemoveDuplicates();
 			}
 			return GetSuggestions();
 		}
@@ -108,6 +140,22 @@ namespace RedOnion.Script.Completion
 		/// </summary>
 		public virtual void Reset()
 		{
+			var reset = Resetting?.GetInvocationList();
+			if (reset != null)
+			{
+				foreach (var action in reset)
+				{
+					try
+					{
+						action.DynamicInvoke(this);
+					}
+					catch (Exception ex)
+					{
+						this.DebugLog("Exception in Engine.Reset: " + ex.Message);
+						Resetting -= (Action<IEngine>)action;
+					}
+				}
+			}
 			Exit = 0;
 			Root.Reset();
 			Arguments.Clear();
@@ -119,6 +167,7 @@ namespace RedOnion.Script.Completion
 				_suggestionsCount = 0;
 			}
 		}
+		public event Action<IEngine> Resetting;
 
 		CompiledCode IEngine.Compile(string source)
 			=> throw new NotImplementedException();
@@ -233,22 +282,14 @@ namespace RedOnion.Script.Completion
 					return;
 			}
 		}
-		private void RemoveDuplicates(string prefix = null)
+		private void RemoveDuplicates()
 		{
 			int i, j;
-			if (prefix != null && prefix.Length > 0)
-			{
-				for (i = 0, j = 0; j < _suggestionsCount; j++)
-				{
-					if (_suggestions[j].StartsWith(prefix,
-						StringComparison.OrdinalIgnoreCase))
-						_suggestions[i++] = _suggestions[j];
-				}
-				_suggestionsCount = i;
-			}
 			if (_suggestionsCount <= 1)
 				return;
-			Array.Sort(_suggestions, 0, _suggestionsCount, StringComparer.OrdinalIgnoreCase);
+			if (partial == null || partial.Length == 0)
+				Array.Sort(_suggestions, 0, _suggestionsCount, StringComparer.OrdinalIgnoreCase);
+			else Array.Sort(_suggestions, 0, _suggestionsCount, new Comparer(partial));
 			for (i = 0, j = 1; j < _suggestionsCount; j++)
 			{
 				if (string.Compare(_suggestions[j], _suggestions[i],
@@ -257,5 +298,15 @@ namespace RedOnion.Script.Completion
 			}
 			_suggestionsCount = i + 1;
 		}
+
+#pragma warning disable 67
+		public event Action<string> Printing;
+#pragma warning restore 67
+		void IEngine.Print(string msg) { }
+		void IEngine.Print(string msg, params object[] args) { }
+
+		~CompletionEngine() => Dispose(false);
+		public void Dispose() => Dispose(true);
+		protected virtual void Dispose(bool disposing) { }
 	}
 }

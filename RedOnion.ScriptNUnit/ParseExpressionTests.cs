@@ -228,32 +228,42 @@ namespace RedOnion.ScriptNUnit
 		public void ROS_PExpr03_Parenthesis()
 		{
 			Test("(1L + x) * 3.0");
+			check();
+			Reset();
+			Test("(1L\n+ x) * 3.0");
+			check();
+			Reset();
+			Test("(\n1L\n+\nx\n) * 3.0");
+			check();
 
-			ValueCheck	( 0, 1L);
-			ValueCheck	( 8, OpCode.Long);
-			ValueTopMark(13, 0);
-			ValueCheck	(13, 0, "x");
-			ValueCheck	(17, OpCode.Identifier);
-			ValueTopMark(22, 13);
-			ValueCheck	(22, OpCode.Add);
-			ValueTopMark(27, 0);
-			ValueCheck	(27, 3.0);
-			ValueCheck	(35, OpCode.Double);
-			ValueTopMark(40, 27);
-			ValueCheck	(40, OpCode.Mul);
-			ValueFinal	(45);
+			void check()
+			{
+				ValueCheck	( 0, 1L);
+				ValueCheck	( 8, OpCode.Long);
+				ValueTopMark(13, 0);
+				ValueCheck	(13, 0, "x");
+				ValueCheck	(17, OpCode.Identifier);
+				ValueTopMark(22, 13);
+				ValueCheck	(22, OpCode.Add);
+				ValueTopMark(27, 0);
+				ValueCheck	(27, 3.0);
+				ValueCheck	(35, OpCode.Double);
+				ValueTopMark(40, 27);
+				ValueCheck	(40, OpCode.Mul);
+				ValueFinal	(45);
 
-			Rewrite(ValuesAt);
+				Rewrite(ValuesAt);
 
-			CodeCheck( 0, OpCode.Mul);
-			CodeCheck( 1, OpCode.Add);
-			CodeCheck( 2, OpCode.Long);
-			CodeCheck( 3, 1L);
-			CodeCheck(11, OpCode.Identifier);
-			CodeCheck(12, 0, "x");
-			CodeCheck(16, OpCode.Double);
-			CodeCheck(17, 3.0);
-			CodeCheck(25);
+				CodeCheck( 0, OpCode.Mul);
+				CodeCheck( 1, OpCode.Add);
+				CodeCheck( 2, OpCode.Long);
+				CodeCheck( 3, 1L);
+				CodeCheck(11, OpCode.Identifier);
+				CodeCheck(12, 0, "x");
+				CodeCheck(16, OpCode.Double);
+				CodeCheck(17, 3.0);
+				CodeCheck(25);
+			}
 		}
 
 		[Test]
@@ -673,29 +683,36 @@ namespace RedOnion.ScriptNUnit
 		public void ROS_PExpr15_ArrayVariable()
 		{
 			Test("var a:byte[]"); // ActionScript
+			check();
+			Reset();
+			Test("var a:byte[\n]");
+			check();
 
-			ValueCheck	( 0, 0, "a");
-			ValueCheck	( 4, OpCode.Identifier);
-			ValueTopMark( 9, 0);
-			ValueCheck	( 9, OpCode.Byte);
-			ValueTopMark(14, 9);
-			ValueCheck	(14, (byte)1);			// dimensions
-			ValueCheck	(15, OpCode.Array);
-			ValueTopMark(20, 9);				// byte[]
-			ValueCheck	(20, OpCode.Undefined);	// no initializer
-			ValueTopMark(25, 20);
-			ValueCheck	(25, OpCode.Var);
-			ValueFinal	(30);
+			void check()
+			{
+				ValueCheck( 0, 0, "a");
+				ValueCheck	( 4, OpCode.Identifier);
+				ValueTopMark( 9, 0);
+				ValueCheck	( 9, OpCode.Byte);
+				ValueTopMark(14, 9);
+				ValueCheck	(14, (byte)1);			// dimensions
+				ValueCheck	(15, OpCode.Array);
+				ValueTopMark(20, 9);				// byte[]
+				ValueCheck	(20, OpCode.Undefined);	// no initializer
+				ValueTopMark(25, 20);
+				ValueCheck	(25, OpCode.Var);
+				ValueFinal	(30);
 
-			Rewrite(ValuesAt);
+				Rewrite(ValuesAt);
 
-			CodeCheck( 0, OpCode.Var);
-			CodeCheck( 1, 0, "a");
-			CodeCheck( 5, OpCode.Array);
-			CodeCheck( 6, (byte)1);				// dimensions
-			CodeCheck( 7, OpCode.Byte);			// byte[]
-			CodeCheck( 8, OpCode.Undefined);	// no initializer
-			CodeCheck( 9);
+				CodeCheck( 0, OpCode.Var);
+				CodeCheck( 1, 0, "a");
+				CodeCheck( 5, OpCode.Array);
+				CodeCheck( 6, (byte)1);				// dimensions
+				CodeCheck( 7, OpCode.Byte);			// byte[]
+				CodeCheck( 8, OpCode.Undefined);	// no initializer
+				CodeCheck( 9);
+			}
 		}
 
 		[Test]

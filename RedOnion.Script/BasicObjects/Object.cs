@@ -146,10 +146,10 @@ namespace RedOnion.Script.BasicObjects
 			IObject obj = this;
 			for (; ; )
 			{
-				props = obj.BaseProps;
+				props = obj.MoreProps;
 				if (props != null && props.Get(name, out value))
 					break;
-				props = obj.MoreProps;
+				props = obj.BaseProps;
 				if (props != null && props.Get(name, out value))
 					break;
 				if ((obj = obj.BaseClass) == null)
@@ -173,6 +173,9 @@ namespace RedOnion.Script.BasicObjects
 			Value query;
 			for (IObject obj = this; ;)
 			{
+				props = obj.MoreProps;
+				if (props != null && props.Get(name, out query))
+					break;
 				props = obj.BaseProps;
 				if (props != null && props.Get(name, out query))
 				{
@@ -182,9 +185,6 @@ namespace RedOnion.Script.BasicObjects
 						return false;
 					break;
 				}
-				props = obj.MoreProps;
-				if (props != null && props.Get(name, out query))
-					break;
 				if ((obj = obj.BaseClass) == null)
 					break;
 			}
@@ -194,9 +194,11 @@ namespace RedOnion.Script.BasicObjects
 		}
 		public void Add(string name, Value value)
 		{
+			if (Engine.HasOption(EngineOption.Strict) && BaseProps?.Has(name) == true)
+				throw new InvalidOperationException("Cannot shadow " + name + " in " + Name);
 			if (MoreProps == null)
 				MoreProps = new Properties();
-			MoreProps.Set(name, value);
+			MoreProps.Set(name, value.RValue);
 		}
 
 		public virtual bool Modify(string name, OpCode op, Value value)

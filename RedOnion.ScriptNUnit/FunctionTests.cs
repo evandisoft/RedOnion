@@ -31,7 +31,7 @@ namespace RedOnion.ScriptNUnit
 		public void ROS_Func03_ArgsLength()
 		{
 			Lines(3,
-				"function test",
+				"def test", // alternative syntax from Python/Ruby
 				"	return arguments.length",
 				"test 0,1,2");
 		}
@@ -47,15 +47,42 @@ namespace RedOnion.ScriptNUnit
 			Assert.IsTrue(Result.RefObj is Script.BasicObjects.FunctionObj);
 			Lines(1f,
 				"var v = 1f",
-				"var test = function",
+				"var test = def",
 				"	return v",
 				"test");
 			Lines(3u,
-				"var sum = function x, y",
+				"var sum = def x, y",
 				"	return x + y",
 				"var a = 1u",
 				"var b = 2u",
 				"sum a, b");
+		}
+
+		[Test]
+		public void ROS_Func05_ShortLambda()
+		{
+			Lines(3.14,
+				"var pi = 3.14",
+				"var get = def => pi",
+				"get");
+			Lines(3.14,
+				"def get => pi",
+				"get");
+			Lines(3u,
+				"var sum = def x, y => x + y",
+				"sum 1u, 2u");
+			Lines(3u,
+				"var sum = (def x, y => x + y)",
+				"sum 1u, 2u");
+			Lines(3u,
+				"(def x, y; return x + y) 1u, 2u");
+			Lines(3u,
+				"var sum = def x, y; return x + y",
+				"sum 1u, 2u");
+			Lines(3u,
+				"var sum = (def x, y",
+				"	return x + y)",
+				"sum 1u, 2u");
 		}
 	}
 }

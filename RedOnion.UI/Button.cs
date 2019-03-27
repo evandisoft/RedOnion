@@ -71,10 +71,10 @@ namespace RedOnion.UI
 			base.Dispose(true);
 		}
 
-		public event UnityAction Click
+		public Event Click
 		{
-			add => Core.onClick.AddListener(value);
-			remove => Core.onClick.RemoveListener(value);
+			get => new Event(Core.onClick);
+			set { }
 		}
 
 		public string Text

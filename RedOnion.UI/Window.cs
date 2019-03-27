@@ -9,7 +9,7 @@ namespace RedOnion.UI
 {
 	public class Window : IDisposable
 	{
-		protected class FramePanel : Panel
+		public class FramePanel : Panel
 		{
 			static Texture2D DefaultCloseButtonIcon = LoadIcon(13, 13, "WindowCloseButtonIcon.png");
 
@@ -74,8 +74,8 @@ namespace RedOnion.UI
 			}
 		}
 
-		protected FramePanel Frame { get; private set; }
-		protected Panel Content { get; private set; }
+		public FramePanel Frame { get; private set; }
+		public Panel Content { get; private set; }
 
 		public string Name
 		{
@@ -116,11 +116,16 @@ namespace RedOnion.UI
 			Frame.Visible = false;
 		}
 
-		public event UnityAction Closed;
+		readonly Event closed = new Event(new UnityEvent());
+		public Event Closed
+		{
+			get => closed;
+			set { }
+		}
 		public virtual void Close()
 		{
 			Hide();
-			Closed?.Invoke();
+			Closed.Invoke();
 		}
 
 		public string Title
@@ -144,16 +149,6 @@ namespace RedOnion.UI
 		{
 			get => Frame.MinHeight;
 			set => Frame.MinHeight = Mathf.Max(80f, value);
-		}
-		public float PreferWidth
-		{
-			get => Frame.PreferWidth;
-			set => Frame.PreferWidth = value;
-		}
-		public float PreferHeight
-		{
-			get => Frame.PreferHeight;
-			set => Frame.PreferHeight = value;
 		}
 
 		public E Add<E>(E element) where E : Element
@@ -189,7 +184,7 @@ namespace RedOnion.UI
 		public float Y
 		{
 			get => -Frame.RectTransform.anchoredPosition.y;
-			set => Position = new Vector2(X, -value);
+			set => Position = new Vector2(X, value);
 		}
 		public Vector2 Size
 		{
@@ -204,7 +199,7 @@ namespace RedOnion.UI
 					: UUI.ContentSizeFitter.FitMode.PreferredSize;
 				Frame.RectTransform.sizeDelta = new Vector2(
 					value.x >= MinWidth ? value.x : Width,
-					value.y >= MinHeight ? -value.y : Height);
+					value.y >= MinHeight ? value.y : Height);
 			}
 		}
 		public float Width
@@ -215,8 +210,8 @@ namespace RedOnion.UI
 				Frame.Fitter.horizontalFit = value >= MinWidth
 					? UUI.ContentSizeFitter.FitMode.Unconstrained
 					: UUI.ContentSizeFitter.FitMode.PreferredSize;
-				Frame.RectTransform.sizeDelta = new Vector2(
-					value >= MinWidth ? value : Width, Height);
+				if (value >= MinWidth)
+					Frame.RectTransform.sizeDelta = new Vector2(value, Height);
 			}
 		}
 		public float Height
@@ -227,8 +222,8 @@ namespace RedOnion.UI
 				Frame.Fitter.verticalFit = value >= MinHeight
 					? UUI.ContentSizeFitter.FitMode.Unconstrained
 					: UUI.ContentSizeFitter.FitMode.PreferredSize;
-				Frame.RectTransform.sizeDelta = new Vector2(
-					Width, value >= MinHeight ? -value : Height);
+				if (value >= MinHeight)
+					Frame.RectTransform.sizeDelta = new Vector2(Width, value);
 			}
 		}
 

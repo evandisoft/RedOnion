@@ -136,13 +136,15 @@ namespace RedOnion.Script.Parsing
 		/// <summary>
 		/// Write integer (4B LE) to code buffer
 		/// </summary>
-		protected void Write(int value)
+		protected int Write(int value)
 		{
+			var codeAt = CodeAt;
 			Reserve(4);
 			Code[CodeAt++] = (byte)value;
 			Code[CodeAt++] = (byte)(value >> 8);
 			Code[CodeAt++] = (byte)(value >> 16);
 			Code[CodeAt++] = (byte)(value >> 24);
+			return codeAt;
 		}
 
 		/// <summary>

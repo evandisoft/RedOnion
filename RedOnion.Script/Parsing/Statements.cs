@@ -16,8 +16,12 @@ namespace RedOnion.Script.Parsing
 			&& lexer.Curr != ';'
 			&& lexer.Curr != ','
 			&& lexer.Curr != ':'
-			&& (lexer.Word == null
-			|| lexer.Code.Kind() < OpKind.Statement);
+			&& (lexer.Code.Kind() <= OpKind.Number
+			&& (lexer.Code != OpCode.Undefined || lexer.Word == null)
+			|| lexer.Code.Kind() == OpKind.Unary || lexer.Code.Kind() == OpKind.PreOrPost
+			|| lexer.Code == OpCode.Add || lexer.Code == OpCode.Sub
+			|| lexer.Code == OpCode.Var || lexer.Code == OpCode.Create
+			|| lexer.Curr == '(');
 
 		/// <summary>
 		/// Full/required expression (e.g. condition of while)
@@ -37,7 +41,7 @@ namespace RedOnion.Script.Parsing
 		protected bool OptionalExpression(Flag flags)
 		{
 			var state = StartExpression();
-			if (lexer.Curr == '=' || lexer.Curr == ':')
+			if (lexer.Code == OpCode.Assign)
 				Next(true);
 			else if (!PeekExpression(flags))
 				goto skip;
@@ -84,11 +88,11 @@ namespace RedOnion.Script.Parsing
 		/// <summary>
 		/// Parse block of statements
 		/// </summary>
-		/// <returns>True if there was at least one statement</returns>
-		protected virtual bool ParseBlock(Flag flags)
+		/// <returns>Number of statements</returns>
+		protected virtual int ParseBlock(Flag flags)
 		{
 			var ind = lexer.Indent;
-			if (ind == 0 && lexer.First)
+			if (ind == 0 && lexer.First && (flags & Flag.LimitedContext) == 0)
 				ind = -1;
 			var nosize = (flags & Flag.NoSize) != 0;
 			var member = (flags & Flag.Member) != 0;
@@ -100,7 +104,7 @@ namespace RedOnion.Script.Parsing
 				Write(0);
 				block = CodeAt;
 			}
-			while (!lexer.Eof)
+			while (!lexer.Eof && lexer.Curr != ')' && lexer.Curr != '}' && lexer.Curr != ']')
 			{
 				while (lexer.Indent >= ind && lexer.Peek == ':' && lexer.Code == OpCode.Identifier)
 				{
@@ -131,7 +135,7 @@ namespace RedOnion.Script.Parsing
 			}
 			if (!nosize)
 				Write(CodeAt - block, block - 4);
-			return count > 0;
+			return count;
 		}
 
 		protected Dictionary<string, int> LabelTable;
@@ -275,7 +279,9 @@ namespace RedOnion.Script.Parsing
 						throw new ParseError(lexer, "Expected 'while' or 'until' for 'do'");
 					Code[doat] = OpCode.DoUntil.Code();
 				}
+				var condAt = Write(0);
 				Next().FullExpression(flags);
+				Write(CodeAt-condAt-4, condAt);
 				return;
 
 			case OpCode.For:
@@ -384,8 +390,7 @@ namespace RedOnion.Script.Parsing
 
 			//--------------------------------------------------------------------------------------
 			case OpCode.Function:
-				if ((Options & Option.Script) == 0)
-					goto default; // TODO: local functions
+			case OpCode.Def:
 				if (Next().lexer.Word == null)
 					throw new ParseError(lexer, "Expected function name");
 				var fname = lexer.Word;
@@ -399,8 +404,9 @@ namespace RedOnion.Script.Parsing
 
 		protected virtual void ParseFunction(string name, Flag flags)
 		{
-			if (name != null)	// null if parsing lambda / inline function
+			if (name != null)   // null if parsing lambda / inline function
 				Write(name);    // function name (index to string table)
+			else flags |= Flag.LimitedContext;
 			Write(0);           // header size
 			int mark = CodeAt;
 			Write((ushort)0);   // type flags
@@ -416,7 +422,8 @@ namespace RedOnion.Script.Parsing
 			var paren = lexer.Curr == '(';
 			if (paren || lexer.Curr == ',')
 				Next(true);
-			while ((paren || !lexer.Eol) && !lexer.Eof)
+			bool lambda = !paren && lexer.Code == OpCode.Lambda;
+			while ((paren || (!lexer.Eol && lexer.Curr != ';')) && !lexer.Eof && !lambda)
 			{
 				if (lexer.Word == null)
 					throw new ParseError(lexer, "Expected argument name");
@@ -441,15 +448,40 @@ namespace RedOnion.Script.Parsing
 					Next();
 					break;
 				}
+				if (!paren && lexer.Code == OpCode.Lambda)
+				{
+					lambda = true;
+					break;
+				}
 				if (lexer.Curr == ',')
 					Next(true);
+			}
+			if (lambda)
+			{
+				Next();
+				flags |= Flag.LimitedContext;
 			}
 
 			Write(CodeAt - mark, mark-4);   // header size
 			Code[mark + 3] = (byte)argc;    // number of arguments
 
 			var labels = StoreLabels();
-			ParseBlock(flags);
+			var blockAt = CodeAt;
+			var count = ParseBlock(flags);
+			if (lambda && count == 1)
+			{
+				var op = ((OpCode)Code[blockAt+4]).Extend();
+				if (op == OpCode.Autocall)
+					Code[blockAt+4] = OpCode.Return.Code();
+				else if (op.Kind() < OpKind.Statement)
+				{
+					var sz = BitConverter.ToInt32(Code, blockAt);
+					Write(++sz, blockAt);
+					Array.Copy(Code, blockAt+4, Code, blockAt+5, CodeAt-blockAt-5);
+					Write(OpCode.Return.Code(), blockAt+4);
+					CodeAt++;
+				}
+			}
 			RestoreLabels(labels);
 		}
 	}

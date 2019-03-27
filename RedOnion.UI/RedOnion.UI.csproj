@@ -38,12 +38,14 @@
     <Compile Include="Components\BackgroundImage.cs" />
     <Compile Include="Components\DragHandler.cs" />
     <Compile Include="Components\InputField.cs" />
+    <Compile Include="Event.cs" />
     <Compile Include="Icon.cs" />
     <Compile Include="Label.cs" />
     <Compile Include="Element.cs" />
     <Compile Include="Enums.cs" />
     <Compile Include="Components\LayoutComponent.cs" />
     <Compile Include="Panel.Children.cs" />
+    <Compile Include="ScrollBox.cs" />
     <Compile Include="Structures\Anchors.cs" />
     <Compile Include="Structures\LayoutPadding.cs" />
     <Compile Include="Panel.cs" />

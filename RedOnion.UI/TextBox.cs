@@ -74,5 +74,50 @@ namespace RedOnion.UI
 			set => Label.FontStyle = value;
 		}
 
+		public Event<string> Submitted
+		{
+			get => new Event<string>(Core.onEndEdit);
+			set { }
+		}
+		public Event<string> Changed
+		{
+			get => new Event<string>(Core.onValueChanged);
+			set { }
+		}
+
+		public int CaretPosition
+		{
+			get => Core.caretPosition;
+			set => Core.caretPosition = value;
+		}
+		public int SelectionStart
+		{
+			get => Core.selectionAnchorPosition;
+			set => Core.selectionAnchorPosition = value;
+		}
+		public int SelectionEnd
+		{
+			get => Core.selectionFocusPosition;
+			set => Core.selectionFocusPosition = value;
+		}
+		public int CharacterLimit
+		{
+			get => Core.characterLimit;
+			set => Core.characterLimit = value;
+		}
+		public bool Focused
+		{
+			get => Core.isFocused;
+			set
+			{
+				if (value) Core.ActivateInputField();
+				else Core.DeactivateInputField();
+			}
+		}
+		public bool ReadOnly
+		{
+			get => Core.readOnly;
+			set => Core.readOnly = value;
+		}
 	}
 }

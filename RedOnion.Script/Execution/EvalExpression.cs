@@ -28,7 +28,7 @@ namespace RedOnion.Script
 			if (op == OpCode.Array)
 			{
 				if (Code[at++] != 0)
-					throw new NotImplementedException("Fixed and multi-dimensional arrays not implemented");
+					throw new NotImplementedException("Fixed-typed and multi-dimensional arrays not implemented");
 				TypeReference(ref at);
 				Value = new Value(Root.GetType(OpCode.Array, Value));
 				return;
@@ -44,7 +44,8 @@ namespace RedOnion.Script
 				else throw new InvalidOperationException("Null cannot be dereferenced");
 				return;
 			}
-			throw new NotImplementedException();
+			throw new NotImplementedException(string.Format(Value.Culture,
+				"Unknown type reference: {0:04X} {1}", (ushort)op, op));
 		}
 
 		protected override void Literal(OpCode op, ref int at)
@@ -129,7 +130,8 @@ namespace RedOnion.Script
 				Value = CodeDouble(ref at);
 				return;
 			}
-			throw new NotImplementedException();
+			throw new NotImplementedException(string.Format(Value.Culture,
+				"Unknown literal: {0:04X} {1}", (ushort)op, op));
 		}
 
 		protected override void Special(OpCode op, ref int at)
@@ -188,9 +190,11 @@ namespace RedOnion.Script
 				}
 				fn = Box(Value);
 				Expression(ref at);
-				Arguments.Add(Result);
-				Value = create ? new Value(fn.Create(1)) : fn.Call(self, 1);
-				Arguments.Remove(1);
+				using (Arguments.Guard())
+				{
+					Arguments.Add(Result);
+					Value = create ? new Value(fn.Create(1)) : fn.Call(self, 1);
+				}
 				return;
 			case OpCode.Call2:
 				CountStatement();
@@ -211,11 +215,13 @@ namespace RedOnion.Script
 				}
 				fn = Box(Value);
 				Expression(ref at);
-				Arguments.Add(Result);
-				Expression(ref at);
-				Arguments.Add(Result);
-				Value = create ? new Value(fn.Create(2)) : fn.Call(self, 2);
-				Arguments.Remove(2);
+				using (Arguments.Guard())
+				{
+					Arguments.Add(Result);
+					Expression(ref at);
+					Arguments.Add(Result);
+					Value = create ? new Value(fn.Create(2)) : fn.Call(self, 2);
+				}
 				return;
 			case OpCode.CallN:
 				CountStatement();
@@ -237,13 +243,15 @@ namespace RedOnion.Script
 				}
 				fn = Box(Value);
 				var argc = n - 1;
-				while (--n > 0)
+				using (Arguments.Guard())
 				{
-					Expression(ref at);
-					Arguments.Add(Result);
+					while (--n > 0)
+					{
+						Expression(ref at);
+						Arguments.Add(Result);
+					}
+					Value = create ? new Value(fn.Create(argc)) : fn.Call(self, argc);
 				}
-				Value = create ? new Value(fn.Create(argc)) : fn.Call(self, argc);
-				Arguments.Remove(argc);
 				return;
 			case OpCode.Index:
 			case OpCode.IndexN:
@@ -275,6 +283,7 @@ namespace RedOnion.Script
 				{
 					Expression(ref at);
 					Context.Vars.Add(name, Value);
+					Value = new Value(Context.Vars, name);
 					return;
 				}
 				// strongly typed variable - have to call converter
@@ -287,6 +296,7 @@ namespace RedOnion.Script
 					Value = fn.Call(null, 1);
 				}
 				Context.Vars.Add(name, Value);
+				Value = new Value(Context.Vars, name);
 				return;
 			case OpCode.Dot:
 				Expression(ref at);
@@ -318,8 +328,30 @@ namespace RedOnion.Script
 			case OpCode.Function:
 				Value = new Value(Function(null, ref at));
 				return;
+			case OpCode.Array:
+				n = Code[at++];
+				TypeReference(ref at);
+				var arrCreator = Root.GetType(OpCode.Array, Result);
+				if (arrCreator == null)
+					throw new NotImplementedException("Array");
+				if (n <= 1)
+				{
+					Value = new Value(arrCreator.Create(0));
+					return;
+				}
+				using (Arguments.Guard())
+				{
+					for (int i = 1; i < n; i++)
+					{
+						Expression(ref at);
+						Arguments.Add(Result);
+					}
+					Value = new Value(arrCreator.Create(n-1));
+				}
+				return;
 			}
-			throw new NotImplementedException();
+			throw new NotImplementedException(string.Format(Value.Culture,
+				"Unknown special opcode: {0:04X} {1}", (ushort)op, op));
 		}
 		private IObject Generic(ref int at)
 		{
@@ -458,7 +490,8 @@ namespace RedOnion.Script
 				Value = left.Binary(op, Value);
 				return;
 			}
-			throw new NotImplementedException();
+			throw new NotImplementedException(string.Format(Value.Culture,
+				"Unknown binary operator: {0:04X} {1}", (ushort)op, op));
 		}
 
 		protected override void Unary(OpCode op, ref int at)
@@ -494,7 +527,8 @@ namespace RedOnion.Script
 				--Value.Self;
 				return;
 			}
-			throw new NotImplementedException();
+			throw new NotImplementedException(string.Format(Value.Culture,
+				"Unknown unary operator: {0:04X} {1}", (ushort)op, op));
 		}
 	}
 }

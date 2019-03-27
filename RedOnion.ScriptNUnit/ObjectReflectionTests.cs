@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using NUnit.Framework;
@@ -232,6 +233,135 @@ namespace RedOnion.ScriptNUnit
 			Test("var w = 3 * v");
 			var w = (MyVector)Result.Native;
 			Assert.AreEqual(6f, w.y);
+		}
+
+		public struct MyEvent
+		{
+			public List<Action> it;
+			public MyEvent(bool dummy) => it = new List<Action>();
+			public void Add(Action call) => it.Add(call);
+			public void Remove(Action call) => it.Remove(call);
+			public void Clear() => it.Clear();
+			public void Invoke()
+			{
+				foreach (var action in it)
+					action();
+			}
+			public void Set(Action call)
+			{
+				Clear();
+				Add(call);
+			}
+
+			public struct AddProxy
+			{
+				internal readonly MyEvent Event;
+				internal readonly Action Action;
+				public AddProxy(MyEvent e, Action a)
+				{
+					Event = e;
+					Action = a;
+				}
+			}
+			public struct RemoveProxy
+			{
+				internal readonly MyEvent Event;
+				internal readonly Action Action;
+				public RemoveProxy(MyEvent e, Action a)
+				{
+					Event = e;
+					Action = a;
+				}
+			}
+			public static AddProxy operator +(MyEvent e, Action a)
+				=> new AddProxy(e, a);
+			public static RemoveProxy operator -(MyEvent e, Action a)
+				=> new RemoveProxy(e, a);
+			public MyEvent(AddProxy add)
+			{
+				it = add.Event.it;
+				Add(add.Action);
+			}
+			public MyEvent(RemoveProxy remove)
+			{
+				it = remove.Event.it;
+				Remove(remove.Action);
+			}
+			public static implicit operator MyEvent(AddProxy add)
+				=> new MyEvent(add);
+			public static implicit operator MyEvent(RemoveProxy remove)
+				=> new MyEvent(remove);
+
+			public MyEvent Click
+			{
+				get => this;
+				set { }
+			}
+		}
+		[Test]
+		public void ROS_DRefl10_CustomEvent()
+		{
+			var myEvent = new MyEvent(true);
+			int counter = 0;
+			myEvent += () => counter++;
+			Assert.AreEqual(1, myEvent.it.Count);
+			myEvent.Invoke();
+			Assert.AreEqual(1, counter);
+
+			Root.AddType(typeof(MyEvent));
+			Lines(1,
+				"var e = new myEvent true",
+				"var c = 0",
+				"e.click += def => c++",
+				"e.click.invoke",
+				"return c");
+		}
+
+		public class ExtraEnumerable : IEnumerable
+		{
+			public IEnumerator GetEnumerator()
+			{
+				yield return 1;
+				yield return 2f;
+				yield return 3.0;
+			}
+		}
+		public static class ListHolder
+		{
+			public static List<string> List { get; } = new List<string>();
+			public static List<IEnumerable> Complex = new List<IEnumerable>(new[] { "hello" });
+			public static List<IEnumerable> Extra = new List<IEnumerable>(new IEnumerable[] {
+				"hello",
+				new byte[0],
+				new ulong[] { 1,2 },
+				new ExtraEnumerable() });
+		}
+		[Test]
+		public void ROS_DRefl11_List()
+		{
+			Root.AddType(typeof(ListHolder));
+			Lines(
+				(object)"it",
+				"var list = listHolder.list",
+				"list.add \"it\"",
+				"var result = \"none\"",
+				"for var e in list; result = e",
+				"return result");
+			Lines(
+				'h',
+				"var complex = listHolder.complex",
+				"var it",
+				"for var x in complex",
+				"	for var y in x",
+				"		it = y",
+				"		break",
+				"return it");
+			Lines(
+				3.0,
+				"for var x in listHolder.extra",
+				"	for var y in x",
+				"		it = y",
+				"return it");
 		}
 	}
 }

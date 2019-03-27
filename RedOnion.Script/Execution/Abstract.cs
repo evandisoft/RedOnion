@@ -71,6 +71,16 @@ namespace RedOnion.Script
 		public void DebugLog(string msg, params object[] args)
 			=> Log(string.Format(Value.Culture, msg, args));
 
+		public event Action<string> Printing;
+		public void Print(string msg)
+		{
+			var it = Printing;
+			if (it != null) it(msg);
+			else Log(msg);
+		}
+		public void Print(string msg, params object[] args)
+			=> Print(string.Format(Value.Culture, msg, args));
+
 		/// <summary>
 		/// Run script
 		/// </summary>
@@ -174,10 +184,14 @@ namespace RedOnion.Script
 			{
 				Process(ref at);
 				if (Exit != 0)
-				{
 					break;
-				}
 			}
+			at = end;
+		}
+		protected void SkipBlock(ref int at)
+		{
+			var size = CodeInt(ref at);
+			var end = at + size;
 			at = end;
 		}
 
