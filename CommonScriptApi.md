@@ -9,7 +9,7 @@ MANY WILL NOT WORK PROPERLY. Many will lead to one or more scripting engine fail
 This is a WIP, and as time goes on we will develop a more robust system.
 
 # KSP
-We are exposing various objects/types to our Scripting engines. Some are defined in KSP or UnityEngine, and some are are objects/types we created ourselves that are useful for interacting with the game. These objects/types have been added inside an object/namespace that is a global in both scripting languages.
+We are exposing various objects/types to our Scripting engines. Some are defined in KSP or UnityEngine, and some are objects/types we created ourselves that are useful for interacting with the game. These objects/types have been added inside an object/namespace that is a global in both scripting languages.
 
 For Lua, this global is spelled "Ksp", and for ROS (though ros is case insensitive) it is spelled "KSP".
 
@@ -39,6 +39,9 @@ To set the ship to always point at a particular direction, use
 `ctrl.TargetDir=vec`. This is using the raw coordinate system under the hood and a better function will be implemented to replace this in the future.
 
 To stop the autopilot you can click "Kill Ctrl" button in the repl, or call `ctrl.Shutdown()`.
+
+Autopilot currently doesn't handle control surfaces well.
+It's a WIP.
 
 ## FlightGlobals
 Here we are exposing KSP's [FlightGlobals](https://kerbalspaceprogram.com/api/class_flight_globals.html) class. This is just used as a static class, and those are accessed similarly in Lua and ROS.

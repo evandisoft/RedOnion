@@ -29,7 +29,7 @@ This is a WIP, and as time goes on we will develop a more robust system.
 
 This API is subject to change. Even major changes. We are still in exploration mode.
 
-Currently Scripts are stored in GameData/RedOnion/Scripts. These are the scripts we are messing with while trying out the game (Use them at your own risk). If you make some scripts of your own, you will lose them when you update the game unless you save them somewhere else and copy them back in.
+Currently Scripts are stored in GameData/RedOnion/Scripts. These are the scripts we are messing with while trying out the game (Use them at your own risk). If you make some scripts of your own, you will lose them when you update this mod unless you save them somewhere else and copy them back in.
 
 The Script folder situation is going to be changed dramatically in the future and we will make it easy for you to have your scripts saved somewhere that is not going to be overwritten.
 
