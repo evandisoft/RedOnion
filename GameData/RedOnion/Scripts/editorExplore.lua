@@ -1,9 +1,9 @@
 -- exploring interaction with editor functionality
 editor=Ksp.EditorLogic
-panels=Ksp.EditorPanels
+
 ship=editor.ship
 parts=ship.parts
-
+part=parts[0]
 function each(lst,action)
     for i=0,lst.count-1 do
         action(lst[i])

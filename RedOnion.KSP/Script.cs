@@ -94,6 +94,8 @@ namespace RedOnion.KSP
 				{ "FlightDriver",		this[typeof(FlightDriver)] },
 				{ "GameScenes",         this[typeof(GameScenes)] },
 				{ "PartLoader",         this[typeof(PartLoader)] },
+				{ "Time",               this[typeof(UE.Time)]},
+				{ "Random",             this[typeof(UE.Random)]},
 			})));
 
 			// Unity and UI-related stuff

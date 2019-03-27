@@ -1,4 +1,4 @@
-using System;
+using System.Diagnostics;
 using UnityEngine;
 using System.Collections.Generic;
 
@@ -14,7 +14,8 @@ namespace Kerbalua.Gui {
 		Dictionary<string,ICompletable> completableMap=new Dictionary<string, ICompletable>();
 		public ICompletionSelector completionSelector;
 		public string mostRecentlyFocusedCompletable = "";
-		bool focusChanged;// = true;
+		public Stopwatch stopwatch = new Stopwatch();
+		public int CompletionDelay = 0;
 
 		//bool completeOnNextUpdate = false;
 
@@ -22,6 +23,7 @@ namespace Kerbalua.Gui {
 		public CompletionManager(ICompletionSelector completionSelector)
 		{
 			this.completionSelector = completionSelector;
+			stopwatch.Start();
 		}
 
 		public void AddCompletable(ICompletable source)
@@ -30,9 +32,11 @@ namespace Kerbalua.Gui {
 		}
 
 		//int inc = 0;
+		bool newInput = false;
+		bool focusChanged = false;
 		public void Update(bool hadMouseDownLastUpdate)
 		{
-			bool newInput= hadMouseDownLastUpdate;
+			newInput|= hadMouseDownLastUpdate;
 			//if (hadMouseDownLastUpdate) {
 			//	Debug.Log("mouse down last update");
 			//}
@@ -44,12 +48,15 @@ namespace Kerbalua.Gui {
 			if (GUI.GetNameOfFocusedControl() != mostRecentlyFocusedCompletable &&
 				completableMap.ContainsKey(focusedControlName)) {
 				mostRecentlyFocusedCompletable = focusedControlName;
-				focusChanged = true;
+				focusChanged |= true;
 			}
 
-			if (focusChanged || newInput) {
+			if ((focusChanged || newInput)&& stopwatch.ElapsedMilliseconds>CompletionDelay) {
 				//Debug.Log("GUI/foc: " + newInput + "," + focusChanged + "," + mostRecentlyFocusedCompletable + "," + inc++);
 				focusChanged = false;
+				newInput = false;
+				stopwatch.Reset();
+				stopwatch.Start();
 				//Debug.Log("Changed");
 				ICompletable currentCompletable;
 				if (completableMap.TryGetValue(mostRecentlyFocusedCompletable, out currentCompletable)) {

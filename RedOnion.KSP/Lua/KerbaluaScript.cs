@@ -20,6 +20,10 @@ namespace RedOnion.KSP.Lua
 		public EditorLogic EditorLogic = EditorLogic.fetch;
 		public ShipConstruction ShipConstruction = new ShipConstruction();
 		public Random Random = new Random();
+		public FlightDriver FlightDriver = new FlightDriver();
+		public HighLogic HighLogic = new HighLogic();
+		public StageManager StageManager = StageManager.Instance;
+		public PartLoader PartLoader = PartLoader.Instance;
 	}
 
 	public class KerbaluaScript : MoonSharp.Interpreter.Script

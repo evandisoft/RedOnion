@@ -1,2 +1,3 @@
 var vessel=KSP.FlightGlobals.ActiveVessel
 var ctrl=KSP.FlightControl.GetInstance()
+ctrl.TargetDir=vessel.transform.up

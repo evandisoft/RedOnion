@@ -6,7 +6,7 @@ function selfDestruct(part)
         selfDestruct(childParts[i])
     end
     part.explode()
-    for i=0,Ksp.Random.Range(1,60*10) do
+    for i=0,Ksp.Random.Range(20*1,20*2) do
         coroutine.yield()
     end
 end
