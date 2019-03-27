@@ -8,19 +8,19 @@ using UUI = UnityEngine.UI;
 using KUI = KSP.UI;
 using ROC = RedOnion.UI.Components;
 using RedOnion.KSP.Autopilot;
+using RedOnion.Script.Utilities;
 
 namespace RedOnion.KSP
 {
-	public class RuntimeRoot : BasicRoot
+	public class RuntimeRoot : BasicRoot<ROS.KspRosEngine>
 	{
 		public bool IsRepl { get; }
-		public RuntimeRoot(IEngine engine, bool repl)
+		public RuntimeRoot(ROS.KspRosEngine engine, bool repl)
 			: base(engine, fill: false)
 		{
 			IsRepl = repl;
 			Fill();
 		}
-		// note: for now we ignore IsRepl
 		protected override void Fill()
 		{
 			base.Fill();
@@ -30,16 +30,20 @@ namespace RedOnion.KSP
 			// core types (added to both "System" namespace and "soft" global)
 			var system = Get("System").Object;
 			var sys = system?.BaseProps ?? new Properties();
-			sys.Set("Delegate", AddType(typeof(Delegate)));
-			sys.Set("Debug", AddType(typeof(UE.Debug)));
-			sys.Set("Color", AddType(typeof(UE.Color)));
-			sys.Set("Rect", AddType(typeof(UE.Rect)));
-			sys.Set("Vector2", AddType(typeof(UE.Vector2)));
-			var vector = AddType(typeof(UE.Vector3));
-			soft.Set("Vector", vector);
-			sys.Set("Vector", vector);
-			sys.Set("Vector3", vector);
-			sys.Set("Vector4", AddType(typeof(UE.Vector4)));
+			var update = new Value(e => _update.Get(e));
+			var idle = new Value(e => _idle.Get(e));
+
+			sys.Set("Update",	update);
+			sys.Set("Idle",		idle);
+			sys.Set("Debug",	AddType(typeof(UE.Debug)));
+			sys.Set("Color",	AddType(typeof(UE.Color)));
+			sys.Set("Rect",		AddType(typeof(UE.Rect)));
+			sys.Set("Vector2",	AddType(typeof(UE.Vector2)));
+			var vector =		AddType(typeof(UE.Vector3));
+			soft.Set("Vector",	vector);
+			sys.Set("Vector",	vector);
+			sys.Set("Vector3",	vector);
+			sys.Set("Vector4",	AddType(typeof(UE.Vector4)));
 			if (system == null)
 				BaseProps.Set("System", new SimpleObject(Engine, sys));
 
@@ -80,7 +84,9 @@ namespace RedOnion.KSP
 			hard.Set("KSP", new Value(engine =>
 			new SimpleObject(engine, new Properties()
 			{
-				{ "ship", ship },
+				{ "update",				update },
+				{ "idle",				idle },
+				{ "ship",				ship },
 				{ "Vessel",				this[typeof(Vessel)] },
 				{ "FlightGlobals",		this[typeof(FlightGlobals)] },
 				{ "FlightCtrlState",	this[typeof(FlightCtrlState)] },
@@ -139,61 +145,40 @@ namespace RedOnion.KSP
 				{ "UIStyle",			this[typeof(UIStyle)] },
 				{ "UIStyleState",		this[typeof(UIStyleState)] },
 			})));
-
-			// IMGUI (can only be used from onGUI!)
-			hard.Set("IMGUI", new Value(engine =>
-			this[typeof(UE.GUI)] = new ReflectedType(engine, typeof(UE.GUI), new Properties()
-			{
-				{ "GUISkin",			this[typeof(UE.GUISkin)] },
-				{ "GUIStyle",			this[typeof(UE.GUIStyle)] },
-				{ "GUIStyleState",		this[typeof(UE.GUIStyleState)] },
-				{ "GUIContent",			this[typeof(UE.GUIContent)] },
-				{ "GUIElement",			this[typeof(UE.GUIElement)] },
-				{ "GUILayer",			this[typeof(UE.GUILayer)] },
-				{ "GUILayout",			this[typeof(UE.GUILayout)] },
-				{ "GUIText",			this[typeof(UE.GUIText)] },
-				{ "GUIUtility",			this[typeof(UE.GUIUtility)] },
-			})));
 		}
 
 		struct LazyGet
 		{
 			IObject it;
 			CreateObject creator;
+			public delegate IObject CreateObject(ROS.KspRosEngine engine);
 			public LazyGet(CreateObject creator)
 			{
 				it = null;
 				this.creator = creator;
 			}
 			public IObject Get(IEngine e)
+				=> it ?? (it = creator((ROS.KspRosEngine)e));
+			public IObject Get(ROS.KspRosEngine e)
 				=> it ?? (it = creator(e));
 		}
+		LazyGet _update = new LazyGet(e => new EventObj(e, e.Update));
+		LazyGet _idle	= new LazyGet(e => new EventObj(e, e.Idle));
 		LazyGet _window = new LazyGet(e => new ROS_UI.WindowFun(e));
 	}
 
 	/// <summary>
 	/// Runtime engine with all the features
 	/// </summary>
-	public class RuntimeEngine : Engine
+	public class RuntimeEngine : ROS.KspRosEngine
 	{
 		public RuntimeEngine()
 			: base(engine => new RuntimeRoot(engine, repl: false)) { }
-		public override void Log(string msg)
-			=> UE.Debug.Log("[RedOnion] " + msg);
-
-
-		private static Ionic.Zip.ZipFile ScriptsZip;
-		public static string LoadScript(string path)
-		{
-			var data = UI.Element.ResourceFileData(System.Reflection.Assembly.GetCallingAssembly(),
-				"Scripts", ref ScriptsZip, path);
-			return data == null ? null : System.Text.Encoding.UTF8.GetString(data);
-		}
 	}
 	/// <summary>
 	/// Limited engine whith what is safe in REPL / Immediate Mode
 	/// </summary>
-	public class ImmediateEngine : Engine
+	public class ImmediateEngine : ROS.KspRosEngine
 	{
 		public ImmediateEngine()
 			: base(engine => new RuntimeRoot(engine, repl: true))

@@ -367,13 +367,23 @@ namespace RedOnion.Script
 			=> Add(name, Value.FromObject(obj));
 	}
 
+	public interface ICallable
+	{
+		/// <summary>
+		/// Execute regular function call. Features.Function
+		/// </summary>
+		/// <param name="self">The object to call it on (as method if not null)</param>
+		/// <param name="argc">number of arguments (pass to Arg method)</param>
+		/// <returns>The result of the function</returns>
+		Value Call(IObject self, int argc);
+	}
 	public interface IEnumerableObject : IObject, IEnumerable<Value> { }
 	public interface IListObject : IEnumerableObject, IList<Value>
 	{
 		bool IsWritable { get; }
 		bool IsFixedSize { get; }
 	}
-	public interface IObject : IProperties
+	public interface IObject : IProperties, ICallable
 	{
 		/// <summary>
 		/// Engine this object belongs to.
@@ -420,14 +430,6 @@ namespace RedOnion.Script
 		/// Referenced native object (if any). Features.Proxy
 		/// </summary>
 		object Target { get; }
-
-		/// <summary>
-		/// Execute regular function call. Features.Function
-		/// </summary>
-		/// <param name="self">The object to call it on (as method if not null)</param>
-		/// <param name="argc">number of arguments (pass to Arg method)</param>
-		/// <returns>The result of the function</returns>
-		Value Call(IObject self, int argc);
 
 		/// <summary>
 		/// Execute constructor ('new' used). Features.Constructor

@@ -107,12 +107,14 @@ namespace RedOnion.Script.Completion
 						{
 							matched = true;
 							type = field.FieldType;
+							instance = true;
 							break;
 						}
 						if (member is PropertyInfo property)
 						{
 							matched = true;
 							type = property.PropertyType;
+							instance = true;
 							break;
 						}
 					}

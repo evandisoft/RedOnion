@@ -5,7 +5,7 @@ using System.Text;
 
 namespace RedOnion.Script.Parsing
 {
-	public class ParseError : Exception
+	public class ParseError : Exception, IErrorWithLine
 	{
 		/// <summary>
 		/// Line with error

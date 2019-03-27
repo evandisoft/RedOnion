@@ -5,7 +5,12 @@ using System.Text;
 
 namespace RedOnion.Script
 {
-	public class RuntimeError : Exception
+	public interface IErrorWithLine
+	{
+		int LineNumber { get; }
+		string Line { get; }
+	}
+	public class RuntimeError : Exception, IErrorWithLine
 	{
 		public CompiledCode Code { get; }
 		public int CodeAt { get; }

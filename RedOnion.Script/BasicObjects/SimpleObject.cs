@@ -74,7 +74,7 @@ namespace RedOnion.Script.BasicObjects
 				return false;
 			if (value.Kind == ValueKind.Create)
 			{
-				value = new Value(((CreateObject)value.ptr)(Engine));
+				value = new Value(((CreateObject)value.ptr)(Engine), value.flag);
 				BaseProps.Set(name, value);
 			}
 			else if (value.IsProperty)

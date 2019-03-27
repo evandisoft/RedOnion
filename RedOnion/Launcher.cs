@@ -86,11 +86,17 @@ namespace RedOnion
 			}
 			catch(Script.Parsing.ParseError err)
 			{
-				Log("ParseError at {0}.{1}: {2}", err.LineNumber, err.Column, err.Message);
+				Log("ParseError at {0}.{1}: {2}", err.LineNumber+1, err.Column+1, err.Message);
 				Log("Content of the line: " + err.Line);
 				StopScript();
 			}
-			catch(Exception err)
+			catch(Script.RuntimeError err)
+			{
+				Log("RuntimeError at {0}: {1}", err.LineNumber+1, err.Message);
+				Log("Content of the line: " + err.Line);
+				StopScript();
+			}
+			catch (Exception err)
 			{
 				Log("Exception in engine or parser: " + err.Message);
 				StopScript();
@@ -103,41 +109,14 @@ namespace RedOnion
 			if (stopping)
 				return;
 			stopping = true;
-			RunFunction("shutdown");
+			engine?.Dispose();
 			engine = null;
 			stopping = false;
 		}
 
 		private void FixedUpdate()
-			=> RunFunction("fixedUpdate");
-		private void Update()
-			=> RunFunction("update");
-		private void OnGUI()
-			=> RunFunction("onGUI");
-		private void RunFunction(string name)
 		{
-			if (engine == null)
-				return;
-			if (!engine.Root.Get(name, out var value))
-				return;
-			if (value.Object is Script.BasicObjects.FunctionObj fn)
-			{
-				try
-				{
-					engine.ExecutionCountdown = 1000;
-					fn.Call(null, 0);
-				}
-				catch (Script.Engine.TookTooLong)
-				{
-					Log(name + " took too long");
-					StopScript();
-				}
-				catch (Exception err)
-				{
-					Log("Exception in {0}: {1}", name, err.Message);
-					StopScript();
-				}
-			}
+			engine?.FixedUpdate();
 		}
 
 		private static void Log(string msg)

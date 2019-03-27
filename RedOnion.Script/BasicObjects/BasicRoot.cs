@@ -5,7 +5,20 @@ using System.Text;
 
 namespace RedOnion.Script.BasicObjects
 {
-	public class BasicRoot : BasicObject, IEngineRoot
+	/// <summary>
+	/// Root object (globals and mappings)
+	/// </summary>
+	public class BasicRoot : BasicRoot<IEngine>, IEngineRoot
+	{
+		public BasicRoot(IEngine engine)
+			: this(engine, true) { }
+		protected BasicRoot(IEngine engine, bool fill)
+			: base(engine, fill) { }
+	}
+	/// <summary>
+	/// Root object (globals and mappings)
+	/// </summary>
+	public class BasicRoot<TEngine> : BasicObject<TEngine>, IEngineRoot where TEngine: IEngine
 	{
 		~BasicRoot() => Dispose(false);
 		public void Dispose() => Dispose(true);
@@ -40,9 +53,9 @@ namespace RedOnion.Script.BasicObjects
 
 		public PrintFun Print { get; }
 
-		public BasicRoot(IEngine engine)
+		public BasicRoot(TEngine engine)
 			: this(engine, true) { }
-		protected BasicRoot(IEngine engine, bool fill)
+		protected BasicRoot(TEngine engine, bool fill)
 			: base(engine, null, new Properties(), new Properties())
 		{
 			var obj	= new BasicObject(engine);
@@ -95,12 +108,13 @@ namespace RedOnion.Script.BasicObjects
 
 		protected void FillSystem(IProperties core, IProperties more)
 		{
+			var hide = core == more ? ValueFlags.None : ValueFlags.DoNotSuggest;
 			core.Set("global",		this);
 			core.Set("undefined",	Undefined);
 			core.Set("null",		Null);
 			core.Set("nan",			NaN);
 			core.Set("infinity",	Infinity);
-			more.Set("inf",			Infinity);
+			more.Set("inf",			new Value(Infinity, hide));
 			core.Set("Function",	Function);
 			core.Set("Object",		Object);
 			core.Set("String",		String);
@@ -108,26 +122,26 @@ namespace RedOnion.Script.BasicObjects
 			more.Set("List",		List);
 			more.Set("Number",		Number);
 			core.Set("Float",		Float);
-			more.Set("Single",		Float);
+			more.Set("Single",		new Value(Float, hide));
 			core.Set("Double",		Double);
 			core.Set("Long",		Long);
-			more.Set("Int64",		Long);
+			more.Set("Int64",		new Value(Long, hide));
 			core.Set("ULong",		ULong);
-			more.Set("UInt64",		ULong);
+			more.Set("UInt64",		new Value(ULong, hide));
 			core.Set("Int",			Int);
-			more.Set("Int32",		Int);
+			more.Set("Int32",		new Value(Int, hide));
 			core.Set("UInt",		UInt);
-			more.Set("UInt32",		UInt);
+			more.Set("UInt32",		new Value(UInt, hide));
 			core.Set("Short",		Short);
-			more.Set("Int16",		Short);
+			more.Set("Int16",		new Value(Short, hide));
 			core.Set("UShort",		UShort);
-			more.Set("UInt16",		UShort);
+			more.Set("UInt16",		new Value(UShort, hide));
 			core.Set("SByte",		SByte);
-			more.Set("Int8",		SByte);
+			more.Set("Int8",		new Value(SByte, hide));
 			core.Set("Byte",		Byte);
-			more.Set("UInt8",		Byte);
+			more.Set("UInt8",		new Value(Byte, hide));
 			core.Set("Bool",		Bool);
-			more.Set("Boolean",		Bool);
+			more.Set("Boolean",		new Value(Bool, hide));
 			core.Set("Char",		Char);
 
 			core.Set("print",		Print);

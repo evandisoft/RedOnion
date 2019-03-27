@@ -249,8 +249,11 @@ namespace RedOnion.Script.Completion
 					{
 						if (props is IDictionary<string, Value> dict)
 						{
-							foreach (var name in dict.Keys)
-								AddSuggestion(name);
+							foreach (var pair in dict)
+							{
+								if (!pair.Value.HasFlag(ValueFlags.DoNotSuggest))
+									AddSuggestion(pair.Key);
+							}
 						}
 						return;
 					}

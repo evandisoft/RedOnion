@@ -1,12 +1,22 @@
-var vessel=ksp.flightglobals.activevessel
+var waiting = 0
 
-var rootpart=vessel.parts[0]
-rootpart.children
-
-function selfDestruct part
-    var childParts=part.children
-    for var i=childParts.count-1;i>=0;i--
-        selfDestruct(childParts[i])
+def selfDestruct part
+  var children = part.children
+  if children.count > 0
+    selfDestruct children[children.count-1]
+  else
     part.explode()
-    
-selfDestruct rootpart
+    waiting = ksp.random.range 20,40
+    print "waiting: " + waiting
+
+def update
+  if ship.parts.count == 0
+    print "finished"
+    ksp.update.remove update
+    return
+  if waiting <= 0
+    selfDestruct ship.parts[0]
+    return
+  waiting--
+
+ksp.update.add update

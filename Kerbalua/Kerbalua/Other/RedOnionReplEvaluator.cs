@@ -21,17 +21,31 @@ namespace Kerbalua.Other
 			engine.Printing += msg => PrintAction?.Invoke(msg);
 		}
 
+		string mainResult;
+		bool isComplete = true;
 		protected override bool ProtectedEvaluate(string source, out string output)
 		{
+			output = "";
 			try
 			{
-				engine.ExecutionCountdown = 10000;
-				engine.Execute(source);
-				output = engine.Result.ToString();
+				if (isComplete)
+				{
+					engine.ExecutionCountdown = 10000;
+					engine.Execute(source);
+					mainResult = engine.Result.ToString();
+					if (engine.HasEvents)
+						return isComplete = false;
+					output = mainResult;
+					return isComplete = true;
+				}
+				engine.FixedUpdate();
+				isComplete = !engine.HasEvents;
+				if (isComplete)
+					output = mainResult;
+				return isComplete;
 			}
 			catch (Exception e)
 			{
-				output = "";
 				PrintErrorAction?.Invoke(e.Message);
 
 				string FormatLine(int lineNumber, string line)
@@ -46,10 +60,9 @@ namespace Kerbalua.Other
 
 				Debug.Log(e);
 			}
-
-			// TODO: This needs to be replaced when engine can fail to complete in one update
-			bool isComplete = true;
-			return isComplete;
+			Terminate();
+			output = "";
+			return isComplete = true;
 		}
 
 		/// <summary>
@@ -72,6 +85,7 @@ namespace Kerbalua.Other
 
 		public override void ResetEngine()
 		{
+			isComplete = true;
 			engine.Reset();
 			hints.Reset();
 			FlightControl.GetInstance().Shutdown();
@@ -79,7 +93,9 @@ namespace Kerbalua.Other
 
 		public override void Terminate()
 		{
-			throw new NotImplementedException();
+			isComplete = true;
+			engine.Update.Clear();
+			engine.Idle.Clear();
 		}
 	}
 }

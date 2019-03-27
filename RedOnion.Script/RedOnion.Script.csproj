@@ -49,6 +49,7 @@
     <Compile Include="Completion\CompletionEngine.cs" />
     <Compile Include="Completion\CompletionExec.cs" />
     <Compile Include="Completion\CompletionRoot.cs" />
+    <Compile Include="Utilities\Event.cs" />
     <Compile Include="Execution\ExecStatement.cs" />
     <Compile Include="Execution\Engine.cs" />
     <Compile Include="Execution\Abstract.cs" />
@@ -78,6 +79,7 @@
     <Compile Include="ReflectedObjects\ReflectedMethod.cs" />
     <Compile Include="ReflectedObjects\ReflectedObject.cs" />
     <Compile Include="ReflectedObjects\ReflectedType.cs" />
+    <Compile Include="Utilities\ListCore.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />

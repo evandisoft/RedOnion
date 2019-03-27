@@ -38,7 +38,7 @@ namespace RedOnion.KSP.ROS_UI
 			}
 			var arg2 = Engine.GetArgument(argc, 1);
 			if (arg2.IsNumber)
-				return new WindowObj(Engine, new Window(Engine, arg.String, (UI.Layout)arg.Int), this);
+				return new WindowObj(Engine, new Window(Engine, arg.String, (UI.Layout)arg2.Int), this);
 			if (arg.IsNumber)
 				return new WindowObj(Engine, new Window(Engine, arg2.String, (UI.Layout)arg.Int), this);
 			return new WindowObj(Engine, new Window(Engine, arg.String), this);

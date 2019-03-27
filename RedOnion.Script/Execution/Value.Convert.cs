@@ -568,5 +568,13 @@ namespace RedOnion.Script
 				return c;
 			return new Value();
 		}
+
+		public ICallable ToCallable()
+		{
+			var obj = RValue.Object;
+			if (obj == null || !obj.HasFeature(ObjectFeatures.Function))
+				throw new InvalidOperationException(Name + " is not a function");
+			return obj;
+		}
 	}
 }

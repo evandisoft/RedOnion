@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using RedOnion.Script.Parsing;
 
 namespace RedOnion.Script
@@ -35,7 +33,14 @@ namespace RedOnion.Script
 		/// and will throw exception if it reaches zero
 		/// </summary>
 		/// <remarks>Indexing and creation of objects counted as well</remarks>
-		public int ExecutionCountdown;
+		public int ExecutionCountdown
+		{
+			get => executionCountdown;
+			set => executionCountdown = countdownFrom = value;
+		}
+		protected int executionCountdown, countdownFrom;
+		public int CountdownPercent => countdownFrom == 0 ? 100 : executionCountdown*100/countdownFrom;
+
 		public class TookTooLong : Exception
 		{
 			public TookTooLong() : base("Took too long") { }
