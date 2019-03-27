@@ -14,12 +14,7 @@ namespace RedOnion.Script
 		public Engine()
 			: this(engine => new BasicObjects.BasicRoot(engine)) { }
 		public Engine(Func<IEngine, IEngineRoot> createRoot)
-			: base(createRoot, new Parser(DefaultParserOptions)) { }
-		public static readonly Parser.Option DefaultParserOptions
-			= Parsing.Parser.Option.Script
-			| Parsing.Parser.Option.Untyped
-			| Parsing.Parser.Option.Typed
-			| Parsing.Parser.Option.Autocall;
+			: base(createRoot, new Parser()) { }
 		public Engine(Parser.Option parserOptions)
 			: base(engine => new BasicObjects.BasicRoot(engine), new Parser(parserOptions)) { }
 		public Engine(Func<IEngine, IEngineRoot> createRoot, Parser.Option parserOptions)
@@ -99,6 +94,35 @@ namespace RedOnion.Script
 		/// Event executed on reset (before the root is cleared)
 		/// </summary>
 		public event Action<IEngine> Resetting;
+
+		~Engine() => Dispose(false);
+		public void Dispose() => Dispose(true);
+		protected virtual void Dispose(bool disposing)
+		{
+			if (Parser == null)
+				return;
+			try
+			{
+
+				var reset = Resetting?.GetInvocationList();
+				if (reset != null)
+				{
+					foreach (var action in reset)
+					{
+						try
+						{
+							action.DynamicInvoke(this);
+						}
+						catch { }
+					}
+				}
+				Root.Dispose();
+				Root = null;
+			}
+			catch { }
+			Parser = null;
+		}
+
 
 		/// <summary>
 		/// Compile source to code

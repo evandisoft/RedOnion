@@ -76,7 +76,7 @@ namespace RedOnion.Script.BasicObjects
 			case ValueKind.Char:
 				return value.Char;
 			}
-			throw new NotImplementedException();
+			throw new NotImplementedException("Conversion to number from " + value.Name);
 		}
 
 		public override IObject Create(int argc)

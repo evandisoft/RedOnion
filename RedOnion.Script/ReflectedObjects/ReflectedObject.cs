@@ -305,26 +305,19 @@ namespace RedOnion.Script.ReflectedObjects
 			if (op.Unary())
 			{
 				var arguments = Engine.Arguments;
-				var startLength = arguments.Length;
-				try
+				using (arguments.Guard())
 				{
 					arguments.Add(new Value(this));
 					foreach (var method in methods)
 						if (ReflectedFunction.TryCall(Engine, method, null, 1, ref result))
 							return true;
 				}
-				finally
-				{
-					arguments.Remove(arguments.Length - startLength);
-				}
 				return false;
 			}
 			else
 			{
 				var arguments = Engine.Arguments;
-				var startLength = arguments.Length;
-				try
-				{
+				using (arguments.Guard()) {
 					if (!selfRhs)
 						arguments.Add(new Value(this));
 					arguments.Add(arg);
@@ -333,10 +326,6 @@ namespace RedOnion.Script.ReflectedObjects
 					foreach (var method in methods)
 						if (ReflectedFunction.TryCall(Engine, method, null, 2, ref result))
 							return true;
-				}
-				finally
-				{
-					arguments.Remove(arguments.Length - startLength);
 				}
 				return false;
 			}

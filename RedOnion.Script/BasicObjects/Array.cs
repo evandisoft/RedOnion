@@ -100,7 +100,8 @@ namespace RedOnion.Script.BasicObjects
 			return base.Index(self, argc);
 		}
 
-		int ICollection<Value>.Count => Array.Length;
+		public int Count => Array.Length;
+		public int Length => Array.Length;
 		bool ICollection<Value>.IsReadOnly => true;
 
 		public bool Contains(Value item)

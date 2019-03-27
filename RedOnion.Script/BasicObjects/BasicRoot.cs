@@ -7,6 +7,10 @@ namespace RedOnion.Script.BasicObjects
 {
 	public class BasicRoot : BasicObject, IEngineRoot
 	{
+		~BasicRoot() => Dispose(false);
+		public void Dispose() => Dispose(true);
+		protected virtual void Dispose(bool disposing) { }
+
 		public Dictionary<Type, IObject> TypeMap
 		{ get; } = new Dictionary<Type, IObject>();
 
@@ -150,7 +154,7 @@ namespace RedOnion.Script.BasicObjects
 			default:
 				if (value.IsNumber)
 					return new NumberObj(Engine, Number.Prototype, value);
-				throw new NotImplementedException();
+				throw new NotImplementedException("Boxing of " + value.Name);
 			}
 		}
 
@@ -205,14 +209,14 @@ namespace RedOnion.Script.BasicObjects
 		{
 			if (op == OpCode.Array)
 				return Array;
-			//TODO: array object
-			throw new NotImplementedException();
+			throw new NotImplementedException(string.Format(Value.Culture,
+				"Unknown type opcode: {0:04X} {1}", (ushort)op, op));
 		}
 
 		public IObject GetType(OpCode op, params Value[] par)
 		{
-			//TODO: multi-dimensional array
-			throw new NotImplementedException();
+			throw new NotImplementedException(string.Format(Value.Culture,
+				"Unknown type opcode: {0:04X} {1}", (ushort)op, op));
 		}
 
 		public IObject this[Type type]

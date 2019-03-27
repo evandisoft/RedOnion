@@ -189,18 +189,26 @@ namespace RedOnion.Script.BasicObjects
 		public override Value Call(IObject self, int argc)
 		{
 			var args = Engine.CreateContext(self, Scope, argc);
-			if (Arguments != null)
+			Value result;
+			try
 			{
-				for (var i = 0; i < Arguments.Length; i++)
+				if (Arguments != null)
 				{
-					//TODO: cast/convert to argument type
-					args.Set(Arguments[i].Name, i < argc ? Engine.GetArgument(argc, i) :
-						Arguments[i].Value < 0 ? new Value() :
-						Engine.Evaluate(Code, Arguments[i].Value));
+					for (var i = 0; i < Arguments.Length; i++)
+					{
+						//TODO: cast/convert to argument type
+						args.Set(Arguments[i].Name, i < argc ? Engine.GetArgument(argc, i) :
+							Arguments[i].Value < 0 ? new Value() :
+							Engine.Evaluate(Code, Arguments[i].Value));
+					}
 				}
+				Engine.Execute(Code, CodeAt, CodeSize);
 			}
-			Engine.Execute(Code, CodeAt, CodeSize);
-			return Engine.DestroyContext();
+			finally
+			{
+				result = Engine.DestroyContext();
+			}
+			return result;
 		}
 
 		public override IObject Create(int argc)
@@ -252,32 +260,22 @@ namespace RedOnion.Script.BasicObjects
 		{
 			var engine = fn.Engine;
 			var arguments = engine.Arguments;
-			var startLength = arguments.Length;
-			try
+			using (arguments.Guard())
 			{
 				foreach (var arg in args)
 					arguments.Add(ReflectedType.Convert(engine, arg));
 				fn.Call(null, args.Length);
-			}
-			finally
-			{
-				arguments.Remove(arguments.Length - startLength);
 			}
 		}
 		public static T FunctionCallHelper<T>(FunctionObj fn, params object[] args)
 		{
 			var engine = fn.Engine;
 			var arguments = engine.Arguments;
-			var startLength = arguments.Length;
-			try
+			using (arguments.Guard())
 			{
 				foreach (var arg in args)
 					arguments.Add(ReflectedType.Convert(engine, arg));
 				return ReflectedType.Convert<T>(fn.Call(null, args.Length));
-			}
-			finally
-			{
-				arguments.Remove(arguments.Length - startLength);
 			}
 		}
 	}

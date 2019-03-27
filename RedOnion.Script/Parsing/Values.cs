@@ -41,7 +41,7 @@ namespace RedOnion.Script.Parsing
 		/// <summary>
 		/// Push string value (string, identifier)
 		/// </summary>
-		protected void Push(OpCode code, string value)
+		protected void Push(OpCode op, string value)
 		{
 			var start = ValuesAt;
 			int i;
@@ -50,12 +50,12 @@ namespace RedOnion.Script.Parsing
 			long ll;
 			double d;
 			char c;
-			switch (code)
+			switch (op)
 			{
 			case OpCode.Identifier:
 				ValuesReserve(9);
 				ValuesPush(value);
-				ValuesPush((byte)code);
+				ValuesPush((byte)op);
 				ValuesPush(start);
 				return;
 
@@ -103,7 +103,7 @@ namespace RedOnion.Script.Parsing
 				{
 					ValuesReserve(6);
 					ValuesPush((byte)c);
-					ValuesPush((byte)code);
+					ValuesPush((byte)op);
 					ValuesPush(start);
 					return;
 				}
@@ -122,7 +122,7 @@ namespace RedOnion.Script.Parsing
 					value = value.Substring(2, value.Length - 3);
 					ValuesReserve(9);
 					ValuesPush(value);
-					ValuesPush((byte)code);
+					ValuesPush((byte)op);
 					ValuesPush(start);
 					return;
 				}
@@ -173,7 +173,7 @@ namespace RedOnion.Script.Parsing
 				_stringBuilder.Length = 0;
 				ValuesReserve(9);
 				ValuesPush(value);
-				ValuesPush((byte)code);
+				ValuesPush((byte)op);
 				ValuesPush(start);
 				return;
 
@@ -270,7 +270,8 @@ namespace RedOnion.Script.Parsing
 				ValuesPush(start);
 				return;
 			}
-			throw new NotImplementedException();
+			throw new NotImplementedException(string.Format(Value.Culture,
+				"Parser.Push {0:04X} {1} with string", (ushort)op, op));
 		}
 		private StringBuilder _stringBuilder = new StringBuilder();
 		private int Nibble(char value)

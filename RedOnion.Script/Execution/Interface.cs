@@ -53,7 +53,7 @@ namespace RedOnion.Script
 		Repl = 1 << 31,
 	}
 
-	public interface IEngine
+	public interface IEngine : IDisposable
 	{
 		/// <summary>
 		/// Engine options
@@ -495,7 +495,7 @@ namespace RedOnion.Script
 		IObject Which(string name);
 	}
 
-	public interface IEngineRoot : IScope
+	public interface IEngineRoot : IScope, IDisposable
 	{
 		/// <summary>
 		/// Box value (StringObj, NumberObj, ...)
