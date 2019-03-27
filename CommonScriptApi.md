@@ -1,10 +1,10 @@
 # Common Scripting API for Lua and RedOnionScript (ROS)
 Here is some information about the API that we provide. In the future a lot of the content in these docs will be automated, but for now we will try to keep documentation manually caught up with at least some of the features we have added. But some features may be out of date or improperly maintained until we have an automatic documentation system.
 
-Note: As we are very early in the process of figuring out all that we can do with this system, this API may change dramatically. We are also going to try to make the API more consistent between the two engines. We are very heavily involved in exploring what we can do with this at the moment and it is a mess.
+Note: As we are very early in the process of figuring out all that we can do with this system, this API may change dramatically. We are also going to try to make the API more consistent between the two engines. We are very heavily involved in exploring what we can do with this at the moment and a lot of this can be considered a prototype.
 
-Note also: WE ARE PROVIDING ACCESS TO POWERFUL KSP FEATURES:
-MANY WILL NOT WORK PROPERLY. Many will lead to one or more scripting engine failing failing to work.
+Note also: WE ARE PROVIDING ACCESS TO POWERFUL KSP FEATURES.
+MANY WILL NOT WORK PROPERLY. Many will lead to one or more scripting engine failing to work.
 
 This is a WIP, and as time goes on we can develop a stronger safer system.
 
