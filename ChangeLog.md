@@ -9,7 +9,7 @@
 ### Documentation:
 - Added CommonScriptApi.md
 - Updated Readme.md
-- Updated Docs for ROS and UI
+- Updated Docs for ROS and UI lib
 
 ### Lua:
 - Wrapper table class called, ProxyTable, created. Can be used to act in place of classes that MoonSharp cannot properly reflect.
