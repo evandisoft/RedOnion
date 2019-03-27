@@ -25,7 +25,7 @@ Note:
 WE ARE PROVIDING ACCESS TO POWERFUL KSP FEATURES:
 MANY WILL NOT WORK PROPERLY. Many will lead to one or more scripting engine failing failing to work.
 
-This is a WIP, and as time goes on we can develop a stronger safer system.
+This is a WIP, and as time goes on we will develop a more robust system.
 
 This API is subject to change. Even major changes. We are still in exploration mode.
 
@@ -37,3 +37,12 @@ The Script folder situation is going to be changed dramatically in the future an
 We welcome people of all skill levels to contribute or give feedback, ask questions, etc.
 
 Here is more information about [contributing](Contributing.md).
+
+## Documentation
+
+[RedOnionScript (ROS)](RedOnion.Script/README.md) - A powerful in-game scripting engine taking inspiration from several popular languages (Ruby,Python,Javascript,etc)
+
+[RedOnionUI](RedOnion.UI/README.md) - A WIP UI Library, intended to be used by modders, users, and ourselves.
+
+[CommonScriptApi](CommonScriptApi.md) - Our tentative, WIP API shared by Lua and ROS for interacting with the game in various ways. May be changed dramatically in the future.
+

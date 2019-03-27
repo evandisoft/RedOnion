@@ -6,12 +6,12 @@ Note: As we are very early in the process of figuring out all that we can do wit
 Note also: WE ARE PROVIDING ACCESS TO POWERFUL KSP FEATURES.
 MANY WILL NOT WORK PROPERLY. Many will lead to one or more scripting engine failing to work.
 
-This is a WIP, and as time goes on we can develop a stronger safer system.
+This is a WIP, and as time goes on we will develop a more robust system.
 
 # KSP
-We currently are exposing objects/types to our Scripting engines. Some are defined in KSP or UnityEngine, and some are types are types we added that are useful for interacting with KSP and KSP types. These objects/types have been added inside an object/namespace that is a global in both scripting languages.
+We are exposing various objects/types to our Scripting engines. Some are defined in KSP or UnityEngine, and some are are objects/types we created ourselves that are useful for interacting with the game. These objects/types have been added inside an object/namespace that is a global in both scripting languages.
 
-For Lua, this global is spelled "Ksp", and for ROS (though ros allows case insensnivitity when there is no ambiguity) it is spelled "KSP".
+For Lua, this global is spelled "Ksp", and for ROS (though ros is case insensitive) it is spelled "KSP".
 
 For Lua, we must expose instantiated objects, while for ROS we can expose types or instantiated objects.
 
@@ -38,7 +38,7 @@ STOP_SPIN mode.
 To set the ship to always point at a particular direction, use
 `ctrl.TargetDir=vec`. This is using the raw coordinate system under the hood and a better function will be implemented to replace this in the future.
 
-To stop the autopilot you can click "Kill Ctrl" button in the repl, or call `ctrl.Shutdown`.
+To stop the autopilot you can click "Kill Ctrl" button in the repl, or call `ctrl.Shutdown()`.
 
 ## FlightGlobals
 Here we are exposing KSP's [FlightGlobals](https://kerbalspaceprogram.com/api/class_flight_globals.html) class. This is just used as a static class, and those are accessed similarly in Lua and ROS.
@@ -51,7 +51,7 @@ allows you to interact directly with the very vessel you are flying.
 You can get access to a lot of different gameplay objects from this class.
 
 ## HighLogic
-Here we are just exposing KSP's [HighLogic](https://kerbalspaceprogram.com/api/class_high_logic.html) class, which is also used as a static class.
+This is KSP's [HighLogic](https://kerbalspaceprogram.com/api/class_high_logic.html) class, which is also used as a static class.
 
 One thing you can do with this, is get access to the [CurrentGame](https://kerbalspaceprogram.com/api/class_game.html), and use that to get a reference to the current [CrewRoster](https://kerbalspaceprogram.com/api/class_kerbal_roster.html).
 
@@ -60,12 +60,11 @@ This is KSP's [EditorLogic](https://kerbalspaceprogram.com/api/class_editor_logi
 
 For Lua, you just access `editor=Ksp.EditorLogic` to get the instance, while in ROS you do `var editor=KSP.EditorLogic.fetch`.
 
-The EditorLogic instance will be null unless you are in the VAB or SBH.
+The EditorLogic instance will be null unless you are in the VAB or SPH.
 
 I'm thinking a lot about what I can do with this class. One thing it allows you to do is get a reference to the ship that is being currently built: `editor.ship`.
 
-from this you can iterate over the parts:
-ROS:
+from this you can iterate over the parts (ROS):
 ```
 var vessel=ksp.EditorLogic.fetch.ship
 
@@ -95,7 +94,7 @@ end
 ## ShipConstruction
 Here we are exposing KSP's [ShipConstruction](https://kerbalspaceprogram.com/api/class_ship_construction.html) class, which is used as a static class.
 
-There are a lot of interesting things that seem to be accessible from this class. I don't know much about it at the moment.
+There are a lot of interesting capabillities that seem to be accessible from this class. I don't know much about it at the moment.
 
 Possibly only useful in the VAB/SPH
 
@@ -107,7 +106,8 @@ Here we are exposing KSP's [FlightDriver](https://kerbalspaceprogram.com/api/cla
 
 One thing I know that this can do is allow you to programmatically switch to a different vessel.
 
-The following shows all the vessels.
+The following code prints out all the vessels and their associated index:
+
 ROS:
 ```
 var vessels=ksp.FlightGlobals.Vessels
@@ -115,10 +115,10 @@ var vessels=ksp.FlightGlobals.Vessels
 for var i=0;i<vessels.count;i++
     print i+":"+vessels[i]
 ```
-Then you can pick an `index` of the ship to switch to from this list.
-Lua:
+Then you can pick an `index` from the printed list and use that `index` to switch to the associated vessel using `FlightDriver` and `HighLogic`.
+
 ```
-ksp.FlightDriver.StartAndFocusVessel(Ksp.HighLogic.CurrentGame,index)
+Ksp.FlightDriver.StartAndFocusVessel(Ksp.HighLogic.CurrentGame,index)
 ```
 
 ## StageManager
@@ -133,7 +133,7 @@ vector math.
 Partwise vector division:
 `Ksp.Vec.Div(vec1,vec2)`
 
-Partwise vector abs:
+Partwise vector absolute value:
 `Ksp.Vec.Abs(vec)`
 
 Instantiate new vector (currently needed for Lua):
@@ -149,8 +149,7 @@ Repl/Editor scripts are ran during the FixedUpdate.
 You can use Time.deltaTime to ensure accurate physics
 calculations.
 
-Example:
-Lua:
+Example (Lua):
 ```
 vessel=Ksp.FlightGlobals.ActiveVessel
 ctrl=Ksp.FlightControl

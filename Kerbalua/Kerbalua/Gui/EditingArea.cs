@@ -208,6 +208,10 @@ namespace Kerbalua.Gui
 
 					editor.Backspace();
 
+					if (editor.cursorIndex <= 0)
+					{
+						break;
+					}
 					if (editor.text[editor.cursorIndex - 1] == '.')
 					{
 						break;
