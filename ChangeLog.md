@@ -20,5 +20,5 @@
 - testFlightGui.ros: A script that creates a simple UI for interacting with the autopilot.
 
 ### Videos:
-- Demo of majorMalfunction and selfDestruct: https://www.youtube.com/watch?v=xzAghlB2NLw
-- ROS, Autopilot and UI: https://www.youtube.com/watch?v=CDBNb6jR_Cc 
+- Demo of majorMalfunction.lua and selfDestruct.lua: https://www.youtube.com/watch?v=xzAghlB2NLw
+- ROS, Autopilot and UI using testFlightGui.ros: https://www.youtube.com/watch?v=CDBNb6jR_Cc 
