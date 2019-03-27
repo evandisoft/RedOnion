@@ -18,3 +18,7 @@
 - majorMalfunction.lua: A fun script that causes random parts to explode.
 - selfDestruct.lua: A script that explodes all the parts starting from the parts furthest from the root.
 - testFlightGui.ros: A script that creates a simple UI for interacting with the autopilot.
+
+### Videos:
+- Demo of majorMalfunction and selfDestruct: https://www.youtube.com/watch?v=xzAghlB2NLw
+- ROS, Autopilot and UI: https://www.youtube.com/watch?v=CDBNb6jR_Cc 
