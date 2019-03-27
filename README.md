@@ -21,6 +21,7 @@ but should be much safer to use.
 
 We have implemented a tentative [common API](CommonScriptApi.md) for both engines.
 
+Note:
 WE ARE PROVIDING ACCESS TO POWERFUL KSP FEATURES:
 MANY WILL NOT WORK PROPERLY. Many will lead to one or more scripting engine failing failing to work.
 

@@ -3,17 +3,15 @@ Here is some information about the API that we provide. In the future a lot of t
 
 Note: As we are very early in the process of figuring out all that we can do with this system, this API may change dramatically. We are also going to try to make the API more consistent between the two engines. We are very heavily involved in exploring what we can do with this at the moment and it is a mess.
 
-Note also that as this is an exploration phase in the development of this Mod, some of these features we talk about may not work properly in certain cases.
-
-WE ARE PROVIDING ACCESS TO POWERFUL KSP FEATURES:
+Note also: WE ARE PROVIDING ACCESS TO POWERFUL KSP FEATURES:
 MANY WILL NOT WORK PROPERLY. Many will lead to one or more scripting engine failing failing to work.
 
 This is a WIP, and as time goes on we can develop a stronger safer system.
 
 # KSP
-We currently are exposing objects/types defined in KSP or other types that are just generally useful for interacting with KSP inside an object/namespace that is a global in both scripting languages.
+We currently are exposing objects/types to our Scripting engines. Some are defined in KSP or UnityEngine, and some are types are types we added that are useful for interacting with KSP and KSP types. These objects/types have been added inside an object/namespace that is a global in both scripting languages.
 
-For Lua, it is spelled "Ksp", and for ROS (though ros allows case insensnivitity when there is no ambiguity) it is spelled "KSP".
+For Lua, this global is spelled "Ksp", and for ROS (though ros allows case insensnivitity when there is no ambiguity) it is spelled "KSP".
 
 For Lua, we must expose instantiated objects, while for ROS we can expose types or instantiated objects.
 
