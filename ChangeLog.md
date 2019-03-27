@@ -7,9 +7,9 @@
 - Enhanced reflection, especially for IEnumerable and List (new for var e in list)
 
 ### Documentation:
-- Added [CommonScriptApi.md](CommonScriptApi.md): Documents some of the API for interacting with the game that is available to both Lua and ROS.
+- Added [CommonScriptApi.md](https://github.com/evandisoft/RedOnion/blob/master/CommonScriptApi.md): Documents some of the API for interacting with the game that is available to both Lua and ROS.
 - Updated [README.md](README.md)
-- Updated Docs for [ROS](RedOnion.Script/README.md) and [UI lib](RedOnion.UI/README.md)
+- Updated Docs for [ROS](https://github.com/evandisoft/RedOnion/blob/master/RedOnion.Script/README.md) and [UI lib](RedOnion.UI/README.md)
 
 ### Lua:
 - Wrapper table class called, ProxyTable, created. Can be used to act in place of classes that MoonSharp cannot properly reflect.
