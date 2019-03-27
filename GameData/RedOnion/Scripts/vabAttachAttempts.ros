@@ -1,5 +1,5 @@
 var vessel=ksp.EditorLogic.fetch.ship
-
+var part=vessel.parts[0]
 var construction=ksp.ShipConstruction
 var construct=construction.LoadShip()
 var loader=ksp.PartLoader

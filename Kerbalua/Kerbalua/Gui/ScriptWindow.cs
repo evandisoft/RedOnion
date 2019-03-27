@@ -215,7 +215,8 @@ ctrl + k: move cursor down
 ctrl + l: move cursor up
 ctrl +;: move cursor right
 ctrl + m: move cursor to next tab left
-ctrl + backspace: delete to next tab left
+shift + backspace: delete to next tab left
+ctrl + backspace: delete to next '.' left
 ctrl + comma: move cursor 4 lines down
 ctrl + period: move cursor 4 lines up
 ctrl +/: move cursor to next tab right
