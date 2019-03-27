@@ -23,7 +23,7 @@ We have implemented a tentative [common API](CommonScriptApi.md) for both engine
 
 Note:
 WE ARE PROVIDING ACCESS TO POWERFUL KSP FEATURES:
-MANY WILL NOT WORK PROPERLY. Many will lead to one or more scripting engine failing failing to work.
+MANY WILL LEAD TO ERRORS IN ONE OR MORE OF THE SCRIPTING ENGINES.
 
 This is a WIP, and as time goes on we will develop a more robust system.
 
@@ -46,3 +46,5 @@ Here is more information about [contributing](Contributing.md).
 
 [CommonScriptApi](CommonScriptApi.md) - Our tentative, WIP API shared by Lua and ROS for interacting with the game in various ways. May be changed dramatically in the future.
 
+## Videos
+Videos about this mod will on [this channel](https://www.youtube.com/channel/UChduoYTVOtAH0NA-Lj8EiKA).

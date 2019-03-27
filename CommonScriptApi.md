@@ -3,8 +3,8 @@ Here is some information about the API that we provide. In the future a lot of t
 
 Note: As we are very early in the process of figuring out all that we can do with this system, this API may change dramatically. We are also going to try to make the API more consistent between the two engines. We are very heavily involved in exploring what we can do with this at the moment and a lot of this can be considered a prototype.
 
-Note also: WE ARE PROVIDING ACCESS TO POWERFUL KSP FEATURES.
-MANY WILL NOT WORK PROPERLY. Many will lead to one or more scripting engine failing to work.
+WE ARE PROVIDING ACCESS TO POWERFUL KSP FEATURES:
+MANY WILL LEAD TO ERRORS IN ONE OR MORE OF THE SCRIPTING ENGINES.
 
 This is a WIP, and as time goes on we will develop a more robust system.
 

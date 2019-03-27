@@ -1,0 +1,15 @@
+var vessel=ksp.flightglobals.activevessel
+
+var parts=vessel.parts
+var part=parts[0]
+var m=part.modules[0]
+
+def each lst,action
+    for var i=0;i<lst.count;i++; action lst[i]
+
+for var part in vessel.parts
+    print part
+    
+each vessel.parts,def part
+    print part
+    
