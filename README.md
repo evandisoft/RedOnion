@@ -11,7 +11,7 @@ vessels, anything, with own script.
 [(MoonSharp)](https://github.com/xanathar/moonsharp)
 is well known scripting language
 and will offer more comfort and safety, while
-[**ROS** (Red Onion Script)](RedOnion.Script/README.md)
+[**ROS** (Red Onion Script)](https://github.com/evandisoft/RedOnion/blob/master/RedOnion.Script/README.md)
 aims to provide unrestricted (and potentionally dangerous)
 access to every public method of KSP and Unity.
 
@@ -19,7 +19,7 @@ access to every public method of KSP and Unity.
 **LUA** may have some limitations
 but should be much safer to use.
 
-We have implemented a tentative [common API](CommonScriptApi.md) for both engines.
+We have implemented a tentative [common API](https://github.com/evandisoft/RedOnion/blob/master/CommonScriptApi.md) for both engines.
 
 Note:
 WE ARE PROVIDING ACCESS TO POWERFUL KSP FEATURES:
@@ -36,15 +36,15 @@ The Script folder situation is going to be changed dramatically in the future an
 ## Contributing
 We welcome people of all skill levels to contribute or give feedback, ask questions, etc.
 
-Here is more information about [contributing](Contributing.md).
+Here is more information about [contributing](https://github.com/evandisoft/RedOnion/blob/master/Contributing.md).
 
 ## Documentation
 
-[RedOnionScript (ROS)](RedOnion.Script/README.md) - A powerful in-game scripting engine taking inspiration from several popular languages (Ruby,Python,Javascript,etc)
+[RedOnionScript (ROS)](https://github.com/evandisoft/RedOnion/blob/master/RedOnion.Script/README.md) - A powerful in-game scripting engine taking inspiration from several popular languages (Ruby,Python,Javascript,etc)
 
-[RedOnionUI](RedOnion.UI/README.md) - A WIP UI Library, intended to be used by modders, users, and ourselves.
+[RedOnionUI](https://github.com/evandisoft/RedOnion/blob/master/RedOnion.UI/README.md) - A WIP UI Library, intended to be used by modders, users, and ourselves.
 
-[CommonScriptApi](CommonScriptApi.md) - Our tentative, WIP API shared by Lua and ROS for interacting with the game in various ways. May be changed dramatically in the future.
+[CommonScriptApi](https://github.com/evandisoft/RedOnion/blob/master/CommonScriptApi.md) - Our tentative, WIP API shared by Lua and ROS for interacting with the game in various ways. May be changed dramatically in the future.
 
 ## Videos
 Demonstration videos for this mod are on [this channel](https://www.youtube.com/channel/UChduoYTVOtAH0NA-Lj8EiKA).
