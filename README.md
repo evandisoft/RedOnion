@@ -21,6 +21,11 @@ but should be much safer to use.
 
 We have implemented a tentative [common API](CommonScriptApi.md) for both engines.
 
+WE ARE PROVIDING ACCESS TO POWERFUL KSP FEATURES:
+MANY WILL NOT WORK PROPERLY. Many will lead to one or more scripting engine failing failing to work.
+
+This is a WIP, and as time goes on we can develop a stronger safer system.
+
 This API is subject to change. Even major changes. We are still in exploration mode.
 
 Currently Scripts are stored in GameData/RedOnion/Scripts. These are the scripts we are messing with while trying out the game (Use them at your own risk). If you make some scripts of your own, you will lose them when you update the game unless you save them somewhere else and copy them back in.
