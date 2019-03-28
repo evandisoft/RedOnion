@@ -28,7 +28,7 @@ A Lua script being ran in the editor/repl will have to return control to KSP at 
 This script is a script that waits a short time, and then explodes 5 random parts. It can be a fun piloting challenge because
 it can make your ship very difficult to recover from. A video demonstration of my poor piloting skills being put to the test by this script is [here](https://www.youtube.com/watch?v=xzAghlB2NLw)
 
-First thing this script does, is use our [CommonScriptApi](https://github.com/evandisoft/RedOnion/blob/master/CommonScriptApi.md) to
+The first thing this script does is use our [CommonScriptApi](https://github.com/evandisoft/RedOnion/blob/master/CommonScriptApi.md) to
 get access to a reference to the current vessel.
 
 ```
