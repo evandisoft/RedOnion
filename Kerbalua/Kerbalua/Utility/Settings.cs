@@ -4,8 +4,9 @@ using System.Collections.Generic;
 
 namespace Kerbalua.Utility {
 	static public class Settings {
-		public static string BaseScriptsPath;
-		public static string SettingsFile;
+		// will need some changes about loading scripts if that gets changed!
+		public static readonly string BaseScriptsPath;
+		public static readonly string SettingsFile;
 
 		static Settings()
 		{

@@ -1,22 +1,21 @@
 var waiting = 0
 
 def selfDestruct part
-  var children = part.children
-  if children.count > 0
-    selfDestruct children[children.count-1]
-  else
+    while part.children.count > 0
+        part = part.children[part.children.count-1]
+    print "exploding " + part
     part.explode()
     waiting = ksp.random.range 20,40
     print "waiting: " + waiting
 
 def update
-  if ship.parts.count == 0
-    print "finished"
-    ksp.update.remove update
-    return
-  if waiting <= 0
-    selfDestruct ship.parts[0]
-    return
-  waiting--
+    if ship.parts.count == 0
+        print "finished"
+        ksp.update.remove update
+        return
+    if waiting <= 0
+        selfDestruct ship.parts[0]
+        return
+    waiting--
 
 ksp.update.add update

@@ -6,11 +6,12 @@ namespace Kerbalua.Other {
 		public bool WithHistory { get; private set; }
 		public ReplEvaluator ReplEvaluator { get; private set; }
 
-		public Evaluation(string source,ReplEvaluator replEvaluator,bool withHistory=false)
+		public Evaluation(string source, string path,
+			ReplEvaluator replEvaluator, bool withHistory=false)
 		{
 			Source = source;
 			ReplEvaluator = replEvaluator;
-			replEvaluator.SetSource(source,withHistory);
+			replEvaluator.SetSource(source, path, withHistory);
 			WithHistory = withHistory;
 		}
 

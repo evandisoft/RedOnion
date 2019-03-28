@@ -74,6 +74,18 @@ namespace Kerbalua.Gui
 					currentEvaluation = null;
 				}
 			}
+			foreach (var repl in replEvaluators.Values)
+			{
+				try
+				{
+					repl.FixedUpdate();
+				}
+				catch (Exception ex)
+				{
+					Debug.Log("Exception in REPL.FixedUpdate: " + ex.Message);
+					repl.ResetEngine();
+				}
+			}
 		}
 
 		public ScriptWindow(Rect param_mainWindowRect)
@@ -173,7 +185,7 @@ namespace Kerbalua.Gui
 			{
 				scriptIOTextArea.Save(editor.content.text);
 				repl.outputBox.AddFileContent(scriptIOTextArea.content.text);
-				currentEvaluation = new Evaluation(editor.content.text, currentReplEvaluator);
+				currentEvaluation = new Evaluation(editor.content.text, scriptIOTextArea.content.text, currentReplEvaluator);
 			}));
 			widgetBar.renderables.Add(new Button("Reset Engine", () =>
 			{
@@ -310,17 +322,17 @@ Any other key gives focus to input box.
 			{
 				scriptIOTextArea.Save(editor.content.text);
 				repl.outputBox.AddFileContent(scriptIOTextArea.content.text);
-				currentEvaluation = new Evaluation(editor.content.text, currentReplEvaluator);
+				currentEvaluation = new Evaluation(editor.content.text, scriptIOTextArea.content.text, currentReplEvaluator);
 			});
 			repl.inputBox.KeyBindings.Add(new EventKey(KeyCode.E, true), () =>
 			{
 				repl.outputBox.AddSourceString(repl.inputBox.content.text);
-				currentEvaluation = new Evaluation(repl.inputBox.content.text, currentReplEvaluator);
+				currentEvaluation = new Evaluation(repl.inputBox.content.text, null, currentReplEvaluator);
 			});
 			repl.inputBox.KeyBindings.Add(new EventKey(KeyCode.Return), () =>
 			{
 				repl.outputBox.AddSourceString(repl.inputBox.content.text);
-				currentEvaluation = new Evaluation(repl.inputBox.content.text, currentReplEvaluator, true);
+				currentEvaluation = new Evaluation(repl.inputBox.content.text, null, currentReplEvaluator, true);
 				repl.inputBox.content.text = "";
 				completionBox.content.text = "";
 			});

@@ -23,8 +23,9 @@ namespace Kerbalua.Other {
 		/// </summary>
 		/// <returns>True if evaluation has completed. False if evaluation is unfinished.</returns>
 		/// <param name="source">The source string to be evaluated.</param>
+		/// <param name="path">Script path or null for repl.</param>
 		/// <param name="withHistory">True if this source should be added to the history.</param
-		public void SetSource(string source, bool withHistory = false)
+		public void SetSource(string source, string path = null, bool withHistory = false)
 		{
 			if (withHistory)
 			{
@@ -46,11 +47,12 @@ namespace Kerbalua.Other {
 
 			}
 
-			ProtectedSetSource(source);
+			ProtectedSetSource(source, path);
 		}
 
+		protected abstract void ProtectedSetSource(string source, string path);
 		public abstract bool Evaluate(out string result);
-		public abstract void ProtectedSetSource(string source);
+		public abstract void FixedUpdate();
 
 		/// <summary>
 		/// Tell the engine to end an incomplete evaluation.

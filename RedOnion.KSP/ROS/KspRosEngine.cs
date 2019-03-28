@@ -1,6 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+using System.Text;
+using Ionic.Zip;
 using RedOnion.Script;
 using RedOnion.Script.Utilities;
 using UE = UnityEngine;
@@ -19,9 +23,30 @@ namespace RedOnion.KSP.ROS
 		private static Ionic.Zip.ZipFile ScriptsZip;
 		public static string LoadScript(string path)
 		{
-			var data = UI.Element.ResourceFileData(System.Reflection.Assembly.GetCallingAssembly(),
+			var data = UI.Element.ResourceFileData(Assembly.GetCallingAssembly(),
 				"Scripts", ref ScriptsZip, path);
-			return data == null ? null : System.Text.Encoding.UTF8.GetString(data);
+			return data == null ? null : Encoding.UTF8.GetString(data);
+		}
+		public static List<string> EnumerateScripts()
+		{
+			// assume asm.Location points to GameData/RedOnion/Plugis/RedOnion.dll (or any other dll)
+			var root = Path.Combine(Path.GetDirectoryName(Assembly.GetCallingAssembly().Location), "..");
+			var raw = new List<string>(Directory.GetFiles(root));
+
+			// GameData/RedOnion/Scripts.zip
+			if (ScriptsZip == null)
+			{
+				var zipPath = Path.Combine(root, "Scripts.zip");
+				if (!File.Exists(zipPath))
+					return raw;
+				ScriptsZip = ZipFile.Read(zipPath);
+			}
+			var map = new HashSet<string>(raw);
+			foreach (var entry in ScriptsZip.Entries)
+				map.Add(Path.Combine(root, entry.FileName));
+			raw.Clear();
+			raw.AddRange(map);
+			return raw;
 		}
 
 		protected UpdateList updateList = new UpdateList();
@@ -45,9 +70,15 @@ namespace RedOnion.KSP.ROS
 			updateList.Clear();
 			idleList.Clear();
 		}
+		public override void Reset()
+		{
+			ClearEvents();
+			base.Reset();
+		}
 
 		int counter;
-		public void FixedUpdate(int countdown = 1000, int percent = 30, int idlePercent = 50)
+		int idleSkipped;
+		public void FixedUpdate(int countdown = 1000, int percent = 50, int idlePercent = 80)
 		{
 			counter++;
 			ExecutionCountdown = countdown;
@@ -74,8 +105,13 @@ namespace RedOnion.KSP.ROS
 					}
 				} while (!updateList.AtEnd && CountdownPercent > percent);
 			}
-			if (idleList.Count > 0 && CountdownPercent > idlePercent)
+			if (idleList.IsEmpty)
+				idleSkipped = 0;
+			else if (CountdownPercent <= idlePercent && idleSkipped < 10)
+				idleSkipped++;
+			else
 			{
+				idleSkipped = 0;
 				do
 				{
 					DebugLog("FixedUpdate #{1}: idleList.index = {0}", idleList.index, counter);

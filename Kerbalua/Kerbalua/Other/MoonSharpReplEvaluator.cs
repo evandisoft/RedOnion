@@ -111,7 +111,7 @@ namespace Kerbalua.Other
 			return isComplete;
 		}
 
-		public override void ProtectedSetSource(string source)
+		protected override void ProtectedSetSource(string source, string path)
 		{
 			try
 			{
@@ -131,6 +131,11 @@ namespace Kerbalua.Other
 				Debug.Log(exception);
 				Terminate();
 			}
+		}
+
+		public override void FixedUpdate()
+		{
+			// do nothing, LUA/MoonSharp Engine does not use events
 		}
 	}
 }

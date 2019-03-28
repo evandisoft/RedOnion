@@ -12,6 +12,8 @@ namespace Kerbalua.Other
 	{
 		ImmediateEngine engine;
 		ReplHintsEngine hints;
+		string source, path;
+		bool skipUpdate;
 
 		public RedOnionReplEvaluator()
 		{
@@ -21,49 +23,52 @@ namespace Kerbalua.Other
 			engine.Printing += msg => PrintAction?.Invoke(msg);
 		}
 
-		//string mainResult;
-		bool isComplete = true;
-		//protected override bool ProtectedEvaluate(string source, out string output)
-		//{
-		//	output = "";
-		//	try
-		//	{
-		//		if (isComplete)
-		//		{
-		//			engine.ExecutionCountdown = 10000;
-		//			engine.Execute(source);
-		//			mainResult = engine.Result.ToString();
-		//			if (engine.HasEvents)
-		//				return isComplete = false;
-		//			output = mainResult;
-		//			return isComplete = true;
-		//		}
-		//		engine.FixedUpdate();
-		//		isComplete = !engine.HasEvents;
-		//		if (isComplete)
-		//			output = mainResult;
-		//		return isComplete;
-		//	}
-		//	catch (Exception e)
-		//	{
-		//		PrintErrorAction?.Invoke(e.Message);
+		public override void FixedUpdate()
+		{
+			if (skipUpdate)
+			{
+				skipUpdate = false;
+				return;
+			}
+			engine.FixedUpdate();
+		}
 
-		//		string FormatLine(int lineNumber, string line)
-		//			=> string.Format(Value.Culture,
-		//			line == null ? "At line {0}." : "At line {0}: {1}",
-		//			lineNumber+1, line);
+		protected override void ProtectedSetSource(string source, string path)
+		{
+			this.source = source;
+			this.path = path;
+			//TODO: unsubscribe events from last execution if path is the same
+		}
+		public override bool Evaluate(out string result)
+		{
+			try
+			{
+				skipUpdate = true;
+				engine.ExecutionCountdown = 10000;
+				engine.Execute(source);
+				result = engine.Result.ToString();
+				return true; // for now we always complete immediately
+			}
+			catch (Exception e)
+			{
+				PrintErrorAction?.Invoke(e.Message);
 
-		//		if (e is RuntimeError runError)
-		//			PrintErrorAction?.Invoke(FormatLine(runError.LineNumber, runError.Line));
-		//		else if (e is ParseError parseError)
-		//			PrintErrorAction?.Invoke(FormatLine(parseError.LineNumber, parseError.Line));
+				string FormatLine(int lineNumber, string line)
+					=> string.Format(Value.Culture,
+					line == null ? "At line {0}." : "At line {0}: {1}",
+					lineNumber+1, line);
 
-		//		Debug.Log(e);
-		//	}
-		//	Terminate();
-		//	output = "";
-		//	return isComplete = true;
-		//}
+				if (e is RuntimeError runError)
+					PrintErrorAction?.Invoke(FormatLine(runError.LineNumber, runError.Line));
+				else if (e is ParseError parseError)
+					PrintErrorAction?.Invoke(FormatLine(parseError.LineNumber, parseError.Line));
+
+				Debug.Log(e);
+			}
+			Terminate();
+			result = "";
+			return true;
+		}
 
 		/// <summary>
 		/// See the abstract version for complete comments.
@@ -85,7 +90,8 @@ namespace Kerbalua.Other
 
 		public override void ResetEngine()
 		{
-			isComplete = true;
+			source = null;
+			path = null;
 			engine.Reset();
 			hints.Reset();
 			FlightControl.GetInstance().Shutdown();
@@ -93,19 +99,9 @@ namespace Kerbalua.Other
 
 		public override void Terminate()
 		{
-			isComplete = true;
-			engine.Update.Clear();
-			engine.Idle.Clear();
-		}
-
-		public override bool Evaluate(out string result)
-		{
-			throw new NotImplementedException();
-		}
-
-		public override void ProtectedSetSource(string source)
-		{
-			throw new NotImplementedException();
+			source = null;
+			path = null;
+			engine.ClearEvents();
 		}
 	}
 }
