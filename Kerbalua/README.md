@@ -1,0 +1,58 @@
+The [Lua implementation](https://www.lua.org/manual/5.2/) uses [MoonSharp](http://www.moonsharp.org/). MoonSharp is a lua implementation
+that can interact with dotnet/C# objects.
+
+We provide an API for both Lua and ROS that is documented [here](https://github.com/evandisoft/RedOnion/blob/master/CommonScriptApi.md)
+
+A Lua script being ran in the editor/repl will automatically be pre-empted at various points to allow KSP to run. You can 
+voluntarily yield control back to KSP by calling coroutine.yield().
+
+Here is an example script that can be ran while you are in flight mode:
+```
+vessel=Ksp.FlightGlobals.ActiveVessel
+
+for i=0,20*60 do
+    coroutine.yield()
+end
+
+for j=1,5 do
+    for i=0,Ksp.Random.Range(0,20*60) do
+        coroutine.yield()
+    end
+    local num=Ksp.Random.Range(0,vessel.parts.Count)
+    print(vessel.parts[num].ToString().."is malfunctioning!")
+    vessel.parts[num].explode()
+end
+print("Done!")
+```
+
+First thing this does, is use our [CommonScriptApi](https://github.com/evandisoft/RedOnion/blob/master/CommonScriptApi.md) to
+get access to a reference to the current vessel.
+
+Then goes into a normal lua for loop for 20*60=1200 iterations. This effectively causes the script to delay a while.
+
+After that is done, it goes into another for loop that will run 5 times.
+```
+for j=1,5 do
+```
+
+Each iteration of the loop is going to first wait a random amount of time by yielding over and over again in this little loop:
+```
+for i=0,Ksp.Random.Range(0,20*60) do
+    coroutine.yield()
+end
+```
+
+Then it will select a random part index.
+```
+local num=Ksp.Random.Range(0,vessel.parts.Count)
+```
+
+Display which part will be exploding:
+```
+print(vessel.parts[num].ToString().."is malfunctioning!")
+```
+
+And finally call the part's explode functionality:
+```
+vessel.parts[num].explode()
+```
