@@ -14,16 +14,16 @@ def zipFiles zip, name, indir
 		var write = entry.open()
 		var read = new fileStream resource, fileMode.open
 		read.copyTo write
-		read.dispose()
-		write.dispose()
+		read.dispose
+		write.dispose
 
 def createZip name
 	print name + ".zip"
 	var file = new fileStream path.combine(data,name+".zip"), fileMode.create
 	var zip = new zipArchive file, zipArchiveMode.create
 	zipFiles zip, name, false
-	zip.dispose()
-	file.dispose()
+	zip.dispose
+	file.dispose
 
 createZip "Resources"
 createZip "Scripts"
