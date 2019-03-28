@@ -3,8 +3,7 @@ that can interact with Mono/C# objects. KSP is implemented in C# Mono. Using Moo
 
 We provide an API for both Lua and ROS that is documented [here](https://github.com/evandisoft/RedOnion/blob/master/CommonScriptApi.md)
 
-A Lua script being ran in the editor/repl will automatically be pre-empted at various points to allow KSP to run. You can 
-voluntarily yield control back to KSP by calling coroutine.yield(). This will also effectively wait the script for a short time.
+A Lua script being ran in the editor/repl will have to return control to KSP at various points in order to allow KSP to execute its code. You can voluntarily temporarily yield control back to KSP by calling coroutine.yield(). This will effectively make the script wait a short time. So it can be used as a crude timing mechanism. If you do not call coroutine.yield() within a certain amount of time, your script will be automatically yielded, and then later automatically resumed at the point where it was automatically yielded.
 
 Here is an example script that can be ran while you are in flight mode (make sure you have [the "Lua" engine selected](https://github.com/evandisoft/RedOnion/blob/master/TroubleShooting.md#script-wont-work)):
 ```
