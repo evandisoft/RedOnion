@@ -30,6 +30,11 @@ it can make your ship very difficult to recover from.
 First thing this script does, is use our [CommonScriptApi](https://github.com/evandisoft/RedOnion/blob/master/CommonScriptApi.md) to
 get access to a reference to the current vessel.
 
+```
+vessel=Ksp.FlightGlobals.ActiveVessel
+```
+And stores the current vessel in a global variable called "vessel"
+
 Then goes into a normal lua for loop for 20*60=1200 iterations. This effectively causes the script to delay a while.
 
 After that is done, it goes into another for loop that will run 5 times.
