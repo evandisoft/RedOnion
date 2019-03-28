@@ -5,4 +5,5 @@ If you are trying to execute ROS code, ensure RedOnionScript engine is selected.
 The Repl/Editor both use whatever engine is currently selected. The currently selected engine will be shown in the textbox below the RedOnion and Lua buttons. The Repl also remembers which engine you used last.
 
 ### Repl won't respond to input:
+Repl/Editor is disabled when a program is running.
 Try terminating the current program with ctrl+c
