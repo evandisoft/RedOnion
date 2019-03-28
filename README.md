@@ -47,3 +47,6 @@ Here is more information about [contributing](https://github.com/evandisoft/RedO
 
 ## Videos
 Demonstration videos for this mod are on [this channel](https://www.youtube.com/channel/UChduoYTVOtAH0NA-Lj8EiKA).
+
+## Release
+Releases are hosted [here](https://spacedock.info/mod/2116/Red%20Onion)
