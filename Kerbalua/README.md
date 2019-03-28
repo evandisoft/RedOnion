@@ -1,12 +1,12 @@
 The [Lua implementation](https://www.lua.org/manual/5.2/) uses [MoonSharp](http://www.moonsharp.org/). MoonSharp is a lua implementation
-that can interact with dotnet/C# objects.
+that can interact with Mono/C# objects. KSP is implemented in C# Mono. Using MoonSharp our engine can interact with the [KSP api](https://kerbalspaceprogram.com/api/annotated.html) ingame. We can provide in scripting nearly any functionality a modmaker would normally have to implemente in C#.
 
 We provide an API for both Lua and ROS that is documented [here](https://github.com/evandisoft/RedOnion/blob/master/CommonScriptApi.md)
 
 A Lua script being ran in the editor/repl will automatically be pre-empted at various points to allow KSP to run. You can 
 voluntarily yield control back to KSP by calling coroutine.yield().
 
-Here is an example script that can be ran while you are in flight mode (make sure you have "Lua" engine selected":
+Here is an example script that can be ran while you are in flight mode (make sure you have [the "Lua" engine selected](https://github.com/evandisoft/RedOnion/blob/master/TroubleShooting.md#script-wont-work)):
 ```
 vessel=Ksp.FlightGlobals.ActiveVessel
 
@@ -57,4 +57,4 @@ And finally call the part's explode functionality:
 vessel.parts[num].explode()
 ```
 
-If you have any questions, or problems, please feel free to make an issue on this repository, or respond in our [KSP forum thread](https://forum.kerbalspaceprogram.com/index.php?/topic/183050-wipalpha-release-020-redonion-unrestricted-in-game-scripting-with-repl-and-live-editing-with-intellisense-lua-and-a-custom-jsruby-like-language-implemented/)
+If you have any questions, problems, or requests for new functionality please feel free to make an issue on this repository, or respond in our [KSP forum thread](https://forum.kerbalspaceprogram.com/index.php?/topic/183050-wipalpha-release-020-redonion-unrestricted-in-game-scripting-with-repl-and-live-editing-with-intellisense-lua-and-a-custom-jsruby-like-language-implemented/)
