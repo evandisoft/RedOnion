@@ -4,7 +4,7 @@ Since MoonSharp is a lua implementation that can interact with Mono/C# objects, 
 
 We provide an API for both Lua and ROS that is documented [here](https://github.com/evandisoft/RedOnion/blob/master/CommonScriptApi.md)
 
-Here is an example Lua script that can be ran while you are in flight mode (make sure you have [the "Lua" engine selected](https://github.com/evandisoft/RedOnion/blob/master/TroubleShooting.md#script-wont-work)):
+Here is an example Lua script that can be [executed](https://github.com/evandisoft/RedOnion/blob/master/TroubleShooting.md#how-do-i-run-a-script) while you are in flight mode (make sure you have [the "Lua" engine selected](https://github.com/evandisoft/RedOnion/blob/master/TroubleShooting.md#script-wont-work)):
 ```
 vessel=Ksp.FlightGlobals.ActiveVessel
 
