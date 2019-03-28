@@ -6,7 +6,7 @@ We provide an API for both Lua and ROS that is documented [here](https://github.
 A Lua script being ran in the editor/repl will automatically be pre-empted at various points to allow KSP to run. You can 
 voluntarily yield control back to KSP by calling coroutine.yield().
 
-Here is an example script that can be ran while you are in flight mode:
+Here is an example script that can be ran while you are in flight mode (make sure you have "Lua" engine selected":
 ```
 vessel=Ksp.FlightGlobals.ActiveVessel
 
