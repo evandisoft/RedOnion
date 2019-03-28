@@ -10,27 +10,31 @@ namespace Kerbalua.Other {
 	/// </summary>
 	public abstract class ReplEvaluator {
 		const int maxHistorySize = 1000;
+
+
 		public Action<string> PrintAction;
 		public Action<string> PrintErrorAction;
 
-		LinkedListNode<string> currentHistoryItem=null;
+		LinkedListNode<string> currentHistoryItem = null;
 		/// <summary>
-		/// Evaluate the source and return the result of that evaluation.
-		/// Subclasses override the protected method "ProtectedEvaluate" to provide a per-engine evaluation
+		/// Sets the source and return the result of that evaluation.
+		/// Subclasses override the protected method "ProtectedSetSource" to provide a per-engine SetSource
 		/// implementation that will be called by this function.
 		/// </summary>
 		/// <returns>True if evaluation has completed. False if evaluation is unfinished.</returns>
 		/// <param name="source">The source string to be evaluated.</param>
-		/// <param name="output">A ToString of the result of evaluating source.</param>
-		/// <param name="withHistory">True if this source should be added to the history.</param>
-		public bool Evaluate(string source,out string output,bool withHistory=false)
+		/// <param name="withHistory">True if this source should be added to the history.</param
+		public void SetSource(string source, bool withHistory = false)
 		{
-			if (withHistory) {
-				if(!(History.Count>0 && source == History.First.Value)) {
+			if (withHistory)
+			{
+				if (!(History.Count > 0 && source == History.First.Value))
+				{
 					History.AddFirst(source);
 				}
 
-				if (History.Count > maxHistorySize) {
+				if (History.Count > maxHistorySize)
+				{
 					History.RemoveLast();
 				}
 
@@ -39,10 +43,14 @@ namespace Kerbalua.Other {
 				//foreach (var item in History) {
 				//	Debug.Log(item);
 				//}
+
 			}
 
-			return ProtectedEvaluate(source, out output);
+			ProtectedSetSource(source);
 		}
+
+		public abstract bool Evaluate(out string result);
+		public abstract void ProtectedSetSource(string source);
 
 		/// <summary>
 		/// Tell the engine to end an incomplete evaluation.
@@ -81,14 +89,6 @@ namespace Kerbalua.Other {
 
 			return currentHistoryItem.Value;
 		}
-
-		/// <summary>
-		/// Overriden by subclasses for their per-engine evaluation functionality.
-		/// </summary>
-		/// <returns><c>true</c>, if evaluation was complete, <c>false</c> otherwise.</returns>
-		/// <param name="source">String to be evaluated.</param>
-		/// <param name="output">ToString of the result of the evaluation.</param>
-		protected abstract bool ProtectedEvaluate(string source,out string output);
 
 		protected LinkedList<string> History = new LinkedList<string>();
 

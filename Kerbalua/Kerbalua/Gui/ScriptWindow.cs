@@ -169,7 +169,7 @@ namespace Kerbalua.Gui
 			{
 				editor.content.text = scriptIOTextArea.Load();
 			}));
-			widgetBar.renderables.Add(new Button("Evaluate", () =>
+			widgetBar.renderables.Add(new Button("Run Script", () =>
 			{
 				scriptIOTextArea.Save(editor.content.text);
 				repl.outputBox.AddFileContent(scriptIOTextArea.content.text);

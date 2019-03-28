@@ -3,6 +3,8 @@ function blah()
     coroutine.yield()
 end
 
-while true do
+for i=1,10 do
     blah()
 end
+print("done")
+return 1

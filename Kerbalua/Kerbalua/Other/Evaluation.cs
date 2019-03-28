@@ -10,13 +10,14 @@ namespace Kerbalua.Other {
 		{
 			Source = source;
 			ReplEvaluator = replEvaluator;
+			replEvaluator.SetSource(source,withHistory);
 			WithHistory = withHistory;
 		}
 
 		public bool Evaluate()
 		{
 			string result;
-			if(ReplEvaluator.Evaluate(Source,out result, WithHistory)) {
+			if(ReplEvaluator.Evaluate(out result)) {
 				Result = result;
 				return true;
 			}

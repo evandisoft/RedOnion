@@ -15,53 +15,11 @@ namespace Kerbalua.Other
     {
 		KerbaluaScript scriptEngine;
 
-		//CoreModules coreModules;
 		KerbaluaExecutionManager kem = new KerbaluaExecutionManager();
 
 		public MoonSharpReplEvaluator()
 		{
-			//this.coreModules = coreModules;
 			InternalResetEngine();
-		}
-
-		protected override bool ProtectedEvaluate(string source,out string output)
-		{
-			output="";
-			DynValue result;
-			bool isComplete = false;
-			try {
-				if(scriptEngine.EvaluateWithCoroutine(source,out result)) {
-					isComplete = true;
-
-					if (result.UserData == null) {
-						output += result;
-					} else {
-						output += result.UserData.Object;
-						if (result.UserData.Object == null) {
-							output += " (" + result.UserData.Object.GetType() + ")";
-						}
-					}
-
-				} else {
-					output = "";
-				}
-
-			} catch (Exception exception) {
-				if(exception is InterpreterException interExcept)
-				{
-					PrintErrorAction?.Invoke(interExcept.DecoratedMessage);
-				}
-				else
-				{
-					PrintErrorAction?.Invoke(exception.Message);
-				}
-
-				Debug.Log(exception);
-				Terminate();
-				isComplete = true;
-			}
-
-			return isComplete;
 		}
 
 		/// <summary>
@@ -89,8 +47,6 @@ namespace Kerbalua.Other
 			scriptEngine.Options.ScriptLoader = new FileSystemScriptLoader();
 			((ScriptLoaderBase)scriptEngine.Options.ScriptLoader).IgnoreLuaPathGlobal = true;
 			((ScriptLoaderBase)scriptEngine.Options.ScriptLoader).ModulePaths = new string[] { Settings.BaseScriptsPath+"/?.lua" };
-
-			//scriptEngine.AttachDebugger(kem);
 		}
 
 		public override void ResetEngine()
@@ -103,6 +59,78 @@ namespace Kerbalua.Other
 		public override void Terminate()
 		{
 			scriptEngine.Terminate();
+		}
+
+		public override bool Evaluate(out string result)
+		{
+			result = "";
+			DynValue dynResult;
+			bool isComplete = false;
+			try
+			{
+				if (scriptEngine.Evaluate(out dynResult))
+				{
+					isComplete = true;
+
+					if (dynResult.UserData == null)
+					{
+						result += dynResult;
+					}
+					else
+					{
+						result += dynResult.UserData.Object;
+						if (dynResult.UserData.Object == null)
+						{
+							result += " (" + dynResult.UserData.Object.GetType() + ")";
+						}
+					}
+
+				}
+				else
+				{
+					result = "";
+				}
+
+			}
+			catch (Exception exception)
+			{
+				if (exception is InterpreterException interExcept)
+				{
+					PrintErrorAction?.Invoke(interExcept.DecoratedMessage);
+				}
+				else
+				{
+					PrintErrorAction?.Invoke(exception.Message);
+				}
+
+				Debug.Log(exception);
+				Terminate();
+				isComplete = true;
+			}
+
+			return isComplete;
+		}
+
+		public override void ProtectedSetSource(string source)
+		{
+			try
+			{
+				scriptEngine.SetCoroutine(source);
+			}
+			catch (Exception exception)
+			{
+				if (exception is InterpreterException interExcept)
+				{
+					PrintErrorAction?.Invoke(interExcept.DecoratedMessage);
+				}
+				else
+				{
+					PrintErrorAction?.Invoke(exception.Message);
+				}
+
+				Debug.Log(exception);
+				Terminate();
+			}
 		}
 	}
 }

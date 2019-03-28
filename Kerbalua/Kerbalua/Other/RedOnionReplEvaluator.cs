@@ -21,49 +21,49 @@ namespace Kerbalua.Other
 			engine.Printing += msg => PrintAction?.Invoke(msg);
 		}
 
-		string mainResult;
+		//string mainResult;
 		bool isComplete = true;
-		protected override bool ProtectedEvaluate(string source, out string output)
-		{
-			output = "";
-			try
-			{
-				if (isComplete)
-				{
-					engine.ExecutionCountdown = 10000;
-					engine.Execute(source);
-					mainResult = engine.Result.ToString();
-					if (engine.HasEvents)
-						return isComplete = false;
-					output = mainResult;
-					return isComplete = true;
-				}
-				engine.FixedUpdate();
-				isComplete = !engine.HasEvents;
-				if (isComplete)
-					output = mainResult;
-				return isComplete;
-			}
-			catch (Exception e)
-			{
-				PrintErrorAction?.Invoke(e.Message);
+		//protected override bool ProtectedEvaluate(string source, out string output)
+		//{
+		//	output = "";
+		//	try
+		//	{
+		//		if (isComplete)
+		//		{
+		//			engine.ExecutionCountdown = 10000;
+		//			engine.Execute(source);
+		//			mainResult = engine.Result.ToString();
+		//			if (engine.HasEvents)
+		//				return isComplete = false;
+		//			output = mainResult;
+		//			return isComplete = true;
+		//		}
+		//		engine.FixedUpdate();
+		//		isComplete = !engine.HasEvents;
+		//		if (isComplete)
+		//			output = mainResult;
+		//		return isComplete;
+		//	}
+		//	catch (Exception e)
+		//	{
+		//		PrintErrorAction?.Invoke(e.Message);
 
-				string FormatLine(int lineNumber, string line)
-					=> string.Format(Value.Culture,
-					line == null ? "At line {0}." : "At line {0}: {1}",
-					lineNumber+1, line);
+		//		string FormatLine(int lineNumber, string line)
+		//			=> string.Format(Value.Culture,
+		//			line == null ? "At line {0}." : "At line {0}: {1}",
+		//			lineNumber+1, line);
 
-				if (e is RuntimeError runError)
-					PrintErrorAction?.Invoke(FormatLine(runError.LineNumber, runError.Line));
-				else if (e is ParseError parseError)
-					PrintErrorAction?.Invoke(FormatLine(parseError.LineNumber, parseError.Line));
+		//		if (e is RuntimeError runError)
+		//			PrintErrorAction?.Invoke(FormatLine(runError.LineNumber, runError.Line));
+		//		else if (e is ParseError parseError)
+		//			PrintErrorAction?.Invoke(FormatLine(parseError.LineNumber, parseError.Line));
 
-				Debug.Log(e);
-			}
-			Terminate();
-			output = "";
-			return isComplete = true;
-		}
+		//		Debug.Log(e);
+		//	}
+		//	Terminate();
+		//	output = "";
+		//	return isComplete = true;
+		//}
 
 		/// <summary>
 		/// See the abstract version for complete comments.
@@ -96,6 +96,16 @@ namespace Kerbalua.Other
 			isComplete = true;
 			engine.Update.Clear();
 			engine.Idle.Clear();
+		}
+
+		public override bool Evaluate(out string result)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override void ProtectedSetSource(string source)
+		{
+			throw new NotImplementedException();
 		}
 	}
 }

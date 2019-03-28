@@ -31,80 +31,49 @@ namespace RedOnion.KSP.Lua
 		public KerbaluaScript() : base(CoreModules.Preset_Complete)
 		{
 			UserData.RegistrationPolicy = InteropRegistrationPolicy.Automatic;
-			//UserData.RegisterProxyType<ModuleProxy, PartModule>(m => new ModuleProxy(m));
 
-			//UserData.RegisterProxyType<ModuleControlSurfaceProxy, ModuleControlSurface>(m => new ModuleControlSurfaceProxy(m));
 			GlobalOptions.CustomConverters
 				.SetClrToScriptCustomConversion(
 					(MoonSharp.Interpreter.Script script, ModuleControlSurface m)
 						=> DynValue.NewTable(new ProxyTable(this, m))
 					);
-			//var a = new Table(this);
-			//UserData.
-			//var d=UserData.RegisterType<ModuleControlSurface>();
-			//Debug.Log(d);
-			//descr.RemoveMember("transformName");
 
 			Globals["Ksp"] = new KspApi();
 		}
 
+
+
 		DynValue coroutine;
-		public bool EvaluateWithCoroutine(string source, out DynValue result)
+		public bool Evaluate(out DynValue result)
 		{
 			if (coroutine == null)
 			{
-				SetCoroutine(source);
+				throw new System.Exception("Coroutine not set in KerbaluaScript");
 			}
 
 			coroutine.Coroutine.AutoYieldCounter = 1000;
 			result = coroutine.Coroutine.Resume();
-			//Debug.Log("result is " + result);
-			//if (coroutine.Coroutine.State == CoroutineState.ForceSuspended) {
-			//	Globals["suspended"] = result;
-			//}
+
 
 			bool isComplete = false;
 			if (coroutine.Coroutine.State == CoroutineState.Dead)
 			{
-				//Debug.Log("It's dead jim " + result);
-
-				//Debug.Log("Coroutine state is" + coroutine.Coroutine.State + ", result is " + result);
 				isComplete = true;
 				coroutine = null;
 			}
-			else
-			{
-				//Debug.Log("Coroutine state is" + coroutine.Coroutine.State + ", result is incomplete");
-			}
 
-			//DynValue result = base.DoString("return " + str);
 			return isComplete;
 		}
 
-		void SetCoroutine(string source)
+		public void SetCoroutine(string source)
 		{
-			try
+			if (source.StartsWith("="))
 			{
-				if (source.StartsWith("="))
-				{
-					source = "return " + source.Substring(1);
-				}
-				DynValue mainFunction = base.DoString("return function () " + source + " end");
-				//Debug.Log("Main function is "+mainFunction);
-				coroutine = CreateCoroutine(mainFunction);
-				//Debug.Log("Coroutine is " + coroutine);
+				source = "return " + source.Substring(1);
 			}
-			catch (SyntaxErrorException e)
-			{
-				//Doesn't work in general
-				//DynValue mainFunction = base.DoString("return function () return " + source + " end");
-				//Debug.Log("Main function is "+mainFunction);
-				//coroutine = CreateCoroutine(mainFunction);
-				//Debug.Log(e);
-				//Debug.Log("Coroutine is " + coroutine);
-				throw e;
-			}
+			DynValue mainFunction = base.DoString("return function () " + source + " end");
 
+			coroutine = CreateCoroutine(mainFunction);
 		}
 
 		public void Terminate()
