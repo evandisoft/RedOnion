@@ -7,3 +7,6 @@ The Repl/Editor both use whatever engine is currently selected. The currently se
 ### Repl won't respond to input:
 Repl/Editor is disabled when a program is running.
 Try terminating the current program with ctrl+c
+
+### How do I run a script?
+Click the evaluate button when a script is in the editor. Ensure you have the right engine selected.
