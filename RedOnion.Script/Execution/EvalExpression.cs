@@ -426,10 +426,10 @@ namespace RedOnion.Script
 			Expression(ref at);
 			if (op == OpCode.LogicAnd || op == OpCode.LogicOr)
 			{
+				var n = CodeInt(ref at);
 				if ((Value == true) == (op == OpCode.LogicOr))
 				{
 					Value = op == OpCode.LogicOr;
-					var n = CodeInt(ref at);
 					at += n;
 					return;
 				}
