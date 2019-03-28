@@ -9,4 +9,4 @@ Repl/Editor is disabled when a program is running.
 Try terminating the current program with ctrl+c
 
 ### How do I run a script?
-Click the evaluate button when a script is in the editor. Ensure you have the right engine selected.
+Click the evaluate button when a script is in the editor. Ensure you have the [right engine selected](https://github.com/evandisoft/RedOnion/blob/master/TroubleShooting.md#script-wont-work).
