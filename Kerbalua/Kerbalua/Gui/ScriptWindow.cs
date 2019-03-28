@@ -78,25 +78,25 @@ namespace Kerbalua.Gui
 
 		public ScriptWindow(Rect param_mainWindowRect)
 		{
-			replEvaluators["RedOnion"] = new RedOnionReplEvaluator();
-			replEvaluators["RedOnion"].PrintAction = (str) =>
+			replEvaluators["ROS Engine"] = new RedOnionReplEvaluator();
+			replEvaluators["ROS Engine"].PrintAction = (str) =>
 			{
 				repl.outputBox.AddOutput(str);
 			};
-			replEvaluators["RedOnion"].PrintErrorAction = (str) =>
+			replEvaluators["ROS Engine"].PrintErrorAction = (str) =>
 			{
 				repl.outputBox.AddError(str);
 			};
-			replEvaluators["Lua"] = new MoonSharpReplEvaluator();
-			replEvaluators["Lua"].PrintAction = (str) =>
+			replEvaluators["Lua Engine"] = new MoonSharpReplEvaluator();
+			replEvaluators["Lua Engine"].PrintAction = (str) =>
 			{
 				repl.outputBox.AddOutput(str);
 			};
-			replEvaluators["Lua"].PrintErrorAction = (str) =>
+			replEvaluators["Lua Engine"].PrintErrorAction = (str) =>
 			{
 				repl.outputBox.AddError(str);
 			};
-			string lastEngineName = Settings.LoadSetting("lastEngine", "RedOnion");
+			string lastEngineName = Settings.LoadSetting("lastEngine", "Lua Engine");
 			if (replEvaluators.ContainsKey(lastEngineName))
 			{
 				currentReplEvaluator = replEvaluators[lastEngineName];

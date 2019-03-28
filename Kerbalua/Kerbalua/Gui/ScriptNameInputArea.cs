@@ -10,7 +10,7 @@ namespace Kerbalua.Gui {
 		public bool receivedInput;
 
 
-		static string defaultScriptFilename= "untitled.ros";
+		static string defaultScriptFilename= "untitled.lua";
 
 		public ScriptNameInputArea()
 		{
