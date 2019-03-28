@@ -1,10 +1,10 @@
 Our [Lua engine](https://www.lua.org/manual/5.2/) uses [MoonSharp](http://www.moonsharp.org/) to create an in-game Lua scripting environment for KSP. 
 
-Since MoonSharp is a lua implementation that can interact with Mono/C# objects, and since KSP is implemented in C# Mono, our engine can interact with any aspect of the the [KSP api](https://kerbalspaceprogram.com/api/annotated.html) ingame. We can provide in in-game scripting nearly any functionality a modmaker would normally have to access with C#.
+Since MoonSharp is a lua implementation that can interact with Mono/C# objects, and since KSP is implemented in C# Mono, our engine can interact with any aspect of the the [KSP Api](https://kerbalspaceprogram.com/api/annotated.html) ingame. We can provide, in in-game scripting, nearly any functionality a modmaker would normally have to access with C#.
 
 We provide an API for both Lua and ROS that is documented [here](https://github.com/evandisoft/RedOnion/blob/master/CommonScriptApi.md)
 
-Here is an example Lua script that can be ran while you are in flight mode (make sure you have [the "Lua" engine selected](https://github.com/evandisoft/RedOnion/blob/master/TroubleShooting.md#script-wont-work)):
+Here is an example Lua script that can be [executed](https://github.com/evandisoft/RedOnion/blob/master/TroubleShooting.md#how-do-i-run-a-script) while you are in flight mode (make sure you have [the "Lua" engine selected](https://github.com/evandisoft/RedOnion/blob/master/TroubleShooting.md#script-wont-work)):
 ```
 vessel=Ksp.FlightGlobals.ActiveVessel
 
@@ -23,12 +23,12 @@ end
 print("Done!")
 ```
 
-A Lua script being ran in the editor/repl will have to return control to KSP at various points in order to allow KSP to execute its code. You can voluntarily temporarily yield control back to KSP by calling coroutine.yield(). This will effectively make the script wait a short time. So it can be used as a crude timing mechanism. If you do not call coroutine.yield() within a certain amount of time, your script will be automatically yielded, and then later automatically resumed at the point where it was automatically yielded.
+A Lua script being executed in the editor/repl will have to return control to KSP at various points in order to allow KSP to execute its code. You can voluntarily temporarily yield control back to KSP by calling coroutine.yield(). This will also effectively make the script wait a short time, so it can be used as a crude timing mechanism. If you do not call coroutine.yield() within a certain amount of time, your script will be automatically yielded, and then later automatically resumed at the point where it was automatically yielded.
 
 This script is a script that waits a short time, and then explodes 5 random parts. It can be a fun piloting challenge because
-it can make your ship very difficult to recover from. A video demonstration of my poor piloting skills being put to the test by this script is [here](https://www.youtube.com/watch?v=CDBNb6jR_Cc)
+it can make your ship very difficult to recover from. A video demonstration of my poor piloting skills being put to the test by this script is [here](https://www.youtube.com/watch?v=xzAghlB2NLw)
 
-First thing this script does, is use our [CommonScriptApi](https://github.com/evandisoft/RedOnion/blob/master/CommonScriptApi.md) to
+The first thing this script does is use our [CommonScriptApi](https://github.com/evandisoft/RedOnion/blob/master/CommonScriptApi.md) to
 get access to a reference to the current vessel.
 
 ```
