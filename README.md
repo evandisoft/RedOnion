@@ -41,6 +41,8 @@ Here is more information about [contributing](https://github.com/evandisoft/RedO
 
 [RedOnionScript (ROS)](https://github.com/evandisoft/RedOnion/blob/master/RedOnion.Script/README.md) - A powerful in-game scripting engine taking inspiration from several popular languages (Ruby,Python,Javascript,etc)
 
+[Lua Engine](https://github.com/evandisoft/RedOnion/blob/master/Kerbalua/README.md) - A Lua scripting engine.
+
 [RedOnionUI](https://github.com/evandisoft/RedOnion/blob/master/RedOnion.UI/README.md) - A WIP UI Library, intended to be used by modders, users, and ourselves.
 
 [CommonScriptApi](https://github.com/evandisoft/RedOnion/blob/master/CommonScriptApi.md) - Our tentative, WIP API shared by Lua and ROS for interacting with the game in various ways. May be changed dramatically in the future.
