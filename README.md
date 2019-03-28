@@ -49,4 +49,4 @@ Here is more information about [contributing](https://github.com/evandisoft/RedO
 Demonstration videos for this mod are on [this channel](https://www.youtube.com/channel/UChduoYTVOtAH0NA-Lj8EiKA).
 
 ## Releases
-Releases are hosted [here](https://spacedock.info/mod/2116/Red%20Onion)
+Releases are hosted at [spacedock](https://spacedock.info/mod/2116/Red%20Onion) and [curseforge](https://kerbal.curseforge.com/projects/redonion).
