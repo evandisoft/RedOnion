@@ -7,8 +7,7 @@ vessels, anything, with own script.
  
 ## Differences between ROS and LUA
 
-[**LUA**](https://www.lua.org/)
-[(MoonSharp)](https://github.com/xanathar/moonsharp)
+[**LUA**](https://github.com/evandisoft/RedOnion/blob/master/Kerbalua/README.md)
 is well known scripting language
 and will offer more comfort and safety, while
 [**ROS** (Red Onion Script)](https://github.com/evandisoft/RedOnion/blob/master/RedOnion.Script/README.md)
