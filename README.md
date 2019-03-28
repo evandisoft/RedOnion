@@ -7,7 +7,7 @@ vessels, anything, with own script.
  
 ## Differences between ROS and LUA
 
-[**LUA**](https://github.com/evandisoft/RedOnion/blob/master/Kerbalua/README.md)
+[**Lua**](https://github.com/evandisoft/RedOnion/blob/master/Kerbalua/README.md)
 is well known scripting language
 and will offer more comfort and safety, while
 [**ROS** (Red Onion Script)](https://github.com/evandisoft/RedOnion/blob/master/RedOnion.Script/README.md)
@@ -51,7 +51,7 @@ Here is more information about [contributing](https://github.com/evandisoft/RedO
 Demonstration videos for this mod are on [this channel](https://www.youtube.com/channel/UChduoYTVOtAH0NA-Lj8EiKA).
 
 ## Discussion
-Feedback can be left here on this github page as a new issue, as a comment on any of our videos, or as a reply on our forum [thread](https://forum.kerbalspaceprogram.com/index.php?/topic/183050-wip-redonion-020-unrestricted-in-game-scripting-has-repl-editor-and-intellisense-lua-and-a-custom-jsruby-like-language-implemented-tested-on-ksp-161/)
+Feedback can be left here on this github page as a new issue, as a comment on any of our videos, or as a reply on our forum [thread](https://forum.kerbalspaceprogram.com/index.php?/topic/183050-wip-redonion-020-unrestricted-in-game-scripting-has-repl-editor-and-intellisense-lua-and-a-custom-jsruby-like-language-implemented-tested-on-ksp-161/).
 
 ## Releases
 Releases are hosted at [spacedock](https://spacedock.info/mod/2116/Red%20Onion) and [curseforge](https://kerbal.curseforge.com/projects/redonion).
