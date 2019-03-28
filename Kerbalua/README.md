@@ -56,3 +56,5 @@ And finally call the part's explode functionality:
 ```
 vessel.parts[num].explode()
 ```
+
+If you have any questions, or problems, please feel free to make an issue on this repository, or respond in our [KSP forum thread](https://forum.kerbalspaceprogram.com/index.php?/topic/183050-wipalpha-release-020-redonion-unrestricted-in-game-scripting-with-repl-and-live-editing-with-intellisense-lua-and-a-custom-jsruby-like-language-implemented/)
