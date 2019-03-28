@@ -30,8 +30,8 @@ namespace RedOnion.KSP
 			// core types (added to both "System" namespace and "soft" global)
 			var system = Get("System").Object;
 			var sys = system?.BaseProps ?? new Properties();
-			var update = new Value(e => _update.Get(e));
-			var idle = new Value(e => _idle.Get(e));
+			var update = new Value((IProperty)new EventObj(Engine, Engine.Update));
+			var idle = new Value((IProperty)new EventObj(Engine, Engine.Idle));
 
 			sys.Set("Update",	update);
 			sys.Set("Idle",		idle);
@@ -162,8 +162,6 @@ namespace RedOnion.KSP
 			public IObject Get(ROS.KspRosEngine e)
 				=> it ?? (it = creator(e));
 		}
-		LazyGet _update = new LazyGet(e => new EventObj(e, e.Update));
-		LazyGet _idle	= new LazyGet(e => new EventObj(e, e.Idle));
 		LazyGet _window = new LazyGet(e => new ROS_UI.WindowFun(e));
 	}
 

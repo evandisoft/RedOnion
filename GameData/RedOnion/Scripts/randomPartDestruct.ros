@@ -1,0 +1,23 @@
+var counter = 5
+var wait = 0
+def setWait
+    wait = int ksp.random.range 0,20*60
+    print "Will wait " + wait + " updates"
+def update
+    if wait > 0
+        wait--
+        if wait % 20 == 0
+            print "Still waiting... " + wait
+        return
+    var index = int ksp.random.range 0,ship.parts.count
+    var part = ship.parts[index]
+    print "Exploding " + part
+    part.explode()
+    if --counter == 0
+        ksp.update -= update
+        print "Done!"
+        return
+    setWait()
+
+setWait()
+ksp.update += update

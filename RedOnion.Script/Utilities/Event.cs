@@ -93,7 +93,7 @@ namespace RedOnion.Script.Utilities
 				=> action?.GetHashCode() ?? ~0;
 		}
 	}
-	public class EventObj : BasicObjects.BasicObject
+	public class EventObj : BasicObjects.BasicObject, IPropertyEx
 	{
 		protected Event it;
 		public EventObj(IEngine engine, Event it)
@@ -104,8 +104,30 @@ namespace RedOnion.Script.Utilities
 		{
 			{ "add",	Value.Method<EventObj>((obj, value) => obj.it.Add(value.ToCallable())) },
 			{ "remove",	Value.Method<EventObj>((obj, value) => obj.it.Remove(value.ToCallable())) },
-			{ "set",	Value.Method<EventObj>((obj, value) => obj.it.Set(value.ToCallable())) },
+			{ "set",	Value.Method<EventObj>((obj, value) => obj.it.Set(value.ToCallable(true))) },
 			{ "clear",	Value.Method<EventObj>(obj => obj.it.Clear()) },
 		};
+
+		Value IProperty.Get(IObject self)
+			=> new Value((IObject)this);
+		bool IProperty.Set(IObject self, Value value)
+		{
+			it.Set(value.ToCallable(true));
+			return true;
+		}
+		public bool Modify(IObject self, OpCode op, Value value)
+		{
+			if (op == OpCode.AddAssign)
+			{
+				it.Add(value.ToCallable());
+				return true;
+			}
+			if (op == OpCode.SubAssign)
+			{
+				it.Remove(value.ToCallable());
+				return true;
+			}
+			return false;
+		}
 	}
 }

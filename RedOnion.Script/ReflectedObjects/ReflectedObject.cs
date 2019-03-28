@@ -60,7 +60,7 @@ namespace RedOnion.Script.ReflectedObjects
 					return true;
 				}
 			}
-			return false;
+			return Creator?.Has(name) ?? false;
 		}
 
 		public override bool Get(string name, out Value value)
@@ -116,7 +116,7 @@ namespace RedOnion.Script.ReflectedObjects
 				if (member is EventInfo)
 					return false;
 			}
-			return false;
+			return Creator?.Get(name, out value) ?? false;
 		}
 
 		public override bool Set(string name, Value value)
@@ -150,7 +150,7 @@ namespace RedOnion.Script.ReflectedObjects
 					return prop.Set(this, value);
 				}
 			}
-			return false;
+			return Creator?.Set(name, value) ?? false;
 		}
 
 		public override bool Modify(string name, OpCode op, Value value)
@@ -194,7 +194,7 @@ namespace RedOnion.Script.ReflectedObjects
 					return devt.Modify(this, op, value);
 				}
 			}
-			return false;
+			return Creator?.Modify(name, op, value) ?? false;
 		}
 
 		private KeyValuePair<PropertyInfo, ParameterInfo[]>[] indexers;

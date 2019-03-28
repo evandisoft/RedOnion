@@ -30,20 +30,29 @@ namespace RedOnion.KSP.ROS
 		public static List<string> EnumerateScripts()
 		{
 			// assume asm.Location points to GameData/RedOnion/Plugis/RedOnion.dll (or any other dll)
-			var root = Path.Combine(Path.GetDirectoryName(Assembly.GetCallingAssembly().Location), "..");
-			var raw = new List<string>(Directory.GetFiles(root));
+			var root = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(
+				Assembly.GetCallingAssembly().Location), "../Scripts"));
+			var raw = new List<string>();
+			foreach (var path in Directory.GetFiles(root))
+			{
+				if (path.Length <= root.Length+1 || path[root.Length+1] == '.')
+					continue;
+				raw.Add(path.Substring(root.Length+1));
+			}
 
 			// GameData/RedOnion/Scripts.zip
 			if (ScriptsZip == null)
 			{
-				var zipPath = Path.Combine(root, "Scripts.zip");
+				var zipPath = Path.GetFullPath(Path.Combine(root, "../Scripts.zip"));
 				if (!File.Exists(zipPath))
 					return raw;
 				ScriptsZip = ZipFile.Read(zipPath);
 			}
 			var map = new HashSet<string>(raw);
 			foreach (var entry in ScriptsZip.Entries)
-				map.Add(Path.Combine(root, entry.FileName));
+			{
+				map.Add(entry.FileName);
+			}
 			raw.Clear();
 			raw.AddRange(map);
 			return raw;

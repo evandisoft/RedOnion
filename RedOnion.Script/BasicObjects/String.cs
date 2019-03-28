@@ -115,7 +115,23 @@ namespace RedOnion.Script.BasicObjects
 
 		public static IDictionary<string, Value> StdProps { get; } = new Dictionary<string, Value>()
 		{
-			{ "length", ArrayObj.LengthProp.Value }
+			{ "length", ArrayObj.LengthProp.Value },
+			{ "substring", new Value(e => new SubstringMtd(e)) }
 		};
+		public class SubstringMtd : BasicObject
+		{
+			public SubstringMtd(IEngine engine)
+				: base(engine) { }
+			public override ObjectFeatures Features => ObjectFeatures.Function;
+			public override Value Call(IObject self, int argc)
+			{
+				var str = ((StringObj)self).String;
+				if (argc == 0) return str;
+				var arg = Engine.GetArgument(argc).Int;
+				if (argc == 1) return str.Substring(arg);
+				var arg2 = Engine.GetArgument(argc, 1).Int;
+				return str.Substring(arg, arg2);
+			}
+		}
 	}
 }

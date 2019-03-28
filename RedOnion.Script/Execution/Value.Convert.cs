@@ -569,10 +569,12 @@ namespace RedOnion.Script
 			return new Value();
 		}
 
-		public ICallable ToCallable()
+		public ICallable ToCallable(bool allowNull = false)
 		{
 			var obj = RValue.Object;
-			if (obj == null || !obj.HasFeature(ObjectFeatures.Function))
+			if (obj != null && obj.HasFeature(ObjectFeatures.Function))
+				return obj;
+			if (obj != null || !allowNull)
 				throw new InvalidOperationException(Name + " is not a function");
 			return obj;
 		}

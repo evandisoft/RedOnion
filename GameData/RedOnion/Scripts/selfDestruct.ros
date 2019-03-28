@@ -11,11 +11,11 @@ def selfDestruct part
 def update
     if ship.parts.count == 0
         print "finished"
-        ksp.update.remove update
+        ksp.update -= update
         return
     if waiting <= 0
         selfDestruct ship.parts[0]
         return
     waiting--
 
-ksp.update.add update
+ksp.update += update
