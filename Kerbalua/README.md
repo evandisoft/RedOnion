@@ -1,5 +1,5 @@
 The [Lua engine](https://www.lua.org/manual/5.2/) uses [MoonSharp](http://www.moonsharp.org/). MoonSharp is a lua implementation
-that can interact with Mono/C# objects. Since KSP is implemented in C# Mono, our engine can interact with the [KSP api](https://kerbalspaceprogram.com/api/annotated.html) ingame. We can provide in scripting nearly any functionality a modmaker would normally have to access with C#.
+that can interact with Mono/C# objects. Since KSP is implemented in C# Mono, our engine can interact with the [KSP api](https://kerbalspaceprogram.com/api/annotated.html) ingame. We can provide in in-game scripting nearly any functionality a modmaker would normally have to access with C#.
 
 We provide an API for both Lua and ROS that is documented [here](https://github.com/evandisoft/RedOnion/blob/master/CommonScriptApi.md)
 
