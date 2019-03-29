@@ -9,10 +9,11 @@ using System.Text;
 
 namespace RedOnion.KSP.ROS
 {
-	public class Stage : BasicObject
+	// see RedOnion.KSP.Lua.Stage
+	public class Stage : SimpleObject
 	{
 		public Stage(IEngine engine)
-			: base(engine) { }
+			: base(engine, new Properties(StdProps)) { }
 		public override ObjectFeatures Features => ObjectFeatures.Function;
 		public override Value Call(IObject self, int argc)
 		{
@@ -23,5 +24,10 @@ namespace RedOnion.KSP.ROS
 			StageManager.ActivateNextStage();
 			return true;
 		}
+
+		public static IDictionary<string, Value> StdProps { get; } = new Dictionary<string, Value>()
+		{
+			{ "number", Value.ReadOnly(stage => StageManager.CurrentStage) }
+		};
 	}
 }

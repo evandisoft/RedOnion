@@ -39,6 +39,7 @@ namespace RedOnion.KSP.Lua
 					);
 
 			Globals["Ksp"] = new KspApi();
+			Globals["stage"] = new Stage(this);
 		}
 
 
