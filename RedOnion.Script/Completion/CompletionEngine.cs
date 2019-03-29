@@ -187,6 +187,8 @@ namespace RedOnion.Script.Completion
 				return (IObject)value.ptr;
 			return Root.Box(value);
 		}
+		public Value Convert(object value) => new Value();
+
 		/// <summary>
 		/// Current context (method)
 		/// </summary>

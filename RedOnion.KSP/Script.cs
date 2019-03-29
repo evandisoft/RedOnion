@@ -9,6 +9,7 @@ using KUI = KSP.UI;
 using ROC = RedOnion.UI.Components;
 using RedOnion.KSP.Autopilot;
 using RedOnion.Script.Utilities;
+using KSP.UI.Screens;
 
 namespace RedOnion.KSP
 {
@@ -44,6 +45,7 @@ namespace RedOnion.KSP
 			sys.Set("Vector",	vector);
 			sys.Set("Vector3",	vector);
 			sys.Set("Vector4",	AddType(typeof(UE.Vector4)));
+			sys.Set("Math",		AddType(typeof(Math)));
 			if (system == null)
 				BaseProps.Set("System", new SimpleObject(Engine, sys));
 
@@ -52,6 +54,8 @@ namespace RedOnion.KSP
 				HighLogic.LoadedSceneIsFlight ? (object)FlightGlobals.ActiveVessel :
 				HighLogic.LoadedSceneIsEditor ? EditorLogic.fetch.ship : null));
 			soft.Set("ship", ship);
+			var stage = new Value(e => _stage.Get(e));
+			soft.Set("stage", stage);
 
 			// UI namespace
 			hard.Set("UI", new Value(new SimpleObject(Engine, new Properties()
@@ -87,21 +91,25 @@ namespace RedOnion.KSP
 				{ "update",				update },
 				{ "idle",				idle },
 				{ "ship",				ship },
+				{ "stage",				stage },
+
 				{ "Vessel",				this[typeof(Vessel)] },
 				{ "FlightGlobals",		this[typeof(FlightGlobals)] },
 				{ "FlightCtrlState",	this[typeof(FlightCtrlState)] },
-				{ "FlightControl",		this[typeof(FlightControl)]},
+				{ "FlightControl",		new Value(e => Convert(FlightControl.GetInstance())) },
+				{ "FlightDriver",       this[typeof(FlightDriver)] },
 				{ "HighLogic",			this[typeof(HighLogic)] },
 				{ "InputLockManager",	this[typeof(InputLockManager)] },
 				{ "InputLock",			this[typeof(InputLockManager)] },
-				{ "StageManager",		this[typeof(KUI.Screens.StageManager)] },
+				{ "StageManager",       this[typeof(StageManager)] },
 				{ "EditorLogic",		this[typeof(EditorLogic)] },
+				{ "EditorPanels",       this[typeof(EditorPanels)] },
 				{ "ShipConstruction",	this[typeof(ShipConstruction)]},
-				{ "FlightDriver",		this[typeof(FlightDriver)] },
 				{ "GameScenes",         this[typeof(GameScenes)] },
 				{ "PartLoader",         this[typeof(PartLoader)] },
-				{ "Time",               this[typeof(UE.Time)]},
-				{ "Random",             this[typeof(UE.Random)]},
+				{ "Time",               this[typeof(UE.Time)] },
+				{ "Random",             this[typeof(UE.Random)] },
+				{ "Mathf",				this[typeof(UE.Mathf)] },
 			})));
 
 			// Unity and UI-related stuff
@@ -163,6 +171,7 @@ namespace RedOnion.KSP
 				=> it ?? (it = creator(e));
 		}
 		LazyGet _window = new LazyGet(e => new ROS_UI.WindowFun(e));
+		LazyGet _stage = new LazyGet(e => new ROS.Stage(e));
 	}
 
 	/// <summary>

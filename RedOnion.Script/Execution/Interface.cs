@@ -99,6 +99,10 @@ namespace RedOnion.Script
 		/// Box value (StringObj, NumberObj, ...)
 		/// </summary>
 		IObject Box(Value value);
+		/// <summary>
+		/// Convert native object to Value
+		/// </summary>
+		Value Convert(object value);
 
 		/// <summary>
 		/// Argument list for function calls

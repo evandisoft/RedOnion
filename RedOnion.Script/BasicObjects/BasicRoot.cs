@@ -248,6 +248,12 @@ namespace RedOnion.Script.BasicObjects
 		}
 		protected virtual IObject ReflectType(Type type)
 			=> new ReflectedObjects.ReflectedType(Engine, type);
+		public override IObject Convert(object value)
+		{
+			if (value == null) return null;
+			var converter = this[value.GetType()];
+			return converter?.Convert(value);
+		}
 
 		public IObject AddType(string name, Type type, IObject creator = null)
 			=> EngineRootExtensions.AddType(this, name, type, creator);

@@ -6,8 +6,8 @@ using System.Text;
 namespace RedOnion.Script.BasicObjects
 {
 	/// <summary>
-	/// Simple implementation of IObject
-	/// suitable for custom objects
+	/// Simple implementation of IObject suitable for custom objects.
+	/// Does not allow to add new properties by script.
 	/// </summary>
 	public class SimpleObject : IObject
 	{

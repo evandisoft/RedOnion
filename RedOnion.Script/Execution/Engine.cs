@@ -168,6 +168,8 @@ namespace RedOnion.Script
 				return (IObject)value.ptr;
 			return Root.Box(value);
 		}
+		public virtual Value Convert(object value)
+			=> ReflectedObjects.ReflectedType.Convert(this, value);
 
 		/// <summary>
 		/// Parser
