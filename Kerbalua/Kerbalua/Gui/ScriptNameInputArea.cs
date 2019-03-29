@@ -55,7 +55,12 @@ namespace Kerbalua.Gui {
 		public void Save(string text)
 		{
 			try {
-				File.WriteAllText(CreateFullPath(true), text.Replace("\n",Environment.NewLine));
+				var previousText = RedOnion.KSP.ROS.KspRosEngine.LoadScript(content.text).Replace("\r", "");
+				if (text != previousText)
+				{
+					UnityEngine.Debug.Log(text + "\n!=\n" + previousText);
+					File.WriteAllText(CreateFullPath(true), text.Replace("\n", Environment.NewLine));
+				}
 				CommonSaveLoadActions();
 			}
 			catch(Exception e) {
