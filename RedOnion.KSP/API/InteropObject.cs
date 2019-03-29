@@ -2,44 +2,142 @@ using System;
 using System.Collections.Generic;
 using RedOnion.Script;
 using MoonSharp.Interpreter;
+using MoonSharp.Interpreter.Interop;
 
 namespace RedOnion.KSP.API
 {
-	public abstract class InteropObject : Table, IObject
+	public abstract class InteropObject : IObject, IUserDataType
 	{
 		public abstract string Help { get; }
 
 		public ObjectFeatures Features { get; }
-		public Member[] MemberList { get; }
-		public Dictionary<string, Member> Members { get; }
-		public InteropObject(ObjectFeatures features, Member[] members)
-			: base(null)
+		public IMember[] MemberList { get; }
+		public Dictionary<string, IMember> Members { get; }
+		public InteropObject(ObjectFeatures features, IMember[] members)
 		{
 			Features = features;
-			MemberList = members;
-			Members = new Dictionary<string, Member>(members.Length);
-			foreach (var member in members)
-				Members.Add(member.Name, member);
-			MetaTable = new Table(null)
+			if (members == null || members.Length == 0)
 			{
-				["__index"] = new Func<Table, DynValue, DynValue>(LuaGet)
-			};
+				MemberList = NoMembers;
+				Members = EmptyMemberDictionary;
+			}
+			else
+			{
+				Members = new Dictionary<string, IMember>(members.Length);
+				foreach (var member in members)
+					Members.Add(member.Name, member);
+			}
 		}
 
-		public class Member
+		public static readonly IMember[] NoMembers = new IMember[0];
+		public static readonly Dictionary<string, IMember>
+			EmptyMemberDictionary = new Dictionary<string, IMember>();
+
+		public interface IMember
+		{
+			string Name { get; }
+			string Type { get; }
+			string Help { get; }
+			bool CanRead { get; }
+			bool CanWrite { get; }
+
+			Value RosGet(InteropObject self);
+			DynValue LuaGet(InteropObject self);
+			void RosSet(InteropObject self, Value value);
+			void LuaSet(InteropObject self, DynValue value);
+		}
+		public class Bool : IMember
 		{
 			public string Name { get; }
 			public string Type { get; }
 			public string Help { get; }
-			public Func<object> Get { get; }
-			public Action<object> Set { get; }
+			public bool CanRead { get; }
+			public bool CanWrite { get; }
 
-			public Member(string name, string type, string help,
-				Func<object> read, Action<object> write = null)
+			public Func<bool> Get { get; }
+			public Action<bool> Set { get; }
+
+			public Value RosGet(InteropObject self)
+				=> new Value(Get());
+			public DynValue LuaGet(InteropObject self)
+				=> DynValue.NewBoolean(Get());
+			public void RosSet(InteropObject self, Value value)
+				=> Set(value.Bool);
+			public void LuaSet(InteropObject self, DynValue value)
+				=> Set(value.Boolean);
+
+			public Bool(string name, string help,
+				Func<bool> read, Action<bool> write = null)
 			{
 				Name = name;
-				Type = type;
+				Type = "bool";
 				Help = help;
+				CanRead = read != null;
+				CanWrite = write != null;
+				Get = read;
+				Set = write;
+			}
+		}
+		public class Int : IMember
+		{
+			public string Name { get; }
+			public string Type { get; }
+			public string Help { get; }
+			public bool CanRead { get; }
+			public bool CanWrite { get; }
+
+			public Func<int> Get { get; }
+			public Action<int> Set { get; }
+
+			public Value RosGet(InteropObject self)
+				=> new Value(Get());
+			public DynValue LuaGet(InteropObject self)
+				=> DynValue.NewNumber(Get());
+			public void RosSet(InteropObject self, Value value)
+				=> Set(value.Int);
+			public void LuaSet(InteropObject self, DynValue value)
+				=> Set((int)value.Number);
+
+			public Int(string name, string help,
+				Func<int> read, Action<int> write = null)
+			{
+				Name = name;
+				Type = "int";
+				Help = help;
+				CanRead = read != null;
+				CanWrite = write != null;
+				Get = read;
+				Set = write;
+			}
+		}
+		public class Float : IMember
+		{
+			public string Name { get; }
+			public string Type { get; }
+			public string Help { get; }
+			public bool CanRead { get; }
+			public bool CanWrite { get; }
+
+			public Func<float> Get { get; }
+			public Action<float> Set { get; }
+
+			public Value RosGet(InteropObject self)
+				=> new Value(Get());
+			public DynValue LuaGet(InteropObject self)
+				=> DynValue.NewNumber(Get());
+			public void RosSet(InteropObject self, Value value)
+				=> Set(value.Int);
+			public void LuaSet(InteropObject self, DynValue value)
+				=> Set((int)value.Number);
+
+			public Float(string name, string help,
+				Func<float> read, Action<float> write = null)
+			{
+				Name = name;
+				Type = "float";
+				Help = help;
+				CanRead = read != null;
+				CanWrite = write != null;
 				Get = read;
 				Set = write;
 			}
@@ -53,32 +151,39 @@ namespace RedOnion.KSP.API
 				throw new NotImplementedException(name + " does not exist");
 			return value;
 		}
-		public bool Get(string name, out Value value)
+		public virtual bool Get(string name, out Value value)
 		{
-			if (Members.TryGetValue(name, out var member)
-				&& member.Get != null)
+			if (Members.TryGetValue(name, out var member) && member.CanRead)
 			{
-				value = Value.FromPrimitive(member.Get());
+				value = member.RosGet(this);
 				return true;
 			}
 			value = new Value();
 			return false;
 		}
 
-		DynValue LuaGet(Table table, DynValue key)
+		public virtual bool Set(string name, Value value)
 		{
-			if (Members.TryGetValue(key.String, out var member)
-				&& member.Get != null)
-				return DynValue.FromObject(table.OwnerScript, member.Get());
+			if (Members.TryGetValue(name, out var member) && member.CanWrite)
+			{
+				member.RosSet(this, value);
+				return true;
+			}
+			return false;
+		}
+
+		public virtual DynValue Index(MoonSharp.Interpreter.Script script, DynValue index, bool isDirectIndexing)
+		{
+			if (Members.TryGetValue(index.String, out var member) && member.CanRead)
+				return member.LuaGet(this);
 			return DynValue.Nil;
 		}
 
-		public bool Set(string name, Value value)
+		public virtual bool SetIndex(MoonSharp.Interpreter.Script script, DynValue index, DynValue value, bool isDirectIndexing)
 		{
-			if (Members.TryGetValue(name, out var member)
-				&& member.Set != null)
+			if (Members.TryGetValue(index.String, out var member) && member.CanWrite)
 			{
-				member.Set(value.Native);
+				member.LuaSet(this, value);
 				return true;
 			}
 			return false;
@@ -86,6 +191,8 @@ namespace RedOnion.KSP.API
 
 		public virtual Value Call(IObject self, Arguments args)
 			=> new Value();
+		public virtual DynValue MetaIndex(MoonSharp.Interpreter.Script script, string metaname)
+			=> null;
 
 		bool IObject.Modify(string name, OpCode op, Value value) => false;
 		bool IProperties.Delete(string name) => false;

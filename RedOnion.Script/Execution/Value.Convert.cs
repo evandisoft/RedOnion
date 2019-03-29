@@ -8,6 +8,8 @@ namespace RedOnion.Script
 {
 	public partial struct Value
 	{
+		public bool IsNative => Kind == ValueKind.Native;
+
 		/// <summary>
 		/// Get native object (string, int, ...)
 		/// </summary>
@@ -31,6 +33,8 @@ namespace RedOnion.Script
 				case ValueKind.Reference:
 				case ValueKind.IndexRef:
 					return RValue.Native;
+				case ValueKind.Native:
+					return ptr;
 				case ValueKind.String:
 					return ptr;
 				case ValueKind.Char:

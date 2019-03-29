@@ -68,6 +68,10 @@ namespace RedOnion.Script
 		/// Reference to indexed value (ptr is IObject, idx is Value)
 		/// </summary>
 		IndexRef	= 0x0009,
+		/// <summary>
+		/// C# native object (the engine will convert it as needed)
+		/// </summary>
+		Native		= 0x000A,
 
 		Byte		= 0x0140,// 8 bit unsigned
 		UShort		= 0x0241,// 16 bit unsigned
@@ -138,6 +142,9 @@ namespace RedOnion.Script
 		public static readonly Value Undefined = new Value();
 		public static readonly Value Null = new Value((IObject)null);
 		public static readonly Value NaN = new Value(double.NaN);
+
+		public static Value AsNative(object value)
+			=> new Value(ValueKind.Native, value);
 
 		public Value(Value src, ValueFlags flags)
 		{
