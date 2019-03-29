@@ -82,9 +82,10 @@ namespace RedOnion.KSP.Autopilot
 		/// </summary>
 		/// <returns>The available torque.</returns>
 		/// <param name="vessel">Vessel.</param>
-		public Vector3 GetAvailableTorque(Vessel vessel)
+		public void GetAvailableTorque(Vessel vessel,out Vector3 pos, out Vector3 neg)
 		{
-			Vector3 torque = new Vector3();
+			pos = new Vector3();
+			neg = new Vector3();
 
 			foreach (var part in vessel.Parts)
 			{
@@ -92,14 +93,23 @@ namespace RedOnion.KSP.Autopilot
 				{
 					if (module is ITorqueProvider torqueProvider)
 					{
-						Vector3 pos, neg;
-						torqueProvider.GetPotentialTorque(out pos, out neg);
-						torque += pos;
+						Vector3 newPos, newNeg;
+						torqueProvider.GetPotentialTorque(out newPos, out newNeg);
+						if(torqueProvider is ModuleControlSurface s)
+						{
+							//newPos *= 10;
+							//newNeg *= 10;
+
+						}
+						pos += newPos;
+						neg += newNeg;
+						if(module.GUIName=="Control Surface")
+						{
+							Debug.Log("torque is "+newPos+","+newNeg);
+						}
 					}
 				}
 			}
-
-			return torque;
 		}
 
 		public void Shutdown()
@@ -210,15 +220,15 @@ namespace RedOnion.KSP.Autopilot
 			////(d-vt)*2/t^2=a
 			////accel=(angularDistance-angularSpeed*Time.deltaTime)/Time.deltaTime^2
 			Vector3 distanceAxis = vessel.transform.worldToLocalMatrix * Vector3.Cross(currentDir.normalized, targetDir.normalized);
-			Vector3 maxAccel = GetMaxAcceleration(vessel);
+			GetMaxAcceleration(vessel,out Vector3 posAccel,out Vector3 negAccel);
 			//Vector3 desiredAccel=(-distanceAxis + angularSpeed * Time.deltaTime) * 2 / (float)Math.Pow(Time.deltaTime,2);
 
 
 			Vector3 inputNeeded = new Vector3();
 
-			inputNeeded.x = InputNeeded(distanceAxis.x, angularVelocity.x, maxAccel.x);
-			inputNeeded.y = angularVelocity.y / (maxAccel.y * Time.deltaTime); ;//InputNeeded(distanceAxis.y, angularVelocity.y, maxAccel.y);
-			inputNeeded.z = InputNeeded(distanceAxis.z, angularVelocity.z, maxAccel.z);
+			inputNeeded.x = InputNeeded(distanceAxis.x, angularVelocity.x, posAccel.x);
+			inputNeeded.y = angularVelocity.y / (posAccel.y * Time.deltaTime); ;//InputNeeded(distanceAxis.y, angularVelocity.y, maxAccel.y);
+			inputNeeded.z = InputNeeded(distanceAxis.z, angularVelocity.z, posAccel.z);
 
 			//Debug.Log(distanceAxis+","+angularVelocity+","+pryNeeded);
 			SetPitchRollYaw(flightCtrlState, inputNeeded);
@@ -258,17 +268,18 @@ namespace RedOnion.KSP.Autopilot
 			}
 
 			Vector3 angularVelocity = GetAngularVelocity(vessel);
-			Vector3 maxAccel = GetMaxAcceleration(vessel);
-			Vector3 pry = MathUtil.Vec.Div(angularVelocity - targetSpin, maxAccel * Time.deltaTime);
+			GetMaxAcceleration(vessel,out Vector3 posAccel,out Vector3 negAccel);
+			Vector3 pry = MathUtil.Vec.Div(angularVelocity - targetSpin, posAccel * Time.deltaTime);
 			SetPitchRollYaw(flightCtrlState, pry);
 		}
 
 
 
-		Vector3 GetMaxAcceleration(Vessel vessel)
+		void GetMaxAcceleration(Vessel vessel,out Vector3 posAccel,out Vector3 negAccel)
 		{
-			Vector3 torque = GetAvailableTorque(vessel);
-			return MathUtil.Vec.Div(torque, vessel.MOI);
+			GetAvailableTorque(vessel,out Vector3 posTorque,out Vector3 negTorque);
+			posAccel=MathUtil.Vec.Div(posTorque, vessel.MOI);
+			negAccel = MathUtil.Vec.Div(negTorque, vessel.MOI);
 		}
 
 		Vector3 GetAngularVelocity(Vessel vessel)

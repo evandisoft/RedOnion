@@ -55,7 +55,15 @@ namespace Kerbalua.Gui {
 		public void Save(string text)
 		{
 			try {
-				var previousText = RedOnion.KSP.ROS.KspRosEngine.LoadScript(content.text).Replace("\r", "");
+				var previousText = ""; 
+				try
+				{
+					previousText = RedOnion.KSP.ROS.KspRosEngine.LoadScript(content.text).Replace("\r", "");
+				}
+				catch (Exception)
+				{
+					previousText = "";
+				}
 				if (text != previousText)
 				{
 					UnityEngine.Debug.Log(text + "\n!=\n" + previousText);

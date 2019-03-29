@@ -30,6 +30,7 @@ namespace RedOnion.KSP.Lua.Proxies
 			metatable["__index"] = new Func<Table, DynValue, object>(IndexFunc);
 			metatable["__tostring"] = new Func<Table, DynValue>(ToString);
 			MetaTable = metatable;
+
 		}
 
 		DynValue Index(Table table,DynValue key)
@@ -108,9 +109,6 @@ namespace RedOnion.KSP.Lua.Proxies
 				return mi.Invoke(ProxiedObject, args);
 			}
 		}
-
-
-
 
 		delegate object Invoker(params object[] args);
 	}
