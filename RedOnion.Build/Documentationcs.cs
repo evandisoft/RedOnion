@@ -58,7 +58,7 @@ namespace RedOnion.Build
 						var m = member.Value;
 						string typePath = null;
 						if (types.TryGetValue(m.Type, out var tdoc))
-							typePath = tdoc.path + ".md";
+							typePath = GetRelativePath(doc.path, tdoc.path) + ".md";
 						wr.WriteLine(typePath == null
 							? "- `{0}`: {1} - {3}"
 							: "- `{0}`: [{1}]({2}) - {3}",
@@ -70,12 +70,8 @@ namespace RedOnion.Build
 
 		static string GetRelativePath(string fromPath, string toPath)
 		{
-			var fromUri = new Uri(fromPath);
-			var toUri = new Uri(toPath);
-
-			if (fromUri.Scheme != toUri.Scheme)
-				return toPath;
-
+			var fromUri = new Uri(Path.GetFullPath(fromPath));
+			var toUri = new Uri(Path.GetFullPath(toPath));
 			var relativeUri = fromUri.MakeRelativeUri(toUri);
 			return Uri.UnescapeDataString(relativeUri.ToString());
 		}
