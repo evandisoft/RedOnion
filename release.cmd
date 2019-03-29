@@ -1,3 +1,3 @@
 @echo off
 cd /D %~dp0
-RedOnion.Shell\bin\Release\ros.exe release.ros
+RedOnion.Build\bin\Release\RedOnion.Build.exe

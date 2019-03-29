@@ -13,7 +13,7 @@ namespace RedOnion.KSP.API
 		public Dictionary<string, IMember> Members { get; }
 		public IMember[] MemberList { get; } = new IMember[]
 		{
-			new Native("ship", "Vessel", "Active vessel (in fight or editor)",
+			new Native("ship", "Vessel", "Active vessel (in flight or editor)",
 				() => HighLogic.LoadedSceneIsFlight ? (object)FlightGlobals.ActiveVessel
 				: HighLogic.LoadedSceneIsEditor ? EditorLogic.fetch.ship : null),
 			new Interop("stage", "Stage", "Staging logic",
