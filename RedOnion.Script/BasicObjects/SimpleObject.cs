@@ -58,7 +58,7 @@ namespace RedOnion.Script.BasicObjects
 
 		public Value Get(string name)
 		{
-			if (!Get(name, out var value) && !Engine.HasOption(EngineOption.Silent))
+			if (!Get(name, out var value) && Engine?.HasOption(EngineOption.Silent) != false)
 				throw new NotImplementedException(name + " does not exist");
 			return value;
 		}

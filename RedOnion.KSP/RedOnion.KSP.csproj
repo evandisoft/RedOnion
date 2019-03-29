@@ -59,10 +59,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Lua\Stage.cs" />
+    <Compile Include="API\InteropObject.cs" />
+    <Compile Include="API\Stage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ROS\KspRosEngine.cs" />
-    <Compile Include="ROS\Stage.cs" />
     <Compile Include="ROS\UI\Window.cs" />
     <Compile Include="Script.cs" />
     <Compile Include="Lua\KerbaluaScript.cs" />

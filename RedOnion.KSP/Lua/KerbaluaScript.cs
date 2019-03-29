@@ -6,6 +6,7 @@ using UnityEngine;
 using RedOnion.KSP.MathUtil;
 using KSP.UI.Screens;
 using RedOnion.KSP.Lua.Proxies;
+using RedOnion.KSP.API;
 
 namespace RedOnion.KSP.Lua
 {
@@ -39,7 +40,7 @@ namespace RedOnion.KSP.Lua
 					);
 
 			Globals["Ksp"] = new KspApi();
-			Globals["stage"] = new Stage(this);
+			Globals["stage"] = Stage.Instance;
 		}
 
 

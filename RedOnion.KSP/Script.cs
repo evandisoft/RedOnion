@@ -54,8 +54,7 @@ namespace RedOnion.KSP
 				HighLogic.LoadedSceneIsFlight ? (object)FlightGlobals.ActiveVessel :
 				HighLogic.LoadedSceneIsEditor ? EditorLogic.fetch.ship : null));
 			soft.Set("ship", ship);
-			var stage = new Value(e => _stage.Get(e));
-			soft.Set("stage", stage);
+			soft.Set("stage", new Value(API.Stage.Instance));
 
 			// UI namespace
 			hard.Set("UI", new Value(new SimpleObject(Engine, new Properties()
@@ -91,7 +90,7 @@ namespace RedOnion.KSP
 				{ "update",				update },
 				{ "idle",				idle },
 				{ "ship",				ship },
-				{ "stage",				stage },
+				{ "stage",              new Value(API.Stage.Instance) },
 
 				{ "Vessel",				this[typeof(Vessel)] },
 				{ "FlightGlobals",		this[typeof(FlightGlobals)] },
@@ -171,7 +170,6 @@ namespace RedOnion.KSP
 				=> it ?? (it = creator(e));
 		}
 		LazyGet _window = new LazyGet(e => new ROS_UI.WindowFun(e));
-		LazyGet _stage = new LazyGet(e => new ROS.Stage(e));
 	}
 
 	/// <summary>
