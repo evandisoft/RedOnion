@@ -54,6 +54,7 @@ namespace RedOnion.Script
 		protected Engine(Func<IEngine, IEngineRoot> createRoot, P parser)
 		{
 			Parser = parser;
+			Arguments = new ArgumentList(this);
 			Root = createRoot(this);
 			Context = new EngineContext(this);
 		}
@@ -178,7 +179,7 @@ namespace RedOnion.Script
 		/// <summary>
 		/// Argument list for function calls
 		/// </summary>
-		public ArgumentList Arguments { get; } = new ArgumentList();
+		public ArgumentList Arguments { get; }
 
 		/// <summary>
 		/// Current context (method)

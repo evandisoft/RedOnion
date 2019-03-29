@@ -169,7 +169,8 @@ namespace RedOnion.Script
 				if (self == Root && HasOption(EngineOption.Strict))
 					self = null;
 				var fn = Box(Value);
-				Value = create ? new Value(fn.Create(0)) : fn.Call(self, 0);
+				Value = create ? new Value(fn.Create(new Arguments(Arguments, 0)))
+					: fn.Call(self, new Arguments(Arguments, 0));
 				return;
 			case OpCode.Call1:
 				CountStatement();
@@ -193,7 +194,8 @@ namespace RedOnion.Script
 				using (Arguments.Guard())
 				{
 					Arguments.Add(Result);
-					Value = create ? new Value(fn.Create(1)) : fn.Call(self, 1);
+					Value = create ? new Value(fn.Create(new Arguments(Arguments, 1)))
+						: fn.Call(self, new Arguments(Arguments, 1));
 				}
 				return;
 			case OpCode.Call2:
@@ -220,7 +222,8 @@ namespace RedOnion.Script
 					Arguments.Add(Result);
 					Expression(ref at);
 					Arguments.Add(Result);
-					Value = create ? new Value(fn.Create(2)) : fn.Call(self, 2);
+					Value = create ? new Value(fn.Create(new Arguments(Arguments, 2)))
+						: fn.Call(self, new Arguments(Arguments, 2));
 				}
 				return;
 			case OpCode.CallN:
@@ -250,7 +253,8 @@ namespace RedOnion.Script
 						Expression(ref at);
 						Arguments.Add(Result);
 					}
-					Value = create ? new Value(fn.Create(argc)) : fn.Call(self, argc);
+					Value = create ? new Value(fn.Create(new Arguments(Arguments, argc)))
+						: fn.Call(self, new Arguments(Arguments, argc));
 				}
 				return;
 			case OpCode.Index:
@@ -293,7 +297,7 @@ namespace RedOnion.Script
 				using (Arguments.Guard())
 				{
 					Arguments.Add(Result);
-					Value = fn.Call(null, 1);
+					Value = fn.Call(null, new Arguments(Arguments, 1));
 				}
 				Context.Vars.Add(name, Value);
 				Value = new Value(Context.Vars, name);
@@ -336,7 +340,7 @@ namespace RedOnion.Script
 					throw new NotImplementedException("Array");
 				if (n <= 1)
 				{
-					Value = new Value(arrCreator.Create(0));
+					Value = new Value(arrCreator.Create(new Arguments(Arguments, 0)));
 					return;
 				}
 				using (Arguments.Guard())
@@ -346,7 +350,7 @@ namespace RedOnion.Script
 						Expression(ref at);
 						Arguments.Add(Result);
 					}
-					Value = new Value(arrCreator.Create(n-1));
+					Value = new Value(arrCreator.Create(new Arguments(Arguments, n-1)));
 				}
 				return;
 			}

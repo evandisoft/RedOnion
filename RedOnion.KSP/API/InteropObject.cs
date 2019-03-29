@@ -29,13 +29,16 @@ namespace RedOnion.KSP.API
 		public class Member
 		{
 			public string Name { get; }
+			public string Type { get; }
 			public string Help { get; }
 			public Func<object> Get { get; }
 			public Action<object> Set { get; }
 
-			public Member(string name, string help, Func<object> read, Action<object> write = null)
+			public Member(string name, string type, string help,
+				Func<object> read, Action<object> write = null)
 			{
 				Name = name;
+				Type = type;
 				Help = help;
 				Get = read;
 				Set = write;
@@ -81,14 +84,14 @@ namespace RedOnion.KSP.API
 			return false;
 		}
 
-		public virtual Value Call(IObject self, int argc)
+		public virtual Value Call(IObject self, Arguments args)
 			=> new Value();
 
 		bool IObject.Modify(string name, OpCode op, Value value) => false;
 		bool IProperties.Delete(string name) => false;
 		void IProperties.Reset() { }
 
-		IObject IObject.Create(int argc)
+		IObject IObject.Create(Arguments args)
 			=> null;
 		Value IObject.Index(IObject self, int argc)
 			=> throw new NotImplementedException();

@@ -135,6 +135,10 @@ namespace RedOnion.Script
 		internal object idx;
 		internal ValueData data;
 
+		public static readonly Value Undefined = new Value();
+		public static readonly Value Null = new Value((IObject)null);
+		public static readonly Value NaN = new Value(double.NaN);
+
 		public Value(Value src, ValueFlags flags)
 		{
 			kind = src.kind;

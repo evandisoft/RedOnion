@@ -25,22 +25,22 @@ namespace RedOnion.Script.BasicObjects
 			: base(engine, baseClass, new Properties("prototype", prototype))
 			=> Prototype = prototype;
 
-		public override Value Call(IObject self, int argc)
-			=> new Value(Create(argc));
+		public override Value Call(IObject self, Arguments args)
+			=> new Value(Create(args));
 
-		public override IObject Create(int argc)
+		public override IObject Create(Arguments args)
 		{
-			if (argc == 0)
+			if (args.Length == 0)
 				return null;
 			string arglist = null;
-			for (var i = 0; i < (argc - 1); i++)
+			for (var i = 0; i < args.Length - 1; i++)
 			{
 				if (arglist == null)
-					arglist = Engine.GetArgument(argc, i).String;
+					arglist = args[i].String;
 				else
-					arglist += ", " + Engine.GetArgument(argc, i).String;
+					arglist += ", " + args[i].String;
 			}
-			List<ArgumentInfo> args = null;
+			List<ArgumentInfo> info = null;
 			if (arglist != null)
 			{
 				var scanner = new Scanner();
@@ -49,9 +49,9 @@ namespace RedOnion.Script.BasicObjects
 				{
 					if (scanner.Word == null)
 						return null;
-					if (args == null)
-						args = new List<ArgumentInfo>();
-					args.Add(new ArgumentInfo()
+					if (info == null)
+						info = new List<ArgumentInfo>();
+					info.Add(new ArgumentInfo()
 					{
 						Name = scanner.Word,
 						Type = -1,
@@ -69,10 +69,10 @@ namespace RedOnion.Script.BasicObjects
 						break;
 				}
 			}
-			var body = Engine.GetArgument(argc, argc - 1).String;
+			var body = args[args.Length - 1].String;
 			var code = Engine.Compile(body);
 			return new FunctionObj(Engine, Prototype,
-				code, 0, code.Code.Length, -1, args?.ToArray());
+				code, 0, code.Code.Length, -1, info?.ToArray());
 		}
 	}
 
@@ -186,9 +186,9 @@ namespace RedOnion.Script.BasicObjects
 			Scope = scope;
 		}
 
-		public override Value Call(IObject self, int argc)
+		public override Value Call(IObject self, Arguments args)
 		{
-			var args = Engine.CreateContext(self, Scope, argc);
+			var argobj = Engine.CreateContext(self, Scope, args.Length);
 			Value result;
 			try
 			{
@@ -196,8 +196,8 @@ namespace RedOnion.Script.BasicObjects
 				{
 					for (var i = 0; i < Arguments.Length; i++)
 					{
-						//TODO: cast/convert to argument type
-						args.Set(Arguments[i].Name, i < argc ? Engine.GetArgument(argc, i) :
+						//TODO: cast/convert to argument type + make this indexable
+						argobj.Set(Arguments[i].Name, i < args.Length ? args[i] :
 							Arguments[i].Value < 0 ? new Value() :
 							Engine.Evaluate(Code, Arguments[i].Value));
 					}
@@ -211,13 +211,13 @@ namespace RedOnion.Script.BasicObjects
 			return result;
 		}
 
-		public override IObject Create(int argc)
+		public override IObject Create(Arguments args)
 		{
 			IObject baseClass = null;
 			if (Get("prototype", out var proto))
 				baseClass = Engine.Box(proto);
 			var it = new BasicObject(Engine, baseClass);
-			Call(it, argc);
+			Call(it, args);
 			return it;
 		}
 
@@ -264,7 +264,7 @@ namespace RedOnion.Script.BasicObjects
 			{
 				foreach (var arg in args)
 					arguments.Add(ReflectedType.Convert(engine, arg));
-				fn.Call(null, args.Length);
+				fn.Call(null, new Arguments(arguments, args.Length));
 			}
 		}
 		public static T FunctionCallHelper<T>(FunctionObj fn, params object[] args)
@@ -275,7 +275,7 @@ namespace RedOnion.Script.BasicObjects
 			{
 				foreach (var arg in args)
 					arguments.Add(ReflectedType.Convert(engine, arg));
-				return ReflectedType.Convert<T>(fn.Call(null, args.Length));
+				return ReflectedType.Convert<T>(fn.Call(null, new Arguments(arguments, args.Length)));
 			}
 		}
 	}

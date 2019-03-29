@@ -66,7 +66,10 @@ namespace RedOnion.Script.Completion
 		public CompletionEngine(IEngine linked)
 			: this(linked?.Root) { }
 		public CompletionEngine(IEngineRoot linked)
-			=> Root = new CompletionRoot(this, this.linked = linked);
+		{
+			Arguments = new ArgumentList(this);
+			Root = new CompletionRoot(this, this.linked = linked);
+		}
 
 		protected Lexer lexer = new Lexer();
 		protected int interest, replaceAt, replaceTo;
@@ -133,7 +136,7 @@ namespace RedOnion.Script.Completion
 		/// <summary>
 		/// Argument list for function calls
 		/// </summary>
-		public ArgumentList Arguments { get; } = new ArgumentList();
+		public ArgumentList Arguments { get; }
 
 		/// <summary>
 		/// Reset engine

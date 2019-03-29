@@ -40,20 +40,20 @@ namespace RedOnion.Script.ReflectedObjects
 			Methods = methods;
 		}
 
-		public override Value Call(IObject self, int argc)
+		public override Value Call(IObject self, Arguments args)
 		{
 			// TODO: better matching of float vs. int
 			var result = new Value();
 			foreach (MethodInfo method in Methods)
-				if (TryCall(Engine, method, null, argc, ref result))
+				if (TryCall(Engine, method, null, args, ref result))
 					return result;
 			if (!Engine.HasOption(EngineOption.Silent))
 			{
 #if DEBUG
-				Engine.DebugLog("{0}(argc:{1})", Type == null ? Name : Type.Name + "." + Name, argc);
-				for (int i = 0; i < argc; i++)
+				Engine.DebugLog("{0}(argc:{1})", Type == null ? Name : Type.Name + "." + Name, args.Length);
+				for (int i = 0; i < args.Length; i++)
 				{
-					var arg = Arg(argc, i);
+					var arg = args[i];
 					var native = arg.Native;
 					Engine.DebugLog("#{0} {1} -> {2} {4}", i, arg.Kind, arg.String,
 						native?.GetType().FullName ?? "null", native?.ToString() ?? "null");
@@ -86,20 +86,20 @@ namespace RedOnion.Script.ReflectedObjects
 
 		protected internal static bool TryCall(
 			IEngine engine, MethodBase method,
-			object self, int argc, ref Value result)
+			object self, Arguments args, ref Value result)
 		{
 			var pars = method.GetParameters();
-			if (pars.Length != argc)
+			if (pars.Length != args.Length)
 			{
-				if (pars.Length < argc)
+				if (pars.Length < args.Length)
 					return false;
-				if (pars[argc].RawDefaultValue == DBNull.Value)
+				if (pars[args.Length].RawDefaultValue == DBNull.Value)
 					return false;
 			}
-			for (int i = 0; i < argc; i++)
+			for (int i = 0; i < args.Length; i++)
 			{
 				var param = pars[i];
-				var arg = engine.GetArgument(argc, i);
+				var arg = args[i];
 				var type = param.ParameterType;
 				if (type == typeof(string))
 				{
@@ -150,48 +150,48 @@ namespace RedOnion.Script.ReflectedObjects
 				}
 				return false;
 			}
-			var args = new object[pars.Length];
-			for (int i = 0; i < args.Length; i++)
+			var call = new object[pars.Length];
+			for (int i = 0; i < call.Length; i++)
 			{
 				var param = pars[i];
-				var arg = engine.GetArgument(argc, i);
+				var arg = args[i];
 				var type = param.ParameterType;
-				if (i >= argc)
-					args[i] = param.DefaultValue;
+				if (i >= args.Length)
+					call[i] = param.DefaultValue;
 				else if (type == typeof(string))
-					args[i] = arg.String;
+					call[i] = arg.String;
 				else if (type.IsPrimitive || type.IsEnum)
-					args[i] = System.Convert.ChangeType(arg.Native, type);
+					call[i] = System.Convert.ChangeType(arg.Native, type);
 				else if (typeof(Delegate).IsAssignableFrom(type))
-					args[i] = ((BasicObjects.FunctionObj)arg.Object).GetDelegate(type);
+					call[i] = ((BasicObjects.FunctionObj)arg.Object).GetDelegate(type);
 				else
 				{
 					var val = arg.Native;
 					if (val == null)
 					{
-						args[i] = null;
+						call[i] = null;
 						continue;
 					}
 					if (type.IsAssignableFrom(val.GetType()))
 					{
-						args[i] = val;
+						call[i] = val;
 						continue;
 					}
-					args[i] = ((IObject)val).Target;
+					call[i] = ((IObject)val).Target;
 				}
 			}
 			var ctor = method as ConstructorInfo;
 			if (ctor != null)
 			{
-				var native = ctor.Invoke(args);
+				var native = ctor.Invoke(call);
 				var creator = engine.Root[native.GetType()];
 				result = new Value(creator.Convert(native));
 				return true;
 			}
 			result = ReflectedType.Convert(
 				engine, method.IsStatic
-				? method.Invoke(null, args)
-				: method.Invoke(self, args),
+				? method.Invoke(null, call)
+				: method.Invoke(self, call),
 				((MethodInfo)method).ReturnType);
 			return true;
 		}

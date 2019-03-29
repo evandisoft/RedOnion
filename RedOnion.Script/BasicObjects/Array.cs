@@ -29,17 +29,13 @@ namespace RedOnion.Script.BasicObjects
 			: base(engine, baseClass, new Properties("prototype", prototype))
 			=> Empty = new ArrayObj(Engine, Prototype = prototype);
 
-		public override Value Call(IObject self, int argc)
-			=> argc == 0 ? new Value(Empty)
-			: new ArrayObj(Engine, Prototype, GetArray(Engine.GetArgument(argc)));
+		public override Value Call(IObject self, Arguments args)
+			=> args.Length == 0 ? new Value(Empty)
+			: args.Length == 0 ? new ArrayObj(Engine, Prototype, GetArray(args[0]))
+			: new ArrayObj(Engine, Prototype, args.ToArray());
 
-		public override IObject Create(int argc)
-		{
-			var arr = new Value[argc];
-			for (int i = 0; i < arr.Length; i++)
-				arr[i] = Engine.GetArgument(argc, i);
-			return new ArrayObj(Engine, Prototype, arr);
-		}
+		public override IObject Create(Arguments args)
+			=> new ArrayObj(Engine, Prototype, args.ToArray());
 
 		public override IObject Convert(object value)
 			=> new ArrayObj(Engine, Prototype, GetArray(value));

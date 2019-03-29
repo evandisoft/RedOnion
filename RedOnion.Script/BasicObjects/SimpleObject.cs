@@ -108,10 +108,10 @@ namespace RedOnion.Script.BasicObjects
 		public void Reset()
 		{ }
 
-		public virtual Value Call(IObject self, int argc)
+		public virtual Value Call(IObject self, Arguments args)
 			=> new Value();
 
-		public virtual IObject Create(int argc)
+		public virtual IObject Create(Arguments args)
 			=> null;
 
 		public virtual Value Index(IObject self, int argc)

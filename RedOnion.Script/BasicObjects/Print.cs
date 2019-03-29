@@ -7,23 +7,23 @@ namespace RedOnion.Script.BasicObjects
 	{
 		public PrintFun(IEngine engine) : base(engine) { }
 		public override ObjectFeatures Features => ObjectFeatures.Function;
-		public override Value Call(IObject self, int argc)
+		public override Value Call(IObject self, Arguments args)
 		{
-			if (argc == 0)
+			if (args.Length == 0)
 			{
 				Engine.Print("");
 				return "";
 			}
-			var msg = Engine.GetArgument(argc, 0).String;
-			if (argc == 1)
+			var msg = args[0].String;
+			if (args.Length == 1)
 			{
 				Engine.Print(msg);
 				return msg;
 			}
-			var args = new string[argc-1];
+			var call = new string[args.Length-1];
 			for (int i = 0; i < args.Length; i++)
-				args[i] = Engine.GetArgument(argc, i+1).String;
-			msg = string.Format(Value.Culture, msg, args);
+				call[i] = args[i+1].String;
+			msg = string.Format(Value.Culture, msg, call);
 			Engine.Print(msg);
 			return msg;
 		}

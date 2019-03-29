@@ -25,14 +25,14 @@ namespace RedOnion.Script.BasicObjects
 			: base(engine, baseClass, new Properties("prototype", prototype))
 			=> Prototype = prototype;
 
-		public override Value Call(IObject self, int argc)
-			=> new Value(Create(argc));
+		public override Value Call(IObject self, Arguments args)
+			=> new Value(Create(args));
 
-		public override IObject Create(int argc)
+		public override IObject Create(Arguments args)
 		{
-			var list = new List<Value>(argc);
-			for (int i = 0; i < argc; i++)
-				list[i] = Engine.GetArgument(argc, i);
+			var list = new List<Value>(args.Length);
+			for (int i = 0; i < args.Length; i++)
+				list[i] = args[i];
 			return new ListObj(Engine, Prototype, list);
 		}
 

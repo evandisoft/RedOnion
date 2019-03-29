@@ -309,7 +309,8 @@ namespace RedOnion.Script.ReflectedObjects
 				{
 					arguments.Add(new Value(this));
 					foreach (var method in methods)
-						if (ReflectedFunction.TryCall(Engine, method, null, 1, ref result))
+						if (ReflectedFunction.TryCall(Engine, method, null,
+							new Arguments(arguments, 1), ref result))
 							return true;
 				}
 				return false;
@@ -324,7 +325,8 @@ namespace RedOnion.Script.ReflectedObjects
 					if (selfRhs)
 						arguments.Add(new Value(this));
 					foreach (var method in methods)
-						if (ReflectedFunction.TryCall(Engine, method, null, 2, ref result))
+						if (ReflectedFunction.TryCall(Engine, method, null,
+							new Arguments(arguments, 2), ref result))
 							return true;
 				}
 				return false;

@@ -33,7 +33,7 @@ namespace RedOnion.Script
 			{
 				var obj = (IObject)Value.ptr;
 				if (obj.HasFeature(ObjectFeatures.Function))
-					Value = obj.Call(self, 0);
+					Value = obj.Call(self, new Arguments(Arguments, 0));
 				return;
 			}
 			if (weak || HasOption(EngineOption.WeakAutocall))

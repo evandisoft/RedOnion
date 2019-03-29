@@ -99,7 +99,7 @@ namespace RedOnion.KSP.ROS
 					var call = updateList.GetNext();
 					try
 					{
-						call.Call(null, 0);
+						call.Call(null, new Arguments(Arguments, 0));
 					}
 					catch (Exception ex)
 					{
@@ -127,7 +127,7 @@ namespace RedOnion.KSP.ROS
 					var call = idleList.GetNext();
 					try
 					{
-						call.Call(null, 0);
+						call.Call(null, new Arguments(Arguments, 0));
 					}
 					catch (Exception ex)
 					{

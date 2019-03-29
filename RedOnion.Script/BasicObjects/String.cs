@@ -25,11 +25,11 @@ namespace RedOnion.Script.BasicObjects
 			: base(engine, baseClass, new Properties("prototype", prototype))
 			=> Prototype = prototype;
 
-		public override Value Call(IObject self, int argc)
-			=> argc == 0 ? new Value("") : new Value(Engine.GetArgument(argc).String);
+		public override Value Call(IObject self, Arguments args)
+			=> args.Length == 0 ? new Value("") : new Value(args[0].String);
 
-		public override IObject Create(int argc)
-			=> new StringObj(Engine, Prototype, argc == 0 ? "" : Engine.GetArgument(argc).String);
+		public override IObject Create(Arguments args)
+			=> new StringObj(Engine, Prototype, args.Length == 0 ? "" : args[0].String);
 
 		public override IObject Convert(object value)
 			=> new StringObj(Engine, Prototype, value.ToString());
@@ -123,13 +123,13 @@ namespace RedOnion.Script.BasicObjects
 			public SubstringMtd(IEngine engine)
 				: base(engine) { }
 			public override ObjectFeatures Features => ObjectFeatures.Function;
-			public override Value Call(IObject self, int argc)
+			public override Value Call(IObject self, Arguments args)
 			{
 				var str = ((StringObj)self).String;
-				if (argc == 0) return str;
-				var arg = Engine.GetArgument(argc).Int;
-				if (argc == 1) return str.Substring(arg);
-				var arg2 = Engine.GetArgument(argc, 1).Int;
+				if (args.Length == 0) return str;
+				var arg = args[0].Int;
+				if (args.Length == 1) return str.Substring(arg);
+				var arg2 = args[1].Int;
 				return str.Substring(arg, arg2);
 			}
 		}
