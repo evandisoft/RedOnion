@@ -8,9 +8,13 @@ function each(lst,action)
     end
 end
 
+ctrlSurface=nil
 for part in vessel.parts do
     --printModules(part)
     each(part.Modules,function(m)
         print(m)
+        if (m.GUIName=="Control Surface") then
+            ctrlSurface=m
+        end
     end)
 end
