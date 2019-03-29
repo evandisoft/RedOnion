@@ -84,15 +84,15 @@ namespace RedOnion.Script.BasicObjects
 			: base(engine, baseClass, new Properties(StdProps))
 			=> List = value;
 
-		public override Value Index(IObject self, int argc)
+		public override Value Index(Arguments args)
 		{
-			if (argc == 1)
+			if (args.Length == 1)
 			{
-				var i = Engine.GetArgument(argc);
+				var i = args[0];
 				if (i.IsNumber)
 					return List[i.Int];
 			}
-			return base.Index(self, argc);
+			return base.Index(args);
 		}
 
 		int ICollection<Value>.Count => List.Count;

@@ -6,7 +6,7 @@ using MoonSharp.Interpreter.Interop;
 
 namespace RedOnion.KSP.API
 {
-	public abstract class InteropObject : IObject, IUserDataType
+	public abstract class InteropObject : IObject, IUserDataType, IType
 	{
 		public abstract string Help { get; }
 
@@ -32,116 +32,6 @@ namespace RedOnion.KSP.API
 		public static readonly IMember[] NoMembers = new IMember[0];
 		public static readonly Dictionary<string, IMember>
 			EmptyMemberDictionary = new Dictionary<string, IMember>();
-
-		public interface IMember
-		{
-			string Name { get; }
-			string Type { get; }
-			string Help { get; }
-			bool CanRead { get; }
-			bool CanWrite { get; }
-
-			Value RosGet(InteropObject self);
-			DynValue LuaGet(InteropObject self);
-			void RosSet(InteropObject self, Value value);
-			void LuaSet(InteropObject self, DynValue value);
-		}
-		public class Bool : IMember
-		{
-			public string Name { get; }
-			public string Type { get; }
-			public string Help { get; }
-			public bool CanRead { get; }
-			public bool CanWrite { get; }
-
-			public Func<bool> Get { get; }
-			public Action<bool> Set { get; }
-
-			public Value RosGet(InteropObject self)
-				=> new Value(Get());
-			public DynValue LuaGet(InteropObject self)
-				=> DynValue.NewBoolean(Get());
-			public void RosSet(InteropObject self, Value value)
-				=> Set(value.Bool);
-			public void LuaSet(InteropObject self, DynValue value)
-				=> Set(value.Boolean);
-
-			public Bool(string name, string help,
-				Func<bool> read, Action<bool> write = null)
-			{
-				Name = name;
-				Type = "bool";
-				Help = help;
-				CanRead = read != null;
-				CanWrite = write != null;
-				Get = read;
-				Set = write;
-			}
-		}
-		public class Int : IMember
-		{
-			public string Name { get; }
-			public string Type { get; }
-			public string Help { get; }
-			public bool CanRead { get; }
-			public bool CanWrite { get; }
-
-			public Func<int> Get { get; }
-			public Action<int> Set { get; }
-
-			public Value RosGet(InteropObject self)
-				=> new Value(Get());
-			public DynValue LuaGet(InteropObject self)
-				=> DynValue.NewNumber(Get());
-			public void RosSet(InteropObject self, Value value)
-				=> Set(value.Int);
-			public void LuaSet(InteropObject self, DynValue value)
-				=> Set((int)value.Number);
-
-			public Int(string name, string help,
-				Func<int> read, Action<int> write = null)
-			{
-				Name = name;
-				Type = "int";
-				Help = help;
-				CanRead = read != null;
-				CanWrite = write != null;
-				Get = read;
-				Set = write;
-			}
-		}
-		public class Float : IMember
-		{
-			public string Name { get; }
-			public string Type { get; }
-			public string Help { get; }
-			public bool CanRead { get; }
-			public bool CanWrite { get; }
-
-			public Func<float> Get { get; }
-			public Action<float> Set { get; }
-
-			public Value RosGet(InteropObject self)
-				=> new Value(Get());
-			public DynValue LuaGet(InteropObject self)
-				=> DynValue.NewNumber(Get());
-			public void RosSet(InteropObject self, Value value)
-				=> Set(value.Int);
-			public void LuaSet(InteropObject self, DynValue value)
-				=> Set((int)value.Number);
-
-			public Float(string name, string help,
-				Func<float> read, Action<float> write = null)
-			{
-				Name = name;
-				Type = "float";
-				Help = help;
-				CanRead = read != null;
-				CanWrite = write != null;
-				Get = read;
-				Set = write;
-			}
-		}
 
 		bool IProperties.Has(string name)
 			=> Members.ContainsKey(name);
@@ -176,7 +66,7 @@ namespace RedOnion.KSP.API
 		{
 			if (Members.TryGetValue(index.String, out var member) && member.CanRead)
 				return member.LuaGet(this);
-			return DynValue.Nil;
+			return null;
 		}
 
 		public virtual bool SetIndex(MoonSharp.Interpreter.Script script, DynValue index, DynValue value, bool isDirectIndexing)
@@ -200,7 +90,7 @@ namespace RedOnion.KSP.API
 
 		IObject IObject.Create(Arguments args)
 			=> null;
-		Value IObject.Index(IObject self, int argc)
+		Value IObject.Index(Arguments args)
 			=> throw new NotImplementedException();
 		Value IObject.IndexGet(Value index)
 			=> throw new NotImplementedException();

@@ -163,13 +163,17 @@ namespace RedOnion.Script
 		/// </summary>
 		public virtual IObject Box(Value value)
 		{
-			if (value.IsReference)
-				value = value.RValue;
 			if (value.Kind == ValueKind.Object)
 				return (IObject)value.ptr;
+			if (value.IsReference || value.IsNative)
+			{
+				value = ResultOf(value);
+				if (value.Kind == ValueKind.Object)
+					return (IObject)value.ptr;
+			}
 			return Root.Box(value);
 		}
-		public virtual Value Convert(object value)
+		public override Value Convert(object value)
 			=> ReflectedObjects.ReflectedType.Convert(this, value);
 
 		/// <summary>

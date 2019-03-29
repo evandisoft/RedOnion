@@ -61,15 +61,15 @@ namespace RedOnion.Script.BasicObjects
 			: base(engine, baseClass, new Properties(StdProps))
 			=> String = value;
 
-		public override Value Index(IObject self, int argc)
+		public override Value Index(Arguments args)
 		{
-			if (argc == 1)
+			if (args.Length == 1)
 			{
-				var i = Engine.GetArgument(argc);
+				var i = args[0];
 				if (i.IsNumber)
 					return String[i.Int];
 			}
-			return base.Index(self, argc);
+			return base.Index(args);
 		}
 
 		public int Count => String.Length;

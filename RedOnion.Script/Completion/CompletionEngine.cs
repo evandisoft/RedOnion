@@ -184,11 +184,35 @@ namespace RedOnion.Script.Completion
 		/// </summary>
 		public virtual IObject Box(Value value)
 		{
-			if (value.IsReference)
-				value = value.RValue;
 			if (value.Kind == ValueKind.Object)
 				return (IObject)value.ptr;
+			if (value.IsReference || value.IsNative)
+			{
+				value = ResultOf(value);
+				if (value.Kind == ValueKind.Object)
+					return (IObject)value.ptr;
+			}
 			return Root.Box(value);
+		}
+		public Value ResultOf(Value value)
+		{
+			switch (value.Kind)
+			{
+			default:
+				return value;
+			case ValueKind.Reference:
+				value = ((IProperties)Value.ptr).Get((string)Value.idx);
+				if (value.Kind == ValueKind.Native)
+					goto case ValueKind.Native;
+				return value;
+			case ValueKind.IndexRef:
+				value = ((IObject)Value.ptr).IndexGet((Value)Value.idx);
+				if (value.Kind == ValueKind.Native)
+					goto case ValueKind.Native;
+				return value;
+			case ValueKind.Native:
+				return Convert(value.ptr);
+			}
 		}
 		public Value Convert(object value) => new Value();
 
@@ -231,64 +255,63 @@ namespace RedOnion.Script.Completion
 
 		public virtual void Log(string msg) { }
 
-		private void FillFrom(object value)
+		protected virtual void FillFrom(object value)
 		{
 			if (value == null)
 				return;
-			for (; ; )
+			var type = value as Type;
+			var props = value as IProperties;
+			IObject obj = null;
+			if (props != null)
 			{
-				var type = value as Type;
-				var props = value as IProperties;
-				IObject obj = null;
-				if (props != null)
+				obj = props as IObject;
+				if (obj != null)
 				{
-					obj = props as IObject;
-					if (obj != null)
+					FillFrom(obj.BaseProps);
+					FillFrom(obj.MoreProps);
+					if (obj.HasFeature(ObjectFeatures.TypeReference|ObjectFeatures.Proxy))
+						type = obj.Type;
+				}
+				else
+				{
+					if (props is IDictionary<string, Value> dict)
 					{
-						FillFrom(obj.BaseProps);
-						FillFrom(obj.MoreProps);
-						if (obj.HasFeature(ObjectFeatures.TypeReference|ObjectFeatures.Proxy))
-							type = obj.Type;
-					}
-					else
-					{
-						if (props is IDictionary<string, Value> dict)
+						foreach (var pair in dict)
 						{
-							foreach (var pair in dict)
-							{
-								if (!pair.Value.HasFlag(ValueFlags.DoNotSuggest))
-									AddSuggestion(pair.Key);
-							}
+							if (!pair.Value.HasFlag(ValueFlags.DoNotSuggest))
+								AddSuggestion(pair.Key);
 						}
-						return;
 					}
+					return;
 				}
-				if (type != null)
+			}
+			if (type != null)
+			{
+				var binding = BindingFlags.Public;
+				if (obj != null && obj.HasFeature(ObjectFeatures.TypeReference))
+					binding |= BindingFlags.Static;
+				if (obj == null || obj.HasFeature(ObjectFeatures.Proxy))
+					binding |= BindingFlags.Instance;
+				foreach (var member in type.GetMembers(binding))
 				{
-					var binding = BindingFlags.Public;
-					if (obj != null && obj.HasFeature(ObjectFeatures.TypeReference))
-						binding |= BindingFlags.Static;
-					if (obj == null || obj.HasFeature(ObjectFeatures.Proxy))
-						binding |= BindingFlags.Instance;
-					foreach (var member in type.GetMembers(binding))
-					{
-						if (member.MemberType == MemberTypes.Constructor)
-							continue;
-						if (member.MemberType == MemberTypes.Method
-							&& ((MethodInfo)member).IsSpecialName)
-							continue;
-						AddSuggestion(member.Name);
-					}
+					if (member.MemberType == MemberTypes.Constructor)
+						continue;
+					if (member.MemberType == MemberTypes.Method
+						&& ((MethodInfo)member).IsSpecialName)
+						continue;
+					AddSuggestion(member.Name);
 				}
-				bool wasRoot = value == Root;
-				if (obj != null && (value = obj.BaseClass) != null)
-					continue;
+			}
+			bool wasRoot = value == Root;
+			if (obj == null || (value = obj.BaseClass) == null)
+			{
 				if (!wasRoot)
-					break;
+					return;
 				value = linked;
 				if (value == null)
 					return;
 			}
+			FillFrom(value);
 		}
 		private void RemoveDuplicates()
 		{

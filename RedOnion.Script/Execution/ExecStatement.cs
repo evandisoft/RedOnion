@@ -118,7 +118,7 @@ namespace RedOnion.Script
 					Expression(ref at);
 					var element = Value;
 					Expression(ref at);
-					var obj = Box(Result);
+					var obj = Box(Value);
 					var wasBlock = false;
 					if (!(obj is IEnumerable<Value> list))
 					{

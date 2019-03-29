@@ -114,17 +114,16 @@ namespace RedOnion.Script.BasicObjects
 		public virtual IObject Create(Arguments args)
 			=> null;
 
-		public virtual Value Index(IObject self, int argc)
+		public virtual Value Index(Arguments args)
 		{
-			switch (argc)
+			switch (args.Length)
 			{
 			case 0:
 				return new Value();
 			case 1:
-				return Value.IndexRef(this, Engine.GetArgument(argc, 0));
+				return Value.IndexRef(this, args[0]);
 			default:
-				self = Engine.Box(Value.IndexRef(this, Engine.GetArgument(argc, 0)));
-				return self.Index(this, argc - 1);
+				return Engine.Box(IndexGet(args[0])).Index(new Arguments(args, args.Length - 1));
 			}
 		}
 		public virtual Value IndexGet(Value index) => Get(index.String);
@@ -135,11 +134,5 @@ namespace RedOnion.Script.BasicObjects
 			result = new Value();
 			return false;
 		}
-
-		/// <summary>
-		/// Get n-th argument (for call/create implementation)
-		/// </summary>
-		protected Value Arg(int argc, int n = 0)
-			=> Engine.GetArgument(argc, n);
 	}
 }

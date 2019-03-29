@@ -39,11 +39,9 @@ namespace RedOnion.KSP.Lua
 						=> DynValue.NewTable(new ProxyTable(this, m))
 					);
 
+			Globals.MetaTable = API.Globals.Instance;
 			Globals["Ksp"] = new KspApi();
-			Globals["stage"] = Stage.Instance;
 		}
-
-
 
 		DynValue coroutine;
 		public bool Evaluate(out DynValue result)

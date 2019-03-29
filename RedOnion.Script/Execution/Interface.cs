@@ -450,7 +450,7 @@ namespace RedOnion.Script
 		/// Default implementation treats x[y, z] as x[y][z],
 		/// but redirecting to Call may be valid as well
 		/// </remarks>
-		Value Index(IObject self, int argc);
+		Value Index(Arguments args);
 		/// <summary>
 		/// Get value (RValue) at index. This can only ever be called if Index created ValueKind.IndexRef.
 		/// </summary>
@@ -642,6 +642,11 @@ namespace RedOnion.Script
 		{
 			this.list = list;
 			this.argc = argc;
+		}
+		public Arguments(Arguments args, int argc)
+		{
+			this.list = args.list;
+			this.argc = Math.Min(argc, args.argc);
 		}
 
 		public Value this[int i] => i >= argc ? new Value() : list.Get(argc, i);

@@ -262,12 +262,6 @@ namespace RedOnion.Script
 				CountStatement();
 				n = op == OpCode.Index ? 2 : Code[at++];
 				Expression(ref at);
-				self = null;
-				if (Value.IsReference)
-				{
-					self = Value.ptr as IObject;
-					Value = Result;
-				}
 				fn = Box(Value);
 				argc = n - 1;
 				using (Arguments.Guard())
@@ -277,7 +271,7 @@ namespace RedOnion.Script
 						Expression(ref at);
 						Arguments.Add(Result);
 					}
-					Value = fn.Index(self, argc);
+					Value = fn.Index(new Arguments(Arguments, argc));
 				}
 				return;
 			case OpCode.Var:
