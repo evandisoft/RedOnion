@@ -60,8 +60,8 @@ namespace RedOnion.Build
 						if (types.TryGetValue(m.Type, out var tdoc))
 							typePath = tdoc.path + ".md";
 						wr.WriteLine(typePath == null
-							? "`{0}`: {1} - {3}"
-							: "`{0}`: [{1}]({2}) - {3}",
+							? "- `{0}`: {1} - {3}"
+							: "- `{0}`: [{1}]({2}) - {3}",
 							member.Key, m.Type, typePath, m.Help);
 					}
 				}
