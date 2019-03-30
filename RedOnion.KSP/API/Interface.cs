@@ -6,6 +6,17 @@ using MoonSharp.Interpreter.Interop;
 
 namespace RedOnion.KSP.API
 {
+	public class ProxyDocsAttribute : Attribute
+	{
+		public Type ForType { get; }
+		public ProxyDocsAttribute(Type type)
+		{
+			ForType = type;
+		}
+	}
+	public class IgnoreForDocsAttribute : Attribute
+	{
+	}
 	public interface IType
 	{
 		string Help { get; }

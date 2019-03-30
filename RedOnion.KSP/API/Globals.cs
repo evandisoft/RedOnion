@@ -6,12 +6,13 @@ using MoonSharp.Interpreter.Interop;
 
 namespace RedOnion.KSP.API
 {
-	public class Globals : Table, IProperties, IType
+	// this is here to mitigate problems with MoonSharp when RedOnion.Builder was touching Globals
+	[ProxyDocs(typeof(Globals))]
+	public static class GlobalMembers
 	{
-		public static Globals Instance { get; } = new Globals();
+		public static string Help => "Global object";
 
-		public Dictionary<string, IMember> Members { get; }
-		public IMember[] MemberList { get; } = new IMember[]
+		public static IMember[] MemberList { get; } = new IMember[]
 		{
 			new Native("ship", "Vessel", "Active vessel (in flight or editor)",
 				() => HighLogic.LoadedSceneIsFlight ? (object)FlightGlobals.ActiveVessel
@@ -20,16 +21,27 @@ namespace RedOnion.KSP.API
 				() => Stage.Instance)
 		};
 
-		public string Help => "Global object";
-		public ObjectFeatures Features => ObjectFeatures.None;
+		public static Dictionary<string, IMember> Members { get; }
+		static GlobalMembers()
+		{
+			Members = new Dictionary<string, IMember>(MemberList.Length);
+			foreach (var member in MemberList)
+				Members.Add(member.Name, member);
+		}
+	}
+	public class Globals : Table, IProperties, IType
+	{
+		public static Globals Instance { get; } = new Globals();
+
+		public string Help => GlobalMembers.Help;
+		ObjectFeatures IType.Features => ObjectFeatures.None;
+		public IMember[] MemberList => GlobalMembers.MemberList;
+		public Dictionary<string, IMember> Members => GlobalMembers.Members;
 
 		public Globals() : base(null)
 		{
 			this["__index"] = new Func<Table, DynValue, DynValue>(Get);
 			this["__newindex"] = new Func<Table, DynValue, DynValue, DynValue>(Set);
-			Members = new Dictionary<string, IMember>(MemberList.Length);
-			foreach (var member in MemberList)
-				Members.Add(member.Name, member);
 		}
 
 		public bool Has(string name)

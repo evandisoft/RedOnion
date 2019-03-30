@@ -1,5 +1,5 @@
 ## define soft link to KSP folder
-##/ksp
+/ksp
 *.zip
 GameData/RedOnion/Plugins
 *.settings
