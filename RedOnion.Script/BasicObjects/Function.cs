@@ -80,6 +80,7 @@ namespace RedOnion.Script.BasicObjects
 	/// Function object (callable, can construct)
 	/// </summary>
 	[DebuggerDisplay("function {Name} {ArgsString}")]
+	[Creator(typeof(FunctionFun))]
 	public class FunctionObj : BasicObject
 	{
 		protected string name;

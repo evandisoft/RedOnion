@@ -10,33 +10,24 @@ namespace RedOnion.KSP.API
 	[ProxyDocs(typeof(Globals))]
 	public static class GlobalMembers
 	{
-		public static string Help => "Global object";
-
-		public static IMember[] MemberList { get; } = new IMember[]
+		public static MemberList Members { get; } = new MemberList(
+		"Global variables, objects and functions.",
+		new IMember[]
 		{
 			new Native("ship", "Vessel", "Active vessel (in flight or editor)",
 				() => HighLogic.LoadedSceneIsFlight ? (object)FlightGlobals.ActiveVessel
 				: HighLogic.LoadedSceneIsEditor ? EditorLogic.fetch.ship : null),
 			new Interop("stage", "Stage", "Staging logic",
 				() => Stage.Instance)
-		};
-
-		public static Dictionary<string, IMember> Members { get; }
-		static GlobalMembers()
-		{
-			Members = new Dictionary<string, IMember>(MemberList.Length);
-			foreach (var member in MemberList)
-				Members.Add(member.Name, member);
-		}
+		});
 	}
+	[IgnoreForDocs]
 	public class Globals : Table, IProperties, IType
 	{
 		public static Globals Instance { get; } = new Globals();
 
-		public string Help => GlobalMembers.Help;
 		ObjectFeatures IType.Features => ObjectFeatures.None;
-		public IMember[] MemberList => GlobalMembers.MemberList;
-		public Dictionary<string, IMember> Members => GlobalMembers.Members;
+		public MemberList Members => GlobalMembers.Members;
 
 		public Globals() : base(null)
 		{
@@ -45,7 +36,7 @@ namespace RedOnion.KSP.API
 		}
 
 		public bool Has(string name)
-			=> Members.ContainsKey(name);
+			=> Members.Contains(name);
 		Value IProperties.Get(string name)
 		{
 			if (!Get(name, out var value))
@@ -89,7 +80,6 @@ namespace RedOnion.KSP.API
 				return DynValue.NewBoolean(true);
 			}
 			table[index] = value;
-
 			return DynValue.NewBoolean(false);
 		}
 	}

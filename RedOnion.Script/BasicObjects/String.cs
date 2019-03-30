@@ -39,6 +39,7 @@ namespace RedOnion.Script.BasicObjects
 	/// String object (string box)
 	/// </summary>
 	[DebuggerDisplay("{Name}: {String}")]
+	[Creator(typeof(StringFun))]
 	public class StringObj : BasicObject, IListObject
 	{
 		/// <summary>

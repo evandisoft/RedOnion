@@ -87,6 +87,7 @@ namespace RedOnion.Script.BasicObjects
 	/// Number object (value box)
 	/// </summary>
 	[DebuggerDisplay("{GetType().Name}: {Number}")]
+	[Creator(typeof(NumberFun))]
 	public class NumberObj : BasicObject
 	{
 		/// <summary>
