@@ -37,7 +37,7 @@ namespace RedOnion.KSP.Lua
 			GlobalOptions.CustomConverters
 				.SetClrToScriptCustomConversion(
 					(MoonSharp.Interpreter.Script script, ModuleControlSurface m)
-						=> DynValue.NewTable(new ProxyTable(this, m))
+						=> DynValue.NewTable(new ModuleControlSurfaceProxyTable(this, m))
 					);
 			Globals.MetaTable = API.Globals.Instance;
 			//Globals["Vessel"] = FlightGlobals.ActiveVessel;

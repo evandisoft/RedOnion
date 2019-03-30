@@ -72,7 +72,7 @@
     <Compile Include="MathUtil\Vec.cs" />
     <Compile Include="MathUtil\Scalar.cs" />
     <Compile Include="PartsAPI\PartsExploration.cs" />
-    <Compile Include="Lua\Proxies\ModuleControlSurfaceProxy.cs" />
+    <Compile Include="Lua\Proxies\ModuleControlSurfaceProxyTable.cs" />
     <Compile Include="Lua\Proxies\ExperimentalProxy.cs" />
     <Compile Include="Lua\Proxies\ProxyTable.cs" />
     <Compile Include="Lua\Proxies\ProxyCallTable.cs" />

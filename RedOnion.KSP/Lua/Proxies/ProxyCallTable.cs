@@ -28,7 +28,7 @@ namespace RedOnion.KSP.Lua.Proxies
 				end
 			");
 			DynValue invoker = script.Call(createInvoker, new Func<Table, object>(CallFunc));
-
+			
 			var metatable = new Table(script);
 			metatable["__call"] = invoker;
 			MetaTable = metatable;
