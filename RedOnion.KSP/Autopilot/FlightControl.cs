@@ -264,7 +264,8 @@ namespace RedOnion.KSP.Autopilot
 
 			// Only use our super precise mode if we have enough instant torque for it to work
 			// Works perfectly so far in space, and works well for craft in atmospheric flight
-			// that do not have control surfaces
+			// that do not have control surfaces. Oscillates indefinitely when used with
+			// Craft whose current torque is dominated by control surfaces.
 			if (posAllTorque.magnitude < posInstantTorque.magnitude * 2)
 			{
 				Vector3 currentDir = vessel.transform.up;
