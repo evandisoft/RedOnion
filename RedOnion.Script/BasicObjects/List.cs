@@ -96,12 +96,13 @@ namespace RedOnion.Script.BasicObjects
 			return base.Index(args);
 		}
 
-		int ICollection<Value>.Count => List.Count;
+		public int Count => List.Count;
+		public int Length => List.Count;
 		bool ICollection<Value>.IsReadOnly => false;
 
-		bool ICollection<Value>.Contains(Value item)
+		public bool Contains(Value item)
 			=> List.Contains(item);
-		void ICollection<Value>.CopyTo(Value[] array, int arrayIndex)
+		public void CopyTo(Value[] array, int arrayIndex)
 			=> List.CopyTo(array, arrayIndex);
 
 		IEnumerator IEnumerable.GetEnumerator()
@@ -111,7 +112,7 @@ namespace RedOnion.Script.BasicObjects
 
 		bool IListObject.IsWritable => true;
 		bool IListObject.IsFixedSize => false;
-		Value IList<Value>.this[int index]
+		public Value this[int index]
 		{
 			get => List[index];
 			set => List[index] = value;

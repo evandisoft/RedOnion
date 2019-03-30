@@ -8,19 +8,16 @@ namespace RedOnion.KSP.API
 {
 	public abstract class InteropObject : IObject, IUserDataType, IType
 	{
-		public ObjectFeatures Features { get; }
 		public MemberList Members { get; }
-		public InteropObject(
-			ObjectFeatures features,
-			MemberList members)
-		{
-			Features = features;
-			Members = members;
-		}
+		public ObjectFeatures Features => Members.Features;
+		public bool ReadOnly { get; protected set; }
 
-		bool IProperties.Has(string name)
+		public InteropObject(MemberList members)
+			=> Members = members;
+
+		public virtual bool Has(string name)
 			=> Members.Contains(name);
-		Value IProperties.Get(string name)
+		public Value Get(string name)
 		{
 			if (!Get(name, out var value))
 				throw new NotImplementedException(name + " does not exist");
@@ -39,6 +36,8 @@ namespace RedOnion.KSP.API
 
 		public virtual bool Set(string name, Value value)
 		{
+			if (ReadOnly)
+				return false;
 			if (Members.TryGetValue(name, out var member) && member.CanWrite)
 			{
 				member.RosSet(this, value);
@@ -56,6 +55,8 @@ namespace RedOnion.KSP.API
 
 		public virtual bool SetIndex(MoonSharp.Interpreter.Script script, DynValue index, DynValue value, bool isDirectIndexing)
 		{
+			if (ReadOnly)
+				return false;
 			if (Members.TryGetValue(index.String, out var member) && member.CanWrite)
 			{
 				member.LuaSet(this, value);
@@ -65,11 +66,16 @@ namespace RedOnion.KSP.API
 		}
 
 		public virtual Value Call(IObject self, Arguments args)
-			=> new Value();
+			=> Value.Void;
 		public virtual IObject Create(Arguments args)
 			=> null;
-		public virtual DynValue MetaIndex(MoonSharp.Interpreter.Script script, string metaname)
-			=> null;
+		DynValue IUserDataType.MetaIndex(MoonSharp.Interpreter.Script script, string metaname)
+		{
+			if (metaname != "__call") return null;
+			return DynValue.FromObject(script, new CallbackFunction(Call));
+		}
+		public virtual DynValue Call(ScriptExecutionContext ctx, CallbackArguments args)
+			=> DynValue.Void;
 
 		bool IObject.Modify(string name, OpCode op, Value value) => false;
 		bool IProperties.Delete(string name) => false;
@@ -87,11 +93,11 @@ namespace RedOnion.KSP.API
 			=> throw new NotImplementedException();
 
 		string IObject.Name => GetType().Name;
+		Value IObject.Value => new Value(ToString());
 		IEngine IObject.Engine => null;
 		IObject IObject.BaseClass => null;
 		IProperties IObject.BaseProps => null;
 		IProperties IObject.MoreProps => null;
-		Value IObject.Value => new Value(GetType().FullName);
 		Type IObject.Type => null;
 		object IObject.Target => null;
 		IObject IObject.Convert(object value) => null;

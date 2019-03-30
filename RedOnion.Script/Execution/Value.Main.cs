@@ -72,6 +72,10 @@ namespace RedOnion.Script
 		/// C# native object (the engine will convert it as needed)
 		/// </summary>
 		Native		= 0x000A,
+		/// <summary>
+		/// Like undefined but throws when it enters operators or arguments
+		/// </summary>
+		Void		= 0x000B,
 
 		Byte		= 0x0140,// 8 bit unsigned
 		UShort		= 0x0241,// 16 bit unsigned
@@ -142,6 +146,7 @@ namespace RedOnion.Script
 		public static readonly Value Undefined = new Value();
 		public static readonly Value Null = new Value((IObject)null);
 		public static readonly Value NaN = new Value(double.NaN);
+		public static readonly Value Void = new Value(ValueKind.Void, null);
 
 		public static Value AsNative(object value)
 			=> new Value(ValueKind.Native, value);

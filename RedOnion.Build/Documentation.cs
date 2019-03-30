@@ -15,6 +15,9 @@ namespace RedOnion.Build
 			public string name;
 			public string path;
 			public MemberList members;
+
+			public bool HasFeature(ObjectFeatures feature)
+				=> (members.Features & feature) != 0;
 		}
 		static Dictionary<string, Document> docs = new Dictionary<string, Document>();
 		static Dictionary<Type, Document> types = new Dictionary<Type, Document>();
@@ -92,28 +95,43 @@ namespace RedOnion.Build
 			{
 				if (fn2obj.ContainsKey(doc.type))
 					continue;
-				/* TODO: function signatures
 				Document cdoc = null;
 				if (obj2fn.TryGetValue(doc.type, out var ctype))
 					cdoc = types[ctype];
-				*/
 				using (var file = new FileStream(doc.path + ".md", FileMode.Create))
 				using (var wr = new StreamWriter(file))
 				{
-					wr.WriteLine("## " + doc.name);
-					wr.WriteLine();
-					wr.WriteLine(doc.members.Help);
-					wr.WriteLine();
-					foreach (var member in doc.members)
+					if (cdoc != null)
 					{
-						string typePath = null;
-						if (docs.TryGetValue(member.Type, out var tdoc))
-							typePath = GetRelativePath(doc.path, tdoc.path) + ".md";
-						wr.WriteLine(typePath == null
-							? "- `{0}`: {1} - {3}"
-							: "- `{0}`: [{1}]({2}) - {3}",
-							member.Name, member.Type, typePath, member.Help);
+						wr.WriteLine(
+							cdoc.HasFeature(ObjectFeatures.Function)
+							? "## {0} Function" :
+							cdoc.HasFeature(ObjectFeatures.Constructor)
+							? "## {0} Constructor"
+							: "## {0}", doc.name);
+						Print(wr, cdoc, doc.name);
+						wr.WriteLine();
 					}
+					wr.WriteLine("## " + doc.name);
+					Print(wr, doc, doc.name);
+				}
+			}
+			void Print(StreamWriter wr, Document doc, string name)
+			{
+				wr.WriteLine();
+				wr.WriteLine(doc.members.Help);
+				wr.WriteLine();
+				foreach (var member in doc.members)
+				{
+					string typePath = null;
+					if (member.Type != name
+						&& docs.TryGetValue(member.Type, out var tdoc))
+						typePath = GetRelativePath(doc.path, tdoc.path) + ".md";
+					wr.WriteLine(typePath == null
+						? "- `{0}`: {1} - {3}"
+						: "- `{0}`: [{1}]({2}) - {3}",
+						member is Method ? member.Name + "()" : member.Name,
+						member.Type, typePath, member.Help);
 				}
 			}
 		}
