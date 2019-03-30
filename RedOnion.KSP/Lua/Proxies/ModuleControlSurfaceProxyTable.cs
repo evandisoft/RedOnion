@@ -8,7 +8,7 @@ namespace RedOnion.KSP.Lua.Proxies
 	{
 		public ModuleControlSurfaceProxyTable(MoonSharp.Interpreter.Script script, object proxied) : base(script, proxied)
 		{
-			this["GetPotentialTorque"] = new GetPotentialTorque(GetPotentialTorqueImpl);
+			//this["GetPotentialTorque"] = new GetPotentialTorque(GetPotentialTorqueImpl);
 		}
 
 		delegate void GetPotentialTorque(out Vector3 pos, out Vector3 neg);

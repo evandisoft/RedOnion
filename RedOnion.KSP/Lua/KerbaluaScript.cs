@@ -4,9 +4,11 @@ using MoonSharp.Interpreter.Interop;
 using RedOnion.KSP.Autopilot;
 using UnityEngine;
 using RedOnion.KSP.MathUtil;
+using System;
 using KSP.UI.Screens;
 using RedOnion.KSP.Lua.Proxies;
 using RedOnion.KSP.API;
+using System.Linq;
 
 namespace RedOnion.KSP.Lua
 {
@@ -21,7 +23,7 @@ namespace RedOnion.KSP.Lua
 		public EditorPanels EditorPanels = EditorPanels.Instance;
 		public EditorLogic EditorLogic = EditorLogic.fetch;
 		public ShipConstruction ShipConstruction = new ShipConstruction();
-		public Random Random = new Random();
+		public UnityEngine.Random Random = new UnityEngine.Random();
 		public FlightDriver FlightDriver = FlightDriver.fetch;
 		public HighLogic HighLogic = HighLogic.fetch;
 		public StageManager StageManager = StageManager.Instance;
@@ -42,7 +44,52 @@ namespace RedOnion.KSP.Lua
 			Globals.MetaTable = API.Globals.Instance;
 			//Globals["Vessel"] = FlightGlobals.ActiveVessel;
 			Globals["Ksp"] = new KspApi();
+			Globals["new"] = new Constructor(ConstructorImpl);
 		}
+
+		object ConstructorImpl(object copyType,params DynValue[] dynArgs)
+		{
+			Type t = copyType.GetType();
+			var constructors = t.GetConstructors();
+			foreach(var constructor in constructors)
+			{
+				var parinfos = constructor.GetParameters();
+				if (parinfos.Length == dynArgs.Length)
+				{ 
+					object[] args = new object[parinfos.Length];
+
+					for(int i = 0; i < args.Length; i++)
+					{
+						var parinfo = parinfos[i];
+						if (parinfo.ParameterType.IsValueType)
+						{
+							try
+							{
+								args[i] = Convert.ChangeType(dynArgs[i].ToObject(), parinfo.ParameterType);
+							}
+							catch(Exception)
+							{
+								goto nextLoop;
+							}
+						}
+						else
+						{
+							args[i] = dynArgs[i].ToObject();
+						}
+					}
+
+					return constructor.Invoke(args);
+				}
+			nextLoop:;
+			}
+
+			if (dynArgs.Length == 0)
+			{
+				return Activator.CreateInstance(copyType.GetType());
+			}
+			throw new Exception("Could not find constructor accepting given args for type " + copyType.GetType());
+		}
+		delegate object Constructor(object copyType,params DynValue[] args);
 
 		DynValue coroutine;
 		public bool Evaluate(out DynValue result)
