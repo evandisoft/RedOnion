@@ -16,6 +16,7 @@ namespace RedOnion.KSP.Lua
 		public FlightGlobals FlightGlobals = new FlightGlobals();
 		public Time Time = new Time();
 		public Mathf Mathf = new Mathf();
+		public Scalar Scalar = new Scalar();
 		public Vec Vec = new Vec();
 		public EditorPanels EditorPanels = EditorPanels.Instance;
 		public EditorLogic EditorLogic = EditorLogic.fetch;

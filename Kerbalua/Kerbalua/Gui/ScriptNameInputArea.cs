@@ -66,7 +66,7 @@ namespace Kerbalua.Gui {
 				}
 				if (text != previousText)
 				{
-					UnityEngine.Debug.Log(text + "\n!=\n" + previousText);
+					//UnityEngine.Debug.Log(text + "\n!=\n" + previousText);
 					File.WriteAllText(CreateFullPath(true), text.Replace("\n", Environment.NewLine));
 				}
 				CommonSaveLoadActions();
