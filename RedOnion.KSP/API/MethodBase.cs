@@ -10,7 +10,11 @@ namespace RedOnion.KSP.API
 	{
 		public ObjectFeatures Features => ObjectFeatures.Function;
 		public abstract Value Call(Self self, Arguments args);
-		public abstract DynValue Call(ScriptExecutionContext ctx, CallbackArguments args);
+		public virtual DynValue Call(ScriptExecutionContext ctx, CallbackArguments args)
+		{
+			var self = args.ToRos(out var ros);
+			return Call((Self)self, ros).ToLua();
+		}
 
 		Value ICallable.Call(IObject self, Arguments args)
 			=> Call((Self)self, args);

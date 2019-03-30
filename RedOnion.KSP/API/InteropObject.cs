@@ -75,7 +75,10 @@ namespace RedOnion.KSP.API
 			return DynValue.FromObject(script, new CallbackFunction(Call));
 		}
 		public virtual DynValue Call(ScriptExecutionContext ctx, CallbackArguments args)
-			=> DynValue.Void;
+		{
+			var self = args.ToRos(out var ros);
+			return Call(self, ros).ToLua();
+		}
 
 		bool IObject.Modify(string name, OpCode op, Value value) => false;
 		bool IProperties.Delete(string name) => false;

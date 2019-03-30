@@ -27,6 +27,7 @@ namespace RedOnion.KSP.API
 				self.Native = Vector3d.Scale(self.Native, v.Native);
 				return Value.Void;
 			}
+			/*
 			public override DynValue Call(ScriptExecutionContext ctx, CallbackArguments args)
 			{
 				if (args.Count != 2)
@@ -45,6 +46,7 @@ namespace RedOnion.KSP.API
 				self.Native = Vector3d.Scale(self.Native, v.Native);
 				return DynValue.Void;
 			}
+			*/
 		}
 	}
 }

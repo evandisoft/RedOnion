@@ -22,6 +22,7 @@ namespace RedOnion.KSP.API
 					throw new InvalidOperationException("Second argument is not a vector");
 				return new Value(new Vector(Vector3d.Cross(lhs.Native, rhs.Native)));
 			}
+			/*
 			public override DynValue Call(ScriptExecutionContext ctx, CallbackArguments args)
 			{
 				if (args.Count != 3)
@@ -34,6 +35,7 @@ namespace RedOnion.KSP.API
 					throw new InvalidOperationException("Second argument is not a vector");
 				return DynValue.FromObject(null, new Vector(Vector3d.Cross(lhs.Native, rhs.Native)));
 			}
+			*/
 		}
 	}
 }

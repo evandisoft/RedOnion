@@ -40,7 +40,7 @@ namespace RedOnion.KSP.API
 			Features = features;
 			Help = help;
 			list = members;
-			dict = new Dictionary<string, IMember>(list.Length);
+			dict = new Dictionary<string, IMember>(list.Length, StringComparer.OrdinalIgnoreCase);
 			foreach (var member in members)
 				dict.Add(member.Name, member);
 		}
