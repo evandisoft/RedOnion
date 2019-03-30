@@ -13,7 +13,7 @@ namespace RedOnion.KSP.Lua
 	public class KspApi
 	{
 		public FlightControl FlightControl = FlightControl.GetInstance();
-		public FlightGlobals FlightGlobals = new FlightGlobals();
+		public FlightGlobals FlightGlobals = FlightGlobals.fetch;
 		public Time Time = new Time();
 		public Mathf Mathf = new Mathf();
 		public Scalar Scalar = new Scalar();
@@ -22,8 +22,8 @@ namespace RedOnion.KSP.Lua
 		public EditorLogic EditorLogic = EditorLogic.fetch;
 		public ShipConstruction ShipConstruction = new ShipConstruction();
 		public Random Random = new Random();
-		public FlightDriver FlightDriver = new FlightDriver();
-		public HighLogic HighLogic = new HighLogic();
+		public FlightDriver FlightDriver = FlightDriver.fetch;
+		public HighLogic HighLogic = HighLogic.fetch;
 		public StageManager StageManager = StageManager.Instance;
 		public PartLoader PartLoader = PartLoader.Instance;
 	}
