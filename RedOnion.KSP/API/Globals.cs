@@ -76,6 +76,8 @@ namespace RedOnion.KSP.API
 				member.LuaSet(this, value);
 				return DynValue.NewBoolean(true);
 			}
+			table[index] = value;
+
 			return DynValue.NewBoolean(false);
 		}
 	}

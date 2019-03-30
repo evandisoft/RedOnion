@@ -39,8 +39,8 @@ namespace RedOnion.KSP.Lua
 					(MoonSharp.Interpreter.Script script, ModuleControlSurface m)
 						=> DynValue.NewTable(new ProxyTable(this, m))
 					);
-
 			Globals.MetaTable = API.Globals.Instance;
+			//Globals["Vessel"] = FlightGlobals.ActiveVessel;
 			Globals["Ksp"] = new KspApi();
 		}
 
