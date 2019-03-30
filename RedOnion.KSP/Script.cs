@@ -15,6 +15,7 @@ using System.Collections.Generic;
 
 namespace RedOnion.KSP
 {
+	[IgnoreForDocs]
 	public class RuntimeRoot : BasicRoot<ROS.KspRosEngine>, IType
 	{
 		public bool IsRepl { get; }
@@ -186,9 +187,9 @@ namespace RedOnion.KSP
 			return base.Set(name, value);
 		}
 
-		string IType.Help => Globals.Instance.Help;
-		IMember[] IType.MemberList => Globals.Instance.MemberList;
-		Dictionary<string, IMember> IType.Members => Globals.Instance.Members;
+		string IType.Help => GlobalMembers.Help;
+		IMember[] IType.MemberList => GlobalMembers.MemberList;
+		Dictionary<string, IMember> IType.Members => GlobalMembers.Members;
 	}
 
 	/// <summary>
