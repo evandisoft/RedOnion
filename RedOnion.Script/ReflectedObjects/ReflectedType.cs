@@ -44,14 +44,14 @@ namespace RedOnion.Script.ReflectedObjects
 			: this(engine, type, staticProps)
 			=> TypeProps = typeProps;
 
-		public override Value Call(IObject self, int argc)
-			=> new Value(Create(argc));
+		public override Value Call(IObject self, Arguments args)
+			=> new Value(Create(args));
 
-		public override IObject Create(int argc)
+		public override IObject Create(Arguments args)
 		{
 			if (Type.IsAbstract)
 				return null;
-			if (argc == 0)
+			if (args.Length == 0)
 			{
 				// Structure/ValueType has implicit default constructor (zero everything)
 				if (Type.IsValueType)
@@ -68,10 +68,10 @@ namespace RedOnion.Script.ReflectedObjects
 					var cpars = ctr.GetParameters();
 					if (cpars[0].RawDefaultValue == DBNull.Value)
 						continue;
-					var args = new object[cpars.Length];
-					for (int i = 0; i < args.Length; i++)
-						args[i] = cpars[i].DefaultValue;
-					return Convert(ctr.Invoke(args));
+					var call = new object[cpars.Length];
+					for (int i = 0; i < call.Length; i++)
+						call[i] = cpars[i].DefaultValue;
+					return Convert(ctr.Invoke(call));
 				}
 
 				if (!Engine.HasOption(EngineOption.Silent))
@@ -82,7 +82,7 @@ namespace RedOnion.Script.ReflectedObjects
 			var value = new Value();
 			foreach (var ctor in Type.GetConstructors())
 			{
-				if (!ReflectedFunction.TryCall(Engine, ctor, this, argc, ref value))
+				if (!ReflectedFunction.TryCall(Engine, ctor, this, args, ref value))
 					continue;
 				var obj = value.Object;
 				if (obj != null)
@@ -91,7 +91,7 @@ namespace RedOnion.Script.ReflectedObjects
 			}
 			if (!Engine.HasOption(EngineOption.Silent))
 				throw new NotImplementedException(string.Format(Value.Culture,
-					"{0} cannot be constructed with {1} argument(s)", Type.FullName, argc));
+					"{0} cannot be constructed with {1} argument(s)", Type.FullName, args.Length));
 			return null;
 		}
 

@@ -54,6 +54,7 @@ namespace RedOnion.Script
 		protected Engine(Func<IEngine, IEngineRoot> createRoot, P parser)
 		{
 			Parser = parser;
+			Arguments = new ArgumentList(this);
 			Root = createRoot(this);
 			Context = new EngineContext(this);
 		}
@@ -162,13 +163,17 @@ namespace RedOnion.Script
 		/// </summary>
 		public virtual IObject Box(Value value)
 		{
-			if (value.IsReference)
-				value = value.RValue;
 			if (value.Kind == ValueKind.Object)
 				return (IObject)value.ptr;
+			if (value.IsReference || value.IsNative)
+			{
+				value = ResultOf(value);
+				if (value.Kind == ValueKind.Object)
+					return (IObject)value.ptr;
+			}
 			return Root.Box(value);
 		}
-		public virtual Value Convert(object value)
+		public override Value Convert(object value)
 			=> ReflectedObjects.ReflectedType.Convert(this, value);
 
 		/// <summary>
@@ -178,7 +183,7 @@ namespace RedOnion.Script
 		/// <summary>
 		/// Argument list for function calls
 		/// </summary>
-		public ArgumentList Arguments { get; } = new ArgumentList();
+		public ArgumentList Arguments { get; }
 
 		/// <summary>
 		/// Current context (method)

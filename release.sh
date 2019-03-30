@@ -1,4 +1,4 @@
 #/bin/bash
-FILE='RedOnion.Shell/bin/Release/ros.exe'
+FILE='RedOnion.Build/bin/Release/RedOnion.Build.exe'
 chmod +x $FILE
-$FILE release.ros
+$FILE

@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -377,9 +378,9 @@ namespace RedOnion.Script
 		/// Execute regular function call. Features.Function
 		/// </summary>
 		/// <param name="self">The object to call it on (as method if not null)</param>
-		/// <param name="argc">number of arguments (pass to Arg method)</param>
+		/// <param name="args">The arguments</param>
 		/// <returns>The result of the function</returns>
-		Value Call(IObject self, int argc);
+		Value Call(IObject self, Arguments args);
 	}
 	public interface IEnumerableObject : IObject, IEnumerable<Value> { }
 	public interface IListObject : IEnumerableObject, IList<Value>
@@ -440,7 +441,7 @@ namespace RedOnion.Script
 		/// </summary>
 		/// <param name="argc">Number of arguments (pass to Arg method)</param>
 		/// <returns>The new object (or null if not supported)</returns>
-		IObject Create(int argc);
+		IObject Create(Arguments args);
 
 		/// <summary>
 		/// Get property/value (reference) at the indexes. Features.Collection
@@ -449,7 +450,7 @@ namespace RedOnion.Script
 		/// Default implementation treats x[y, z] as x[y][z],
 		/// but redirecting to Call may be valid as well
 		/// </remarks>
-		Value Index(IObject self, int argc);
+		Value Index(Arguments args);
 		/// <summary>
 		/// Get value (RValue) at index. This can only ever be called if Index created ValueKind.IndexRef.
 		/// </summary>
@@ -605,6 +606,10 @@ namespace RedOnion.Script
 	/// </summary>
 	public class ArgumentList : List<Value>
 	{
+		public IEngine Engine { get; }
+		public ArgumentList(IEngine engine)
+			=> Engine = engine;
+
 		public int Length => Count;
 		public void Remove(int last)
 			=> RemoveRange(Count - last, last);
@@ -626,6 +631,38 @@ namespace RedOnion.Script
 		}
 		public AddGuard Guard()
 			=> new AddGuard(this);
+	}
+	public struct Arguments : IEnumerable<Value>
+	{
+		readonly ArgumentList list;
+		public readonly int argc;
+		public int Length => argc;
+		public int Count => argc;
+		public Arguments(ArgumentList list, int argc)
+		{
+			this.list = list;
+			this.argc = argc;
+		}
+		public Arguments(Arguments args, int argc)
+		{
+			this.list = args.list;
+			this.argc = Math.Min(argc, args.argc);
+		}
+
+		public Value this[int i] => i >= argc ? new Value() : list.Get(argc, i);
+		public IEnumerator<Value> GetEnumerator()
+		{
+			for (int i = 0; i < argc; i++)
+				yield return list.Get(argc, i);
+		}
+		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+		public Value[] ToArray()
+		{
+			var arr = new Value[argc];
+			for (int i = 0; i < argc; i++)
+				arr[i] = list.Get(argc, i);
+			return arr;
+		}
 	}
 
 	/// <summary>

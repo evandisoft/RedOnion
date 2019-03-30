@@ -223,17 +223,17 @@ namespace RedOnion.Script.ReflectedObjects
 				return indexers;
 			}
 		}
-		public override Value Index(IObject self, int argc)
+		public override Value Index(Arguments args)
 		{
-			if (argc <= 0)
+			if (args.Length == 0)
 				return new Value();
 			var indexers = Indexers;
-			var value = Arg(argc, 0);
-			if (indexers != null && argc == 1) // TODO multi-indexers
+			var value = args[0];
+			if (indexers != null && args.Length == 1) // TODO multi-indexers
 			{
 				foreach (var pair in indexers)
 				{
-					if (pair.Value.Length != argc || !pair.Key.CanRead)
+					if (pair.Value.Length != args.Length || !pair.Key.CanRead)
 						continue;
 					if (value.IsNumber && pair.Value[0].ParameterType == typeof(int))
 						return Convert(Engine, pair.Key.GetGetMethod()
@@ -244,8 +244,8 @@ namespace RedOnion.Script.ReflectedObjects
 				}
 			}
 			value = new Value(this, value.String);
-			return argc == 1 ? value
-				: Engine.Box(new Value(this, value.String)).Index(this, argc - 1);
+			return args.Length == 1 ? value
+				: Engine.Box(IndexGet(value)).Index(new Arguments(args, args.Length - 1));
 		}
 
 		internal static readonly Dictionary<OpCode, string> OperatorNames = new Dictionary<OpCode, string>()
@@ -309,7 +309,8 @@ namespace RedOnion.Script.ReflectedObjects
 				{
 					arguments.Add(new Value(this));
 					foreach (var method in methods)
-						if (ReflectedFunction.TryCall(Engine, method, null, 1, ref result))
+						if (ReflectedFunction.TryCall(Engine, method, null,
+							new Arguments(arguments, 1), ref result))
 							return true;
 				}
 				return false;
@@ -324,7 +325,8 @@ namespace RedOnion.Script.ReflectedObjects
 					if (selfRhs)
 						arguments.Add(new Value(this));
 					foreach (var method in methods)
-						if (ReflectedFunction.TryCall(Engine, method, null, 2, ref result))
+						if (ReflectedFunction.TryCall(Engine, method, null,
+							new Arguments(arguments, 2), ref result))
 							return true;
 				}
 				return false;

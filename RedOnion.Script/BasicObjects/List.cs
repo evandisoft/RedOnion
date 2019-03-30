@@ -25,14 +25,14 @@ namespace RedOnion.Script.BasicObjects
 			: base(engine, baseClass, new Properties("prototype", prototype))
 			=> Prototype = prototype;
 
-		public override Value Call(IObject self, int argc)
-			=> new Value(Create(argc));
+		public override Value Call(IObject self, Arguments args)
+			=> new Value(Create(args));
 
-		public override IObject Create(int argc)
+		public override IObject Create(Arguments args)
 		{
-			var list = new List<Value>(argc);
-			for (int i = 0; i < argc; i++)
-				list[i] = Engine.GetArgument(argc, i);
+			var list = new List<Value>(args.Length);
+			for (int i = 0; i < args.Length; i++)
+				list[i] = args[i];
 			return new ListObj(Engine, Prototype, list);
 		}
 
@@ -84,15 +84,15 @@ namespace RedOnion.Script.BasicObjects
 			: base(engine, baseClass, new Properties(StdProps))
 			=> List = value;
 
-		public override Value Index(IObject self, int argc)
+		public override Value Index(Arguments args)
 		{
-			if (argc == 1)
+			if (args.Length == 1)
 			{
-				var i = Engine.GetArgument(argc);
+				var i = args[0];
 				if (i.IsNumber)
 					return List[i.Int];
 			}
-			return base.Index(self, argc);
+			return base.Index(args);
 		}
 
 		int ICollection<Value>.Count => List.Count;

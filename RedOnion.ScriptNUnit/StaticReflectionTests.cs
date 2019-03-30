@@ -44,7 +44,7 @@ namespace RedOnion.ScriptNUnit
 			var simple = simpleAction.RefObj as ReflectedFunction;
 			Assert.NotNull(simple);
 			StaticClass.WasExecuted = false;
-			simple.Call(null, 0);
+			simple.Call(null, new Arguments(Arguments, 0));
 			Assert.IsTrue(StaticClass.WasExecuted);
 
 			Root.Set("testClass", creator);

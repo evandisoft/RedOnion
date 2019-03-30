@@ -20,14 +20,14 @@ namespace RedOnion.Script.BasicObjects
 			: base(engine, baseClass, new Properties("prototype", prototype))
 			=> Prototype = prototype;
 
-		public override Value Call(IObject self, int argc)
-			=> new Value(Create(argc));
+		public override Value Call(IObject self, Arguments args)
+			=> new Value(Create(args));
 
-		public override IObject Create(int argc)
+		public override IObject Create(Arguments args)
 		{
-			if (argc == 0)
+			if (args.Length == 0)
 				return new BasicObject(Engine, Prototype);
-			return Engine.Box(Engine.GetArgument(argc));
+			return Engine.Box(args[0]);
 		}
 	}
 
@@ -254,31 +254,30 @@ namespace RedOnion.Script.BasicObjects
 		public virtual void Reset()
 			=> MoreProps = null;
 
-		public virtual Value Call(IObject self, int argc)
+		public virtual Value Call(IObject self, Arguments args)
 		{
 			if (!Engine.HasOption(EngineOption.Silent))
 				throw new NotImplementedException(GetType().FullName + " is not a function");
 			return new Value();
 		}
 
-		public virtual IObject Create(int argc)
+		public virtual IObject Create(Arguments args)
 		{
 			if (!Engine.HasOption(EngineOption.Silent))
 				throw new NotImplementedException(GetType().FullName + " is not a constructor");
 			return null;
 		}
 
-		public virtual Value Index(IObject self, int argc)
+		public virtual Value Index(Arguments args)
 		{
-			switch (argc)
+			switch (args.Length)
 			{
 			case 0:
 				return new Value();
 			case 1:
-				return Value.IndexRef(this, Engine.GetArgument(argc, 0));
+				return Value.IndexRef(this, args[0]);
 			default:
-				self = Engine.Box(Value.IndexRef(this, Engine.GetArgument(argc, 0)));
-				return self.Index(this, argc - 1);
+				return Engine.Box(IndexGet(args[0])).Index(new Arguments(args, args.Length - 1));
 			}
 		}
 		public virtual Value IndexGet(Value index) => Get(index.String);

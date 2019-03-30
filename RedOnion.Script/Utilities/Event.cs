@@ -28,7 +28,7 @@ namespace RedOnion.Script.Utilities
 		public void Invoke()
 		{
 			foreach (var call in list)
-				call.Call(null, 0);
+				call.Call(null, new Arguments());
 		}
 
 		public struct AddProxy
@@ -79,7 +79,7 @@ namespace RedOnion.Script.Utilities
 			Action action;
 			public ActionWrapper(Action action)
 				=> this.action = action;
-			public Value Call(IObject self, int argc)
+			public Value Call(IObject self, Arguments args)
 			{
 				action();
 				return new Value();

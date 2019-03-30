@@ -36,7 +36,33 @@ namespace RedOnion.Script
 		/// <summary>
 		/// Result of last expression (rvalue)
 		/// </summary>
-		public Value Result => Value.RValue;
+		public Value Result => ResultOf(Value);
+		/// <summary>
+		/// Convert Value to RValue (Result - resolve references and native objects)
+		/// </summary>
+		/// <param name="value"></param>
+		/// <returns></returns>
+		public Value ResultOf(Value value)
+		{
+			switch (value.Kind)
+			{
+			default:
+				return value;
+			case ValueKind.Reference:
+				value = ((IProperties)Value.ptr).Get((string)Value.idx);
+				if (value.Kind == ValueKind.Native)
+					goto case ValueKind.Native;
+				return value;
+			case ValueKind.IndexRef:
+				value = ((IObject)Value.ptr).IndexGet((Value)Value.idx);
+				if (value.Kind == ValueKind.Native)
+					goto case ValueKind.Native;
+				return value;
+			case ValueKind.Native:
+				return Convert(value.ptr);
+			}
+		}
+		public abstract Value Convert(object value);
 
 		/// <summary>
 		/// Currently executed code
