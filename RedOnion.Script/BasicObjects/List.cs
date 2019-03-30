@@ -64,6 +64,7 @@ namespace RedOnion.Script.BasicObjects
 	/// String object (string box)
 	/// </summary>
 	[DebuggerDisplay("{Name}")]
+	[Creator(typeof(ListFun))]
 	public class ListObj : BasicObject, IListObject
 	{
 		public static readonly Value[] Empty = new Value[0];

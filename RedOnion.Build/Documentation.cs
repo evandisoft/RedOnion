@@ -1,4 +1,5 @@
 using RedOnion.KSP.API;
+using RedOnion.Script;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,18 +11,23 @@ namespace RedOnion.Build
 	{
 		class Document
 		{
+			public Type type;
 			public string name;
 			public string path;
-			public string help;
-			public IDictionary<string, IMember> members;
+			public MemberList members;
 		}
-		static Dictionary<string, Document> types = new Dictionary<string, Document>();
+		static Dictionary<string, Document> docs = new Dictionary<string, Document>();
+		static Dictionary<Type, Document> types = new Dictionary<Type, Document>();
 		static HashSet<Type> proxied = new HashSet<Type>();
 		static HashSet<Type> discovered = new HashSet<Type>();
+		static Dictionary<Type, Type> obj2fn = new Dictionary<Type, Type>();
+		static Dictionary<Type, Type> fn2obj = new Dictionary<Type, Type>();
 		internal static void Exec()
 		{
 			foreach (var type in typeof(GlobalMembers).Assembly.GetTypes())
 			{
+				if (type.IsDefined(typeof(IgnoreForDocsAttribute)))
+					continue;
 				var proxy = type.GetCustomAttribute<ProxyDocsAttribute>();
 				if (proxy != null)
 				{
@@ -38,7 +44,16 @@ namespace RedOnion.Build
 						break;
 					}
 				}
-				if (found) discovered.Add(type);
+				if (found)
+				{
+					discovered.Add(type);
+					var creator = type.GetCustomAttribute<CreatorAttribute>();
+					if (creator != null)
+					{
+						obj2fn[type] = creator.Creator;
+						fn2obj[creator.Creator] = type;
+					}
+				}
 			}
 			foreach (var type in proxied)
 				discovered.Remove(type);
@@ -49,55 +64,55 @@ namespace RedOnion.Build
 				if (proxy != null) doctype = proxy.ForType;
 				var name = doctype.Name;
 				var full = doctype.FullName.Substring("RedOnion.KSP.".Length);
-				string help = null;
-				IDictionary<string, IMember> members = null;
+				MemberList members;
 
-				var getHelp = type.GetProperty("Help",
-					BindingFlags.Public|BindingFlags.Static|BindingFlags.GetProperty);
-				var getMembers = type.GetProperty("Members",
+				var getMembers = type.GetProperty("MemberList",
 					BindingFlags.Public|BindingFlags.Static|BindingFlags.GetProperty);
 
-				if (getHelp != null && getMembers != null)
-				{
-					help = (string)getHelp.GetValue(null);
-					members = (IDictionary<string, IMember>)getMembers.GetValue(null);
-				}
+				if (getMembers != null)
+					members = (MemberList)getMembers.GetValue(null);
 				else
 				{
 					var instance = type.GetProperty("Instance",
 					BindingFlags.Public|BindingFlags.Static|BindingFlags.GetProperty);
 					if (instance == null || !instance.CanRead) continue;
-					var it = (IType)instance.GetValue(null);
-					help = it.Help;
-					members = it.Members;
+					members = ((IType)instance.GetValue(null)).Members;
 				}
-				types.Add(name, new Document()
+				var doc = new Document()
 				{
+					type = doctype,
 					name = name,
 					path = "RedOnion.KSP/" + string.Join("/", full.Split('.')),
-					help = help,
 					members = members
-				});
+				};
+				docs.Add(name, doc);
+				types.Add(doctype, doc);
 			}
-			foreach (var doc in types.Values)
+			foreach (var doc in docs.Values)
 			{
+				if (fn2obj.ContainsKey(doc.type))
+					continue;
+				/* TODO: function signatures
+				Document cdoc = null;
+				if (obj2fn.TryGetValue(doc.type, out var ctype))
+					cdoc = types[ctype];
+				*/
 				using (var file = new FileStream(doc.path + ".md", FileMode.Create))
 				using (var wr = new StreamWriter(file))
 				{
 					wr.WriteLine("## " + doc.name);
 					wr.WriteLine();
-					wr.WriteLine(doc.help);
+					wr.WriteLine(doc.members.Help);
 					wr.WriteLine();
 					foreach (var member in doc.members)
 					{
-						var m = member.Value;
 						string typePath = null;
-						if (types.TryGetValue(m.Type, out var tdoc))
+						if (docs.TryGetValue(member.Type, out var tdoc))
 							typePath = GetRelativePath(doc.path, tdoc.path) + ".md";
 						wr.WriteLine(typePath == null
 							? "- `{0}`: {1} - {3}"
 							: "- `{0}`: [{1}]({2}) - {3}",
-							member.Key, m.Type, typePath, m.Help);
+							member.Name, member.Type, typePath, member.Help);
 					}
 				}
 			}

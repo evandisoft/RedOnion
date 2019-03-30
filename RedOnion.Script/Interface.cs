@@ -372,6 +372,15 @@ namespace RedOnion.Script
 			=> Add(name, Value.FromObject(obj));
 	}
 
+	/// <summary>
+	/// Link from instance to creator (ROS object to function).
+	/// </summary>
+	public class CreatorAttribute : Attribute
+	{
+		public Type Creator { get; }
+		public CreatorAttribute(Type creator)
+			=> Creator = creator;
+	}
 	public interface ICallable
 	{
 		/// <summary>

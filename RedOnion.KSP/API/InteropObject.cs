@@ -8,33 +8,18 @@ namespace RedOnion.KSP.API
 {
 	public abstract class InteropObject : IObject, IUserDataType, IType
 	{
-		public abstract string Help { get; }
-
 		public ObjectFeatures Features { get; }
-		public IMember[] MemberList { get; }
-		public Dictionary<string, IMember> Members { get; }
-		public InteropObject(ObjectFeatures features, IMember[] members)
+		public MemberList Members { get; }
+		public InteropObject(
+			ObjectFeatures features,
+			MemberList members)
 		{
 			Features = features;
-			if (members == null || members.Length == 0)
-			{
-				MemberList = NoMembers;
-				Members = EmptyMemberDictionary;
-			}
-			else
-			{
-				Members = new Dictionary<string, IMember>(members.Length);
-				foreach (var member in members)
-					Members.Add(member.Name, member);
-			}
+			Members = members;
 		}
 
-		public static readonly IMember[] NoMembers = new IMember[0];
-		public static readonly Dictionary<string, IMember>
-			EmptyMemberDictionary = new Dictionary<string, IMember>();
-
 		bool IProperties.Has(string name)
-			=> Members.ContainsKey(name);
+			=> Members.Contains(name);
 		Value IProperties.Get(string name)
 		{
 			if (!Get(name, out var value))
@@ -81,6 +66,8 @@ namespace RedOnion.KSP.API
 
 		public virtual Value Call(IObject self, Arguments args)
 			=> new Value();
+		public virtual IObject Create(Arguments args)
+			=> null;
 		public virtual DynValue MetaIndex(MoonSharp.Interpreter.Script script, string metaname)
 			=> null;
 
@@ -88,8 +75,6 @@ namespace RedOnion.KSP.API
 		bool IProperties.Delete(string name) => false;
 		void IProperties.Reset() { }
 
-		IObject IObject.Create(Arguments args)
-			=> null;
 		Value IObject.Index(Arguments args)
 			=> throw new NotImplementedException();
 		Value IObject.IndexGet(Value index)

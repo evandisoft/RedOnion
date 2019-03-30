@@ -88,11 +88,11 @@ namespace RedOnion.KSP
 				{ "idle",               idle },
 
 				{ "Vessel",             this[typeof(Vessel)] },
-				{ "FlightGlobals",      this[typeof(FlightGlobals)] },
 				{ "FlightCtrlState",    this[typeof(FlightCtrlState)] },
+				{ "FlightGlobals",      new Value(e => Convert(FlightGlobals.fetch)) },
 				{ "FlightControl",      new Value(e => Convert(FlightControl.GetInstance())) },
-				{ "FlightDriver",       this[typeof(FlightDriver)] },
-				{ "HighLogic",          this[typeof(HighLogic)] },
+				{ "FlightDriver",       new Value(e => Convert(FlightDriver.fetch)) },
+				{ "HighLogic",          new Value(e => Convert(HighLogic.fetch)) },
 				{ "InputLockManager",   this[typeof(InputLockManager)] },
 				{ "InputLock",          this[typeof(InputLockManager)] },
 				{ "StageManager",       this[typeof(StageManager)] },
@@ -187,9 +187,7 @@ namespace RedOnion.KSP
 			return base.Set(name, value);
 		}
 
-		string IType.Help => GlobalMembers.Help;
-		IMember[] IType.MemberList => GlobalMembers.MemberList;
-		Dictionary<string, IMember> IType.Members => GlobalMembers.Members;
+		MemberList IType.Members => GlobalMembers.Members;
 	}
 
 	/// <summary>
@@ -225,7 +223,7 @@ namespace RedOnion.KSP
 		{
 			if (value is IType desc)
 			{
-				foreach (var member in desc.MemberList)
+				foreach (var member in desc.Members)
 					AddSuggestion(member.Name);
 			}
 			base.FillFrom(value);

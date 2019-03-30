@@ -40,6 +40,7 @@ namespace RedOnion.Script.BasicObjects
 	/// which can be used like string-keyed dictionary.
 	/// </remarks>
 	[DebuggerDisplay("{Name}")]
+	[Creator(typeof(ObjectFun))]
 	public class BasicObject : BasicObject<IEngine>
 	{
 		/// <summary>
