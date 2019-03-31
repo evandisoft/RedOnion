@@ -118,18 +118,33 @@ namespace RedOnion.KSP.ApiNUnit
 		{
 			Test("var a = v 1,2,3");
 			Test("var b = v 4,5,6");
-			Test("var c = a + b");
+			Test("a + b");
 			var v = Result.Object as Vector;
 			Assert.NotNull(v);
 			Assert.AreEqual(1.0+4.0, v.X);
 			Assert.AreEqual(2.0+5.0, v.Y);
 			Assert.AreEqual(3.0+6.0, v.Z);
-			Test("var d = a - b");
+
+			Test("a - b");
 			v = Result.Object as Vector;
 			Assert.NotNull(v);
 			Assert.AreEqual(1.0-4.0, v.X);
 			Assert.AreEqual(2.0-5.0, v.Y);
 			Assert.AreEqual(3.0-6.0, v.Z);
+
+			Test("a * b");
+			v = Result.Object as Vector;
+			Assert.NotNull(v);
+			Assert.AreEqual(1.0*4.0, v.X);
+			Assert.AreEqual(2.0*5.0, v.Y);
+			Assert.AreEqual(3.0*6.0, v.Z);
+
+			Test("a / b");
+			v = Result.Object as Vector;
+			Assert.NotNull(v);
+			Assert.AreEqual(1.0/4.0, v.X);
+			Assert.AreEqual(2.0/5.0, v.Y);
+			Assert.AreEqual(3.0/6.0, v.Z);
 		}
 	}
 }

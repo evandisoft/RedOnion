@@ -116,6 +116,12 @@ namespace RedOnion.KSP.API
 				case OpCode.Sub:
 					result = new Value(new Vector(a - b));
 					return true;
+				case OpCode.Mul:
+					result = new Value(new Vector(a.x * b.x, a.y * b.y, a.z * b.z));
+					return true;
+				case OpCode.Div:
+					result = new Value(new Vector(a.x / b.x, a.y / b.y, a.z / b.z));
+					return true;
 				}
 			}
 			result = new Value();
@@ -129,6 +135,10 @@ namespace RedOnion.KSP.API
 				return DynValue.NewCallback(Add);
 			case "__sub":
 				return DynValue.NewCallback(Sub);
+			case "__mul":
+				return DynValue.NewCallback(Mul);
+			case "__div":
+				return DynValue.NewCallback(Div);
 			}
 			return null;
 		}
@@ -148,6 +158,27 @@ namespace RedOnion.KSP.API
 				VectorCreator.ToVector(args[0].ToObject())
 				- VectorCreator.ToVector(args[1].ToObject()));
 		}
+		DynValue Mul(ScriptExecutionContext ctx, CallbackArguments args)
+		{
+			if (args.Count != 2)
+				throw new InvalidOperationException("Unexpected number of arguments: " + args.Count);
+			return UserData.Create(
+				VectorCreator.ToVector(args[0].ToObject())
+				* VectorCreator.ToVector(args[1].ToObject()));
+		}
+		DynValue Div(ScriptExecutionContext ctx, CallbackArguments args)
+		{
+			if (args.Count != 2)
+				throw new InvalidOperationException("Unexpected number of arguments: " + args.Count);
+			return UserData.Create(
+				VectorCreator.ToVector(args[0].ToObject())
+				/ VectorCreator.ToVector(args[1].ToObject()));
+		}
+
+		public static implicit operator Vector3d(Vector v) => v.Native;
+		public static implicit operator Vector3(Vector v) => v.Native;
+		public static implicit operator Vector2d(Vector v) => new Vector2d(v.X, v.Y);
+		public static implicit operator Vector2(Vector v) => new Vector2((float)v.X, (float)v.Y);
 
 		public static Vector operator +(Vector a)
 			=> new Vector(a.Native);
@@ -175,5 +206,27 @@ namespace RedOnion.KSP.API
 			=> new Vector(a - b.Native);
 		public static Vector operator -(Vector a, Vector3 b)
 			=> new Vector(a.Native - b);
+
+		public static Vector operator *(Vector a, Vector b)
+			=> new Vector(a.X * b.X, a.Y * b.Y, a.Z * b.Z);
+		public static Vector operator *(Vector3d a, Vector b)
+			=> new Vector(a.x * b.X, a.y * b.Y, a.z * b.Z);
+		public static Vector operator *(Vector a, Vector3d b)
+			=> new Vector(a.X * b.x, a.Y * b.y, a.Z * b.z);
+		public static Vector operator *(Vector3 a, Vector b)
+			=> new Vector(a.x * b.X, a.y * b.Y, a.z * b.Z);
+		public static Vector operator *(Vector a, Vector3 b)
+			=> new Vector(a.X * b.x, a.Y * b.y, a.Z * b.z);
+
+		public static Vector operator /(Vector a, Vector b)
+			=> new Vector(a.X / b.X, a.Y / b.Y, a.Z / b.Z);
+		public static Vector operator /(Vector3d a, Vector b)
+			=> new Vector(a.x / b.X, a.y / b.Y, a.z / b.Z);
+		public static Vector operator /(Vector a, Vector3d b)
+			=> new Vector(a.X / b.x, a.Y / b.y, a.Z / b.z);
+		public static Vector operator /(Vector3 a, Vector b)
+			=> new Vector(a.x / b.X, a.y / b.Y, a.z / b.Z);
+		public static Vector operator /(Vector a, Vector3 b)
+			=> new Vector(a.X / b.x, a.Y / b.y, a.Z / b.z);
 	}
 }
