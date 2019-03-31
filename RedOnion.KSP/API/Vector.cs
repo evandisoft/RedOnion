@@ -121,6 +121,23 @@ namespace RedOnion.KSP.API
 			result = new Value();
 			return false;
 		}
+		public override DynValue LuaOperator(string metaname)
+		{
+			switch (metaname)
+			{
+			case "__add":
+				return DynValue.NewCallback(Add);
+			}
+			return null;
+		}
+		DynValue Add(ScriptExecutionContext ctx, CallbackArguments args)
+		{
+			if (args.Count != 2)
+				throw new InvalidOperationException("Unexpected number of arguments: " + args.Count);
+			return UserData.Create(
+				VectorCreator.ToVector(args[0].ToObject())
+				+ VectorCreator.ToVector(args[1].ToObject()));
+		}
 
 		public static Vector operator +(Vector a)
 			=> new Vector(a.Native);
