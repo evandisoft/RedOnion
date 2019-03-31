@@ -33,6 +33,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedOnion.Shell", "RedOnion.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedOnion.Build", "RedOnion.Build\RedOnion.Build.csproj", "{976203CB-DAF8-4320-BA90-A3987EC0F82A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedOnion.KSP.ApiNUnit", "RedOnion.KSP.ApiNUnit\RedOnion.KSP.ApiNUnit.csproj", "{7E7D0224-887F-4DFB-93C3-F3738440271A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -75,6 +77,10 @@ Global
 		{976203CB-DAF8-4320-BA90-A3987EC0F82A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{976203CB-DAF8-4320-BA90-A3987EC0F82A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{976203CB-DAF8-4320-BA90-A3987EC0F82A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7E7D0224-887F-4DFB-93C3-F3738440271A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E7D0224-887F-4DFB-93C3-F3738440271A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E7D0224-887F-4DFB-93C3-F3738440271A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E7D0224-887F-4DFB-93C3-F3738440271A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

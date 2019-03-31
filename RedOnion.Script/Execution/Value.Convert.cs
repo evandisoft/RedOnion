@@ -9,6 +9,7 @@ namespace RedOnion.Script
 	public partial struct Value
 	{
 		public bool IsNative => Kind == ValueKind.Native;
+		public bool IsObject => Kind == ValueKind.Object;
 
 		/// <summary>
 		/// Get native object (string, int, ...)
@@ -61,6 +62,8 @@ namespace RedOnion.Script
 					return data.Float;
 				case ValueKind.Double:
 					return data.Double;
+				case ValueKind.Void:
+					throw new InvalidOperationException("Void cannot be converted to object");
 				}
 			}
 		}
@@ -307,6 +310,8 @@ namespace RedOnion.Script
 				case ValueKind.Float:
 				case ValueKind.Double:
 					return this;
+				case ValueKind.Void:
+					throw new InvalidOperationException("Void cannot be converted to number");
 				}
 			}
 		}
@@ -317,14 +322,19 @@ namespace RedOnion.Script
 		public static CultureInfo Culture = CultureInfo.InvariantCulture;
 
 		public static implicit operator string(Value value)
-			=> value.ToString();
-		public string String => ToString();
+			=> value.String;
+		public string String
+			=> Kind == ValueKind.Void
+			? throw new InvalidOperationException("Void cannot be converted to string")
+			: ToString();
 		public override string ToString()
 		{
 			switch (Kind)
 			{
 			default:
 				return "undefined";
+			case ValueKind.Void:
+				return "void";
 			case ValueKind.Object:
 				if (ptr == null)
 					return "null";
@@ -378,6 +388,8 @@ namespace RedOnion.Script
 					return String;
 				case ValueKind.Undefined:
 					return "undefined";
+				case ValueKind.Void:
+					return "void";
 				case ValueKind.Object:
 					return ptr == null ? "null" : ((IObject)ptr).Name;
 				case ValueKind.Reference:
@@ -394,37 +406,41 @@ namespace RedOnion.Script
 
 		public ValueKind Kind => kind;
 		/// <summary>
-		/// Is string or char
+		/// Is string or char.
 		/// </summary>
 		public bool IsString => (Kind & ValueKind.fStr) != 0;
 		/// <summary>
-		/// Is number (primitive type - includes char and bool)
+		/// Is number (primitive type - includes char and bool).
 		/// </summary>
 		public bool IsNumber => (Kind & ValueKind.fNum) != 0;
 		/// <summary>
-		/// Is enum (handled like primitive but converted to enum when converting to Native)
+		/// Is enum (handled like primitive but converted to enum when converting to Native).
 		/// </summary>
 		public bool IsEnum => (Kind & ValueKind.fEnum) != 0;
 		/// <summary>
-		/// Is 64bit or more (long, ulong and double, more bits not supported yet)
+		/// Is 64bit or more (long, ulong and double, more bits not supported yet).
 		/// </summary>
 		public bool Is64 => (Kind & ValueKind.f64) != 0;
 		/// <summary>
-		/// Number of bytes the number / primitive type uses (zero if not primitive type)
+		/// Number of bytes the number / primitive type uses (zero if not primitive type).
 		/// </summary>
 		public byte NumberSize => (byte)(((ushort)(Kind & ValueKind.mSz)) >> 8);
 		/// <summary>
-		/// Is signed number type (double, float, int, long, short or sbyte)
+		/// Is signed number type (double, float, int, long, short or sbyte).
 		/// </summary>
 		public bool Signed => (Kind & ValueKind.fSig) != 0;
 		/// <summary>
-		/// Is foating point number (double or float)
+		/// Is foating point number (double or float).
 		/// </summary>
 		public bool IsFloatigPoint => (Kind & ValueKind.fFp) != 0;
 		/// <summary>
-		/// Is floating point number with not-a-number value
+		/// Is floating point number with not-a-number value.
 		/// </summary>
 		public bool IsNaN => (Kind & ValueKind.fFp) != 0 && double.IsNaN(data.Double);
+		/// <summary>
+		/// Is void (no-value returned from functions/methods).
+		/// </summary>
+		public bool IsVoid => Kind == ValueKind.Void;
 
 		public static implicit operator bool(Value value)
 			=> value.Bool;
@@ -435,6 +451,7 @@ namespace RedOnion.Script
 			Kind == ValueKind.String ? ptr != null && ((string)ptr).Length > 0 :
 			Kind == ValueKind.Reference ? ((IProperties)ptr).Get((string)idx).Bool :
 			Kind == ValueKind.IndexRef ? ((IObject)ptr).IndexGet((Value)idx).Bool :
+			Kind == ValueKind.Void ? throw new InvalidOperationException("Void cannot be converted to bool") :
 			false;
 
 		public static implicit operator char(Value value)
@@ -448,6 +465,8 @@ namespace RedOnion.Script
 					var s = ptr as string;
 					return s == null || s.Length == 0 ? '\0' : s[0];
 				}
+				if (Kind == ValueKind.Void)
+					throw new InvalidOperationException("Void cannot be converted to char");
 				return IsNumber ? IsFloatigPoint ?
 					(char)data.Double : (char)data.Long :
 					Kind == ValueKind.Reference ? ((IProperties)ptr).Get((string)idx).Char :
@@ -470,6 +489,8 @@ namespace RedOnion.Script
 						return v;
 					return double.NaN;
 				}
+				if (Kind == ValueKind.Void)
+					throw new InvalidOperationException("Void cannot be converted to double");
 				return IsNumber ? IsFloatigPoint ?
 					data.Double : data.Long :
 					Kind == ValueKind.Reference ? ((IProperties)ptr).Get((string)idx).Double :
@@ -492,6 +513,8 @@ namespace RedOnion.Script
 						return v;
 					return 0;
 				}
+				if (Kind == ValueKind.Void)
+					throw new InvalidOperationException("Void cannot be converted to long");
 				return IsNumber ? IsFloatigPoint ?
 					(long)data.Double : data.Long :
 					Kind == ValueKind.Reference ? ((IProperties)ptr).Get((string)idx).Long :
@@ -514,6 +537,8 @@ namespace RedOnion.Script
 						return v;
 					return 0;
 				}
+				if (Kind == ValueKind.Void)
+					throw new InvalidOperationException("Void cannot be converted to ulong");
 				return IsNumber ? IsFloatigPoint ?
 					(ulong)data.Double : (ulong)data.Long :
 					Kind == ValueKind.Reference ? ((IProperties)ptr).Get((string)idx).ULong :

@@ -11,23 +11,26 @@ namespace RedOnion.KSP.API
 	public static class GlobalMembers
 	{
 		public static MemberList Members { get; } = new MemberList(
+		ObjectFeatures.None,
+
 		"Global variables, objects and functions.",
+
 		new IMember[]
 		{
-			new Native("ship", "Vessel", "Active vessel (in flight or editor)",
+			new Native("ship", "Vessel|ShipConstruct", "Active vessel (in flight or editor)",
 				() => HighLogic.LoadedSceneIsFlight ? (object)FlightGlobals.ActiveVessel
 				: HighLogic.LoadedSceneIsEditor ? EditorLogic.fetch.ship : null),
 			new Interop("stage", "Stage", "Staging logic",
-				() => Stage.Instance)
+				() => Stage.Instance),
+			new Interop("V", "Vector", "Function for creating 3D vector / coordinate",
+				() => VectorCreator.Instance)
 		});
 	}
 	[IgnoreForDocs]
 	public class Globals : Table, IProperties, IType
 	{
-		public static Globals Instance { get; } = new Globals();
-
-		ObjectFeatures IType.Features => ObjectFeatures.None;
 		public MemberList Members => GlobalMembers.Members;
+		public static Globals Instance { get; } = new Globals();
 
 		public Globals() : base(null)
 		{

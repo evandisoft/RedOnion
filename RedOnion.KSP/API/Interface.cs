@@ -30,27 +30,17 @@ namespace RedOnion.KSP.API
 	public class MemberList : IEnumerable<IMember>
 	{
 		//TODO: function signatures
-		public string Help { get; }
-		IMember[] list;
 		Dictionary<string, IMember> dict;
-		class Comparer : IComparer<IMember>, IComparer
+		IMember[] list;
+		public ObjectFeatures Features { get; }
+		public string Help { get; }
+		public MemberList(ObjectFeatures features,
+			string help, IMember[] members)
 		{
-			public static Comparer Instance { get; } = new Comparer();
-			public int Compare(IMember x, IMember y)
-				=> x.Name.CompareTo(y.Name);
-			public int Compare(object x, object y)
-			{
-				var xname = (x as IMember)?.Name ?? x.ToString();
-				var yname = (y as IMember)?.Name ?? y.ToString();
-				return xname.CompareTo(yname);
-			}
-		}
-		public MemberList(string help, IMember[] members)
-		{
+			Features = features;
 			Help = help;
-			Array.Sort(members, Comparer.Instance);
 			list = members;
-			dict = new Dictionary<string, IMember>(list.Length);
+			dict = new Dictionary<string, IMember>(list.Length, StringComparer.OrdinalIgnoreCase);
 			foreach (var member in members)
 				dict.Add(member.Name, member);
 		}
@@ -68,8 +58,6 @@ namespace RedOnion.KSP.API
 		{
 			get => dict.TryGetValue(name, out var it) ? it : null;
 		}
-		public int IndexOf(string name)
-			=> Array.BinarySearch(list, name, Comparer.Instance);
 		public bool Contains(string name)
 			=> dict.ContainsKey(name);
 		public bool TryGetValue(string name, out IMember member)
@@ -80,7 +68,6 @@ namespace RedOnion.KSP.API
 	/// </summary>
 	public interface IType
 	{
-		ObjectFeatures Features { get; }
 		MemberList Members { get; }
 	}
 	/// <summary>
@@ -137,7 +124,7 @@ namespace RedOnion.KSP.API
 	/// <summary>
 	/// Boolean property.
 	/// </summary>
-	public class Bool<T> : IMember where T : InteropObject
+	public class Bool<Self> : IMember where Self : IObject
 	{
 		public string Name { get; }
 		public string Type { get; }
@@ -145,20 +132,20 @@ namespace RedOnion.KSP.API
 		public bool CanRead { get; }
 		public bool CanWrite { get; }
 
-		public Func<T, bool> Get { get; }
-		public Action<T, bool> Set { get; }
+		public Func<Self, bool> Get { get; }
+		public Action<Self, bool> Set { get; }
 
 		public Value RosGet(object self)
-			=> new Value(Get((T)self));
+			=> new Value(Get((Self)self));
 		public DynValue LuaGet(object self)
-			=> DynValue.NewBoolean(Get((T)self));
+			=> DynValue.NewBoolean(Get((Self)self));
 		public void RosSet(object self, Value value)
-			=> Set((T)self, value.Bool);
+			=> Set((Self)self, value.Bool);
 		public void LuaSet(object self, DynValue value)
-			=> Set((T)self, value.Boolean);
+			=> Set((Self)self, value.Boolean);
 
 		public Bool(string name, string help,
-			Func<T, bool> read, Action<T, bool> write = null)
+			Func<Self, bool> read, Action<Self, bool> write = null)
 		{
 			Name = name;
 			Type = "bool";
@@ -207,7 +194,7 @@ namespace RedOnion.KSP.API
 	/// <summary>
 	/// Integer property.
 	/// </summary>
-	public class Int<T> : IMember where T : InteropObject
+	public class Int<Self> : IMember where Self : IObject
 	{
 		public string Name { get; }
 		public string Type { get; }
@@ -215,20 +202,20 @@ namespace RedOnion.KSP.API
 		public bool CanRead { get; }
 		public bool CanWrite { get; }
 
-		public Func<T, int> Get { get; }
-		public Action<T, int> Set { get; }
+		public Func<Self, int> Get { get; }
+		public Action<Self, int> Set { get; }
 
 		public Value RosGet(object self)
-			=> new Value(Get((T)self));
+			=> new Value(Get((Self)self));
 		public DynValue LuaGet(object self)
-			=> DynValue.NewNumber(Get((T)self));
+			=> DynValue.NewNumber(Get((Self)self));
 		public void RosSet(object self, Value value)
-			=> Set((T)self, value.Int);
+			=> Set((Self)self, value.Int);
 		public void LuaSet(object self, DynValue value)
-			=> Set((T)self, (int)value.Number);
+			=> Set((Self)self, (int)value.Number);
 
 		public Int(string name, string help,
-			Func<T, int> read, Action<T, int> write = null)
+			Func<Self, int> read, Action<Self, int> write = null)
 		{
 			Name = name;
 			Type = "int";
@@ -277,7 +264,7 @@ namespace RedOnion.KSP.API
 	/// <summary>
 	/// Floating-point property.
 	/// </summary>
-	public class Float<T> : IMember where T : InteropObject
+	public class Float<Self> : IMember where Self : IObject
 	{
 		public string Name { get; }
 		public string Type { get; }
@@ -285,20 +272,20 @@ namespace RedOnion.KSP.API
 		public bool CanRead { get; }
 		public bool CanWrite { get; }
 
-		public Func<T, float> Get { get; }
-		public Action<T, float> Set { get; }
+		public Func<Self, float> Get { get; }
+		public Action<Self, float> Set { get; }
 
 		public Value RosGet(object self)
-			=> new Value(Get((T)self));
+			=> new Value(Get((Self)self));
 		public DynValue LuaGet(object self)
-			=> DynValue.NewNumber(Get((T)self));
+			=> DynValue.NewNumber(Get((Self)self));
 		public void RosSet(object self, Value value)
-			=> Set((T)self, value.Float);
+			=> Set((Self)self, value.Float);
 		public void LuaSet(object self, DynValue value)
-			=> Set((T)self, (float)value.Number);
+			=> Set((Self)self, (float)value.Number);
 
 		public Float(string name, string help,
-			Func<T, float> read, Action<T, float> write = null)
+			Func<Self, float> read, Action<Self, float> write = null)
 		{
 			Name = name;
 			Type = "float";
@@ -347,7 +334,7 @@ namespace RedOnion.KSP.API
 	/// <summary>
 	/// Property getting/setting C#-native object.
 	/// </summary>
-	public class Native<T> : IMember where T : InteropObject
+	public class Native<Self> : IMember where Self : IObject
 	{
 		public string Name { get; }
 		public string Type { get; }
@@ -355,23 +342,58 @@ namespace RedOnion.KSP.API
 		public bool CanRead { get; }
 		public bool CanWrite { get; }
 
-		public Func<T, object> Get { get; }
-		public Action<T, object> Set { get; }
+		public Func<Self, object> Get { get; }
+		public Action<Self, object> Set { get; }
 
 		public Value RosGet(object self)
-			=> Value.AsNative(Get((T)self));
+			=> Value.AsNative(Get((Self)self));
 		public DynValue LuaGet(object self)
-			=> DynValue.FromObject(null, Get((T)self));
+			=> DynValue.FromObject(null, Get((Self)self));
 		public void RosSet(object self, Value value)
-			=> Set((T)self, value.Native);
+			=> Set((Self)self, value.Native);
 		public void LuaSet(object self, DynValue value)
-			=> Set((T)self, value.ToObject());
+			=> Set((Self)self, value.ToObject());
 
 		public Native(string name, string type, string help,
-			Func<T, object> read, Action<T, object> write = null)
+			Func<Self, object> read, Action<Self, object> write = null)
 		{
 			Name = name;
 			Type = type;
+			Help = help;
+			CanRead = read != null;
+			CanWrite = write != null;
+			Get = read;
+			Set = write;
+		}
+	}
+	/// <summary>
+	/// Property getting/setting C#-native object.
+	/// </summary>
+	public class Native<Self, T> : IMember where Self : IObject
+	{
+		public string Name { get; }
+		public string Type { get; }
+		public string Help { get; }
+		public bool CanRead { get; }
+		public bool CanWrite { get; }
+
+		public Func<Self, T> Get { get; }
+		public Action<Self, T> Set { get; }
+
+		public Value RosGet(object self)
+			=> Value.AsNative(Get((Self)self));
+		public DynValue LuaGet(object self)
+			=> DynValue.FromObject(null, Get((Self)self));
+		public void RosSet(object self, Value value)
+			=> Set((Self)self, (T)value.Native);
+		public void LuaSet(object self, DynValue value)
+			=> Set((Self)self, (T)value.ToObject());
+
+		public Native(string name, string help,
+			Func<Self, T> read, Action<Self, T> write = null)
+		{
+			Name = name;
+			Type = typeof(T).Name;
 			Help = help;
 			CanRead = read != null;
 			CanWrite = write != null;
@@ -390,20 +412,20 @@ namespace RedOnion.KSP.API
 		public bool CanRead { get; }
 		public bool CanWrite { get; }
 
-		public Func<InteropObject> Get { get; }
-		public Action<InteropObject> Set { get; }
+		public Func<IObject> Get { get; }
+		public Action<IObject> Set { get; }
 
 		public Value RosGet(object self)
 			=> new Value(Get());
 		public DynValue LuaGet(object self)
 			=> DynValue.FromObject(null, Get());
 		public void RosSet(object self, Value value)
-			=> Set((InteropObject)value.Object);
+			=> Set((IObject)value.Object);
 		public void LuaSet(object self, DynValue value)
-			=> Set((InteropObject)value.ToObject());
+			=> Set((IObject)value.ToObject());
 
 		public Interop(string name, string type, string help,
-			Func<InteropObject> read, Action<InteropObject> write = null)
+			Func<IObject> read, Action<IObject> write = null)
 		{
 			Name = name;
 			Type = type;
@@ -417,7 +439,7 @@ namespace RedOnion.KSP.API
 	/// <summary>
 	/// Property getting/setting interop object (usable by both ROS and LUA).
 	/// </summary>
-	public class Interop<T> : IMember where T : InteropObject
+	public class Interop<Self> : IMember where Self : IObject
 	{
 		public string Name { get; }
 		public string Type { get; }
@@ -425,20 +447,20 @@ namespace RedOnion.KSP.API
 		public bool CanRead { get; }
 		public bool CanWrite { get; }
 
-		public Func<T, InteropObject> Get { get; }
-		public Action<T, InteropObject> Set { get; }
+		public Func<Self, IObject> Get { get; }
+		public Action<Self, IObject> Set { get; }
 
 		public Value RosGet(object self)
-			=> new Value(Get((T)self));
+			=> new Value(Get((Self)self));
 		public DynValue LuaGet(object self)
-			=> DynValue.FromObject(null, Get((T)self));
+			=> DynValue.FromObject(null, Get((Self)self));
 		public void RosSet(object self, Value value)
-			=> Set((T)self, (InteropObject)value.Object);
+			=> Set((Self)self, (InteropObject)value.Object);
 		public void LuaSet(object self, DynValue value)
-			=> Set((T)self, (InteropObject)value.ToObject());
+			=> Set((Self)self, (InteropObject)value.ToObject());
 
 		public Interop(string name, string type, string help,
-			Func<T, InteropObject> read, Action<T, InteropObject> write = null)
+			Func<Self, IObject> read, Action<Self, IObject> write = null)
 		{
 			Name = name;
 			Type = type;
@@ -448,5 +470,95 @@ namespace RedOnion.KSP.API
 			Get = read;
 			Set = write;
 		}
+	}
+	/// <summary>
+	/// Property getting/setting interop object (usable by both ROS and LUA).
+	/// </summary>
+	public class Interop<Self, T> : IMember where Self : IObject where T : IObject
+	{
+		public string Name { get; }
+		public string Type { get; }
+		public string Help { get; }
+		public bool CanRead { get; }
+		public bool CanWrite { get; }
+
+		public Func<Self, T> Get { get; }
+		public Action<Self, T> Set { get; }
+
+		public Value RosGet(object self)
+			=> new Value(Get((Self)self));
+		public DynValue LuaGet(object self)
+			=> DynValue.FromObject(null, Get((Self)self));
+		public void RosSet(object self, Value value)
+			=> Set((Self)self, (T)value.Object);
+		public void LuaSet(object self, DynValue value)
+			=> Set((Self)self, (T)value.ToObject());
+
+		public Interop(string name, string type, string help,
+			Func<Self, T> read, Action<Self, T> write = null)
+		{
+			Name = name;
+			Type = type;
+			Help = help;
+			CanRead = read != null;
+			CanWrite = write != null;
+			Get = read;
+			Set = write;
+		}
+	}
+	/// <summary>
+	/// Abstract base class for functions and methods.
+	/// </summary>
+	public abstract class Method : IMember
+	{
+		public string Name { get; }
+		public string Type { get; }
+		public string Help { get; }
+		bool IMember.CanRead => true;
+		bool IMember.CanWrite => false;
+		public abstract Value RosGet(object self);
+		public abstract DynValue LuaGet(object self);
+		void IMember.RosSet(object self, Value value) { }
+		void IMember.LuaSet(object self, DynValue value) { }
+		protected Method(string name, string type, string help)
+		{
+			Name = name;
+			Type = type;
+			Help = help;
+		}
+	}
+	/// <summary>
+	/// Static property returning a function.
+	/// </summary>
+	public class Function : Method, IMember
+	{
+		public Func<FunctionBase> Get { get; }
+
+		public override Value RosGet(object self)
+			=> new Value(Get());
+		public override DynValue LuaGet(object self)
+			=> DynValue.FromObject(null, Get());
+
+		public Function(string name, string type, string help,
+			Func<FunctionBase> read) : base(name, type, help)
+			=> Get = read;
+	}
+	/// <summary>
+	/// Static property returning a function.
+	/// </summary>
+	public class Method<Self> : Method, IMember where Self : InteropObject
+	{
+		public Func<MethodBase<Self>> Get { get; }
+
+		public override Value RosGet(object self)
+			=> new Value(Get());
+		public override DynValue LuaGet(object self)
+			=> DynValue.FromObject(null, Get());
+		public void RosSet(object self, Value value) { }
+		public void LuaSet(object self, DynValue value) { }
+
+		public Method(string name, string type, string help,
+			Func<MethodBase<Self>> read) : base(name, type, help)
+			=> Get = read;
 	}
 }
