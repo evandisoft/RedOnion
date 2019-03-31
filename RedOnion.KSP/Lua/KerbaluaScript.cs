@@ -9,6 +9,7 @@ using KSP.UI.Screens;
 using RedOnion.KSP.Lua.Proxies;
 using RedOnion.KSP.API;
 using System.Linq;
+using System.Reflection;
 
 namespace RedOnion.KSP.Lua
 {
@@ -45,11 +46,19 @@ namespace RedOnion.KSP.Lua
 			//Globals["Vessel"] = FlightGlobals.ActiveVessel;
 			Globals["Ksp"] = new KspApi();
 			Globals["new"] = new Constructor(ConstructorImpl);
+			//Globals["import"] = new Importer(ImporterImpl);
 		}
 
-		object ConstructorImpl(object copyType,params DynValue[] dynArgs)
+		//private Table ImporterImpl(string name)
+		//{
+		//	var a=Assembly.GetAssembly(GetType());
+
+		//}
+
+		delegate Table Importer(string name);
+
+		object ConstructorImpl(Type t,params DynValue[] dynArgs)
 		{
-			Type t = copyType.GetType();
 			var constructors = t.GetConstructors();
 			foreach(var constructor in constructors)
 			{
@@ -85,11 +94,11 @@ namespace RedOnion.KSP.Lua
 
 			if (dynArgs.Length == 0)
 			{
-				return Activator.CreateInstance(copyType.GetType());
+				return Activator.CreateInstance(t);
 			}
-			throw new Exception("Could not find constructor accepting given args for type " + copyType.GetType());
+			throw new Exception("Could not find constructor accepting given args for type " + t);
 		}
-		delegate object Constructor(object copyType,params DynValue[] args);
+		delegate object Constructor(Type t,params DynValue[] args);
 
 		DynValue coroutine;
 		public bool Evaluate(out DynValue result)
