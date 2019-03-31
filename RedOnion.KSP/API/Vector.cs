@@ -127,6 +127,8 @@ namespace RedOnion.KSP.API
 			{
 			case "__add":
 				return DynValue.NewCallback(Add);
+			case "__sub":
+				return DynValue.NewCallback(Sub);
 			}
 			return null;
 		}
@@ -137,6 +139,14 @@ namespace RedOnion.KSP.API
 			return UserData.Create(
 				VectorCreator.ToVector(args[0].ToObject())
 				+ VectorCreator.ToVector(args[1].ToObject()));
+		}
+		DynValue Sub(ScriptExecutionContext ctx, CallbackArguments args)
+		{
+			if (args.Count != 2)
+				throw new InvalidOperationException("Unexpected number of arguments: " + args.Count);
+			return UserData.Create(
+				VectorCreator.ToVector(args[0].ToObject())
+				- VectorCreator.ToVector(args[1].ToObject()));
 		}
 
 		public static Vector operator +(Vector a)

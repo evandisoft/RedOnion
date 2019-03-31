@@ -18,6 +18,6 @@ Function to create 3D vector / coordinate, also aliased as simple `V`.
 3D vector / coordinate
 
 - `native`: Vector3d - Native Vector3d (convertible to UnityEngine.Vector3).
-- `unity`: Vector3 - Native UnityEngine.Vector3 (float).
+- `vector3`: Vector3 - Native UnityEngine.Vector3 (float).
 - `vector2`: Vector2 - Native UnityEngine.Vector2 (float x,y).
 - `scale()`: void - Scale the vector by a factor (all axes at once if number is provided, per-axis if Vector).
