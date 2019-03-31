@@ -69,40 +69,58 @@ namespace RedOnion.KSP.API
 			=> Value.Void;
 		public virtual IObject Create(Arguments args)
 			=> null;
-		DynValue IUserDataType.MetaIndex(MoonSharp.Interpreter.Script script, string metaname)
-		{
-			if (metaname != "__call") return null;
-			return DynValue.FromObject(script, new CallbackFunction(Call));
-		}
 		public virtual DynValue Call(ScriptExecutionContext ctx, CallbackArguments args)
 		{
 			var self = args.ToRos(out var ros);
 			return Call(self, ros).ToLua();
 		}
 
-		bool IObject.Modify(string name, OpCode op, Value value) => false;
+		public virtual string Name => GetType().Name;
+		public virtual Value Value => new Value(ToString());
+		public virtual Type Type => null;
+		public virtual object Target => null;
+		public virtual IObject Convert(object value) => null;
+
+		public virtual bool Operator(OpCode op, Value arg, bool selfRhs, out Value result)
+		{
+			result = new Value();
+			return false;
+		}
+		public bool HasFeature(ObjectFeatures feature)
+			=> (Features & feature) != 0;
+		DynValue IUserDataType.MetaIndex(MoonSharp.Interpreter.Script script, string metaname)
+		{
+			if (metaname == "__call")
+				return HasFeature(ObjectFeatures.Function)
+					? DynValue.FromObject(script, new CallbackFunction(Call))
+					: null;
+			return HasFeature(ObjectFeatures.Operators) ? LuaOperator(metaname) : null;
+		}
+		public virtual DynValue LuaOperator(string metaname)
+			=> null;
+
+		public virtual Value Index(Arguments args)
+		{
+			switch (args.Length)
+			{
+			case 0:
+				return new Value();
+			case 1:
+				return Value.IndexRef(this, args[0]);
+			default:
+				throw new InvalidOperationException(Name + " cannot be multi-indexed");
+			}
+		}
+		public virtual Value IndexGet(Value index) => Get(index.String);
+		public virtual bool IndexSet(Value index, Value value) => Set(index.String, value);
+		public virtual bool IndexModify(Value index, OpCode op, Value value) => Modify(index.String, op, value);
+		public virtual bool Modify(string name, OpCode op, Value value) => false;
+
 		bool IProperties.Delete(string name) => false;
 		void IProperties.Reset() { }
-
-		Value IObject.Index(Arguments args)
-			=> throw new NotImplementedException();
-		Value IObject.IndexGet(Value index)
-			=> throw new NotImplementedException();
-		bool IObject.IndexSet(Value index, Value value)
-			=> throw new NotImplementedException();
-		bool IObject.IndexModify(Value index, OpCode op, Value value)
-			=> throw new NotImplementedException();
-		bool IObject.Operator(OpCode op, Value arg, bool selfRhs, out Value result)
-			=> throw new NotImplementedException();
-
-		string IObject.Name => GetType().Name;
-		Value IObject.Value => new Value(ToString());
 		IEngine IObject.Engine => null;
 		IObject IObject.BaseClass => null;
 		IProperties IObject.BaseProps => null;
 		IProperties IObject.MoreProps => null;
-		Type IObject.Type => null;
-		object IObject.Target => null;
-		IObject IObject.Convert(object value) => null;
 	}
 }

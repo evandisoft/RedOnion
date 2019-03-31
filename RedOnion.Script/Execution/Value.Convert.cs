@@ -9,6 +9,7 @@ namespace RedOnion.Script
 	public partial struct Value
 	{
 		public bool IsNative => Kind == ValueKind.Native;
+		public bool IsObject => Kind == ValueKind.Object;
 
 		/// <summary>
 		/// Get native object (string, int, ...)
