@@ -113,6 +113,10 @@ namespace Kerbalua
 			guiActive = !guiActive;
         }
 
+		void OnDestroy()
+		{
+			repl.OnDestroy();
+		}
 
 		void FixedUpdate()
 		{

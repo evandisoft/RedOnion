@@ -75,5 +75,10 @@ namespace Kerbalua.Gui {
 				Debug.Log(e);
 			}
 		}
+
+		public void OnDestroy()
+		{
+			scriptWindow.OnDestroy();
+		}
 	}
 }
