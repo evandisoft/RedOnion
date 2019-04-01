@@ -76,7 +76,7 @@ public partial class IncompleteLuaLexer : Lexer {
 	}
 
 	private static readonly string[] _LiteralNames = {
-		null, "'='", "';'", "'break'", "'goto'", "'do'", "'end'", "'while'", "'repeat'", 
+		null, "';'", "'='", "'break'", "'goto'", "'do'", "'end'", "'while'", "'repeat'", 
 		"'until'", "'if'", "'then'", "'elseif'", "'else'", "'for'", "','", "'in'", 
 		"'function'", "'local'", "'return'", "'::'", "'.'", "':'", "'nil'", "'false'", 
 		"'true'", "'...'", "'('", "')'", "'['", "']'", "'{'", "'}'", "'or'", "'and'", 
@@ -346,8 +346,8 @@ public partial class IncompleteLuaLexer : Lexer {
 		'\x91', '\x216', '\x3', '\x2', '\x2', '\x2', '\x93', '\x218', '\x3', '\x2', 
 		'\x2', '\x2', '\x95', '\x221', '\x3', '\x2', '\x2', '\x2', '\x97', '\x24B', 
 		'\x3', '\x2', '\x2', '\x2', '\x99', '\x251', '\x3', '\x2', '\x2', '\x2', 
-		'\x9B', '\x9C', '\a', '?', '\x2', '\x2', '\x9C', '\x4', '\x3', '\x2', 
-		'\x2', '\x2', '\x9D', '\x9E', '\a', '=', '\x2', '\x2', '\x9E', '\x6', 
+		'\x9B', '\x9C', '\a', '=', '\x2', '\x2', '\x9C', '\x4', '\x3', '\x2', 
+		'\x2', '\x2', '\x9D', '\x9E', '\a', '?', '\x2', '\x2', '\x9E', '\x6', 
 		'\x3', '\x2', '\x2', '\x2', '\x9F', '\xA0', '\a', '\x64', '\x2', '\x2', 
 		'\xA0', '\xA1', '\a', 't', '\x2', '\x2', '\xA1', '\xA2', '\a', 'g', '\x2', 
 		'\x2', '\xA2', '\xA3', '\a', '\x63', '\x2', '\x2', '\xA3', '\xA4', '\a', 

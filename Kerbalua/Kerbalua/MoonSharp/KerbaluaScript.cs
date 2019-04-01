@@ -7,11 +7,9 @@ using RedOnion.KSP.MathUtil;
 using System;
 using KSP.UI.Screens;
 using RedOnion.KSP.Lua.Proxies;
-using RedOnion.KSP.API;
-using System.Linq;
-using System.Reflection;
+using Kerbalua.Parsing;
 
-namespace RedOnion.KSP.Lua
+namespace Kerbalua.MoonSharp
 {
 	public class KspApi
 	{
@@ -33,7 +31,7 @@ namespace RedOnion.KSP.Lua
 
 
 
-	public class KerbaluaScript : MoonSharp.Interpreter.Script
+	public class KerbaluaScript : Script
 	{
 		public KerbaluaScript() : base(CoreModules.Preset_Complete)
 		{
@@ -41,10 +39,10 @@ namespace RedOnion.KSP.Lua
 
 			GlobalOptions.CustomConverters
 				.SetClrToScriptCustomConversion(
-					(MoonSharp.Interpreter.Script script, ModuleControlSurface m)
+					(Script script, ModuleControlSurface m)
 						=> DynValue.NewTable(new ModuleControlSurfaceProxyTable(this, m))
 					);
-			Globals.MetaTable = API.Globals.Instance;
+			Globals.MetaTable = RedOnion.KSP.API.Globals.Instance;
 			//Globals["Vessel"] = FlightGlobals.ActiveVessel;
 			//Globals["Ksp"] = new KspApi();
 			Globals["new"] = new Constructor(ConstructorImpl);
@@ -104,6 +102,7 @@ namespace RedOnion.KSP.Lua
 		delegate object Constructor(Type t,params DynValue[] args);
 
 		DynValue coroutine;
+
 		public bool Evaluate(out DynValue result)
 		{
 			if (coroutine == null)
@@ -127,9 +126,9 @@ namespace RedOnion.KSP.Lua
 
 		public void SetCoroutine(string source)
 		{
-			if (source.StartsWith("="))
+			if (IncompleteLuaParsing.IsImplicitReturn(source))
 			{
-				source = "return " + source.Substring(1);
+				source = "return " + source;
 			}
 			DynValue mainFunction = base.DoString("return function () " + source + " end");
 
