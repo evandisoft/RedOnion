@@ -33,9 +33,17 @@ namespace KerbaluaNUnit {
 				@"os."
 				);
 			var completions = completion.GetCurrentCompletions();
-			Assert.AreEqual(1, completions.Count);
+			foreach(var c in completions)
+			{
+				Console.WriteLine(c);
+			}
+			Assert.AreEqual(2, completions.Count);
 			Assert.True(completion.ProcessNextSegment());
 			completions = completion.GetCurrentCompletions();
+			foreach (var c in completions)
+			{
+				Console.WriteLine(c);
+			}
 			Assert.AreEqual(11, completions.Count);
 		}
 
@@ -60,28 +68,61 @@ namespace KerbaluaNUnit {
 				@"ADF."
 				);
 			var completions = completion.GetCurrentCompletions();
-			Assert.AreEqual(1, completions.Count);
+			Assert.AreEqual(3, completions.Count);
 			Assert.True(completion.ProcessNextSegment());
 			completions = completion.GetCurrentCompletions();
+			foreach (var c in completions)
+			{
+				Console.WriteLine(c);
+			}
 			Assert.AreEqual(10, completions.Count);
 		}
 
 		[Test()]
-		public void LUA_TestCase_3()
+		public void LUA_TestCase_3_Interop()
 		{
-			script = new Script(CoreModules.Preset_Complete);
-			script.Globals["ADF"] = new Adf();
+			script = new KerbaluaScript();
+			//script.Globals["ship"] = new Adf();
 
 			var completion = GetCompletionObject(script.Globals,
 @"
-	ADF.a
+	a=ship.
 "
 				);
 			var completions = completion.GetCurrentCompletions();
+			foreach (var c in completions)
+			{
+				Console.WriteLine(c);
+			}
 			Assert.AreEqual(1, completions.Count);
-			Assert.True(completion.ProcessNextSegment());
+			Assert.Throws<LuaIntellisenseException>(() => completion.ProcessNextSegment());
+		}
+
+		[Test()]
+		public void LUA_TestCase_4_Interop_2()
+		{
+			script = new KerbaluaScript();
+			//script.Globals["ship"] = new Adf();
+
+			// I think this is not quite right, but I'm done for now.
+			var completion = GetCompletionObject(script.Globals,
+@"
+	a=Vector.abs
+"
+				);
+			var completions = completion.GetCurrentCompletions();
+			foreach (var c in completions)
+			{
+				Console.WriteLine(c);
+			}
+			Assert.AreEqual(1, completions.Count);
+			completion.ProcessNextSegment();
 			completions = completion.GetCurrentCompletions();
-			Assert.AreEqual(3, completions.Count);
+			foreach (var c in completions)
+			{
+				Console.WriteLine(c);
+			}
+			Assert.AreEqual(1, completions.Count);
 		}
 	}
 }

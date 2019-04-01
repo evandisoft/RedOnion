@@ -46,7 +46,7 @@ namespace RedOnion.KSP.Lua
 					);
 			Globals.MetaTable = API.Globals.Instance;
 			//Globals["Vessel"] = FlightGlobals.ActiveVessel;
-			Globals["Ksp"] = new KspApi();
+			//Globals["Ksp"] = new KspApi();
 			Globals["new"] = new Constructor(ConstructorImpl);
 
 			//Globals["import"] = new Importer(ImporterImpl);

@@ -83,6 +83,8 @@ namespace Kerbalua.Completion {
 		{
 			List<string> completions = new List<string>();
 			string partial = CurrentPartial;
+			
+
 			foreach(var member in CurrentInterop.Members)
 			{
 				if (member.Name.ToLower().Contains(partial.ToLower()))
@@ -109,9 +111,15 @@ namespace Kerbalua.Completion {
 					Index++;
 					return;
 				}
-				if (member is InteropObject interop)
+				if (member is Interop interop)
 				{
-					CurrentInterop = interop;
+					if (interop.Get() == null || !(interop.Get() is InteropObject))
+					{
+						throw new LuaIntellisenseException();
+					}
+
+					CurrentInterop = interop.Get() as InteropObject;
+
 					if (currentSegment.Parts.Count > 0)
 					{
 						Type partType = currentSegment.Parts[0].GetType();
@@ -149,15 +157,26 @@ namespace Kerbalua.Completion {
 						if(member is Native native)
 						{
 							CurrentTable = null;
-							CurrentType = native.Get().GetType();
+							object nativeObject = native.Get();
+							if (nativeObject == null)
+							{
+								throw new LuaIntellisenseException("native object "+native.Name + " is null");
+							}
+							CurrentType = nativeObject.GetType();
 							ProcessCurrentParts();
 							Index++;
 							return;
 						}
-						if(member is InteropObject interop)
+						if(member is Interop interop)
 						{
 							CurrentTable = null;
-							CurrentInterop = interop;
+							if (interop.Get() == null || !(interop.Get() is InteropObject))
+							{
+								throw new LuaIntellisenseException();
+							}
+
+							CurrentInterop = interop.Get() as InteropObject;
+
 							if (currentSegment.Parts.Count > 0)
 							{
 								Type partType = currentSegment.Parts[0].GetType();
@@ -327,6 +346,18 @@ namespace Kerbalua.Completion {
 				}
 			}
 
+			if(CurrentTable.MetaTable!=null && CurrentTable.MetaTable is Globals globals)
+			{
+				foreach (var entry in globals.Members)
+				{
+					if (entry.Name.ToLower().Contains(partial.ToLower()))
+					{
+						completions.Add(entry.Name);
+					}
+				}
+			}
+
+			completions = completions.Distinct().ToList();
 			completions.Sort();
 			return completions;
 		}
