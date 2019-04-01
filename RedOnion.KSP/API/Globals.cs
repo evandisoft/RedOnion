@@ -17,9 +17,8 @@ namespace RedOnion.KSP.API
 
 		new IMember[]
 		{
-			new Native("ship", "Vessel|ShipConstruct", "Active vessel (in flight or editor).",
-				() => HighLogic.LoadedSceneIsFlight ? (object)FlightGlobals.ActiveVessel
-				: HighLogic.LoadedSceneIsEditor ? EditorLogic.fetch.ship : null),
+			new Interop("ship", "Ship", "Active vessel (in flight or editor).",
+				() => Ship.Instance),
 			new Interop("stage", "Stage", "Staging logic.",
 				() => Stage.Instance),
 			new Interop("Vector", "VectorCreator", "Function for creating 3D vector / coordinate.",

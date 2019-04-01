@@ -53,6 +53,8 @@ namespace RedOnion.KSP
 			if (system == null)
 				BaseProps.Set("System", new SimpleObject(Engine, sys));
 
+			AddType(typeof(VesselType));
+
 			// UI namespace
 			hard.Set("UI", new Value(new SimpleObject(Engine, new Properties()
 			{

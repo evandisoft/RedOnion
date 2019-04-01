@@ -227,6 +227,76 @@ namespace RedOnion.KSP.API
 		}
 	}
 	/// <summary>
+	/// Static unsigned integer property.
+	/// </summary>
+	public class UInt : IMember
+	{
+		public string Name { get; }
+		public string Type { get; }
+		public string Help { get; }
+		public bool CanRead { get; }
+		public bool CanWrite { get; }
+
+		public Func<uint> Get { get; }
+		public Action<uint> Set { get; }
+
+		public Value RosGet(object self)
+			=> new Value(Get());
+		public DynValue LuaGet(object self)
+			=> DynValue.NewNumber(Get());
+		public void RosSet(object self, Value value)
+			=> Set(value.UInt);
+		public void LuaSet(object self, DynValue value)
+			=> Set((uint)value.Number);
+
+		public UInt(string name, string help,
+			Func<uint> read, Action<uint> write = null)
+		{
+			Name = name;
+			Type = "uint";
+			Help = help;
+			CanRead = read != null;
+			CanWrite = write != null;
+			Get = read;
+			Set = write;
+		}
+	}
+	/// <summary>
+	/// Unsigned integer property.
+	/// </summary>
+	public class UInt<Self> : IMember where Self : IObject
+	{
+		public string Name { get; }
+		public string Type { get; }
+		public string Help { get; }
+		public bool CanRead { get; }
+		public bool CanWrite { get; }
+
+		public Func<Self, uint> Get { get; }
+		public Action<Self, uint> Set { get; }
+
+		public Value RosGet(object self)
+			=> new Value(Get((Self)self));
+		public DynValue LuaGet(object self)
+			=> DynValue.NewNumber(Get((Self)self));
+		public void RosSet(object self, Value value)
+			=> Set((Self)self, value.UInt);
+		public void LuaSet(object self, DynValue value)
+			=> Set((Self)self, (uint)value.Number);
+
+		public UInt(string name, string help,
+			Func<Self, uint> read, Action<Self, uint> write = null)
+		{
+			Name = name;
+			Type = "uint";
+			Help = help;
+			CanRead = read != null;
+			CanWrite = write != null;
+			Get = read;
+			Set = write;
+		}
+	}
+	/// <summary>
 	/// Static single-precision floating-point property.
 	/// </summary>
 	public class Float : IMember
@@ -359,6 +429,76 @@ namespace RedOnion.KSP.API
 		{
 			Name = name;
 			Type = "double";
+			Help = help;
+			CanRead = read != null;
+			CanWrite = write != null;
+			Get = read;
+			Set = write;
+		}
+	}
+	/// <summary>
+	/// Static text property.
+	/// </summary>
+	public class String : IMember
+	{
+		public string Name { get; }
+		public string Type { get; }
+		public string Help { get; }
+		public bool CanRead { get; }
+		public bool CanWrite { get; }
+
+		public Func<string> Get { get; }
+		public Action<string> Set { get; }
+
+		public Value RosGet(object self)
+			=> new Value(Get());
+		public DynValue LuaGet(object self)
+			=> DynValue.NewString(Get());
+		public void RosSet(object self, Value value)
+			=> Set(value.String);
+		public void LuaSet(object self, DynValue value)
+			=> Set(value.String);
+
+		public String(string name, string help,
+			Func<string> read, Action<string> write = null)
+		{
+			Name = name;
+			Type = "string";
+			Help = help;
+			CanRead = read != null;
+			CanWrite = write != null;
+			Get = read;
+			Set = write;
+		}
+	}
+	/// <summary>
+	/// Text property.
+	/// </summary>
+	public class String<Self> : IMember where Self : IObject
+	{
+		public string Name { get; }
+		public string Type { get; }
+		public string Help { get; }
+		public bool CanRead { get; }
+		public bool CanWrite { get; }
+
+		public Func<Self, string> Get { get; }
+		public Action<Self, string> Set { get; }
+
+		public Value RosGet(object self)
+			=> new Value(Get((Self)self));
+		public DynValue LuaGet(object self)
+			=> DynValue.NewString(Get((Self)self));
+		public void RosSet(object self, Value value)
+			=> Set((Self)self, value.String);
+		public void LuaSet(object self, DynValue value)
+			=> Set((Self)self, value.String);
+
+		public String(string name, string help,
+			Func<Self, string> read, Action<Self, string> write = null)
+		{
+			Name = name;
+			Type = "string";
 			Help = help;
 			CanRead = read != null;
 			CanWrite = write != null;
