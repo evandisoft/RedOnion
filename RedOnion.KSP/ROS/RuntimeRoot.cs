@@ -187,7 +187,7 @@ namespace RedOnion.KSP
 			return base.Set(name, value);
 		}
 
-		MemberList IType.Members => GlobalMembers.Members;
+		MemberList IType.Members => GlobalMembers.MemberList;
 	}
 
 	/// <summary>

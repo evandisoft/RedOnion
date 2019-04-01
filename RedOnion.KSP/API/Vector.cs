@@ -12,26 +12,59 @@ namespace RedOnion.KSP.API
 		public static MemberList MemberList { get; } = new MemberList(
 		ObjectFeatures.Proxy|ObjectFeatures.Operators,
 
-		"3D vector / coordinate",
+@"3D vector / coordinate. All the usual operators were implemented,
+multiplication and dividion can use both vector (per-axis) and number (all-axes).
+Beware that multiplication is scaling, not cross product or dot - use appropriate function for these.",
 
 		new IMember[]
 		{
 			new Native<Vector, Vector3d>(
 				"native",
-				"Native Vector3d (convertible to UnityEngine.Vector3).",
+				"Native Vector3d (`double x,y,z`).",
 				v => v.Native, (v, value) => v.Native = value),
 			new Native<Vector, Vector3>(
 				"vector3",
-				"Native UnityEngine.Vector3 (float).",
+				"Native UnityEngine.Vector3 (`float x,y,z`).",
 				v => v.Native, (v, value) => v.Native = value),
 			new Native<Vector, Vector2>(
 				"vector2",
-				"Native UnityEngine.Vector2 (float x,y).",
+				"Native UnityEngine.Vector2 (`float x,y`).",
 				v => (Vector3)v.Native, (v, value) => v.Native = (Vector3)value),
+			new Double<Vector>(
+				"x", "The X-coordinate",
+				v => v.X, (v, value) => v.X = value),
+			new Double<Vector>(
+				"y", "The Y-coordinate",
+				v => v.Y, (v, value) => v.Y = value),
+			new Double<Vector>(
+				"z", "The Z-coordinate",
+				v => v.Z, (v, value) => v.Z = value),
 			new Method<Vector>(
 				"scale", "void",
-				"Scale the vector by a factor (all axes at once if number is provided, per-axis if Vector).",
+				"Scale the vector by a factor (all axes if number is provided, per-axis if Vector)."
+				+ " Multiplication does the same.",
 				() => ScaleMethod.Instance),
+			new Method<Vector>(
+				"shrink", "void",
+				"Shrink the vector by a factor (all axes if number is provided, per-axis if Vector)."
+				+ " Division does the same.",
+				() => ShrinkMethod.Instance),
+			new Double<Vector>(
+				"size",
+				"Size of the vector - `sqrt(x*x+y*y+z*z)`. Scale if setting.",
+				v => v.Size, (v, value) => v.Size = value),
+			new Double<Vector>(
+				"magnitude",
+				"Alias to size of the vector - `sqrt(x*x+y*y+z*z)`. Scale if setting.",
+				v => v.Size, (v, value) => v.Size = value),
+			new Double<Vector>(
+				"squareSize",
+				"Square size of the vector - `x*x+y*y+z*z`. Scale if setting.",
+				v => v.SquareSize, (v, value) => v.SquareSize = value),
+			new Interop<Vector>(
+				"normalized", "Vector",
+				"Get normalized vector (size 1).",
+				v => v.Normalized),
 		});
 
 		public Vector() : base(MemberList) { }
@@ -80,6 +113,23 @@ namespace RedOnion.KSP.API
 			get => Native.z;
 			set => Native = new Vector3d(X, Y, value);
 		}
+		public double Size
+		{
+			get => Native.magnitude;
+			set => Native *= value/Native.magnitude;
+		}
+		public double Magnitude
+		{
+			get => Native.magnitude;
+			set => Native *= value/Native.magnitude;
+		}
+		public double SquareSize
+		{
+			get => Native.sqrMagnitude;
+			set => Native *= value*value/Native.magnitude;
+		}
+		public Vector Normalized
+			=> new Vector(Native.normalized);
 
 		public override string ToString()
 			=> string.Format(Value.Culture, "[{0}, {1}, {2}]", X, Y, Z);

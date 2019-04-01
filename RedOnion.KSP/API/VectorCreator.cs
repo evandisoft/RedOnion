@@ -14,7 +14,9 @@ namespace RedOnion.KSP.API
 		ObjectFeatures.Function|ObjectFeatures.Constructor
 		|ObjectFeatures.Converter|ObjectFeatures.TypeReference,
 
-		"Function to create 3D vector / coordinate, also aliased as simple `V`.",
+@"Function to create 3D vector / coordinate, also aliased as simple `V`.
+Receives either three arguments (x,y,z), two (x,y - z=0), or one (x=y=z).
+Can also convert array / list of numbers (`V([1,2,3])` becomes `V(1,2,3)`).",
 
 		new IMember[]
 		{
@@ -29,6 +31,9 @@ namespace RedOnion.KSP.API
 			new Interop("right","Vector", "Vector(1, 0, 0).", () => Right),
 
 			new Function("cross", "Vector", "Cross product.", () => CrossFunction.Instance),
+			new Function("crs", "Vector", "Cross product. (Alias to cross.)", () => CrossFunction.Instance),
+			new Function("dot", "Vector", "Dot product.", () => DotFunction.Instance),
+			new Function("abs", "Vector", "Vector with coordinates changed to non-negative.", () => AbsFunction.Instance),
 		});
 
 		public static VectorCreator Instance { get; } = new VectorCreator();

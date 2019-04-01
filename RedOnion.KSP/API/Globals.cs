@@ -10,7 +10,7 @@ namespace RedOnion.KSP.API
 	[ProxyDocs(typeof(Globals))]
 	public static class GlobalMembers
 	{
-		public static MemberList Members { get; } = new MemberList(
+		public static MemberList MemberList { get; } = new MemberList(
 		ObjectFeatures.None,
 
 		"Global variables, objects and functions.",
@@ -22,14 +22,22 @@ namespace RedOnion.KSP.API
 				: HighLogic.LoadedSceneIsEditor ? EditorLogic.fetch.ship : null),
 			new Interop("stage", "Stage", "Staging logic",
 				() => Stage.Instance),
-			new Interop("V", "Vector", "Function for creating 3D vector / coordinate",
-				() => VectorCreator.Instance)
+			new Interop("Vector", "VectorCreator", "Function for creating 3D vector / coordinate",
+				() => VectorCreator.Instance),
+			new Interop("V", "VectorCreator", "Alias to Vector Function for creating 3D vector / coordinate",
+				() => VectorCreator.Instance),
+			new Function("vdot", "Vector", "Alias to `Vector.dot` (or `v.dot`).",
+				() => VectorCreator.DotFunction.Instance),
+			new Function("vcrs", "Vector", "Alias to `Vector.cross` (or `v.cross`).",
+				() => VectorCreator.CrossFunction.Instance),
+			new Function("vcross", "Vector", "Alias to `Vector.cross` (or `v.cross`).",
+				() => VectorCreator.CrossFunction.Instance),
 		});
 	}
 	[IgnoreForDocs]
 	public class Globals : Table, IProperties, IType
 	{
-		public MemberList Members => GlobalMembers.Members;
+		public MemberList Members => GlobalMembers.MemberList;
 		public static Globals Instance { get; } = new Globals();
 
 		public Globals() : base(null)

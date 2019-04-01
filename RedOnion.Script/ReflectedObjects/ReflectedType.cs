@@ -309,6 +309,7 @@ namespace RedOnion.Script.ReflectedObjects
 			return converter == null ? new Value()
 				: new Value(converter.Convert(value));
 		}
+		// TODO: cache discovered conversions (dict[type-pair] = delegate)
 		public static object Convert(Value value, Type type)
 		{
 			if (type == typeof(string))
@@ -326,8 +327,18 @@ namespace RedOnion.Script.ReflectedObjects
 				return null;
 			if (type.IsAssignableFrom(val.GetType()))
 				return val;
-			return type.GetMethod("op_Implicit", new Type[] { val.GetType() })
-				.Invoke(null, new object[] { val });
+			var cmtd = type.GetMethod("op_Implicit", new Type[] { val.GetType() });
+			if (cmtd != null)
+				return cmtd.Invoke(null, new object[] { val });
+			foreach (var mtd in val.GetType().GetMethods(
+				BindingFlags.Public|BindingFlags.Static|BindingFlags.InvokeMethod))
+			{
+				if (!mtd.IsSpecialName || mtd.Name != "op_Implicit")
+					continue;
+				if (type.IsAssignableFrom(mtd.ReturnType))
+					return mtd.Invoke(null, new object[] { val });
+			}
+			throw new NotImplementedException("Unable to convert " + value.Name + " to " + type.FullName);
 		}
 		public static T Convert<T>(Value value)
 			=> (T)Convert(value, typeof(T));

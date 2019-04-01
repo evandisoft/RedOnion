@@ -81,20 +81,23 @@ namespace RedOnion.KSP.ApiNUnit
 			Assert.AreEqual(1.0, v.X);
 			Assert.AreEqual(1.0, v.Y);
 			Assert.AreEqual(1.0, v.Z);
+			Test(1.0, "v(1).x");
 
-			Test("v 1,2u");
+			Test("var a = v 1,2u");
 			v = Result.Object as Vector;
 			Assert.NotNull(v);
 			Assert.AreEqual(1.0, v.X);
 			Assert.AreEqual(2.0, v.Y);
 			Assert.AreEqual(0.0, v.Z);
+			Test(2.0, "a.y");
 
-			Test("v 1,2f,3.0");
+			Test("var b = v 1,2f,3.0");
 			v = Result.Object as Vector;
 			Assert.NotNull(v);
 			Assert.AreEqual(1.0, v.X);
 			Assert.AreEqual(2.0, v.Y);
 			Assert.AreEqual(3.0, v.Z);
+			Test(3.0, "b.z");
 		}
 		[Test]
 		public void API_Vec02_Unary()
@@ -145,6 +148,51 @@ namespace RedOnion.KSP.ApiNUnit
 			Assert.AreEqual(1.0/4.0, v.X);
 			Assert.AreEqual(2.0/5.0, v.Y);
 			Assert.AreEqual(3.0/6.0, v.Z);
+		}
+
+		public static class ConvertTest
+		{
+			public static Vector3d v3d;
+			public static UnityEngine.Vector3 v3;
+		}
+		[Test]
+		public void API_Vec04_Convert()
+		{
+			Root.AddType("test", typeof(ConvertTest));
+			ConvertTest.v3d = Vector3d.zero;
+			Test("test.v3d = v.one");
+			Assert.AreEqual(1.0, ConvertTest.v3d.x);
+			ConvertTest.v3 = UnityEngine.Vector3.zero;
+			Test("test.v3 = v.one");
+			Assert.AreEqual(1f, ConvertTest.v3.x);
+			Test("v.abs -test.v3");
+			var v = Result.Object as Vector;
+			Assert.NotNull(v);
+			Assert.AreEqual(1.0, v.X);
+			Assert.AreEqual(1.0, v.Y);
+			Assert.AreEqual(1.0, v.Z);
+			Assert.AreEqual(Math.Sqrt(3.0), v.Size);
+		}
+
+		[Test]
+		public void API_Vec05_Methods()
+		{
+			Lines(
+				"var a = v.one",
+				"a.scale 2",
+				"return a");
+			var v = Result.Object as Vector;
+			Assert.NotNull(v);
+			Assert.AreEqual(2.0, v.X);
+			Assert.AreEqual(2.0, v.Y);
+			Assert.AreEqual(2.0, v.Z);
+
+			Lines(
+				"a.shrink 3",
+				"return a");
+			Assert.AreEqual(2.0/3.0, v.X);
+			Assert.AreEqual(2.0/3.0, v.Y);
+			Assert.AreEqual(2.0/3.0, v.Z);
 		}
 	}
 }

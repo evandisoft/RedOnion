@@ -6,36 +6,55 @@ namespace RedOnion.KSP.API
 {
 	public partial class VectorCreator
 	{
-		public class CrossFunction : FunctionBase
+		public abstract class VectorFunctionBase : FunctionBase
+		{
+			protected Vector3d GetOne(Arguments args)
+			{
+				if (args.Length != 1)
+					throw new InvalidOperationException("Expected a vector");
+				if (ToVector3d(args[0], out var it))
+					return it;
+				throw new InvalidOperationException("Argument is not a vector");
+			}
+			protected void GetTwo(Arguments args, out Vector3d lhs, out Vector3d rhs)
+			{
+				if (args.Length != 2)
+					throw new InvalidOperationException("Expected two vectors");
+				if (!ToVector3d(args[0], out lhs))
+					throw new InvalidOperationException("First argument is not a vector");
+				if (!ToVector3d(args[1], out rhs))
+					throw new InvalidOperationException("Second argument is not a vector");
+			}
+		}
+		public class CrossFunction : VectorFunctionBase
 		{
 			public static CrossFunction Instance { get; } = new CrossFunction();
 
 			public override Value Call(Arguments args)
 			{
-				if (args.Length != 2)
-					throw new InvalidOperationException("Expected two vectors");
-				var lhs = args[0].Object as Vector;
-				if (lhs == null)
-					throw new InvalidOperationException("First argument is not a vector");
-				var rhs = args[1].Object as Vector;
-				if (rhs == null)
-					throw new InvalidOperationException("Second argument is not a vector");
-				return new Value(new Vector(Vector3d.Cross(lhs.Native, rhs.Native)));
+				GetTwo(args, out var lhs, out var rhs);
+				return new Value(new Vector(Vector3d.Cross(lhs, rhs)));
 			}
-			/*
-			public override DynValue Call(ScriptExecutionContext ctx, CallbackArguments args)
+		}
+		public class DotFunction : VectorFunctionBase
+		{
+			public static DotFunction Instance { get; } = new DotFunction();
+
+			public override Value Call(Arguments args)
 			{
-				if (args.Count != 3)
-					throw new InvalidOperationException("Expected two vectors");
-				var lhs = args[1].ToObject<Vector>();
-				if (lhs == null)
-					throw new InvalidOperationException("First argument is not a vector");
-				var rhs = args[2].ToObject<Vector>();
-				if (rhs == null)
-					throw new InvalidOperationException("Second argument is not a vector");
-				return DynValue.FromObject(null, new Vector(Vector3d.Cross(lhs.Native, rhs.Native)));
+				GetTwo(args, out var lhs, out var rhs);
+				return new Value(new Vector(Vector3d.Dot(lhs, rhs)));
 			}
-			*/
+		}
+		public class AbsFunction : VectorFunctionBase
+		{
+			public static AbsFunction Instance { get; } = new AbsFunction();
+
+			public override Value Call(Arguments args)
+			{
+				var v = GetOne(args);
+				return new Value(new Vector(Math.Abs(v.x), Math.Abs(v.y), Math.Abs(v.z)));
+			}
 		}
 	}
 }
