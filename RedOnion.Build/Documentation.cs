@@ -69,7 +69,7 @@ namespace RedOnion.Build
 				var full = doctype.FullName.Substring("RedOnion.KSP.".Length);
 				MemberList members;
 
-				var getMembers = doctype.GetProperty("MemberList",
+				var getMembers = type.GetProperty("MemberList",
 					BindingFlags.Public|BindingFlags.Static|BindingFlags.GetProperty);
 
 				if (getMembers != null)

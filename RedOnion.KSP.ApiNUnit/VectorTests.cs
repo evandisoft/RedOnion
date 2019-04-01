@@ -162,6 +162,13 @@ namespace RedOnion.KSP.ApiNUnit
 			ConvertTest.v3 = UnityEngine.Vector3.zero;
 			Test("test.v3 = v.one");
 			Assert.AreEqual(1f, ConvertTest.v3.x);
+			Test("v.abs -test.v3");
+			var v = Result.Object as Vector;
+			Assert.NotNull(v);
+			Assert.AreEqual(1.0, v.X);
+			Assert.AreEqual(1.0, v.Y);
+			Assert.AreEqual(1.0, v.Z);
+			Assert.AreEqual(Math.Sqrt(3.0), v.Size);
 		}
 
 		[Test]

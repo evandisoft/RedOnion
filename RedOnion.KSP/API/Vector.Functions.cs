@@ -8,24 +8,21 @@ namespace RedOnion.KSP.API
 	{
 		public abstract class VectorFunctionBase : FunctionBase
 		{
-			protected Vector GetOne(Arguments args)
+			protected Vector3d GetOne(Arguments args)
 			{
 				if (args.Length != 1)
 					throw new InvalidOperationException("Expected a vector");
-				var result = args[0].Object as Vector;
-				if (result == null)
-					throw new InvalidOperationException("Argument is not a vector");
-				return result;
+				if (ToVector3d(args[0], out var it))
+					return it;
+				throw new InvalidOperationException("Argument is not a vector");
 			}
-			protected void GetTwo(Arguments args, out Vector lhs, out Vector rhs)
+			protected void GetTwo(Arguments args, out Vector3d lhs, out Vector3d rhs)
 			{
 				if (args.Length != 2)
 					throw new InvalidOperationException("Expected two vectors");
-				lhs = args[0].Object as Vector;
-				if (lhs == null)
+				if (!ToVector3d(args[0], out lhs))
 					throw new InvalidOperationException("First argument is not a vector");
-				rhs = args[1].Object as Vector;
-				if (rhs == null)
+				if (!ToVector3d(args[1], out rhs))
 					throw new InvalidOperationException("Second argument is not a vector");
 			}
 		}
@@ -36,7 +33,7 @@ namespace RedOnion.KSP.API
 			public override Value Call(Arguments args)
 			{
 				GetTwo(args, out var lhs, out var rhs);
-				return new Value(new Vector(Vector3d.Cross(lhs.Native, rhs.Native)));
+				return new Value(new Vector(Vector3d.Cross(lhs, rhs)));
 			}
 		}
 		public class DotFunction : VectorFunctionBase
@@ -46,7 +43,7 @@ namespace RedOnion.KSP.API
 			public override Value Call(Arguments args)
 			{
 				GetTwo(args, out var lhs, out var rhs);
-				return new Value(new Vector(Vector3d.Dot(lhs.Native, rhs.Native)));
+				return new Value(new Vector(Vector3d.Dot(lhs, rhs)));
 			}
 		}
 		public class AbsFunction : VectorFunctionBase
@@ -56,7 +53,7 @@ namespace RedOnion.KSP.API
 			public override Value Call(Arguments args)
 			{
 				var v = GetOne(args);
-				return new Value(new Vector(Math.Abs(v.X), Math.Abs(v.Y), Math.Abs(v.Z)));
+				return new Value(new Vector(Math.Abs(v.x), Math.Abs(v.y), Math.Abs(v.z)));
 			}
 		}
 	}
