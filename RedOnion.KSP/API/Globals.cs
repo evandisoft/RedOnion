@@ -22,7 +22,9 @@ namespace RedOnion.KSP.API
 				: HighLogic.LoadedSceneIsEditor ? EditorLogic.fetch.ship : null),
 			new Interop("stage", "Stage", "Staging logic",
 				() => Stage.Instance),
-			new Interop("V", "Vector", "Function for creating 3D vector / coordinate",
+			new Interop("Vector", "VectorCreator", "Function for creating 3D vector / coordinate",
+				() => VectorCreator.Instance),
+			new Interop("V", "VectorCreator", "Alias to Vector Function for creating 3D vector / coordinate",
 				() => VectorCreator.Instance)
 		});
 	}

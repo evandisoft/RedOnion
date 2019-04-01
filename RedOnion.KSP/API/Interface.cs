@@ -227,7 +227,7 @@ namespace RedOnion.KSP.API
 		}
 	}
 	/// <summary>
-	/// Static floating-point property.
+	/// Static single-precision floating-point property.
 	/// </summary>
 	public class Float : IMember
 	{
@@ -262,7 +262,7 @@ namespace RedOnion.KSP.API
 		}
 	}
 	/// <summary>
-	/// Floating-point property.
+	/// Single-precision floating-point property.
 	/// </summary>
 	public class Float<Self> : IMember where Self : IObject
 	{
@@ -286,6 +286,76 @@ namespace RedOnion.KSP.API
 
 		public Float(string name, string help,
 			Func<Self, float> read, Action<Self, float> write = null)
+		{
+			Name = name;
+			Type = "float";
+			Help = help;
+			CanRead = read != null;
+			CanWrite = write != null;
+			Get = read;
+			Set = write;
+		}
+	}
+	/// <summary>
+	/// Static double-precision floating-point property.
+	/// </summary>
+	public class Double : IMember
+	{
+		public string Name { get; }
+		public string Type { get; }
+		public string Help { get; }
+		public bool CanRead { get; }
+		public bool CanWrite { get; }
+
+		public Func<double> Get { get; }
+		public Action<double> Set { get; }
+
+		public Value RosGet(object self)
+			=> new Value(Get());
+		public DynValue LuaGet(object self)
+			=> DynValue.NewNumber(Get());
+		public void RosSet(object self, Value value)
+			=> Set(value.Double);
+		public void LuaSet(object self, DynValue value)
+			=> Set(value.Number);
+
+		public Double(string name, string help,
+			Func<double> read, Action<double> write = null)
+		{
+			Name = name;
+			Type = "float";
+			Help = help;
+			CanRead = read != null;
+			CanWrite = write != null;
+			Get = read;
+			Set = write;
+		}
+	}
+	/// <summary>
+	/// Double-precision floating-point property.
+	/// </summary>
+	public class Double<Self> : IMember where Self : IObject
+	{
+		public string Name { get; }
+		public string Type { get; }
+		public string Help { get; }
+		public bool CanRead { get; }
+		public bool CanWrite { get; }
+
+		public Func<Self, double> Get { get; }
+		public Action<Self, double> Set { get; }
+
+		public Value RosGet(object self)
+			=> new Value(Get((Self)self));
+		public DynValue LuaGet(object self)
+			=> DynValue.NewNumber(Get((Self)self));
+		public void RosSet(object self, Value value)
+			=> Set((Self)self, value.Double);
+		public void LuaSet(object self, DynValue value)
+			=> Set((Self)self, value.Number);
+
+		public Double(string name, string help,
+			Func<Self, double> read, Action<Self, double> write = null)
 		{
 			Name = name;
 			Type = "float";

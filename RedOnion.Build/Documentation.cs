@@ -69,16 +69,24 @@ namespace RedOnion.Build
 				var full = doctype.FullName.Substring("RedOnion.KSP.".Length);
 				MemberList members;
 
-				var getMembers = type.GetProperty("MemberList",
+				var getMembers = doctype.GetProperty("MemberList",
 					BindingFlags.Public|BindingFlags.Static|BindingFlags.GetProperty);
 
 				if (getMembers != null)
 					members = (MemberList)getMembers.GetValue(null);
 				else
 				{
-					var instance = type.GetProperty("Instance",
+					var instance = doctype.GetProperty("Instance",
 					BindingFlags.Public|BindingFlags.Static|BindingFlags.GetProperty);
-					if (instance == null || !instance.CanRead) continue;
+					if (instance == null || !instance.CanRead)
+					{
+						if (proxy == null)
+							continue;
+						instance = type.GetProperty("Instance",
+						BindingFlags.Public|BindingFlags.Static|BindingFlags.GetProperty);
+						if (instance == null || !instance.CanRead)
+							continue;
+					}
 					members = ((IType)instance.GetValue(null)).Members;
 				}
 				var doc = new Document()
@@ -124,14 +132,22 @@ namespace RedOnion.Build
 				foreach (var member in doc.members)
 				{
 					string typePath = null;
+					string typeName = member.Type;
 					if (member.Type != name
 						&& docs.TryGetValue(member.Type, out var tdoc))
+					{
+						if (fn2obj.TryGetValue(tdoc.type, out var objtype))
+						{
+							tdoc = docs[objtype.Name];
+							typeName = objtype.Name + " Function";
+						}
 						typePath = GetRelativePath(doc.path, tdoc.path) + ".md";
+					}
 					wr.WriteLine(typePath == null
 						? "- `{0}`: {1} - {3}"
 						: "- `{0}`: [{1}]({2}) - {3}",
 						member is Method ? member.Name + "()" : member.Name,
-						member.Type, typePath, member.Help);
+						typeName, typePath, member.Help);
 				}
 			}
 		}

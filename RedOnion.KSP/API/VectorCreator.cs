@@ -29,6 +29,8 @@ namespace RedOnion.KSP.API
 			new Interop("right","Vector", "Vector(1, 0, 0).", () => Right),
 
 			new Function("cross", "Vector", "Cross product.", () => CrossFunction.Instance),
+			new Function("dot", "Vector", "Dot product.", () => DotFunction.Instance),
+			new Function("abs", "Vector", "Vector with coordinates changed to non-negative.", () => AbsFunction.Instance),
 		});
 
 		public static VectorCreator Instance { get; } = new VectorCreator();
