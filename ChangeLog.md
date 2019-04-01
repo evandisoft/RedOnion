@@ -1,4 +1,14 @@
-# 0.2.0:
+
+# Next Release
+- Lua no longer requires "=" at start to return a value to the repl. Will automatically add a "return " at the start of a source that parses as a lone expression.
+- New automatic documentation system, and interop.
+- Slightly better Autopilot. Still needs work. Handles control surfaces somewhat.
+
+# 0.2:
+## 0.2.1:
+- Misc changes. Uses new build script, default engine changed to lua. Other minor changes not listed.
+
+## 0.2.0:
 ### General:
 - Improved error handling and reporting (line number and line content of where error/exception occured)
 

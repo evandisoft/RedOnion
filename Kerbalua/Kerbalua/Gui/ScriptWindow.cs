@@ -51,6 +51,13 @@ namespace Kerbalua.Gui
 
 		public KeyBindings GlobalKeyBindings = new KeyBindings();
 
+		internal void OnDestroy()
+		{
+			Settings.SaveSetting("WindowPositionX", mainWindowRect.x.ToString());
+			Settings.SaveSetting("WindowPositionY", mainWindowRect.y.ToString());
+			//Debug.Log("On Destroy was called");
+		}
+
 		/// <summary>
 		/// This manages completion. Keeps track of what is was focused and
 		/// manages the completion interaction between an control that can
@@ -90,6 +97,7 @@ namespace Kerbalua.Gui
 
 		public ScriptWindow(Rect param_mainWindowRect)
 		{
+			editorVisible=bool.Parse(Settings.LoadSetting("editorVisible", "true"));
 			replEvaluators["ROS Engine"] = new RedOnionReplEvaluator();
 			replEvaluators["ROS Engine"].PrintAction = (str) =>
 			{
@@ -133,6 +141,8 @@ namespace Kerbalua.Gui
 			});
 
 			mainWindowRect = param_mainWindowRect;
+			mainWindowRect.x = float.Parse(Settings.LoadSetting("WindowPositionX", param_mainWindowRect.x.ToString()));
+			mainWindowRect.y = float.Parse(Settings.LoadSetting("WindowPositionY", param_mainWindowRect.y.ToString()));
 			completionManager = new CompletionManager(completionBox);
 			completionManager.AddCompletable(scriptIOTextArea);
 			completionManager.AddCompletable(new EditingAreaCompletionAdapter(editor, this));
@@ -170,8 +180,14 @@ namespace Kerbalua.Gui
 			completionBoxRect.x = replRect.x + replRect.width;
 			mainWindowRect.width = widgetBarRect.width + replRect.width + editorRect.width + completionBoxRect.width;
 
-			widgetBar.renderables.Add(new Button("<<", () => editorVisible = !editorVisible));
-			widgetBar.renderables.Add(new Button(">>", () => replVisible = !replVisible));
+			widgetBar.renderables.Add(new Button("<<", () => {
+				editorVisible = !editorVisible;
+				Settings.SaveSetting("editorVisible", editorVisible.ToString());
+				}));
+			widgetBar.renderables.Add(new Button(">>", () => {
+				replVisible = !replVisible;
+				Settings.SaveSetting("editorVisible", editorVisible.ToString());
+			}));
 			//widgetBar.renderables.Add(scriptIOTextArea);
 			widgetBar.renderables.Add(new Button("Save", () =>
 			{
