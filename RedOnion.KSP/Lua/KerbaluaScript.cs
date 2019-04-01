@@ -31,6 +31,8 @@ namespace RedOnion.KSP.Lua
 		public PartLoader PartLoader = PartLoader.Instance;
 	}
 
+
+
 	public class KerbaluaScript : MoonSharp.Interpreter.Script
 	{
 		public KerbaluaScript() : base(CoreModules.Preset_Complete)
@@ -46,6 +48,7 @@ namespace RedOnion.KSP.Lua
 			//Globals["Vessel"] = FlightGlobals.ActiveVessel;
 			Globals["Ksp"] = new KspApi();
 			Globals["new"] = new Constructor(ConstructorImpl);
+
 			//Globals["import"] = new Importer(ImporterImpl);
 		}
 

@@ -43,23 +43,19 @@ This grammar file derived from:
     http://www.antlr3.org/grammar/1178608849736/Lua.g
 */
 
-grammar StandardIncompleteLua;
+grammar FinalExpLua;
 
 chunk
     : block EOF
-    ;
-
-incompleteChunk
-    : incompleteBlock EOF
+    | implicitReturnExp EOF
     ;
 
 block
-    : stat* retstat?
+    : stat*? retstat?
     ;
-
-incompleteBlock
-    : stat* incompleteStat
-    | stat* incompleteRetstat
+    
+implicitReturnExp
+    : exp
     ;
 
 stat
@@ -80,32 +76,8 @@ stat
     | 'local' namelist ('=' explist)?
     ;
 
-incompleteStat
-    : incompleteVarlist | varlist '=' incompleteExplist
-    | incompleteFunctionCall
-    | 'goto' incompleteName
-    | 'do' incompleteBlock
-    | 'while' incompleteExp | 'while' exp 'do' incompleteBlock
-    | 'repeat' incompleteBlock | 'repeat' block 'until' incompleteExp
-    | 'if' incompleteExp | 'if' exp 'then' incompleteBlock | 'if' exp 'then' block incompleteElse
-    | 'for' incompleteName | 'for' NAME '=' incompleteExp | 'for' NAME '=' exp ',' incompleteExp
-    | 'for' NAME '=' exp ',' exp ',' incompleteExp | | 'for' NAME '=' exp ',' exp (',' exp)? 'do' incompleteBlock
-    | 'function' incompleteFuncname | 'function' funcname incompleteFuncbody
-    | 'local' 'function' incompleteName | 'local' 'function' NAME incompleteFuncbody 
-    | 'local' incompleteNamelist | 'local' namelist '=' incompleteExplist
-    ;
-
-incompleteElse
-    : ('elseif' exp 'then' block)* 'elseif' incompleteExp | 'elseif' exp 'then' incompleteBlock
-    | ('elseif' exp 'then' block)* 'else' incompleteBlock
-    ;
-
 retstat
     : 'return' explist? ';'?
-    ;
-
-incompleteRetstat
-    : 'return' incompleteExplist
     ;
 
 label
@@ -116,33 +88,16 @@ funcname
     : NAME ('.' NAME)* (':' NAME)?
     ;
 
-incompleteFuncname
-    : (NAME '.')* incompleteName
-    | NAME ('.' NAME)* ':' incompleteName
-    ;
-
 varlist
     : var (',' var)*
-    ;
-
-incompleteVarlist
-    :  (var ',')* incompleteVar
     ;
 
 namelist
     : NAME (',' NAME)*
     ;
 
-incompleteNamelist
-    : (NAME ',')* incompleteName
-    ;
-
 explist
     : exp (',' exp)*
-    ;
-
-incompleteExplist
-    : (exp ',')* incompleteExp
     ;
 
 exp
@@ -164,63 +119,28 @@ exp
     | exp operatorBitwise exp
     ;
 
-incompleteExp
-    : incompleteFunctiondef | incompletePrefixexp | incompleteTableconstructor
-    | <assoc=right> exp operatorPower incompleteExp | operatorUnary incompleteExp
-    | exp operatorMulDivMod incompleteExp | exp operatorAddSub incompleteExp
-    | <assoc=right> exp operatorStrcat incompleteExp | exp operatorComparison incompleteExp
-    | exp operatorAnd incompleteExp | exp operatorOr incompleteExp
-    | exp operatorBitwise incompleteExp
-    ;
-
 prefixexp
     : varOrExp nameAndArgs*
-    ;
-
-incompletePrefixexp
-    : incompleteVarOrExp | varOrExp nameAndArgs* incompleteNameAndArgs
     ;
 
 functioncall
     : varOrExp nameAndArgs+
     ;
 
-incompleteFunctionCall
-    : incompleteVarOrExp | varOrExp nameAndArgs* incompleteNameAndArgs
-    ;
-
 varOrExp
     : var | '(' exp ')'
-    ;
-
-incompleteVarOrExp
-    : incompleteVar | '(' incompleteExp
     ;
 
 var
     : (NAME | '(' exp ')' varSuffix) varSuffix*
     ;
 
-incompleteVar
-    : incompleteName | '(' incompleteExp | '(' exp ')' incompleteVarSuffix
-    | (NAME | '(' exp ')' varSuffix) varSuffix* incompleteVarSuffix
-    ;
-
 varSuffix
     : nameAndArgs* ('[' exp ']' | '.' NAME)
     ;
 
-incompleteVarSuffix
-    : nameAndArgs* incompleteNameAndArgs
-    | nameAndArgs* ('[' incompleteExp | '.' incompleteName)
-    ;
-
 nameAndArgs
     : (':' NAME)? args
-    ;
-
-incompleteNameAndArgs
-    : ':' incompleteName | (':' NAME)? incompleteArgs
     ;
 
 /*
@@ -241,57 +161,28 @@ args
     : '(' explist? ')' | tableconstructor | string
     ;
 
-incompleteArgs
-    : '(' incompleteExplist | incompleteTableconstructor | incompleteString
-    ;
-
-
 functiondef
     : 'function' funcbody
-    ;
-
-incompleteFunctiondef
-    : 'function' incompleteFuncbody
     ;
 
 funcbody
     : '(' parlist? ')' block 'end'
     ;
 
-incompleteFuncbody
-    : '(' incompleteParlist | '(' parlist? ')' incompleteBlock
-    ;
-
 parlist
     : namelist (',' '...')? | '...'
-    ;
-
-incompleteParlist
-    : incompleteNamelist
     ;
 
 tableconstructor
     : '{' fieldlist? '}'
     ;
 
-incompleteTableconstructor
-    : '{' incompleteFieldlist
-    ;
-
 fieldlist
     : field (fieldsep field)* fieldsep?
     ;
 
-incompleteFieldlist
-    : (field fieldsep)* incompleteField
-    ;
-
 field
     : '[' exp ']' '=' exp | NAME '=' exp | exp
-    ;
-
-incompleteField
-    : '[' incompleteExp | '[' exp ']' '=' incompleteExp | incompleteName | NAME '=' incompleteExp | incompleteExp
     ;
 
 fieldsep
@@ -331,14 +222,6 @@ number
 
 string
     : NORMALSTRING | CHARSTRING | LONGSTRING
-    ;
-
-incompleteString
-    : NORMALSTRING | CHARSTRING | LONGSTRING
-    ;
-
-incompleteName
-    : NAME
     ;
 
 // LEXER

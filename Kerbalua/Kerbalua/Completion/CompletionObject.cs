@@ -6,11 +6,13 @@ using MoonSharp.Interpreter.Interop;
 using System.Reflection;
 using RedOnion.KSP.Lua.Proxies;
 using RedOnion.KSP.API;
+using System.Linq;
 
 namespace Kerbalua.Completion {
 	public class CompletionObject {
 		public Table CurrentTable { get; private set; }
 		public Type CurrentType { get; private set; }
+		public InteropObject CurrentInterop { get; private set; }
 		IList<Segment> segments;
 
 		public string CurrentPartial {
@@ -52,6 +54,12 @@ namespace Kerbalua.Completion {
 				return true;
 			}
 
+			if (CurrentInterop != null)
+			{
+				SetNextResultFromInterop();
+				return true;
+			}
+
 			throw new Exception("Both currentTable and currentType are null");
 		}
 
@@ -63,8 +71,68 @@ namespace Kerbalua.Completion {
 			if (CurrentType != null) {
 				return GetCurrentTypeCompletions();
 			}
+			if (CurrentInterop != null)
+			{
+				return GetCurrentInteropCompletions();
+			}
 
 			throw new Exception("Both currentTable and currentType are null");
+		}
+
+		private IList<string> GetCurrentInteropCompletions()
+		{
+			List<string> completions = new List<string>();
+			string partial = CurrentPartial;
+			foreach(var member in CurrentInterop.Members)
+			{
+				if (member.Name.ToLower().Contains(partial.ToLower()))
+				{
+					completions.Add(member.Name);
+				}
+			}
+			completions.Sort();
+			return completions;
+		}
+
+		private void SetNextResultFromInterop()
+		{
+			Segment currentSegment = segments[Index];
+			string name = currentSegment.Name;
+			var member = CurrentInterop.Members.Where((m) => m.Name == name).FirstOrDefault();
+			if (member != default(IMember))
+			{
+				if (member is Native native)
+				{
+					CurrentInterop= null;
+					CurrentType = native.Get().GetType();
+					ProcessCurrentParts();
+					Index++;
+					return;
+				}
+				if (member is InteropObject interop)
+				{
+					CurrentInterop = interop;
+					if (currentSegment.Parts.Count > 0)
+					{
+						Type partType = currentSegment.Parts[0].GetType();
+
+						if (partType == typeof(CallPart))
+						{
+							throw new InteropCallException();
+						}
+
+						if (partType == typeof(ArrayPart))
+						{
+							throw new InteropArrayAccessException();
+						}
+
+						throw new LuaIntellisenseException("Unknown part type.");
+					}
+					Index++;
+					return;
+				}
+			}
+			throw new LuaIntellisenseException(name + " not found in " + CurrentInterop.Name);
 		}
 
 		void SetNextResultFromTable()
@@ -73,6 +141,44 @@ namespace Kerbalua.Completion {
 			string name = currentSegment.Name;
 			object newObject = CurrentTable[name];
 			if (newObject == null) {
+				if(CurrentTable.MetaTable!=null && CurrentTable.MetaTable is Globals globals)
+				{
+					var member=globals.Members.Where((m) => m.Name == name).FirstOrDefault();
+					if (member != default(IMember))
+					{
+						if(member is Native native)
+						{
+							CurrentTable = null;
+							CurrentType = native.Get().GetType();
+							ProcessCurrentParts();
+							Index++;
+							return;
+						}
+						if(member is InteropObject interop)
+						{
+							CurrentTable = null;
+							CurrentInterop = interop;
+							if (currentSegment.Parts.Count > 0)
+							{
+								Type partType = currentSegment.Parts[0].GetType();
+
+								if (partType == typeof(CallPart))
+								{
+									throw new InteropCallException();
+								}
+
+								if (partType == typeof(ArrayPart))
+								{
+									throw new InteropArrayAccessException();
+								}
+
+								throw new LuaIntellisenseException("Unknown part type.");
+							}
+							Index++;
+							return;
+						}
+					}
+				}
 				throw new KeyNotInTableException();
 			}
 

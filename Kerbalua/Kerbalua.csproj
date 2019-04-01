@@ -116,12 +116,6 @@
     <Compile Include="Kerbalua\Completion\Grammar\IncompleteLuaListener.cs" />
     <Compile Include="Kerbalua\Completion\Grammar\IncompleteLuaParser.cs" />
     <Compile Include="Kerbalua\Completion\Grammar\IncompleteLuaVisitor.cs" />
-    <Compile Include="Kerbalua\Completion\Grammar\StandardLuaBaseListener.cs" />
-    <Compile Include="Kerbalua\Completion\Grammar\StandardLuaBaseVisitor.cs" />
-    <Compile Include="Kerbalua\Completion\Grammar\StandardLuaLexer.cs" />
-    <Compile Include="Kerbalua\Completion\Grammar\StandardLuaListener.cs" />
-    <Compile Include="Kerbalua\Completion\Grammar\StandardLuaParser.cs" />
-    <Compile Include="Kerbalua\Completion\Grammar\StandardLuaVisitor.cs" />
     <Compile Include="Kerbalua\Completion\ProcessedIncompleteVar.cs" />
     <Compile Include="Kerbalua\Completion\LuaIntellisenseException.cs" />
     <Compile Include="Kerbalua\Completion\CompletionObject.cs" />
@@ -133,16 +127,12 @@
     <None Include="Kerbalua\Completion\Grammar\regenerate.sh" />
     <None Include="Kerbalua\Completion\Grammar\BackwardsLua.g4" />
     <None Include="Kerbalua\Completion\Grammar\StandardLua.g4" />
-    <None Include="Kerbalua\Completion\Grammar\StandardIncompleteLua.g4" />
     <None Include="Kerbalua\Completion\Grammar\IncompleteLua.interp" />
     <None Include="Kerbalua\Completion\Grammar\IncompleteLua.tokens" />
     <None Include="Kerbalua\Completion\Grammar\IncompleteLuaLexer.interp" />
     <None Include="Kerbalua\Completion\Grammar\IncompleteLuaLexer.tokens" />
-    <None Include="Kerbalua\Completion\Grammar\StandardLua.interp" />
-    <None Include="Kerbalua\Completion\Grammar\StandardLua.tokens" />
-    <None Include="Kerbalua\Completion\Grammar\StandardLuaLexer.interp" />
-    <None Include="Kerbalua\Completion\Grammar\StandardLuaLexer.tokens" />
     <None Include="Kerbalua\Completion\Grammar\IncompleteLua.g4" />
+    <None Include="Kerbalua\Completion\Grammar\FinalExpLua.g4" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Kerbalua\" />
