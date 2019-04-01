@@ -17,11 +17,12 @@ Can also convert array / list of numbers (`V([1,2,3])` becomes `V(1,2,3)`).
 - `crs()`: Vector - Cross product. (Alias to cross.)
 - `dot()`: Vector - Dot product.
 - `abs()`: Vector - Vector with coordinates changed to non-negative.
+- `angle()`: Vector - Angle between vectors (0..180).
 
 ## Vector
 
 3D vector / coordinate. All the usual operators were implemented,
-multiplication and dividion can use both vector (per-axis) and number (all-axes).
+multiplication and division can use both vector (per-axis) and number (all-axes).
 Beware that multiplication is scaling, not cross product or dot - use appropriate function for these.
 
 - `native`: Vector3d - Native Vector3d (`double x,y,z`).
