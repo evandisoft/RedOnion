@@ -25,7 +25,13 @@ namespace RedOnion.KSP.API
 			new Interop("Vector", "VectorCreator", "Function for creating 3D vector / coordinate",
 				() => VectorCreator.Instance),
 			new Interop("V", "VectorCreator", "Alias to Vector Function for creating 3D vector / coordinate",
-				() => VectorCreator.Instance)
+				() => VectorCreator.Instance),
+			new Function("vdot", "Vector", "Alias to `Vector.dot` (or `v.dot`).",
+				() => VectorCreator.DotFunction.Instance),
+			new Function("vcrs", "Vector", "Alias to `Vector.cross` (or `v.cross`).",
+				() => VectorCreator.CrossFunction.Instance),
+			new Function("vcross", "Vector", "Alias to `Vector.cross` (or `v.cross`).",
+				() => VectorCreator.CrossFunction.Instance),
 		});
 	}
 	[IgnoreForDocs]

@@ -81,20 +81,23 @@ namespace RedOnion.KSP.ApiNUnit
 			Assert.AreEqual(1.0, v.X);
 			Assert.AreEqual(1.0, v.Y);
 			Assert.AreEqual(1.0, v.Z);
+			Test(1.0, "v(1).x");
 
-			Test("v 1,2u");
+			Test("var a = v 1,2u");
 			v = Result.Object as Vector;
 			Assert.NotNull(v);
 			Assert.AreEqual(1.0, v.X);
 			Assert.AreEqual(2.0, v.Y);
 			Assert.AreEqual(0.0, v.Z);
+			Test(2.0, "a.y");
 
-			Test("v 1,2f,3.0");
+			Test("var b = v 1,2f,3.0");
 			v = Result.Object as Vector;
 			Assert.NotNull(v);
 			Assert.AreEqual(1.0, v.X);
 			Assert.AreEqual(2.0, v.Y);
 			Assert.AreEqual(3.0, v.Z);
+			Test(3.0, "b.z");
 		}
 		[Test]
 		public void API_Vec02_Unary()

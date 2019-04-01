@@ -20,16 +20,25 @@ Beware that multiplication is scaling, not cross product or dot - use appropriat
 		{
 			new Native<Vector, Vector3d>(
 				"native",
-				"Native Vector3d (convertible to UnityEngine.Vector3).",
+				"Native Vector3d (`double x,y,z`).",
 				v => v.Native, (v, value) => v.Native = value),
 			new Native<Vector, Vector3>(
 				"vector3",
-				"Native UnityEngine.Vector3 (float).",
+				"Native UnityEngine.Vector3 (`float x,y,z`).",
 				v => v.Native, (v, value) => v.Native = value),
 			new Native<Vector, Vector2>(
 				"vector2",
-				"Native UnityEngine.Vector2 (float x,y).",
+				"Native UnityEngine.Vector2 (`float x,y`).",
 				v => (Vector3)v.Native, (v, value) => v.Native = (Vector3)value),
+			new Double<Vector>(
+				"x", "The X-coordinate",
+				v => v.X, (v, value) => v.X = value),
+			new Double<Vector>(
+				"y", "The Y-coordinate",
+				v => v.Y, (v, value) => v.Y = value),
+			new Double<Vector>(
+				"z", "The Z-coordinate",
+				v => v.Z, (v, value) => v.Z = value),
 			new Method<Vector>(
 				"scale", "void",
 				"Scale the vector by a factor (all axes if number is provided, per-axis if Vector)."
@@ -42,15 +51,15 @@ Beware that multiplication is scaling, not cross product or dot - use appropriat
 				() => ShrinkMethod.Instance),
 			new Double<Vector>(
 				"size",
-				"Size of the vector - sqrt(x*x+y*y+z*z). Scale if setting.",
+				"Size of the vector - `sqrt(x*x+y*y+z*z)`. Scale if setting.",
 				v => v.Size, (v, value) => v.Size = value),
 			new Double<Vector>(
 				"magnitude",
-				"Alias to size of the vector - sqrt(x*x+y*y+z*z). Scale if setting.",
+				"Alias to size of the vector - `sqrt(x*x+y*y+z*z)`. Scale if setting.",
 				v => v.Size, (v, value) => v.Size = value),
 			new Double<Vector>(
 				"squareSize",
-				"Square size of the vector - x*x+y*y+z*z. Scale if setting.",
+				"Square size of the vector - `x*x+y*y+z*z`. Scale if setting.",
 				v => v.SquareSize, (v, value) => v.SquareSize = value),
 			new Interop<Vector>(
 				"normalized", "Vector",

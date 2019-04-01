@@ -323,7 +323,7 @@ namespace RedOnion.KSP.API
 			Func<double> read, Action<double> write = null)
 		{
 			Name = name;
-			Type = "float";
+			Type = "double";
 			Help = help;
 			CanRead = read != null;
 			CanWrite = write != null;
@@ -358,7 +358,7 @@ namespace RedOnion.KSP.API
 			Func<Self, double> read, Action<Self, double> write = null)
 		{
 			Name = name;
-			Type = "float";
+			Type = "double";
 			Help = help;
 			CanRead = read != null;
 			CanWrite = write != null;
