@@ -7,6 +7,7 @@ using MoonSharp.Interpreter.REPL;
 using MoonSharp.Interpreter.Interop;
 using Kerbalua.Other;
 using RedOnion.KSP.Lua;
+using Kerbalua.MoonSharp;
 
 namespace KerbaluaNUnit {
 	[TestFixture()]

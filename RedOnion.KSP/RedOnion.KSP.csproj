@@ -75,7 +75,6 @@
     <Compile Include="ROS\KspRosEngine.cs" />
     <Compile Include="ROS\UI\Window.cs" />
     <Compile Include="ROS\RuntimeRoot.cs" />
-    <Compile Include="Lua\KerbaluaScript.cs" />
     <Compile Include="Autopilot\FlightControl.cs" />
     <Compile Include="MathUtil\Vec.cs" />
     <Compile Include="MathUtil\Scalar.cs" />

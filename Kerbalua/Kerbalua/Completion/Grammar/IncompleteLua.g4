@@ -48,9 +48,13 @@ grammar IncompleteLua;
 chunk
     : block EOF
     ;
+    
+implicitReturn
+    : exp EOF
+    ;
 
 incompleteChunk
-    : '='? incompleteBlock EOF
+    : incompleteBlock EOF
     ;
 
 block

@@ -47,6 +47,18 @@ public partial class IncompleteLuaBaseListener : IIncompleteLuaListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitChunk([NotNull] IncompleteLuaParser.ChunkContext context) { }
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="IncompleteLuaParser.implicitReturn"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterImplicitReturn([NotNull] IncompleteLuaParser.ImplicitReturnContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="IncompleteLuaParser.implicitReturn"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitImplicitReturn([NotNull] IncompleteLuaParser.ImplicitReturnContext context) { }
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="IncompleteLuaParser.incompleteChunk"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>

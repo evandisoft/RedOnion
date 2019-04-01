@@ -121,6 +121,8 @@
     <Compile Include="Kerbalua\Completion\CompletionObject.cs" />
     <Compile Include="Kerbalua\Utility\Settings.cs" />
     <Compile Include="Kerbalua\Other\Evaluation.cs" />
+    <Compile Include="Kerbalua\Parsing\IncompleteLuaParsing.cs" />
+    <Compile Include="Kerbalua\MoonSharp\KerbaluaScript.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -143,6 +145,7 @@
     <Folder Include="Kerbalua\Completion\" />
     <Folder Include="Kerbalua\MoonSharp\" />
     <Folder Include="Kerbalua\Completion\Grammar\" />
+    <Folder Include="Kerbalua\Parsing\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RedOnion.KSP\RedOnion.KSP.csproj">
