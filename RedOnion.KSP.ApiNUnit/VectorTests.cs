@@ -194,5 +194,17 @@ namespace RedOnion.KSP.ApiNUnit
 			Assert.AreEqual(2.0/3.0, v.Y);
 			Assert.AreEqual(2.0/3.0, v.Z);
 		}
+
+		[Test]
+		public void API_Vec06_Index()
+		{
+			Lines(1.0,
+				"var a = v 1,2",
+				"return a[0]");
+			Test(2.0, "a[1]");
+			Test(0.0, "a[2]");
+			Test(3.0, "a[2] = 3");
+			Test(3.0, "a[2]");
+		}
 	}
 }

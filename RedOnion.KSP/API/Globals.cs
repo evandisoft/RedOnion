@@ -17,14 +17,14 @@ namespace RedOnion.KSP.API
 
 		new IMember[]
 		{
-			new Native("ship", "Vessel|ShipConstruct", "Active vessel (in flight or editor)",
+			new Native("ship", "Vessel|ShipConstruct", "Active vessel (in flight or editor).",
 				() => HighLogic.LoadedSceneIsFlight ? (object)FlightGlobals.ActiveVessel
 				: HighLogic.LoadedSceneIsEditor ? EditorLogic.fetch.ship : null),
-			new Interop("stage", "Stage", "Staging logic",
+			new Interop("stage", "Stage", "Staging logic.",
 				() => Stage.Instance),
-			new Interop("Vector", "VectorCreator", "Function for creating 3D vector / coordinate",
+			new Interop("Vector", "VectorCreator", "Function for creating 3D vector / coordinate.",
 				() => VectorCreator.Instance),
-			new Interop("V", "VectorCreator", "Alias to Vector Function for creating 3D vector / coordinate",
+			new Interop("V", "VectorCreator", "Alias to Vector Function for creating 3D vector / coordinate.",
 				() => VectorCreator.Instance),
 			new Function("vdot", "Vector", "Alias to `Vector.dot` (or `v.dot`).",
 				() => VectorCreator.DotFunction.Instance),
@@ -32,6 +32,10 @@ namespace RedOnion.KSP.API
 				() => VectorCreator.CrossFunction.Instance),
 			new Function("vcross", "Vector", "Alias to `Vector.cross` (or `v.cross`).",
 				() => VectorCreator.CrossFunction.Instance),
+			new Function("vangle", "double", "alias to `Vector.angle` (or `v.angle`).",
+				() => VectorCreator.AngleFunction.Instance),
+			new Function("vang", "double", "alias to `Vector.angle` (or `v.angle`).",
+				() => VectorCreator.AngleFunction.Instance),
 		});
 	}
 	[IgnoreForDocs]

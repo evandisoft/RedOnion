@@ -34,6 +34,7 @@ Can also convert array / list of numbers (`V([1,2,3])` becomes `V(1,2,3)`).",
 			new Function("crs", "Vector", "Cross product. (Alias to cross.)", () => CrossFunction.Instance),
 			new Function("dot", "Vector", "Dot product.", () => DotFunction.Instance),
 			new Function("abs", "Vector", "Vector with coordinates changed to non-negative.", () => AbsFunction.Instance),
+			new Function("angle", "Vector", "Angle between vectors (0..180).", () => AngleFunction.Instance),
 		});
 
 		public static VectorCreator Instance { get; } = new VectorCreator();

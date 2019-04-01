@@ -7,13 +7,13 @@ using UnityEngine;
 namespace RedOnion.KSP.API
 {
 	[Creator(typeof(VectorCreator))]
-	public partial class Vector : InteropObject
+	public partial class Vector : InteropObject, IEquatable<Vector>
 	{
 		public static MemberList MemberList { get; } = new MemberList(
-		ObjectFeatures.Proxy|ObjectFeatures.Operators,
+		ObjectFeatures.Proxy|ObjectFeatures.Operators|ObjectFeatures.Collection,
 
 @"3D vector / coordinate. All the usual operators were implemented,
-multiplication and dividion can use both vector (per-axis) and number (all-axes).
+multiplication and division can use both vector (per-axis) and number (all-axes).
 Beware that multiplication is scaling, not cross product or dot - use appropriate function for these.",
 
 		new IMember[]
@@ -96,7 +96,12 @@ Beware that multiplication is scaling, not cross product or dot - use appropriat
 			}
 		}
 
-		public Vector3d Native { get; set; }
+		public Vector3d native;
+		public Vector3d Native
+		{
+			get => native;
+			set => native = value;
+		}
 		public override object Target => Native;
 		public double X
 		{
@@ -181,6 +186,8 @@ Beware that multiplication is scaling, not cross product or dot - use appropriat
 		{
 			switch (metaname)
 			{
+			case "__unm":
+				return DynValue.NewCallback(Neg);
 			case "__add":
 				return DynValue.NewCallback(Add);
 			case "__sub":
@@ -191,6 +198,13 @@ Beware that multiplication is scaling, not cross product or dot - use appropriat
 				return DynValue.NewCallback(Div);
 			}
 			return null;
+		}
+		DynValue Neg(ScriptExecutionContext ctx, CallbackArguments args)
+		{
+			if (args.Count != 1)
+				throw new InvalidOperationException("Unexpected number of arguments: " + args.Count);
+			return UserData.Create(
+				-VectorCreator.ToVector(args[0].ToObject()));
 		}
 		DynValue Add(ScriptExecutionContext ctx, CallbackArguments args)
 		{
@@ -224,6 +238,27 @@ Beware that multiplication is scaling, not cross product or dot - use appropriat
 				VectorCreator.ToVector(args[0].ToObject())
 				/ VectorCreator.ToVector(args[1].ToObject()));
 		}
+
+		public bool Equals(Vector other)
+			=> other != null && Native == other.Native;
+		public override bool Equals(object obj)
+		{
+			if (obj is Vector v)
+				return Equals(v);
+			if (obj is Vector3d v3d)
+				return Native == v3d;
+			if (obj is Vector3 v3)
+				return (Vector3)Native == v3;
+			if (Z < 0 || Z > 0) // zero and NaN are acceptable
+				return false;
+			if (obj is Vector2d v2d)
+				return X == v2d.x && Y == v2d.y;
+			if (obj is Vector2 v2)
+				return (float)X == v2.x && (float)Y == v2.y;
+			return false;
+		}
+		public override int GetHashCode()
+			=> Native.GetHashCode();
 
 		public static implicit operator Vector3d(Vector v) => v.Native;
 		public static implicit operator Vector3(Vector v) => v.Native;
@@ -278,5 +313,37 @@ Beware that multiplication is scaling, not cross product or dot - use appropriat
 			=> new Vector(a.x / b.X, a.y / b.Y, a.z / b.Z);
 		public static Vector operator /(Vector a, Vector3 b)
 			=> new Vector(a.X / b.x, a.Y / b.y, a.Z / b.z);
+
+		public double this[int i]
+		{
+			get => native[i];
+			set => native[i] = value;
+		}
+		public override Value IndexGet(Value index)
+			=> index.IsNumber ? new Value(native[index.Int]) : Get(index.String);
+		public override bool IndexSet(Value index, Value value)
+		{
+			if (index.IsNumber)
+			{
+				native[index.Int] = value.Double;
+				return true;
+			}
+			return Set(index.String, value);
+		}
+		public override DynValue Index(MoonSharp.Interpreter.Script script, DynValue index, bool isDirectIndexing)
+		{
+			if (index.Type == DataType.Number)
+				return DynValue.NewNumber(native[(int)index.Number]);
+			return base.Index(script, index, isDirectIndexing);
+		}
+		public override bool SetIndex(MoonSharp.Interpreter.Script script, DynValue index, DynValue value, bool isDirectIndexing)
+		{
+			if (index.Type == DataType.Number)
+			{
+				native[(int)index.Number] = value.Number;
+				return true;
+			}
+			return base.SetIndex(script, index, value, isDirectIndexing);
+		}
 	}
 }

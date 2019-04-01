@@ -113,7 +113,7 @@ namespace RedOnion.KSP.API
 		}
 		public virtual Value IndexGet(Value index) => Get(index.String);
 		public virtual bool IndexSet(Value index, Value value) => Set(index.String, value);
-		public virtual bool IndexModify(Value index, OpCode op, Value value) => Modify(index.String, op, value);
+		public virtual bool IndexModify(Value index, OpCode op, Value value) => false;
 		public virtual bool Modify(string name, OpCode op, Value value) => false;
 
 		bool IProperties.Delete(string name) => false;

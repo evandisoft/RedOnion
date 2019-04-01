@@ -56,5 +56,15 @@ namespace RedOnion.KSP.API
 				return new Value(new Vector(Math.Abs(v.x), Math.Abs(v.y), Math.Abs(v.z)));
 			}
 		}
+		public class AngleFunction : VectorFunctionBase
+		{
+			public static AngleFunction Instance { get; } = new AngleFunction();
+
+			public override Value Call(Arguments args)
+			{
+				GetTwo(args, out var lhs, out var rhs);
+				return new Value(new Vector(Vector3d.Angle(lhs, rhs)));
+			}
+		}
 	}
 }
