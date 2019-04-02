@@ -65,6 +65,7 @@
     <Compile Include="API\InteropObject.cs" />
     <Compile Include="API\InteropUtilities.cs" />
     <Compile Include="API\MethodBase.cs" />
+    <Compile Include="API\Reflect.cs" />
     <Compile Include="API\Ship.cs" />
     <Compile Include="API\Stage.cs" />
     <Compile Include="API\Vector.cs" />

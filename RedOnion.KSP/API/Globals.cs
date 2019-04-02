@@ -17,6 +17,8 @@ namespace RedOnion.KSP.API
 
 		new IMember[]
 		{
+			new Interop("reflect", "Reflect", "All the reflection stuff.",
+				() => Reflect.Instance),
 			new Interop("ship", "Ship", "Active vessel (in flight or editor).",
 				() => Ship.Instance),
 			new Interop("stage", "Stage", "Staging logic.",

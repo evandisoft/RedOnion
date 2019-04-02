@@ -647,6 +647,7 @@ namespace RedOnion.Script
 		public readonly int argc;
 		public int Length => argc;
 		public int Count => argc;
+		public IEngine Engine => list?.Engine;
 		public Arguments(ArgumentList list, int argc)
 		{
 			this.list = list;

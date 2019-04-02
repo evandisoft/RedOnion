@@ -103,6 +103,7 @@ namespace RedOnion.KSP
 				{ "ShipConstruction",   this[typeof(ShipConstruction)]},
 				{ "GameScenes",         this[typeof(GameScenes)] },
 				{ "PartLoader",         this[typeof(PartLoader)] },
+				{ "PartResourceLibrary",new Value(e => Convert(PartResourceLibrary.Instance)) },
 				{ "Time",               this[typeof(UE.Time)] },
 				{ "Random",             this[typeof(UE.Random)] },
 				{ "Mathf",              this[typeof(UE.Mathf)] },
