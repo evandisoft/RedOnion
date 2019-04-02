@@ -8,6 +8,7 @@ using System;
 using KSP.UI.Screens;
 using RedOnion.KSP.Lua.Proxies;
 using Kerbalua.Parsing;
+using RedOnion.UI;
 
 namespace Kerbalua.MoonSharp
 {
@@ -29,7 +30,14 @@ namespace Kerbalua.MoonSharp
 		public PartLoader PartLoader = PartLoader.Instance;
 	}
 
-
+	public class UI
+	{
+		public Type Window = typeof(Window);
+		public Type Panel = typeof(Panel);
+		public Type Layout = typeof(Layout);
+		public Type Button = typeof(Button);
+		public Type Anchors = typeof(Anchors);
+	}
 
 	public class KerbaluaScript : Script
 	{
@@ -44,9 +52,9 @@ namespace Kerbalua.MoonSharp
 					);
 			Globals.MetaTable = RedOnion.KSP.API.Globals.Instance;
 			//Globals["Vessel"] = FlightGlobals.ActiveVessel;
-			//Globals["Ksp"] = new KspApi();
+			Globals["KSP"] = new KspApi();
 			Globals["new"] = new Constructor(ConstructorImpl);
-
+			Globals["UI"] = new UI();
 			//Globals["import"] = new Importer(ImporterImpl);
 		}
 

@@ -47,6 +47,7 @@ grammar IncompleteLua;
 
 chunk
     : block EOF
+    | implicitReturn EOF
     ;
     
 implicitReturn

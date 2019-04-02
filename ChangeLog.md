@@ -1,7 +1,7 @@
 
 # Next Release
-- Lua no longer requires "=" at start to return a value to the repl. Will automatically add a "return " at the start of a source that parses as a lone expression.
-- New automatic documentation system, and interop.
+- Lua no longer requires or allows "=" at start to return a value to the repl. Will automatically return the value of a lone expression entered at the repl.
+- A start to a automatic documentation system, and interop. Some new [globals](https://github.com/evandisoft/RedOnion/blob/redonion-imgui/RedOnion.KSP/API/Globals.md) added to api.
 - Slightly better Autopilot. Still needs work. Handles control surfaces somewhat.
 
 # 0.2:

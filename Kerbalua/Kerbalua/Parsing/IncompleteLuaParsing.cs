@@ -1,6 +1,8 @@
 using System;
 using Antlr4.Runtime;
+using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
+using UnityEngine;
 
 namespace Kerbalua.Parsing
 {
@@ -13,7 +15,9 @@ namespace Kerbalua.Parsing
 		static public bool IsImplicitReturn(string source)
 		{
 			var parser = GetParser(source);
-			return parser.implicitReturn() != null;
+			var implicitReturn = parser.implicitReturn();
+
+			return implicitReturn.exception==null;
 		}
 
 		static public IncompleteLuaParser GetParser(string source)
@@ -26,7 +30,7 @@ namespace Kerbalua.Parsing
 			{
 				BuildParseTree = true
 			};
-
+			
 			return parser;
 		}
 	}
