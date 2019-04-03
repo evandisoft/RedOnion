@@ -210,6 +210,15 @@ namespace Kerbalua.Completion {
 				return;
 			}
 
+			if (newObject is LuaProxy luaProxy)
+			{
+				CurrentTable = null;
+				CurrentType = luaProxy.ProxiedObject.GetType();
+				ProcessCurrentParts();
+				Index++;
+				return;
+			}
+
 			if (newObject is Table newTable) {
 				// Function calls cannot happen on tables and
 				// array access requires evaluating expressions, which we
@@ -235,8 +244,17 @@ namespace Kerbalua.Completion {
 				return;
 			}
 
+			// Using the normal object value from CurrentTable[name] 
+			// didn't work with UserData.CreateStatic. 
+			// Kept treating the static class as a type.
+			DynValue dynValue = CurrentTable.Get(name);
+
 			CurrentTable = null;
-			CurrentType = newObject.GetType();
+			// Using UserData.Descriptor.Type gives the right underlying
+			// type to tell the difference between a static class and a type.
+			// GetType() was returning System.RuntimeType
+			CurrentType = dynValue.UserData.Descriptor.Type;//newObject.GetType();
+			//CurrentType=CurrentType.UnderlyingSystemType;
 			ProcessCurrentParts();
 			Index++;
 		}

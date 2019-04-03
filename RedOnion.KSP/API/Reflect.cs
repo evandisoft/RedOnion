@@ -60,40 +60,53 @@ namespace RedOnion.KSP.API
 				_args = _args.SkipMethodCall();
 				if (_args.Count == 0)
 					throw new InvalidOperationException("Expected at least one argument");
-				var obj = _args[0].ToObject();
+				var obj = _args[1].ToObject();
 				Type t = (obj as Type) ?? obj.GetType();
+
 				var constructors = t.GetConstructors();
-				var dynArgs = _args.GetArray(1);
+				var dynArgs = _args.GetArray(2);
 				foreach (var constructor in constructors)
 				{
 					var parinfos = constructor.GetParameters();
-					if (parinfos.Length == dynArgs.Length)
+					if (parinfos.Length >= dynArgs.Length)
 					{
 						object[] args = new object[parinfos.Length];
 
 						for (int i = 0; i < args.Length; i++)
 						{
 							var parinfo = parinfos[i];
-							if (parinfo.ParameterType.IsValueType)
+							if (i >= dynArgs.Length)
 							{
-								try
+								if (!parinfo.IsOptional)
 								{
-									args[i] = System.Convert.ChangeType(dynArgs[i].ToObject(), parinfo.ParameterType);
+									goto nextConstructor;
 								}
-								catch (Exception)
-								{
-									goto nextLoop;
-								}
+								args[i] = parinfo.DefaultValue;
 							}
 							else
 							{
-								args[i] = dynArgs[i].ToObject();
+								if (parinfo.ParameterType.IsValueType)
+								{
+									try
+									{
+										args[i] = System.Convert.ChangeType(dynArgs[i].ToObject(), parinfo.ParameterType);
+									}
+									catch (Exception)
+									{
+										goto nextConstructor;
+									}
+								}
+								else
+								{
+									args[i] = dynArgs[i].ToObject();
+								}
 							}
+
 						}
 
-						return DynValue.FromObject(ctx.OwnerScript, constructor.Invoke(args));
+						return DynValue.FromObject(ctx.OwnerScript,constructor.Invoke(args));
 					}
-				nextLoop:;
+				nextConstructor:;
 				}
 
 				if (dynArgs.Length == 0)

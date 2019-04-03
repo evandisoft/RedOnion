@@ -1,7 +1,7 @@
-vessel=Ksp.FlightGlobals.ActiveVessel
+vessel=KSP.FlightGlobals.ActiveVessel
 part=vessel.parts[8]
 m=part.Modules[0]
-ctrl=Ksp.FlightControl
+ctrl=KSP.FlightControl
 
 function each(lst,action)
     for i in lst do

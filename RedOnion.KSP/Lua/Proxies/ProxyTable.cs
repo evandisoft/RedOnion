@@ -32,7 +32,6 @@ namespace RedOnion.KSP.Lua.Proxies
 			metatable["__tostring"] = new Func<Table, DynValue>(ToString);
 			metatable["__newindex"] = new Action<Table, DynValue, DynValue>(NewIndexFunc);
 			MetaTable = metatable;
-
 		}
 
 		DynValue ToString(Table table)

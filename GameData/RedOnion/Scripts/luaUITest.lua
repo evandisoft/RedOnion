@@ -1,6 +1,14 @@
-for a=1,3 do
-    print(a)
-end
+w=reflect.new(UI.Window,"Window",UI.Layout.None)
+
+p=reflect.new(UI.Panel)
+w.Add(p)
+p.Layout=UI.Layout.Vertical
+p.ChildAnchors=UI.Anchors.Fill
+b=reflect.new(UI.Button)
+b.text="buttontext"
+p.Add(b)
+
+b.click.Add(function() local i=0 while true do print(i) i=i+1 end end)
 --[[
 var wnd = new window
 function shutdown

@@ -84,6 +84,10 @@
     <Compile Include="Lua\Proxies\ExperimentalProxy.cs" />
     <Compile Include="Lua\Proxies\ProxyTable.cs" />
     <Compile Include="Lua\Proxies\ProxyCallTable.cs" />
+    <Compile Include="API\NativeImport.cs" />
+    <Compile Include="Lua\Proxies\ImportCompletion.cs" />
+    <Compile Include="Lua\Proxies\LuaProxy.cs" />
+    <Compile Include="Lua\Proxies\LuaCallProxy.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RedOnion.Script\RedOnion.Script.csproj">

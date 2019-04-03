@@ -43,6 +43,7 @@ namespace Kerbalua.Other
 			scriptEngine.Options.DebugPrint = (string str) => {
 				PrintAction?.Invoke(str);
 			};
+			scriptEngine.PrintErrorAction = (str)=>PrintErrorAction?.Invoke(str);
 			
 			scriptEngine.Options.ScriptLoader = new FileSystemScriptLoader();
 			((ScriptLoaderBase)scriptEngine.Options.ScriptLoader).IgnoreLuaPathGlobal = true;

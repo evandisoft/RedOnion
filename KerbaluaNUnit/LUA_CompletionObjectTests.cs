@@ -8,6 +8,8 @@ using MoonSharp.Interpreter.Interop;
 using Kerbalua.Other;
 using RedOnion.KSP.Lua;
 using Kerbalua.MoonSharp;
+using UnityEngine;
+using System.Reflection;
 
 namespace KerbaluaNUnit {
 	[TestFixture()]
@@ -96,7 +98,7 @@ namespace KerbaluaNUnit {
 				Console.WriteLine(c);
 			}
 			Assert.AreEqual(1, completions.Count);
-			Assert.Throws<LuaIntellisenseException>(() => completion.ProcessNextSegment());
+			//Assert.Throws<LuaIntellisenseException>(() => completion.ProcessNextSegment());
 		}
 
 		[Test()]
@@ -123,6 +125,35 @@ namespace KerbaluaNUnit {
 			{
 				Console.WriteLine(c);
 			}
+			Assert.AreEqual(1, completions.Count);
+		}
+
+		[Test()]
+		public void LUA_TestCase_5_Static()
+		{
+			script = new KerbaluaScript();
+			//script.Globals["ship"] = new Adf();
+
+			// I think this is not quite right, but I'm done for now.
+			var completion = GetCompletionObject(script.Globals,
+@"
+	a=AssemblyStatic.
+"
+				);
+			var completions = completion.GetCurrentCompletions();
+			foreach (var c in completions)
+			{
+				Console.WriteLine(c);
+			}
+			Assert.AreEqual(1, completions.Count);
+			completion.ProcessNextSegment();
+			completions = completion.GetCurrentCompletions();
+			foreach (var c in completions)
+			{
+				Console.WriteLine(c);
+			}
+			Assembly a = Assembly.GetAssembly(typeof(System.Linq.Enumerable));
+			Console.WriteLine(a);
 			Assert.AreEqual(1, completions.Count);
 		}
 	}

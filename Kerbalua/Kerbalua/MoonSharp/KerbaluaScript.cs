@@ -9,6 +9,11 @@ using KSP.UI.Screens;
 using RedOnion.KSP.Lua.Proxies;
 using Kerbalua.Parsing;
 using RedOnion.UI;
+using System.Reflection;
+using System.Globalization;
+using UnityEngine.Events;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Kerbalua.MoonSharp
 {
@@ -34,13 +39,15 @@ namespace Kerbalua.MoonSharp
 	{
 		public Type Window = typeof(Window);
 		public Type Panel = typeof(Panel);
-		public Type Layout = typeof(Layout);
 		public Type Button = typeof(Button);
-		public Type Anchors = typeof(Anchors);
+		public Anchors Anchors = new Anchors();
+		public Layout Layout = new Layout();
 	}
 
 	public class KerbaluaScript : Script
 	{
+		public Action<string> PrintErrorAction { get; set; }
+
 		public KerbaluaScript() : base(CoreModules.Preset_Complete)
 		{
 			UserData.RegistrationPolicy = InteropRegistrationPolicy.Automatic;
@@ -48,14 +55,33 @@ namespace Kerbalua.MoonSharp
 			GlobalOptions.CustomConverters
 				.SetClrToScriptCustomConversion(
 					(Script script, ModuleControlSurface m)
-						=> DynValue.NewTable(new ModuleControlSurfaceProxyTable(this, m))
+						=> DynValue.FromObject(script,new LuaProxy(m)) //DynValue.NewTable(new ModuleControlSurfaceProxyTable(this, m))
 					);
+			GlobalOptions.CustomConverters
+				.SetScriptToClrCustomConversion(DataType.Function
+					, typeof(UnityAction), (f) => new UnityAction(() => 
+				{
+					var co = CreateCoroutine(f);
+					co.Coroutine.AutoYieldCounter = 10000;
+					co.Coroutine.Resume();
+					if (co.Coroutine.State == CoroutineState.ForceSuspended)
+					{
+						PrintErrorAction?.Invoke("UnityAction callback unable to finish");
+					}
+				}));
 			Globals.MetaTable = RedOnion.KSP.API.Globals.Instance;
 			//Globals["Vessel"] = FlightGlobals.ActiveVessel;
 			Globals["KSP"] = new KspApi();
 			Globals["new"] = new Constructor(ConstructorImpl);
+			Globals["unity"] = Assembly.GetAssembly(typeof(Vector3));
+			Globals["Assembly"] = typeof(Assembly);
+			//Assembly blah;
+
+			Globals["AppDomain"] = UserData.CreateStatic(typeof(AppDomain));
+			Globals["AssemblyStatic"] = UserData.CreateStatic(typeof(Assembly));
 			Globals["UI"] = new UI();
-			//Globals["import"] = new Importer(ImporterImpl);
+			//UserData.RegisterExtensionType(typeof(System.Linq.Enumerable));
+			//UserData.RegisterAssembly(Assembly.GetAssembly(typeof(System.Linq.Enumerable)),true);
 		}
 
 		//private Table ImporterImpl(string name)
@@ -72,33 +98,45 @@ namespace Kerbalua.MoonSharp
 			foreach(var constructor in constructors)
 			{
 				var parinfos = constructor.GetParameters();
-				if (parinfos.Length == dynArgs.Length)
+				if (parinfos.Length >= dynArgs.Length)
 				{ 
 					object[] args = new object[parinfos.Length];
 
 					for(int i = 0; i < args.Length; i++)
 					{
 						var parinfo = parinfos[i];
-						if (parinfo.ParameterType.IsValueType)
+						if(i>= dynArgs.Length)
 						{
-							try
+							if (!parinfo.IsOptional)
 							{
-								args[i] = Convert.ChangeType(dynArgs[i].ToObject(), parinfo.ParameterType);
+								goto nextConstructor;
 							}
-							catch(Exception)
-							{
-								goto nextLoop;
-							}
+							args[i] = parinfo.DefaultValue;
 						}
 						else
 						{
-							args[i] = dynArgs[i].ToObject();
+							if (parinfo.ParameterType.IsValueType)
+							{
+								try
+								{
+									args[i] = Convert.ChangeType(dynArgs[i].ToObject(), parinfo.ParameterType);
+								}
+								catch (Exception)
+								{
+									goto nextConstructor;
+								}
+							}
+							else
+							{
+								args[i] = dynArgs[i].ToObject();
+							}
 						}
+
 					}
 
 					return constructor.Invoke(args);
 				}
-			nextLoop:;
+			nextConstructor:;
 			}
 
 			if (dynArgs.Length == 0)
