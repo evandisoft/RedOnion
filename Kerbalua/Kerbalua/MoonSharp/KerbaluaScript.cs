@@ -14,6 +14,7 @@ using System.Globalization;
 using UnityEngine.Events;
 using System.Collections.Generic;
 using System.Linq;
+using API = RedOnion.KSP.API;
 
 namespace Kerbalua.MoonSharp
 {
@@ -69,10 +70,10 @@ namespace Kerbalua.MoonSharp
 						PrintErrorAction?.Invoke("UnityAction callback unable to finish");
 					}
 				}));
-			Globals.MetaTable = RedOnion.KSP.API.Globals.Instance;
+			Globals.MetaTable = API.Globals.Instance;
 			//Globals["Vessel"] = FlightGlobals.ActiveVessel;
 			Globals["KSP"] = new KspApi();
-			Globals["new"] = new Constructor(ConstructorImpl);
+			Globals["new"] = new Constructor(API.Reflect.LuaNew);
 			Globals["unity"] = Assembly.GetAssembly(typeof(Vector3));
 			Globals["Assembly"] = typeof(Assembly);
 			//Assembly blah;
@@ -91,60 +92,6 @@ namespace Kerbalua.MoonSharp
 		//}
 
 		delegate Table Importer(string name);
-
-		object ConstructorImpl(Type t,params DynValue[] dynArgs)
-		{
-			var constructors = t.GetConstructors();
-			foreach(var constructor in constructors)
-			{
-				var parinfos = constructor.GetParameters();
-				if (parinfos.Length >= dynArgs.Length)
-				{ 
-					object[] args = new object[parinfos.Length];
-
-					for(int i = 0; i < args.Length; i++)
-					{
-						var parinfo = parinfos[i];
-						if(i>= dynArgs.Length)
-						{
-							if (!parinfo.IsOptional)
-							{
-								goto nextConstructor;
-							}
-							args[i] = parinfo.DefaultValue;
-						}
-						else
-						{
-							if (parinfo.ParameterType.IsValueType)
-							{
-								try
-								{
-									args[i] = Convert.ChangeType(dynArgs[i].ToObject(), parinfo.ParameterType);
-								}
-								catch (Exception)
-								{
-									goto nextConstructor;
-								}
-							}
-							else
-							{
-								args[i] = dynArgs[i].ToObject();
-							}
-						}
-
-					}
-
-					return constructor.Invoke(args);
-				}
-			nextConstructor:;
-			}
-
-			if (dynArgs.Length == 0)
-			{
-				return Activator.CreateInstance(t);
-			}
-			throw new Exception("Could not find constructor accepting given args for type " + t);
-		}
 		delegate object Constructor(Type t,params DynValue[] args);
 
 		DynValue coroutine;
