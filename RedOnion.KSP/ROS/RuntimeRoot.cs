@@ -50,6 +50,7 @@ namespace RedOnion.KSP
 			sys.Set("Vector3", vector);
 			sys.Set("Vector4", AddType(typeof(UE.Vector4)));
 			sys.Set("Math", AddType(typeof(Math)));
+			sys.Set("API", Globals.Instance);
 			if (system == null)
 				BaseProps.Set("System", new SimpleObject(Engine, sys));
 
@@ -176,17 +177,16 @@ namespace RedOnion.KSP
 				return this;
 			return base.Which(name);
 		}
-
 		public override bool Get(string name, out Value value)
 		{
-			if (Globals.Instance.Get(name, out value))
+			if (base.Get(name, out value))
 				return true;
-			return base.Get(name, out value);
+			return Globals.Instance.Get(name, out value);
 		}
 		public override bool Set(string name, Value value)
 		{
-			if (Globals.Instance.Has(name))
-				return Globals.Instance.Set(name, value);
+			if (!Has(name) && Globals.Instance.Has(name))
+				Globals.Instance.Set(name, value);
 			return base.Set(name, value);
 		}
 

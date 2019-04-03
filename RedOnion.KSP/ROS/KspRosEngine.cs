@@ -85,17 +85,14 @@ namespace RedOnion.KSP.ROS
 			base.Reset();
 		}
 
-		int counter;
 		int idleSkipped;
 		public void FixedUpdate(int countdown = 1000, int percent = 50, int idlePercent = 80)
 		{
-			counter++;
 			ExecutionCountdown = countdown;
 			if (updateList.Count > 0)
 			{
 				do
 				{
-					DebugLog("FixedUpdate #{1}: updateList.index = {0}", updateList.index, counter);
 					var call = updateList.GetNext();
 					try
 					{
@@ -123,7 +120,6 @@ namespace RedOnion.KSP.ROS
 				idleSkipped = 0;
 				do
 				{
-					DebugLog("FixedUpdate #{1}: idleList.index = {0}", idleList.index, counter);
 					var call = idleList.GetNext();
 					try
 					{

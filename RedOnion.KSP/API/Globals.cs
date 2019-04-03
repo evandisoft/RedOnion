@@ -40,7 +40,7 @@ namespace RedOnion.KSP.API
 		});
 	}
 	[IgnoreForDocs]
-	public class Globals : Table, IProperties, IType
+	public class Globals : Table, IObject, IType
 	{
 		public MemberList Members => GlobalMembers.MemberList;
 		public static Globals Instance { get; } = new Globals();
@@ -97,6 +97,29 @@ namespace RedOnion.KSP.API
 			}
 			table[index] = value;
 			return DynValue.NewBoolean(false);
+		}
+
+		IEngine IObject.Engine => null;
+		ObjectFeatures IObject.Features => Members.Features;
+		string IObject.Name => "Globals";
+		IObject IObject.BaseClass => null;
+		IProperties IObject.BaseProps => null;
+		IProperties IObject.MoreProps => null;
+		Value IObject.Value => new Value("Globals");
+		Type IObject.Type => null;
+		object IObject.Target => null;
+		bool IObject.Modify(string name, OpCode op, Value value) => false;
+		IObject IObject.Create(Arguments args) => null;
+		Value IObject.Index(Arguments args) => Value.Undefined;
+		Value IObject.IndexGet(Value index) => Value.Undefined;
+		bool IObject.IndexSet(Value index, Value value) => false;
+		bool IObject.IndexModify(Value index, OpCode op, Value value) => false;
+		IObject IObject.Convert(object value) => null;
+		Value ICallable.Call(IObject self, Arguments args) => Value.Undefined;
+		bool IObject.Operator(OpCode op, Value arg, bool selfRhs, out Value result)
+		{
+			result = Value.Undefined;
+			return false;
 		}
 	}
 }
