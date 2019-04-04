@@ -13,7 +13,7 @@ namespace RedOnion.KSP.API
 		public Dictionary<string,Type> NameTypeMap;
 		/// <summary>
 		/// Possible continuations of the current namespace that when concatenated
-		/// to the current namespace represent an existing namespace.
+		/// to the current namespace represent another existing namespace.
 		/// </summary>
 		public List<string> NamespaceContinuations;
 		public List<string> PossibleCompletions;
@@ -80,6 +80,24 @@ namespace RedOnion.KSP.API
 					return t.MakeGenericType(typeArgs);
 				}
 
+				return t;
+			}
+
+			throw new Exception("Type " + typeName + " not found in namespace " + NamespaceString);
+		}
+
+		/// <summary>
+		/// Returns a raw unparamaterized type, in contrast to GetType(string typeName), which returns
+		/// a type that has all its type parameters set to typeof(object).
+		/// 
+		/// For types that do not have type parameters, this returns the same type as GetType(string typeName)
+		/// </summary>
+		/// <returns>The raw type.</returns>
+		/// <param name="typeName">Type name.</param>
+		public Type GetRawType(string typeName)
+		{
+			if (NameTypeMap.TryGetValue(typeName, out Type t))
+			{
 				return t;
 			}
 
