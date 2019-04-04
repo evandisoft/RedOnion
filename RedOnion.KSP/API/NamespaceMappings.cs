@@ -14,6 +14,7 @@ namespace RedOnion.KSP.API
 		static public Assembly[] assemblies;
 		static public Dictionary<string, Dictionary<string,Type>> NamespaceToNameTypeMap = new Dictionary<string, Dictionary<string, Type>>();
 		static public Dictionary<string, List<string>> NamespaceContinuationMap = new Dictionary<string, List<string>>();
+		static public Dictionary<string, List<string>> NamespaceCompletionMap = new Dictionary<string, List<string>>();
 
 		static public void Load()
 		{
@@ -58,6 +59,18 @@ namespace RedOnion.KSP.API
 				{
 					NamespaceContinuationMap[namespace1] = new List<string>();
 				}
+			}
+
+			foreach(var namespace1 in NamespaceToNameTypeMap.Keys)
+			{
+				if (!NamespaceCompletionMap.ContainsKey(namespace1))
+				{
+					NamespaceCompletionMap[namespace1] = new List<string>();
+				}
+
+				NamespaceCompletionMap[namespace1].AddRange(NamespaceToNameTypeMap[namespace1].Keys);
+				NamespaceCompletionMap[namespace1].AddRange(NamespaceContinuationMap[namespace1]);
+				NamespaceCompletionMap[namespace1].Sort();
 			}
 		}
 
