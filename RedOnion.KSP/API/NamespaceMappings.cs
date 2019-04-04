@@ -12,12 +12,12 @@ namespace RedOnion.KSP.API
 		public readonly string CurrentNamespace;
 
 		static public Assembly[] assemblies;
-		static public Dictionary<string, Dictionary<string,Type>> NamespaceTypes=new Dictionary<string, Dictionary<string, Type>>();
-		static public Dictionary<string, List<string>> NextNamespaceParts = new Dictionary<string, List<string>>();
+		static public Dictionary<string, Dictionary<string,Type>> NamespaceToNameTypeMap = new Dictionary<string, Dictionary<string, Type>>();
+		static public Dictionary<string, List<string>> NamespaceContinuationMap = new Dictionary<string, List<string>>();
 
 		static public void Load()
 		{
-			if (NamespaceTypes.Count == 0)
+			if (NamespaceToNameTypeMap.Count == 0)
 			{
 				Reload();
 			}
@@ -32,13 +32,12 @@ namespace RedOnion.KSP.API
 				foreach (var type in assembly.GetTypes())
 				{
 					string namespace1 = type.Namespace ?? "";
-					if (!NamespaceTypes.ContainsKey(namespace1))
+					if (!NamespaceToNameTypeMap.ContainsKey(namespace1))
 					{
-						NamespaceTypes[namespace1] = new Dictionary<string, Type>();
+						NamespaceToNameTypeMap[namespace1] = new Dictionary<string, Type>();
 					}
 
-					NamespaceTypes[namespace1][type.Name] = type;
-
+					NamespaceToNameTypeMap[namespace1][type.Name] = type;
 
 					namespaces.Add(namespace1);
 				}
@@ -48,16 +47,16 @@ namespace RedOnion.KSP.API
 			{
 				if (NamespaceParent(namespace1,out string parent))
 				{
-					if (!NextNamespaceParts.ContainsKey(parent))
+					if (!NamespaceContinuationMap.ContainsKey(parent))
 					{
-						NextNamespaceParts[parent] = new List<string>();
+						NamespaceContinuationMap[parent] = new List<string>();
 					}
-					NextNamespaceParts[parent].Add(LastNamespacePart(namespace1));
+					NamespaceContinuationMap[parent].Add(LastNamespacePart(namespace1));
 				}
 
-				if (!NextNamespaceParts.ContainsKey(namespace1))
+				if (!NamespaceContinuationMap.ContainsKey(namespace1))
 				{
-					NextNamespaceParts[namespace1] = new List<string>();
+					NamespaceContinuationMap[namespace1] = new List<string>();
 				}
 			}
 		}

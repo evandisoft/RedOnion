@@ -19,17 +19,13 @@ namespace KerbaluaNUnit {
 		[Test()]
 		public void LUA_ImportManager_1()
 		{
-			var namespace1 = new NamespaceInstance("System.Collections.Generic");
+			var namespace1 = new NamespaceInstance("System");
 			foreach(var part in namespace1.PossibleCompletions)
 			{
 				Console.WriteLine(part);
 			}
-			foreach(var type in namespace1.TypesMap.Values)
-			{
-				Console.WriteLine(type.FullName);
-			}
 			Assert.AreEqual(typeof(HashSet<object>), namespace1.GetType("HashSet`1"));
-			//Assert.IsTrue(false);
+			Assert.IsTrue(false);
 		}
 	}
 }

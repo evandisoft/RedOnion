@@ -7,8 +7,15 @@ namespace RedOnion.KSP.API
 	public class NamespaceInstance
 	{
 		public string NamespaceString;
-		public Dictionary<string,Type> TypesMap;
-		public List<string> NextNamespaceParts;
+		/// <summary>
+		/// Mapping from Type Name to Type
+		/// </summary>
+		public Dictionary<string,Type> NameTypeMap;
+		/// <summary>
+		/// Possible continuations of the current namespace that when concatenated
+		/// to the current namespace represent an existing namespace.
+		/// </summary>
+		public List<string> NamespaceContinuations;
 		public List<string> PossibleCompletions;
 
 		public NamespaceInstance(string namespace1)
@@ -16,10 +23,10 @@ namespace RedOnion.KSP.API
 			NamespaceString=namespace1;
 			NamespaceMappings.Load();
 			if (NamespaceMappings
-				.NamespaceTypes
+				.NamespaceToNameTypeMap
 				.TryGetValue(namespace1, out Dictionary<string, Type> typesMap))
 			{
-				TypesMap = typesMap;
+				NameTypeMap = typesMap;
 			}
 			else
 			{
@@ -27,30 +34,30 @@ namespace RedOnion.KSP.API
 			}
 
 			if (NamespaceMappings
-				.NextNamespaceParts
-				.TryGetValue(namespace1,out List<string> namespaces))
+				.NamespaceContinuationMap
+				.TryGetValue(namespace1,out List<string> namespaceContinuations))
 			{
-				NextNamespaceParts = namespaces;
+				NamespaceContinuations = namespaceContinuations;
 			}
 			else
 			{
-				throw new Exception("Namespace \"" + namespace1 + "\" not found.");
+				throw new Exception("NextNamespaceParts for namespace \"" + namespace1 + "\" not found.");
 			}
 
 			PossibleCompletions = new List<string>();
-			PossibleCompletions.AddRange(TypesMap.Keys);
-			PossibleCompletions.AddRange(NextNamespaceParts);
+			PossibleCompletions.AddRange(NameTypeMap.Keys);
+			PossibleCompletions.AddRange(NamespaceContinuations);
 			PossibleCompletions.Sort();
 		}
 
 		public bool IsType(string maybeTypeName)
 		{
-			return TypesMap.ContainsKey(maybeTypeName);
+			return NameTypeMap.ContainsKey(maybeTypeName);
 		}
 
-		public bool IsNextNamespacePart(string maybeNextNamespacePart)
+		public bool IsNamespaceContinuation(string maybeNamespaceContinuation)
 		{
-			return NextNamespaceParts.Contains(maybeNextNamespacePart);
+			return NamespaceContinuations.Contains(maybeNamespaceContinuation);
 		}
 
 		/// <summary>
@@ -61,7 +68,7 @@ namespace RedOnion.KSP.API
 		/// <param name="typeName">Type name.</param>
 		public Type GetType(string typeName)
 		{
-			if(TypesMap.TryGetValue(typeName,out Type t))
+			if(NameTypeMap.TryGetValue(typeName,out Type t))
 			{
 				if (t.IsGenericType)
 				{
@@ -79,9 +86,9 @@ namespace RedOnion.KSP.API
 			throw new Exception("Type " + typeName + " not found in namespace " + NamespaceString);
 		}
 
-		public NamespaceInstance NextNamespace(string namespacePart)
+		public NamespaceInstance NextNamespace(string namespaceContinuation)
 		{
-			return new NamespaceInstance(NamespaceString + "." + namespacePart);
+			return new NamespaceInstance(NamespaceString + "." + namespaceContinuation);
 		}
 
 		public override string ToString()
