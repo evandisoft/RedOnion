@@ -6,7 +6,6 @@ namespace RedOnion.KSP.API
 {
 	public class NamespaceInstance
 	{
-
 		public string NamespaceString;
 		public Dictionary<string,Type> TypesMap;
 		public List<string> NextNamespaceParts;
@@ -55,23 +54,29 @@ namespace RedOnion.KSP.API
 		}
 
 		/// <summary>
-		/// Gets the type in this namespace of name typeName
+		/// Gets the type in this namespace of name typeName.
+		/// Makes any generic parts of types be of type object.
 		/// </summary>
 		/// <returns>The type.</returns>
 		/// <param name="typeName">Type name.</param>
-		public Type GetTypeFromNamespace(string typeName)
+		public Type GetType(string typeName)
 		{
-			Type t= TypesMap[typeName];
-			if (t.IsGenericType)
+			if(TypesMap.TryGetValue(typeName,out Type t))
 			{
-				Type[] typeArgs = new Type[t.GetGenericArguments().Length];
-				for(int i = 0; i < typeArgs.Length; i++)
+				if (t.IsGenericType)
 				{
-					typeArgs[i] = typeof(object);
+					Type[] typeArgs = new Type[t.GetGenericArguments().Length];
+					for (int i = 0; i < typeArgs.Length; i++)
+					{
+						typeArgs[i] = typeof(object);
+					}
+					return t.MakeGenericType(typeArgs);
 				}
-				return t.MakeGenericType(typeArgs);
+
+				return t;
 			}
-			return t;
+
+			throw new Exception("Type " + typeName + " not found in namespace " + NamespaceString);
 		}
 
 		public NamespaceInstance NextNamespace(string namespacePart)
