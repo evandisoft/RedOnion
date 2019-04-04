@@ -2,62 +2,70 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace RedOnion.KSP.API
+namespace RedOnion.KSP.ReflectionUtil
 {
 	public class NamespaceInstance
 	{
-		public string NamespaceString;
+		public readonly string NamespaceString;
 		/// <summary>
 		/// Mapping from Type Name to Type
 		/// </summary>
-		public Dictionary<string,Type> NameTypeMap;
+		public Dictionary<string, Type> NameTypeMap
+		{
+			get
+			{
+				if (NamespaceMappings
+					.NamespaceToNameTypeMap
+					.TryGetValue(NamespaceString, out Dictionary<string,Type> nameTypeMap))
+				{
+					return nameTypeMap;
+				}
+
+				throw new Exception("Types for namespace \"" + NamespaceString + "\" not found.");
+			}
+		}
 		/// <summary>
 		/// Possible continuations of the current namespace that when concatenated
 		/// to the current namespace represent another existing namespace.
 		/// </summary>
-		public List<string> NamespaceContinuations;
+		public List<string> NamespaceContinuations
+		{
+			get
+			{
+				if (NamespaceMappings
+					.NamespaceContinuationMap
+					.TryGetValue(NamespaceString, out List<string> namespaceContinuations))
+				{
+					return namespaceContinuations;
+				}
+
+				throw new Exception("NamespaceContinuations for namespace \"" + NamespaceString+ "\" not found.");
+			}
+		}
 
 		/// <summary>
-		/// A list of the possible completions in the current context.
+		/// A list of the possible completions in the current context. All the typenames and namespaceContinuations
+		/// together in a sorted list.
 		/// </summary>
-		public List<string> PossibleCompletions;
+		public List<string> PossibleCompletions
+		{
+			get
+			{
+				if (NamespaceMappings
+					.NamespaceCompletionMap
+					.TryGetValue(NamespaceString, out List<string> completions))
+				{
+					return completions;
+				}
+
+				throw new Exception("Possible completions for namespace \"" +NamespaceString + "\" not found.");
+			}
+		}
 
 		public NamespaceInstance(string namespace1)
 		{
 			NamespaceString=namespace1;
 			NamespaceMappings.Load();
-			if (NamespaceMappings
-				.NamespaceToNameTypeMap
-				.TryGetValue(namespace1, out Dictionary<string, Type> typesMap))
-			{
-				NameTypeMap = typesMap;
-			}
-			else
-			{
-				throw new Exception("Types for namespace \"" + namespace1 + "\" not found.");
-			}
-
-			if (NamespaceMappings
-				.NamespaceContinuationMap
-				.TryGetValue(namespace1,out List<string> namespaceContinuations))
-			{
-				NamespaceContinuations = namespaceContinuations;
-			}
-			else
-			{
-				throw new Exception("NamespaceContinuations for namespace \"" + namespace1 + "\" not found.");
-			}
-
-			if (NamespaceMappings
-				.NamespaceCompletionMap
-				.TryGetValue(namespace1,out List<string> possibleCompletions))
-			{
-				PossibleCompletions = possibleCompletions;
-			}
-			else
-			{
-				throw new Exception("Possible completions for namespace \"" + namespace1 + "\" not found.");
-			}
 		}
 
 		/// <summary>
