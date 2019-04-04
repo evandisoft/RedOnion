@@ -15,7 +15,7 @@ using UnityEngine.Events;
 using System.Collections.Generic;
 using System.Linq;
 using API = RedOnion.KSP.API;
-using RedOnion.KSP.API;
+using RedOnion.KSP.ReflectionUtil;
 
 namespace Kerbalua.MoonSharp
 {

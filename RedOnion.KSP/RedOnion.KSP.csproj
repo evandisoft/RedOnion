@@ -86,8 +86,8 @@
     <Compile Include="Lua\Proxies\ProxyCallTable.cs" />
     <Compile Include="Lua\Proxies\LuaProxy.cs" />
     <Compile Include="Lua\Proxies\LuaCallProxy.cs" />
-    <Compile Include="API\NamespaceMappings.cs" />
-    <Compile Include="API\NamespaceInstance.cs" />
+    <Compile Include="ReflectionUtil\NamespaceInstance.cs" />
+    <Compile Include="ReflectionUtil\NamespaceMappings.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RedOnion.Script\RedOnion.Script.csproj">
@@ -104,5 +104,8 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup />
+  <ItemGroup>
+    <Folder Include="ReflectionUtil\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

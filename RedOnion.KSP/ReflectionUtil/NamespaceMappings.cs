@@ -5,7 +5,7 @@ using System.Reflection;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
 
-namespace RedOnion.KSP.API
+namespace RedOnion.KSP.ReflectionUtil
 {
 	public class NamespaceMappings
 	{
