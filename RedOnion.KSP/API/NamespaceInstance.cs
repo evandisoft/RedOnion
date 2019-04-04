@@ -41,7 +41,7 @@ namespace RedOnion.KSP.API
 			}
 			else
 			{
-				throw new Exception("NextNamespaceParts for namespace \"" + namespace1 + "\" not found.");
+				throw new Exception("NamespaceContinuations for namespace \"" + namespace1 + "\" not found.");
 			}
 
 			PossibleCompletions = new List<string>();
@@ -87,8 +87,8 @@ namespace RedOnion.KSP.API
 		}
 
 		/// <summary>
-		/// Returns a raw unparamaterized type, in contrast to GetType(string typeName), which returns
-		/// a type that has all its type parameters set to typeof(object).
+		/// Returns a raw unparamaterized type, in contrast to GetType(string typeName) (which returns
+		/// a type that has all its type parameters set to typeof(object)).
 		/// 
 		/// For types that do not have type parameters, this returns the same type as GetType(string typeName)
 		/// </summary>
@@ -104,7 +104,12 @@ namespace RedOnion.KSP.API
 			throw new Exception("Type " + typeName + " not found in namespace " + NamespaceString);
 		}
 
-		public NamespaceInstance NextNamespace(string namespaceContinuation)
+		/// <summary>
+		/// Gets the namespace created by adding the given continuation to the current namespace.
+		/// </summary>
+		/// <returns>The namespace.</returns>
+		/// <param name="namespaceContinuation">Namespace continuation.</param>
+		public NamespaceInstance GetNamespace(string namespaceContinuation)
 		{
 			return new NamespaceInstance(NamespaceString + "." + namespaceContinuation);
 		}

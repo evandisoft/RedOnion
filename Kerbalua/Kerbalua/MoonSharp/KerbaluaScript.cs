@@ -78,7 +78,7 @@ namespace Kerbalua.MoonSharp
 			Globals["unity"] = Assembly.GetAssembly(typeof(Vector3));
 			Globals["Assembly"] = typeof(Assembly);
 			//Assembly blah;
-			Globals["Coll"] = new NamespaceInstance("System.Collections.Generic");
+			Globals["Coll"] = new NamespaceInstance("System.Collections");
 			Globals["AppDomain"] = UserData.CreateStatic(typeof(AppDomain));
 			Globals["AssemblyStatic"] = UserData.CreateStatic(typeof(Assembly));
 			Globals["UI"] = new UI();
