@@ -7,6 +7,9 @@ using MoonSharp.Interpreter.Interop;
 
 namespace RedOnion.KSP.ReflectionUtil
 {
+	/// <summary>
+	/// Stores mappings between namespaces and potential completions for those namespaces.
+	/// </summary>
 	public class NamespaceMappings
 	{
 		public readonly string CurrentNamespace;
@@ -26,85 +29,89 @@ namespace RedOnion.KSP.ReflectionUtil
 
 		static public void Reload()
 		{
+			NamespaceToNameTypeMap = new Dictionary<string, Dictionary<string, Type>>();
+			NamespaceContinuationMap = new Dictionary<string, List<string>>();
+			NamespaceCompletionMap = new Dictionary<string, List<string>>();
+
 			assemblies = AppDomain.CurrentDomain.GetAssemblies();
-			HashSet<string> namespaces = new HashSet<string>();
+			HashSet<string> namespaceStrings = new HashSet<string>();
 			foreach(var assembly in assemblies)
 			{
 				foreach (var type in assembly.GetTypes())
 				{
-					string namespace1 = type.Namespace ?? "";
-					if (!NamespaceToNameTypeMap.ContainsKey(namespace1))
+					string namespaceString = type.Namespace ?? "";
+					if (!NamespaceToNameTypeMap.ContainsKey(namespaceString))
 					{
-						NamespaceToNameTypeMap[namespace1] = new Dictionary<string, Type>();
+						NamespaceToNameTypeMap[namespaceString] = new Dictionary<string, Type>();
 					}
 
-					NamespaceToNameTypeMap[namespace1][type.Name] = type;
+					NamespaceToNameTypeMap[namespaceString][type.Name] = type;
 
-					namespaces.Add(namespace1);
+					namespaceStrings.Add(namespaceString);
 				}
 			}
 
-			foreach(var namespace1 in namespaces)
+			foreach(var namespaceString in namespaceStrings)
 			{
-				if (NamespaceParent(namespace1,out string parent))
+				if (NamespaceParent(namespaceString,out string parent))
 				{
 					if (!NamespaceContinuationMap.ContainsKey(parent))
 					{
 						NamespaceContinuationMap[parent] = new List<string>();
 					}
-					NamespaceContinuationMap[parent].Add(LastNamespacePart(namespace1));
+					NamespaceContinuationMap[parent].Add(LastNamespacePart(namespaceString));
 				}
 
-				if (!NamespaceContinuationMap.ContainsKey(namespace1))
+				if (!NamespaceContinuationMap.ContainsKey(namespaceString))
 				{
-					NamespaceContinuationMap[namespace1] = new List<string>();
+					NamespaceContinuationMap[namespaceString] = new List<string>();
 				}
 			}
 
-			foreach(var namespace1 in NamespaceToNameTypeMap.Keys)
+			foreach(var namespaceString in NamespaceToNameTypeMap.Keys)
 			{
-				if (!NamespaceCompletionMap.ContainsKey(namespace1))
+				if (!NamespaceCompletionMap.ContainsKey(namespaceString))
 				{
-					NamespaceCompletionMap[namespace1] = new List<string>();
+					NamespaceCompletionMap[namespaceString] = new List<string>();
 				}
 
-				NamespaceCompletionMap[namespace1].AddRange(NamespaceToNameTypeMap[namespace1].Keys);
-				NamespaceCompletionMap[namespace1].AddRange(NamespaceContinuationMap[namespace1]);
-				NamespaceCompletionMap[namespace1].Sort();
+				NamespaceCompletionMap[namespaceString].AddRange(NamespaceToNameTypeMap[namespaceString].Keys);
+				NamespaceCompletionMap[namespaceString].AddRange(NamespaceContinuationMap[namespaceString]);
+				NamespaceCompletionMap[namespaceString].Sort();
 			}
 		}
 
-		static public bool NamespaceParent(string namespace1,out string parent)
+		static public bool NamespaceParent(string maybeChild,out string parent)
 		{
-			if (namespace1 == "")
+			if (maybeChild == "")
 			{
 				parent = "";
 				return false;
 			}
 
-			if (!namespace1.Contains("."))
+			if (!maybeChild.Contains("."))
 			{
 				parent = "";
 				return true;
 			}
 
-			parent = namespace1.Substring(0,namespace1.LastIndexOf('.'));
+			parent = maybeChild.Substring(0,maybeChild.LastIndexOf('.'));
 			return true;
 		}
 
-		static public string LastNamespacePart(string namespace1)
+		static public string LastNamespacePart(string namespaceString)
 		{
-			if (namespace1 == "")
+			if (namespaceString == "")
 			{
 				return "";
 			}
 
-			if (!namespace1.Contains("."))
+			if (!namespaceString.Contains("."))
 			{
-				return namespace1;
+				return namespaceString;
 			}
 
-			return namespace1.Substring(namespace1.LastIndexOf('.')+1);
+			return namespaceString.Substring(namespaceString.LastIndexOf('.')+1);
 		}
 	}
 }

@@ -4,11 +4,14 @@ using System.Linq;
 
 namespace RedOnion.KSP.ReflectionUtil
 {
+	/// <summary>
+	/// Represents a Namespace. Can return a type from this namespace or a child namespace.
+	/// </summary>
 	public class NamespaceInstance
 	{
 		public readonly string NamespaceString;
 		/// <summary>
-		/// Mapping from Type Name to Type
+		/// Returns the current Mapping from Type Name to Type for this namespace
 		/// </summary>
 		public Dictionary<string, Type> NameTypeMap
 		{
@@ -45,7 +48,7 @@ namespace RedOnion.KSP.ReflectionUtil
 
 		/// <summary>
 		/// A list of the possible completions in the current context. All the typenames and namespaceContinuations
-		/// together in a sorted list.
+		/// for this namespace together in a sorted list.
 		/// </summary>
 		public List<string> PossibleCompletions
 		{
@@ -62,9 +65,9 @@ namespace RedOnion.KSP.ReflectionUtil
 			}
 		}
 
-		public NamespaceInstance(string namespace1)
+		public NamespaceInstance(string namespaceString)
 		{
-			NamespaceString=namespace1;
+			NamespaceString=namespaceString;
 			NamespaceMappings.Load();
 		}
 
