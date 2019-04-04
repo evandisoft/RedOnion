@@ -15,6 +15,7 @@ using UnityEngine.Events;
 using System.Collections.Generic;
 using System.Linq;
 using API = RedOnion.KSP.API;
+using RedOnion.KSP.API;
 
 namespace Kerbalua.MoonSharp
 {
@@ -77,7 +78,7 @@ namespace Kerbalua.MoonSharp
 			Globals["unity"] = Assembly.GetAssembly(typeof(Vector3));
 			Globals["Assembly"] = typeof(Assembly);
 			//Assembly blah;
-
+			Globals["Coll"] = new NamespaceInstance("System.Collections.Generic");
 			Globals["AppDomain"] = UserData.CreateStatic(typeof(AppDomain));
 			Globals["AssemblyStatic"] = UserData.CreateStatic(typeof(Assembly));
 			Globals["UI"] = new UI();

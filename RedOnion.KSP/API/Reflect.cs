@@ -116,6 +116,7 @@ namespace RedOnion.KSP.API
 			throw new Exception("Could not find constructor accepting given args for type " + t);
 		}
 
+
 		public class Constructor : FunctionBase
 		{
 			public static Constructor Instance { get; } = new Constructor();
