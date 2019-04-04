@@ -28,8 +28,8 @@ namespace KerbaluaNUnit {
 			{
 				Console.WriteLine(type.FullName);
 			}
-			Assert.AreEqual(typeof(HashSet<object>), namespace1.GetTypeFromNamespace("HashSet`1"));
-			Assert.IsTrue(false);
+			Assert.AreEqual(typeof(HashSet<object>), namespace1.GetType("HashSet`1"));
+			//Assert.IsTrue(false);
 		}
 	}
 }
