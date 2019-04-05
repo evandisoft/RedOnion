@@ -13,22 +13,22 @@ namespace RedOnion.KSP.ReflectionUtil
 	/// </summary>
 	public class NamespaceMappings
 	{
-		static NamespaceMappings allAssemblies;
+		static NamespaceMappings forAllAssemblies;
 		/// <summary>
 		/// Namespace mappings that encompass all assemblies.
 		/// If Reset is called, will rebuild mappings based on assemblies
 		/// returned by AppDomain.CurrentDomain.GetAssemblies()
 		/// </summary>
 		/// <value>All.</value>
-		static public NamespaceMappings All
+		static public NamespaceMappings ForAllAssemblies
 		{
 			get
 			{
-				if (allAssemblies == null)
+				if (forAllAssemblies == null)
 				{
-					allAssemblies = new NamespaceMappings(()=>AppDomain.CurrentDomain.GetAssemblies());
+					forAllAssemblies = new NamespaceMappings(() => AppDomain.CurrentDomain.GetAssemblies());
 				}
-				return allAssemblies;
+				return forAllAssemblies;
 			}
 		}
 
@@ -44,7 +44,7 @@ namespace RedOnion.KSP.ReflectionUtil
 
 		public NamespaceInstance GetNamespace(string namespaceString)
 		{
-			if(TryGetNamespace(namespaceString,out NamespaceInstance namespaceInstance))
+			if (TryGetNamespace(namespaceString, out NamespaceInstance namespaceInstance))
 			{
 				return namespaceInstance;
 			}
@@ -149,12 +149,12 @@ namespace RedOnion.KSP.ReflectionUtil
 		/// <param name="assemblies">Assemblies.</param>
 		public void SetAssemblies(Assembly[] assemblies)
 		{
-			GetAssemblies = new Func<Assembly[]>(()=>assemblies);
+			GetAssemblies = new Func<Assembly[]>(() => assemblies);
 
 			Reset();
 		}
 
-		public bool NamespaceParent(string maybeChild,out string parent)
+		public bool NamespaceParent(string maybeChild, out string parent)
 		{
 			if (maybeChild == "")
 			{
@@ -168,7 +168,7 @@ namespace RedOnion.KSP.ReflectionUtil
 				return true;
 			}
 
-			parent = maybeChild.Substring(0,maybeChild.LastIndexOf('.'));
+			parent = maybeChild.Substring(0, maybeChild.LastIndexOf('.'));
 			return true;
 		}
 
@@ -184,7 +184,7 @@ namespace RedOnion.KSP.ReflectionUtil
 				return namespaceString;
 			}
 
-			return namespaceString.Substring(namespaceString.LastIndexOf('.')+1);
+			return namespaceString.Substring(namespaceString.LastIndexOf('.') + 1);
 		}
 	}
 }
