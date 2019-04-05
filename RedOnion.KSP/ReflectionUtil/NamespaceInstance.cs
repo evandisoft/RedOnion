@@ -232,7 +232,7 @@ namespace RedOnion.KSP.ReflectionUtil
 		/// </summary>
 		/// <returns>The namespace.</returns>
 		/// <param name="namespaceContinuation">Namespace continuation.</param>
-		public NamespaceInstance GetNamespace(string namespaceContinuation)
+		public NamespaceInstance GetChildNamespace(string namespaceContinuation)
 		{
 			return new NamespaceInstance(GetNamespaceString(namespaceContinuation),NamespaceMappings);
 		}
