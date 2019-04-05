@@ -88,6 +88,8 @@
     <Compile Include="Lua\Proxies\LuaCallProxy.cs" />
     <Compile Include="ReflectionUtil\NamespaceInstance.cs" />
     <Compile Include="ReflectionUtil\NamespaceMappings.cs" />
+    <Compile Include="ReflectionUtil\TypeAlternatives.cs" />
+    <Compile Include="ReflectionUtil\NameTypeMap.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RedOnion.Script\RedOnion.Script.csproj">

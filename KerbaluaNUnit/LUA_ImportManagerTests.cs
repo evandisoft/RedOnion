@@ -10,12 +10,14 @@ namespace KerbaluaNUnit {
 		[Test()]
 		public void LUA_ImportManager_1()
 		{
-			var namespace1 = new NamespaceInstance("System");
+			var namespace1 = new NamespaceInstance("System.Collections.Generic");
 			foreach(var part in namespace1.PossibleCompletions)
 			{
 				Console.WriteLine(part);
 			}
-			Assert.AreEqual(typeof(HashSet<object>), namespace1.GetType("HashSet`1"));
+			//namespace1.TryGetType("HashSet",out Type rawType);
+
+			Assert.AreEqual(typeof(HashSet<>), namespace1.GetRawType("HashSet`1"));
 			Assert.IsTrue(false);
 		}
 	}
