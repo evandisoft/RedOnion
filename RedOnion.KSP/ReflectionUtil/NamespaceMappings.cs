@@ -8,7 +8,8 @@ using MoonSharp.Interpreter.Interop;
 namespace RedOnion.KSP.ReflectionUtil
 {
 	/// <summary>
-	/// Stores mappings between namespaces and potential completions for those namespaces.
+	/// Stores mappings between namespaces, types in those namespaces, possible namespaceContinuations
+	/// and potential completions namespaces.
 	/// </summary>
 	public class NamespaceMappings
 	{

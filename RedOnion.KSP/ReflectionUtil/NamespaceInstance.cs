@@ -252,25 +252,26 @@ namespace RedOnion.KSP.ReflectionUtil
 		}
 
 		/// <summary>
-		/// Outputs a type or another NamespaceInstance.
+		/// Outputs a type or another NamespaceInstance, or null if no type or 
+		/// namespace found.
 		/// </summary>
 		/// <returns>True if the completion is available, false otherwise.</returns>
 		/// <param name="completionName">Completable name.</param>
-		public bool TryGetCompletion(string completionName, out object completable)
+		public bool TryGetCompletion(string completionName, out object completion)
 		{
 			if(NameTypeMap.TryBasename(completionName,out Type type))
 			{
-				completable = type;
+				completion = type;
 				return true;
 			}
 
 			if (NamespaceMappings.NamespaceToNameTypeMap.ContainsKey(GetNamespaceString(completionName)))
 			{
-				completable = new NamespaceInstance(completionName);
+				completion = new NamespaceInstance(completionName);
 				return true;
 			}
 
-			completable = null;
+			completion = null;
 			return false;
 		}
 
