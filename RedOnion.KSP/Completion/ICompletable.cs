@@ -7,7 +7,14 @@ namespace RedOnion.KSP.Completion
 	{
 		IList<string> PossibleCompletions { get; }
 		/// <summary>
-		/// Outputs the specified completion or returns false.
+		/// Outputs the specified completion or returns false. Even if the
+		/// completion is listed in PossibleCompletions, an attempt to output
+		/// the specified completion may be considered too expensive or as having
+		/// unwanted side effects. In these cases, or simply if the given completion
+		/// is not available, TryGetCompletion should return false.
+		/// 
+		/// Whether the outputted completion can complete in turn will be decided by
+		/// the completion engine.
 		/// </summary>
 		/// <returns><c>true</c>, if a completion was outputted, <c>false</c> otherwise.</returns>
 		/// <param name="completionName">Completable name.</param>

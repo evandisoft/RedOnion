@@ -46,6 +46,7 @@ namespace RedOnion.KSP.ReflectionUtil
 			}
 		}
 
+		IList<string> ICompletable.PossibleCompletions => PossibleCompletions;
 		/// <summary>
 		/// A list of the possible completions in the current context. All the base typenames and namespaceContinuations
 		/// for this namespace together in a sorted list.
@@ -68,7 +69,7 @@ namespace RedOnion.KSP.ReflectionUtil
 		}
 
 		/// <summary>
-		/// List of all the RawTypeNames in the current namespace. Raw types names are of the form
+		/// List of all the RawTypeNames in the current namespace. Raw typenames are of the form
 		/// 'HashSet`n', where n is the number of type parameters. If ` is not present, number
 		/// of type parameters is 0.
 		/// </summary>
@@ -88,7 +89,7 @@ namespace RedOnion.KSP.ReflectionUtil
 			}
 		}
 
-		IList<string> ICompletable.PossibleCompletions => throw new NotImplementedException();
+
 
 		public NamespaceInstance(string namespaceString)
 		{
@@ -275,7 +276,7 @@ namespace RedOnion.KSP.ReflectionUtil
 		/// </summary>
 		/// <returns>The completable.</returns>
 		/// <param name="completionName">Completable name.</param>
-		public bool TryGetCompletable(string completionName, out object completable)
+		public bool TryGetCompletion(string completionName, out object completable)
 		{
 			if(NameTypeMap.TryBasename(completionName,out Type type))
 			{
