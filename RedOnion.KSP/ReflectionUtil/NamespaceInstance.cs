@@ -9,9 +9,9 @@ namespace RedOnion.KSP.ReflectionUtil
 	/// </summary>
 	public class NamespaceInstance : ICompletable
 	{
-		public readonly string NamespaceString;
+		public string NamespaceString;
 
-		public readonly NamespaceMappings NamespaceMappings;
+		public NamespaceMappings NamespaceMappings;
 		/// <summary>
 		/// Returns the current Mapping from Type Name to Type for this namespace
 		/// </summary>
