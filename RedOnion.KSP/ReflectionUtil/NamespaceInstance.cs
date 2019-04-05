@@ -44,7 +44,7 @@ namespace RedOnion.KSP.ReflectionUtil
 					return namespaceContinuations;
 				}
 
-				throw new Exception("NamespaceContinuations for namespace \"" + NamespaceString+ "\" not found.");
+				throw new Exception("NamespaceContinuations for namespace \"" + NamespaceString + "\" not found.");
 			}
 		}
 
@@ -72,7 +72,7 @@ namespace RedOnion.KSP.ReflectionUtil
 		}
 
 
-		public NamespaceInstance(string namespaceString,NamespaceMappings namespaceMappings)
+		public NamespaceInstance(string namespaceString, NamespaceMappings namespaceMappings)
 		{
 			NamespaceMappings = namespaceMappings;
 
@@ -102,7 +102,7 @@ namespace RedOnion.KSP.ReflectionUtil
 		/// <param name="basename">Basename.</param>
 		public Type GetType(string basename)
 		{
-			if(TryGetType(basename,out Type type))
+			if (TryGetType(basename, out Type type))
 			{
 				return type;
 			}
@@ -115,7 +115,7 @@ namespace RedOnion.KSP.ReflectionUtil
 		/// </summary>
 		public Type GetType(string basename, int numTypeParameters)
 		{
-			if(TryGetType(basename,numTypeParameters,out Type type))
+			if (TryGetType(basename, numTypeParameters, out Type type))
 			{
 				return type;
 			}
@@ -128,7 +128,7 @@ namespace RedOnion.KSP.ReflectionUtil
 		/// </summary>
 		public Type GetRawType(string basename, int numTypeParameters)
 		{
-			if(TryGetRawType(basename,numTypeParameters,out Type rawType))
+			if (TryGetRawType(basename, numTypeParameters, out Type rawType))
 			{
 				return rawType;
 			}
@@ -141,7 +141,7 @@ namespace RedOnion.KSP.ReflectionUtil
 		/// </summary>
 		public Type GetRawType(string rawTypeName)
 		{
-			if(TryGetRawType(rawTypeName,out Type rawType))
+			if (TryGetRawType(rawTypeName, out Type rawType))
 			{
 				return rawType;
 			}
@@ -152,13 +152,13 @@ namespace RedOnion.KSP.ReflectionUtil
 		/// <summary>
 		/// Outputs a type with all type parameters set to typeof<object>
 		/// </summary>
-		public bool TryGetType(string basename,out Type type)
+		public bool TryGetType(string basename, out Type type)
 		{
 			type = null;
 
-			if(NameTypeMap.TryBasename(basename,out Type rawType))
+			if (NameTypeMap.TryBasename(basename, out Type rawType))
 			{
-				type=MakeGeneric(rawType);
+				type = MakeGeneric(rawType);
 				return true;
 			}
 
@@ -227,14 +227,27 @@ namespace RedOnion.KSP.ReflectionUtil
 			return t;
 		}
 
+		public bool TryGetSubNamespace(string subNamespace, out NamespaceInstance namespaceInstance)
+		{
+			string namespaceString = GetNamespaceString(subNamespace);
+
+			return NamespaceMappings.TryGetNamespace(namespaceString, out namespaceInstance);
+		}
+
 		/// <summary>
-		/// Gets the namespace created by adding the given namespaceContinuation to the current namespace.
+		/// Gets the namespace created by adding the given <paramref name="subNamespace"/>
+		/// to the current namespace.
 		/// </summary>
 		/// <returns>The namespace.</returns>
-		/// <param name="namespaceContinuation">Namespace continuation.</param>
-		public NamespaceInstance GetChildNamespace(string namespaceContinuation)
+		/// <param name="subNamespace">Namespace continuation.</param>
+		public NamespaceInstance GetSubNamespace(string subNamespace)
 		{
-			return new NamespaceInstance(GetNamespaceString(namespaceContinuation),NamespaceMappings);
+			if (TryGetSubNamespace(subNamespace, out NamespaceInstance namespaceInstance))
+			{
+				return namespaceInstance;
+			}
+
+			return null;
 		}
 
 		public string GetNamespaceString(string namespaceContinuation)
@@ -260,7 +273,7 @@ namespace RedOnion.KSP.ReflectionUtil
 		/// <param name="completionName">Completable name.</param>
 		public bool TryGetCompletion(string completionName, out object completion)
 		{
-			if(NameTypeMap.TryBasename(completionName,out Type type))
+			if (NameTypeMap.TryBasename(completionName, out Type type))
 			{
 				completion = type;
 				return true;
@@ -268,7 +281,7 @@ namespace RedOnion.KSP.ReflectionUtil
 
 			if (NamespaceMappings.NamespaceToNameTypeMap.ContainsKey(GetNamespaceString(completionName)))
 			{
-				completion = new NamespaceInstance(completionName,NamespaceMappings);
+				completion = new NamespaceInstance(completionName, NamespaceMappings);
 				return true;
 			}
 
