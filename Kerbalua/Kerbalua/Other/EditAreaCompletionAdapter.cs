@@ -8,7 +8,7 @@ namespace Kerbalua.Other {
 	/// scriptWindow. Scriptwindow is used in order to complete based off of its
 	/// currentReplEvaluator.
 	/// </summary>
-	public class EditingAreaCompletionAdapter:ICompletable {
+	public class EditingAreaCompletionAdapter:ICompletableElement {
 		public EditingArea editingArea;
 		public ScriptWindow scriptWindow;
 

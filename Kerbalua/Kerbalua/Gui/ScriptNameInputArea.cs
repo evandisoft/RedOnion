@@ -6,7 +6,7 @@ using System.Diagnostics;
 using Kerbalua.Utility;
 
 namespace Kerbalua.Gui {
-	public class ScriptNameInputArea:EditingArea, ICompletable {
+	public class ScriptNameInputArea:EditingArea, ICompletableElement {
 		public bool receivedInput;
 
 

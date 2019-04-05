@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
+using RedOnion.KSP.Completion;
 
 namespace RedOnion.KSP.ReflectionUtil
 {
 	/// <summary>
 	/// Represents a Namespace. Can return a type from this namespace or return a child namespace.
 	/// </summary>
-	public class NamespaceInstance
+	public class NamespaceInstance : ICompletable
 	{
 		public readonly string NamespaceString;
 		/// <summary>
@@ -86,6 +87,8 @@ namespace RedOnion.KSP.ReflectionUtil
 				throw new Exception("Possible completions for namespace \"" + NamespaceString + "\" not found.");
 			}
 		}
+
+		IList<string> ICompletable.PossibleCompletions => throw new NotImplementedException();
 
 		public NamespaceInstance(string namespaceString)
 		{
@@ -249,12 +252,42 @@ namespace RedOnion.KSP.ReflectionUtil
 		/// <param name="namespaceContinuation">Namespace continuation.</param>
 		public NamespaceInstance GetNamespace(string namespaceContinuation)
 		{
-			return new NamespaceInstance(NamespaceString + "." + namespaceContinuation);
+			return new NamespaceInstance(GetNamespaceString(namespaceContinuation));
+		}
+
+		public string GetNamespaceString(string namespaceContinuation)
+		{
+			if (NamespaceString == "")
+			{
+				return namespaceContinuation;
+			}
+
+			return NamespaceString + "." + namespaceContinuation;
 		}
 
 		public override string ToString()
 		{
 			return NamespaceString;
+		}
+
+		/// <summary>
+		/// Gets the completable.
+		/// </summary>
+		/// <returns>The completable.</returns>
+		/// <param name="completableName">Completable name.</param>
+		public object GetCompletable(string completableName)
+		{
+			if(NameTypeMap.TryBasename(completableName,out Type type))
+			{
+				return type;
+			}
+
+			if (NamespaceMappings.NamespaceToNameTypeMap.ContainsKey(GetNamespaceString(completableName)))
+			{
+				return new NamespaceInstance(completableName);
+			}
+
+			return null;
 		}
 	}
 }

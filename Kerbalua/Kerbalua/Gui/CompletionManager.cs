@@ -11,7 +11,7 @@ namespace Kerbalua.Gui {
 	/// completes whichever ICompletable was focused last.
 	/// </summary>
 	public class CompletionManager {
-		Dictionary<string,ICompletable> completableMap=new Dictionary<string, ICompletable>();
+		Dictionary<string,ICompletableElement> completableMap=new Dictionary<string, ICompletableElement>();
 		public ICompletionSelector completionSelector;
 		public string mostRecentlyFocusedCompletable = "";
 		public Stopwatch stopwatch = new Stopwatch();
@@ -26,7 +26,7 @@ namespace Kerbalua.Gui {
 			stopwatch.Start();
 		}
 
-		public void AddCompletable(ICompletable source)
+		public void AddCompletable(ICompletableElement source)
 		{
 			completableMap[source.ControlName] = source;
 		}
@@ -58,7 +58,7 @@ namespace Kerbalua.Gui {
 				stopwatch.Reset();
 				stopwatch.Start();
 				//Debug.Log("Changed");
-				ICompletable currentCompletable;
+				ICompletableElement currentCompletable;
 				if (completableMap.TryGetValue(mostRecentlyFocusedCompletable, out currentCompletable)) {
 					//Debug.Log("Displaying completions");
 					DisplayCurrentCompletions(currentCompletable);
@@ -75,14 +75,14 @@ namespace Kerbalua.Gui {
 
 		public void DisplayCurrentCompletions()
 		{
-			ICompletable currentCompletable;
+			ICompletableElement currentCompletable;
 			if (completableMap.TryGetValue(mostRecentlyFocusedCompletable, out currentCompletable)) {
 				//Debug.Log("Displaying completions");
 				DisplayCurrentCompletions(currentCompletable);
 			}
 		}
 
-		void DisplayCurrentCompletions(ICompletable completable)
+		void DisplayCurrentCompletions(ICompletableElement completable)
 		{
 			completionSelector.SetContentFromICompletable(completable);
 		}
@@ -90,7 +90,7 @@ namespace Kerbalua.Gui {
 		public void Complete()
 		{
 			//Debug.Log("completing");
-			ICompletable completable;
+			ICompletableElement completable;
 			if (completableMap.TryGetValue(mostRecentlyFocusedCompletable,out completable)) {
 				completable.GrabFocus();
 				completable.Complete(completionSelector.SelectionIndex);

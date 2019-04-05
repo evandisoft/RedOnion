@@ -90,6 +90,7 @@
     <Compile Include="ReflectionUtil\NamespaceMappings.cs" />
     <Compile Include="ReflectionUtil\TypeAlternatives.cs" />
     <Compile Include="ReflectionUtil\NameTypeMap.cs" />
+    <Compile Include="Completion\ICompletable.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RedOnion.Script\RedOnion.Script.csproj">
@@ -108,6 +109,7 @@
   <ItemGroup />
   <ItemGroup>
     <Folder Include="ReflectionUtil\" />
+    <Folder Include="Completion\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
