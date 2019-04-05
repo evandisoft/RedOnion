@@ -274,20 +274,23 @@ namespace RedOnion.KSP.ReflectionUtil
 		/// Gets the completable.
 		/// </summary>
 		/// <returns>The completable.</returns>
-		/// <param name="completableName">Completable name.</param>
-		public object GetCompletable(string completableName)
+		/// <param name="completionName">Completable name.</param>
+		public bool TryGetCompletable(string completionName, out object completable)
 		{
-			if(NameTypeMap.TryBasename(completableName,out Type type))
+			if(NameTypeMap.TryBasename(completionName,out Type type))
 			{
-				return type;
+				completable = type;
+				return true;
 			}
 
-			if (NamespaceMappings.NamespaceToNameTypeMap.ContainsKey(GetNamespaceString(completableName)))
+			if (NamespaceMappings.NamespaceToNameTypeMap.ContainsKey(GetNamespaceString(completionName)))
 			{
-				return new NamespaceInstance(completableName);
+				completable = new NamespaceInstance(completionName);
+				return true;
 			}
 
-			return null;
+			completable = null;
+			return false;
 		}
 	}
 }

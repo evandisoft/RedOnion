@@ -10,7 +10,7 @@ namespace Kerbalua.Gui {
 
 		public int SelectionIndex { get; private set; } = 0;
 
-		public void SetContentFromICompletable(ICompletable completable)
+		public void SetContentFromICompletable(ICompletableElement completable)
 		{
 			contentStrings = completable.GetCompletionContent(out int replaceStart, out int replaceEnd);
 			//Debug.Log("Getting Completions");

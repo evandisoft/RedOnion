@@ -6,6 +6,6 @@ namespace RedOnion.KSP.Completion
 	public interface ICompletable
 	{
 		IList<string> PossibleCompletions { get; }
-		object GetCompletable(string completableName);
+		bool TryGetCompletable(string completableName,out object completable);
 	}
 }
