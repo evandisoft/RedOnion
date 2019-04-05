@@ -10,6 +10,8 @@ namespace RedOnion.KSP.ReflectionUtil
 	public class NamespaceInstance : ICompletable
 	{
 		public readonly string NamespaceString;
+
+		public readonly NamespaceMappings NamespaceMappings;
 		/// <summary>
 		/// Returns the current Mapping from Type Name to Type for this namespace
 		/// </summary>
@@ -70,10 +72,9 @@ namespace RedOnion.KSP.ReflectionUtil
 		}
 
 
-
-		public NamespaceInstance(string namespaceString)
+		public NamespaceInstance(string namespaceString,NamespaceMappings namespaceMappings)
 		{
-			NamespaceMappings.Load();
+			NamespaceMappings = namespaceMappings;
 
 			if (!NamespaceMappings.NamespaceToNameTypeMap.ContainsKey(namespaceString))
 			{
@@ -233,7 +234,7 @@ namespace RedOnion.KSP.ReflectionUtil
 		/// <param name="namespaceContinuation">Namespace continuation.</param>
 		public NamespaceInstance GetNamespace(string namespaceContinuation)
 		{
-			return new NamespaceInstance(GetNamespaceString(namespaceContinuation));
+			return new NamespaceInstance(GetNamespaceString(namespaceContinuation),NamespaceMappings);
 		}
 
 		public string GetNamespaceString(string namespaceContinuation)
@@ -267,7 +268,7 @@ namespace RedOnion.KSP.ReflectionUtil
 
 			if (NamespaceMappings.NamespaceToNameTypeMap.ContainsKey(GetNamespaceString(completionName)))
 			{
-				completion = new NamespaceInstance(completionName);
+				completion = new NamespaceInstance(completionName,NamespaceMappings);
 				return true;
 			}
 

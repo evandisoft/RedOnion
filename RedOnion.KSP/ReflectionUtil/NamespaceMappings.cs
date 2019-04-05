@@ -13,37 +13,93 @@ namespace RedOnion.KSP.ReflectionUtil
 	/// </summary>
 	public class NamespaceMappings
 	{
-		public readonly string CurrentNamespace;
+		static NamespaceMappings allAssemblies;
+		/// <summary>
+		/// Namespace mappings that encompass all assemblies.
+		/// If Reset is called, will rebuild mappings based on assemblies
+		/// returned by AppDomain.CurrentDomain.GetAssemblies()
+		/// </summary>
+		/// <value>All.</value>
+		static public NamespaceMappings All
+		{
+			get
+			{
+				if (allAssemblies == null)
+				{
+					allAssemblies = new NamespaceMappings();
+				}
+				return allAssemblies;
+			}
+		}
 
-		static public Assembly[] assemblies;
-		static public Dictionary<string, NameTypeMap> NamespaceToNameTypeMap = new Dictionary<string, NameTypeMap>();
-		static public Dictionary<string, List<string>> NamespaceContinuationMap = new Dictionary<string, List<string>>();
+		public class AllMappings : NamespaceMappings
+		{
+			public AllMappings() : base(null)
+			{
+
+			}
+		}
+
+		public Dictionary<string, NameTypeMap> NamespaceToNameTypeMap = new Dictionary<string, NameTypeMap>();
+		public Dictionary<string, List<string>> NamespaceContinuationMap = new Dictionary<string, List<string>>();
 		/// <summary>
 		/// Map of namespace to possible completions. The completions consist of all the
 		/// possible namespace continuations from the given namespace as well as
 		/// all the base type names. By base I mean "HashSet" instead of "HashSet`1"
 		/// </summary>
-		static public Dictionary<string, List<string>> NamespaceCompletionMap = new Dictionary<string, List<string>>();
-		static public Dictionary<string, List<string>> NamespaceRawTypeNamesMap = new Dictionary<string, List<string>>();
+		public Dictionary<string, List<string>> NamespaceCompletionMap = new Dictionary<string, List<string>>();
+		public Dictionary<string, List<string>> NamespaceRawTypeNamesMap = new Dictionary<string, List<string>>();
 
-		static public void Load()
+		public NamespaceInstance GetNamespace(string namespaceString)
 		{
-			if (NamespaceToNameTypeMap.Count == 0)
+			if(TryGetNamespace(namespaceString,out NamespaceInstance namespaceInstance))
 			{
-				Reload();
+				return namespaceInstance;
 			}
+
+			return null;
 		}
 
-		static public void Reload()
+		public bool TryGetNamespace(string namespaceString, out NamespaceInstance namespaceInstance)
 		{
+			if (NamespaceToNameTypeMap.ContainsKey(namespaceString))
+			{
+				namespaceInstance = new NamespaceInstance(namespaceString, this);
+				return true;
+			}
+
+			namespaceInstance = null;
+			return false;
+		}
+
+		public NamespaceMappings(Assembly[] assemblies)
+		{
+			SetAssemblies(assemblies);
+		}
+
+		public NamespaceMappings()
+		{
+			GetAssemblies = () => AppDomain.CurrentDomain.GetAssemblies();
+
+			Reset();
+		}
+
+		public Func<Assembly[]> GetAssemblies;
+
+		/// <summary>
+		/// Rebuilds mappings based on current assemblies returned by GetAssemblies.
+		/// </summary>
+		public void Reset()
+		{
+			var assemblies = GetAssemblies();
+
 			NamespaceToNameTypeMap = new Dictionary<string, NameTypeMap>();
 			NamespaceContinuationMap = new Dictionary<string, List<string>>();
 			NamespaceCompletionMap = new Dictionary<string, List<string>>();
 			NamespaceRawTypeNamesMap = new Dictionary<string, List<string>>();
 
-			assemblies = AppDomain.CurrentDomain.GetAssemblies();
 			HashSet<string> namespaceStrings = new HashSet<string>();
-			foreach(var assembly in assemblies)
+			foreach (var assembly in assemblies)
 			{
 				foreach (var type in assembly.GetTypes())
 				{
@@ -60,9 +116,9 @@ namespace RedOnion.KSP.ReflectionUtil
 				}
 			}
 
-			foreach(var namespaceString in namespaceStrings)
+			foreach (var namespaceString in namespaceStrings)
 			{
-				if (NamespaceParent(namespaceString,out string parent))
+				if (NamespaceParent(namespaceString, out string parent))
 				{
 					if (!NamespaceContinuationMap.ContainsKey(parent))
 					{
@@ -77,7 +133,7 @@ namespace RedOnion.KSP.ReflectionUtil
 				}
 			}
 
-			foreach(var namespaceString in NamespaceToNameTypeMap.Keys)
+			foreach (var namespaceString in NamespaceToNameTypeMap.Keys)
 			{
 				if (!NamespaceCompletionMap.ContainsKey(namespaceString))
 				{
@@ -95,7 +151,18 @@ namespace RedOnion.KSP.ReflectionUtil
 			}
 		}
 
-		static public bool NamespaceParent(string maybeChild,out string parent)
+		/// <summary>
+		/// Sets the assemblies and updates all mappings.
+		/// </summary>
+		/// <param name="assemblies">Assemblies.</param>
+		public void SetAssemblies(Assembly[] assemblies)
+		{
+			GetAssemblies = new Func<Assembly[]>(()=>assemblies);
+
+			Reset();
+		}
+
+		public bool NamespaceParent(string maybeChild,out string parent)
 		{
 			if (maybeChild == "")
 			{
@@ -113,7 +180,7 @@ namespace RedOnion.KSP.ReflectionUtil
 			return true;
 		}
 
-		static public string LastNamespacePart(string namespaceString)
+		public string LastNamespacePart(string namespaceString)
 		{
 			if (namespaceString == "")
 			{

@@ -10,7 +10,8 @@ namespace KerbaluaNUnit {
 		[Test()]
 		public void LUA_ImportManager_1()
 		{
-			var namespace1 = new NamespaceInstance("System.Collections.Generic");
+			var mappings = NamespaceMappings.All;
+			var namespace1 = mappings.GetNamespace("System.Collections.Generic");
 			foreach(var part in namespace1.PossibleCompletions)
 			{
 				Console.WriteLine(part);
@@ -18,7 +19,25 @@ namespace KerbaluaNUnit {
 			//namespace1.TryGetType("HashSet",out Type rawType);
 
 			Assert.AreEqual(typeof(HashSet<>), namespace1.GetRawType("HashSet`1"));
-			Assert.IsTrue(false);
+			//Assert.IsTrue(false);
+		}
+
+		[Test()]
+		public void LUA_ImportManager_2()
+		{
+			var mappings = NamespaceMappings.All;
+			var namespace1 = mappings.GetNamespace("")
+				.GetNamespace("System")
+				.GetNamespace("Collections")
+				.GetNamespace("Generic");
+			foreach (var part in namespace1.PossibleCompletions)
+			{
+				Console.WriteLine(part);
+			}
+			//namespace1.TryGetType("HashSet",out Type rawType);
+
+			Assert.AreEqual(typeof(HashSet<>), namespace1.GetRawType("HashSet`1"));
+			//Assert.IsTrue(false);
 		}
 	}
 }
