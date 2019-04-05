@@ -73,7 +73,7 @@ namespace Kerbalua.MoonSharp
 				}));
 			Globals.MetaTable = API.Globals.Instance;
 			//Globals["Vessel"] = FlightGlobals.ActiveVessel;
-			var allMappings = NamespaceMappings.All;
+			var allMappings = NamespaceMappings.ForAllAssemblies;
 			Globals["KSP"] = new KspApi();
 			Globals["new"] = new Constructor(API.Reflect.LuaNew);
 			Globals["unity"] = Assembly.GetAssembly(typeof(Vector3));

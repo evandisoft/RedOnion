@@ -10,7 +10,7 @@ namespace KerbaluaNUnit {
 		[Test()]
 		public void LUA_ImportManager_1()
 		{
-			var mappings = NamespaceMappings.All;
+			var mappings = NamespaceMappings.ForAllAssemblies;
 			var namespaceInstance = mappings.GetNamespace("System.Collections.Generic");
 			foreach(var part in namespaceInstance.PossibleCompletions)
 			{
@@ -23,7 +23,7 @@ namespace KerbaluaNUnit {
 		[Test()]
 		public void LUA_ImportManager_2()
 		{
-			var mappings = NamespaceMappings.All;
+			var mappings = NamespaceMappings.ForAllAssemblies;
 			var namespaceInstance = mappings.GetNamespace("")
 				.GetSubNamespace("System")
 				.GetSubNamespace("Collections")
@@ -39,7 +39,7 @@ namespace KerbaluaNUnit {
 		[Test()]
 		public void LUA_ImportManager_3()
 		{
-			var mappings = NamespaceMappings.All;
+			var mappings = NamespaceMappings.ForAllAssemblies;
 			var namespaceInstance = mappings.GetNamespace("")
 				.GetSubNamespace("System.Collections.Generic");
 			foreach (var part in namespaceInstance.PossibleCompletions)
@@ -53,7 +53,7 @@ namespace KerbaluaNUnit {
 		[Test()]
 		public void LUA_ImportManager_4()
 		{
-			var mappings = NamespaceMappings.All;
+			var mappings = NamespaceMappings.ForAllAssemblies;
 			var namespaceInstance = mappings.GetNamespace("")
 				.GetSubNamespace("System.Collections")
 				.GetSubNamespace("Generic");
@@ -68,7 +68,7 @@ namespace KerbaluaNUnit {
 		[Test()]
 		public void LUA_ImportManager_5()
 		{
-			var mappings = NamespaceMappings.All;
+			var mappings = NamespaceMappings.ForAllAssemblies;
 			var namespaceInstance = mappings.GetNamespace("")
 				.GetSubNamespace("System.Collections")
 				.GetSubNamespace("Generic");
@@ -83,7 +83,7 @@ namespace KerbaluaNUnit {
 		[Test()]
 		public void LUA_ImportManager_6()
 		{
-			var mappings = NamespaceMappings.All;
+			var mappings = NamespaceMappings.ForAllAssemblies;
 			var namespaceInstance = mappings.GetNamespace("")
 				.GetSubNamespace("System");
 			foreach (var part in namespaceInstance.PossibleCompletions)
@@ -97,7 +97,7 @@ namespace KerbaluaNUnit {
 		[Test()]
 		public void LUA_ImportManager_7()
 		{
-			var mappings = NamespaceMappings.All;
+			var mappings = NamespaceMappings.ForAllAssemblies;
 			var namespaceInstance = mappings.GetNamespace("System");
 			foreach (var part in namespaceInstance.PossibleCompletions)
 			{
@@ -110,7 +110,7 @@ namespace KerbaluaNUnit {
 		[Test()]
 		public void LUA_ImportManager_8()
 		{
-			var mappings = NamespaceMappings.All;
+			var mappings = NamespaceMappings.ForAllAssemblies;
 			var namespaceInstance = mappings.GetNamespace("System");
 			foreach (var part in namespaceInstance.PossibleCompletions)
 			{

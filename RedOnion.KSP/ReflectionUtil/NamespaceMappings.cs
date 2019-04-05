@@ -145,11 +145,26 @@ namespace RedOnion.KSP.ReflectionUtil
 
 		/// <summary>
 		/// Sets the assemblies and updates all mappings.
+		/// 
+		/// Sets GetAssemblies to be a function that returns the given assemblies.
 		/// </summary>
 		/// <param name="assemblies">Assemblies.</param>
 		public void SetAssemblies(Assembly[] assemblies)
 		{
 			GetAssemblies = new Func<Assembly[]>(() => assemblies);
+
+			Reset();
+		}
+
+		/// <summary>
+		/// Sets the field GetAssemblies, with a function that will be called to 
+		/// get the assemblies that will be used when Reset is again called. 
+		/// Also calls reset.
+		/// </summary>
+		/// <param name="getAssemblies">Get assemblies.</param>
+		public void SetAssemblies(Func<Assembly[]> getAssemblies)
+		{
+			GetAssemblies = getAssemblies;
 
 			Reset();
 		}
