@@ -85,6 +85,8 @@ namespace RedOnion.KSP.ReflectionUtil
 
 				NamespaceCompletionMap[namespaceString].AddRange(NamespaceToNameTypeMap[namespaceString].BaseTypeNames);
 				NamespaceCompletionMap[namespaceString].AddRange(NamespaceContinuationMap[namespaceString]);
+
+				NamespaceRawTypeNamesMap[namespaceString] = new List<string>();
 				NamespaceRawTypeNamesMap[namespaceString].AddRange(NamespaceToNameTypeMap[namespaceString].RawTypeNames);
 
 				NamespaceCompletionMap[namespaceString].Sort();

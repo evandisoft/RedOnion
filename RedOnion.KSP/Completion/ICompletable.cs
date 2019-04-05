@@ -13,8 +13,12 @@ namespace RedOnion.KSP.Completion
 		/// unwanted side effects. In these cases, or simply if the given completion
 		/// is not available, TryGetCompletion should return false.
 		/// 
-		/// Whether the outputted completion can complete in turn will be decided by
-		/// the completion engine.
+		/// Whether the outputted completion can/should return completions
+		/// in turn will be decided by the completion engine.
+		/// 
+		/// <paramref name="completion"/> may not be the actual object that is to
+		/// be returned but an ICompletable that merely represents the object for
+		/// completion purposes.
 		/// </summary>
 		/// <returns><c>true</c>, if a completion was outputted, <c>false</c> otherwise.</returns>
 		/// <param name="completionName">Completable name.</param>

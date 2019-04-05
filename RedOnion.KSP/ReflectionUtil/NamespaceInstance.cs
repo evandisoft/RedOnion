@@ -46,27 +46,7 @@ namespace RedOnion.KSP.ReflectionUtil
 			}
 		}
 
-		IList<string> ICompletable.PossibleCompletions => PossibleCompletions;
-		/// <summary>
-		/// A list of the possible completions in the current context. All the base typenames and namespaceContinuations
-		/// for this namespace together in a sorted list.
-		/// 
-		/// This will return type names like HashSet instead of HashSet`1.
-		/// </summary>
-		public List<string> PossibleCompletions
-		{
-			get
-			{
-				if (NamespaceMappings
-					.NamespaceCompletionMap
-					.TryGetValue(NamespaceString, out List<string> completions))
-				{
-					return completions;
-				}
 
-				throw new Exception("Possible completions for namespace \"" + NamespaceString + "\" not found.");
-			}
-		}
 
 		/// <summary>
 		/// List of all the RawTypeNames in the current namespace. Raw typenames are of the form
@@ -272,9 +252,9 @@ namespace RedOnion.KSP.ReflectionUtil
 		}
 
 		/// <summary>
-		/// Gets the completable.
+		/// Outputs a type or another NamespaceInstance.
 		/// </summary>
-		/// <returns>The completable.</returns>
+		/// <returns>True if the completion is available, false otherwise.</returns>
 		/// <param name="completionName">Completable name.</param>
 		public bool TryGetCompletion(string completionName, out object completable)
 		{
@@ -292,6 +272,27 @@ namespace RedOnion.KSP.ReflectionUtil
 
 			completable = null;
 			return false;
+		}
+
+		/// <summary>
+		/// A list of the possible completions in the current context. All the base typenames and namespaceContinuations
+		/// for this namespace together in a sorted list.
+		/// 
+		/// This will return type names like HashSet instead of HashSet`1.
+		/// </summary>
+		public IList<string> PossibleCompletions
+		{
+			get
+			{
+				if (NamespaceMappings
+					.NamespaceCompletionMap
+					.TryGetValue(NamespaceString, out List<string> completions))
+				{
+					return completions;
+				}
+
+				throw new Exception("Possible completions for namespace \"" + NamespaceString + "\" not found.");
+			}
 		}
 	}
 }
