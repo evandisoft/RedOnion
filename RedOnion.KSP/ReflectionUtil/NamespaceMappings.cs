@@ -26,17 +26,9 @@ namespace RedOnion.KSP.ReflectionUtil
 			{
 				if (allAssemblies == null)
 				{
-					allAssemblies = new NamespaceMappings();
+					allAssemblies = new NamespaceMappings(()=>AppDomain.CurrentDomain.GetAssemblies());
 				}
 				return allAssemblies;
-			}
-		}
-
-		public class AllMappings : NamespaceMappings
-		{
-			public AllMappings() : base(null)
-			{
-
 			}
 		}
 
@@ -77,9 +69,9 @@ namespace RedOnion.KSP.ReflectionUtil
 			SetAssemblies(assemblies);
 		}
 
-		public NamespaceMappings()
+		public NamespaceMappings(Func<Assembly[]> getAssemblies)
 		{
-			GetAssemblies = () => AppDomain.CurrentDomain.GetAssemblies();
+			GetAssemblies = getAssemblies;
 
 			Reset();
 		}
