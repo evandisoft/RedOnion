@@ -106,6 +106,7 @@ namespace RedOnion.KSP.ReflectionUtil
 			{
 				return int.Parse(rawName.Substring(rawName.LastIndexOf('`') + 1));
 			}
+
 			return 0;
 		}
 
@@ -115,6 +116,7 @@ namespace RedOnion.KSP.ReflectionUtil
 			{
 				return rawName.Substring(0, rawName.LastIndexOf('`'));
 			}
+
 			return rawName;
 		}
 	}
