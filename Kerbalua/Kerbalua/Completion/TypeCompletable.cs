@@ -85,7 +85,7 @@ namespace Kerbalua.Completion
 		{
 			IList<Part> parts = segment.Parts;
 
-			for (int i = 0; i < parts.Count; i++)
+			for (int i = startIndex; i < parts.Count; i++)
 			{
 				if (parts[i] is CallPart)
 				{

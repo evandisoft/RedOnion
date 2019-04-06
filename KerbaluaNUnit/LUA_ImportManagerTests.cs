@@ -14,7 +14,7 @@ namespace KerbaluaNUnit {
 			var namespaceInstance = mappings.GetNamespace("System.Collections.Generic");
 			foreach(var part in namespaceInstance.PossibleCompletions)
 			{
-				Console.WriteLine(part);
+				//Console.WriteLine(part);
 			}
 
 			Assert.AreEqual(typeof(HashSet<>), namespaceInstance.GetRawType("HashSet`1"));
@@ -30,7 +30,7 @@ namespace KerbaluaNUnit {
 				.GetSubNamespace("Generic");
 			foreach (var part in namespaceInstance.PossibleCompletions)
 			{
-				Console.WriteLine(part);
+				//Console.WriteLine(part);
 			}
 
 			Assert.AreEqual(typeof(HashSet<>), namespaceInstance.GetRawType("HashSet`1"));
@@ -44,7 +44,7 @@ namespace KerbaluaNUnit {
 				.GetSubNamespace("System.Collections.Generic");
 			foreach (var part in namespaceInstance.PossibleCompletions)
 			{
-				Console.WriteLine(part);
+				//Console.WriteLine(part);
 			}
 
 			Assert.AreEqual(typeof(HashSet<>), namespaceInstance.GetRawType("HashSet`1"));
@@ -59,7 +59,7 @@ namespace KerbaluaNUnit {
 				.GetSubNamespace("Generic");
 			foreach (var part in namespaceInstance.PossibleCompletions)
 			{
-				Console.WriteLine(part);
+				//Console.WriteLine(part);
 			}
 
 			Assert.AreEqual(typeof(HashSet<>), namespaceInstance.GetRawType("HashSet`1"));
@@ -74,7 +74,7 @@ namespace KerbaluaNUnit {
 				.GetSubNamespace("Generic");
 			foreach (var part in namespaceInstance.PossibleCompletions)
 			{
-				Console.WriteLine(part);
+				//Console.WriteLine(part);
 			}
 
 			Assert.AreEqual(typeof(HashSet<object>), namespaceInstance.GetType("HashSet"));
@@ -88,7 +88,7 @@ namespace KerbaluaNUnit {
 				.GetSubNamespace("System");
 			foreach (var part in namespaceInstance.PossibleCompletions)
 			{
-				Console.WriteLine(part);
+				//Console.WriteLine(part);
 			}
 
 			Assert.AreEqual(typeof(Func<object,object>), namespaceInstance.GetType("Func",2));
@@ -101,7 +101,7 @@ namespace KerbaluaNUnit {
 			var namespaceInstance = mappings.GetNamespace("System");
 			foreach (var part in namespaceInstance.PossibleCompletions)
 			{
-				Console.WriteLine(part);
+				//Console.WriteLine(part);
 			}
 
 			Assert.AreEqual(typeof(Func<,,>), namespaceInstance.GetRawType("Func`3"));
@@ -114,7 +114,7 @@ namespace KerbaluaNUnit {
 			var namespaceInstance = mappings.GetNamespace("System");
 			foreach (var part in namespaceInstance.PossibleCompletions)
 			{
-				Console.WriteLine(part);
+			//Console.WriteLine(part);
 			}
 
 			Assert.AreEqual(typeof(Func<,,>), namespaceInstance.GetRawType("Func",3));

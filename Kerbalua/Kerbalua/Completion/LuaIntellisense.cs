@@ -31,7 +31,7 @@ namespace Kerbalua.Completion {
 			var completionObject = new CompletionObject(globals, processedIncompleteVar.Segments);
 
 			try {
-				completionObject.ProcessCompletion();
+				completionObject.ProcessAllSegments();
 			}
 			catch(LuaIntellisenseException) {
 				replaceStart = replaceEnd = cursorPos;

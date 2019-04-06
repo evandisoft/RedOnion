@@ -7,7 +7,7 @@ namespace RedOnion.KSP.ReflectionUtil
 	/// <summary>
 	/// Represents a Namespace. Can return a type from this namespace or return a child namespace.
 	/// </summary>
-	public class NamespaceInstance : ICompletable
+	public partial class NamespaceInstance : ICompletable
 	{
 		public string NamespaceString;
 

@@ -25,16 +25,18 @@ namespace Kerbalua.Completion {
 
 		public CompletionObject(object StartObject, IList<Segment> segments)
 		{
-			Reset();
+			this.StartObject = StartObject;
 			this.segments = segments;
+			Reset();
 		}
 
 		public void Reset()
 		{
 			CurrentCompletionObject = StartObject;
+			Index = 0;
 		}
 
-		public void ProcessCompletion()
+		public void ProcessAllSegments()
 		{
 			while (ProcessNextSegment()) { }
 		}
@@ -71,6 +73,24 @@ namespace Kerbalua.Completion {
 
 		ICompletable GetICompletable(object obj)
 		{
+			int limit = 100;
+			int i = 0;
+			for(i = 0; i < limit; i++)
+			{
+				if(obj is IHasCompletionProxy proxy)
+				{
+					obj = proxy.CompletionProxy;
+				}
+				else
+				{
+					break;
+				}
+			}
+			if (i >= limit)
+			{
+				throw new LuaIntellisenseException("Could not resolve proxies at " + segments[Index].Name);
+			}
+
 			switch (obj)
 			{
 				case ICompletable completable:

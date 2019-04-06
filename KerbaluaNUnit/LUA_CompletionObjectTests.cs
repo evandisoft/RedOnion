@@ -40,14 +40,14 @@ namespace KerbaluaNUnit {
 			var completions = completion.GetCurrentCompletions();
 			foreach (var c in completions)
 			{
-				Console.WriteLine(c);
+				//Console.WriteLine(c);
 			}
 			Assert.AreEqual(2, completions.Count);
 			Assert.True(completion.ProcessNextSegment());
 			completions = completion.GetCurrentCompletions();
 			foreach (var c in completions)
 			{
-				Console.WriteLine(c);
+				//Console.WriteLine(c);
 			}
 			Assert.AreEqual(11, completions.Count);
 		}
@@ -79,7 +79,31 @@ namespace KerbaluaNUnit {
 			completions = completion.GetCurrentCompletions();
 			foreach (var c in completions)
 			{
-				Console.WriteLine(c);
+				//Console.WriteLine(c);
+			}
+			Assert.AreEqual(10, completions.Count);
+		}
+
+		[Test()]
+		public void LUA_TestCase_3()
+		{
+			script = new Script(CoreModules.Preset_Complete);
+			script.Globals["ADF"] = new Adf();
+
+			var completion = GetCompletionObject(script.Globals,
+				@"ADF."
+				);
+			var completions = completion.GetCurrentCompletions();
+			foreach (var c in completions)
+			{
+				//Console.WriteLine(c);
+			}
+			Assert.AreEqual(3, completions.Count);
+			Assert.True(completion.ProcessNextSegment());
+			completions = completion.GetCurrentCompletions();
+			foreach (var c in completions)
+			{
+				//Console.WriteLine(c);
 			}
 			Assert.AreEqual(10, completions.Count);
 		}
