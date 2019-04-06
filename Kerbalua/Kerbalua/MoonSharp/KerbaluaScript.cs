@@ -81,7 +81,7 @@ namespace Kerbalua.MoonSharp
 			Globals["Assembly"] = typeof(Assembly);
 			//Assembly blah;
 
-
+			Globals["Coll"] = allMappings.GetNamespace("System.Collections.Generic");
 
 			Globals["AppDomain"] = UserData.CreateStatic(typeof(AppDomain));
 			Globals["AssemblyStatic"] = UserData.CreateStatic(typeof(Assembly));
