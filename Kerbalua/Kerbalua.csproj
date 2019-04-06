@@ -123,6 +123,9 @@
     <Compile Include="Kerbalua\Other\Evaluation.cs" />
     <Compile Include="Kerbalua\Parsing\IncompleteLuaParsing.cs" />
     <Compile Include="Kerbalua\MoonSharp\KerbaluaScript.cs" />
+    <Compile Include="Kerbalua\Completion\TableCompletable.cs" />
+    <Compile Include="Kerbalua\Completion\TypeCompletable.cs" />
+    <Compile Include="Kerbalua\Completion\CompletionObjectOld.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
