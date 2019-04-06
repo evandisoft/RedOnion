@@ -91,6 +91,7 @@
     <Compile Include="ReflectionUtil\TypeAlternatives.cs" />
     <Compile Include="ReflectionUtil\NameTypeMap.cs" />
     <Compile Include="Completion\ICompletable.cs" />
+    <Compile Include="API\NamespaceAPI.MoonSharp.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RedOnion.Script\RedOnion.Script.csproj">
