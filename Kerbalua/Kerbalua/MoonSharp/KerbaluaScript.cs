@@ -58,11 +58,11 @@ namespace Kerbalua.MoonSharp
 			GlobalOptions.CustomConverters
 				.SetClrToScriptCustomConversion(
 					(Script script, ModuleControlSurface m)
-						=> DynValue.FromObject(script,new LuaProxy(m)) //DynValue.NewTable(new ModuleControlSurfaceProxyTable(this, m))
+						=> DynValue.FromObject(script, new LuaProxy(m)) //DynValue.NewTable(new ModuleControlSurfaceProxyTable(this, m))
 					);
 			GlobalOptions.CustomConverters
 				.SetScriptToClrCustomConversion(DataType.Function
-					, typeof(UnityAction), (f) => new UnityAction(() => 
+					, typeof(UnityAction), (f) => new UnityAction(() =>
 				{
 					var co = CreateCoroutine(f);
 					co.Coroutine.AutoYieldCounter = 10000;
@@ -75,17 +75,37 @@ namespace Kerbalua.MoonSharp
 			Globals.MetaTable = API.Globals.Instance;
 			//Globals["Vessel"] = FlightGlobals.ActiveVessel;
 			var allMappings = NamespaceMappings.ForAllAssemblies;
-			Globals["KSP"] = new KspApi();
+			//Globals["KSP"] = new KspApi();
 			Globals["new"] = new Constructor(API.Reflect.LuaNew);
-			Globals["unity"] = Assembly.GetAssembly(typeof(Vector3));
-			Globals["Assembly"] = typeof(Assembly);
+			Globals["static"] = new Func<object, DynValue>((o) =>
+			{
+				if (o is Type t)
+				{
+					return UserData.CreateStatic(t);
+				}
+				return UserData.CreateStatic(o.GetType());
+			});
+			Globals["gettype"] = new Func<object, DynValue>((o) =>
+			{
+				if (o is DynValue d && d.Type==DataType.UserData)
+				{
+					return DynValue.FromObject(this,d.UserData.Descriptor.Type);
+				}
+				if (o is Type t)
+				{
+					return DynValue.FromObject(this,t);
+				}
+				return DynValue.FromObject(this,o.GetType());
+			});
+			//Globals["unity"] = Assembly.GetAssembly(typeof(Vector3));
+			//Globals["Assembly"] = typeof(Assembly);
 			//Assembly blah;
+			Globals["Native"] = allMappings.GetNamespace("");
+			//Globals["Coll"] = allMappings.GetNamespace("System.Collections.Generic");
 
-			Globals["Coll"] = allMappings.GetNamespace("System.Collections.Generic");
-
-			Globals["AppDomain"] = UserData.CreateStatic(typeof(AppDomain));
-			Globals["AssemblyStatic"] = UserData.CreateStatic(typeof(Assembly));
-			Globals["UI"] = new UI();
+			//Globals["AppDomain"] = UserData.CreateStatic(typeof(AppDomain));
+			//Globals["AssemblyStatic"] = UserData.CreateStatic(typeof(Assembly));
+			//Globals["UI"] = new UI();
 			//UserData.RegisterExtensionType(typeof(System.Linq.Enumerable));
 			//UserData.RegisterAssembly(Assembly.GetAssembly(typeof(System.Linq.Enumerable)),true);
 		}

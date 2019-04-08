@@ -62,8 +62,22 @@ namespace RedOnion.KSP.API
 		public static Type ResolveType(object o)
 			=> o is string s ? ResolveType(s) : o as Type ?? o?.GetType();
 
-		public static object LuaNew(Type t, params DynValue[] dynArgs)
+		public static object LuaNew(object obj, params DynValue[] dynArgs)
 		{
+			Type t = null;
+			if(obj is Type)
+			{
+				t = obj as Type;
+			}
+			if (obj is DynValue dynValue && dynValue.Type==DataType.UserData)
+			{
+				t = dynValue.UserData.Descriptor.Type;
+			}
+			else
+			{
+				t = obj.GetType();
+			}
+
 			var constructors = t.GetConstructors();
 			foreach (var constructor in constructors)
 			{

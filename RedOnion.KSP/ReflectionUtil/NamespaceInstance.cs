@@ -280,9 +280,10 @@ namespace RedOnion.KSP.ReflectionUtil
 				return true;
 			}
 
-			if (NamespaceMappings.NamespaceToNameTypeMap.ContainsKey(GetNamespaceString(completionName)))
+			string namespaceString = GetNamespaceString(completionName);
+			if (NamespaceMappings.NamespaceToNameTypeMap.ContainsKey(namespaceString))
 			{
-				completion = new NamespaceInstance(completionName, NamespaceMappings);
+				completion = new NamespaceInstance(namespaceString, NamespaceMappings);
 				return true;
 			}
 

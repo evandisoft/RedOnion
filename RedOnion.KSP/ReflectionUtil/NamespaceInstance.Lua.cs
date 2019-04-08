@@ -20,7 +20,7 @@ namespace RedOnion.KSP.ReflectionUtil
 
 			if (TryGetType(index.String, out Type type))
 			{
-				return DynValue.FromObject(script,type);
+				return UserData.CreateStatic(type);
 			}
 
 			throw new Exception("No type or subnamespace named " + index + " found in namespace " + NamespaceString);
