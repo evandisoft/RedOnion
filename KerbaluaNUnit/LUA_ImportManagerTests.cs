@@ -28,7 +28,7 @@ namespace KerbaluaNUnit {
 				.GetSubNamespace("System")
 				.GetSubNamespace("Collections")
 				.GetSubNamespace("Generic");
-			
+
 			foreach (var part in namespaceInstance.PossibleCompletions)
 			{
 				//Console.WriteLine(part);
