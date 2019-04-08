@@ -8,7 +8,7 @@ using MoonSharp.Interpreter.Interop;
 using Kerbalua.Other;
 using RedOnion.KSP.Lua;
 using Kerbalua.MoonSharp;
-using UnityEngine;
+//using UnityEngine;
 using System.Reflection;
 using RedOnion.KSP.API;
 
