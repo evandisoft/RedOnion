@@ -1,4 +1,5 @@
 using System;
+
 namespace Kerbalua.Completion
 {
 	public class LuaIntellisenseException : Exception

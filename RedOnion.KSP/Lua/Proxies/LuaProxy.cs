@@ -1,11 +1,13 @@
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
+using RedOnion.KSP.Completion;
 
 namespace RedOnion.KSP.Lua.Proxies
 {
-	public class LuaProxy:IUserDataType
+	public class LuaProxy:IUserDataType,IHasCompletionProxy
 	{
 		public object ProxiedObject;
 
@@ -69,5 +71,7 @@ namespace RedOnion.KSP.Lua.Proxies
 		{
 			throw new NotImplementedException();
 		}
+
+		public object CompletionProxy => ProxiedObject.GetType();
 	}
 }

@@ -84,10 +84,15 @@
     <Compile Include="Lua\Proxies\ExperimentalProxy.cs" />
     <Compile Include="Lua\Proxies\ProxyTable.cs" />
     <Compile Include="Lua\Proxies\ProxyCallTable.cs" />
-    <Compile Include="API\NativeImport.cs" />
-    <Compile Include="Lua\Proxies\ImportCompletion.cs" />
     <Compile Include="Lua\Proxies\LuaProxy.cs" />
     <Compile Include="Lua\Proxies\LuaCallProxy.cs" />
+    <Compile Include="ReflectionUtil\NamespaceInstance.cs" />
+    <Compile Include="ReflectionUtil\NamespaceMappings.cs" />
+    <Compile Include="ReflectionUtil\TypeAlternatives.cs" />
+    <Compile Include="ReflectionUtil\NameTypeMap.cs" />
+    <Compile Include="Completion\ICompletable.cs" />
+    <Compile Include="Completion\IHasCompletionProxy.cs" />
+    <Compile Include="ReflectionUtil\NamespaceInstance.Lua.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RedOnion.Script\RedOnion.Script.csproj">
@@ -104,5 +109,9 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup />
+  <ItemGroup>
+    <Folder Include="ReflectionUtil\" />
+    <Folder Include="Completion\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

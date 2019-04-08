@@ -17,11 +17,21 @@ namespace Kerbalua.Completion {
 		{
 			string relevantText = source.Substring(0, cursorPos);
 
-			var processedIncompleteVar = Parse(relevantText);
+			ProcessedIncompleteVar processedIncompleteVar;
+			try
+			{
+				processedIncompleteVar = Parse(relevantText);
+			}
+			catch (LuaIntellisenseException)
+			{
+				replaceStart = replaceEnd = cursorPos;
+				return new List<string>();
+			}
+
 			var completionObject = new CompletionObject(globals, processedIncompleteVar.Segments);
 
 			try {
-				completionObject.ProcessCompletion();
+				completionObject.ProcessAllSegments();
 			}
 			catch(LuaIntellisenseException) {
 				replaceStart = replaceEnd = cursorPos;
@@ -43,10 +53,14 @@ namespace Kerbalua.Completion {
 				BuildParseTree = true
 			};
 
-			IParseTree tree = parser.incompleteChunk();
+			var incompleteChunk = parser.incompleteChunk();
+			if (incompleteChunk.exception != null)
+			{
+				throw new LuaIntellisenseException("Could not parse incompleteChunk");
+			}
 
 			var lastIncompleteVarExtractor = new LastIncompleteVarExtractor();
-			ParseTreeWalker.Default.Walk(lastIncompleteVarExtractor, tree);
+			ParseTreeWalker.Default.Walk(lastIncompleteVarExtractor, incompleteChunk);
 			var lastIncompleteVar = lastIncompleteVarExtractor.LastIncompleteVar;
 
 			var processedIncompleteVar = new ProcessedIncompleteVar(lastIncompleteVar);

@@ -13,6 +13,7 @@ namespace RedOnion.KSP.Lua.Proxies
 		public object ProxiedObject;
 		MoonSharp.Interpreter.Script script;
 		public string MemberName;
+
 		public ProxyCallTable(MoonSharp.Interpreter.Script script,object proxiedObject,string memberName) : base(script)
 		{
 			this.script = script;

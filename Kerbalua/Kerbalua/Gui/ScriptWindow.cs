@@ -352,8 +352,7 @@ Any other key gives focus to input box.
 				repl.inputBox.content.text = "";
 				completionBox.content.text = "";
 			});
-			// For some reason having this event occur inside completionBox update
-			// makes it so that the target for completion has its cursorIndex reset to 0
+
 
 		}
 

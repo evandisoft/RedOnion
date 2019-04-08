@@ -10,11 +10,13 @@ using RedOnion.KSP.Lua;
 using Kerbalua.MoonSharp;
 using UnityEngine;
 using System.Reflection;
+using RedOnion.KSP.API;
 
 namespace KerbaluaNUnit {
 	[TestFixture()]
-	public class LUA_CompletionObjectTests {
-		public CompletionObject GetCompletionObject(Table globals,string source)
+	public class LUA_CompletionObjectTests
+	{
+		public CompletionObject GetCompletionObject(Table globals, string source)
 		{
 			var processed = LuaIntellisense.Parse(source);
 
@@ -31,26 +33,27 @@ namespace KerbaluaNUnit {
 		[Test()]
 		public void LUA_TestCase()
 		{
-			script= new Script();
-			var completion= GetCompletionObject(script.Globals,
+			script = new Script();
+			var completion = GetCompletionObject(script.Globals,
 				@"os."
 				);
 			var completions = completion.GetCurrentCompletions();
-			foreach(var c in completions)
+			foreach (var c in completions)
 			{
-				Console.WriteLine(c);
+				//Console.WriteLine(c);
 			}
 			Assert.AreEqual(2, completions.Count);
 			Assert.True(completion.ProcessNextSegment());
 			completions = completion.GetCurrentCompletions();
 			foreach (var c in completions)
 			{
-				Console.WriteLine(c);
+				//Console.WriteLine(c);
 			}
 			Assert.AreEqual(11, completions.Count);
 		}
 
-		public class Adf {
+		public class Adf
+		{
 			public Adf asdf()
 			{
 				return this;
@@ -76,85 +79,111 @@ namespace KerbaluaNUnit {
 			completions = completion.GetCurrentCompletions();
 			foreach (var c in completions)
 			{
-				Console.WriteLine(c);
+				//Console.WriteLine(c);
 			}
 			Assert.AreEqual(10, completions.Count);
 		}
 
 		[Test()]
-		public void LUA_TestCase_3_Interop()
+		public void LUA_TestCase_3()
 		{
-			script = new KerbaluaScript();
-			//script.Globals["ship"] = new Adf();
+			script = new Script(CoreModules.Preset_Complete);
+			script.Globals["ADF"] = new Adf();
 
 			var completion = GetCompletionObject(script.Globals,
-@"
-	a=ship.
-"
+				@"ADF."
 				);
 			var completions = completion.GetCurrentCompletions();
 			foreach (var c in completions)
 			{
-				Console.WriteLine(c);
+				//Console.WriteLine(c);
 			}
-			Assert.AreEqual(1, completions.Count);
-			//Assert.Throws<LuaIntellisenseException>(() => completion.ProcessNextSegment());
-		}
-
-		[Test()]
-		public void LUA_TestCase_4_Interop_2()
-		{
-			script = new KerbaluaScript();
-			//script.Globals["ship"] = new Adf();
-
-			// I think this is not quite right, but I'm done for now.
-			var completion = GetCompletionObject(script.Globals,
-@"
-	a=Vector.abs
-"
-				);
-			var completions = completion.GetCurrentCompletions();
-			foreach (var c in completions)
-			{
-				Console.WriteLine(c);
-			}
-			Assert.AreEqual(1, completions.Count);
-			completion.ProcessNextSegment();
+			Assert.AreEqual(3, completions.Count);
+			Assert.True(completion.ProcessNextSegment());
 			completions = completion.GetCurrentCompletions();
 			foreach (var c in completions)
 			{
-				Console.WriteLine(c);
+				//Console.WriteLine(c);
 			}
-			Assert.AreEqual(1, completions.Count);
+			Assert.AreEqual(10, completions.Count);
 		}
 
-		[Test()]
-		public void LUA_TestCase_5_Static()
-		{
-			script = new KerbaluaScript();
-			//script.Globals["ship"] = new Adf();
+		//		[Test()]
+		//		public void LUA_TestCase_3_Interop()
+		//		{
+		//			script = new KerbaluaScript();
+		//			//script.Globals["ship"] = new Adf();
 
-			// I think this is not quite right, but I'm done for now.
-			var completion = GetCompletionObject(script.Globals,
-@"
-	a=AssemblyStatic.
-"
-				);
-			var completions = completion.GetCurrentCompletions();
-			foreach (var c in completions)
-			{
-				Console.WriteLine(c);
-			}
-			Assert.AreEqual(1, completions.Count);
-			completion.ProcessNextSegment();
-			completions = completion.GetCurrentCompletions();
-			foreach (var c in completions)
-			{
-				Console.WriteLine(c);
-			}
-			Assembly a = Assembly.GetAssembly(typeof(System.Linq.Enumerable));
-			Console.WriteLine(a);
-			Assert.AreEqual(1, completions.Count);
-		}
+		//			var completion = GetCompletionObject(script.Globals,
+		//@"
+		//	a=ship.
+		//"
+		//				);
+		//			var completions = completion.GetCurrentCompletions();
+		//			foreach (var c in completions)
+		//			{
+		//				Console.WriteLine(c);
+		//			}
+		//			Assert.AreEqual(1, completions.Count);
+		//			//Assert.Throws<LuaIntellisenseException>(() => completion.ProcessNextSegment());
+		//		}
+
+		//		[Test()]
+		//		public void LUA_TestCase_4_Interop_2()
+		//		{
+		//			script = new KerbaluaScript();
+		//			//script.Globals["ship"] = new Adf();
+
+		//			// I think this is not quite right, but I'm done for now.
+		//			var completion = GetCompletionObject(script.Globals,
+		//@"
+		//	a=Vector.abs
+		//"
+		//				);
+		//			var completions = completion.GetCurrentCompletions();
+		//			foreach (var c in completions)
+		//			{
+		//				Console.WriteLine(c);
+		//			}
+		//			Assert.AreEqual(1, completions.Count);
+		//			completion.ProcessNextSegment();
+		//			completions = completion.GetCurrentCompletions();
+		//			foreach (var c in completions)
+		//			{
+		//				Console.WriteLine(c);
+		//			}
+		//			Assert.AreEqual(1, completions.Count);
+		//		}
+
+		//		[Test()]
+		//		public void LUA_TestCase_5_Static()
+		//		{
+		//			script = new KerbaluaScript();
+		//			//script.Globals["ship"] = new Adf();
+
+		//			// I think this is not quite right, but I'm done for now.
+		//			var completion = GetCompletionObject(script.Globals,
+		//@"
+		//	a=AssemblyStatic.
+		//"
+		//		);
+		//	var completions = completion.GetCurrentCompletions();
+		//	foreach (var c in completions)
+		//	{
+		//		Console.WriteLine(c);
+		//	}
+		//	Assert.AreEqual(1, completions.Count);
+		//	completion.ProcessNextSegment();
+		//	completions = completion.GetCurrentCompletions();
+		//	foreach (var c in completions)
+		//	{
+		//		Console.WriteLine(c);
+		//	}
+		//	Assembly a = Assembly.GetAssembly(typeof(System.Linq.Enumerable));
+		//	Console.WriteLine(a);
+		//	Assert.AreEqual(1, completions.Count);
+		//}
+
+
 	}
 }
