@@ -56,6 +56,6 @@ Feedback can be left on our forum [thread](https://forum.kerbalspaceprogram.com/
 ## Releases
 Releases are hosted at [spacedock](https://spacedock.info/mod/2116/Red%20Onion) and [curseforge](https://kerbal.curseforge.com/projects/redonion).
 
-[Planned Features](https://github.com/evandisoft/RedOnion/blob/master/ChangeLog.md#planned-features)
+[Next Release Features](https://github.com/evandisoft/RedOnion/blob/master/ChangeLog.md#planned-features)
 
-[Next Release](https://github.com/evandisoft/RedOnion/blob/master/ChangeLog.md#planned-features)
+[Planned Features](https://github.com/evandisoft/RedOnion/blob/master/ChangeLog.md#planned-features)
