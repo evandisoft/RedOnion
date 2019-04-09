@@ -16,14 +16,21 @@ partloader=Import.PartLoader.Instance
 KSP has a system for getting "the" instance of a class that sometimes involves "fetch" and sometimes uses "Instance".
 
 - Less bad autopilot. Works to some extent with control surfaces.
-- Lua no longer requires or allows "=" at start to return a value to the repl. Will automatically return the value of a lone expression entered at the repl. Note:  this only works for single expressions. (alist[0], Import.System.Collections, 1, "blah")
+- Lua no longer requires or allows "=" at start to return a value to the repl. Will automatically return the value of a lone expression entered at the repl. Note:  this only works for single expressions.
+```
+i> alist[0] -- works
+```
+```
+i> alist=new(List)
+alist[0] -- doesn't work
+```
 - Repl/Editor saves it's position, Repl visibility status, and Editor visibility status.
 - Lua now has a function for constructing types into instances. Called new(). Can construct an instance of a class using a type imported using the new Import system.
 ```
-List=Import.System.Collections.Generic.List
-alist=new(List)
-alist.Add(1)
-alist[0] -- returns 1
+i> List=Import.System.Collections.Generic.List
+i> alist=new(List)
+i> alist.Add(1)
+i> alist[0] -- returns 1
 ```
 
 # 0.2:
