@@ -10,7 +10,7 @@ libraries (included loaded mods) written in C#. You should check out the license
 - Less bad autopilot. Works to some extent with control surfaces.
 - Lua no longer requires or allows "=" at start to return a value to the repl. Will automatically return the value of a lone expression entered at the repl.
 - Repl/Editor saves it's position, Repl visibility status, and Editor visibility status.
-- Lua has a function for constructing types into instances. Called new(). Can construct an instance of a class using a type imported using the new Import system.
+- Lua now has a function for constructing types into instances. Called new(). Can construct an instance of a class using a type imported using the new Import system.
 ```
 List=Import.System.Collections.Generic.List
 alist=new(List)
