@@ -152,10 +152,10 @@ namespace Kerbalua.Completion
 			}
 			if(obj is Type)
 			{
-				convertedObj = obj.GetType();
-				return OperationsProcessorType.Instance;
+				convertedObj = obj as Type;
+				//return OperationsProcessorType.Instance;
+				return OperationsProcessorStatic.Instance;
 			}
-
 
 			convertedObj = obj.GetType();
 			return OperationsProcessorInstance.Instance;

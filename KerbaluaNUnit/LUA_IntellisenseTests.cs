@@ -65,6 +65,7 @@ namespace KerbaluaNUnit
 				@"Adf.asdfg.";
 
 			var completions = GetCompletions(source);
+
 			Assert.AreEqual(11, completions.Count);
 		}
 
@@ -93,8 +94,25 @@ namespace KerbaluaNUnit
 				@"Native.";
 
 			var completions = GetCompletions(source);
-			PrintAll(completions);
-			Assert.AreEqual(12, completions.Count);
+
+			Assert.AreEqual(107, completions.Count);
+
+			//Assert.AreEqual(11, completions.Count);
+		}
+
+		[Test()]
+		public void LUA_IntellisenseTest_NamespaceStatic()
+		{
+			Setup();
+			var allMappings = NamespaceMappings.ForAllAssemblies;
+			globals["Import"] = allMappings.GetNamespace("");
+			//globals["Adf"] = new Adf();
+			string source =
+				@"Import.System.Collections.Generic.List.";
+
+			var completions = GetCompletions(source);
+			//PrintAll(completions);
+			Assert.AreEqual(107, completions.Count);
 
 			//Assert.AreEqual(11, completions.Count);
 		}
