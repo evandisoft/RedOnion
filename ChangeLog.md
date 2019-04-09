@@ -2,12 +2,14 @@
 - New user-centric system for managing scripts. Will be a file-selection dialog or the completion area will do this.
 - Better autopilot (locking to a heading instead of a raw direction). Make Autopilot work with control surfaces.
 - Automatic documentation
+- ROS redesign
 
 # Next Release
 - Import System
 - Less bad autopilot. Works sometimes ok with control surfaces.
 - Lua no longer requires or allows "=" at start to return a value to the repl. Will automatically return the value of a lone expression entered at the repl.
 - Repl/Editor saves it's position, Repl visibility status, and Editor visibility status.
+- Lua has a function for constructing types into instances. Called new().
 
 # 0.2:
 ## 0.2.1:
