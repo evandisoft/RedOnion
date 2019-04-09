@@ -9,7 +9,7 @@
 - Lua no longer requires or allows "=" at start to return a value to the repl. Will automatically return the value of a lone expression entered at the repl.
 - Repl/Editor saves it's position, Repl visibility status, and Editor visibility status.
 
-# 0.2
+# 0.2:
 ## 0.2.1:
 - Misc Changes
 
