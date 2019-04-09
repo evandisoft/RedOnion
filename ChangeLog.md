@@ -13,7 +13,7 @@ editor=Import.EditorLogic.fetch
 ship=editor.ship
 partloader=Import.PartLoader.Instance
 ```
-KSP has a system for getting "the" instance of a class that sometimes involves "fetch" and sometimes uses "Instance".
+KSP has a system for getting "the" instance of a class that sometimes involves "fetch" and sometimes uses "Instance". You have to check which one works and use that.
 
 - Less bad autopilot. Works to some extent with control surfaces.
 - Lua no longer requires or allows "=" at start to return a value to the repl. Will automatically return the value of a lone expression entered at the repl. Note:  this only works for single expressions.
