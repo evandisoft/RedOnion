@@ -8,9 +8,14 @@ namespace RedOnion.ROS
 
 		internal class OfLong : Descriptor
 		{
-			internal OfLong() : base("long", typeof(long), ExCode.Long, TypeCode.Int64) { }
-			public override object Box(ref Value self) => self.num.Long;
-
+			internal OfLong()
+				: base("long", typeof(long), ExCode.Long, TypeCode.Int64) { }
+			public override object Box(ref Value self)
+				=> self.num.Long;
+			public override bool Equals(ref Value self, object obj)
+				=> self.num.Long.Equals(obj);
+			public override int GetHashCode(ref Value self)
+				=> self.num.Long.GetHashCode();
 			public override string ToString(ref Value self, string format, IFormatProvider provider, bool debug)
 				=> self.num.Long.ToString(format, provider);
 
@@ -85,9 +90,9 @@ namespace RedOnion.ROS
 				var rtype = rhs.desc.Primitive;
 				if (rtype != ExCode.Long)
 				{
-					if (rtype.Kind() != OpKind.Number)
+					if (!rtype.IsNumber())
 						return false;
-					if ((rtype & ExCode.fFp) != 0)
+					if (rtype.IsFloatPoint())
 					{
 						if (rtype != ExCode.Double)
 							rhs.desc.Convert(ref rhs, Double);
@@ -127,6 +132,24 @@ namespace RedOnion.ROS
 					if (rhs.num.Long == 0)
 						lhs = Value.NaN;
 					else lhs.num.Long /= rhs.num.Long;
+					return true;
+				case OpCode.Equals:
+					lhs = lhs.num.Long == rhs.num.Long;
+					return true;
+				case OpCode.Differ:
+					lhs = lhs.num.Long != rhs.num.Long;
+					return true;
+				case OpCode.Less:
+					lhs = lhs.num.Long < rhs.num.Long;
+					return true;
+				case OpCode.More:
+					lhs = lhs.num.Long > rhs.num.Long;
+					return true;
+				case OpCode.LessEq:
+					lhs = lhs.num.Long <= rhs.num.Long;
+					return true;
+				case OpCode.MoreEq:
+					lhs = lhs.num.Long >= rhs.num.Long;
 					return true;
 				}
 				return false;

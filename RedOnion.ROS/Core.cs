@@ -21,6 +21,7 @@ namespace RedOnion.ROS
 		public UserObject Globals { get; set; }
 		public OpCode Exit { get; protected set; }
 		public Value Result => result;
+		public int Countdown { get; set; }
 		public ArgumentList Arguments => vals;
 
 		protected CompiledCode compiled;
@@ -77,7 +78,10 @@ namespace RedOnion.ROS
 				while (at < code.Length)
 				{
 					if (countdown <= 0)
+					{
+						Countdown = countdown;
 						return false;
+					}
 					countdown--;
 					var op = (OpCode)code[at++];
 					switch (op)
@@ -155,6 +159,31 @@ namespace RedOnion.ROS
 						}
 						throw new NotImplementedException("Not implemented: OpCode.Create + " + op.ToString());
 
+					case OpCode.Index:
+					{
+						ref var lhs = ref vals.Top(-2);
+						if (lhs.IsReference && !lhs.desc.Get(ref lhs, lhs.num.Int))
+							throw CouldNotGet(ref lhs);
+						var idx = lhs.desc.IndexFind(ref lhs, new Arguments(Arguments, 1));
+						if (idx < 0)
+							throw InvalidOperation("'{0}' cannot be indexed by '{1}'", lhs.Name, vals.Top().ToString());
+						lhs.SetRef(idx);
+						vals.Pop(1);
+						continue;
+					}
+					case OpCode.IndexN:
+					{
+						var n = code[at++];
+						ref var it = ref vals.Top(-n);
+						if (it.IsReference && !it.desc.Get(ref it, it.num.Int))
+							throw CouldNotGet(ref it);
+						var idx = it.desc.IndexFind(ref it, new Arguments(Arguments, n-1));
+						if (idx < 0)
+							throw InvalidOperation("'{0}' cannot be indexed by '{1}'", it.Name, vals.Top().ToString());
+						it.SetRef(idx);
+						vals.Pop(n-1);
+						continue;
+					}
 					case OpCode.Dot:
 					{
 						//TODO: convert to hard index if we know the type for sure
@@ -181,6 +210,35 @@ namespace RedOnion.ROS
 						vals.Pop(1);
 						ref var it = ref vals.Top();
 						it.SetRef(ctx, idx);
+						continue;
+					}
+					case OpCode.Array:
+					{
+						byte n = code[at++];
+						ref var type = ref vals.Top(-n);
+						if (type.desc != Descriptor.Void)
+							throw new NotImplementedException("Typed array");
+						var arr = new Value[n-1];
+						for (int i = 0; i < arr.Length; i++)
+							arr[i] = vals.Top(i-arr.Length);
+						type = new Value(arr);
+						vals.Pop(n-1);
+						continue;
+					}
+
+					case OpCode.Ternary:
+					{
+						ref var cond = ref vals.Top();
+						if (cond.IsReference && !cond.desc.Get(ref cond, cond.num.Int))
+							throw CouldNotGet(ref cond);
+						if (cond.desc.Primitive != ExCode.Bool && !cond.desc.Convert(ref cond, Descriptor.Bool))
+							throw InvalidOperation("Could not convert '{0}' to boolean", cond.Name);
+						int sz = Int(code, at);
+						at += 4;
+						var it = cond.num.Bool;
+						vals.Pop();
+						if (!it)
+							at += sz + 5;
 						continue;
 					}
 
@@ -225,6 +283,12 @@ namespace RedOnion.ROS
 					case OpCode.Sub:
 					case OpCode.Mul:
 					case OpCode.Div:
+					case OpCode.Equals:
+					case OpCode.Differ:
+					case OpCode.Less:
+					case OpCode.More:
+					case OpCode.LessEq:
+					case OpCode.MoreEq:
 					{
 						ref var lhs = ref vals.Top(-2);
 						if (lhs.IsReference && !lhs.desc.Get(ref lhs, lhs.num.Int))
@@ -237,6 +301,38 @@ namespace RedOnion.ROS
 							throw InvalidOperation(
 								"Binary operator '{0}' not supported on operands '{1}' and '{2}'",
 								op.Text(), lhs.desc.Name, rhs.desc.Name);
+						vals.Pop(1);
+						continue;
+					}
+					case OpCode.LogicOr:
+					case OpCode.LogicAnd:
+					{
+						ref var lhs = ref vals.Top();
+						if (lhs.IsReference && !lhs.desc.Get(ref lhs, lhs.num.Int))
+							throw CouldNotGet(ref lhs);
+						if (lhs.desc.Primitive != ExCode.Bool && !lhs.desc.Convert(ref lhs, Descriptor.Bool))
+							throw InvalidOperation("Could not convert '{0}' to boolean", lhs.Name);
+						int sz = Int(code, at);
+						at += 4;
+						if (lhs.num.Bool == (op == OpCode.LogicOr))
+						{
+							at += sz;
+							continue;
+						}
+						vals.Pop(1);
+						continue;
+					}
+					case OpCode.Identity:
+					case OpCode.NotIdentity:
+					{
+						ref var lhs = ref vals.Top(-2);
+						if (lhs.IsReference && !lhs.desc.Get(ref lhs, lhs.num.Int))
+							throw CouldNotGet(ref lhs);
+						ref var rhs = ref vals.Top(-1);
+						if (rhs.IsReference && !rhs.desc.Get(ref rhs, rhs.num.Int))
+							throw CouldNotGet(ref rhs);
+						lhs = (lhs.desc == rhs.desc && lhs.obj == rhs.obj
+							&& lhs.num.Long == rhs.num.Long) == (op == OpCode.Identity);
 						vals.Pop(1);
 						continue;
 					}
@@ -283,6 +379,14 @@ namespace RedOnion.ROS
 						continue;
 					}
 
+					case OpCode.Else:
+					{
+						int sz = Int(code, at);
+						at += sz + 4;
+						continue;
+					}
+
+
 					default:
 						throw new NotImplementedException("Not implemented: " + op.ToString());
 					}
@@ -299,6 +403,7 @@ namespace RedOnion.ROS
 							result.desc.NameOf(result.obj, result.num.Int), result.desc.Name);
 				}
 				vals.Clear();
+				Countdown = countdown;
 				return true;
 			}
 			catch (Exception ex)

@@ -119,11 +119,11 @@ namespace RedOnion.ROS
 		Var				= 0x28, // var x[[:]type][=val] - moved to expressions that we can do if var... and for var...
 		Type			= 0x29, // 			special marker for built-in types in postfix notation
 		Array			= 0x2A, // t[n]	array declaration or creation
-		NullCol			= 0x2B, // ??		(one ?? two)
-		NullCall		= 0x2C, // ?.()
-		NullDot			= 0x2D, // ?.it
-		Ternary			= 0x2E, // ?:		(or: val1 if cond else val2)
-		Lambda			= 0x2F, // =>		(reserved)
+		BigArray		= 0x2B, // t[n]	array declaration or creation
+		NullCol			= 0x2C, // ??		(one ?? two)
+		NullCall		= 0x2D, // ?.()
+		NullDot			= 0x2E, // ?.it
+		Ternary			= 0x2F, // ?:		(or: val1 if cond else val2)
 
 	//	assign
 		Assign			= 0x30, // =
@@ -311,11 +311,11 @@ namespace RedOnion.ROS
 		Var				= 0x2028, // var x[[:]type][=val] - moved to expressions that we can do if var... and for var...
 		Type			= 0x6029, //		special marker for built-in types in postfix notation
 		Array			= 0x602A, // t[n]	array declaration or creation
-		NullCol			= 0x002B, // ??		(one ?? two)
-		NullCall		= 0x002C, // ?.()
-		NullDot			= 0x002D, // ?.it
-		Ternary			= 0x202E, // ?:		(or: val1 if cond else val2)
-		Lambda			= 0x802F, // =>		(reserved)
+		BigArray		= 0x602B, // t[n]	array declaration or creation
+		NullCol			= 0x002C, // ??		(one ?? two)
+		NullCall		= 0x002D, // ?.()
+		NullDot			= 0x002E, // ?.it
+		Ternary			= 0x202F, // ?:		(or: val1 if cond else val2)
 
 	//	assign
 		Assign			= 0x0130, // =
@@ -468,6 +468,7 @@ namespace RedOnion.ROS
 
 		Function		= 0x00DB, // method (function, procedure)
 		Def				= 0x01DB, // define method/lambda (Python)
+		Lambda			= 0x02DB, // => operator
 		Operator		= 0x00DC, // operator (type conversion or +-*/% ...)
 
 		Field			= 0x00DD, // var in class
@@ -529,6 +530,14 @@ namespace RedOnion.ROS
 			=> (OpKind)(self & (OpCode)ExCode.mKind);
 		public static OpKind Kind(this ExCode self)
 			=> (OpKind)(self & ExCode.mKind);
+		public static bool IsNumber(this ExCode self)
+			=> (OpCode)self > OpCode.String;
+		public static bool IsNumber(this OpCode self)
+			=> self > OpCode.String;
+		public static bool IsSigned(this ExCode self)
+			=> (self & ExCode.fSig) != 0;
+		public static bool IsFloatPoint(this ExCode self)
+			=> (self & ExCode.fFp) != 0;
 		public static byte NumberSize(this ExCode self)
 			=> (byte)(((ushort)(self & ExCode.mSz)) >> 8);
 		public static string Text(this OpCode self)
@@ -557,7 +566,7 @@ namespace RedOnion.ROS
 			// 0    1    2    3    4    5    6    7     8    9    A    B    C    D    E    F
 			0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00, 0x00,0x00,0x00,0x00,0x01,0x02,0x04,0x00, //0 constants
 			0x01,0x02,0x04,0x08,0x41,0x42,0x44,0x48, 0xC4,0xC8,0xCA,0x01,0x10,0x90,0x10,0x50, //1 numbers
-			0x40,0x40,0x00,0x20,0x60,0x00,0x60,0x00, 0x20,0x60,0x60,0x00,0x00,0x00,0x20,0x80, //2 special
+			0x40,0x40,0x00,0x20,0x60,0x00,0x60,0x00, 0x20,0x60,0x60,0x60,0x00,0x00,0x00,0x20, //2 special
 			0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01, 0x01,0x01,0x01,0x81,0x81,0x81,0x81,0x81, //3 assign
 			0x81,0x09,0x0A,0x0B,0x0C,0x0C,0x0D,0x0D, 0x0E,0x0E,0x0E,0x8F,0x8F,0x8F,0x8F,0x8F, //4 binary
 			0x02,0x03,0x07,0x07,0x08,0x08,0x08,0x08, 0x08,0x08,0x08,0x08,0x08,0x08,0x08,0x88, //5 logic + casts

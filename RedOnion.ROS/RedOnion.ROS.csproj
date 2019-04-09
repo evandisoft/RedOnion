@@ -38,6 +38,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Descriptors\All.cs" />
     <Compile Include="Descriptors\Bool.cs" />
     <Compile Include="Descriptors\Byte.cs" />
     <Compile Include="Descriptors\Char.cs" />
@@ -47,6 +48,7 @@
     <Compile Include="Descriptors\Int.cs" />
     <Compile Include="Descriptors\Long.cs" />
     <Compile Include="Descriptors\Null.cs" />
+    <Compile Include="Descriptors\Reflected.cs" />
     <Compile Include="Descriptors\SByte.cs" />
     <Compile Include="Descriptors\Short.cs" />
     <Compile Include="Descriptors\String.cs" />

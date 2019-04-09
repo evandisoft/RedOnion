@@ -12,8 +12,12 @@ namespace RedOnion.ROS
 		/// </summary>
 		internal class OfVoid : Descriptor
 		{
-			internal OfVoid() : base("void", typeof(void), ExCode.Void, TypeCode.DBNull) { }
-
+			internal OfVoid()
+				: base("void", typeof(void), ExCode.Void, TypeCode.DBNull) { }
+			public override bool Equals(ref Value self, object obj)
+				=> false;
+			public override int GetHashCode(ref Value self)
+				=> ~0;
 			public override string ToString(ref Value self, string format, IFormatProvider provider, bool debug)
 				=> debug ? "void" : throw new InvalidOperationException("void");
 		}

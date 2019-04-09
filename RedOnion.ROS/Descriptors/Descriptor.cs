@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace RedOnion.ROS
 {
@@ -10,6 +11,10 @@ namespace RedOnion.ROS
 		public ExCode Primitive { get; }
 		public TypeCode TypeCode { get; }
 		public virtual object Box(ref Value self) => self.obj;
+		public virtual bool Equals(ref Value self, object obj)
+			=> self.obj.Equals(obj);
+		public virtual int GetHashCode(ref Value self)
+			=> self.obj.GetHashCode();
 
 		protected Descriptor(string name, Type type)
 		{
@@ -44,10 +49,28 @@ namespace RedOnion.ROS
 		public virtual bool Binary(ref Value lhs, OpCode op, ref Value rhs) => false;
 		public virtual bool Call(ref Value result, ref Value self, Arguments args, bool create) => false;
 		public virtual int Find(object self, string name, bool add) => -1;
-		public virtual int IndexFind(object self, Arguments args) => -1;
 		public virtual string NameOf(object self, int at) => null;
 		public virtual bool Get(ref Value self, int at) => false;
 		public virtual bool Set(ref Value self, int at, OpCode op, ref Value value) => false;
 		public virtual IEnumerator<Value> Enumerate(ref Value self) => null;
+
+		public virtual int IndexFind(ref Value self, Arguments args)
+		{
+			if (args.Length == 0)
+				return -1;
+			var index = args[0];
+			int at;
+			if (index.IsNumber)
+				return -1;
+			if (!index.desc.Convert(ref index, String))
+				return -1;
+			var name = index.obj.ToString();
+			at = Find(self.obj, name, true);
+			if (at < 0 || args.Length == 1)
+				return at;
+			if (!Get(ref self, at))
+				return -1;
+			return self.desc.IndexFind(ref self, new Arguments(args, args.Length-1));
+		}
 	}
 }
