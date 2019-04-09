@@ -6,8 +6,15 @@
 
 # Next Release
 - Import System: `List=Import.System.Collections.Generic.List`. Using the Import system you can interact with any loaded
-libraries (included loaded mods) written in C#. You should check out the licenses of those mods/libraries prior to writing any code that depends on them. However, many mods have very permissive licenses.
-- All of the C# classes that were in the CommonScriptAPI will only be available through the Import system. (At least for Lua)
+libraries (included loaded mods) written in C#. You should check out the licenses of those mods/libraries prior to writing any code that depends on them. However, many mods have very permissive licenses. This feature organizes all types in the namespace they are found in C#.
+- For Lua, All of the C# classes that were in the CommonScriptAPI will only be available through the Import system. Most are in the default namespace "". Example:
+```
+editor=Import.EditorLogic.fetch
+ship=editor.ship
+partloader=Import.PartLoader.Instance
+```
+KSP has a system for getting "the" instance of a class that sometimes involves "fetch" and sometimes uses "Instance".
+
 - Less bad autopilot. Works to some extent with control surfaces.
 - Lua no longer requires or allows "=" at start to return a value to the repl. Will automatically return the value of a lone expression entered at the repl.
 - Repl/Editor saves it's position, Repl visibility status, and Editor visibility status.
