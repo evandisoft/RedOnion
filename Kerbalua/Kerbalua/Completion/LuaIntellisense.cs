@@ -28,19 +28,55 @@ namespace Kerbalua.Completion {
 				return new List<string>();
 			}
 
-			var completionObject = new CompletionObject(globals, processedIncompleteVar.Segments);
+			var operations = new CompletionOperations(processedIncompleteVar.Segments);
 
-			try {
-				completionObject.ProcessAllSegments();
+
+			object currentObject = globals;
+
+			try
+			{
+				while (!operations.LastOperation)
+				{
+					if (operations.IsFinished)
+					{
+						throw new LuaIntellisenseException("Operations should not have been finished ");
+					}
+
+					if (!OperationsProcessor.TryProcessOperation(currentObject, operations, out currentObject))
+					{
+						replaceStart = replaceEnd = cursorPos;
+						return new List<string>();
+					}
+				}
 			}
-			catch(LuaIntellisenseException) {
+			catch (LuaIntellisenseException)
+			{
 				replaceStart = replaceEnd = cursorPos;
 				return new List<string>();
 			}
-			string Partial = completionObject.CurrentPartial;
-			replaceStart = cursorPos - Partial.Length;
-			replaceEnd = cursorPos;
-			return completionObject.GetCurrentCompletions();
+
+			var lastOp = operations.Current;
+			if(lastOp is GetMemberOperation getMemberOperation)
+			{
+				string lowercasePartial = getMemberOperation.Name.ToLower();
+				List<string> completions = new List<string>();
+				foreach(var possibleCompletion in OperationsProcessor
+					.StaticGetPossibleCompletions(currentObject))
+				{
+					if (possibleCompletion.ToLower().Contains(lowercasePartial))
+					{
+						completions.Add(possibleCompletion);
+					}
+				}
+				completions.Sort();
+				replaceStart = cursorPos - lowercasePartial.Length;
+				replaceEnd = cursorPos;
+
+				return completions;
+			}
+
+			replaceStart = replaceEnd = cursorPos;
+			return new List<string>();
 		}
 
 		static public ProcessedIncompleteVar Parse(string str)

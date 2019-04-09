@@ -23,13 +23,24 @@ namespace RedOnion.KSP.ReflectionUtil
 				return UserData.CreateStatic(type);
 			}
 
-			throw new Exception("No type or subnamespace named " + index + " found in namespace " + NamespaceString);
+			throw new Exception("No type or subnamespace named " + index + " found in namespace " + ToString());
 		}
 
 		public DynValue MetaIndex(MoonSharp.Interpreter.Script script, string metaname)
 		{
-			throw new NotImplementedException();
+			//if (metaname == "__tostring")
+			//{
+			//	return DynValue.FromObject(script, new CallbackFunction(ToString));
+			//}
+
+			return null;
 		}
+
+		//DynValue ToString(ScriptExecutionContext arg1, CallbackArguments args)
+		//{
+		//	return DynValue.FromObject(arg1.OwnerScript,ToString());
+		//}
+
 
 		public bool SetIndex(MoonSharp.Interpreter.Script script, DynValue index, DynValue value, bool isDirectIndexing)
 		{

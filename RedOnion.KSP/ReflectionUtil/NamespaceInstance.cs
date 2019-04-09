@@ -263,7 +263,7 @@ namespace RedOnion.KSP.ReflectionUtil
 
 		public override string ToString()
 		{
-			return NamespaceString;
+			return "\""+NamespaceString+"\"";
 		}
 
 		/// <summary>

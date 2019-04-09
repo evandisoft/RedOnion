@@ -73,19 +73,18 @@ namespace Kerbalua.Other
 				{
 					isComplete = true;
 
-					if (dynResult.UserData == null)
+					if (dynResult.Type==DataType.String)
 					{
-						result += dynResult;
+						result = "\"" + dynResult.ToObject() + "\"";
+					}
+					else if (dynResult.Type == DataType.Nil || dynResult.Type== DataType.Void)
+					{
+						result = dynResult.ToString();
 					}
 					else
 					{
-						result += dynResult.UserData.Object;
-						if (dynResult.UserData.Object == null)
-						{
-							result += " (" + dynResult.UserData.Object.GetType() + ")";
-						}
+						result += dynResult.ToObject().ToString();
 					}
-
 				}
 				else
 				{

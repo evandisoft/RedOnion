@@ -65,13 +65,13 @@ namespace RedOnion.KSP.API
 		public static object LuaNew(object obj, params DynValue[] dynArgs)
 		{
 			Type t = null;
-			if(obj is Type)
-			{
-				t = obj as Type;
-			}
-			if (obj is DynValue dynValue && dynValue.Type==DataType.UserData)
+			if (obj is DynValue dynValue && dynValue.Type==DataType.UserData && dynValue.UserData.Object==null)
 			{
 				t = dynValue.UserData.Descriptor.Type;
+			}
+			else if(obj is Type)
+			{
+				t = obj as Type;
 			}
 			else
 			{

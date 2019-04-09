@@ -95,6 +95,12 @@ namespace RedOnion.KSP.ReflectionUtil
 			{
 				foreach (var type in assembly.GetTypes())
 				{
+					char startChar = type.Name[0];
+					if(startChar == '<' || startChar == '$' || startChar == '_')
+					{
+						continue;
+					}
+
 					string namespaceString = type.Namespace ?? "";
 					if (!NamespaceToNameTypeMap.ContainsKey(namespaceString))
 					{

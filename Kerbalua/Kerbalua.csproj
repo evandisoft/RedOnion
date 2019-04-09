@@ -118,14 +118,21 @@
     <Compile Include="Kerbalua\Completion\Grammar\IncompleteLuaVisitor.cs" />
     <Compile Include="Kerbalua\Completion\ProcessedIncompleteVar.cs" />
     <Compile Include="Kerbalua\Completion\LuaIntellisenseException.cs" />
-    <Compile Include="Kerbalua\Completion\CompletionObject.cs" />
     <Compile Include="Kerbalua\Utility\Settings.cs" />
     <Compile Include="Kerbalua\Other\Evaluation.cs" />
     <Compile Include="Kerbalua\Parsing\IncompleteLuaParsing.cs" />
     <Compile Include="Kerbalua\MoonSharp\KerbaluaScript.cs" />
-    <Compile Include="Kerbalua\Completion\TableCompletable.cs" />
-    <Compile Include="Kerbalua\Completion\TypeCompletable.cs" />
-    <Compile Include="Kerbalua\Completion\CompletionObjectOld.cs" />
+    <Compile Include="Kerbalua\Completion\OperationsProcessorStatic.cs" />
+    <Compile Include="Kerbalua\Completion\OperationsProcessorInstance.cs" />
+    <Compile Include="Kerbalua\Completion\OperationsProcessorType.cs" />
+    <Compile Include="Kerbalua\Completion\OperationsProcessorICompletable.cs" />
+    <Compile Include="Kerbalua\Completion\OperationsProcessorTable.cs" />
+    <Compile Include="Kerbalua\Completion\OperationsProcessor.cs" />
+    <Compile Include="Kerbalua\Completion\CompletionOperation.cs" />
+    <Compile Include="Kerbalua\Completion\CompletionOperations.cs" />
+    <Compile Include="Kerbalua\Completion\CompletionReflectionUtil.cs" />
+    <Compile Include="Kerbalua\Completion\Instance.cs" />
+    <Compile Include="Kerbalua\Completion\OperationsProcessorNative.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
