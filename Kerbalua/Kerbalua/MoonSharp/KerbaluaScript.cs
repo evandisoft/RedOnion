@@ -97,6 +97,11 @@ namespace Kerbalua.MoonSharp
 				}
 				return DynValue.FromObject(this,o.GetType());
 			});
+
+			Globals["printall"] = DoString(
+			@"
+				return function(lst) for i=0,lst.Count-1 do print(i..' '..lst[i].ToString()) end end
+				");
 			//Globals["unity"] = Assembly.GetAssembly(typeof(Vector3));
 			//Globals["Assembly"] = typeof(Assembly);
 			//Assembly blah;

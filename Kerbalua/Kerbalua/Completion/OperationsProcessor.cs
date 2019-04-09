@@ -93,6 +93,11 @@ namespace Kerbalua.Completion
 
 		static public OperationsProcessor GetCompletionProcessor(object obj,out object convertedObj)
 		{
+			if (obj == null)
+			{
+				throw new LuaIntellisenseException("object is null in " + nameof(GetCompletionProcessor));
+			}
+
 			obj = GetProxy(obj);
 
 			if (obj is Instance instance)

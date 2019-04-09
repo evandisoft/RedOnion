@@ -15,6 +15,7 @@ namespace Kerbalua.Gui
 		{
 			Rect absoluteRect = new Rect();
 			Vector2 absoluteRectStart = GUIUtility.GUIToScreenPoint(new Vector2(rect.x, rect.y));
+			//Debug.Log(absoluteRectStart);
 			absoluteRect.x = absoluteRectStart.x;
 			absoluteRect.y = absoluteRectStart.y;
 			absoluteRect.width = rect.width;

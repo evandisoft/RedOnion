@@ -403,8 +403,10 @@ Any other key gives focus to input box.
 		bool hadMouseDownLastUpdate = false;
 		public void Update()
 		{
+
 			//UnityEngine.Debug.Log("blah");
 			SetOrReleaseInputLock();
+
 			completionManager.Update(hadMouseDownLastUpdate);
 			hadMouseDownLastUpdate = false;
 
@@ -422,79 +424,7 @@ Any other key gives focus to input box.
 			//GlobalKeyBindings.ExecuteAndConsumeIfMatched(Event.current)
 		}
 
-		Rect GetCurrentWindowRect()
-		{
-			Rect currentWindowRect = new Rect(mainWindowRect);
-			if (!editorVisible)
-			{
-				currentWindowRect.x += editorRect.width;
-				currentWindowRect.width -= editorRect.width;
-			}
-			if (!replVisible)
-			{
-				currentWindowRect.width -= replRect.width;
-			}
-			if (!replVisible && !editorVisible)
-			{
-				currentWindowRect.width -= completionBoxRect.width;
-			}
-			return currentWindowRect;
-		}
 
-		Rect GetCurrentEditorRect()
-		{
-			Rect currentEditorRect = new Rect(editorRect);
-			float scriptNameHeight = GetCurrentScriptNameRect().height;
-			currentEditorRect.y += scriptNameHeight;
-			currentEditorRect.height = currentEditorRect.height - scriptNameHeight;
-
-			return currentEditorRect;
-		}
-
-		Rect GetCurrentScriptNameRect()
-		{
-			Rect currentScriptNameRect = new Rect();
-			currentScriptNameRect.y = titleHeight;
-			currentScriptNameRect.x = 0;
-			currentScriptNameRect.width = editorRect.width;
-			currentScriptNameRect.height = 25;
-			return currentScriptNameRect;
-		}
-
-		Rect GetCurrentWidgetBarRect()
-		{
-			Rect currentWidgetRect = new Rect(widgetBarRect);
-			if (!editorVisible)
-			{
-				currentWidgetRect.x -= editorRect.width;
-			}
-			return currentWidgetRect;
-		}
-
-		Rect GetCurrentReplRect()
-		{
-			Rect currentReplRect = new Rect(replRect);
-			if (!editorVisible)
-			{
-				currentReplRect.x -= editorRect.width;
-			}
-			return currentReplRect;
-		}
-
-		Rect GetCurrentCompletionBoxRect()
-		{
-			Rect currentCompletionBoxRect = new Rect(completionBoxRect);
-			if (!editorVisible)
-			{
-				currentCompletionBoxRect.x -= editorRect.width;
-			}
-			if (!replVisible)
-			{
-				currentCompletionBoxRect.x -= replRect.width;
-			}
-
-			return currentCompletionBoxRect;
-		}
 
 		/// <summary>
 		/// To make input handling simpler, only the repl and button bar are in
@@ -506,6 +436,7 @@ Any other key gives focus to input box.
 		/// <param name="id">Identifier.</param>
 		void MainWindow(int id)
 		{
+
 			if (currentEvaluation != null
 					&& Event.current.type == EventType.KeyDown
 					&& Event.current.keyCode == KeyCode.C
@@ -619,7 +550,10 @@ Any other key gives focus to input box.
 				bool lastEventWasMouseDown = Event.current.type == EventType.MouseDown;
 				string lastControlname = GUI.GetNameOfFocusedControl();
 				//completionBoxRect = UpdateBoxPositionWithWindow(completionBoxRect, mainWindowRect.width);
-
+				if (inputIsLocked && Event.current.type == EventType.scrollWheel)
+				{
+					Event.current.Use();
+				}
 				completionBox.Update(GetCurrentCompletionBoxRect());
 				if (lastEventWasMouseDown && Event.current.type == EventType.Used)
 				{
@@ -639,7 +573,80 @@ Any other key gives focus to input box.
 					}
 				}
 			}
+		}
 
+		Rect GetCurrentWindowRect()
+		{
+			Rect currentWindowRect = new Rect(mainWindowRect);
+			if (!editorVisible)
+			{
+				currentWindowRect.x += editorRect.width;
+				currentWindowRect.width -= editorRect.width;
+			}
+			if (!replVisible)
+			{
+				currentWindowRect.width -= replRect.width;
+			}
+			if (!replVisible && !editorVisible)
+			{
+				currentWindowRect.width -= completionBoxRect.width;
+			}
+			return currentWindowRect;
+		}
+
+		Rect GetCurrentEditorRect()
+		{
+			Rect currentEditorRect = new Rect(editorRect);
+			float scriptNameHeight = GetCurrentScriptNameRect().height;
+			currentEditorRect.y += scriptNameHeight;
+			currentEditorRect.height = currentEditorRect.height - scriptNameHeight;
+
+			return currentEditorRect;
+		}
+
+		Rect GetCurrentScriptNameRect()
+		{
+			Rect currentScriptNameRect = new Rect();
+			currentScriptNameRect.y = titleHeight;
+			currentScriptNameRect.x = 0;
+			currentScriptNameRect.width = editorRect.width;
+			currentScriptNameRect.height = 25;
+			return currentScriptNameRect;
+		}
+
+		Rect GetCurrentWidgetBarRect()
+		{
+			Rect currentWidgetRect = new Rect(widgetBarRect);
+			if (!editorVisible)
+			{
+				currentWidgetRect.x -= editorRect.width;
+			}
+			return currentWidgetRect;
+		}
+
+		Rect GetCurrentReplRect()
+		{
+			Rect currentReplRect = new Rect(replRect);
+			if (!editorVisible)
+			{
+				currentReplRect.x -= editorRect.width;
+			}
+			return currentReplRect;
+		}
+
+		Rect GetCurrentCompletionBoxRect()
+		{
+			Rect currentCompletionBoxRect = new Rect(completionBoxRect);
+			if (!editorVisible)
+			{
+				currentCompletionBoxRect.x -= editorRect.width;
+			}
+			if (!replVisible)
+			{
+				currentCompletionBoxRect.x -= replRect.width;
+			}
+
+			return currentCompletionBoxRect;
 		}
 	}
 }
