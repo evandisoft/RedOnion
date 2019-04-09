@@ -28,9 +28,13 @@ alist[0] -- doesn't work
 - Lua now has a function for constructing types into instances. Called new(). Can construct an instance of a class using a type imported using the new Import system.
 ```
 i> List=Import.System.Collections.Generic.List
+r> void
 i> alist=new(List)
+r> void
 i> alist.Add(1)
-i> alist[0] -- returns 1
+r> void
+i> alist[0]
+r> 1
 ```
 
 # 0.2:
