@@ -44,7 +44,7 @@ namespace RedOnion.KSP.ReflectionUtil
 
 		public bool SetIndex(MoonSharp.Interpreter.Script script, DynValue index, DynValue value, bool isDirectIndexing)
 		{
-			throw new NotImplementedException();
+			throw new NotSupportedException("Cannot modify fields of "+nameof(NamespaceInstance));
 		}
 	}
 }

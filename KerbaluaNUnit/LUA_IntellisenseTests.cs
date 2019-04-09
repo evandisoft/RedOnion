@@ -112,7 +112,25 @@ namespace KerbaluaNUnit
 
 			var completions = GetCompletions(source);
 			//PrintAll(completions);
-			Assert.AreEqual(107, completions.Count);
+			Assert.AreEqual(1, completions.Count);
+
+			//Assert.AreEqual(11, completions.Count);
+		}
+
+		[Test()]
+		public void LUA_IntellisenseTest_Action()
+		{
+			Setup();
+			var allMappings = NamespaceMappings.ForAllAssemblies;
+			globals["Import"] = allMappings.GetNamespace("");
+			//globals["Adf"] = new Adf();
+			string source =
+				@"Import.System.";
+			Console.WriteLine(allMappings.GetNamespace("")
+				.GetSubNamespace("System").GetType("Action"));
+			var completions = GetCompletions(source);
+			//PrintAll(completions);
+			Assert.AreEqual(1, completions.Count);
 
 			//Assert.AreEqual(11, completions.Count);
 		}

@@ -65,11 +65,11 @@ namespace RedOnion.KSP.API
 		public static object LuaNew(object obj, params DynValue[] dynArgs)
 		{
 			Type t = null;
-			if (obj is DynValue dynValue && dynValue.Type==DataType.UserData && dynValue.UserData.Object==null)
+			if (obj is DynValue dynValue && dynValue.Type == DataType.UserData && dynValue.UserData.Object == null)
 			{
 				t = dynValue.UserData.Descriptor.Type;
 			}
-			else if(obj is Type)
+			else if (obj is Type)
 			{
 				t = obj as Type;
 			}
@@ -147,6 +147,8 @@ namespace RedOnion.KSP.API
 				if (args.Count <= 1)
 					throw new InvalidOperationException("Expected at least one argument");
 				var arg = args[1];
+
+
 				Type t = arg.Type == DataType.String ? ResolveType(arg.String) : ResolveType(arg.ToObject());
 				return DynValue.FromObject(ctx.OwnerScript, LuaNew(t, args.GetArray(2)));
 			}

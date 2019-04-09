@@ -107,7 +107,7 @@ namespace Kerbalua.MoonSharp
 			//Assembly blah;
 			Globals["Import"] = allMappings.GetNamespace("");
 			//Globals["Coll"] = allMappings.GetNamespace("System.Collections.Generic");
-
+			Globals["reldir"] = new Func<double, double, RelDir>((heading, pitch) => new RelDir(heading, pitch));
 			//Globals["AppDomain"] = UserData.CreateStatic(typeof(AppDomain));
 			//Globals["AssemblyStatic"] = UserData.CreateStatic(typeof(Assembly));
 			//Globals["UI"] = new UI();

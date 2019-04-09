@@ -18,6 +18,7 @@ namespace RedOnion.KSP.Autopilot
 
 		public enum SpinMode
 		{
+			SET_RELDIR,
 			SET_DIR,
 			SET_SPIN,
 			RAW,
@@ -56,6 +57,21 @@ namespace RedOnion.KSP.Autopilot
 			}
 		}
 
+		RelativeDirection targetRel = new RelativeDirection();
+		public RelativeDirection TargetRel
+		{
+			get
+			{
+				return targetRel;
+			}
+			set
+			{
+				Enable();
+				CurrentSpinMode = SpinMode.SET_RELDIR;
+				targetRel = value;
+			}
+		}
+
 		public void SetSpin(float x, float y, float z)
 		{
 			TargetSpin = new Vector3(x, y, z);
@@ -74,6 +90,12 @@ namespace RedOnion.KSP.Autopilot
 		protected FlightControl()
 		{
 			CurrentSpinMode = SpinMode.OFF;
+		}
+
+
+		public void SetRel(double heading,double pitch)
+		{
+			TargetRel = new RelativeDirection(heading, pitch);
 		}
 
 		/// <summary>
@@ -160,6 +182,7 @@ namespace RedOnion.KSP.Autopilot
 		void ControlCallback(FlightCtrlState flightCtrlState)
 		{
 			//flightCtrlState.CopyFrom(userCtrlState);
+			Vessel vessel = FlightGlobals.ActiveVessel;
 			switch (CurrentSpinMode)
 			{
 				case SpinMode.SET_SPIN:
@@ -171,6 +194,13 @@ namespace RedOnion.KSP.Autopilot
 				case SpinMode.RAW:
 					SetPitchRollYaw(flightCtrlState, new Vector3(
 						userCtrlState.pitch, userCtrlState.roll, userCtrlState.yaw));
+					break;
+				case SpinMode.SET_RELDIR:
+					if(targetRel.TryGetCurrentDir(vessel,out Vector3 dir))
+					{
+						targetDir = dir;
+					}
+					SetDir(flightCtrlState);
 					break;
 			}
 		}

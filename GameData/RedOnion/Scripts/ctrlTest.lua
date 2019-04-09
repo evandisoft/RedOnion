@@ -1,8 +1,3 @@
-vessel=Ksp.FlightGlobals.ActiveVessel
-while true do
-    print(vessel.ctrlState.roll)
-    print(vessel.ctrlState.yaw)
-    print(vessel.ctrlState.pitch)
-    coroutine.yield()
-end
+vessel=Import.FlightGlobals.ActiveVessel
+ctrl=Import.RedOnion.KSP.Autopilot.FlightControl.GetInstance()
 
