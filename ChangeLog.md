@@ -1,7 +1,7 @@
 # Planned Features
 - New user-centric system for managing scripts. Will be a file-selection dialog or the completion area will do this.
 - Automatic documentation.
-- ROS redesign.
+- ROS redesign. Allowing pause and continue features (something similar to coroutine.yield())
 - Better Autopilot. Needs to handle all torque possibilities, work better with control structures, and probably use PIDs. I'd also like a better relative direction system that does not go wonky near the poles for polar orbits. Example: You're approaching north pole, you've specified your ship to have a heading of due north, then suddenly you reach the north pole and now instantly your ship is headed south. I'm sure there's a better way to do this.
 - Editor/Repl reimplementation in new library. Hopefully allowing multiple editors/repls open at a time.
 - Ability to run multiple scripts at a time and manage them.
@@ -9,6 +9,7 @@
 - Ingame testing framework.
 - Ingame debugging.
 - Make editor more of an open general tool for editing.
+- More work on UI library.
 
 # Next Release
 - Import System: `List=Import.System.Collections.Generic.List`. Using the Import system you can interact with any loaded
