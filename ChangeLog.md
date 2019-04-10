@@ -1,10 +1,11 @@
 # Planned Features
 - New user-centric system for managing scripts. Will be a file-selection dialog or the completion area will do this.
-- Automatic documentation
-- ROS redesign
-- Better Autopilot
-- Editor/Repl reimplementation
+- Automatic documentation.
+- ROS redesign.
+- Better Autopilot.
+- Editor/Repl reimplementation in new library. Hopefully allowing multiple editors/repls open at a time.
 - Ability to run multiple scripts at a time and manage them.
+- Lots of new GUI's built on new gui library.
 
 # Next Release
 - Import System: `List=Import.System.Collections.Generic.List`. Using the Import system you can interact with any loaded
