@@ -17,7 +17,9 @@ namespace RedOnion.KSP.API
 
 		new IMember[]
 		{
-			new Interop("reflect", "Reflect", "All the reflection stuff.",
+			new Interop("reflect", "Reflect", "All the reflection stuff and namespaces.",
+				() => Reflect.Instance),
+			new Interop("native", "Reflect", "Alias to `reflect` because of the namespaces.",
 				() => Reflect.Instance),
 			new Interop("ship", "Ship", "Active vessel (in flight or editor).",
 				() => Ship.Instance),
