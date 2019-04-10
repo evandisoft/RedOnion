@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using RedOnion.Script;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
+using RedOnion.KSP.Completion;
 
 namespace RedOnion.KSP.API
 {
@@ -42,7 +43,7 @@ namespace RedOnion.KSP.API
 		});
 	}
 	[IgnoreForDocs]
-	public class Globals : Table, IObject, IType
+	public class Globals : Table, IObject, IType, IHasCompletionProxy
 	{
 		public MemberList Members => GlobalMembers.MemberList;
 		public static Globals Instance { get; } = new Globals();
@@ -110,6 +111,8 @@ namespace RedOnion.KSP.API
 		Value IObject.Value => new Value("Globals");
 		Type IObject.Type => null;
 		object IObject.Target => null;
+
+
 		bool IObject.Modify(string name, OpCode op, Value value) => false;
 		IObject IObject.Create(Arguments args) => null;
 		Value IObject.Index(Arguments args) => Value.Undefined;
@@ -123,5 +126,7 @@ namespace RedOnion.KSP.API
 			result = Value.Undefined;
 			return false;
 		}
+
+		public object CompletionProxy => Members;
 	}
 }

@@ -5,6 +5,8 @@ using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
 using RedOnion.Script.Utilities;
 using System.Collections;
+using RedOnion.KSP.Completion;
+using System.Linq;
 
 namespace RedOnion.KSP.API
 {
@@ -27,7 +29,7 @@ namespace RedOnion.KSP.API
 	/// <summary>
 	/// Sorted list/dictionary of object members with all the documentation.
 	/// </summary>
-	public class MemberList : IEnumerable<IMember>
+	public class MemberList : IEnumerable<IMember>, ICompletable
 	{
 		//TODO: function signatures
 		Dictionary<string, IMember> dict;
@@ -53,6 +55,9 @@ namespace RedOnion.KSP.API
 			=> GetEnumerator();
 		public int Count => list.Length;
 		public int Length => list.Length;
+
+		public IList<string> PossibleCompletions => dict.Keys.ToList();
+
 		public IMember this[int i] => list[i];
 		public IMember this[string name]
 		{
@@ -62,6 +67,17 @@ namespace RedOnion.KSP.API
 			=> dict.ContainsKey(name);
 		public bool TryGetValue(string name, out IMember member)
 			=> dict.TryGetValue(name, out member);
+
+		public bool TryGetCompletion(string completionName, out object completion)
+		{
+			if(TryGetValue(completionName, out IMember member))
+			{
+				completion = member;
+				return true;
+			}
+			completion = null;
+			return false;
+		}
 	}
 	/// <summary>
 	/// Documentation and list of members for the type.

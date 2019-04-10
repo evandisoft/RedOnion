@@ -96,6 +96,7 @@
     <Compile Include="Completion\IHasCompletionProxy.cs" />
     <Compile Include="ReflectionUtil\NamespaceInstance.Lua.cs" />
     <Compile Include="Autopilot\RelativeDirection.cs" />
+    <Compile Include="ReflectionUtil\DualCaseSensitivityDict.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RedOnion.Script\RedOnion.Script.csproj">

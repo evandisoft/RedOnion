@@ -55,28 +55,28 @@ namespace RedOnion.KSP.ReflectionUtil
 
 
 
-		/// <summary>
-		/// List of all the RawTypeNames in the current namespace. Raw typenames are of the form
-		/// 'HashSet`n', where n is the number of type parameters. If ` is not present, number
-		/// of type parameters is 0.
-		/// </summary>
-		/// <value>The raw type names.</value>
-		public List<string> RawTypeNames
-		{
-			get
-			{
-				if (NamespaceMappings
-					.NamespaceRawTypeNamesMap
-					.TryGetValue(NamespaceString, out List<string> completions))
-				{
-					return completions;
-				}
+		///// <summary>
+		///// List of all the RawTypeNames in the current namespace. Raw typenames are of the form
+		///// 'HashSet`n', where n is the number of type parameters. If ` is not present, number
+		///// of type parameters is 0.
+		///// </summary>
+		///// <value>The raw type names.</value>
+		//public List<string> RawTypeNames
+		//{
+		//	get
+		//	{
+		//		if (NamespaceMappings
+		//			.NamespaceRawTypeNamesMap
+		//			.TryGetValue(NamespaceString, out List<string> completions))
+		//		{
+		//			return completions;
+		//		}
 
-				// Should only happen if somehow this namespace instance starts out being legitimate
-				// but later ends up not being so by the associated mappings changing.
-				throw new Exception("Possible completions for namespace \"" + NamespaceString + "\" not found.");
-			}
-		}
+		//		// Should only happen if somehow this namespace instance starts out being legitimate
+		//		// but later ends up not being so by the associated mappings changing.
+		//		throw new Exception("Possible completions for namespace \"" + NamespaceString + "\" not found.");
+		//	}
+		//}
 
 
 		public NamespaceInstance(string namespaceString, NamespaceMappings namespaceMappings)

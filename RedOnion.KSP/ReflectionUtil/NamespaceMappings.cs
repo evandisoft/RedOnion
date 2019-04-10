@@ -32,15 +32,15 @@ namespace RedOnion.KSP.ReflectionUtil
 			}
 		}
 
-		public Dictionary<string, NameTypeMap> NamespaceToNameTypeMap = new Dictionary<string, NameTypeMap>();
-		public Dictionary<string, List<string>> NamespaceContinuationMap = new Dictionary<string, List<string>>();
+		public DualCaseSensitivityDict<NameTypeMap> NamespaceToNameTypeMap = new DualCaseSensitivityDict<NameTypeMap>();
+		public DualCaseSensitivityDict<List<string>> NamespaceContinuationMap = new DualCaseSensitivityDict<List<string>>();
 		/// <summary>
 		/// Map of namespace to possible completions. The completions consist of all the
 		/// possible namespace continuations from the given namespace as well as
 		/// all the base type names. By base I mean "HashSet" instead of "HashSet`1"
 		/// </summary>
-		public Dictionary<string, List<string>> NamespaceCompletionMap = new Dictionary<string, List<string>>();
-		public Dictionary<string, List<string>> NamespaceRawTypeNamesMap = new Dictionary<string, List<string>>();
+		public DualCaseSensitivityDict<List<string>> NamespaceCompletionMap = new DualCaseSensitivityDict<List<string>>();
+		//public Dictionary<string, List<string>> NamespaceRawTypeNamesMap = new Dictionary<string, List<string>>();
 
 		public NamespaceInstance GetNamespace(string namespaceString)
 		{
@@ -85,10 +85,10 @@ namespace RedOnion.KSP.ReflectionUtil
 		{
 			var assemblies = GetAssemblies();
 
-			NamespaceToNameTypeMap = new Dictionary<string, NameTypeMap>();
-			NamespaceContinuationMap = new Dictionary<string, List<string>>();
-			NamespaceCompletionMap = new Dictionary<string, List<string>>();
-			NamespaceRawTypeNamesMap = new Dictionary<string, List<string>>();
+			NamespaceToNameTypeMap = new DualCaseSensitivityDict<NameTypeMap>();
+			NamespaceContinuationMap = new DualCaseSensitivityDict<List<string>>();
+			NamespaceCompletionMap = new DualCaseSensitivityDict<List<string>>();
+			//NamespaceRawTypeNamesMap = new Dictionary<string, List<string>>();
 
 			HashSet<string> namespaceStrings = new HashSet<string>();
 			foreach (var assembly in assemblies)
@@ -141,11 +141,11 @@ namespace RedOnion.KSP.ReflectionUtil
 				NamespaceCompletionMap[namespaceString].AddRange(NamespaceToNameTypeMap[namespaceString].BaseTypeNames);
 				NamespaceCompletionMap[namespaceString].AddRange(NamespaceContinuationMap[namespaceString]);
 
-				NamespaceRawTypeNamesMap[namespaceString] = new List<string>();
-				NamespaceRawTypeNamesMap[namespaceString].AddRange(NamespaceToNameTypeMap[namespaceString].RawTypeNames);
+				//NamespaceRawTypeNamesMap[namespaceString] = new List<string>();
+				//NamespaceRawTypeNamesMap[namespaceString].AddRange(NamespaceToNameTypeMap[namespaceString].RawTypeNames);
 
 				NamespaceCompletionMap[namespaceString].Sort();
-				NamespaceRawTypeNamesMap[namespaceString].Sort();
+				//NamespaceRawTypeNamesMap[namespaceString].Sort();
 			}
 		}
 
