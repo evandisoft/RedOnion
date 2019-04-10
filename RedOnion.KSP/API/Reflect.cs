@@ -9,7 +9,9 @@ using RedOnion.KSP.Completion;
 
 namespace RedOnion.KSP.API
 {
-	public class Reflect : InteropObject, ICompletable
+	// RedOnion.Builder again had some problems
+	[ProxyDocs(typeof(Reflect))]
+	public static class ReflectMembers
 	{
 		public static MemberList MemberList { get; } = new MemberList(
 		ObjectFeatures.Function,
@@ -25,16 +27,20 @@ returned by `AppDomain.CurrentDomain.GetAssemblies()`.",
 			new Function("new", "object",
 @"Construct new object given type or object and arguments.
 Example: `reflect.new(""System.Collections.ArrayList"")`.",
-				() => Constructor.Instance),
+				() => Reflect.Constructor.Instance),
 			new Function("create", "object", "Alias to new().",
-				() => Constructor.Instance),
+				() => Reflect.Constructor.Instance),
 			new Function("construct", "object", "Alias to new().",
-				() => Constructor.Instance),
+				() => Reflect.Constructor.Instance),
 		});
+	}
 
+	[IgnoreForDocs]
+	public class Reflect : InteropObject, ICompletable
+	{
 		public static Reflect Instance { get; } = new Reflect();
 
-		public Reflect() : base(MemberList) { }
+		public Reflect() : base(ReflectMembers.MemberList) { }
 
 		public override Value Call(IObject self, Arguments args)
 		{
