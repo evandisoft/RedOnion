@@ -2,7 +2,8 @@
 
 Global variables, objects and functions.
 
-- `reflect`: [Reflect](Reflect.md) - All the reflection stuff.
+- `reflect`: [Reflect](Reflect.md) - All the reflection stuff and namespaces.
+- `native`: [Reflect](Reflect.md) - Alias to `reflect` because of the namespaces.
 - `ship`: [Ship](Ship.md) - Active vessel (in flight or editor).
 - `stage`: [Stage](Stage.md) - Staging logic.
 - `Vector`: [Vector Function](Vector.md) - Function for creating 3D vector / coordinate.
