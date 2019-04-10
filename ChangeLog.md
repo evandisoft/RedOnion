@@ -57,6 +57,9 @@ i> alist[0] -- works
 i> alist=new(List)
 alist[0] -- doesn't work
 ```
+```
+i> =alist[0] -- no longer works
+```
 ### Repl/Editor settings
 Repl/Editor saves it's position, Repl visibility status, and Editor visibility status.
 
