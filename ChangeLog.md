@@ -18,16 +18,17 @@
 <details><summary>Show/Hide</summary>
 
 ### New Import System:
-`List=Import.System.Collections.Generic.List`. Using the Import system you can interact with any loaded
+`listtype=import.system.collections.generic.list`. Using the Import system you can interact with any loaded
 libraries (included loaded mods) written in C#. You should check out the licenses of those mods/libraries prior to writing any code that depends on them. However, many mods have very permissive licenses. This feature organizes all types in the namespace they are found in C#.
 
-For Lua, Import takes generic types like `List<T>` and sets their type parameters to `typeof<object>`. So `Import.System.Collections.Generic.List` returns the Type `List<object>`.
+Import currently takes generic types like `List<T>` and sets their type parameters to `typeof<object>`. So `import.system.collections.generic.list` returns the Type `List<object>`.
 
-Currently, `Import` only works in Lua, but in ROS you can do:
+For ROS, import is named "reflect" so
 ```
-var list=reflect.new("System.Collections.ArrayList")
+var alist=new reflect.system.collections.generic.list
+alist.add 1
+alist[0]
 ```
-Import will probably be added to ROS eventually and may be added soon.
 
 For Lua, All of the C# classes that were in the CommonScriptAPI will only be available through the Import system. Most are in the default namespace "". Example:
 ```
