@@ -175,6 +175,8 @@ Example: `reflect.new(""System.Collections.ArrayList"")`.",
 				if (args.Count <= 1)
 					throw new InvalidOperationException("Expected at least one argument");
 				return DynValue.FromObject(ctx.OwnerScript, LuaNew(args[1], args.GetArray(2)));
+
+
 			}
 		}
 

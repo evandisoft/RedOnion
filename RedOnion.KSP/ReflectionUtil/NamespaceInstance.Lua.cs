@@ -6,7 +6,7 @@ namespace RedOnion.KSP.ReflectionUtil
 {
 	public partial class NamespaceInstance : IUserDataType
 	{
-		public DynValue Index(MoonSharp.Interpreter.Script script, DynValue index, bool isDirectIndexing)
+		DynValue IUserDataType.Index(MoonSharp.Interpreter.Script script, DynValue index, bool isDirectIndexing)
 		{
 			if (index.Type != DataType.String)
 			{
@@ -23,17 +23,28 @@ namespace RedOnion.KSP.ReflectionUtil
 				return UserData.CreateStatic(type);
 			}
 
-			throw new Exception("No type or subnamespace named " + index + " found in namespace " + NamespaceString);
+			throw new Exception("No type or subnamespace named " + index + " found in namespace " + ToString());
 		}
 
-		public DynValue MetaIndex(MoonSharp.Interpreter.Script script, string metaname)
+		DynValue IUserDataType.MetaIndex(MoonSharp.Interpreter.Script script, string metaname)
 		{
-			throw new NotImplementedException();
+			//if (metaname == "__tostring")
+			//{
+			//	return DynValue.FromObject(script, new CallbackFunction(ToString));
+			//}
+
+			return null;
 		}
 
-		public bool SetIndex(MoonSharp.Interpreter.Script script, DynValue index, DynValue value, bool isDirectIndexing)
+		//DynValue ToString(ScriptExecutionContext arg1, CallbackArguments args)
+		//{
+		//	return DynValue.FromObject(arg1.OwnerScript,ToString());
+		//}
+
+
+		bool IUserDataType.SetIndex(MoonSharp.Interpreter.Script script, DynValue index, DynValue value, bool isDirectIndexing)
 		{
-			throw new NotImplementedException();
+			throw new NotSupportedException("Cannot modify fields of "+nameof(NamespaceInstance));
 		}
 	}
 }

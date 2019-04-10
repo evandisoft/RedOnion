@@ -12,6 +12,7 @@
     <RootNamespace>KerbaluaNUnit</RootNamespace>
     <AssemblyName>KerbaluaNUnit</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <ReleaseVersion>0.2.1</ReleaseVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -48,8 +49,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="LUA_ProcessedIncompleteVarTests.cs" />
-    <Compile Include="LUA_CompletionObjectTests.cs" />
     <Compile Include="LUA_ImportManagerTests.cs" />
+    <Compile Include="LUA_CompletionOperationsTests.cs" />
+    <Compile Include="TestingUtil.cs" />
+    <Compile Include="LUA_IntellisenseTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Kerbalua\Kerbalua.csproj">
