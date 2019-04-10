@@ -9,7 +9,7 @@
 - Ingame testing framework.
 - Ingame debugging.
 - Make editor more of an open general tool for editing.
-- More work on UI library.
+- More UI library features.
 
 # Next Release
 - Import System: `List=Import.System.Collections.Generic.List`. Using the Import system you can interact with any loaded
