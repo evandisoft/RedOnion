@@ -18,8 +18,11 @@
 <details><summary>Show/Hide</summary>
 
 ### New Import System:
-`listtype=import.system.collections.generic.list`. Using the Import system you can interact with any loaded
+`listtype=import.system.collections.generic.list`. Using the import system you can interact with any loaded
 libraries (included loaded mods) written in C#. You should check out the licenses of those mods/libraries prior to writing any code that depends on them. However, many mods have very permissive licenses. This feature organizes all types in the namespace they are found in C#.
+
+For import namespace/type accesses are case insensitive. This is to provide compatibility with ROS's general case insensitive
+nature. In Lua, the returned type will still have its member accesss be case sensitive, but the type and namespace name in import is going to be case insensitive. so `listtype=import.System.Collections.Generic.List` works the same as `listtype=import.system.collections.generic.list`.
 
 Import currently takes generic types like `List<T>` and sets their type parameters to `typeof<object>`. So `import.system.collections.generic.list` returns the Type `List<object>`. This may change in the future, or be implemented differently in ROS and Lua.
 
@@ -32,9 +35,9 @@ alist[0]
 
 For Lua, All of the C# classes that were in the CommonScriptAPI will only be available through the Import system. Most are in the default namespace "". Example:
 ```
-editor=Import.EditorLogic.fetch
+editor=import.EditorLogic.fetch
 ship=editor.ship
-partloader=Import.PartLoader.Instance
+partloader=import.PartLoader.Instance
 ```
 KSP has a system for getting the instance of a class that sometimes involves "fetch" and sometimes uses "Instance". You have to check which one works with a given class and use that.
 
@@ -68,7 +71,7 @@ Repl/Editor saves it's position, Repl visibility status, and Editor visibility s
 Lua now has a function for constructing types into instances. 
 Called new(). Can construct an instance of a class using a type imported using the new Import system.
 ```
-i> List=Import.System.Collections.Generic.List
+i> List=import.System.Collections.Generic.List
 r> void
 i> alist=new(List)
 r> void
