@@ -5,7 +5,7 @@
 - Better Autopilot.
 - Editor/Repl reimplementation in new library. Hopefully allowing multiple editors/repls open at a time.
 - Ability to run multiple scripts at a time and manage them.
-- Lots of new GUI's built on new gui library.
+- Lots of new user interfaces for various features built on new gui library.
 - Ingame testing framework.
 - Ingame debugging.
 
