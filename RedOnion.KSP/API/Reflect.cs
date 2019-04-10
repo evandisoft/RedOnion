@@ -4,10 +4,12 @@ using KSP.UI.Screens;
 using MoonSharp.Interpreter;
 using System.Collections.Generic;
 using RedOnion.Script.ReflectedObjects;
+using RedOnion.KSP.ReflectionUtil;
+using RedOnion.KSP.Completion;
 
 namespace RedOnion.KSP.API
 {
-	public class Reflect : InteropObject
+	public class Reflect : InteropObject, ICompletable
 	{
 		public static MemberList MemberList { get; } = new MemberList(
 		ObjectFeatures.Function,
@@ -31,6 +33,7 @@ Example: `reflect.new(""System.Collections.ArrayList"")`.",
 		});
 
 		public static Reflect Instance { get; } = new Reflect();
+
 		public Reflect() : base(MemberList) { }
 
 		public override Value Call(IObject self, Arguments args)
@@ -168,5 +171,32 @@ Example: `reflect.new(""System.Collections.ArrayList"")`.",
 				return DynValue.FromObject(ctx.OwnerScript, LuaNew(args[1], args.GetArray(2)));
 			}
 		}
+
+		NamespaceInstance map = NamespaceMappings.ForAllAssemblies.GetNamespace("");
+		public override bool Has(string name) => base.Has(name) || map.Has(name);
+		public override bool Get(string name, out Value value)
+			=> base.Get(name, out value) || map.Get(name, out value);
+
+		public IList<string> PossibleCompletions
+		{
+			get
+			{
+				var one = Members;
+				var two = map.PossibleCompletions;
+				var it = new string[one.Count+two.Count];
+				int i = 0;
+				while (i < one.Count)
+				{
+					it[i] = one[i].Name;
+					i++;
+				}
+				int j = 0;
+				while (i < it.Length)
+					it[i++] = two[j++];
+				return it;
+			}
+		}
+		public bool TryGetCompletion(string completionName, out object completion)
+			=> map.TryGetCompletion(completionName, out completion);
 	}
 }
