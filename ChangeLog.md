@@ -2,7 +2,7 @@
 - New user-centric system for managing scripts. Will be a file-selection dialog or the completion area will do this.
 - Automatic documentation.
 - ROS redesign.
-- Better Autopilot. Needs to handle all torque possibilities, work better with control structures, and probably use PIDs. I'd also like a better relative direction system that does not go wonky near the poles for polar orbits. (Example: You're approaching north pole, you're telling your ship to go north, then suddenly you reach the north pole and the same exact direction you used to be going in is now south)
+- Better Autopilot. Needs to handle all torque possibilities, work better with control structures, and probably use PIDs. I'd also like a better relative direction system that does not go wonky near the poles for polar orbits. (Example: You're approaching north pole, you're telling your ship to go north, then suddenly you reach the north pole and now instantly your ship is headed south.)
 - Editor/Repl reimplementation in new library. Hopefully allowing multiple editors/repls open at a time.
 - Ability to run multiple scripts at a time and manage them.
 - Lots of new user interfaces for various features built on new gui library.
