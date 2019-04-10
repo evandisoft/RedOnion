@@ -120,5 +120,18 @@ namespace KerbaluaNUnit {
 
 			Assert.AreEqual(typeof(Func<,,>), namespaceInstance.GetRawType("Func",3));
 		}
+
+		[Test()]
+		public void LUA_ImportManager_9_CaseInsensitivity()
+		{
+			var mappings = NamespaceMappings.ForAllAssemblies;
+			var namespaceInstance = mappings.GetNamespace("system");
+			foreach (var part in namespaceInstance.PossibleCompletions)
+			{
+				//Console.WriteLine(part);
+			}
+
+			Assert.AreEqual(typeof(Func<,,>), namespaceInstance.GetRawType("func", 3));
+		}
 	}
 }

@@ -102,7 +102,7 @@ namespace RedOnion.KSP.ReflectionUtil
 					}
 
 					string namespaceString = type.Namespace ?? "";
-					if (!NamespaceToNameTypeMap.ContainsKey(namespaceString))
+					if (!NamespaceToNameTypeMap.ContainsSensitiveKey(namespaceString))
 					{
 						NamespaceToNameTypeMap[namespaceString] = new NameTypeMap();
 					}
@@ -118,14 +118,14 @@ namespace RedOnion.KSP.ReflectionUtil
 			{
 				if (NamespaceParent(namespaceString, out string parent))
 				{
-					if (!NamespaceContinuationMap.ContainsKey(parent))
+					if (!NamespaceContinuationMap.ContainsSensitiveKey(parent))
 					{
 						NamespaceContinuationMap[parent] = new List<string>();
 					}
 					NamespaceContinuationMap[parent].Add(LastNamespacePart(namespaceString));
 				}
 
-				if (!NamespaceContinuationMap.ContainsKey(namespaceString))
+				if (!NamespaceContinuationMap.ContainsSensitiveKey(namespaceString))
 				{
 					NamespaceContinuationMap[namespaceString] = new List<string>();
 				}
@@ -133,7 +133,7 @@ namespace RedOnion.KSP.ReflectionUtil
 
 			foreach (var namespaceString in NamespaceToNameTypeMap.Keys)
 			{
-				if (!NamespaceCompletionMap.ContainsKey(namespaceString))
+				if (!NamespaceCompletionMap.ContainsSensitiveKey(namespaceString))
 				{
 					NamespaceCompletionMap[namespaceString] = new List<string>();
 				}
