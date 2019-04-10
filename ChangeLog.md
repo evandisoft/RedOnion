@@ -1,13 +1,89 @@
+# Planned Features
+<details><summary>Show/Hide</summary>
+  
+- New user-centric system for managing scripts. Will be a file-selection dialog or the completion area will do this.
+- Automatic documentation.
+- ROS redesign. Allowing pause and continue features (something similar to the way the Lua example code uses coroutine.yield())
+- Better Autopilot. Needs to handle all torque possibilities, work better with control surfaces, and probably use PIDs. I'd also like a better relative direction system that does not go wonky near the poles for polar orbits. Example: You're approaching north pole, you've specified your ship to have a heading of due north, then suddenly you reach the north pole and now instantly your ship is headed south. I'm sure there's a better way to do this.
+- Editor/Repl reimplementation in new library. Hopefully allowing multiple editors/repls open at a time.
+- Ability to run multiple scripts at a time and a gui to manage them.
+- Lots of new user interfaces for various features built on new gui library.
+- Ingame testing framework.
+- Ingame debugging.
+- Provide editors that can be used for editing files in contexts unrelated to our scripting engines.
+- More UI library features.
+</details>
 
 # Next Release
-- Lua no longer requires or allows "=" at start to return a value to the repl. Will automatically return the value of a lone expression entered at the repl.
-- A start to a automatic documentation system, and interop. Some new [globals](https://github.com/evandisoft/RedOnion/blob/redonion-imgui/RedOnion.KSP/API/Globals.md) added to api.
-- Slightly better Autopilot. Still needs work. Handles control surfaces somewhat.
-- Repl/Editor saves it's position, Repl visibility status, and Editor visibility status.
+<details><summary>Show/Hide</summary>
+
+### New Import System:
+`List=Import.System.Collections.Generic.List`. Using the Import system you can interact with any loaded
+libraries (included loaded mods) written in C#. You should check out the licenses of those mods/libraries prior to writing any code that depends on them. However, many mods have very permissive licenses. This feature organizes all types in the namespace they are found in C#.
+
+For Lua, Import takes generic types like `List<T>` and sets their type parameters to `typeof<object>`. So `Import.System.Collections.Generic.List` returns the Type `List<object>`.
+
+Currently, `Import` only works in Lua, but in ROS you can do:
+```
+var list=reflect.new("System.Collections.ArrayList")
+```
+Import will probably be added to ROS eventually and may be added soon.
+
+For Lua, All of the C# classes that were in the CommonScriptAPI will only be available through the Import system. Most are in the default namespace "". Example:
+```
+editor=Import.EditorLogic.fetch
+ship=editor.ship
+partloader=Import.PartLoader.Instance
+```
+KSP has a system for getting the instance of a class that sometimes involves "fetch" and sometimes uses "Instance". You have to check which one works with a given class and use that.
+
+### Less Bad Autopilot.
+Now works to some extent with control surfaces. 
+
+Also can set a relative direction consisting of a heading and pitch. Heading is degrees from north (clockwise), and pitch is degrees above the plane perpendicular to the vector connecting the vessel and the body. This is an easier way to specify the direction you want it to point. It is relative to the closest body. 
+
+```
+ctrl=RedOnion.KSP.Autopilot.FlightControl
+ctrl.SetRel(90,20) -- Aims ship east with a 20 degree pitch above "horizon" (by horizon I mean the plane perpendicular to the vector connecting the vessel and the body rather than the point at which the sky meets the land.)
+```
+
+### Better Lua Repl Interaction
+Lua no longer requires or allows "=" at start to return a value to the repl. 
+Will automatically return the value of a lone expression entered at the repl. Note:  this only works for single expressions.
+```
+i> alist[0] -- works
+```
+```
+i> alist=new(List)
+alist[0] -- doesn't work
+```
+```
+i> =alist[0] -- no longer works
+```
+### Repl/Editor settings
+Repl/Editor saves it's position, Repl visibility status, and Editor visibility status.
+
+### Lua Constructor
+Lua now has a function for constructing types into instances. 
+Called new(). Can construct an instance of a class using a type imported using the new Import system.
+```
+i> List=Import.System.Collections.Generic.List
+r> void
+i> alist=new(List)
+r> void
+i> alist.Add(1)
+r> void
+i> alist[0]
+r> 1
+```
+
+### Better Lua intellisense
+Lua Intellisense now knows whether a reference is static or an instance variable, so it no longer lists all the instance members of a class in the context of a static class reference.
+</details>
 
 # 0.2:
 ## 0.2.1:
-- Misc changes. Uses new build script, default engine changed to lua. Other minor changes not listed.
+- Misc Changes
 
 ## 0.2.0:
 ### General:
