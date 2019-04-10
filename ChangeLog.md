@@ -33,7 +33,7 @@ Heading is degrees from north (clockwise), and pitch is degrees above the plane 
 
 ```
 ctrl=RedOnion.KSP.Autopilot.FlightControl
-ctrl.SetRel(90,20) -- Aims ship east with a 20 degree pitch above "horizon" (by horizon I mean the plane perpendicular to the vector connecting the vessel and the body.)
+ctrl.SetRel(90,20) -- Aims ship east with a 20 degree pitch above "horizon" (by horizon I mean the plane perpendicular to the vector connecting the vessel and the body rather than the point at which the sky meets the land.)
 ```
 
 - Lua no longer requires or allows "=" at start to return a value to the repl. Will automatically return the value of a lone expression entered at the repl. Note:  this only works for single expressions.
