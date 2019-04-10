@@ -7,6 +7,13 @@
 # Next Release
 - Import System: `List=Import.System.Collections.Generic.List`. Using the Import system you can interact with any loaded
 libraries (included loaded mods) written in C#. You should check out the licenses of those mods/libraries prior to writing any code that depends on them. However, many mods have very permissive licenses. This feature organizes all types in the namespace they are found in C#.
+
+Currently, import system only works for Lua, but in ROS you can do:
+```
+var list=reflect.new("System.Collections.ArrayList")
+```
+It's possible that ROS will have the Import system implemented soon.
+
 - For Lua, All of the C# classes that were in the CommonScriptAPI will only be available through the Import system. Most are in the default namespace "". Example:
 ```
 editor=Import.EditorLogic.fetch
