@@ -38,7 +38,7 @@ namespace RedOnion.ROS.Objects
 		/// <summary>
 		/// Create new user object inheriting from this one
 		/// </summary>
-		public override bool Call(ref Value result, ref Value self, Arguments args, bool create)
+		public override bool Call(ref Value result, object self, Arguments args, bool create)
 		{
 			var it = new UserObject(this);
 			result = new Value(it, it);

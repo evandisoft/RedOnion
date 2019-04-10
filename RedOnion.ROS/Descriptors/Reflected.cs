@@ -105,6 +105,8 @@ namespace RedOnion.ROS
 			{
 				if (dict != null && dict.ContainsKey(member.Name))
 					return; // conflict
+
+				//========================================================================= PROPERTY
 				if (member is PropertyInfo p)
 				{
 					if (p.IsSpecialName)
@@ -187,6 +189,50 @@ namespace RedOnion.ROS
 									type)),
 							obj, val
 						).Compile();
+					}
+				}
+
+				//=========================================================================== METHOD
+				if (member is MethodInfo m)
+				{
+					if (m.IsSpecialName)
+						return;
+					if (!instance)
+					{
+						if (m.ReturnType != typeof(void))
+							return; //TODO: functions
+						var args = m.GetParameters();
+						if (args.Length != 0)
+							return; //TODO: arguments
+						if (dict == null)
+							dict = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+						dict[m.Name] = prop.size;
+						ref var it = ref prop.Add();
+						it.name = m.Name;
+						var value = new Value(new ReflectedAction(m.Name),
+							Delegate.CreateDelegate(typeof(Action), m));
+						it.read = obj => value;
+						return;
+					}
+					else
+					{
+						if (m.ReturnType != typeof(void))
+							return; //TODO: functions
+						var args = m.GetParameters();
+						if (args.Length != 0)
+							return; //TODO: arguments
+						if (dict == null)
+							dict = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+						dict[m.Name] = prop.size;
+						ref var it = ref prop.Add();
+						it.name = m.Name;
+						var self = Expression.Parameter(m.DeclaringType, "self");
+						var value = new Value((Descriptor)Activator.CreateInstance(
+							typeof(ReflectedMethod<>).MakeGenericType(m.DeclaringType), m.Name),
+							Expression.Lambda(Expression.Call(self, m),
+							self).Compile());
+						it.read = obj => value;
+						return;
 					}
 				}
 			}

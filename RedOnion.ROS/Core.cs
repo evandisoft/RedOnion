@@ -15,7 +15,6 @@ namespace RedOnion.ROS
 		protected ArgumentList vals = new ArgumentList();
 		protected Context ctx;
 		protected Value self; // `this` for current code
-		protected Value mself; // `this` for next method call
 		protected Value result;
 
 		public UserObject Globals { get; set; }
@@ -35,7 +34,6 @@ namespace RedOnion.ROS
 				str = value?.Strings;
 				vals.Clear();
 				self = Value.Null;
-				mself = Value.Null;
 				Exit = OpCode.Void;
 				result = Value.Void;
 				compiled = value;
@@ -146,18 +144,41 @@ namespace RedOnion.ROS
 							Identifier(at);
 							at += 4;
 							ref var it = ref vals.Top();
-							if (it.desc.Call(ref it, ref mself, new Arguments(), true))
+							if (it.desc.Call(ref it, null, new Arguments(), true))
 								continue;
 							throw InvalidOperation("Could not create new {0}", it.Name);
 						}
 						if (op == OpCode.Call0)
 						{
 							ref var it = ref vals.Top();
-							if (it.desc.Call(ref it, ref mself, new Arguments(), true))
+							if (it.desc.Call(ref it, null, new Arguments(), true))
 								continue;
 							throw InvalidOperation("Could not create new {0}", it.Name);
 						}
 						throw new NotImplementedException("Not implemented: OpCode.Create + " + op.ToString());
+
+					case OpCode.Autocall:
+					case OpCode.Call0:
+					{
+						object self = null;
+						Descriptor selfDesc = null;
+						int idx = -1;
+						ref var it = ref vals.Top();
+						if (it.IsReference)
+						{
+							selfDesc = it.desc;
+							self = it.obj;
+							idx = it.num.Int;
+							if (!it.desc.Get(ref it, idx))
+								throw CouldNotGet(ref it);
+						}
+						if (it.desc.Call(ref it, self, new Arguments(), false))
+							continue;
+						if (op == OpCode.Autocall)
+							continue;
+						throw InvalidOperation((self != null ? selfDesc.NameOf(self, idx) : it.Name)
+							+ " cannot be called with zero arguments");
+					}
 
 					case OpCode.Index:
 					{
@@ -367,25 +388,12 @@ namespace RedOnion.ROS
 						continue;
 					}
 
-					case OpCode.Autocall:
-					{
-						ref var it = ref vals.Top();
-						if (it.IsReference && !it.desc.Get(ref it, it.num.Int))
-							throw InvalidOperation(
-								"Property '{0}' of '{1}' is write only",
-								it.desc.NameOf(it.obj, it.num.Int), it.desc.Name);
-						it.desc.Call(ref it, ref mself, new Arguments(), false);
-						mself = Value.Null;
-						continue;
-					}
-
 					case OpCode.Else:
 					{
 						int sz = Int(code, at);
 						at += sz + 4;
 						continue;
 					}
-
 
 					default:
 						throw new NotImplementedException("Not implemented: " + op.ToString());
