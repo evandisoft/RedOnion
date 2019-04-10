@@ -26,7 +26,7 @@ Currently, `Import` only works in Lua, but in ROS you can do:
 ```
 var list=reflect.new("System.Collections.ArrayList")
 ```
-SImport will probably be added to ROS eventually and may be added soon.
+Import will probably be added to ROS eventually and may be added soon.
 
 - For Lua, All of the C# classes that were in the CommonScriptAPI will only be available through the Import system. Most are in the default namespace "". Example:
 ```
