@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using NUnit.Framework;
 using RedOnion.ROS.Objects;
 
@@ -119,29 +120,11 @@ namespace RedOnion.ROS.Tests
 			Test("obj.s = \"xyz\"");
 			Test("xyz",		"obj.s");
 			Test(3,			"obj.s.length");// test internal property
-
-			/*
-			// obj.s needs to be boxed first - properties are otherwise lost
-			var options = Options;
-			Options |= EngineOption.Silent; // will otherwise throw exception that `s` does not have `bad`
-			Test(3.14,		"obj.s.bad = obj.x");
-			Test(null,		"obj.s.bad");   // was assigned to boxed value and now lost
-			Options = options;
-
-			Test("var s = new string \"hello\"");// box
-			Test("s.e = 2.7");              // preserved as s is boxed, not native string
-			Test(2.7,		"s.e");         // test it (moreProps)
-			Test(5,			"s.length");    // internal property (baseProps)
-
-			// indexing is the same as accessing properties
-			Test(2.7,		"s[\"e\"]");
-			Test(5,			"s[\"length\"]");
+			Test(3,			"obj[\"s\"].length");
 			Test(3,			"obj[\"s\"][\"length\"]");
 			Test(3,			"obj[\"s\", \"length\"]");
-			*/
 		}
 
-		/*
 		[Test]
 		public void ROS_Expr06_Logic()
 		{
@@ -167,52 +150,45 @@ namespace RedOnion.ROS.Tests
 		}
 
 		[Test]
-		public void ROS_Expr08_Autocall()
-		{
-			Expect<InvalidOperationException>("true; false");
-		}
-
-		[Test]
-		public void ROS_Expr09_ArrayLiteral()
+		public void ROS_Expr08_ArrayLiteral()
 		{
 			foreach (var s in new[] { "[1,2]", "[\n1\n,\n2\n]" })
 			{
 				Test(s);
-				var arr = Result.RefObj as ArrayObj;
+				var arr = Result.obj as IList;
 				Assert.NotNull(arr);
-				Assert.AreEqual(2, arr.Length);
-				Assert.AreEqual(1, arr[0].Native);
-				Assert.AreEqual(2, arr[1].Native);
+				Assert.AreEqual(2, arr.Count);
+				Assert.IsTrue(arr[0].Equals(1));
+				Assert.IsTrue(arr[1].Equals(2));
 			}
 			foreach (var s in new[] { "[]", "[\n]" })
 			{
 				Test(s);
-				var arr = Result.RefObj as ArrayObj;
+				var arr = Result.obj as Array;
 				Assert.NotNull(arr);
 				Assert.AreEqual(0, arr.Length);
 			}
 			foreach (var s in new[] { "[true]", "[\ntrue\n]" })
 			{
 				Test(s);
-				var arr = Result.RefObj as ArrayObj;
+				var arr = Result.obj as IList;
 				Assert.NotNull(arr);
-				Assert.AreEqual(1, arr.Length);
-				Assert.AreEqual(true, arr[0].Native);
+				Assert.AreEqual(1, arr.Count);
+				Assert.IsTrue(arr[0].Equals(true));
 			}
 		}
 
 		[Test]
-		public void ROS_Expr10_NewLines()
+		public void ROS_Expr09_NewLines()
 		{
 			foreach (var s in new[]
 			{
 				"(\n+1\n)",
-				"def pass x => x\npass(\n1\n)"
+				//"def pass x => x\npass(\n1\n)"
 			})
 			{
 				Test(1, s);
 			}
 		}
-		*/
 	}
 }

@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 
 namespace RedOnion.ROS
 {
@@ -9,8 +8,8 @@ namespace RedOnion.ROS
 
 		internal class OfString : Descriptor
 		{
-			public OfString() : base("string", typeof(string), ExCode.String, TypeCode.String) { }
-
+			public OfString()
+				: base("string", typeof(string), ExCode.String, TypeCode.String) { }
 			public override string ToString(ref Value self, string format, IFormatProvider provider, bool debug)
 				=> self.obj.ToString();
 
@@ -89,8 +88,34 @@ namespace RedOnion.ROS
 				case 0:
 					self = self.obj.ToString().Length;
 					return true;
+				default:
+					self = self.obj.ToString()[at-0x100];
+					return true;
 				}
-				return false;
+			}
+
+			public override int IndexFind(ref Value self, Arguments args)
+			{
+				if (args.Length == 0)
+					return -1;
+				var index = args[0];
+				int at;
+				if (index.IsNumber)
+				{
+					at = index.ToInt();
+					if (at < 0 || at >= self.obj.ToString().Length)
+						throw new IndexOutOfRangeException();
+					return at + 0x100;
+				}
+				if (!index.desc.Convert(ref index, String))
+					return -1;
+				var name = index.obj.ToString();
+				at = Find(self.obj, name, true);
+				if (at < 0 || args.Length == 1)
+					return at;
+				if (!Get(ref self, at))
+					return -1;
+				return self.desc.IndexFind(ref self, new Arguments(args, args.Length-1));
 			}
 		}
 	}

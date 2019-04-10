@@ -141,24 +141,40 @@ namespace RedOnion.ROS.Objects
 			self = it;
 			return it.desc.Unary(ref it, op + 0x08);
 		}
-		public override int IndexFind(object self, Arguments args)
+		public override int IndexFind(ref Value self, Arguments args)
 		{
 			if (args.Length == 0 || dict == null)
 				return -1;
 			var index = args[0];
-			if (!index.IsNumber)
+			int at;
+			if (index.IsNumber)
+			{
+				at = index.ToInt();
+				if (at < 0 || at >= prop.size)
+				{
+					if (at >= prop.size || args.Length > 1)
+						return -1;
+					at = prop.size;
+					prop.Add(new Prop());
+				}
+			}
+			else
 			{
 				if (!index.desc.Convert(ref index, String))
 					return -1;
-				return Find(index.obj.ToString());
+				var name = index.obj.ToString();
+				at = Find(name);
+				if (at < 0 || at >= prop.size)
+				{
+					if (at > prop.size || args.Length > 1)
+						return -1;
+					at = Add(name, Value.Void);
+				}
 			}
-			var at = index.ToInt();
-			if (at < 0 || at >= prop.size)
-				return -1;
 			if (args.Length == 1)
 				return at;
-			ref var it = ref prop.items[at].value;
-			return it.desc.IndexFind(it.obj, new Arguments(args, args.Length-1));
+			self = prop.items[at].value;
+			return self.desc.IndexFind(ref self, new Arguments(args, args.Length-1));
 		}
 	}
 }

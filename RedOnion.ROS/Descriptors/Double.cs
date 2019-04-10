@@ -8,9 +8,14 @@ namespace RedOnion.ROS
 
 		internal class OfDouble : Descriptor
 		{
-			internal OfDouble() : base("double", typeof(double), ExCode.Double, TypeCode.Double) { }
-			public override object Box(ref Value self) => self.num.Double;
-
+			internal OfDouble()
+				: base("double", typeof(double), ExCode.Double, TypeCode.Double) { }
+			public override object Box(ref Value self)
+				=> self.num.Double;
+			public override bool Equals(ref Value self, object obj)
+				=> self.num.Double.Equals(obj);
+			public override int GetHashCode(ref Value self)
+				=> self.num.Double.GetHashCode();
 			public override string ToString(ref Value self, string format, IFormatProvider provider, bool debug)
 				=> self.num.Double.ToString(format, provider);
 
@@ -98,6 +103,25 @@ namespace RedOnion.ROS
 					return true;
 				case OpCode.Div:
 					lhs.num.Double /= rhs.num.Double;
+					return true;
+
+				case OpCode.Equals:
+					lhs = lhs.num.Double == rhs.num.Double;
+					return true;
+				case OpCode.Differ:
+					lhs = lhs.num.Double != rhs.num.Double;
+					return true;
+				case OpCode.Less:
+					lhs = lhs.num.Double < rhs.num.Double;
+					return true;
+				case OpCode.More:
+					lhs = lhs.num.Double > rhs.num.Double;
+					return true;
+				case OpCode.LessEq:
+					lhs = lhs.num.Double <= rhs.num.Double;
+					return true;
+				case OpCode.MoreEq:
+					lhs = lhs.num.Double >= rhs.num.Double;
 					return true;
 				}
 				return false;

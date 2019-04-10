@@ -12,6 +12,7 @@ using RedOnion.Script.Utilities;
 using KSP.UI.Screens;
 using RedOnion.KSP.API;
 using System.Collections.Generic;
+using RedOnion.KSP.Completion;
 
 namespace RedOnion.KSP
 {
@@ -228,6 +229,15 @@ namespace RedOnion.KSP
 			{
 				foreach (var member in desc.Members)
 					AddSuggestion(member.Name);
+			}
+			if (value is ICompletable cmpl)
+			{
+				var list = cmpl.PossibleCompletions;
+				if (list != null)
+				{
+					foreach (var str in list)
+						AddSuggestion(str);
+				}
 			}
 			base.FillFrom(value);
 		}

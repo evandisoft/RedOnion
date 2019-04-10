@@ -4,19 +4,27 @@ using KSP.UI.Screens;
 using MoonSharp.Interpreter;
 using System.Collections.Generic;
 using RedOnion.Script.ReflectedObjects;
+using RedOnion.KSP.ReflectionUtil;
+using RedOnion.KSP.Completion;
 
 namespace RedOnion.KSP.API
 {
-	public class Reflect : InteropObject
+	public class Reflect : InteropObject, ICompletable
 	{
 		public static MemberList MemberList { get; } = new MemberList(
 		ObjectFeatures.Function,
 
-@"Reflects types provided as assembly-qualified name (""Namespace.Type,Assembly"").",
+@"Reflects/imports native types provided as namespace-qualified string
+(e.g. ""System.Collections.Hashtable"") or assembly-qualified name
+(""UnityEngine.Vector2,UnityEngine""). It will first try `Type.GetType`,
+then search in `Assembly-CSharp`, then in `UnityEngine` and then in all assemblies
+returned by `AppDomain.CurrentDomain.GetAssemblies()`.",
 
 		new IMember[]
 		{
-			new Function("new", "object", "Construct new object given type or object and arguments.",
+			new Function("new", "object",
+@"Construct new object given type or object and arguments.
+Example: `reflect.new(""System.Collections.ArrayList"")`.",
 				() => Constructor.Instance),
 			new Function("create", "object", "Alias to new().",
 				() => Constructor.Instance),
@@ -25,6 +33,7 @@ namespace RedOnion.KSP.API
 		});
 
 		public static Reflect Instance { get; } = new Reflect();
+
 		public Reflect() : base(MemberList) { }
 
 		public override Value Call(IObject self, Arguments args)
@@ -60,24 +69,38 @@ namespace RedOnion.KSP.API
 			throw new InvalidOperationException("Could not resolve " + s + " to type");
 		}
 		public static Type ResolveType(object o)
-			=> o is string s ? ResolveType(s) : o as Type ?? o?.GetType();
+		{
+			if (o is Type t)
+				return t;
+			if (o is string s)
+				return ResolveType(s);
+			if (o is IObject obj)
+			{
+				t = obj.Type;
+				if (t != null)
+					return t;
+			}
+			if (o is Value v)
+			{
+				if (v.IsString)
+					return ResolveType(v.String);
+				return v.Native?.GetType();
+			}
+			if (o is DynValue dyn)
+			{
+				if (dyn.Type == DataType.UserData)
+					return dyn.UserData.Descriptor.Type;
+				if (dyn.Type == DataType.String)
+					return ResolveType(dyn.String);
+				return dyn.ToObject()?.GetType();
+			}
+			return o?.GetType();
+		}
 
 		public static object LuaNew(object obj, params DynValue[] dynArgs)
+			=> LuaNew(ResolveType(obj), dynArgs);
+		public static object LuaNew(Type t, params DynValue[] dynArgs)
 		{
-			Type t = null;
-			if (obj is DynValue dynValue && dynValue.Type == DataType.UserData && dynValue.UserData.Object == null)
-			{
-				t = dynValue.UserData.Descriptor.Type;
-			}
-			else if (obj is Type)
-			{
-				t = obj as Type;
-			}
-			else
-			{
-				t = obj.GetType();
-			}
-
 			var constructors = t.GetConstructors();
 			foreach (var constructor in constructors)
 			{
@@ -138,20 +161,43 @@ namespace RedOnion.KSP.API
 			{
 				if (args.Count == 0)
 					throw new InvalidOperationException("Expected at least one argument");
-				var arg = args[0];
-				Type t = arg.IsString ? ResolveType(arg.String) : ResolveType(arg.Native);
-				return new Value(new ReflectedType(args.Engine, t).Create(new Arguments(args, args.Length-1)));
+				return new Value(new ReflectedType(args.Engine, ResolveType(args[0]))
+					.Create(new Arguments(args, args.Length-1)));
 			}
 			public override DynValue Call(ScriptExecutionContext ctx, CallbackArguments args)
 			{
 				if (args.Count <= 1)
 					throw new InvalidOperationException("Expected at least one argument");
-				var arg = args[1];
 
-
-				Type t = arg.Type == DataType.String ? ResolveType(arg.String) : ResolveType(arg.ToObject());
-				return DynValue.FromObject(ctx.OwnerScript, LuaNew(t, args.GetArray(2)));
+				return DynValue.FromObject(ctx.OwnerScript, LuaNew(args[1], args.GetArray(2)));
 			}
 		}
+
+		NamespaceInstance map = NamespaceMappings.ForAllAssemblies.GetNamespace("");
+		public override bool Has(string name) => base.Has(name) || map.Has(name);
+		public override bool Get(string name, out Value value)
+			=> base.Get(name, out value) || map.Get(name, out value);
+
+		public IList<string> PossibleCompletions
+		{
+			get
+			{
+				var one = Members;
+				var two = map.PossibleCompletions;
+				var it = new string[one.Count+two.Count];
+				int i = 0;
+				while (i < one.Count)
+				{
+					it[i] = one[i].Name;
+					i++;
+				}
+				int j = 0;
+				while (i < it.Length)
+					it[i++] = two[j++];
+				return it;
+			}
+		}
+		public bool TryGetCompletion(string completionName, out object completion)
+			=> map.TryGetCompletion(completionName, out completion);
 	}
 }

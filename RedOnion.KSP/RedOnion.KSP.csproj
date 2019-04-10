@@ -74,6 +74,7 @@
     <Compile Include="API\Vector.Methods.cs" />
     <Compile Include="API\VectorCreator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReflectionUtil\NamespaceInstance.ROS.cs" />
     <Compile Include="ROS\KspRosEngine.cs" />
     <Compile Include="ROS\UI\Window.cs" />
     <Compile Include="ROS\RuntimeRoot.cs" />
@@ -111,9 +112,6 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup />
-  <ItemGroup>
-    <Folder Include="ReflectionUtil\" />
-    <Folder Include="Completion\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

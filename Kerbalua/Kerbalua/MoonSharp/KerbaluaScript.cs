@@ -17,6 +17,7 @@ using System.Linq;
 using API = RedOnion.KSP.API;
 using RedOnion.KSP.ReflectionUtil;
 using RedOnion.KSP.API;
+using static RedOnion.KSP.API.Reflect;
 
 namespace Kerbalua.MoonSharp
 {
@@ -76,7 +77,7 @@ namespace Kerbalua.MoonSharp
 			//Globals["Vessel"] = FlightGlobals.ActiveVessel;
 			var allMappings = NamespaceMappings.ForAllAssemblies;
 			//Globals["KSP"] = new KspApi();
-			Globals["new"] = new Constructor(API.Reflect.LuaNew);
+			Globals["new"] = Constructor.Instance;
 			Globals["static"] = new Func<object, DynValue>((o) =>
 			{
 				if (o is Type t)
@@ -122,7 +123,6 @@ namespace Kerbalua.MoonSharp
 		//}
 
 		delegate Table Importer(string name);
-		delegate object Constructor(Type t,params DynValue[] args);
 
 		DynValue coroutine;
 

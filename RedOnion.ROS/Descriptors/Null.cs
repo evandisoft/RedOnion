@@ -12,7 +12,14 @@ namespace RedOnion.ROS
 		/// </summary>
 		internal class OfNull : Descriptor
 		{
-			internal OfNull() : base("null", typeof(object), ExCode.Null, TypeCode.Empty) { }
+			internal OfNull()
+				: base("null", typeof(object), ExCode.Null, TypeCode.Empty) { }
+			public override bool Equals(ref Value self, object obj)
+				=> obj == null;
+			public override int GetHashCode(ref Value self)
+				=> ~0;
+			public override string ToString(ref Value self, string format, IFormatProvider provider, bool debug)
+				=> debug ? "null" : "";
 		}
 	}
 }

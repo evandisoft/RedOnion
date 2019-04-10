@@ -47,9 +47,10 @@ namespace RedOnion.ROS
 		public static readonly Value Null = new Value(Descriptor.Null, null);
 		public static readonly Value NaN = new Value(double.NaN);
 		public static readonly Value False = new Value(false);
-		public static readonly Value True = new Value(false);
+		public static readonly Value True = new Value(true);
 
 		public Value(UserObject it) : this(it, it) {}
+		public Value(object it) : this(Descriptor.Of(it.GetType()), it) { }
 		public Value(Descriptor descriptor, object it)
 		{
 			desc = descriptor;
@@ -105,6 +106,12 @@ namespace RedOnion.ROS
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		public string Name => desc.Name;
+
+		public override bool Equals(object obj)
+			=> desc.Equals(ref this, obj);
+		public override int GetHashCode()
+			=> desc.GetHashCode(ref this);
+
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		public bool IsNumber => desc.Primitive > ExCode.String;
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
