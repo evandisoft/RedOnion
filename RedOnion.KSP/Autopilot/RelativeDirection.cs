@@ -6,7 +6,7 @@ namespace RedOnion.KSP.Autopilot
 	/// <summary>
 	/// A specification of a direction relative to the nearest body.
 	/// </summary>
-	public struct RelDir
+	public struct RelativeDirection
 	{
 		/// <summary>
 		/// Degrees clockwise from north.
@@ -22,7 +22,7 @@ namespace RedOnion.KSP.Autopilot
 		/// </summary>
 		public double Pitch;
 
-		public RelDir(double heading,double pitch)
+		public RelativeDirection(double heading,double pitch)
 		{
 			Heading = heading;
 			Pitch = pitch;

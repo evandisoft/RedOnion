@@ -92,7 +92,6 @@ namespace RedOnion.KSP.Autopilot
 			CurrentSpinMode = SpinMode.OFF;
 		}
 
-
 		public void SetRel(double heading,double pitch)
 		{
 			TargetRel = new RelativeDirection(heading, pitch);

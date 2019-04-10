@@ -27,6 +27,8 @@ namespace RedOnion.KSP.ReflectionUtil
 					return nameTypeMap;
 				}
 
+				// Should only happen if somehow this namespace instance starts out being legitimate
+				// but later ends up not being so by the associated mappings changing.
 				throw new Exception("Types for namespace \"" + NamespaceString + "\" not found.");
 			}
 		}
@@ -45,6 +47,8 @@ namespace RedOnion.KSP.ReflectionUtil
 					return namespaceContinuations;
 				}
 
+				// Should only happen if somehow this namespace instance starts out being legitimate
+				// but later ends up not being so by the associated mappings changing.
 				throw new Exception("NamespaceContinuations for namespace \"" + NamespaceString + "\" not found.");
 			}
 		}
@@ -68,6 +72,8 @@ namespace RedOnion.KSP.ReflectionUtil
 					return completions;
 				}
 
+				// Should only happen if somehow this namespace instance starts out being legitimate
+				// but later ends up not being so by the associated mappings changing.
 				throw new Exception("Possible completions for namespace \"" + NamespaceString + "\" not found.");
 			}
 		}
@@ -308,6 +314,8 @@ namespace RedOnion.KSP.ReflectionUtil
 					return completions;
 				}
 
+				// Should only happen if somehow this namespace instance starts out being legitimate
+				// but later ends up not being so by the associated mappings changing.
 				throw new Exception("Possible completions for namespace \"" + NamespaceString + "\" not found.");
 			}
 		}

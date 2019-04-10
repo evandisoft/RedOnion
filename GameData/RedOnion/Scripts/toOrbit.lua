@@ -1,5 +1,5 @@
-vessel=Import.FlightGlobals.ActiveVessel
-ctrl=Import.RedOnion.KSP.Autopilot.FlightControl.GetInstance()
+vessel=import.FlightGlobals.ActiveVessel
+ctrl=import.RedOnion.KSP.Autopilot.FlightControl.GetInstance()
 
 ctrl.SetRel(90,90)
 
