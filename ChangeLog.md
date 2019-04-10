@@ -22,7 +22,7 @@ libraries (included loaded mods) written in C#. You should check out the license
 
 For Lua, the import takes generic types like `List<T>` and sets their type parameters to `typeof<object>`. So `List<T>` here became a `List<object>`.
 
-Currently, Import only works in Lua, but in ROS you can do:
+Currently, `Import` only works in Lua, but in ROS you can do:
 ```
 var list=reflect.new("System.Collections.ArrayList")
 ```
