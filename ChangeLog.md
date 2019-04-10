@@ -2,6 +2,9 @@
 - New user-centric system for managing scripts. Will be a file-selection dialog or the completion area will do this.
 - Automatic documentation
 - ROS redesign
+- Better Autopilot
+- Editor/Repl reimplementation
+- Ability to run multiple scripts at a time and manage them.
 
 # Next Release
 - Import System: `List=Import.System.Collections.Generic.List`. Using the Import system you can interact with any loaded
