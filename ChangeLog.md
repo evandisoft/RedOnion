@@ -6,7 +6,7 @@
 - ROS redesign. Allowing pause and continue features (something similar to coroutine.yield())
 - Better Autopilot. Needs to handle all torque possibilities, work better with control surfaces, and probably use PIDs. I'd also like a better relative direction system that does not go wonky near the poles for polar orbits. Example: You're approaching north pole, you've specified your ship to have a heading of due north, then suddenly you reach the north pole and now instantly your ship is headed south. I'm sure there's a better way to do this.
 - Editor/Repl reimplementation in new library. Hopefully allowing multiple editors/repls open at a time.
-- Ability to run multiple scripts at a time and manage them.
+- Ability to run multiple scripts at a time and a gui to manage them.
 - Lots of new user interfaces for various features built on new gui library.
 - Ingame testing framework.
 - Ingame debugging.
