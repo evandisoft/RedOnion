@@ -9,9 +9,7 @@ using RedOnion.KSP.Completion;
 
 namespace RedOnion.KSP.API
 {
-	// RedOnion.Builder again had some problems
-	[ProxyDocs(typeof(Reflect))]
-	public static class ReflectMembers
+	public class Reflect : InteropObject, ICompletable
 	{
 		public static MemberList MemberList { get; } = new MemberList(
 		ObjectFeatures.Function,
@@ -27,20 +25,16 @@ returned by `AppDomain.CurrentDomain.GetAssemblies()`.",
 			new Function("new", "object",
 @"Construct new object given type or object and arguments.
 Example: `reflect.new(""System.Collections.ArrayList"")`.",
-				() => Reflect.Constructor.Instance),
+				() => Constructor.Instance),
 			new Function("create", "object", "Alias to new().",
-				() => Reflect.Constructor.Instance),
+				() => Constructor.Instance),
 			new Function("construct", "object", "Alias to new().",
-				() => Reflect.Constructor.Instance),
+				() => Constructor.Instance),
 		});
-	}
 
-	[IgnoreForDocs]
-	public class Reflect : InteropObject, ICompletable
-	{
 		public static Reflect Instance { get; } = new Reflect();
 
-		public Reflect() : base(ReflectMembers.MemberList) { }
+		public Reflect() : base(MemberList) { }
 
 		public override Value Call(IObject self, Arguments args)
 		{
@@ -174,9 +168,8 @@ Example: `reflect.new(""System.Collections.ArrayList"")`.",
 			{
 				if (args.Count <= 1)
 					throw new InvalidOperationException("Expected at least one argument");
+
 				return DynValue.FromObject(ctx.OwnerScript, LuaNew(args[1], args.GetArray(2)));
-
-
 			}
 		}
 
