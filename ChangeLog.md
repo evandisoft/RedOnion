@@ -10,7 +10,7 @@
 - Lots of new user interfaces for various features built on new gui library.
 - Ingame testing framework.
 - Ingame debugging.
-- Make editor more of an open general tool for editing.
+- Provide editors that can be used for editing files in contexts unrelated to our scripting engines.
 - More UI library features.
 </details>
 
