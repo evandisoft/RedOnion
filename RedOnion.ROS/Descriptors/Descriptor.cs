@@ -33,7 +33,7 @@ namespace RedOnion.ROS
 		public override string ToString() => Name;
 		public virtual string ToString(ref Value self, string format, IFormatProvider provider, bool debug)
 			=> format != null && self.obj is IFormattable fmt
-			? fmt.ToString(format, provider) : self.obj.ToString();
+			? fmt.ToString(format, provider) : self.obj?.ToString() ?? Name;
 
 		public virtual bool Convert(ref Value self, Descriptor to)
 		{
@@ -58,7 +58,7 @@ namespace RedOnion.ROS
 		{
 			if (args.Length == 0)
 				return -1;
-			var index = args[0];
+			ref var index = ref args.GetRef(0);
 			int at;
 			if (index.IsNumber)
 				return -1;
@@ -72,5 +72,10 @@ namespace RedOnion.ROS
 				return -1;
 			return self.desc.IndexFind(ref self, new Arguments(args, args.Length-1));
 		}
+
+		static internal InvalidOperationException InvalidOperation(string msg)
+			=> new InvalidOperationException(msg);
+		static internal InvalidOperationException InvalidOperation(string msg, params object[] args)
+			=> new InvalidOperationException(string.Format(Value.Culture, msg, args));
 	}
 }

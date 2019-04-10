@@ -302,6 +302,11 @@ namespace RedOnion.ROS
 			var idx = Count - argc + index;
 			return idx < Count ? list[idx] : new Value();
 		}
+		public ref Value GetRef(int argc, int index = 0)
+		{
+			var idx = Count - argc + index;
+			return ref list.items[idx];
+		}
 		public void Add(Value value)
 			=> list.Add(value);
 		public void Push(Value value)
@@ -356,6 +361,7 @@ namespace RedOnion.ROS
 		}
 
 		public Value this[int i] => i >= argc ? Value.Void : list.Get(argc, i);
+		public ref Value GetRef(int i) => ref list.GetRef(argc, i);
 		public IEnumerator<Value> GetEnumerator()
 		{
 			for (int i = 0; i < argc; i++)

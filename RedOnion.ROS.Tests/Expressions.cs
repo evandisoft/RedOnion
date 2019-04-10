@@ -176,6 +176,10 @@ namespace RedOnion.ROS.Tests
 				Assert.AreEqual(1, arr.Count);
 				Assert.IsTrue(arr[0].Equals(true));
 			}
+			Test(@"var a = [""hello"",""world""]");
+			Test(2, "a.length");
+			Test("hello", "a[0]");
+			Test("world", "a[1]");
 		}
 
 		[Test]
