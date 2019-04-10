@@ -16,7 +16,7 @@ partloader=Import.PartLoader.Instance
 KSP has a system for getting the instance of a class that sometimes involves "fetch" and sometimes uses "Instance". You have to check which one works with a given class and use that.
 
 - Less bad autopilot. Works to some extent with control surfaces. Also can set a relative direction consisting of a heading
-and pitch, which is a lot easier of a way to specify the direction you want it to go in. It is relative to the closest body.
+and pitch. This is a lot easier of a way to specify the direction you want it to go in. It is relative to the closest body.
 Heading is degrees from north (clockwise), and pitch is degrees above the plane perpendicular to the vector connecting the vessel and the body.
 - Lua no longer requires or allows "=" at start to return a value to the repl. Will automatically return the value of a lone expression entered at the repl. Note:  this only works for single expressions.
 ```
