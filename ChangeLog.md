@@ -21,7 +21,7 @@
 `listtype=import.system.collections.generic.list`. Using the Import system you can interact with any loaded
 libraries (included loaded mods) written in C#. You should check out the licenses of those mods/libraries prior to writing any code that depends on them. However, many mods have very permissive licenses. This feature organizes all types in the namespace they are found in C#.
 
-Import currently takes generic types like `List<T>` and sets their type parameters to `typeof<object>`. So `import.system.collections.generic.list` returns the Type `List<object>`.
+Import currently takes generic types like `List<T>` and sets their type parameters to `typeof<object>`. So `import.system.collections.generic.list` returns the Type `List<object>`. This may change in the future, or be implemented differently in ROS and Lua.
 
 For ROS, import is named "reflect" so
 ```
