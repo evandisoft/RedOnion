@@ -51,6 +51,8 @@ i> alist[0]
 r> 1
 ```
 
+- Lua intellisense now knows whether a reference is static or an instance variable, so it no longer lists all the instance members of a class in the context of a static class reference.
+
 # 0.2:
 ## 0.2.1:
 - Misc Changes
