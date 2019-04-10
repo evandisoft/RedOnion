@@ -1,5 +1,5 @@
 # Planned Features
-<details><summary>Show</summary>
+<details><summary>Show/Hide</summary>
   
 - New user-centric system for managing scripts. Will be a file-selection dialog or the completion area will do this.
 - Automatic documentation.
@@ -15,7 +15,7 @@
 </details>
 
 # Next Release
-<details><summary>Show</summary>
+<details><summary>Show/Hide</summary>
 
 - Import System: `List=Import.System.Collections.Generic.List`. Using the Import system you can interact with any loaded
 libraries (included loaded mods) written in C#. You should check out the licenses of those mods/libraries prior to writing any code that depends on them. However, many mods have very permissive licenses. This feature organizes all types in the namespace they are found in C#.
