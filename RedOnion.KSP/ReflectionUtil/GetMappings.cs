@@ -6,6 +6,7 @@ using RedOnion.KSP.Completion;
 
 namespace RedOnion.KSP.ReflectionUtil
 {
+	// This is now just a regular class. No Icompletable necessary.
 	public partial class GetMappings : ICompletable
 	{
 		IList<string> ICompletable.PossibleCompletions
@@ -22,6 +23,21 @@ namespace RedOnion.KSP.ReflectionUtil
 			}
 			completion = null;
 			return false;
+		}
+
+		public NamespaceInstance Get(string assemblyName)
+		{
+			if(TryGetAssemblyNamespaceInstance(assemblyName,out NamespaceInstance namespaceInstance))
+			{
+				return namespaceInstance;
+			}
+
+			throw new Exception("Assembly name " + assemblyName + " not found.");
+		}
+
+		public NamespaceInstance Get(params Assembly[] assemblies)
+		{
+			return new NamespaceMappings(assemblies).GetNamespace("");
 		}
 
 		public bool TryGetAssemblyNamespaceInstance(string name,out NamespaceInstance namespaceInstance)
