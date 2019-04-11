@@ -4,8 +4,6 @@ namespace RedOnion.ROS
 {
 	public partial class Descriptor
 	{
-		public static readonly Descriptor Int = new OfInt();
-
 		internal class OfInt : Descriptor
 		{
 			internal OfInt()

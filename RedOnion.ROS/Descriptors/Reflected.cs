@@ -255,28 +255,54 @@ namespace RedOnion.ROS
 				{
 					if (m.ReturnType == typeof(void))
 					{
-						if (argc == 0)
+						switch (argc)
 						{
-							var value = ReflectedAction.CreateValue(m);
+						case 0:
+						{
+							var value = ReflectedAction0.CreateValue(m);
 							return obj => value;
 						}
-						else if (argc == 1)
+						case 1:
 						{
 							var value = ReflectedAction1.CreateValue(m, args[0].ParameterType);
 							return obj => value;
 						}
+						case 2:
+						{
+							var value = ReflectedAction2.CreateValue(m, args);
+							return obj => value;
+						}
+						case 3:
+						{
+							var value = ReflectedAction3.CreateValue(m, args);
+							return obj => value;
+						}
+						}
 					}
 					else
 					{
-						if (argc == 0)
+						switch (argc)
 						{
-							var value = ReflectedFunction.CreateValue(m);
+						case 0:
+						{
+							var value = ReflectedFunction0.CreateValue(m);
 							return obj => value;
 						}
-						else if (argc == 1)
+						case 1:
 						{
 							var value = ReflectedFunction1.CreateValue(m, args[0].ParameterType);
 							return obj => value;
+						}
+						case 2:
+						{
+							var value = ReflectedFunction2.CreateValue(m, args);
+							return obj => value;
+						}
+						case 3:
+						{
+							var value = ReflectedFunction3.CreateValue(m, args);
+							return obj => value;
+						}
 						}
 					}
 				}
@@ -284,48 +310,102 @@ namespace RedOnion.ROS
 				{
 					if (m.ReturnType == typeof(void))
 					{
-						if (argc == 0)
+						switch (argc)
+						{
+						case 0:
 						{
 							var self = Expression.Parameter(m.DeclaringType, "self");
 							var value = new Value((Descriptor)Activator.CreateInstance(
-									typeof(ReflectedProcedure<>).MakeGenericType(m.DeclaringType), m.Name),
-									Expression.Lambda(Expression.Call(self, m),
-									self).Compile());
+								typeof(ReflectedProcedure0<>).MakeGenericType(m.DeclaringType), m.Name),
+								Expression.Lambda(Expression.Call(self, m),
+								self).Compile());
 							return obj => value;
 						}
-						else if (argc == 1)
+						case 1:
 						{
 							var self = Expression.Parameter(m.DeclaringType, "self");
 							var value = new Value((Descriptor)Activator.CreateInstance(
-									typeof(ReflectedProcedure1<>).MakeGenericType(m.DeclaringType), m.Name),
-									Expression.Lambda(Expression.Call(self, m,
-									GetValueConvertExpression(args[0].ParameterType, ValueArg0Parameter)),
-									self, ValueArg0Parameter).Compile());
+								typeof(ReflectedProcedure1<>).MakeGenericType(m.DeclaringType), m.Name),
+								Expression.Lambda(Expression.Call(self, m,
+								GetValueConvertExpression(args[0].ParameterType, ValueArg0Parameter)),
+								self, ValueArg0Parameter).Compile());
 							return obj => value;
+						}
+						case 2:
+						{
+							var self = Expression.Parameter(m.DeclaringType, "self");
+							var value = new Value((Descriptor)Activator.CreateInstance(
+								typeof(ReflectedProcedure2<>).MakeGenericType(m.DeclaringType), m.Name),
+								Expression.Lambda(Expression.Call(self, m,
+								GetValueConvertExpression(args[0].ParameterType, ValueArg0Parameter),
+								GetValueConvertExpression(args[1].ParameterType, ValueArg1Parameter)),
+								self, ValueArg0Parameter, ValueArg1Parameter).Compile());
+							return obj => value;
+						}
+						case 3:
+						{
+							var self = Expression.Parameter(m.DeclaringType, "self");
+							var value = new Value((Descriptor)Activator.CreateInstance(
+								typeof(ReflectedProcedure3<>).MakeGenericType(m.DeclaringType), m.Name),
+								Expression.Lambda(Expression.Call(self, m,
+								GetValueConvertExpression(args[0].ParameterType, ValueArg0Parameter),
+								GetValueConvertExpression(args[1].ParameterType, ValueArg1Parameter),
+								GetValueConvertExpression(args[2].ParameterType, ValueArg2Parameter)),
+								self, ValueArg0Parameter, ValueArg1Parameter, ValueArg2Parameter).Compile());
+							return obj => value;
+						}
 						}
 					}
 					else
 					{
-						if (argc == 0)
+						switch (argc)
+						{
+						case 0:
 						{
 							var self = Expression.Parameter(m.DeclaringType, "self");
 							var value = new Value((Descriptor)Activator.CreateInstance(
-									typeof(ReflectedMethod<>).MakeGenericType(m.DeclaringType), m.Name),
-									Expression.Lambda(GetNewValueExpression(m.ReturnType,
-									Expression.Call(self, m)),
-									self).Compile());
+								typeof(ReflectedMethod0<>).MakeGenericType(m.DeclaringType), m.Name),
+								Expression.Lambda(GetNewValueExpression(m.ReturnType,
+								Expression.Call(self, m)),
+								self).Compile());
 							return obj => value;
 						}
-						else if (argc == 1)
+						case 1:
 						{
 							var self = Expression.Parameter(m.DeclaringType, "self");
 							var value = new Value((Descriptor)Activator.CreateInstance(
-									typeof(ReflectedMethod1<>).MakeGenericType(m.DeclaringType), m.Name),
-									Expression.Lambda(GetNewValueExpression(m.ReturnType,
-									Expression.Call(self, m,
-									GetValueConvertExpression(args[0].ParameterType, ValueArg0Parameter))),
-									self, ValueArg0Parameter).Compile());
+								typeof(ReflectedMethod1<>).MakeGenericType(m.DeclaringType), m.Name),
+								Expression.Lambda(GetNewValueExpression(m.ReturnType,
+								Expression.Call(self, m,
+								GetValueConvertExpression(args[0].ParameterType, ValueArg0Parameter))),
+								self, ValueArg0Parameter).Compile());
 							return obj => value;
+						}
+						case 2:
+						{
+							var self = Expression.Parameter(m.DeclaringType, "self");
+							var value = new Value((Descriptor)Activator.CreateInstance(
+								typeof(ReflectedMethod2<>).MakeGenericType(m.DeclaringType), m.Name),
+								Expression.Lambda(GetNewValueExpression(m.ReturnType,
+								Expression.Call(self, m,
+								GetValueConvertExpression(args[0].ParameterType, ValueArg0Parameter),
+								GetValueConvertExpression(args[1].ParameterType, ValueArg1Parameter))),
+								self, ValueArg0Parameter, ValueArg1Parameter).Compile());
+							return obj => value;
+						}
+						case 3:
+						{
+							var self = Expression.Parameter(m.DeclaringType, "self");
+							var value = new Value((Descriptor)Activator.CreateInstance(
+								typeof(ReflectedMethod3<>).MakeGenericType(m.DeclaringType), m.Name),
+								Expression.Lambda(GetNewValueExpression(m.ReturnType,
+								Expression.Call(self, m,
+								GetValueConvertExpression(args[0].ParameterType, ValueArg0Parameter),
+								GetValueConvertExpression(args[1].ParameterType, ValueArg1Parameter),
+								GetValueConvertExpression(args[2].ParameterType, ValueArg2Parameter))),
+								self, ValueArg0Parameter, ValueArg1Parameter, ValueArg2Parameter).Compile());
+							return obj => value;
+						}
 						}
 					}
 				}

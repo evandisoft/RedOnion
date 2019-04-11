@@ -4,8 +4,6 @@ namespace RedOnion.ROS
 {
 	public partial class Descriptor
 	{
-		public static readonly Descriptor Double = new OfDouble();
-
 		internal class OfDouble : Descriptor
 		{
 			internal OfDouble()

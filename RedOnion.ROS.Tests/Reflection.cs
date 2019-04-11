@@ -14,6 +14,8 @@ namespace RedOnion.ROS.Tests
 			public static void Increment() => Integer++;
 			public static int GetInteger() => Integer;
 			public static void SetInteger(int value) => Integer = value;
+			public static string Combine(string a, string b) => a + " " + b;
+			public static double Sum3(double a, float b, int c) => a + b + c;
 		}
 		public class InstanceTest
 		{
@@ -21,6 +23,8 @@ namespace RedOnion.ROS.Tests
 			public void Increment() => Integer++;
 			public int GetInteger() => Integer;
 			public void SetInteger(int value) => Integer = value;
+			public string Combine(string a, string b) => a + " " + b;
+			public double Sum3(double a, float b, long c) => a + b + c;
 		}
 
 		[Test]
@@ -65,6 +69,12 @@ namespace RedOnion.ROS.Tests
 			Globals.Add("it", new InstanceTest());
 			Test("it.setInteger(10)");
 			Test(10, "it.getInteger");
+
+			Test("hello world", @"test.combine ""hello"", ""world""");
+			Test("hello world", @"it.combine ""hello"", ""world""");
+
+			Test(1.0+2f+3, @"test.sum3 1.0, 2f, 3");
+			Test(1.0+2f+3, @"it.sum3 1.0, 2f, 3");
 		}
 	}
 }

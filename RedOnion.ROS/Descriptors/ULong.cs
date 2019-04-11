@@ -4,8 +4,6 @@ namespace RedOnion.ROS
 {
 	public partial class Descriptor
 	{
-		public static readonly Descriptor ULong = new OfULong();
-
 		internal class OfULong : Descriptor
 		{
 			internal OfULong()
