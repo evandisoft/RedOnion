@@ -43,7 +43,7 @@ Intellisense won't work directly  on `asssembly["assemblyName"].`, but it will w
 
 ```
 a=assembly["assemblyName"]
-a. -- this will show completiosn for the given assembly
+a. -- this will show completions for the given assembly
 ```
 
 ## 0.3.0
