@@ -12,4 +12,4 @@ Try terminating the current program with ctrl+c
 Click the evaluate button when a script is in the editor. Ensure you have the [right engine selected](https://github.com/evandisoft/RedOnion/blob/master/TroubleShooting.md#script-wont-work).
 
 ### This mod might have bad interactions with other mods that use MoonSharp.
-This mod needs to modify many global MoonSharp settings to work properly, and that may modify MoonSharp settings used by other mods.
+The Lua engine needs to modify many global MoonSharp settings to work properly, and that may modify MoonSharp settings used by other mods.
