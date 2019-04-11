@@ -1,3 +1,5 @@
+# Note: Most of this doc is obsolete! These classes should be accessed via import in Lua, or reflect in ros, if possible.
+
 # Common Scripting API for Lua and RedOnionScript (ROS)
 Here is some information about the API that we provide. In the future a lot of the content in these docs will be automated, but for now we will try to keep documentation manually caught up with at least some of the features we have added. But some features may be out of date or improperly maintained until we have an automatic documentation system.
 
