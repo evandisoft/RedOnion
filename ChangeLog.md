@@ -22,6 +22,10 @@ Nothing yet! Just had a release!
 </details>
 
 # 0.3 
+## 0.3.1
+import is now limited to a default list of assemblies.
+To get other assemblies access them through `assembly.AssemblyName.`
+
 ## 0.3.0
 ### New Import System:
 `listtype=import.system.collections.generic.list`. Using the import system you can interact with any loaded
