@@ -1,8 +1,8 @@
 -- exploring interaction with editor functionality
-editor=Ksp.EditorLogic
+editor=import.EditorLogic.fetch
 
-pl=Ksp.PartLoader
-sc=Ksp.ShipConstruction
+pl=import.PartLoader.Instance
+sc=import.ShipConstruction
 ship=editor.ship
 parts=ship.parts
 part=parts[0]

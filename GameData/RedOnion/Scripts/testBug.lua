@@ -1,1 +1,0 @@
-vessel=Ksp.FlightGlobals.ActiveVessel

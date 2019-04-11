@@ -1,4 +1,0 @@
-for var p in ship.parts
-    print p
-    for var m in p.modules
-        print m

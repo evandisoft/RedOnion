@@ -2,6 +2,8 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using RedOnion.KSP.ReflectionUtil;
+using MoonSharp.Interpreter.Interop;
+using MoonSharp.Interpreter;
 
 namespace KerbaluaNUnit {
 	[TestFixture()]
@@ -132,6 +134,20 @@ namespace KerbaluaNUnit {
 			}
 
 			Assert.AreEqual(typeof(Func<,,>), namespaceInstance.GetRawType("func", 3));
+		}
+
+		[Test()]
+		public void LUA_ImportManager_10_LuaInterface()
+		{
+			var mappings = NamespaceMappings.ForAllAssemblies;
+			var namespaceInstance = mappings.GetNamespace("system");
+			var luaInterface = namespaceInstance as IUserDataType;
+			foreach (var part in namespaceInstance.PossibleCompletions)
+			{
+				//Console.WriteLine(part);
+			}
+			Script script = new Script();
+			Assert.AreEqual(typeof(Func<object>), luaInterface.Index(script,DynValue.NewString("func"),false));
 		}
 	}
 }

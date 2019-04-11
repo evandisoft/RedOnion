@@ -1,4 +1,0 @@
-var globals=KSP.FlightGlobals
-var vessels=globals.VesselsUnloaded
-var ctrl=ksp.flightcontrol.GetInstance()
-

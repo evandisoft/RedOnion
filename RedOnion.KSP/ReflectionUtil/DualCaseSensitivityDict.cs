@@ -14,11 +14,17 @@ namespace RedOnion.KSP.ReflectionUtil
 	/// Will search first in the case sensitive dict, then in the caseInsensitive
 	/// dict. If when a value is added, the key is already in caseInsenstive,
 	/// but not in caseSensitive, that will represent a collision and it will
-	/// be stored in CollisionKeys
+	/// be stored in CollisionMap
 	/// </summary>
 	public class DualCaseSensitivityDict<TValue>
 	{
 		Dictionary<string, TValue> caseSensitive = new Dictionary<string, TValue>();
+		/// <summary>
+		/// This is a case insensitive mapping from case insensitive keys
+		/// to case sensitive keys. In this[string key] set, this allows us to do
+		/// CollisionMap[key].Add(caseInsensitive[key]), getting the case sensitive
+		/// key that was part of the newly found collision.
+		/// </summary>
 		Dictionary<string, string> caseInsensitive = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 		public Dictionary<string, List<string>> CollisionMap = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
 
@@ -43,7 +49,7 @@ namespace RedOnion.KSP.ReflectionUtil
 				}
 
 				// This should not ever occur. Every value in caseInsensitive should be a key in caseSensitive
-				throw new KeyNotFoundException("kew found in " + nameof(caseInsensitive)
+				throw new KeyNotFoundException("key found in " + nameof(caseInsensitive)
 					+ " but corresponding value was not a key in " + nameof(caseSensitive));
 			}
 
@@ -96,7 +102,7 @@ namespace RedOnion.KSP.ReflectionUtil
 					if (!caseSensitive.ContainsKey(newKey))
 					{
 						// This should not ever occur. Every value in caseInsensitive should be a key in caseSensitive
-						throw new KeyNotFoundException("kew found in " + nameof(caseInsensitive)
+						throw new KeyNotFoundException("key found in " + nameof(caseInsensitive)
 							+ " but corresponding value was not a key in " + nameof(caseSensitive));
 					}
 					return caseSensitive[newKey];

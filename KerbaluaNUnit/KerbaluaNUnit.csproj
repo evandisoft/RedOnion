@@ -12,7 +12,7 @@
     <RootNamespace>KerbaluaNUnit</RootNamespace>
     <AssemblyName>KerbaluaNUnit</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
-    <ReleaseVersion>0.2.1</ReleaseVersion>
+    <ReleaseVersion>0.3.0</ReleaseVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -62,6 +62,10 @@
     <ProjectReference Include="..\RedOnion.KSP\RedOnion.KSP.csproj">
       <Project>{DEC12E09-29AD-4666-9954-8C8A1D7BF454}</Project>
       <Name>RedOnion.KSP</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RedOnion.Script\RedOnion.Script.csproj">
+      <Project>{0D0A04F3-0A82-49CD-8178-7640ACE88BFF}</Project>
+      <Name>RedOnion.Script</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

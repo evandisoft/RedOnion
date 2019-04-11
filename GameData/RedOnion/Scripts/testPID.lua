@@ -1,3 +1,4 @@
+-- Doesn't work. Just keeping this here in case I want to experiment more
 vessel=Ksp.FlightGlobals.ActiveVessel
 ctrl=Ksp.FlightControl
 
