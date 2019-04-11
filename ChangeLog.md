@@ -44,7 +44,7 @@ Intellisense won't work directly  on `asssembly["assemblyName"].`, but it will w
 ```
 i> a=assembly["assemblyName"]
 r> void
-i> a. -- this will show completions for the given assembly
+i> a. -- this will show completions for the assembly named "assemblyName"
 ```
 
 ## 0.3.0
