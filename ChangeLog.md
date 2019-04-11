@@ -32,7 +32,7 @@ First name after "assembly" is the assembly name, followed by any namespaces or 
 
 `assembly.UnityEngine.UnityEngine.Vector3`
 
-This is how you access classes in mods. Just make sure the mod has a permissive license.
+This is how you access types or namespaces in other mods.
 
 ## 0.3.0
 ### New Import System:
