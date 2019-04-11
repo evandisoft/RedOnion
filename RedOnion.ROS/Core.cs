@@ -179,6 +179,27 @@ namespace RedOnion.ROS
 						throw InvalidOperation((self != null ? selfDesc.NameOf(self, idx) : it.Name)
 							+ " cannot be called with zero arguments");
 					}
+					case OpCode.Call1:
+					{
+						object self = null;
+						Descriptor selfDesc = null;
+						int idx = -1;
+						ref var it = ref vals.Top(-2);
+						if (it.IsReference)
+						{
+							selfDesc = it.desc;
+							self = it.obj;
+							idx = it.num.Int;
+							if (!it.desc.Get(ref it, idx))
+								throw CouldNotGet(ref it);
+						}
+						if (it.desc.Call(ref it, self, new Arguments(Arguments, 1), false))
+							continue;
+						if (op == OpCode.Autocall)
+							continue;
+						throw InvalidOperation((self != null ? selfDesc.NameOf(self, idx) : it.Name)
+							+ " cannot be called with zero arguments");
+					}
 
 					case OpCode.Index:
 					{

@@ -27,7 +27,7 @@ namespace RedOnion.ROS
 			protected Func<object, int, Value> intIndexGet;
 			protected Action<object, int, Value> intIndexSet;
 			protected Func<object, string, Value> strIndexGet;
-			protected Action<object, int, Value> strIndexSet;
+			protected Action<object, string, Value> strIndexSet;
 
 			public class MemberComparer : IComparer<MemberInfo>
 			{
@@ -76,35 +76,37 @@ namespace RedOnion.ROS
 				}
 			}
 
-			protected static Dictionary<Type, ConstructorInfo>
-				PrimitiveValueConstructors = GetPrimitiveValueConstructors();
-			private static Dictionary<Type, ConstructorInfo> GetPrimitiveValueConstructors()
-			{
-				var dict = new Dictionary<Type,ConstructorInfo>();
-				foreach (var ctor in typeof(Value).GetConstructors())
-				{
-					var args = ctor.GetParameters();
-					if (args.Length != 1)
-						continue;
-					var type = args[0].ParameterType;
-					if (!type.IsPrimitive)
-						continue;
-					dict[type] = ctor;
-				}
-				return dict;
-			}
-			protected static ConstructorInfo DefaultValueConstructor
-				= typeof(Value).GetConstructor(new Type[] { typeof(object) });
-			protected static ConstructorInfo IntValueConstructor
-				= typeof(Value).GetConstructor(new Type[] { typeof(int) });
-			protected static ConstructorInfo StrValueConstructor
-				= typeof(Value).GetConstructor(new Type[] { typeof(string) });
-
 			protected virtual void ProcessMember(
 				MemberInfo member, bool instance, ref Dictionary<string, int> dict)
 			{
 				if (dict != null && dict.ContainsKey(member.Name))
 					return; // conflict
+
+				//============================================================================ FIELD
+				if (member is FieldInfo f)
+				{
+					if (dict == null)
+						dict = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+					dict[f.Name] = prop.size;
+					ref var it = ref prop.Add();
+					it.name = f.Name;
+					var type = f.FieldType;
+					it.read = Expression.Lambda<Func<object, Value>>(
+						// self => new Value(((T)self).name)
+						GetNewValueExpression(type,
+							Expression.Field(instance
+								? Expression.Convert(SelfParameter, f.DeclaringType)
+								: null, f)),
+						SelfParameter
+					).Compile();
+					if (f.IsInitOnly)
+						return;
+					// maybe use Reflection.Emit: https://docs.microsoft.com/en-us/dotnet/api/system.reflection.emit.dynamicmethod?view=netframework-3.5
+					if (instance)
+						it.write = (self, value) => f.SetValue(self, value.Object);
+					else it.write = (self, value) => f.SetValue(null, value.Object);
+					return;
+				}
 
 				//========================================================================= PROPERTY
 				if (member is PropertyInfo p)
@@ -115,44 +117,69 @@ namespace RedOnion.ROS
 						if (iargs.Length != 1)
 							return;
 						var itype = iargs[0].ParameterType;
+
+						//---------------------------------------------------------------- this[int]
 						if (itype == typeof(int))
 						{
 							if (p.CanRead)
 							{
-								var obj = Expression.Parameter(typeof(object), "obj");
-								var idx = Expression.Parameter(typeof(int), "idx");
 								intIndexGet = Expression.Lambda<Func<object, int, Value>>(
-									// (obj, idx) => new Value(((T)obj)[idx])
 									Expression.New(IntValueConstructor, new Expression[] {
 										Expression.Call(
-											Expression.Convert(obj, p.DeclaringType),
-											p.GetGetMethod(),
-											idx)
+											Expression.Convert(SelfParameter, p.DeclaringType),
+											p.GetGetMethod(), IntIndexParameter)
 									}),
-									obj, idx
+									SelfParameter, IntIndexParameter
+								).Compile();
+							}
+							if (p.CanWrite)
+							{
+								intIndexSet = Expression.Lambda<Action<object, int, Value>>(
+									Expression.New(IntValueConstructor, new Expression[] {
+										Expression.Call(
+											Expression.Convert(SelfParameter, p.DeclaringType),
+											p.GetSetMethod(), IntIndexParameter,
+											GetValueConvertExpression(p.PropertyType, ValueParameter))
+									}),
+									SelfParameter, IntIndexParameter, ValueParameter
+								).Compile();
+							}
+							return;
+						}
+						//------------------------------------------------------------- this[string]
+						if (itype == typeof(string))
+						{
+							if (p.CanRead)
+							{
+								strIndexGet = Expression.Lambda<Func<object, string, Value>>(
+									Expression.New(StrValueConstructor, new Expression[] {
+										Expression.Call(
+											Expression.Convert(SelfParameter, p.DeclaringType),
+											p.GetGetMethod(), StrIndexParameter)
+									}),
+									SelfParameter, StrIndexParameter
 								).Compile();
 							}
 							if (p.CanWrite)
 							{
 								var obj = Expression.Parameter(typeof(object), "obj");
-								var idx = Expression.Parameter(typeof(int), "idx");
+								var idx = Expression.Parameter(typeof(string), "idx");
 								var val = Expression.Parameter(typeof(Value), "val");
-								intIndexSet = Expression.Lambda<Action<object, int, Value>>(
-									// (obj, idx, val) => ((T)obj)[idx] = val.Object
-									Expression.New(IntValueConstructor, new Expression[] {
+								strIndexSet = Expression.Lambda<Action<object, string, Value>>(
+									Expression.New(StrValueConstructor, new Expression[] {
 										Expression.Call(
 											Expression.Convert(obj, p.DeclaringType),
-											p.GetSetMethod(),
-											idx,
-											Expression.Property(val, "Object"))
+											p.GetSetMethod(), StrIndexParameter,
+											GetValueConvertExpression(p.PropertyType, ValueParameter))
 									}),
-									obj, idx
+									SelfParameter, StrIndexParameter, ValueParameter
 								).Compile();
 							}
 							return;
 						}
 						return;
 					}
+					//-------------------------------------------------------------- normal property
 					if (dict == null)
 						dict = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 					dict[p.Name] = prop.size;
@@ -161,33 +188,23 @@ namespace RedOnion.ROS
 					var type = p.PropertyType;
 					if (p.CanRead)
 					{
-						if (!PrimitiveValueConstructors.TryGetValue(type, out var vctor))
-							vctor = DefaultValueConstructor;
-						var obj = Expression.Parameter(typeof(object), "obj");
 						it.read = Expression.Lambda<Func<object, Value>>(
-							// obj => new Value(((T)obj).name)
-							Expression.New(vctor, new Expression[] {
+							GetNewValueExpression(type,
 								Expression.Property(instance
-									? Expression.Convert(obj, p.DeclaringType)
-									: null, p)
-							}),
-							obj
+									? Expression.Convert(SelfParameter, p.DeclaringType)
+									: null, p)),
+							SelfParameter
 						).Compile();
 					}
 					if (p.CanWrite)
 					{
-						var obj = Expression.Parameter(typeof(object), "obj");
-						var val = Expression.Parameter(typeof(Value), "val");
 						it.write = Expression.Lambda<Action<object, Value>>(
-							// (obj, val) => ((T)obj).name = (P)val.Object
 							Expression.Call(instance
-								? Expression.Convert(obj, p.DeclaringType)
+								? Expression.Convert(SelfParameter, p.DeclaringType)
 								: null,
 								p.GetSetMethod(),
-								Expression.Convert(
-									Expression.Property(val, "Object"),
-									type)),
-							obj, val
+								GetValueConvertExpression(type, ValueParameter)),
+							SelfParameter, ValueParameter
 						).Compile();
 					}
 				}
@@ -195,46 +212,124 @@ namespace RedOnion.ROS
 				//=========================================================================== METHOD
 				if (member is MethodInfo m)
 				{
-					if (m.IsSpecialName)
-						return;
-					if (!instance)
+					Func<object, Value> read = null;
+#if DEBUG
+					read = ReflectMethod(m);
+#else
+					try
 					{
-						if (m.ReturnType != typeof(void))
-							return; //TODO: functions
-						var args = m.GetParameters();
-						if (args.Length != 0)
-							return; //TODO: arguments
-						if (dict == null)
-							dict = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-						dict[m.Name] = prop.size;
-						ref var it = ref prop.Add();
-						it.name = m.Name;
-						var value = new Value(new ReflectedAction(m.Name),
-							Delegate.CreateDelegate(typeof(Action), m));
-						it.read = obj => value;
+						read = ReflectMethod(m);
+					}
+					catch
+					{
+					}
+#endif
+					if (read == null)
 						return;
+					if (dict == null)
+						dict = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+					dict[m.Name] = prop.size;
+					ref var it = ref prop.Add();
+					it.name = m.Name;
+					it.read = read;
+					return;
+				}
+			}
+
+			protected static Func<object, Value> ReflectMethod(MethodInfo m)
+			{
+				if (m.IsSpecialName)
+					return null;
+				if (m.ReturnType.IsByRef)
+					return null;
+				var args = m.GetParameters();
+				foreach (var arg in args)
+				{
+					if (arg.ParameterType.IsByRef)
+						return null;
+					if (arg.IsOut)
+						return null;
+				}
+				var argc = args.Length;
+				if (m.IsStatic)
+				{
+					if (m.ReturnType == typeof(void))
+					{
+						if (argc == 0)
+						{
+							var value = ReflectedAction.CreateValue(m);
+							return obj => value;
+						}
+						else if (argc == 1)
+						{
+							var value = ReflectedAction1.CreateValue(m, args[0].ParameterType);
+							return obj => value;
+						}
 					}
 					else
 					{
-						if (m.ReturnType != typeof(void))
-							return; //TODO: functions
-						var args = m.GetParameters();
-						if (args.Length != 0)
-							return; //TODO: arguments
-						if (dict == null)
-							dict = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-						dict[m.Name] = prop.size;
-						ref var it = ref prop.Add();
-						it.name = m.Name;
-						var self = Expression.Parameter(m.DeclaringType, "self");
-						var value = new Value((Descriptor)Activator.CreateInstance(
-							typeof(ReflectedMethod<>).MakeGenericType(m.DeclaringType), m.Name),
-							Expression.Lambda(Expression.Call(self, m),
-							self).Compile());
-						it.read = obj => value;
-						return;
+						if (argc == 0)
+						{
+							var value = ReflectedFunction.CreateValue(m);
+							return obj => value;
+						}
+						else if (argc == 1)
+						{
+							var value = ReflectedFunction1.CreateValue(m, args[0].ParameterType);
+							return obj => value;
+						}
 					}
 				}
+				else
+				{
+					if (m.ReturnType == typeof(void))
+					{
+						if (argc == 0)
+						{
+							var self = Expression.Parameter(m.DeclaringType, "self");
+							var value = new Value((Descriptor)Activator.CreateInstance(
+									typeof(ReflectedProcedure<>).MakeGenericType(m.DeclaringType), m.Name),
+									Expression.Lambda(Expression.Call(self, m),
+									self).Compile());
+							return obj => value;
+						}
+						else if (argc == 1)
+						{
+							var self = Expression.Parameter(m.DeclaringType, "self");
+							var value = new Value((Descriptor)Activator.CreateInstance(
+									typeof(ReflectedProcedure1<>).MakeGenericType(m.DeclaringType), m.Name),
+									Expression.Lambda(Expression.Call(self, m,
+									GetValueConvertExpression(args[0].ParameterType, ValueArg0Parameter)),
+									self, ValueArg0Parameter).Compile());
+							return obj => value;
+						}
+					}
+					else
+					{
+						if (argc == 0)
+						{
+							var self = Expression.Parameter(m.DeclaringType, "self");
+							var value = new Value((Descriptor)Activator.CreateInstance(
+									typeof(ReflectedMethod<>).MakeGenericType(m.DeclaringType), m.Name),
+									Expression.Lambda(GetNewValueExpression(m.ReturnType,
+									Expression.Call(self, m)),
+									self).Compile());
+							return obj => value;
+						}
+						else if (argc == 1)
+						{
+							var self = Expression.Parameter(m.DeclaringType, "self");
+							var value = new Value((Descriptor)Activator.CreateInstance(
+									typeof(ReflectedMethod1<>).MakeGenericType(m.DeclaringType), m.Name),
+									Expression.Lambda(GetNewValueExpression(m.ReturnType,
+									Expression.Call(self, m,
+									GetValueConvertExpression(args[0].ParameterType, ValueArg0Parameter))),
+									self, ValueArg0Parameter).Compile());
+							return obj => value;
+						}
+					}
+				}
+				return null;
 			}
 
 			public override int Find(object self, string name, bool add)
