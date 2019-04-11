@@ -7,6 +7,8 @@
 - We want people to be able to explore their own or other's mods using this mod.
 - We want to be able to interact with the program in an unrestricted way and we think others will enjoy that as well.
 
+**We may, in the future, create an optional sandbox. But that will come later.**
+
 # RedOnion and Kerbalua
 
 A joint effort of Evan Dickinson and Lukáš Fireš to create
