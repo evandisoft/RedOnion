@@ -16,6 +16,8 @@ namespace RedOnion.ROS
 		public virtual int GetHashCode(ref Value self)
 			=> self.obj.GetHashCode();
 
+		protected Descriptor(Type type)
+			: this(type.Name, type) { }
 		protected Descriptor(string name, Type type)
 		{
 			Name = name;
@@ -33,7 +35,7 @@ namespace RedOnion.ROS
 		public override string ToString() => Name;
 		public virtual string ToString(ref Value self, string format, IFormatProvider provider, bool debug)
 			=> format != null && self.obj is IFormattable fmt
-			? fmt.ToString(format, provider) : self.obj.ToString();
+			? fmt.ToString(format, provider) : self.obj?.ToString() ?? Name;
 
 		public virtual bool Convert(ref Value self, Descriptor to)
 		{
@@ -47,7 +49,7 @@ namespace RedOnion.ROS
 
 		public virtual bool Unary(ref Value self, OpCode op) => false;
 		public virtual bool Binary(ref Value lhs, OpCode op, ref Value rhs) => false;
-		public virtual bool Call(ref Value result, ref Value self, Arguments args, bool create) => false;
+		public virtual bool Call(ref Value result, object self, Arguments args, bool create) => false;
 		public virtual int Find(object self, string name, bool add) => -1;
 		public virtual string NameOf(object self, int at) => null;
 		public virtual bool Get(ref Value self, int at) => false;
@@ -58,7 +60,7 @@ namespace RedOnion.ROS
 		{
 			if (args.Length == 0)
 				return -1;
-			var index = args[0];
+			ref var index = ref args.GetRef(0);
 			int at;
 			if (index.IsNumber)
 				return -1;
@@ -72,5 +74,10 @@ namespace RedOnion.ROS
 				return -1;
 			return self.desc.IndexFind(ref self, new Arguments(args, args.Length-1));
 		}
+
+		static internal InvalidOperationException InvalidOperation(string msg)
+			=> new InvalidOperationException(msg);
+		static internal InvalidOperationException InvalidOperation(string msg, params object[] args)
+			=> new InvalidOperationException(string.Format(Value.Culture, msg, args));
 	}
 }

@@ -45,6 +45,7 @@
     <Compile Include="OpCode.cs" />
     <Compile Include="ParseExpression.cs" />
     <Compile Include="ParseStatements.cs" />
+    <Compile Include="Reflection.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

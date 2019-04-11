@@ -6,6 +6,8 @@ namespace RedOnion.ROS
 {
 	public partial class Descriptor
 	{
+		public static Func<Type,Descriptor> Create = type => new Reflected(type);
+
 		private readonly static ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
 		private readonly static Dictionary<Type, Descriptor> _of = new Dictionary<Type, Descriptor>()
 		{
@@ -40,10 +42,17 @@ namespace RedOnion.ROS
 				return it;
 			}
 			_lock.EnterWriteLock();
-			it = new Reflected(type);
-			_of[type] = it;
-			_lock.ExitWriteLock();
-			_lock.ExitUpgradeableReadLock();
+			try
+			{
+				it = Create(type);
+				if (it != null)
+					_of[type] = it;
+			}
+			finally
+			{
+				_lock.ExitWriteLock();
+				_lock.ExitUpgradeableReadLock();
+			}
 			return it;
 		}
 		public static Descriptor Of(Type type, Descriptor value)
@@ -64,10 +73,17 @@ namespace RedOnion.ROS
 				return it;
 			}
 			_lock.EnterWriteLock();
-			it = value ?? new Reflected(type);
-			_of[type] = it;
-			_lock.ExitWriteLock();
-			_lock.ExitUpgradeableReadLock();
+			try
+			{
+				it = value ?? Create(type);
+				if (it != null)
+					_of[type] = it;
+			}
+			finally
+			{
+				_lock.ExitWriteLock();
+				_lock.ExitUpgradeableReadLock();
+			}
 			return it;
 		}
 		public static Descriptor Of(Type type, Func<Descriptor> create)
@@ -80,6 +96,7 @@ namespace RedOnion.ROS
 				_lock.ExitReadLock();
 				return it;
 			}
+			_lock.ExitReadLock();
 			_lock.EnterUpgradeableReadLock();
 			if (_of.TryGetValue(type, out it))
 			{
@@ -89,8 +106,40 @@ namespace RedOnion.ROS
 			_lock.EnterWriteLock();
 			try
 			{
-				it = create() ?? new Reflected(type);
-				_of[type] = it;
+				it = create() ?? Create(type);
+				if (it != null)
+					_of[type] = it;
+			}
+			finally
+			{
+				_lock.ExitWriteLock();
+				_lock.ExitUpgradeableReadLock();
+			}
+			return it;
+		}
+		public static Descriptor Of(Type type, Func<Type,Descriptor> create)
+		{
+			if (type == null)
+				throw new ArgumentNullException("type");
+			_lock.EnterReadLock();
+			if (_of.TryGetValue(type, out var it))
+			{
+				_lock.ExitReadLock();
+				return it;
+			}
+			_lock.ExitReadLock();
+			_lock.EnterUpgradeableReadLock();
+			if (_of.TryGetValue(type, out it))
+			{
+				_lock.ExitUpgradeableReadLock();
+				return it;
+			}
+			_lock.EnterWriteLock();
+			try
+			{
+				it = create(type) ?? Create(type);
+				if (it != null)
+					_of[type] = it;
 			}
 			finally
 			{

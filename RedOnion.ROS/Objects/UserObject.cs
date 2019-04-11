@@ -20,14 +20,25 @@ namespace RedOnion.ROS.Objects
 		protected UserObject parent;
 		protected int readOnlyTop = 0;
 
-		public UserObject() : base("user object", typeof(UserObject)) { }
+		public UserObject()
+			: base("user object", typeof(UserObject)) { }
+		public UserObject(string name)
+			: base(name, typeof(UserObject)) { }
+		public UserObject(string name, Type type)
+			: base(name, type) { }
 		public UserObject(UserObject parent)
 			: this() => this.parent = parent;
+		public UserObject(string name, UserObject parent)
+			: this(name, typeof(UserObject))
+			=> this.parent = parent;
+		public UserObject(string name, Type type, UserObject parent)
+			: this(name, type)
+			=> this.parent = parent;
 
 		/// <summary>
 		/// Create new user object inheriting from this one
 		/// </summary>
-		public override bool Call(ref Value result, ref Value self, Arguments args, bool create)
+		public override bool Call(ref Value result, object self, Arguments args, bool create)
 		{
 			var it = new UserObject(this);
 			result = new Value(it, it);
@@ -57,6 +68,14 @@ namespace RedOnion.ROS.Objects
 			}
 		}
 
+		public int Add(Type type)
+			=> Add(type.Name, new Value(type));
+		public int Add(string name, Type type)
+			=> Add(name, new Value(type));
+		public int Add(string name, UserObject it)
+			=> Add(name, new Value(it));
+		public int Add(string name, object it)
+			=> Add(name, new Value(it));
 		public int Add(string name, Value value)
 			=> Add(name, ref value);
 		public int Add(string name, ref Value value)

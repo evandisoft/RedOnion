@@ -40,6 +40,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Descriptors\ReflectedMethods.cs" />
     <Compile Include="Descriptors\All.cs" />
     <Compile Include="Descriptors\Bool.cs" />
     <Compile Include="Descriptors\Byte.cs" />

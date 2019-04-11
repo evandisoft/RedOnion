@@ -6,7 +6,7 @@ namespace RedOnion.ROS.Objects
 {
 	public class Globals : UserObject
 	{
-		public Globals()
+		public Globals() : base("Globals")
 		{
 			Add("object", new Value(new UserObject()));
 			Lock();

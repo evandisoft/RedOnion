@@ -50,7 +50,71 @@ namespace RedOnion.ROS
 		public static readonly Value True = new Value(true);
 
 		public Value(UserObject it) : this(it, it) {}
-		public Value(object it) : this(Descriptor.Of(it.GetType()), it) { }
+		public Value(Type type) : this(Descriptor.Of(type), null) { }
+		public Value(object it) : this()
+		{
+			if (it is Value v)
+			{
+				desc = v.desc;
+				obj = v.obj;
+				num = v.num;
+				return;
+			}
+			if (it is Descriptor d)
+			{
+				obj = desc = d;
+				return;
+			}
+			desc = Descriptor.Of(it is Type t ? t : it.GetType());
+			if (!IsNumber)
+			{
+				obj = it;
+				return;
+			}
+			var n = (IConvertible)it;
+			switch((OpCode)desc.Primitive)
+			{
+			case OpCode.Char:
+			case OpCode.WideChar:
+				num.Char = n.ToChar(Culture);
+				return;
+
+			case OpCode.Byte:
+				num.Byte = n.ToByte(Culture);
+				return;
+			case OpCode.UShort:
+				num.UShort = n.ToUInt16(Culture);
+				return;
+			case OpCode.UInt:
+				num.UInt = n.ToUInt32(Culture);
+				return;
+			case OpCode.ULong:
+				num.ULong = n.ToUInt64(Culture);
+				return;
+			case OpCode.SByte:
+				num.SByte = n.ToSByte(Culture);
+				return;
+			case OpCode.Short:
+				num.Short = n.ToInt16(Culture);
+				return;
+			case OpCode.Int:
+				num.Int = n.ToInt32(Culture);
+				return;
+			case OpCode.Long:
+				num.Long = n.ToInt64(Culture);
+				return;
+			case OpCode.Float:
+				num.Float = (float)n.ToDouble(Culture);
+				return;
+			case OpCode.Double:
+				num.Double = n.ToDouble(Culture);
+				return;
+			case OpCode.Bool:
+				num.Bool = n.ToBoolean(Culture);
+				return;
+			}
+		}
+
 		public Value(Descriptor descriptor, object it)
 		{
 			desc = descriptor;
@@ -112,6 +176,7 @@ namespace RedOnion.ROS
 		public override int GetHashCode()
 			=> desc.GetHashCode(ref this);
 
+		public bool IsString => desc.Primitive == ExCode.String;
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		public bool IsNumber => desc.Primitive > ExCode.String;
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -239,8 +304,8 @@ namespace RedOnion.ROS
 					return string.Format(Culture, name == null || name.Length == 0 || name[0] == '#'
 						? "'{0}'#{1}" : "'{0}'.{2}", desc.Name, num.Int, name);
 				}
-				return obj == desc ? desc.Name : string.Format(Culture,
-					"{0}: {1}", desc.Name, desc.ToString(ref this, null, Culture, true));
+				return string.Format(Culture, "{0}: {1}",
+					desc.Name, desc.ToString(ref this, null, Culture, true));
 			}
 		}
 	}
