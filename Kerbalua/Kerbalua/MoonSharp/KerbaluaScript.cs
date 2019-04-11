@@ -55,7 +55,7 @@ namespace Kerbalua.MoonSharp
 		public KerbaluaScript() : base(CoreModules.Preset_Complete)
 		{
 			UserData.RegistrationPolicy = InteropRegistrationPolicy.Automatic;
-
+			
 			GlobalOptions.CustomConverters
 				.SetClrToScriptCustomConversion(
 					(Script script, ModuleControlSurface m)
@@ -98,6 +98,12 @@ namespace Kerbalua.MoonSharp
 				}
 				return DynValue.FromObject(this,o.GetType());
 			});
+			Globals["loadedassemblies"] = new Func<Assembly[]>(() =>
+			{
+				return AppDomain.CurrentDomain.GetAssemblies();
+			});
+
+			Globals["assembly"] = new GetMappings();
 
 			Globals["printall"] = DoString(
 			@"

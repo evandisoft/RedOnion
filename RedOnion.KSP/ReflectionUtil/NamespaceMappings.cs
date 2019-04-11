@@ -32,6 +32,54 @@ namespace RedOnion.KSP.ReflectionUtil
 			}
 		}
 
+		/// <summary>
+		/// A list of assemblies we're providing by default.
+		/// </summary>
+		static HashSet<string> defaultAssemblyNames = new HashSet<string> 
+		{ 
+			"RedOnion",
+			"RedOnion.Script",
+			"RedOnion.UI",
+			"RedOnion.KSP",
+			"MoonSharp.Interpreter",
+			"Kerbalua",
+			"System.Core",
+			"System",
+			"KSPTrackIR",
+			"KSPAssets",
+			"UnityEngine.Analytics",
+			"UnityEngine.Timeline",
+			"UnityEngine.Networking",
+			"UnityEngine.UI",
+			"Assembly-CSharp",
+			"Assembly-CSharp-firstpass",
+			"UnityEngine",
+			"mscorlib",
+		};
+		static NamespaceMappings defaultAssemblies;
+		static public NamespaceMappings DefaultAssemblies
+		{
+			get
+			{
+				if (defaultAssemblies == null)
+				{
+					defaultAssemblies = new NamespaceMappings(() =>
+					{
+						var assemblies = new List<Assembly>();
+						foreach(var assembly in AppDomain.CurrentDomain.GetAssemblies())
+						{
+							if (defaultAssemblyNames.Contains(assembly.GetName().Name))
+							{
+								assemblies.Add(assembly);
+							}
+						}
+						return assemblies.ToArray();
+					});
+				}
+				return defaultAssemblies;
+			}
+		}
+
 		public DualCaseSensitivityDict<NameTypeMap> NamespaceToNameTypeMap = new DualCaseSensitivityDict<NameTypeMap>();
 		public DualCaseSensitivityDict<List<string>> NamespaceContinuationMap = new DualCaseSensitivityDict<List<string>>();
 		/// <summary>
@@ -114,6 +162,24 @@ namespace RedOnion.KSP.ReflectionUtil
 				}
 			}
 
+			// Make sure all parent namespaces are included
+			// in case some parent namespace does not have any type
+			// but their subnamespaces do
+			foreach(var namespaceString in namespaceStrings.ToArray())
+			{
+				string currentNamespace = namespaceString;
+				string parent;
+				while (TryGetParentNamespace(currentNamespace, out parent) && !namespaceStrings.Contains(parent))
+				{
+					namespaceStrings.Add(parent);
+					NamespaceToNameTypeMap[parent] = new NameTypeMap();
+					NamespaceContinuationMap[parent] = new List<string>();
+					NamespaceCompletionMap[parent] = new List<string>();
+					currentNamespace = parent;
+				}
+			}
+
+
 			foreach (var namespaceString in namespaceStrings)
 			{
 				if (NamespaceParent(namespaceString, out string parent))
@@ -131,12 +197,14 @@ namespace RedOnion.KSP.ReflectionUtil
 				}
 			}
 
+			// add all completions
 			foreach (var namespaceString in NamespaceToNameTypeMap.Keys)
 			{
 				if (!NamespaceCompletionMap.ContainsSensitiveKey(namespaceString))
 				{
 					NamespaceCompletionMap[namespaceString] = new List<string>();
 				}
+
 
 				NamespaceCompletionMap[namespaceString].AddRange(NamespaceToNameTypeMap[namespaceString].BaseTypeNames);
 				NamespaceCompletionMap[namespaceString].AddRange(NamespaceContinuationMap[namespaceString]);
@@ -147,6 +215,24 @@ namespace RedOnion.KSP.ReflectionUtil
 				NamespaceCompletionMap[namespaceString].Sort();
 				//NamespaceRawTypeNamesMap[namespaceString].Sort();
 			}
+		}
+
+		bool TryGetParentNamespace(string namespaceString,out string parent)
+		{
+			if (namespaceString == "")
+			{
+				parent = "";
+				return false;
+			}
+
+			if (!namespaceString.Contains("."))
+			{
+				parent = "";
+				return true;
+			}
+
+			parent=namespaceString.Substring(0,namespaceString.LastIndexOf('.'));
+			return true;
 		}
 
 		/// <summary>
