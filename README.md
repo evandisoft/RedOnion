@@ -47,7 +47,7 @@ Here is more information about [contributing](https://github.com/evandisoft/RedO
 
 [CommonScriptApi](https://github.com/evandisoft/RedOnion/blob/master/CommonScriptApi.md) - Our tentative, WIP API shared by Lua and ROS for interacting with the game in various ways. May be changed dramatically in the future.
 
-[TroubleShooting](https://github.com/evandisoft/RedOnion/blob/master/TroubleShooting.md)
+[TroubleShooting](https://github.com/evandisoft/RedOnion/blob/master/TroubleShooting.md) - Some possible issues and solutions
 
 ## Videos
 Demonstration videos for this mod are on [this channel](https://www.youtube.com/channel/UChduoYTVOtAH0NA-Lj8EiKA).
