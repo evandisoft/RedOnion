@@ -16,6 +16,7 @@
 
 # Next Release
 <details><summary>Show/Hide</summary>
+
 Nothing yet! Just had a release!
 
 </details>
@@ -92,6 +93,8 @@ Lua Intellisense now knows whether a reference is static or an instance variable
 </details>
 
 # 0.2:
+<details><summary>Show/Hide</summary>
+  
 ## 0.2.1:
 - Misc Changes
 
@@ -119,3 +122,5 @@ Lua Intellisense now knows whether a reference is static or an instance variable
 ### Videos:
 - Demo of majorMalfunction.lua and selfDestruct.lua: https://www.youtube.com/watch?v=xzAghlB2NLw
 - ROS, Autopilot and UI using testFlightGui.ros: https://www.youtube.com/watch?v=CDBNb6jR_Cc 
+
+</details>
