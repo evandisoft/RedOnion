@@ -29,22 +29,17 @@ Nothing yet! Just had a release!
 ## 0.3.1
 import is now limited to a default list of assemblies.
 
-To get access to types in other assemblies access them through `assembly`
+To get access to types in other assemblies (including other mods) access them through assembly
 
-For example:
-First name after "assembly" is the assembly name, followed by any namespaces or types.
+For example: First name after "assembly" is the assembly name, followed by any namespaces or types.
 
-`assembly.UnityEngine.UnityEngine.Vector3`
+assembly.UnityEngine.UnityEngine.Vector3
 
-**Update: This has a big flaw: assemblies with non-word characters in them break this.
+Note: For assembly names with special characters like "Assembly-CSharp" this does not work. You will see completion for them, but if
 
-For assembly names with special characters like "Assembly-CSharp" you can do assembly["Assembly-CSharp"].
+you try to invoke intellisense completion you will get something that looks to Lua like a subtraction operation. For names like this you can do `assembly["Assembly-CSharp"]`.
 
-I will come up with a better workaround.
-
-This is how you access types or namespaces in other mods.
-
-This is how you access types or namespaces in other mods.
+However, it is still useful to use intellisense in order to see what the names are of the various assemblies. If you have a mod you want to interact with, it will most likely have an assembly name very similar to the name of the mod. And you can use that in `assembly[assemblyName]`.
 
 ## 0.3.0
 ### New Import System:
