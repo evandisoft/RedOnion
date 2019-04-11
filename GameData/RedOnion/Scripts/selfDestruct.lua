@@ -1,4 +1,5 @@
-vessel=Ksp.FlightGlobals.ActiveVessel
+vessel=import.FlightGlobals.ActiveVessel
+Random=import.UnityEngine.Random
 
 function selfDestruct(part)
     local childParts=part.children
@@ -6,7 +7,7 @@ function selfDestruct(part)
         selfDestruct(childParts[i])
     end
     part.explode()
-    for i=0,Ksp.Random.Range(20*1,20*2) do
+    for i=0, Random.Range(20*1,20*2) do
         coroutine.yield()
     end
 end

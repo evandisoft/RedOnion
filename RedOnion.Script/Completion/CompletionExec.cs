@@ -12,6 +12,7 @@ namespace RedOnion.Script.Completion
 		// EXPERIMENTAL IMPLEMENTATION
 		protected virtual void Execute()
 		{
+			found = null;
 			var source = lexer.Source;
 			int i = interest;
 			int dotAt = -1;
@@ -95,7 +96,16 @@ namespace RedOnion.Script.Completion
 						&& (linked == null || obj != Root
 						|| !linked.Get(name, out value)))
 							return;
+						value = value.RValue;
+						if (value.IsNative)
+						{
+							type = value.ptr.GetType();
+							instance = true;
+							obj = null;
+							goto next;
+						}
 						obj = Box(value);
+						goto next;
 					}
 				}
 				if (type != null)
@@ -107,18 +117,21 @@ namespace RedOnion.Script.Completion
 						{
 							matched = true;
 							type = field.FieldType;
+							instance = true;
 							break;
 						}
 						if (member is PropertyInfo property)
 						{
 							matched = true;
 							type = property.PropertyType;
+							instance = true;
 							break;
 						}
 					}
 					if (!matched || type == typeof(void))
 						return;
 				}
+			next:
 				if (dotAt == interest)
 				{
 					found = (object)obj ?? type;

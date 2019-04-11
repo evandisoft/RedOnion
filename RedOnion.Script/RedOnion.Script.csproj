@@ -12,6 +12,7 @@
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
+    <ReleaseVersion>0.3.0</ReleaseVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -49,13 +50,14 @@
     <Compile Include="Completion\CompletionEngine.cs" />
     <Compile Include="Completion\CompletionExec.cs" />
     <Compile Include="Completion\CompletionRoot.cs" />
+    <Compile Include="Utilities\Event.cs" />
     <Compile Include="Execution\ExecStatement.cs" />
     <Compile Include="Execution\Engine.cs" />
     <Compile Include="Execution\Abstract.cs" />
-    <Compile Include="Execution\OpCode.cs" />
+    <Compile Include="OpCode.cs" />
     <Compile Include="Execution\RuntimeError.cs" />
     <Compile Include="Execution\Value.Main.cs" />
-    <Compile Include="Execution\Interface.cs" />
+    <Compile Include="Interface.cs" />
     <Compile Include="Execution\EvalExpression.cs" />
     <Compile Include="Parsing\Classes.cs" />
     <Compile Include="Parsing\Code.cs" />
@@ -78,6 +80,7 @@
     <Compile Include="ReflectedObjects\ReflectedMethod.cs" />
     <Compile Include="ReflectedObjects\ReflectedObject.cs" />
     <Compile Include="ReflectedObjects\ReflectedType.cs" />
+    <Compile Include="Utilities\ListCore.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />

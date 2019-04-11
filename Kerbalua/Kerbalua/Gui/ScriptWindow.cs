@@ -51,6 +51,13 @@ namespace Kerbalua.Gui
 
 		public KeyBindings GlobalKeyBindings = new KeyBindings();
 
+		internal void OnDestroy()
+		{
+			Settings.SaveSetting("WindowPositionX", mainWindowRect.x.ToString());
+			Settings.SaveSetting("WindowPositionY", mainWindowRect.y.ToString());
+			//Debug.Log("On Destroy was called");
+		}
+
 		/// <summary>
 		/// This manages completion. Keeps track of what is was focused and
 		/// manages the completion interaction between an control that can
@@ -74,29 +81,42 @@ namespace Kerbalua.Gui
 					currentEvaluation = null;
 				}
 			}
+			foreach (var repl in replEvaluators.Values)
+			{
+				try
+				{
+					repl.FixedUpdate();
+				}
+				catch (Exception ex)
+				{
+					Debug.Log("Exception in REPL.FixedUpdate: " + ex.Message);
+					repl.ResetEngine();
+				}
+			}
 		}
 
 		public ScriptWindow(Rect param_mainWindowRect)
 		{
-			replEvaluators["RedOnion"] = new RedOnionReplEvaluator();
-			replEvaluators["RedOnion"].PrintAction = (str) =>
+			editorVisible=bool.Parse(Settings.LoadSetting("editorVisible", "true"));
+			replEvaluators["ROS Engine"] = new RedOnionReplEvaluator();
+			replEvaluators["ROS Engine"].PrintAction = (str) =>
 			{
 				repl.outputBox.AddOutput(str);
 			};
-			replEvaluators["RedOnion"].PrintErrorAction = (str) =>
+			replEvaluators["ROS Engine"].PrintErrorAction = (str) =>
 			{
 				repl.outputBox.AddError(str);
 			};
-			replEvaluators["Lua"] = new MoonSharpReplEvaluator();
-			replEvaluators["Lua"].PrintAction = (str) =>
+			replEvaluators["Lua Engine"] = new MoonSharpReplEvaluator();
+			replEvaluators["Lua Engine"].PrintAction = (str) =>
 			{
 				repl.outputBox.AddOutput(str);
 			};
-			replEvaluators["Lua"].PrintErrorAction = (str) =>
+			replEvaluators["Lua Engine"].PrintErrorAction = (str) =>
 			{
 				repl.outputBox.AddError(str);
 			};
-			string lastEngineName = Settings.LoadSetting("lastEngine", "RedOnion");
+			string lastEngineName = Settings.LoadSetting("lastEngine", "Lua Engine");
 			if (replEvaluators.ContainsKey(lastEngineName))
 			{
 				currentReplEvaluator = replEvaluators[lastEngineName];
@@ -121,6 +141,8 @@ namespace Kerbalua.Gui
 			});
 
 			mainWindowRect = param_mainWindowRect;
+			mainWindowRect.x = float.Parse(Settings.LoadSetting("WindowPositionX", param_mainWindowRect.x.ToString()));
+			mainWindowRect.y = float.Parse(Settings.LoadSetting("WindowPositionY", param_mainWindowRect.y.ToString()));
 			completionManager = new CompletionManager(completionBox);
 			completionManager.AddCompletable(scriptIOTextArea);
 			completionManager.AddCompletable(new EditingAreaCompletionAdapter(editor, this));
@@ -158,8 +180,14 @@ namespace Kerbalua.Gui
 			completionBoxRect.x = replRect.x + replRect.width;
 			mainWindowRect.width = widgetBarRect.width + replRect.width + editorRect.width + completionBoxRect.width;
 
-			widgetBar.renderables.Add(new Button("<<", () => editorVisible = !editorVisible));
-			widgetBar.renderables.Add(new Button(">>", () => replVisible = !replVisible));
+			widgetBar.renderables.Add(new Button("<<", () => {
+				editorVisible = !editorVisible;
+				Settings.SaveSetting("editorVisible", editorVisible.ToString());
+				}));
+			widgetBar.renderables.Add(new Button(">>", () => {
+				replVisible = !replVisible;
+				Settings.SaveSetting("editorVisible", editorVisible.ToString());
+			}));
 			//widgetBar.renderables.Add(scriptIOTextArea);
 			widgetBar.renderables.Add(new Button("Save", () =>
 			{
@@ -169,11 +197,11 @@ namespace Kerbalua.Gui
 			{
 				editor.content.text = scriptIOTextArea.Load();
 			}));
-			widgetBar.renderables.Add(new Button("Evaluate", () =>
+			widgetBar.renderables.Add(new Button("Run Script", () =>
 			{
 				scriptIOTextArea.Save(editor.content.text);
 				repl.outputBox.AddFileContent(scriptIOTextArea.content.text);
-				currentEvaluation = new Evaluation(editor.content.text, currentReplEvaluator);
+				currentEvaluation = new Evaluation(editor.content.text, scriptIOTextArea.content.text, currentReplEvaluator);
 			}));
 			widgetBar.renderables.Add(new Button("Reset Engine", () =>
 			{
@@ -310,22 +338,21 @@ Any other key gives focus to input box.
 			{
 				scriptIOTextArea.Save(editor.content.text);
 				repl.outputBox.AddFileContent(scriptIOTextArea.content.text);
-				currentEvaluation = new Evaluation(editor.content.text, currentReplEvaluator);
+				currentEvaluation = new Evaluation(editor.content.text, scriptIOTextArea.content.text, currentReplEvaluator);
 			});
 			repl.inputBox.KeyBindings.Add(new EventKey(KeyCode.E, true), () =>
 			{
 				repl.outputBox.AddSourceString(repl.inputBox.content.text);
-				currentEvaluation = new Evaluation(repl.inputBox.content.text, currentReplEvaluator);
+				currentEvaluation = new Evaluation(repl.inputBox.content.text, null, currentReplEvaluator);
 			});
 			repl.inputBox.KeyBindings.Add(new EventKey(KeyCode.Return), () =>
 			{
 				repl.outputBox.AddSourceString(repl.inputBox.content.text);
-				currentEvaluation = new Evaluation(repl.inputBox.content.text, currentReplEvaluator, true);
+				currentEvaluation = new Evaluation(repl.inputBox.content.text, null, currentReplEvaluator, true);
 				repl.inputBox.content.text = "";
 				completionBox.content.text = "";
 			});
-			// For some reason having this event occur inside completionBox update
-			// makes it so that the target for completion has its cursorIndex reset to 0
+
 
 		}
 
@@ -376,8 +403,10 @@ Any other key gives focus to input box.
 		bool hadMouseDownLastUpdate = false;
 		public void Update()
 		{
+
 			//UnityEngine.Debug.Log("blah");
 			SetOrReleaseInputLock();
+
 			completionManager.Update(hadMouseDownLastUpdate);
 			hadMouseDownLastUpdate = false;
 
@@ -395,79 +424,7 @@ Any other key gives focus to input box.
 			//GlobalKeyBindings.ExecuteAndConsumeIfMatched(Event.current)
 		}
 
-		Rect GetCurrentWindowRect()
-		{
-			Rect currentWindowRect = new Rect(mainWindowRect);
-			if (!editorVisible)
-			{
-				currentWindowRect.x += editorRect.width;
-				currentWindowRect.width -= editorRect.width;
-			}
-			if (!replVisible)
-			{
-				currentWindowRect.width -= replRect.width;
-			}
-			if (!replVisible && !editorVisible)
-			{
-				currentWindowRect.width -= completionBoxRect.width;
-			}
-			return currentWindowRect;
-		}
 
-		Rect GetCurrentEditorRect()
-		{
-			Rect currentEditorRect = new Rect(editorRect);
-			float scriptNameHeight = GetCurrentScriptNameRect().height;
-			currentEditorRect.y += scriptNameHeight;
-			currentEditorRect.height = currentEditorRect.height - scriptNameHeight;
-
-			return currentEditorRect;
-		}
-
-		Rect GetCurrentScriptNameRect()
-		{
-			Rect currentScriptNameRect = new Rect();
-			currentScriptNameRect.y = titleHeight;
-			currentScriptNameRect.x = 0;
-			currentScriptNameRect.width = editorRect.width;
-			currentScriptNameRect.height = 25;
-			return currentScriptNameRect;
-		}
-
-		Rect GetCurrentWidgetBarRect()
-		{
-			Rect currentWidgetRect = new Rect(widgetBarRect);
-			if (!editorVisible)
-			{
-				currentWidgetRect.x -= editorRect.width;
-			}
-			return currentWidgetRect;
-		}
-
-		Rect GetCurrentReplRect()
-		{
-			Rect currentReplRect = new Rect(replRect);
-			if (!editorVisible)
-			{
-				currentReplRect.x -= editorRect.width;
-			}
-			return currentReplRect;
-		}
-
-		Rect GetCurrentCompletionBoxRect()
-		{
-			Rect currentCompletionBoxRect = new Rect(completionBoxRect);
-			if (!editorVisible)
-			{
-				currentCompletionBoxRect.x -= editorRect.width;
-			}
-			if (!replVisible)
-			{
-				currentCompletionBoxRect.x -= replRect.width;
-			}
-
-			return currentCompletionBoxRect;
-		}
 
 		/// <summary>
 		/// To make input handling simpler, only the repl and button bar are in
@@ -479,6 +436,7 @@ Any other key gives focus to input box.
 		/// <param name="id">Identifier.</param>
 		void MainWindow(int id)
 		{
+
 			if (currentEvaluation != null
 					&& Event.current.type == EventType.KeyDown
 					&& Event.current.keyCode == KeyCode.C
@@ -592,7 +550,10 @@ Any other key gives focus to input box.
 				bool lastEventWasMouseDown = Event.current.type == EventType.MouseDown;
 				string lastControlname = GUI.GetNameOfFocusedControl();
 				//completionBoxRect = UpdateBoxPositionWithWindow(completionBoxRect, mainWindowRect.width);
-
+				if (inputIsLocked && Event.current.type == EventType.scrollWheel)
+				{
+					Event.current.Use();
+				}
 				completionBox.Update(GetCurrentCompletionBoxRect());
 				if (lastEventWasMouseDown && Event.current.type == EventType.Used)
 				{
@@ -612,7 +573,80 @@ Any other key gives focus to input box.
 					}
 				}
 			}
+		}
 
+		Rect GetCurrentWindowRect()
+		{
+			Rect currentWindowRect = new Rect(mainWindowRect);
+			if (!editorVisible)
+			{
+				currentWindowRect.x += editorRect.width;
+				currentWindowRect.width -= editorRect.width;
+			}
+			if (!replVisible)
+			{
+				currentWindowRect.width -= replRect.width;
+			}
+			if (!replVisible && !editorVisible)
+			{
+				currentWindowRect.width -= completionBoxRect.width;
+			}
+			return currentWindowRect;
+		}
+
+		Rect GetCurrentEditorRect()
+		{
+			Rect currentEditorRect = new Rect(editorRect);
+			float scriptNameHeight = GetCurrentScriptNameRect().height;
+			currentEditorRect.y += scriptNameHeight;
+			currentEditorRect.height = currentEditorRect.height - scriptNameHeight;
+
+			return currentEditorRect;
+		}
+
+		Rect GetCurrentScriptNameRect()
+		{
+			Rect currentScriptNameRect = new Rect();
+			currentScriptNameRect.y = titleHeight;
+			currentScriptNameRect.x = 0;
+			currentScriptNameRect.width = editorRect.width;
+			currentScriptNameRect.height = 25;
+			return currentScriptNameRect;
+		}
+
+		Rect GetCurrentWidgetBarRect()
+		{
+			Rect currentWidgetRect = new Rect(widgetBarRect);
+			if (!editorVisible)
+			{
+				currentWidgetRect.x -= editorRect.width;
+			}
+			return currentWidgetRect;
+		}
+
+		Rect GetCurrentReplRect()
+		{
+			Rect currentReplRect = new Rect(replRect);
+			if (!editorVisible)
+			{
+				currentReplRect.x -= editorRect.width;
+			}
+			return currentReplRect;
+		}
+
+		Rect GetCurrentCompletionBoxRect()
+		{
+			Rect currentCompletionBoxRect = new Rect(completionBoxRect);
+			if (!editorVisible)
+			{
+				currentCompletionBoxRect.x -= editorRect.width;
+			}
+			if (!replVisible)
+			{
+				currentCompletionBoxRect.x -= replRect.width;
+			}
+
+			return currentCompletionBoxRect;
 		}
 	}
 }

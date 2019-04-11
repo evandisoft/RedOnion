@@ -305,6 +305,11 @@ namespace Kerbalua.Gui
 				editor.ReplaceSelection("\n");
 				IndentToPreviousLine();
 			});
+			KeyBindings.Add(new EventKey(KeyCode.Return,false,true), () =>
+			{
+				editor.ReplaceSelection("\n");
+				IndentToPreviousLine();
+			});
 		}
 
 		protected int NextTabLeft(int fromIndex)

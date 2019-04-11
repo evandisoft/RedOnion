@@ -147,11 +147,19 @@ namespace RedOnion.ScriptNUnit
 		}
 
 		[Test]
-		public void ROS_Expr06_Compare()
+		public void ROS_Expr06_Logic()
 		{
 			Test(true,		"1 < 2");       // integers
 			Test(true,		"1 > .1");      // integer vs. double - less
 			Test(true,		"1 == 1.0");    // integer vs. double - equal
+			Test(true,		"true || false");
+			Test(true,		"false || true");
+			Test(false,		"true && false");
+			Test(false,		"false && true");
+			Test(true,		"true && true");
+
+			Test("var s = \"hello\"");
+			Test(false, "s.length <= 3 || s[3] == '.'");
 		}
 
 		[Test]

@@ -25,11 +25,11 @@ namespace RedOnion.Script.BasicObjects
 			: base(engine, baseClass, new Properties("prototype", prototype))
 			=> Prototype = prototype;
 
-		public override Value Call(IObject self, int argc)
-			=> argc == 0 ? new Value("") : new Value(Engine.GetArgument(argc).String);
+		public override Value Call(IObject self, Arguments args)
+			=> args.Length == 0 ? new Value("") : new Value(args[0].String);
 
-		public override IObject Create(int argc)
-			=> new StringObj(Engine, Prototype, argc == 0 ? "" : Engine.GetArgument(argc).String);
+		public override IObject Create(Arguments args)
+			=> new StringObj(Engine, Prototype, args.Length == 0 ? "" : args[0].String);
 
 		public override IObject Convert(object value)
 			=> new StringObj(Engine, Prototype, value.ToString());
@@ -39,6 +39,7 @@ namespace RedOnion.Script.BasicObjects
 	/// String object (string box)
 	/// </summary>
 	[DebuggerDisplay("{Name}: {String}")]
+	[Creator(typeof(StringFun))]
 	public class StringObj : BasicObject, IListObject
 	{
 		/// <summary>
@@ -61,15 +62,15 @@ namespace RedOnion.Script.BasicObjects
 			: base(engine, baseClass, new Properties(StdProps))
 			=> String = value;
 
-		public override Value Index(IObject self, int argc)
+		public override Value Index(Arguments args)
 		{
-			if (argc == 1)
+			if (args.Length == 1)
 			{
-				var i = Engine.GetArgument(argc);
+				var i = args[0];
 				if (i.IsNumber)
 					return String[i.Int];
 			}
-			return base.Index(self, argc);
+			return base.Index(args);
 		}
 
 		public int Count => String.Length;
@@ -115,7 +116,23 @@ namespace RedOnion.Script.BasicObjects
 
 		public static IDictionary<string, Value> StdProps { get; } = new Dictionary<string, Value>()
 		{
-			{ "length", ArrayObj.LengthProp.Value }
+			{ "length", ArrayObj.LengthProp.Value },
+			{ "substring", new Value(e => new SubstringMtd(e)) }
 		};
+		public class SubstringMtd : BasicObject
+		{
+			public SubstringMtd(IEngine engine)
+				: base(engine) { }
+			public override ObjectFeatures Features => ObjectFeatures.Function;
+			public override Value Call(IObject self, Arguments args)
+			{
+				var str = ((StringObj)self).String;
+				if (args.Length == 0) return str;
+				var arg = args[0].Int;
+				if (args.Length == 1) return str.Substring(arg);
+				var arg2 = args[1].Int;
+				return str.Substring(arg, arg2);
+			}
+		}
 	}
 }

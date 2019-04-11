@@ -20,14 +20,14 @@ namespace RedOnion.Script.BasicObjects
 			: base(engine, baseClass, new Properties("prototype", prototype))
 			=> Prototype = prototype;
 
-		public override Value Call(IObject self, int argc)
-			=> new Value(Create(argc));
+		public override Value Call(IObject self, Arguments args)
+			=> new Value(Create(args));
 
-		public override IObject Create(int argc)
+		public override IObject Create(Arguments args)
 		{
-			if (argc == 0)
+			if (args.Length == 0)
 				return new BasicObject(Engine, Prototype);
-			return Engine.Box(Engine.GetArgument(argc));
+			return Engine.Box(args[0]);
 		}
 	}
 
@@ -40,12 +40,38 @@ namespace RedOnion.Script.BasicObjects
 	/// which can be used like string-keyed dictionary.
 	/// </remarks>
 	[DebuggerDisplay("{Name}")]
-	public class BasicObject : IScope
+	[Creator(typeof(ObjectFun))]
+	public class BasicObject : BasicObject<IEngine>
+	{
+		/// <summary>
+		/// Create empty object with no base class
+		/// </summary>
+		public BasicObject(IEngine engine)
+			: base(engine) { }
+		/// <summary>
+		/// Create empty object with base class
+		/// </summary>
+		public BasicObject(IEngine engine, IObject baseClass)
+			: base(engine, baseClass) { }
+		/// <summary>
+		/// Create object with prototype and some base properties
+		/// </summary>
+		public BasicObject(IEngine engine, IObject baseClass, IProperties baseProps)
+			: base(engine, baseClass, baseProps) { }
+		/// <summary>
+		/// Create object with prototype, some base properties and more properties
+		/// </summary>
+		public BasicObject(IEngine engine, IObject baseClass, IProperties baseProps, IProperties moreProps)
+			: base(engine, baseClass, baseProps, moreProps) { }
+	}
+	[DebuggerDisplay("{Name}")]
+	public class BasicObject<TEngine> : IScope where TEngine: IEngine
 	{
 		/// <summary>
 		/// Engine this object belongs to
 		/// </summary>
-		public IEngine Engine { get; }
+		public TEngine Engine { get; }
+		IEngine IObject.Engine => Engine;
 
 		/// <summary>
 		/// Name of the object (or full name of the type)
@@ -73,12 +99,13 @@ namespace RedOnion.Script.BasicObjects
 			=> ObjectFeatures.Collection;
 		public virtual Type Type => null;
 		public virtual object Target => null;
+
 		public virtual IObject Convert(object value) => null;
 
 		/// <summary>
 		/// Create empty object with no base class
 		/// </summary>
-		public BasicObject(IEngine engine)
+		public BasicObject(TEngine engine)
 		{
 			Engine = engine;
 		}
@@ -86,7 +113,7 @@ namespace RedOnion.Script.BasicObjects
 		/// <summary>
 		/// Create empty object with base class
 		/// </summary>
-		public BasicObject(IEngine engine, IObject baseClass)
+		public BasicObject(TEngine engine, IObject baseClass)
 		{
 			Engine = engine;
 			BaseClass = baseClass;
@@ -95,7 +122,7 @@ namespace RedOnion.Script.BasicObjects
 		/// <summary>
 		/// Create object with prototype and some base properties
 		/// </summary>
-		public BasicObject(IEngine engine, IObject baseClass, IProperties baseProps)
+		public BasicObject(TEngine engine, IObject baseClass, IProperties baseProps)
 		{
 			Engine = engine;
 			BaseClass = baseClass;
@@ -105,7 +132,7 @@ namespace RedOnion.Script.BasicObjects
 		/// <summary>
 		/// Create object with prototype, some base properties and more properties
 		/// </summary>
-		public BasicObject(IEngine engine, IObject baseClass, IProperties baseProps, IProperties moreProps)
+		public BasicObject(TEngine engine, IObject baseClass, IProperties baseProps, IProperties moreProps)
 		{
 			Engine = engine;
 			BaseClass = baseClass;
@@ -157,7 +184,7 @@ namespace RedOnion.Script.BasicObjects
 			}
 			if (value.Kind == ValueKind.Create)
 			{
-				value = new Value(((CreateObject)value.ptr)(Engine));
+				value = new Value(((CreateObject)value.ptr)(Engine), value.flag);
 				props.Set(name, value);
 			}
 			else if (value.IsProperty)
@@ -228,31 +255,30 @@ namespace RedOnion.Script.BasicObjects
 		public virtual void Reset()
 			=> MoreProps = null;
 
-		public virtual Value Call(IObject self, int argc)
+		public virtual Value Call(IObject self, Arguments args)
 		{
 			if (!Engine.HasOption(EngineOption.Silent))
 				throw new NotImplementedException(GetType().FullName + " is not a function");
 			return new Value();
 		}
 
-		public virtual IObject Create(int argc)
+		public virtual IObject Create(Arguments args)
 		{
 			if (!Engine.HasOption(EngineOption.Silent))
 				throw new NotImplementedException(GetType().FullName + " is not a constructor");
 			return null;
 		}
 
-		public virtual Value Index(IObject self, int argc)
+		public virtual Value Index(Arguments args)
 		{
-			switch (argc)
+			switch (args.Length)
 			{
 			case 0:
 				return new Value();
 			case 1:
-				return Value.IndexRef(this, Engine.GetArgument(argc, 0));
+				return Value.IndexRef(this, args[0]);
 			default:
-				self = Engine.Box(Value.IndexRef(this, Engine.GetArgument(argc, 0)));
-				return self.Index(this, argc - 1);
+				return Engine.Box(IndexGet(args[0])).Index(new Arguments(args, args.Length - 1));
 			}
 		}
 		public virtual Value IndexGet(Value index) => Get(index.String);

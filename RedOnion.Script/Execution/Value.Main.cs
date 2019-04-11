@@ -68,6 +68,14 @@ namespace RedOnion.Script
 		/// Reference to indexed value (ptr is IObject, idx is Value)
 		/// </summary>
 		IndexRef	= 0x0009,
+		/// <summary>
+		/// C# native object (the engine will convert it as needed)
+		/// </summary>
+		Native		= 0x000A,
+		/// <summary>
+		/// Like undefined but throws when it enters operators or arguments
+		/// </summary>
+		Void		= 0x000B,
 
 		Byte		= 0x0140,// 8 bit unsigned
 		UShort		= 0x0241,// 16 bit unsigned
@@ -100,6 +108,10 @@ namespace RedOnion.Script
 		/// Cannot change type (ValueKind) even in writable properties
 		/// </summary>
 		StrongType	= 0x0001,
+		/// <summary>
+		/// Do not include in suggestions
+		/// </summary>
+		DoNotSuggest= 0x0002,
 	}
 
 	[StructLayout(LayoutKind.Explicit)]
@@ -131,14 +143,24 @@ namespace RedOnion.Script
 		internal object idx;
 		internal ValueData data;
 
-		internal Value(ValueKind vtype)
+		public static readonly Value Undefined = new Value();
+		public static readonly Value Null = new Value((IObject)null);
+		public static readonly Value NaN = new Value(double.NaN);
+		public static readonly Value Void = new Value(ValueKind.Void, null);
+
+		public static Value AsNative(object value)
+			=> new Value(ValueKind.Native, value);
+
+		public Value(Value src, ValueFlags flags)
 		{
-			kind = vtype;
-			flag = 0;
-			ptr = null;
-			idx = null;
-			data = new ValueData();
+			kind = src.kind;
+			flag = flags;
+			ptr = src.ptr;
+			idx = src.idx;
+			data = src.data;
 		}
+		public bool HasFlag(ValueFlags flag)
+			=> (this.flag & flag) != 0;
 
 		internal Value(ValueKind vtype, object value)
 		{
@@ -240,26 +262,26 @@ namespace RedOnion.Script
 			=> Value.FromObject(obj);
 		public static Value FromObject(IObject obj)
 			=> new Value(obj);
-		public Value(IObject obj)
+		public Value(IObject obj, ValueFlags flags = ValueFlags.None)
 		{
 			kind = ValueKind.Object;
-			flag = 0;
+			flag = flags;
 			ptr = obj;
 			idx = null;
 			data = new ValueData();
 		}
-		public Value(BasicObjects.BasicObject obj)
+		public Value(BasicObjects.BasicObject obj, ValueFlags flags = ValueFlags.None)
 		{
 			kind = ValueKind.Object;
-			flag = 0;
+			flag = flags;
 			ptr = obj;
 			idx = null;
 			data = new ValueData();
 		}
-		public Value(BasicObjects.SimpleObject obj)
+		public Value(BasicObjects.SimpleObject obj, ValueFlags flags = ValueFlags.None)
 		{
 			kind = ValueKind.Object;
-			flag = 0;
+			flag = flags;
 			ptr = obj;
 			idx = null;
 			data = new ValueData();
@@ -267,10 +289,10 @@ namespace RedOnion.Script
 
 		public static implicit operator Value(CreateObject create)
 			=> new Value(create);
-		public Value(CreateObject create)
+		public Value(CreateObject create, ValueFlags flags = ValueFlags.None)
 		{
 			kind = ValueKind.Create;
-			flag = 0;
+			flag = flags;
 			ptr = create;
 			idx = null;
 			data = new ValueData();

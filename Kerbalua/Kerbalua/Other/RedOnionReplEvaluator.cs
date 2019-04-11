@@ -12,6 +12,8 @@ namespace Kerbalua.Other
 	{
 		ImmediateEngine engine;
 		ReplHintsEngine hints;
+		string source, path;
+		bool skipUpdate;
 
 		public RedOnionReplEvaluator()
 		{
@@ -21,17 +23,34 @@ namespace Kerbalua.Other
 			engine.Printing += msg => PrintAction?.Invoke(msg);
 		}
 
-		protected override bool ProtectedEvaluate(string source, out string output)
+		public override void FixedUpdate()
+		{
+			if (skipUpdate)
+			{
+				skipUpdate = false;
+				return;
+			}
+			engine.FixedUpdate();
+		}
+
+		protected override void ProtectedSetSource(string source, string path)
+		{
+			this.source = source;
+			this.path = path;
+			//TODO: unsubscribe events from last execution if path is the same
+		}
+		public override bool Evaluate(out string result)
 		{
 			try
 			{
+				skipUpdate = true;
 				engine.ExecutionCountdown = 10000;
 				engine.Execute(source);
-				output = engine.Result.ToString();
+				result = engine.Result.ToString();
+				return true; // for now we always complete immediately
 			}
 			catch (Exception e)
 			{
-				output = "";
 				PrintErrorAction?.Invoke(e.Message);
 
 				string FormatLine(int lineNumber, string line)
@@ -46,10 +65,9 @@ namespace Kerbalua.Other
 
 				Debug.Log(e);
 			}
-
-			// TODO: This needs to be replaced when engine can fail to complete in one update
-			bool isComplete = true;
-			return isComplete;
+			Terminate();
+			result = "";
+			return true;
 		}
 
 		/// <summary>
@@ -72,6 +90,8 @@ namespace Kerbalua.Other
 
 		public override void ResetEngine()
 		{
+			source = null;
+			path = null;
 			engine.Reset();
 			hints.Reset();
 			FlightControl.GetInstance().Shutdown();
@@ -79,7 +99,9 @@ namespace Kerbalua.Other
 
 		public override void Terminate()
 		{
-			throw new NotImplementedException();
+			source = null;
+			path = null;
+			engine.ClearEvents();
 		}
 	}
 }

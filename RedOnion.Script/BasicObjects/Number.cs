@@ -42,11 +42,11 @@ namespace RedOnion.Script.BasicObjects
 			Kind = kind;
 		}
 
-		public override Value Call(IObject self, int argc)
+		public override Value Call(IObject self, Arguments args)
 		{
-			if (argc == 0)
+			if (args.Length == 0)
 				return new Value();
-			var value = Engine.GetArgument(argc).Number;
+			var value = args[0].Number;
 			if (Type == null)
 				return value;
 			switch (Kind)
@@ -79,14 +79,15 @@ namespace RedOnion.Script.BasicObjects
 			throw new NotImplementedException("Conversion to number from " + value.Name);
 		}
 
-		public override IObject Create(int argc)
-			=> new NumberObj(Engine, Prototype, Call(null, argc));
+		public override IObject Create(Arguments args)
+			=> new NumberObj(Engine, Prototype, Call(null, args));
 	}
 
 	/// <summary>
 	/// Number object (value box)
 	/// </summary>
 	[DebuggerDisplay("{GetType().Name}: {Number}")]
+	[Creator(typeof(NumberFun))]
 	public class NumberObj : BasicObject
 	{
 		/// <summary>

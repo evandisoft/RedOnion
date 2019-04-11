@@ -10,13 +10,6 @@ namespace RedOnion.Script
 		public Value Unary(OpCode op)
 		{
 			var self = RValue;
-			if (self.Kind == ValueKind.Object)
-			{
-				var obj = (IObject)self.ptr;
-				if (obj.HasFeature(ObjectFeatures.Operators)
-					&& obj.Operator(op, new Value(), false, out var result))
-					return result;
-			}
 			switch (op)
 			{
 			case OpCode.Plus:
@@ -55,6 +48,13 @@ namespace RedOnion.Script
 				return value;
 			if (value.Kind == ValueKind.String)
 				return value.Number;
+			if (value.Kind == ValueKind.Object)
+			{
+				var obj = (IObject)value.ptr;
+				if (obj.HasFeature(ObjectFeatures.Operators)
+					&& obj.Operator(OpCode.Plus, new Value(), false, out var result))
+					return result;
+			}
 			return new Value();
 		}
 
@@ -66,6 +66,12 @@ namespace RedOnion.Script
 			switch (value.Kind)
 			{
 			default:
+				return new Value();
+			case ValueKind.Object:
+				var obj = (IObject)value.ptr;
+				if (obj.HasFeature(ObjectFeatures.Operators)
+					&& obj.Operator(OpCode.Neg, new Value(), false, out var result))
+					return result;
 				return new Value();
 			case ValueKind.Char:
 				return new Value(-value.data.Char);
@@ -102,6 +108,12 @@ namespace RedOnion.Script
 			switch (value.Kind)
 			{
 			default:
+				return new Value();
+			case ValueKind.Object:
+				var obj = (IObject)value.ptr;
+				if (obj.HasFeature(ObjectFeatures.Operators)
+					&& obj.Operator(OpCode.Not, new Value(), false, out var result))
+					return result;
 				return new Value();
 			case ValueKind.Char:
 				return new Value(~value.data.Char);

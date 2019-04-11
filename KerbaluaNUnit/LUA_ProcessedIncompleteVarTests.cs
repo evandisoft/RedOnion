@@ -124,9 +124,7 @@ namespace KerbaluaNUnit {
 for	a
 ");
 
-			Assert.AreEqual(1, parsed.Segments.Count);
-			Assert.AreEqual("a", parsed.Segments[0].Name);
-			Assert.AreEqual(0, parsed.Segments[0].Parts.Count);
+			Assert.AreEqual(0, parsed.Segments.Count);
 		}
 	}
 }

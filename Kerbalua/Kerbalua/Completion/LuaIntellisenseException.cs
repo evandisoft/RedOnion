@@ -1,6 +1,9 @@
 using System;
-namespace Kerbalua.Completion {
-	public class LuaIntellisenseException : Exception {
+
+namespace Kerbalua.Completion
+{
+	public class LuaIntellisenseException : Exception
+	{
 		public LuaIntellisenseException()
 		{
 		}
@@ -10,7 +13,8 @@ namespace Kerbalua.Completion {
 		}
 	}
 
-	public class TableHasMetatableException : LuaIntellisenseException {
+	public class TableHasMetatableException : LuaIntellisenseException
+	{
 		public TableHasMetatableException()
 		{
 		}
@@ -20,7 +24,8 @@ namespace Kerbalua.Completion {
 		}
 	}
 
-	public class TableCallException : LuaIntellisenseException {
+	public class TableCallException : LuaIntellisenseException
+	{
 		public TableCallException()
 		{
 		}
@@ -30,7 +35,8 @@ namespace Kerbalua.Completion {
 		}
 	}
 
-	public class TableArrayAccessException : LuaIntellisenseException {
+	public class TableArrayAccessException : LuaIntellisenseException
+	{
 		public TableArrayAccessException()
 		{
 		}
@@ -40,7 +46,8 @@ namespace Kerbalua.Completion {
 		}
 	}
 
-	public class KeyNotInTableException : LuaIntellisenseException {
+	public class KeyNotInTableException : LuaIntellisenseException
+	{
 		public KeyNotInTableException()
 		{
 		}
@@ -49,4 +56,27 @@ namespace Kerbalua.Completion {
 		{
 		}
 	}
+
+	public class InteropArrayAccessException : LuaIntellisenseException
+	{
+		public InteropArrayAccessException()
+		{
+		}
+
+		public InteropArrayAccessException(string message) : base(message)
+		{
+		}
+	}
+
+	public class InteropCallException : LuaIntellisenseException
+	{
+		public InteropCallException()
+		{
+		}
+
+		public InteropCallException(string message) : base(message)
+		{
+		}
+	}
+
 }

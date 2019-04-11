@@ -6,8 +6,8 @@ using System.Text;
 namespace RedOnion.Script.BasicObjects
 {
 	/// <summary>
-	/// Simple implementation of IObject
-	/// suitable for custom objects
+	/// Simple implementation of IObject suitable for custom objects.
+	/// Does not allow to add new properties by script.
 	/// </summary>
 	public class SimpleObject : IObject
 	{
@@ -58,7 +58,7 @@ namespace RedOnion.Script.BasicObjects
 
 		public Value Get(string name)
 		{
-			if (!Get(name, out var value) && !Engine.HasOption(EngineOption.Silent))
+			if (!Get(name, out var value) && Engine?.HasOption(EngineOption.Silent) != false)
 				throw new NotImplementedException(name + " does not exist");
 			return value;
 		}
@@ -74,7 +74,7 @@ namespace RedOnion.Script.BasicObjects
 				return false;
 			if (value.Kind == ValueKind.Create)
 			{
-				value = new Value(((CreateObject)value.ptr)(Engine));
+				value = new Value(((CreateObject)value.ptr)(Engine), value.flag);
 				BaseProps.Set(name, value);
 			}
 			else if (value.IsProperty)
@@ -108,23 +108,22 @@ namespace RedOnion.Script.BasicObjects
 		public void Reset()
 		{ }
 
-		public virtual Value Call(IObject self, int argc)
+		public virtual Value Call(IObject self, Arguments args)
 			=> new Value();
 
-		public virtual IObject Create(int argc)
+		public virtual IObject Create(Arguments args)
 			=> null;
 
-		public virtual Value Index(IObject self, int argc)
+		public virtual Value Index(Arguments args)
 		{
-			switch (argc)
+			switch (args.Length)
 			{
 			case 0:
 				return new Value();
 			case 1:
-				return Value.IndexRef(this, Engine.GetArgument(argc, 0));
+				return Value.IndexRef(this, args[0]);
 			default:
-				self = Engine.Box(Value.IndexRef(this, Engine.GetArgument(argc, 0)));
-				return self.Index(this, argc - 1);
+				return Engine.Box(IndexGet(args[0])).Index(new Arguments(args, args.Length - 1));
 			}
 		}
 		public virtual Value IndexGet(Value index) => Get(index.String);
@@ -135,11 +134,5 @@ namespace RedOnion.Script.BasicObjects
 			result = new Value();
 			return false;
 		}
-
-		/// <summary>
-		/// Get n-th argument (for call/create implementation)
-		/// </summary>
-		protected Value Arg(int argc, int n = 0)
-			=> Engine.GetArgument(argc, n);
 	}
 }

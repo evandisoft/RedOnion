@@ -40,7 +40,7 @@ namespace RedOnion.Script.ReflectedObjects
 			Methods = methods;
 		}
 
-		public override Value Call(IObject self, int argc)
+		public override Value Call(IObject self, Arguments args)
 		{
 			var result = new Value();
 			if (self == null || (self.Features & ObjectFeatures.Proxy) == 0)
@@ -61,7 +61,7 @@ namespace RedOnion.Script.ReflectedObjects
 				return result;
 			}
 			foreach (MethodInfo method in Methods)
-				if (TryCall(Engine, method, target, argc, ref result))
+				if (TryCall(Engine, method, target, args, ref result))
 					return result;
 			if (!Engine.HasOption(EngineOption.Silent))
 				throw new InvalidOperationException("Could not call "
@@ -72,8 +72,8 @@ namespace RedOnion.Script.ReflectedObjects
 
 		protected static bool TryCall(
 			IEngine engine, MethodInfo method,
-			object self, int argc, ref Value result)
+			object self, Arguments args, ref Value result)
 			=> ReflectedFunction.TryCall(
-				engine, method, self, argc, ref result);
+				engine, method, self, args, ref result);
 	}
 }

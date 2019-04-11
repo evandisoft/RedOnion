@@ -25,14 +25,14 @@ namespace RedOnion.Script.BasicObjects
 			: base(engine, baseClass, new Properties("prototype", prototype))
 			=> Prototype = prototype;
 
-		public override Value Call(IObject self, int argc)
-			=> new Value(Create(argc));
+		public override Value Call(IObject self, Arguments args)
+			=> new Value(Create(args));
 
-		public override IObject Create(int argc)
+		public override IObject Create(Arguments args)
 		{
-			var list = new List<Value>(argc);
-			for (int i = 0; i < argc; i++)
-				list[i] = Engine.GetArgument(argc, i);
+			var list = new List<Value>(args.Length);
+			for (int i = 0; i < args.Length; i++)
+				list[i] = args[i];
 			return new ListObj(Engine, Prototype, list);
 		}
 
@@ -64,6 +64,7 @@ namespace RedOnion.Script.BasicObjects
 	/// String object (string box)
 	/// </summary>
 	[DebuggerDisplay("{Name}")]
+	[Creator(typeof(ListFun))]
 	public class ListObj : BasicObject, IListObject
 	{
 		public static readonly Value[] Empty = new Value[0];
@@ -84,23 +85,24 @@ namespace RedOnion.Script.BasicObjects
 			: base(engine, baseClass, new Properties(StdProps))
 			=> List = value;
 
-		public override Value Index(IObject self, int argc)
+		public override Value Index(Arguments args)
 		{
-			if (argc == 1)
+			if (args.Length == 1)
 			{
-				var i = Engine.GetArgument(argc);
+				var i = args[0];
 				if (i.IsNumber)
 					return List[i.Int];
 			}
-			return base.Index(self, argc);
+			return base.Index(args);
 		}
 
-		int ICollection<Value>.Count => List.Count;
+		public int Count => List.Count;
+		public int Length => List.Count;
 		bool ICollection<Value>.IsReadOnly => false;
 
-		bool ICollection<Value>.Contains(Value item)
+		public bool Contains(Value item)
 			=> List.Contains(item);
-		void ICollection<Value>.CopyTo(Value[] array, int arrayIndex)
+		public void CopyTo(Value[] array, int arrayIndex)
 			=> List.CopyTo(array, arrayIndex);
 
 		IEnumerator IEnumerable.GetEnumerator()
@@ -110,7 +112,7 @@ namespace RedOnion.Script.BasicObjects
 
 		bool IListObject.IsWritable => true;
 		bool IListObject.IsFixedSize => false;
-		Value IList<Value>.this[int index]
+		public Value this[int index]
 		{
 			get => List[index];
 			set => List[index] = value;

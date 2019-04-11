@@ -38,6 +38,12 @@ public interface IIncompleteLuaVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitChunk([NotNull] IncompleteLuaParser.ChunkContext context);
 	/// <summary>
+	/// Visit a parse tree produced by <see cref="IncompleteLuaParser.implicitReturn"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitImplicitReturn([NotNull] IncompleteLuaParser.ImplicitReturnContext context);
+	/// <summary>
 	/// Visit a parse tree produced by <see cref="IncompleteLuaParser.incompleteChunk"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>

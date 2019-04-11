@@ -2,8 +2,8 @@
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
-    <KerbalLibs Condition=" '$(KerbalLibs)' == '' And '$(OS)' == 'Windows_NT' And Exists('$(SolutionDir)\..\ksp')">$(SolutionDir)\..\ksp\KSP_x64_Data\Managed</KerbalLibs>
-    <KerbalLibs Condition=" '$(KerbalLibs)' == '' And '$(OS)' != 'Windows_NT' And Exists('$(SolutionDir)\..\ksp')">$(SolutionDir)\..\ksp\KSP_Data\Managed</KerbalLibs>
+    <KerbalLibs Condition=" '$(KerbalLibs)' == '' And '$(OS)' == 'Windows_NT' And Exists('$(SolutionDir)\ksp')">$(SolutionDir)\ksp\KSP_x64_Data\Managed</KerbalLibs>
+    <KerbalLibs Condition=" '$(KerbalLibs)' == '' And '$(OS)' != 'Windows_NT' And Exists('$(SolutionDir)\ksp')">$(SolutionDir)\ksp\KSP_Data\Managed</KerbalLibs>
     <KerbalLibs Condition=" '$(KerbalLibs)' == '' And '$(OS)' == 'Windows_NT' ">C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\KSP_x64_Data\Managed</KerbalLibs>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -15,6 +15,7 @@
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
+    <ReleaseVersion>0.3.0</ReleaseVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -59,18 +60,43 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="API\FunctionBase.cs" />
+    <Compile Include="API\Globals.cs" />
+    <Compile Include="API\Interface.cs" />
+    <Compile Include="API\InteropObject.cs" />
+    <Compile Include="API\InteropUtilities.cs" />
+    <Compile Include="API\MethodBase.cs" />
+    <Compile Include="API\Reflect.cs" />
+    <Compile Include="API\Ship.cs" />
+    <Compile Include="API\Stage.cs" />
+    <Compile Include="API\Vector.cs" />
+    <Compile Include="API\Vector.Functions.cs" />
+    <Compile Include="API\Vector.Methods.cs" />
+    <Compile Include="API\VectorCreator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReflectionUtil\NamespaceInstance.ROS.cs" />
+    <Compile Include="ROS\KspRosEngine.cs" />
     <Compile Include="ROS\UI\Window.cs" />
-    <Compile Include="Script.cs" />
-    <Compile Include="Lua\KerbaluaScript.cs" />
+    <Compile Include="ROS\RuntimeRoot.cs" />
     <Compile Include="Autopilot\FlightControl.cs" />
     <Compile Include="MathUtil\Vec.cs" />
     <Compile Include="MathUtil\Scalar.cs" />
     <Compile Include="PartsAPI\PartsExploration.cs" />
-    <Compile Include="Lua\Proxies\ModuleControlSurfaceProxy.cs" />
+    <Compile Include="Lua\Proxies\ModuleControlSurfaceProxyTable.cs" />
     <Compile Include="Lua\Proxies\ExperimentalProxy.cs" />
     <Compile Include="Lua\Proxies\ProxyTable.cs" />
     <Compile Include="Lua\Proxies\ProxyCallTable.cs" />
+    <Compile Include="Lua\Proxies\LuaProxy.cs" />
+    <Compile Include="Lua\Proxies\LuaCallProxy.cs" />
+    <Compile Include="ReflectionUtil\NamespaceInstance.cs" />
+    <Compile Include="ReflectionUtil\NamespaceMappings.cs" />
+    <Compile Include="ReflectionUtil\TypeAlternatives.cs" />
+    <Compile Include="ReflectionUtil\NameTypeMap.cs" />
+    <Compile Include="Completion\ICompletable.cs" />
+    <Compile Include="Completion\IHasCompletionProxy.cs" />
+    <Compile Include="ReflectionUtil\NamespaceInstance.Lua.cs" />
+    <Compile Include="Autopilot\RelativeDirection.cs" />
+    <Compile Include="ReflectionUtil\DualCaseSensitivityDict.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RedOnion.Script\RedOnion.Script.csproj">
@@ -86,8 +112,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />
-  <ItemGroup>
-    <Folder Include="Lua\Proxies\" />
-  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

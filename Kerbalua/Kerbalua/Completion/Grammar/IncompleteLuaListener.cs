@@ -41,6 +41,16 @@ public interface IIncompleteLuaListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitChunk([NotNull] IncompleteLuaParser.ChunkContext context);
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="IncompleteLuaParser.implicitReturn"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterImplicitReturn([NotNull] IncompleteLuaParser.ImplicitReturnContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="IncompleteLuaParser.implicitReturn"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitImplicitReturn([NotNull] IncompleteLuaParser.ImplicitReturnContext context);
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="IncompleteLuaParser.incompleteChunk"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>

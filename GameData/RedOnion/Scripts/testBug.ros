@@ -1,7 +1,0 @@
-function a c
-    return c
-
-a function z
-    print z
-
-print 3

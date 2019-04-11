@@ -6,11 +6,11 @@ using System.Diagnostics;
 using Kerbalua.Utility;
 
 namespace Kerbalua.Gui {
-	public class ScriptNameInputArea:EditingArea, ICompletable {
+	public class ScriptNameInputArea:EditingArea, ICompletableElement {
 		public bool receivedInput;
 
 
-		static string defaultScriptFilename= "untitled.ros";
+		static string defaultScriptFilename= "untitled.lua";
 
 		public ScriptNameInputArea()
 		{
@@ -55,7 +55,20 @@ namespace Kerbalua.Gui {
 		public void Save(string text)
 		{
 			try {
-				File.WriteAllText(CreateFullPath(), text.Replace("\n",Environment.NewLine));
+				var previousText = ""; 
+				try
+				{
+					previousText = RedOnion.KSP.ROS.KspRosEngine.LoadScript(content.text).Replace("\r", "");
+				}
+				catch (Exception)
+				{
+					previousText = "";
+				}
+				if (text != previousText)
+				{
+					//UnityEngine.Debug.Log(text + "\n!=\n" + previousText);
+					File.WriteAllText(CreateFullPath(true), text.Replace("\n", Environment.NewLine));
+				}
 				CommonSaveLoadActions();
 			}
 			catch(Exception e) {
@@ -68,7 +81,8 @@ namespace Kerbalua.Gui {
 			string result = "";
 			try { 
 				CommonSaveLoadActions();
-				result=File.ReadAllText(CreateFullPath()).Replace("\r","");
+				CreateFullPath();
+				result=RedOnion.KSP.ROS.KspRosEngine.LoadScript(content.text).Replace("\r","");
 			}
 			catch(Exception e) {
 				UnityEngine.Debug.Log(e.StackTrace);
@@ -76,7 +90,7 @@ namespace Kerbalua.Gui {
 			return result;
 		}
 
-		string CreateFullPath()
+		string CreateFullPath(bool forSave = false)
 		{
 			if (content.text == "") {
 				content.text = defaultScriptFilename;
@@ -85,7 +99,7 @@ namespace Kerbalua.Gui {
 			Directory.CreateDirectory(Settings.BaseScriptsPath);
 			string fullPath = Path.Combine(Settings.BaseScriptsPath, content.text);
 
-			if (!File.Exists(fullPath)) {
+			if (forSave && !File.Exists(fullPath)) {
 				File.WriteAllText(fullPath, "");
 			}
 
@@ -119,7 +133,7 @@ namespace Kerbalua.Gui {
 		List<string> GetScriptList()
 		{
 			if (scriptList == null || ioDelayWatch.ElapsedMilliseconds > ioDelayMillis) {
-				scriptList = new List<string>(Directory.GetFiles(Settings.BaseScriptsPath));
+				scriptList = RedOnion.KSP.ROS.KspRosEngine.EnumerateScripts();
 				ioDelayWatch.Reset();
 				ioDelayWatch.Start();
 			}

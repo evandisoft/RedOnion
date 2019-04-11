@@ -17,20 +17,66 @@ namespace Kerbalua.Completion {
 		{
 			string relevantText = source.Substring(0, cursorPos);
 
-			var processedIncompleteVar = Parse(relevantText);
-			var completionObject = new CompletionObject(globals, processedIncompleteVar.Segments);
-
-			try {
-				completionObject.ProcessCompletion();
+			ProcessedIncompleteVar processedIncompleteVar;
+			try
+			{
+				processedIncompleteVar = Parse(relevantText);
 			}
-			catch(LuaIntellisenseException) {
+			catch (LuaIntellisenseException)
+			{
 				replaceStart = replaceEnd = cursorPos;
 				return new List<string>();
 			}
-			string Partial = completionObject.CurrentPartial;
-			replaceStart = cursorPos - Partial.Length;
-			replaceEnd = cursorPos;
-			return completionObject.GetCurrentCompletions();
+
+			var operations = new CompletionOperations(processedIncompleteVar.Segments);
+
+
+			object currentObject = globals;
+
+			try
+			{
+				while (!operations.LastOperation)
+				{
+					if (operations.IsFinished)
+					{
+						throw new LuaIntellisenseException("Operations should not have been finished ");
+					}
+
+					if (!OperationsProcessor.TryProcessOperation(currentObject, operations, out currentObject))
+					{
+						replaceStart = replaceEnd = cursorPos;
+						return new List<string>();
+					}
+				}
+			}
+			catch (LuaIntellisenseException)
+			{
+				replaceStart = replaceEnd = cursorPos;
+				return new List<string>();
+			}
+
+			var lastOp = operations.Current;
+			if(lastOp is GetMemberOperation getMemberOperation)
+			{
+				string lowercasePartial = getMemberOperation.Name.ToLower();
+				List<string> completions = new List<string>();
+				foreach(var possibleCompletion in OperationsProcessor
+					.StaticGetPossibleCompletions(currentObject))
+				{
+					if (possibleCompletion.ToLower().Contains(lowercasePartial))
+					{
+						completions.Add(possibleCompletion);
+					}
+				}
+				completions.Sort();
+				replaceStart = cursorPos - lowercasePartial.Length;
+				replaceEnd = cursorPos;
+
+				return completions;
+			}
+
+			replaceStart = replaceEnd = cursorPos;
+			return new List<string>();
 		}
 
 		static public ProcessedIncompleteVar Parse(string str)
@@ -43,10 +89,14 @@ namespace Kerbalua.Completion {
 				BuildParseTree = true
 			};
 
-			IParseTree tree = parser.incompleteChunk();
+			var incompleteChunk = parser.incompleteChunk();
+			if (incompleteChunk.exception != null)
+			{
+				throw new LuaIntellisenseException("Could not parse incompleteChunk");
+			}
 
 			var lastIncompleteVarExtractor = new LastIncompleteVarExtractor();
-			ParseTreeWalker.Default.Walk(lastIncompleteVarExtractor, tree);
+			ParseTreeWalker.Default.Walk(lastIncompleteVarExtractor, incompleteChunk);
 			var lastIncompleteVar = lastIncompleteVarExtractor.LastIncompleteVar;
 
 			var processedIncompleteVar = new ProcessedIncompleteVar(lastIncompleteVar);

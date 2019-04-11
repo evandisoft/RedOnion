@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using MoonSharp.Interpreter;
@@ -29,18 +30,19 @@ namespace RedOnion.KSP.Lua.Proxies
 			var metatable = new Table(script);
 			metatable["__index"] = new Func<Table, DynValue, object>(IndexFunc);
 			metatable["__tostring"] = new Func<Table, DynValue>(ToString);
+			metatable["__newindex"] = new Action<Table, DynValue, DynValue>(NewIndexFunc);
 			MetaTable = metatable;
 		}
-
-		DynValue Index(Table table,DynValue key)
-		{
-			return key;
-		}
-
 
 		DynValue ToString(Table table)
 		{
 			return DynValue.NewString(ProxiedObject.ToString());
+		}
+
+		void NewIndexFunc(Table table, DynValue key, DynValue value)
+		{
+			throw new NotImplementedException("The ProxyTable of type "+GetType() + " for Proxied object " + ProxiedObject + " of type " + ProxiedObject.GetType() +
+				" does not implement NewIndex");
 		}
 
 		object IndexFunc(Table table, DynValue key)
@@ -84,10 +86,10 @@ namespace RedOnion.KSP.Lua.Proxies
 
 			InvokerClass invokerObject = new InvokerClass(mi, ProxiedObject);
 			object o = new Invoker(invokerObject.HandleInvoker);
+
 			if (mi != null)
 			{
-				return o;
-				//return new ProxyCallTable(script, ProxiedObject, memberName);
+				return new ProxyCallTable(script, ProxiedObject, memberName);
 			}
 			throw new NotImplementedException("Member "+memberName+" was not in proxied object "+ProxiedObject.GetType());
 		}
@@ -108,9 +110,6 @@ namespace RedOnion.KSP.Lua.Proxies
 				return mi.Invoke(ProxiedObject, args);
 			}
 		}
-
-
-
 
 		delegate object Invoker(params object[] args);
 	}

@@ -18,6 +18,7 @@ namespace RedOnion.KSP.Autopilot
 
 		public enum SpinMode
 		{
+			SET_RELDIR,
 			SET_DIR,
 			SET_SPIN,
 			RAW,
@@ -56,6 +57,21 @@ namespace RedOnion.KSP.Autopilot
 			}
 		}
 
+		RelativeDirection targetRel = new RelativeDirection();
+		public RelativeDirection TargetRel
+		{
+			get
+			{
+				return targetRel;
+			}
+			set
+			{
+				Enable();
+				CurrentSpinMode = SpinMode.SET_RELDIR;
+				targetRel = value;
+			}
+		}
+
 		public void SetSpin(float x, float y, float z)
 		{
 			TargetSpin = new Vector3(x, y, z);
@@ -76,15 +92,21 @@ namespace RedOnion.KSP.Autopilot
 			CurrentSpinMode = SpinMode.OFF;
 		}
 
+		public void SetRel(double heading,double pitch)
+		{
+			TargetRel = new RelativeDirection(heading, pitch);
+		}
+
 		/// <summary>
 		/// TODO: We don't propery handle both possible torque situations
 		/// (pos/neg)
 		/// </summary>
 		/// <returns>The available torque.</returns>
 		/// <param name="vessel">Vessel.</param>
-		public Vector3 GetAvailableTorque(Vessel vessel)
+		public void GetAllTorque(Vessel vessel,out Vector3 pos, out Vector3 neg)
 		{
-			Vector3 torque = new Vector3();
+			pos = new Vector3();
+			neg = new Vector3();
 
 			foreach (var part in vessel.Parts)
 			{
@@ -92,14 +114,59 @@ namespace RedOnion.KSP.Autopilot
 				{
 					if (module is ITorqueProvider torqueProvider)
 					{
-						Vector3 pos, neg;
-						torqueProvider.GetPotentialTorque(out pos, out neg);
-						torque += pos;
+						Vector3 newPos, newNeg;
+						torqueProvider.GetPotentialTorque(out newPos, out newNeg);
+						if(torqueProvider is ModuleControlSurface s)
+						{
+							//newPos *= 10;
+							//newNeg *= 10;
+							Vector3 currentTorque = Vector3.Cross(s.liftForce,vessel.localCoM - module.transform.position);
+
+						}
+						pos += newPos;
+						neg += newNeg;
+						if(module.GUIName=="Control Surface")
+						{
+							//Debug.Log("torque is "+newPos+","+newNeg);
+						}
 					}
 				}
 			}
+		}
 
-			return torque;
+		public void GetNonControlSurfaceTorque(Vessel vessel, out Vector3 pos, out Vector3 neg)
+		{
+			pos = new Vector3();
+			neg = new Vector3();
+
+			foreach (var part in vessel.Parts)
+			{
+				foreach (var module in part.Modules)
+				{
+					if (module is ITorqueProvider torqueProvider)
+					{
+						Vector3 newPos, newNeg;
+						torqueProvider.GetPotentialTorque(out newPos, out newNeg);
+						if (torqueProvider is ModuleControlSurface s)
+						{
+							//newPos *= 10;
+							//newNeg *= 10;
+							Vector3 currentTorque = Vector3.Cross(s.liftForce, vessel.localCoM - module.transform.position);
+
+						}
+						else
+						{
+							pos += newPos;
+							neg += newNeg;
+						}
+
+						if (module.GUIName == "Control Surface")
+						{
+							//Debug.Log("torque is "+newPos+","+newNeg);
+						}
+					}
+				}
+			}
 		}
 
 		public void Shutdown()
@@ -114,6 +181,7 @@ namespace RedOnion.KSP.Autopilot
 		void ControlCallback(FlightCtrlState flightCtrlState)
 		{
 			//flightCtrlState.CopyFrom(userCtrlState);
+			Vessel vessel = FlightGlobals.ActiveVessel;
 			switch (CurrentSpinMode)
 			{
 				case SpinMode.SET_SPIN:
@@ -126,10 +194,24 @@ namespace RedOnion.KSP.Autopilot
 					SetPitchRollYaw(flightCtrlState, new Vector3(
 						userCtrlState.pitch, userCtrlState.roll, userCtrlState.yaw));
 					break;
+				case SpinMode.SET_RELDIR:
+					if(targetRel.TryGetCurrentDir(vessel,out Vector3 dir))
+					{
+						targetDir = dir;
+					}
+					SetDir(flightCtrlState);
+					break;
 			}
 		}
 
 		const float maxAngularSpeed = Mathf.PI * 2 / 15;
+
+		public Vector3 CurrentDistanceAxis(Vessel vessel,Vector3 targetDir)
+		{
+			Vector3 currentDir = vessel.transform.up;
+			Vector3 distanceAxis = vessel.transform.worldToLocalMatrix * Vector3.Cross(currentDir.normalized, targetDir.normalized);
+			return distanceAxis;
+		}
 		const float fudgeFactor = 0.9f;
 		/// <summary>
 		/// Gets spin needed to approach target direction
@@ -150,6 +232,8 @@ namespace RedOnion.KSP.Autopilot
 
 			Vector3 currentDistanceAxis = vessel.transform.worldToLocalMatrix * Vector3.Cross(halfWayDir, target);
 			float angularDistance = Vector3.Angle(halfWayDir, target) / 360 * 2 * Mathf.PI;
+			//Vector3 currentDistanceAxis = vessel.transform.worldToLocalMatrix * Vector3.Cross(currentDir, target);
+			//float angularDistance = Vector3.Angle(currentDir, target) / 360 * 2 * Mathf.PI;
 			//(d-vt)*2/t^2=a
 			//accel=(angularDistance-angularSpeed*Time.deltaTime)/Time.deltaTime^2
 			// angularSpeedFinal/2*Time.deltaTime=angularDistanceFinal
@@ -204,24 +288,47 @@ namespace RedOnion.KSP.Autopilot
 				return;
 			}
 
-			Vector3 currentDir = vessel.transform.up;
-			Vector3 angularVelocity = GetAngularVelocity(vessel);
-			float angularDistance = Vector3.Angle(currentDir, targetDir) / 360 * 2 * Mathf.PI;
-			////(d-vt)*2/t^2=a
-			////accel=(angularDistance-angularSpeed*Time.deltaTime)/Time.deltaTime^2
-			Vector3 distanceAxis = vessel.transform.worldToLocalMatrix * Vector3.Cross(currentDir.normalized, targetDir.normalized);
-			Vector3 maxAccel = GetMaxAcceleration(vessel);
-			//Vector3 desiredAccel=(-distanceAxis + angularSpeed * Time.deltaTime) * 2 / (float)Math.Pow(Time.deltaTime,2);
+			GetNonControlSurfaceTorque(vessel, out Vector3 posInstantTorque, out Vector3 negInstantTorque);
+			GetAllTorque(vessel, out Vector3 posAllTorque, out Vector3 negAllTorque);
+
+			// Only use our super precise mode if we have enough instant torque for it to work
+			// Works perfectly so far in space, and works well for craft in atmospheric flight
+			// that do not have control surfaces. Oscillates indefinitely when used with
+			// Craft whose current torque is dominated by control surfaces.
+			if (posAllTorque.magnitude < posInstantTorque.magnitude * 2)
+			{
+				Vector3 currentDir = vessel.transform.up;
+				Vector3 angularVelocity = GetAngularVelocity(vessel);
+				float angularDistance = Vector3.Angle(currentDir, targetDir) / 360 * 2 * Mathf.PI;
+				////(d-vt)*2/t^2=a
+				////accel=(angularDistance-angularSpeed*Time.deltaTime)/Time.deltaTime^2
+				Vector3 distanceAxis = vessel.transform.worldToLocalMatrix * Vector3.Cross(currentDir.normalized, targetDir.normalized);
+				GetMaxAcceleration(vessel, out Vector3 posAccel, out Vector3 negAccel);
+				//Vector3 desiredAccel=(-distanceAxis + angularSpeed * Time.deltaTime) * 2 / (float)Math.Pow(Time.deltaTime,2);
 
 
-			Vector3 inputNeeded = new Vector3();
+				Vector3 inputNeeded = new Vector3();
 
-			inputNeeded.x = InputNeeded(distanceAxis.x, angularVelocity.x, maxAccel.x);
-			inputNeeded.y = angularVelocity.y / (maxAccel.y * Time.deltaTime); ;//InputNeeded(distanceAxis.y, angularVelocity.y, maxAccel.y);
-			inputNeeded.z = InputNeeded(distanceAxis.z, angularVelocity.z, maxAccel.z);
+				inputNeeded.x = InputNeeded(distanceAxis.x, angularVelocity.x, posAccel.x);
+				inputNeeded.y = angularVelocity.y / (posAccel.y * Time.deltaTime); ;//InputNeeded(distanceAxis.y, angularVelocity.y, maxAccel.y);
+				inputNeeded.z = InputNeeded(distanceAxis.z, angularVelocity.z, posAccel.z);
+
+				SetPitchRollYaw(flightCtrlState, inputNeeded);
+			}
+			// TargetSpinNeeded + setSpin works way better for handling control surfaces.
+			// When control surface torque is a high percentage of the torque we need to
+			// use this method.
+			else
+			{
+				targetSpin = TargetSpinNeeded(targetDir);
+				//Debug.Log(targetDir+","+targetSpin);
+				SetSpin(flightCtrlState);
+			}
+
+
 
 			//Debug.Log(distanceAxis+","+angularVelocity+","+pryNeeded);
-			SetPitchRollYaw(flightCtrlState, inputNeeded);
+			//SetPitchRollYaw(flightCtrlState, inputNeeded);
 
 
 			//Debug.Log(flightCtrlState.pitch + "," + flightCtrlState.roll + "," + flightCtrlState.yaw);
@@ -241,9 +348,7 @@ namespace RedOnion.KSP.Autopilot
 			//Vector3 pry = MathUtil.Vec.Div(desiredAccel, maxAccel);
 			//Debug.Log(pry);
 			//SetPitchRollYaw(flightCtrlState, pry);
-			//targetSpin = TargetSpinNeeded(targetDir);
-			//Debug.Log(targetDir+","+targetSpin);
-			//SetSpin(flightCtrlState);
+
 
 
 		}
@@ -258,20 +363,21 @@ namespace RedOnion.KSP.Autopilot
 			}
 
 			Vector3 angularVelocity = GetAngularVelocity(vessel);
-			Vector3 maxAccel = GetMaxAcceleration(vessel);
-			Vector3 pry = MathUtil.Vec.Div(angularVelocity - targetSpin, maxAccel * Time.deltaTime);
+			GetMaxAcceleration(vessel,out Vector3 posAccel,out Vector3 negAccel);
+			Vector3 pry = MathUtil.Vec.Div(angularVelocity - targetSpin, posAccel * Time.deltaTime);
 			SetPitchRollYaw(flightCtrlState, pry);
 		}
 
 
 
-		Vector3 GetMaxAcceleration(Vessel vessel)
+		public void GetMaxAcceleration(Vessel vessel,out Vector3 posAccel,out Vector3 negAccel)
 		{
-			Vector3 torque = GetAvailableTorque(vessel);
-			return MathUtil.Vec.Div(torque, vessel.MOI);
+			GetAllTorque(vessel,out Vector3 posTorque,out Vector3 negTorque);
+			posAccel=MathUtil.Vec.Div(posTorque, vessel.MOI);
+			negAccel = MathUtil.Vec.Div(negTorque, vessel.MOI);
 		}
 
-		Vector3 GetAngularVelocity(Vessel vessel)
+		public Vector3 GetAngularVelocity(Vessel vessel)
 		{
 			return MathUtil.Vec.Div(vessel.angularMomentum, vessel.MOI);
 		}

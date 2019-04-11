@@ -13,6 +13,7 @@ namespace RedOnion.KSP.Lua.Proxies
 		public object ProxiedObject;
 		MoonSharp.Interpreter.Script script;
 		public string MemberName;
+
 		public ProxyCallTable(MoonSharp.Interpreter.Script script,object proxiedObject,string memberName) : base(script)
 		{
 			this.script = script;
@@ -23,12 +24,19 @@ namespace RedOnion.KSP.Lua.Proxies
 			@"
 				return function(callFunc)
 					return function(table,...)
-						return callFunc({...})
+						local t=callFunc({...})
+						local r=t[1]
+						t[1]=1
+						if(#t>1) then
+							return r,unpack(t,2)
+						else
+							return r
+						end
 					end
 				end
 			");
-			DynValue invoker = script.Call(createInvoker, new Func<Table, object>(CallFunc));
-
+			DynValue invoker = script.Call(createInvoker, new Func<Table, Table>(CallFunc));
+			
 			var metatable = new Table(script);
 			metatable["__call"] = invoker;
 			MetaTable = metatable;
@@ -36,7 +44,7 @@ namespace RedOnion.KSP.Lua.Proxies
 
 
 
-		object CallFunc(Table argTable)
+		Table CallFunc(Table argTable)
 		{
 			Type t = ProxiedObject.GetType();
 			MethodInfo mi = null;
@@ -55,21 +63,41 @@ namespace RedOnion.KSP.Lua.Proxies
 						break;
 					}
 				}
+				if (mi == null)
+				{
+					throw new Exception("MethodInfo null in ProxyCallTable for type " + ProxiedObject.GetType() + " method " + MemberName);
+				}
 			}
 			UnityEngine.Debug.Log("args");
-			List<object> args = new List<object>();
+			int i = 0;
+			object[] args = new object[mi.GetParameters().Length];
 			foreach(var value in argTable.Values)
 			{
 				if (value.Type == DataType.Nil)
 				{
 					break;
 				}
-				args.Add(value.ToObject());
+				args[i++]=value.ToObject();
 			}
 
-			object[] arrayArgs = args.ToArray();
+			var pis = mi.GetParameters();
+			List<int> OutParamIndices = new List<int>();
+			for(i = 0; i < pis.Length; i++)
+			{
+				if (pis[i].IsOut)
+				{
+					OutParamIndices.Add(i);
+				}
+			}
 
-			return mi.Invoke(ProxiedObject, arrayArgs);
+			object retValue=mi.Invoke(ProxiedObject, args);
+			Table returnVals = new Table(script);
+			returnVals[1] = retValue;
+			for(i = 0; i < OutParamIndices.Count; i++)
+			{
+				returnVals[i + 2] = args[OutParamIndices[i]];
+			}
+			return returnVals;
 		}
 	}
 }

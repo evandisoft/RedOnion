@@ -18,6 +18,7 @@ namespace RedOnion.Script.Parsing
 			=> (Options & opt) != 0;
 
 		protected Lexer lexer;
+		public bool Eof => lexer.Eof;
 
 		public Parser() => lexer = new Lexer(this);
 		public Parser(Option opts) : this() => Options = opts;
