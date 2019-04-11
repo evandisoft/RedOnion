@@ -65,7 +65,7 @@ Now works to some extent with control surfaces.
 Also can set a relative direction consisting of a heading and pitch. Heading is degrees from north (clockwise), and pitch is degrees above the plane perpendicular to the vector connecting the vessel and the body. This is an easier way to specify the direction you want it to point. It is relative to the closest body. 
 
 ```
-ctrl=RedOnion.KSP.Autopilot.FlightControl
+ctrl=import.RedOnion.KSP.Autopilot.FlightControl.GetInstance()
 ctrl.SetRel(90,20) -- Aims ship east with a 20 degree pitch above "horizon" (by horizon I mean the plane perpendicular to the vector connecting the vessel and the body rather than the point at which the sky meets the land.)
 ```
 
