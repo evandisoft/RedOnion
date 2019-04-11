@@ -6,17 +6,19 @@ We provide an API for both Lua and ROS that is documented [here](https://github.
 
 Here is an example Lua script that can be [executed](https://github.com/evandisoft/RedOnion/blob/master/TroubleShooting.md#how-do-i-run-a-script) while you are in flight mode (make sure you have [the "Lua" engine selected](https://github.com/evandisoft/RedOnion/blob/master/TroubleShooting.md#script-wont-work)):
 ```
-vessel=Ksp.FlightGlobals.ActiveVessel
+vessel=import.FlightGlobals.ActiveVessel
+
+Random=import.UnityEngine.Random
 
 for i=0,20*60 do
     coroutine.yield()
 end
 
 for j=1,5 do
-    for i=0,Ksp.Random.Range(0,20*60) do
+    for i=0, Random.Range(0,20*60) do
         coroutine.yield()
     end
-    local num=Ksp.Random.Range(0,vessel.parts.Count)
+    local num=Random.Range(0,vessel.parts.Count)
     print(vessel.parts[num].ToString().."is malfunctioning!")
     vessel.parts[num].explode()
 end
@@ -28,11 +30,13 @@ A Lua script being executed in the editor/repl will have to return control to KS
 This script is a script that waits a short time, and then explodes 5 random parts. It can be a fun piloting challenge because
 it can make your ship very difficult to recover from. A video demonstration of my poor piloting skills being put to the test by this script is [here](https://www.youtube.com/watch?v=xzAghlB2NLw)
 
-The first thing this script does is use our [CommonScriptApi](https://github.com/evandisoft/RedOnion/blob/master/CommonScriptApi.md) to
-get access to a reference to the current vessel.
+The first thing this script does is uses `import` to
+get access to a reference to the current vessel and to UnityEngine's Random class.
 
 ```
-vessel=Ksp.FlightGlobals.ActiveVessel
+vessel=import.FlightGlobals.ActiveVessel
+
+Random=import.UnityEngine.Random
 ```
 And stores the current vessel in a global variable called "vessel"
 
@@ -45,14 +49,14 @@ for j=1,5 do
 
 Each iteration of the loop is going to first wait a random amount of time by yielding over and over again in this little loop:
 ```
-for i=0,Ksp.Random.Range(0,20*60) do
+for i=0, Random.Range(0,20*60) do
     coroutine.yield()
 end
 ```
 
 Then it will select a random part index.
 ```
-local num=Ksp.Random.Range(0,vessel.parts.Count)
+local num= Random.Range(0,vessel.parts.Count)
 ```
 
 Display which part will be exploding:
