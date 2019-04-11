@@ -1,6 +1,6 @@
 **Disclaimer: This is not a sandbox! This is an unrestricted scripting environment. Any script here has as much power as a mod. Any mod you've ever installed on KSP is effectively part of the KSP application, and has the power to modify anything that KSP has permission to (which is basically anything a user is able to modify). Do not run scripts from untrusted sources!**
 
-**And that is the point!:
+**And that is the point!:**
 
 - We want people eventually to be able to create mods using this mod.
 - We want people to be able to debug their mod using this mod.
