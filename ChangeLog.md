@@ -39,6 +39,13 @@ Note: For assembly names with non-word characters like "Assembly-CSharp" this do
 
 However, it is still useful to use intellisense in order to see what the names are of the various assemblies. Intellisense will show you all the loaded assemblies when you type `assembly.`. If you have a mod you want to interact with, it will most likely have an assembly name very similar to the name of the mod. And you can use that in `assembly["assemblyName"]`.
 
+Intellisense won't work directly  on `asssembly["assemblyName"].`, but it will work after you've assigned the result to another variable. 
+
+```
+a=assembly["assemblyName"]
+a. -- this will show completiosn for the given assembly
+```
+
 ## 0.3.0
 ### New Import System:
 `listtype=import.system.collections.generic.list`. Using the import system you can interact with any loaded
