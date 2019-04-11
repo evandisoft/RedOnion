@@ -5,7 +5,7 @@
 - We want people eventually to be able to create mods using this mod.
 - We want people to be able to debug their mod using this mod.
 - We want people to be able to explore their own or other's mods using this mod.
-- We want to be able to interact with the program in an unrestricted way and we think others will enjoy that as well.
+- We want users to be able to interact with the program in an unrestricted way.
 
 **We may, in the future, create an optional sandbox. But that will come later.**
 
