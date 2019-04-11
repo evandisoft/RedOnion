@@ -16,7 +16,13 @@
 
 # Next Release
 <details><summary>Show/Hide</summary>
+Nothing yet! Just had a release!
 
+</details>
+
+# 0.3
+<details><summary>Show/Hide</summary>
+## 0.3.0
 ### New Import System:
 `listtype=import.system.collections.generic.list`. Using the import system you can interact with any loaded
 libraries (included loaded mods) written in C#. You should check out the licenses of those mods/libraries prior to writing any code that depends on them. However, many mods have very permissive licenses. This feature organizes all types in the namespace they are found in C#.
