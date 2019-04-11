@@ -19,7 +19,7 @@ Note that due to KSP using a version of Unity that was not released for Linux, d
 On Windows, Visual Studio 2017 Community is the easiest way to contribute.
 
 ## Common 
-In order to work with the KSP library dll's, we have a symbolic link we place in the directory above the repository directory.
+In order to work with the KSP library dll's, we have a symbolic link called "ksp" we place in the repository directory.
 The link should link to your KSP game install.
 
 On Windows, you can make symbolic links using [mklink](https://www.howtogeek.com/howto/16226/complete-guide-to-symbolic-links-symlinks-on-windows-or-linux/). Use the version that has the "/D" option.
