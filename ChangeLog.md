@@ -42,8 +42,9 @@ However, it is still useful to use intellisense in order to see what the names a
 Intellisense won't work directly  on `asssembly["assemblyName"].`, but it will work after you've assigned the result to another variable. 
 
 ```
-a=assembly["assemblyName"]
-a. -- this will show completions for the given assembly
+i> a=assembly["assemblyName"]
+r> void
+i> a. -- this will show completions for the given assembly
 ```
 
 ## 0.3.0
