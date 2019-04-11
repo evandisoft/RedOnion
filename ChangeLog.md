@@ -36,6 +36,14 @@ First name after "assembly" is the assembly name, followed by any namespaces or 
 
 `assembly.UnityEngine.UnityEngine.Vector3`
 
+**Update: This has a big flaw: assemblies with non-word characters in them break this.
+
+For assembly names with special characters like "Assembly-CSharp" you can do assembly["Assembly-CSharp"].
+
+I will come up with a better workaround.
+
+This is how you access types or namespaces in other mods.
+
 This is how you access types or namespaces in other mods.
 
 ## 0.3.0
