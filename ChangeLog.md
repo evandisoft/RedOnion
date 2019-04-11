@@ -21,9 +21,7 @@ Nothing yet! Just had a release!
 
 </details>
 
-# 0.3
-<details><summary>Show/Hide</summary>
-  
+# 0.3 
 ## 0.3.0
 ### New Import System:
 `listtype=import.system.collections.generic.list`. Using the import system you can interact with any loaded
@@ -91,7 +89,6 @@ r> 1
 
 ### Better Lua intellisense
 Lua Intellisense now knows whether a reference is static or an instance variable, so it no longer lists all the instance members of a class in the context of a static class reference.
-</details>
 
 # 0.2:
 <details><summary>Show/Hide</summary>
