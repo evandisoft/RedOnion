@@ -41,7 +41,7 @@ namespace RedOnion.KSP.ReflectionUtil
 			"RedOnion.Script",
 			"RedOnion.UI",
 			"RedOnion.KSP",
-			"MoonSharp.Interpreter",
+			"KerbaluaMoonSharp",
 			"Kerbalua",
 			"System.Core",
 			"System",
@@ -55,6 +55,7 @@ namespace RedOnion.KSP.ReflectionUtil
 			"Assembly-CSharp-firstpass",
 			"UnityEngine",
 			"mscorlib",
+			"Antlr4.Runtime.Standard",
 		};
 		static NamespaceMappings defaultAssemblies;
 		static public NamespaceMappings DefaultAssemblies
