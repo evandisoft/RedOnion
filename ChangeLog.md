@@ -24,7 +24,11 @@ Nothing yet! Just had a release!
 # 0.3 
 ## 0.3.1
 import is now limited to a default list of assemblies.
-To get other assemblies access them through `assembly.AssemblyName.`
+
+To get access to types in other assemblies access them through `assembly.` followed by the name of the assembly.
+
+For example:
+`assembly.UnityEngine.UnityEngine.Vector3`
 
 ## 0.3.0
 ### New Import System:
