@@ -22,6 +22,10 @@ Nothing yet! Just had a release!
 </details>
 
 # 0.3 
+## 0.3.2
+- import wasn't properly limited to the default list I had specified.
+- Our MoonSharp dll now uses a different assembly name (KerbaluaMoonSharp). So I think there is no longer a compatibility problem with other mods that use MoonSharp
+
 ## 0.3.1
 import is now limited to a default list of assemblies.
 
