@@ -32,6 +32,8 @@ First name after "assembly" is the assembly name, followed by any namespaces or 
 
 `assembly.UnityEngine.UnityEngine.Vector3`
 
+This is how you access classes in mods. Just make sure the mod has a permissive license.
+
 ## 0.3.0
 ### New Import System:
 `listtype=import.system.collections.generic.list`. Using the import system you can interact with any loaded
