@@ -5,7 +5,7 @@
 - We want people eventually to be able to create mods using this mod.
 - We want people to be able to debug their mod using this mod.
 - We want people to be able to explore their own or other's mods using this mod.
-- We want to be able to interact with the program as we see fit and we want others to be able to interact with the program as they see fit!
+- We want to be able to interact with the program in an unrestricted way and we think others will enjoy that as well.
 
 # RedOnion and Kerbalua
 
