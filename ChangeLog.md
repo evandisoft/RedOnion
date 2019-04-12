@@ -35,7 +35,7 @@ For example: First name after "assembly" is the assembly name, followed by any n
 
 assembly.UnityEngine.UnityEngine.Vector3
 
-Note: For assembly names with non-word characters like "Assembly-CSharp" this does not work. You will see them listed in the possible completion results, but if you try to complete you will get something that looks to Lua like some sort of different operation. In the following case, for example, it looks like a subtraction operation: `assembly.Assembly-CSharp`. For names like this you can do `assembly["Assembly-CSharp"]`.
+Note: For assembly names with non-word characters like "Assembly-CSharp" this does not work. You will see them listed in the possible completion results, but if you try to complete you will get something that looks to Lua like some sort of different operation. In the following case, for example, it looks like a subtraction operation: `assembly.Assembly-CSharp`. Also, it would treat assembly.System.Core ("System.Core" is an assembly name) as an attempt to find a namespace "Core" in an assembly called "System". For names like this you can do `assembly["Assembly-CSharp"]`.
 
 However, it is still useful to use intellisense in order to see what the names are of the various assemblies. Intellisense will show you all the loaded assemblies when you type `assembly.`. If you have a mod you want to interact with, it will most likely have an assembly name very similar to the name of the mod. And you can use that in `assembly["assemblyName"]`.
 
