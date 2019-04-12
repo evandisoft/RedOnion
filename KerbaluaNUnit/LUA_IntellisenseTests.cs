@@ -152,5 +152,43 @@ namespace KerbaluaNUnit
 
 			//Assert.AreEqual(11, completions.Count);
 		}
+
+		[Test()]
+		public void LUA_IntellisenseTest_Interop()
+		{
+			Setup();
+			globals.MetaTable = RedOnion.KSP.API.Globals.Instance;
+			var allMappings = NamespaceMappings.ForAllAssemblies;
+			//globals[""] = allMappings.GetNamespace("");
+			//globals["Adf"] = new Adf();
+			string source =
+				@"reflect";
+			//Console.WriteLine(allMappings.GetNamespace("")
+			//.GetSubNamespace("System").GetType("Action"));
+			var completions = GetCompletions(source);
+			//PrintAll(completions);
+			Assert.AreEqual(1, completions.Count);
+
+			//Assert.AreEqual(11, completions.Count);
+		}
+
+		[Test()]
+		public void LUA_IntellisenseTest_Interop2()
+		{
+			Setup();
+			globals.MetaTable = RedOnion.KSP.API.Globals.Instance;
+			var allMappings = NamespaceMappings.ForAllAssemblies;
+			//globals[""] = allMappings.GetNamespace("");
+			//globals["Adf"] = new Adf();
+			string source =
+				@"reflect.";
+			//Console.WriteLine(allMappings.GetNamespace("")
+			//.GetSubNamespace("System").GetType("Action"));
+			var completions = GetCompletions(source);
+			PrintAll(completions);
+			Assert.AreEqual(1, completions.Count);
+
+			//Assert.AreEqual(11, completions.Count);
+		}
 	}
 }

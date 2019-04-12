@@ -7,17 +7,17 @@ namespace RedOnion.KSP.ReflectionUtil
 {
 	public class NameTypeMap
 	{
-		Dictionary<string, TypeAlternatives> nameTypeDict = new Dictionary<string, TypeAlternatives>();
+		DualCaseSensitivityDict<TypeAlternatives> nameTypeDict = new DualCaseSensitivityDict<TypeAlternatives>();
 
-		public Dictionary<string, TypeAlternatives>.KeyCollection BaseTypeNames => nameTypeDict.Keys;
+		public ICollection<string> BaseTypeNames => nameTypeDict.Keys;
 		public List<string> RawTypeNames
 		{
 			get
 			{
 				List<string> rawTypeNames = new List<string>();
-				foreach(var entry in nameTypeDict)
+				foreach(var value in nameTypeDict.Values)
 				{
-					rawTypeNames.AddRange(entry.Value.Values.Select(t => t.Name));
+					rawTypeNames.AddRange(value.Values.Select(t => t.Name));
 				}
 				return rawTypeNames;
 			}
@@ -28,7 +28,7 @@ namespace RedOnion.KSP.ReflectionUtil
 			string basename = GetBasename(rawType.Name);
 			int index = GetNumTypeParameters(rawType.Name);
 
-			if (!nameTypeDict.ContainsKey(basename))
+			if (!nameTypeDict.ContainsSensitiveKey(basename))
 			{
 				nameTypeDict[basename] = new TypeAlternatives(basename);
 			}

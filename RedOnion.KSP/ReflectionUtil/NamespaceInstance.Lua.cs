@@ -1,6 +1,7 @@
 using System;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
+using UnityEngine;
 
 namespace RedOnion.KSP.ReflectionUtil
 {
@@ -8,8 +9,11 @@ namespace RedOnion.KSP.ReflectionUtil
 	{
 		DynValue IUserDataType.Index(MoonSharp.Interpreter.Script script, DynValue index, bool isDirectIndexing)
 		{
+			//Debug.Log(index);
+
 			if (index.Type != DataType.String)
 			{
+				// Exceptions thrown from in here will get intercepted by interpreter and not shown
 				throw new Exception("Type of index must be string for NamespaceInstance");
 			}
 
@@ -23,6 +27,7 @@ namespace RedOnion.KSP.ReflectionUtil
 				return UserData.CreateStatic(type);
 			}
 
+			// Exceptions thrown from in here will get intercepted by interpreter and not shown
 			throw new Exception("No type or subnamespace named " + index + " found in namespace " + ToString());
 		}
 
@@ -32,7 +37,7 @@ namespace RedOnion.KSP.ReflectionUtil
 			//{
 			//	return DynValue.FromObject(script, new CallbackFunction(ToString));
 			//}
-
+			//Debug.Log(metaname);
 			return null;
 		}
 

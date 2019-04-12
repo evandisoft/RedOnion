@@ -1,16 +1,20 @@
-vessel=Ksp.FlightGlobals.ActiveVessel
-ctrl=Ksp.FlightControl
+vessel=import.FlightGlobals.ActiveVessel
+ctrl=import.RedOnion.KSP.Autopilot.FlightControl.GetInstance()
+Vec=import.RedOnion.KSP.MathUtil.Vec
+UE=import.UnityEngine
+
 local previousTime=os.time()
 local ctrlTable={roll=0,pitch=0,yaw=0}
 
 while true do
     print(vessel.ctrlState.GetPYR())
 
-    torque=ctrl.GetAvailableTorque(vessel)
+    local blah=0
+    blah,torque=ctrl.GetAllTorque(vessel)
 
-    local angularVelocity=Ksp.Vec.Div(vessel.angularMomentum,vessel.MOI)
-    local maxAccel=Ksp.Vec.Div(torque,vessel.MOI)
-    local input=Ksp.Vec.Div(angularVelocity,maxAccel*Ksp.Time.deltaTime)
+    local angularVelocity=Vec.Div(vessel.angularMomentum,vessel.MOI)
+    local maxAccel=Vec.Div(torque,vessel.MOI)
+    local input=Vec.Div(angularVelocity,maxAccel*UE.Time.deltaTime)
     
     ctrlTable.pitch=input.x
     ctrlTable.roll=input.y

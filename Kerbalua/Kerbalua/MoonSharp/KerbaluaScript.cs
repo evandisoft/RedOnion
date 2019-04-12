@@ -55,7 +55,7 @@ namespace Kerbalua.MoonSharp
 		public KerbaluaScript() : base(CoreModules.Preset_Complete)
 		{
 			UserData.RegistrationPolicy = InteropRegistrationPolicy.Automatic;
-
+			
 			GlobalOptions.CustomConverters
 				.SetClrToScriptCustomConversion(
 					(Script script, ModuleControlSurface m)
@@ -75,7 +75,7 @@ namespace Kerbalua.MoonSharp
 				}));
 			Globals.MetaTable = API.Globals.Instance;
 			//Globals["Vessel"] = FlightGlobals.ActiveVessel;
-			var allMappings = NamespaceMappings.ForAllAssemblies;
+			var defaultMappings = NamespaceMappings.DefaultAssemblies;
 			//Globals["KSP"] = new KspApi();
 			Globals["new"] = Constructor.Instance;
 			Globals["static"] = new Func<object, DynValue>((o) =>
@@ -98,6 +98,12 @@ namespace Kerbalua.MoonSharp
 				}
 				return DynValue.FromObject(this,o.GetType());
 			});
+			Globals["assemblies"] = new Func<List<Assembly>>(() =>
+			{
+				return AppDomain.CurrentDomain.GetAssemblies().ToList();
+			});
+
+			Globals["assembly"] = new GetMappings();
 
 			Globals["printall"] = DoString(
 			@"
@@ -106,7 +112,7 @@ namespace Kerbalua.MoonSharp
 			//Globals["unity"] = Assembly.GetAssembly(typeof(Vector3));
 			//Globals["Assembly"] = typeof(Assembly);
 			//Assembly blah;
-			Globals["import"] = allMappings.GetNamespace("");
+			Globals["import"] = defaultMappings.GetNamespace("");
 			//Globals["Coll"] = allMappings.GetNamespace("System.Collections.Generic");
 			Globals["reldir"] = new Func<double, double, RelativeDirection>((heading, pitch) => new RelativeDirection(heading, pitch));
 			//Globals["AppDomain"] = UserData.CreateStatic(typeof(AppDomain));

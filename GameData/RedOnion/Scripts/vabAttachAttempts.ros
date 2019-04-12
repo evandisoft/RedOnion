@@ -1,3 +1,4 @@
+# No success yet. Just keeping this here in case I want to work with it.
 var vessel=ksp.EditorLogic.fetch.ship
 var part=vessel.parts[0]
 var construction=ksp.ShipConstruction

@@ -78,11 +78,20 @@ namespace Kerbalua.Completion
 				if (obj is IHasCompletionProxy proxy)
 				{
 					obj = proxy.CompletionProxy;
+					continue;
 				}
-				else
+				if (obj is DynValue dyn)
 				{
-					break;
+					if (dyn.Type == DataType.UserData)
+					{
+						if (dyn.UserData is IHasCompletionProxy proxy2)
+						{
+							obj = proxy2.CompletionProxy;
+							continue;
+						}
+					}
 				}
+				break;
 			}
 			if (i >= limit)
 			{

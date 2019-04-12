@@ -1,8 +1,0 @@
-var vessels=ksp.FlightGlobals.Vessels
-
-for var i=0;i<vessels.count;i++
-    print i+":"+vessels[i]
-    
-
-
-ksp.FlightDriver.StartAndFocusVessel(Ksp.HighLogic.CurrentGame,20)

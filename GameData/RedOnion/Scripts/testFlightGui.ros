@@ -2,7 +2,7 @@ var wnd = new window
 function shutdown
     wnd.dispose
   
-var ctrl = ksp.flightcontrol.GetInstance()
+var ctrl = ksp.FlightControl.GetInstance()
 var vessel = ksp.flightglobals.ActiveVessel
 
 var panel=new panel
