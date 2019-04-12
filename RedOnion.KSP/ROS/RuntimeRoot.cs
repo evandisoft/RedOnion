@@ -56,6 +56,7 @@ namespace RedOnion.KSP
 				BaseProps.Set("System", new SimpleObject(Engine, sys));
 
 			AddType(typeof(VesselType));
+			Add("assembly", Value.FromObject(new ReflectionUtil.GetMappings()));
 
 			// UI namespace
 			hard.Set("UI", new Value(new SimpleObject(Engine, new Properties()
