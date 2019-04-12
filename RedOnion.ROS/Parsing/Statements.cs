@@ -85,9 +85,9 @@ namespace RedOnion.ROS.Parsing
 		}
 
 		/// <summary>
-		/// Parse block of statements
+		/// Parse block of statements.
+		/// Returns number of statements parsed
 		/// </summary>
-		/// <returns>Number of statements</returns>
 		protected virtual int ParseBlock(Flag flags)
 		{
 			var ind = Indent;
@@ -284,21 +284,41 @@ namespace RedOnion.ROS.Parsing
 				return;
 			}
 			case ExCode.Do:
-				var doat = Write(op);
-				Next();
-				ParseBlock(flags | Flag.WasDo);
-				if (ExCode != ExCode.While)
+				if (HasOption(Option.Prefix))
 				{
-					if (ExCode != ExCode.Until)
-						throw new ParseError(this, "Expected 'while' or 'until' for 'do'");
-					code.items[doat] = ExCode.DoUntil.Code();
+					var doAt = Write(op);
+					Next();
+					ParseBlock(flags | Flag.WasDo);
+					if (ExCode != ExCode.While)
+					{
+						if (ExCode != ExCode.Until)
+							throw new ParseError(this, "Expected 'while' or 'until' for 'do'");
+						code.items[doAt] = ExCode.DoUntil.Code();
+					}
+					var condAt = Write(0);
+					Next().FullExpression(flags);
+					Write(code.size-condAt-4, condAt);
 				}
-				var condAt = Write(0);
-				Next().FullExpression(flags);
-				Write(code.size-condAt-4, condAt);
+				else
+				{
+					var doAt = Write(op);
+					Write(0);
+					Next();
+					ParseBlock(flags | Flag.WasDo);
+					if (ExCode != ExCode.While)
+					{
+						if (ExCode != ExCode.Until)
+							throw new ParseError(this, "Expected 'while' or 'until' for 'do'");
+						code.items[doAt] = ExCode.DoUntil.Code();
+					}
+					var condAt = code.size;
+					Next().FullExpression(flags);
+					Write(code.size-condAt, doAt+1);
+				}
 				return;
 
 			case ExCode.For:
+			{
 				var forat = Write(ExCode);
 				Next();
 				FullExpression(flags | Flag.Limited | Flag.NoExpression);
@@ -326,6 +346,7 @@ namespace RedOnion.ROS.Parsing
 					Next();
 				ParseBlock(flags);
 				return;
+			}
 			case ExCode.ForEach:
 				Write(ExCode);
 				Next();

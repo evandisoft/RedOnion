@@ -8,34 +8,45 @@ namespace RedOnion.ROS.Objects
 {
 	public class Context : UserObject
 	{
-		protected struct Layer
+		protected struct Block
 		{
 			public OpCode op;
 			public int start, end;
 			public int at1, at2;
 			public Dictionary<string, int> shadow;
 		}
-		protected ListCore<Layer> layers;
+		protected ListCore<Block> blocks;
 		protected int start = int.MinValue;
 		protected int end = int.MaxValue;
 		protected int rootStart = int.MinValue;
 		protected int rootEnd = int.MaxValue;
-		protected OpCode blockCode;
 		protected int blockAt1, blockAt2;
+		protected OpCode blockCode;
 
-		public int LayerCount => layers.size;
-		public OpCode BlockCode => blockCode;
+		public int BlockCount => blocks.size;
 		public int BlockAt1 => blockAt1;
 		public int BlockAt2 => blockAt2;
 		public int BlockStart => start;
 		public int BlockEnd => end;
+
+		public OpCode BlockCode
+		{
+			get => blockCode;
+			set
+			{
+				blockCode = value;
+				if (blocks.size > 0)
+					blocks.Top().op = value;
+			}
+		}
+
 		public int RootStart
 		{
 			get => rootStart;
 			set
 			{
 				rootStart = value;
-				if (layers.size == 0)
+				if (blocks.size == 0)
 					start = value;
 			}
 		}
@@ -45,7 +56,7 @@ namespace RedOnion.ROS.Objects
 			set
 			{
 				rootEnd = value;
-				if (layers.size == 0)
+				if (blocks.size == 0)
 					end = value;
 			}
 		}
@@ -65,23 +76,29 @@ namespace RedOnion.ROS.Objects
 
 		public void Push(int start, int end, OpCode op = OpCode.Block, int at1 = 0, int at2 = 0)
 		{
-			ref var layer = ref layers.Add();
-			layer.op = blockCode = op;
-			layer.start = this.start = start;
-			layer.end = this.end = end;
-			layer.at1 = blockAt1 = at1;
-			layer.at2 = blockAt2 = at2;
+			ref var block = ref blocks.Add();
+			block.op = blockCode = op;
+			block.start = this.start = start;
+			block.end = this.end = end;
+			block.at1 = blockAt1 = at1;
+			block.at2 = blockAt2 = at2;
 		}
-		public int Pop()
+		public void ResetTop()
 		{
-			var shadow = layers.Top().shadow;
+			var shadow = blocks.Top().shadow;
 			if (shadow != null)
 			{
 				foreach (var pair in shadow)
 					dict[pair.Key] = pair.Value;
 				shadow.Clear();
 			}
-			if (--layers.size == 0)
+		}
+		public int Pop()
+		{
+			if (blocks.size <= 0)
+				throw InvalidOperation("No block left to remove");
+			ResetTop();
+			if (--blocks.size == 0)
 			{
 				blockCode = OpCode.Void;
 				blockAt1 = 0;
@@ -91,21 +108,21 @@ namespace RedOnion.ROS.Objects
 			}
 			else
 			{
-				ref var layer = ref layers.Top();
-				blockCode = layer.op;
-				blockAt1 = layer.at1;
-				blockAt2 = layer.at2;
-				start = layer.start;
-				return end = layer.end;
+				ref var block = ref blocks.Top();
+				blockCode = block.op;
+				blockAt1 = block.at1;
+				blockAt2 = block.at2;
+				start = block.start;
+				return end = block.end;
 			}
 		}
 		public void PopAll()
 		{
 			start = RootStart;
 			end = RootEnd;
-			for (int i = 0; i < layers.size; i++)
-				layers[i].shadow?.Clear();
-			layers.size = 0;
+			for (int i = 0; i < blocks.size; i++)
+				blocks[i].shadow?.Clear();
+			blocks.size = 0;
 		}
 
 		public override int Add(string name, ref Value value)
@@ -116,12 +133,12 @@ namespace RedOnion.ROS.Objects
 			it.value = value;
 			if (name != null)
 			{
-				if (layers.size > 0 && dict != null && dict.ContainsKey(name))
+				if (blocks.size > 0 && dict != null && dict.ContainsKey(name))
 				{
-					ref var layer = ref layers.Top();
-					if (layer.shadow == null)
-						layer.shadow = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-					layer.shadow[name] = dict[name];
+					ref var block = ref blocks.Top();
+					if (block.shadow == null)
+						block.shadow = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+					block.shadow[name] = dict[name];
 				}
 				if (dict == null)
 					dict = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);

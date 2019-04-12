@@ -82,23 +82,44 @@ namespace RedOnion.ROS
 			{
 				while (at < code.Length)
 				{
-					if (countdown <= 0)
-					{
-						Countdown = countdown;
-						return false;
-					}
-					countdown--;
 					while (at == blockEnd)
 					{
+						if (countdown <= 0)
+						{
+							Countdown = countdown;
+							return false;
+						}
+						countdown--;
 						switch (ctx.BlockCode)
 						{
 						case OpCode.While:
 						case OpCode.Until:
 							at = ctx.BlockAt1;
 							break;
+						case OpCode.Do:
+						case OpCode.DoUntil:
+						{
+							ref var cond = ref vals.Top();
+							if (cond.IsReference && !cond.desc.Get(ref cond, cond.num.Int))
+								throw CouldNotGet(ref cond);
+							if (cond.desc.Primitive != ExCode.Bool && !cond.desc.Convert(ref cond, Descriptor.Bool))
+								throw InvalidOperation("Could not convert '{0}' to boolean", cond.Name);
+
+							if (cond.num.Bool != (ctx.BlockCode == OpCode.Do))
+								break;
+							at = ctx.BlockStart;
+							ctx.ResetTop();
+							continue;
+						}
 						}
 						blockEnd = ctx.Pop();
 					}
+					if (countdown <= 0)
+					{
+						Countdown = countdown;
+						return false;
+					}
+					countdown--;
 					var op = (OpCode)code[at++];
 					switch (op)
 					{
@@ -549,9 +570,41 @@ namespace RedOnion.ROS
 						Exit = op;
 						goto finish;
 
-					//TODO: break, continue
-					//TODO: for, foreach, do-while, do-until
+					case OpCode.Break:
+						at = blockEnd;
+						if (ctx == null)
+							continue;
+						while (ctx.BlockCount > 0
+						&& (ctx.BlockCode < OpCode.For || ctx.BlockCode > OpCode.DoUntil))
+							at = blockEnd = ctx.Pop();
+						if (ctx.BlockCount > 0)
+							ctx.BlockCode = OpCode.Block;
+						continue;
+					case OpCode.Continue:
+					{
+						if (ctx == null)
+							throw InvalidOperation("No block to continue");
+						var origin = at;
+						while (ctx.BlockCount > 0
+						&& (ctx.BlockCode < OpCode.For || ctx.BlockCode > OpCode.DoUntil))
+							at = blockEnd = ctx.Pop();
+						if (ctx.BlockCount == 0)
+						{
+							at = origin;
+							throw InvalidOperation("No block to continue");
+						}
+						at = blockEnd;
+						switch (ctx.BlockCode)
+						{
+						case OpCode.Do:
+						case OpCode.DoUntil:
+							at = ctx.BlockAt1;
+							continue;
+						}
+						continue;
+					}
 
+					//TODO: for, foreach
 					case OpCode.While:
 					case OpCode.Until:
 					{
@@ -573,6 +626,18 @@ namespace RedOnion.ROS
 							continue;
 						}
 						at += sz;
+						continue;
+					}
+					case OpCode.Do:
+					case OpCode.DoUntil:
+					{
+						int csz = Int(code, at);
+						at += 4;
+						int bsz = Int(code, at);
+						at += 4;
+						if (ctx == null)
+							ctx = new Context(0, code.Length);
+						ctx.Push(at, blockEnd = at+bsz+csz, op, at+bsz);
 						continue;
 					}
 

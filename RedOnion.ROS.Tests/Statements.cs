@@ -52,6 +52,20 @@ namespace RedOnion.ROS.Tests
 				"until counter > 2",
 				"  counter++",
 				"return counter");
+			Lines(OpCode.Return, 2,
+				"var counter = 0",
+				"do counter++ while counter < 2",
+				"return counter");
+			Lines(OpCode.Return, 6,
+				"var counter = 0",
+				"do",
+				"  if ++counter > 5; break",
+				"  if counter > 3; continue",
+				"  counter++",
+				"  continue",
+				"  counter = 10",
+				"until counter > 10",
+				"return counter");
 		}
 	}
 }
