@@ -140,6 +140,8 @@ namespace RedOnion.ROS
 			=> DebugString;
 		public string ToString(string format, IFormatProvider provider)
 			=> desc.ToString(ref this, format, provider, true);
+		public string ToStr()
+			=> desc.ToString(ref this, null, Culture, false);
 
 		public Value(double v) : this(Descriptor.Double, null) => num.Double = v;
 		public Value(float v) : this(Descriptor.Float, null) => num.Float = v;
@@ -194,6 +196,80 @@ namespace RedOnion.ROS
 			if (it.desc.Convert(ref it, Descriptor.Int))
 				return it.num.Int;
 			throw InvalidOperation("Could not convert {0} to int", this);
+		}
+		public double ToDouble()
+		{
+			var type = desc.Primitive;
+			if (type == ExCode.Double || type == ExCode.Float)
+				return num.Double;
+			if (type.Kind() == OpKind.Number)
+				return num.Long;
+			var it = this;
+			if (it.desc.Convert(ref it, Descriptor.Double))
+				return it.num.Double;
+			throw InvalidOperation("Could not convert {0} to double", this);
+		}
+		public uint ToUInt()
+		{
+			var type = desc.Primitive;
+			if (type == ExCode.UInt)
+				return num.UInt;
+			if (type.Kind() == OpKind.Number)
+				return type == ExCode.Double || type == ExCode.Float
+					? (uint)num.Double : (uint)num.Long;
+			var it = this;
+			if (it.desc.Convert(ref it, Descriptor.UInt))
+				return it.num.UInt;
+			throw InvalidOperation("Could not convert {0} to uint", this);
+		}
+		public long ToLong()
+		{
+			var type = desc.Primitive;
+			if (type == ExCode.Long)
+				return num.Long;
+			if (type.Kind() == OpKind.Number)
+				return type == ExCode.Double || type == ExCode.Float
+					? (long)num.Double : num.Long;
+			var it = this;
+			if (it.desc.Convert(ref it, Descriptor.Long))
+				return it.num.Long;
+			throw InvalidOperation("Could not convert {0} to long", this);
+		}
+		public ulong ToULong()
+		{
+			var type = desc.Primitive;
+			if (type == ExCode.ULong)
+				return num.ULong;
+			if (type.Kind() == OpKind.Number)
+				return type == ExCode.Double || type == ExCode.Float
+					? (ulong)num.Double : num.ULong;
+			var it = this;
+			if (it.desc.Convert(ref it, Descriptor.ULong))
+				return it.num.ULong;
+			throw InvalidOperation("Could not convert {0} to ulong", this);
+		}
+		public bool ToBool()
+		{
+			var type = desc.Primitive;
+			if (type == ExCode.Bool)
+				return num.Long != 0;
+			if (type.Kind() == OpKind.Number)
+				return type == ExCode.Double || type == ExCode.Float
+					? !double.IsNaN(num.Double) && num.Double != 0.0 : num.Long != 0;
+			var it = this;
+			if (it.desc.Convert(ref it, Descriptor.Bool))
+				return it.num.Long != 0;
+			throw InvalidOperation("Could not convert {0} to boolean", this);
+		}
+		public char ToChar()
+		{
+			var type = desc.Primitive;
+			if (type == ExCode.WideChar)
+				return num.Char;
+			var it = this;
+			if (it.desc.Convert(ref it, Descriptor.Char))
+				return it.num.Char;
+			throw InvalidOperation("Could not convert {0} to char", this);
 		}
 
 		/// <summary>

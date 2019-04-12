@@ -139,7 +139,9 @@ namespace RedOnion.ROS
 
 					case OpCode.Create:
 						op = (OpCode)code[at++];
-						if (op == OpCode.Identifier)
+						switch (op)
+						{
+						case OpCode.Identifier:
 						{
 							Identifier(at);
 							at += 4;
@@ -148,12 +150,86 @@ namespace RedOnion.ROS
 								continue;
 							throw InvalidOperation("Could not create new {0}", it.Name);
 						}
-						if (op == OpCode.Call0)
+						case OpCode.Call0:
 						{
+							object self = null;
+							Descriptor selfDesc = null;
+							int idx = -1;
 							ref var it = ref vals.Top();
-							if (it.desc.Call(ref it, null, new Arguments(), true))
+							if (it.IsReference)
+							{
+								selfDesc = it.desc;
+								self = it.obj;
+								idx = it.num.Int;
+								if (!it.desc.Get(ref it, idx))
+									throw CouldNotGet(ref it);
+							}
+							if (it.desc.Call(ref it, self, new Arguments(), true))
 								continue;
-							throw InvalidOperation("Could not create new {0}", it.Name);
+							throw InvalidOperation((self != null ? selfDesc.NameOf(self, idx) : it.Name)
+								+ " cannot create object given zero arguments");
+						}
+						case OpCode.Call1:
+						{
+							object self = null;
+							Descriptor selfDesc = null;
+							int idx = -1;
+							ref var it = ref vals.Top(-2);
+							if (it.IsReference)
+							{
+								selfDesc = it.desc;
+								self = it.obj;
+								idx = it.num.Int;
+								if (!it.desc.Get(ref it, idx))
+									throw CouldNotGet(ref it);
+							}
+							if (!it.desc.Call(ref it, self, new Arguments(Arguments, 1), true))
+								throw InvalidOperation((self != null ? selfDesc.NameOf(self, idx) : it.Name)
+									+ " cannot create object given that argument");
+							vals.Pop(1);
+							continue;
+						}
+						case OpCode.Call2:
+						{
+							object self = null;
+							Descriptor selfDesc = null;
+							int idx = -1;
+							ref var it = ref vals.Top(-3);
+							if (it.IsReference)
+							{
+								selfDesc = it.desc;
+								self = it.obj;
+								idx = it.num.Int;
+								if (!it.desc.Get(ref it, idx))
+									throw CouldNotGet(ref it);
+							}
+							if (!it.desc.Call(ref it, self, new Arguments(Arguments, 2), false))
+								throw InvalidOperation((self != null ? selfDesc.NameOf(self, idx) : it.Name)
+									+ " cannot create object given these two arguments");
+							vals.Pop(2);
+							continue;
+						}
+						case OpCode.CallN:
+						{
+							var n = code[at++];
+							object self = null;
+							Descriptor selfDesc = null;
+							int idx = -1;
+							ref var it = ref vals.Top(-n);
+							if (it.IsReference)
+							{
+								selfDesc = it.desc;
+								self = it.obj;
+								idx = it.num.Int;
+								if (!it.desc.Get(ref it, idx))
+									throw CouldNotGet(ref it);
+							}
+							if (!it.desc.Call(ref it, self, new Arguments(Arguments, n-1), false))
+								throw InvalidOperation("{0} cannot create object given these {1} arguments",
+									self != null ? selfDesc.NameOf(self, idx) : it.Name, n-1);
+							vals.Pop(n-1);
+							continue;
+						}
 						}
 						throw new NotImplementedException("Not implemented: OpCode.Create + " + op.ToString());
 
@@ -178,6 +254,67 @@ namespace RedOnion.ROS
 							continue;
 						throw InvalidOperation((self != null ? selfDesc.NameOf(self, idx) : it.Name)
 							+ " cannot be called with zero arguments");
+					}
+					case OpCode.Call1:
+					{
+						object self = null;
+						Descriptor selfDesc = null;
+						int idx = -1;
+						ref var it = ref vals.Top(-2);
+						if (it.IsReference)
+						{
+							selfDesc = it.desc;
+							self = it.obj;
+							idx = it.num.Int;
+							if (!it.desc.Get(ref it, idx))
+								throw CouldNotGet(ref it);
+						}
+						if (!it.desc.Call(ref it, self, new Arguments(Arguments, 1), false))
+							throw InvalidOperation((self != null ? selfDesc.NameOf(self, idx) : it.Name)
+								+ " cannot be called with that argument");
+						vals.Pop(1);
+						continue;
+					}
+					case OpCode.Call2:
+					{
+						object self = null;
+						Descriptor selfDesc = null;
+						int idx = -1;
+						ref var it = ref vals.Top(-3);
+						if (it.IsReference)
+						{
+							selfDesc = it.desc;
+							self = it.obj;
+							idx = it.num.Int;
+							if (!it.desc.Get(ref it, idx))
+								throw CouldNotGet(ref it);
+						}
+						if (!it.desc.Call(ref it, self, new Arguments(Arguments, 2), false))
+							throw InvalidOperation((self != null ? selfDesc.NameOf(self, idx) : it.Name)
+								+ " cannot be called with these two arguments");
+						vals.Pop(2);
+						continue;
+					}
+					case OpCode.CallN:
+					{
+						var n = code[at++];
+						object self = null;
+						Descriptor selfDesc = null;
+						int idx = -1;
+						ref var it = ref vals.Top(-n);
+						if (it.IsReference)
+						{
+							selfDesc = it.desc;
+							self = it.obj;
+							idx = it.num.Int;
+							if (!it.desc.Get(ref it, idx))
+								throw CouldNotGet(ref it);
+						}
+						if (!it.desc.Call(ref it, self, new Arguments(Arguments, n-1), false))
+							throw InvalidOperation("{0} cannot be called with these {1} arguments",
+								self != null ? selfDesc.NameOf(self, idx) : it.Name, n-1);
+						vals.Pop(n-1);
+						continue;
 					}
 
 					case OpCode.Index:

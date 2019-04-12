@@ -74,6 +74,7 @@
     <Compile Include="API\Vector.Methods.cs" />
     <Compile Include="API\VectorCreator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReflectionUtil\GetMappings.ROS.cs" />
     <Compile Include="ReflectionUtil\NamespaceInstance.ROS.cs" />
     <Compile Include="ROS\KspRosEngine.cs" />
     <Compile Include="ROS\UI\Window.cs" />

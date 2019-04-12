@@ -4,8 +4,6 @@ namespace RedOnion.ROS
 {
 	public partial class Descriptor
 	{
-		public static readonly Descriptor Short = new OfShort();
-
 		internal class OfShort : Descriptor
 		{
 			internal OfShort()

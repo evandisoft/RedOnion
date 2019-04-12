@@ -8,6 +8,19 @@ namespace RedOnion.ROS
 	{
 		public static Func<Type,Descriptor> Create = type => new Reflected(type);
 
+		public static readonly Descriptor Double = new OfDouble();
+		public static readonly Descriptor Float = new OfFloat();
+		public static readonly Descriptor Long = new OfLong();
+		public static readonly Descriptor ULong = new OfULong();
+		public static readonly Descriptor Int = new OfInt();
+		public static readonly Descriptor UInt = new OfUInt();
+		public static readonly Descriptor Short = new OfShort();
+		public static readonly Descriptor UShort = new OfUShort();
+		public static readonly Descriptor SByte = new OfSByte();
+		public static readonly Descriptor Byte = new OfByte();
+		public static readonly Descriptor Char = new OfChar();
+		public static readonly Descriptor String = new OfString();
+
 		private readonly static ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
 		private readonly static Dictionary<Type, Descriptor> _of = new Dictionary<Type, Descriptor>()
 		{

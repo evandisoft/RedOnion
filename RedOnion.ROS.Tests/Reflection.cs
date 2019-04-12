@@ -12,11 +12,19 @@ namespace RedOnion.ROS.Tests
 		{
 			public static int Integer { get; set; }
 			public static void Increment() => Integer++;
+			public static int GetInteger() => Integer;
+			public static void SetInteger(int value) => Integer = value;
+			public static string Combine(string a, string b) => a + " " + b;
+			public static double Sum3(double a, float b, int c) => a + b + c;
 		}
 		public class InstanceTest
 		{
 			public int Integer { get; set; }
 			public void Increment() => Integer++;
+			public int GetInteger() => Integer;
+			public void SetInteger(int value) => Integer = value;
+			public string Combine(string a, string b) => a + " " + b;
+			public double Sum3(double a, float b, long c) => a + b + c;
 		}
 
 		[Test]
@@ -48,6 +56,25 @@ namespace RedOnion.ROS.Tests
 			Test(1, "it.integer");
 			Test("it.increment");
 			Test(2, "it.integer");
+		}
+
+		[Test]
+		public void ROS_Refl03_Methods()
+		{
+			Globals = new Globals();
+			Globals.Add("test", typeof(StaticTest));
+			Test("test.setInteger(10)");
+			Test(10, "test.getInteger()");
+
+			Globals.Add("it", new InstanceTest());
+			Test("it.setInteger(10)");
+			Test(10, "it.getInteger");
+
+			Test("hello world", @"test.combine ""hello"", ""world""");
+			Test("hello world", @"it.combine ""hello"", ""world""");
+
+			Test(1.0+2f+3, @"test.sum3 1.0, 2f, 3");
+			Test(1.0+2f+3, @"it.sum3 1.0, 2f, 3");
 		}
 	}
 }

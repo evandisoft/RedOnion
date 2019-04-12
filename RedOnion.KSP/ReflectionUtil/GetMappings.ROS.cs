@@ -1,15 +1,14 @@
+using System;
 using RedOnion.Script;
 using RedOnion.Script.ReflectedObjects;
-using System;
 
 namespace RedOnion.KSP.ReflectionUtil
 {
-	public partial class NamespaceInstance : IObject
+	public partial class GetMappings : IObject
 	{
 		public bool Has(string name)
-			=> TryGetSubNamespace(name, out var dummy1)
-			|| TryGetType(name, out var dummy2);
-		public Value Get(string name)
+			=> TryGetAssemblyNamespaceInstance(name, out var dummy);
+		Value IProperties.Get(string name)
 		{
 			if (!Get(name, out var value))
 				throw new NotImplementedException(name + " does not exist");
@@ -17,14 +16,9 @@ namespace RedOnion.KSP.ReflectionUtil
 		}
 		public bool Get(string name, out Value value)
 		{
-			if (TryGetSubNamespace(name, out var ns))
+			if (TryGetAssemblyNamespaceInstance(name, out var ns))
 			{
 				value = Value.FromObject(ns);
-				return true;
-			}
-			if (TryGetType(name, out var type))
-			{
-				value = new Value(new ReflectedType(null, type));
 				return true;
 			}
 			value = Value.Undefined;
@@ -34,13 +28,14 @@ namespace RedOnion.KSP.ReflectionUtil
 			=> args.Length != 1 ? new Value() : Value.IndexRef(this, args[0]);
 		Value IObject.IndexGet(Value index)
 		{
-			Get(index.String, out var result);
-			return result;
+			if (TryGetAssemblyNamespaceInstance(index.String, out var ns))
+				return Value.FromObject(ns);
+			return new Value();
 		}
 
 		bool IProperties.Set(string name, Value value) => false;
-		string IObject.Name => NamespaceString;
-		Value IObject.Value => new Value(NamespaceString);
+		string IObject.Name => "assembly";
+		Value IObject.Value => new Value("assembly");
 		IEngine IObject.Engine => null;
 		ObjectFeatures IObject.Features => ObjectFeatures.None;
 		IObject IObject.BaseClass => null;

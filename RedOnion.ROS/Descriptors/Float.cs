@@ -4,8 +4,6 @@ namespace RedOnion.ROS
 {
 	public partial class Descriptor
 	{
-		public static readonly Descriptor Float = new OfFloat();
-
 		internal class OfFloat : Descriptor
 		{
 			internal OfFloat()
