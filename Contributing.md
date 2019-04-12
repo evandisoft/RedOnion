@@ -13,7 +13,7 @@ Make a new branch with your username in it, and use that to contribute and make 
 ## Linux:
 For Linux you have to use the repositories [Here](https://www.mono-project.com/download/stable/) to get the best version of the mono tools, including monodevelop (which is a very good ide on linux for c# development). The default version of mono tools on your linux distribution may not work at all with this project.
 
-Note that due to KSP using a version of Unity that was not released for Linux, debugging C# code does not seem to work. However, the nature of this project means that we may be able to provide better debugging tools inside for our scripting languages, or even the regular C# development part.
+Note that due to KSP using a version of Unity that was not released for Linux, debugging plugin mods does not seem to work. However, the nature of this project means that we may be able to provide better debugging tools inside for our scripting languages, or even the regular C# development part.
 
 ## Windows:
 On Windows, Visual Studio 2017 Community is the easiest way to contribute.
