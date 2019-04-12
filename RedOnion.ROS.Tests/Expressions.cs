@@ -26,7 +26,7 @@ namespace RedOnion.ROS.Tests
 			Test(script, countdown);
 			var result = Result.Object;
 			Assert.AreEqual(value, result, "Different result: <{0}>", script);
-			Assert.AreEqual(value.GetType(), result.GetType(), "Different type: <{0}>", script);
+			Assert.AreEqual(value?.GetType(), result?.GetType(), "Different type: <{0}>", script);
 		}
 		public void Expect<Ex>(string script, int countdown = 100) where Ex : Exception
 		{

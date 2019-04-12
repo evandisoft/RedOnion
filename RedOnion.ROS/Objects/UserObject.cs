@@ -53,7 +53,7 @@ namespace RedOnion.ROS.Objects
 		/// <summary>
 		/// Remove all writable properties (those added after last <see cref="Lock()"/>)
 		/// </summary>
-		public void Reset()
+		public virtual void Reset()
 		{
 			prop.Count = readOnlyTop;
 			if (dict != null)
@@ -78,7 +78,7 @@ namespace RedOnion.ROS.Objects
 			=> Add(name, new Value(it));
 		public int Add(string name, Value value)
 			=> Add(name, ref value);
-		public int Add(string name, ref Value value)
+		public virtual int Add(string name, ref Value value)
 		{
 			var idx = prop.size;
 			ref var it = ref prop.Add();
@@ -92,7 +92,7 @@ namespace RedOnion.ROS.Objects
 			}
 			return idx;
 		}
-		public int Find(string name)
+		public virtual int Find(string name)
 		{
 			if (dict != null && dict.TryGetValue(name, out var idx))
 				return idx;

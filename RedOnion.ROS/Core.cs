@@ -59,7 +59,7 @@ namespace RedOnion.ROS
 		public void Dispose() => Dispose(true);
 		protected virtual void Dispose(bool disposing) { }
 
-		public void ResetContext() => ctx = null;
+		public void ResetContext() => ctx?.Reset();
 		public bool Execute(string script, string path = null, int countdown = 1000)
 		{
 			Code = Compile(script, path);
@@ -71,6 +71,13 @@ namespace RedOnion.ROS
 			var at = this.at;
 			var code = this.code;
 			var str = this.str;
+			int blockEnd = code.Length;
+			if (ctx != null)
+			{
+				ctx.RootStart = 0;
+				ctx.RootEnd = code.Length;
+				blockEnd = ctx.BlockEnd;
+			}
 			try
 			{
 				while (at < code.Length)
@@ -363,7 +370,7 @@ namespace RedOnion.ROS
 						var name = str[Int(code, at)];
 						at += 4;
 						if (ctx == null)
-							ctx = new Context();
+							ctx = new Context(0, code.Length);
 						var idx = ctx.Add(name, ref vals.Top());
 						vals.Pop(1);
 						ref var it = ref vals.Top();
@@ -525,6 +532,44 @@ namespace RedOnion.ROS
 						continue;
 					}
 
+					case OpCode.Raise:
+						//TODO: try..catch.finally
+					case OpCode.Return:
+						Exit = op;
+						goto finish;
+
+					//TODO: break, continue
+					//TODO: for, foreach, while, do-while, until, do-until
+
+					case OpCode.If:
+					case OpCode.Unless:
+					{
+						ref var cond = ref vals.Top();
+						if (cond.IsReference && !cond.desc.Get(ref cond, cond.num.Int))
+							throw CouldNotGet(ref cond);
+						if (cond.desc.Primitive != ExCode.Bool && !cond.desc.Convert(ref cond, Descriptor.Bool))
+							throw InvalidOperation("Could not convert '{0}' to boolean", cond.Name);
+
+						if (cond.num.Bool == (op == OpCode.If))
+							goto case OpCode.Block;
+						int sz = Int(code, at);
+						at += 4 + sz;
+						if (at == blockEnd)
+							goto blockEnd;
+						if ((OpCode)code[at] != OpCode.Else)
+							continue;
+						at++;
+						goto case OpCode.Block;
+					}
+					case OpCode.Block:
+					{
+						int sz = Int(code, at);
+						at += 4;
+						if (ctx == null)
+							ctx = new Context(0, code.Length);
+						ctx.Push(at, blockEnd = at+sz);
+						continue;
+					}
 					case OpCode.Else:
 					{
 						int sz = Int(code, at);
@@ -535,8 +580,13 @@ namespace RedOnion.ROS
 					default:
 						throw new NotImplementedException("Not implemented: " + op.ToString());
 					}
+				blockEnd:
+					if (at == code.Length)
+						goto finish;
+					blockEnd = ctx.Pop();
 				}
 				Exit = OpCode.Void;
+			finish:
 				if (vals.Count == 0)
 					result = Value.Void;
 				else
@@ -548,6 +598,7 @@ namespace RedOnion.ROS
 							result.desc.NameOf(result.obj, result.num.Int), result.desc.Name);
 				}
 				vals.Clear();
+				ctx?.PopAll();
 				Countdown = countdown;
 				return true;
 			}
