@@ -1,4 +1,4 @@
-**Disclaimer: This is not a sandbox! This is an unrestricted scripting environment. You have the power to do anything a mod can do. Don't use scripts from untrusted sources! **
+**Disclaimer: This is not a sandbox! This is an unrestricted scripting environment. You have the power to do anything a mod can do. Don't use scripts from untrusted sources!**
 
 **This is necessary because:**
 
