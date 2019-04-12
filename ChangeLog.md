@@ -47,6 +47,8 @@ r> void
 i> a. -- this will show completions for the assembly named "assemblyName"
 ```
 
+Right now "assembly" is not implemented in ROS because ROS is undergoing a redesign. When the redesign is finished features like these will be implemented quickly.
+
 ## 0.3.0
 ### New Import System:
 `listtype=import.system.collections.generic.list`. Using the import system you can interact with any loaded
