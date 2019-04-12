@@ -6,14 +6,29 @@ namespace RedOnion.KSP.Autopilot
 {
 	public class FlightControl
 	{
+		// I just decided on a whim to make it thread safe.
+		// Probably never going to matter. :)
+		static readonly object instanceLock = new object();
+
 		static FlightControl instance;
+		static public FlightControl Instance
+		{
+			get
+			{
+				lock (instanceLock)
+				{
+					if (instance == null)
+					{
+						instance = new FlightControl();
+					}
+					return instance;
+				}
+			}
+		}
+		
 		static public FlightControl GetInstance()
 		{
-			if (instance == null)
-			{
-				instance = new FlightControl();
-			}
-			return instance;
+			return Instance;
 		}
 
 		public enum SpinMode

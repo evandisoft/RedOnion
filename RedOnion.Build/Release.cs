@@ -19,7 +19,7 @@ namespace RedOnion.Build
 					if (resource.Length <= root || resource[root] == '.')
 						continue;
 					var reduced = resource.Substring(root);
-					if (resource == "RedOnion.dll") continue;
+					if (reduced == "Plugins/RedOnion.dll") continue;
 					Console.WriteLine("- " + reduced);
 					var entry = zip.CreateEntry(reduced);
 					using (var write = entry.Open())

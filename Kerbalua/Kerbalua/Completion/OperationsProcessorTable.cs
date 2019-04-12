@@ -39,10 +39,18 @@ namespace Kerbalua.Completion
 				possibleCompletions.Add(key.String);
 			}
 
-			if (table.MetaTable != null && table.MetaTable is ICompletable)
+			if (table.MetaTable != null) 
 			{
-				var completable = table.MetaTable as ICompletable;
-				possibleCompletions.AddRange(completable.PossibleCompletions);
+				if(table.MetaTable is ICompletable)
+				{
+					var completable = table.MetaTable as ICompletable;
+					possibleCompletions.AddRange(completable.PossibleCompletions);
+				}
+				else if(table.MetaTable is IHasCompletionProxy)
+				{
+					object obj2=GetProxy(table.MetaTable);
+					possibleCompletions.AddRange(StaticGetPossibleCompletions(obj2));
+				}
 			}
 
 			possibleCompletions = possibleCompletions.Distinct().ToList();
@@ -78,13 +86,15 @@ namespace Kerbalua.Completion
 
 			if (newObject == null)
 			{
-				if (table.MetaTable != null && table.MetaTable is ICompletable)
+				if (table.MetaTable != null)
 				{
-					var completable = table.MetaTable as ICompletable;
-					if(completable.TryGetCompletion(getMember.Name, out outObj))
+					if (table.MetaTable is ICompletable)
 					{
-						operations.MoveNext();
-						return true;
+						return TryProcessOperation(table.MetaTable as ICompletable, operations, out outObj);
+					}
+					if (table.MetaTable is IHasCompletionProxy)
+					{
+						return TryProcessOperation(table.MetaTable as IHasCompletionProxy, operations, out outObj);
 					}
 				}
 				outObj = null;

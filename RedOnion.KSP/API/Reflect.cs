@@ -179,7 +179,7 @@ Example: `reflect.new(""System.Collections.ArrayList"")`.",
 			}
 		}
 
-		NamespaceInstance map = NamespaceMappings.ForAllAssemblies.GetNamespace("");
+		NamespaceInstance map = NamespaceMappings.DefaultAssemblies.GetNamespace("");
 		public override bool Has(string name) => base.Has(name) || map.Has(name);
 		public override bool Get(string name, out Value value)
 			=> base.Get(name, out value) || map.Get(name, out value);
