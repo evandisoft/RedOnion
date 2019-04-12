@@ -12,6 +12,6 @@ Try terminating the current program with ctrl+c
 Click the evaluate button when a script is in the editor. Ensure you have the [right engine selected](https://github.com/evandisoft/RedOnion/blob/master/TroubleShooting.md#script-wont-work).
 
 ### Other Issues
-We have currently poor documentation, and given the small userbase, we don't get much feedback, so if there is a problem, it's much more likely to be something wrong with our project or documentation than it is for you to have messed up in some way.
+We have currently poor documentation, and given the small userbase (we're a very new mod), we don't get much feedback, so if there is a problem, it's much more likely to be something wrong with our project or documentation than it is for you to have messed up in some way.
 
 Feel free to ask if you encounter any issues.
