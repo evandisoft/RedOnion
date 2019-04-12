@@ -38,5 +38,20 @@ namespace RedOnion.ROS.Tests
 			Test(OpCode.Return, true, "if true then return true");
 			Test(OpCode.Return, false, "if false: return true else: return false");
 		}
+
+		[Test]
+		public void ROS_Stts03_Loops()
+		{
+			Lines(OpCode.Return, 5,
+				"var counter = 0",
+				"while counter < 5",
+				"  counter++",
+				"return counter");
+			Lines(OpCode.Return, 3,
+				"var counter = 0",
+				"until counter > 2",
+				"  counter++",
+				"return counter");
+		}
 	}
 }

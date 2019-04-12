@@ -13,7 +13,7 @@ namespace RedOnion.ROS.Tests
 			{
 				Code = Compile(script);
 				if (Globals == null) Globals = new Globals();
-				Execute(countdown);
+				Assert.IsTrue(Execute(countdown));
 			}
 			catch (Exception e)
 			{

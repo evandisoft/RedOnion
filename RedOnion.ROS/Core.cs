@@ -88,6 +88,17 @@ namespace RedOnion.ROS
 						return false;
 					}
 					countdown--;
+					while (at == blockEnd)
+					{
+						switch (ctx.BlockCode)
+						{
+						case OpCode.While:
+						case OpCode.Until:
+							at = ctx.BlockAt1;
+							break;
+						}
+						blockEnd = ctx.Pop();
+					}
 					var op = (OpCode)code[at++];
 					switch (op)
 					{
@@ -533,13 +544,37 @@ namespace RedOnion.ROS
 					}
 
 					case OpCode.Raise:
-						//TODO: try..catch.finally
+					//TODO: try..catch..finally
 					case OpCode.Return:
 						Exit = op;
 						goto finish;
 
 					//TODO: break, continue
-					//TODO: for, foreach, while, do-while, until, do-until
+					//TODO: for, foreach, do-while, do-until
+
+					case OpCode.While:
+					case OpCode.Until:
+					{
+						ref var cond = ref vals.Top();
+						if (cond.IsReference && !cond.desc.Get(ref cond, cond.num.Int))
+							throw CouldNotGet(ref cond);
+						if (cond.desc.Primitive != ExCode.Bool && !cond.desc.Convert(ref cond, Descriptor.Bool))
+							throw InvalidOperation("Could not convert '{0}' to boolean", cond.Name);
+
+						var condAt = at + Int(code, at);
+						at += 4;
+						int sz = Int(code, at);
+						at += 4;
+						if (cond.num.Bool == (op == OpCode.While))
+						{
+							if (ctx == null)
+								ctx = new Context(0, code.Length);
+							ctx.Push(at, blockEnd = at+sz, op, condAt);
+							continue;
+						}
+						at += sz;
+						continue;
+					}
 
 					case OpCode.If:
 					case OpCode.Unless:
@@ -555,7 +590,7 @@ namespace RedOnion.ROS
 						int sz = Int(code, at);
 						at += 4 + sz;
 						if (at == blockEnd)
-							goto blockEnd;
+							continue;
 						if ((OpCode)code[at] != OpCode.Else)
 							continue;
 						at++;
@@ -580,10 +615,6 @@ namespace RedOnion.ROS
 					default:
 						throw new NotImplementedException("Not implemented: " + op.ToString());
 					}
-				blockEnd:
-					if (at == code.Length)
-						goto finish;
-					blockEnd = ctx.Pop();
 				}
 				Exit = OpCode.Void;
 			finish:

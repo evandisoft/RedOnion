@@ -10,7 +10,9 @@ namespace RedOnion.ROS.Objects
 	{
 		protected struct Layer
 		{
+			public OpCode op;
 			public int start, end;
+			public int at1, at2;
 			public Dictionary<string, int> shadow;
 		}
 		protected ListCore<Layer> layers;
@@ -18,8 +20,13 @@ namespace RedOnion.ROS.Objects
 		protected int end = int.MaxValue;
 		protected int rootStart = int.MinValue;
 		protected int rootEnd = int.MaxValue;
+		protected OpCode blockCode;
+		protected int blockAt1, blockAt2;
 
 		public int LayerCount => layers.size;
+		public OpCode BlockCode => blockCode;
+		public int BlockAt1 => blockAt1;
+		public int BlockAt2 => blockAt2;
 		public int BlockStart => start;
 		public int BlockEnd => end;
 		public int RootStart
@@ -56,9 +63,14 @@ namespace RedOnion.ROS.Objects
 			base.Reset();
 		}
 
-		public void Push(int start, int end)
+		public void Push(int start, int end, OpCode op = OpCode.Block, int at1 = 0, int at2 = 0)
 		{
 			ref var layer = ref layers.Add();
+			layer.op = blockCode = op;
+			layer.start = this.start = start;
+			layer.end = this.end = end;
+			layer.at1 = blockAt1 = at1;
+			layer.at2 = blockAt2 = at2;
 		}
 		public int Pop()
 		{
@@ -71,12 +83,18 @@ namespace RedOnion.ROS.Objects
 			}
 			if (--layers.size == 0)
 			{
+				blockCode = OpCode.Void;
+				blockAt1 = 0;
+				blockAt2 = 0;
 				start = RootStart;
 				return end = RootEnd;
 			}
 			else
 			{
 				ref var layer = ref layers.Top();
+				blockCode = layer.op;
+				blockAt1 = layer.at1;
+				blockAt2 = layer.at2;
 				start = layer.start;
 				return end = layer.end;
 			}

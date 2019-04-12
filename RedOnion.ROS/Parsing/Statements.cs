@@ -268,13 +268,21 @@ namespace RedOnion.ROS.Parsing
 
 			case ExCode.While:
 			case ExCode.Until:
-				if (HasOption(Option.Prefix)) Write(op);
+			{
+				var start = code.size;
+				if (HasOption(Option.Prefix))
+					Write(op);
 				Next().FullExpression(flags | Flag.Limited);
-				if (!HasOption(Option.Prefix)) Write(op);
+				if (!HasOption(Option.Prefix))
+				{
+					Write(op);
+					Write(start - code.size);
+				}
 				if (Curr == ';' || Curr == ':' || ExCode == ExCode.Do)
 					Next();
 				ParseBlock(flags);
 				return;
+			}
 			case ExCode.Do:
 				var doat = Write(op);
 				Next();
