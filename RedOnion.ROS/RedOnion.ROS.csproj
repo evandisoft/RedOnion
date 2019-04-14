@@ -62,6 +62,7 @@
     <Compile Include="Core.cs" />
     <Compile Include="Interface.cs" />
     <Compile Include="Objects\Context.cs" />
+    <Compile Include="Objects\Function.cs" />
     <Compile Include="Objects\Globals.cs" />
     <Compile Include="Objects\UserObject.cs" />
     <Compile Include="OpCode.cs" />

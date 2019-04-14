@@ -18,6 +18,15 @@ namespace RedOnion.ROS
 		protected Context ctx;
 		protected Value self; // `this` for current code
 		protected Value result;
+		protected struct SavedContext
+		{
+			public Context context;
+			public Value prevSelf;
+			public CompiledCode code;
+			public int at, vtop;
+			public bool create;
+		}
+		protected ListCore<SavedContext> stack;
 
 		public UserObject Globals { get; set; }
 		public OpCode Exit { get; protected set; }
@@ -143,6 +152,21 @@ namespace RedOnion.ROS
 								ctx.ResetTop();
 								continue;
 							}
+							case OpCode.Function:
+								ref var top = ref stack.Top();
+								var vtop = top.vtop;
+								ref var result = ref vals.GetRef(vals.Count, vtop - 1);
+								if (top.create) result = self;
+								vals.Pop(vals.Count - top.vtop);
+								this.at = at = top.at;
+								compiled = top.code;
+								this.code = code = compiled.Code;
+								this.str = str = compiled.Strings;
+								self = top.prevSelf;
+								ctx.PopAll();
+								ctx = top.context;
+								stack.Pop();
+								continue;
 							}
 						}
 					}
@@ -222,6 +246,17 @@ namespace RedOnion.ROS
 							Identifier(at);
 							at += 4;
 							ref var it = ref vals.Top();
+							if (it.IsReference && !it.desc.Get(ref it, it.num.Int))
+								throw CouldNotGet(ref it);
+							if (it.desc.Primitive == ExCode.Function)
+							{
+								this.at = at;
+								blockEnd = CallFunction((Function)it.desc, null, null, 0, true);
+								code = this.code;
+								str = this.str;
+								at = this.at;
+								continue;
+							}
 							if (it.desc.Call(ref it, null, new Arguments(), true))
 								continue;
 							throw InvalidOperation("Could not create new {0}", it.Name);
@@ -240,6 +275,15 @@ namespace RedOnion.ROS
 								if (!it.desc.Get(ref it, idx))
 									throw CouldNotGet(ref it);
 							}
+							if (it.desc.Primitive == ExCode.Function)
+							{
+								this.at = at;
+								blockEnd = CallFunction((Function)it.desc, selfDesc, self, 0, true);
+								code = this.code;
+								str = this.str;
+								at = this.at;
+								continue;
+							}
 							if (it.desc.Call(ref it, self, new Arguments(), true))
 								continue;
 							throw InvalidOperation((self != null ? selfDesc.NameOf(self, idx) : it.Name)
@@ -247,6 +291,7 @@ namespace RedOnion.ROS
 						}
 						case OpCode.Call1:
 						{
+							Dereference(1);
 							object self = null;
 							Descriptor selfDesc = null;
 							int idx = -1;
@@ -259,6 +304,15 @@ namespace RedOnion.ROS
 								if (!it.desc.Get(ref it, idx))
 									throw CouldNotGet(ref it);
 							}
+							if (it.desc.Primitive == ExCode.Function)
+							{
+								this.at = at;
+								blockEnd = CallFunction((Function)it.desc, selfDesc, self, 1, true);
+								code = this.code;
+								str = this.str;
+								at = this.at;
+								continue;
+							}
 							if (!it.desc.Call(ref it, self, new Arguments(Arguments, 1), true))
 								throw InvalidOperation((self != null ? selfDesc.NameOf(self, idx) : it.Name)
 									+ " cannot create object given that argument");
@@ -267,6 +321,7 @@ namespace RedOnion.ROS
 						}
 						case OpCode.Call2:
 						{
+							Dereference(2);
 							object self = null;
 							Descriptor selfDesc = null;
 							int idx = -1;
@@ -279,7 +334,16 @@ namespace RedOnion.ROS
 								if (!it.desc.Get(ref it, idx))
 									throw CouldNotGet(ref it);
 							}
-							if (!it.desc.Call(ref it, self, new Arguments(Arguments, 2), false))
+							if (it.desc.Primitive == ExCode.Function)
+							{
+								this.at = at;
+								blockEnd = CallFunction((Function)it.desc, selfDesc, self, 2, true);
+								code = this.code;
+								str = this.str;
+								at = this.at;
+								continue;
+							}
+							if (!it.desc.Call(ref it, self, new Arguments(Arguments, 2), true))
 								throw InvalidOperation((self != null ? selfDesc.NameOf(self, idx) : it.Name)
 									+ " cannot create object given these two arguments");
 							vals.Pop(2);
@@ -288,6 +352,7 @@ namespace RedOnion.ROS
 						case OpCode.CallN:
 						{
 							var n = code[at++];
+							Dereference(n-1);
 							object self = null;
 							Descriptor selfDesc = null;
 							int idx = -1;
@@ -300,7 +365,16 @@ namespace RedOnion.ROS
 								if (!it.desc.Get(ref it, idx))
 									throw CouldNotGet(ref it);
 							}
-							if (!it.desc.Call(ref it, self, new Arguments(Arguments, n - 1), false))
+							if (it.desc.Primitive == ExCode.Function)
+							{
+								this.at = at;
+								blockEnd = CallFunction((Function)it.desc, selfDesc, self, n - 1, true);
+								code = this.code;
+								str = this.str;
+								at = this.at;
+								continue;
+							}
+							if (!it.desc.Call(ref it, self, new Arguments(Arguments, n - 1), true))
 								throw InvalidOperation("{0} cannot create object given these {1} arguments",
 									self != null ? selfDesc.NameOf(self, idx) : it.Name, n - 1);
 							vals.Pop(n - 1);
@@ -324,6 +398,15 @@ namespace RedOnion.ROS
 							if (!it.desc.Get(ref it, idx))
 								throw CouldNotGet(ref it);
 						}
+						if (it.desc.Primitive == ExCode.Function)
+						{
+							this.at = at;
+							blockEnd = CallFunction((Function)it.desc, selfDesc, self, 0, false);
+							code = this.code;
+							str = this.str;
+							at = this.at;
+							continue;
+						}
 						if (it.desc.Call(ref it, self, new Arguments(), false))
 							continue;
 						if (op == OpCode.Autocall)
@@ -333,6 +416,7 @@ namespace RedOnion.ROS
 					}
 					case OpCode.Call1:
 					{
+						Dereference(1);
 						object self = null;
 						Descriptor selfDesc = null;
 						int idx = -1;
@@ -345,6 +429,15 @@ namespace RedOnion.ROS
 							if (!it.desc.Get(ref it, idx))
 								throw CouldNotGet(ref it);
 						}
+						if (it.desc.Primitive == ExCode.Function)
+						{
+							this.at = at;
+							blockEnd = CallFunction((Function)it.desc, selfDesc, self, 1, false);
+							code = this.code;
+							str = this.str;
+							at = this.at;
+							continue;
+						}
 						if (!it.desc.Call(ref it, self, new Arguments(Arguments, 1), false))
 							throw InvalidOperation((self != null ? selfDesc.NameOf(self, idx) : it.Name)
 								+ " cannot be called with that argument");
@@ -353,6 +446,7 @@ namespace RedOnion.ROS
 					}
 					case OpCode.Call2:
 					{
+						Dereference(2);
 						object self = null;
 						Descriptor selfDesc = null;
 						int idx = -1;
@@ -365,6 +459,15 @@ namespace RedOnion.ROS
 							if (!it.desc.Get(ref it, idx))
 								throw CouldNotGet(ref it);
 						}
+						if (it.desc.Primitive == ExCode.Function)
+						{
+							this.at = at;
+							blockEnd = CallFunction((Function)it.desc, selfDesc, self, 2, false);
+							code = this.code;
+							str = this.str;
+							at = this.at;
+							continue;
+						}
 						if (!it.desc.Call(ref it, self, new Arguments(Arguments, 2), false))
 							throw InvalidOperation((self != null ? selfDesc.NameOf(self, idx) : it.Name)
 								+ " cannot be called with these two arguments");
@@ -374,6 +477,7 @@ namespace RedOnion.ROS
 					case OpCode.CallN:
 					{
 						var n = code[at++];
+						Dereference(n-1);
 						object self = null;
 						Descriptor selfDesc = null;
 						int idx = -1;
@@ -386,6 +490,15 @@ namespace RedOnion.ROS
 							if (!it.desc.Get(ref it, idx))
 								throw CouldNotGet(ref it);
 						}
+						if (it.desc.Primitive == ExCode.Function)
+						{
+							this.at = at;
+							blockEnd = CallFunction((Function)it.desc, selfDesc, self, n - 1, false);
+							code = this.code;
+							str = this.str;
+							at = this.at;
+							continue;
+						}
 						if (!it.desc.Call(ref it, self, new Arguments(Arguments, n - 1), false))
 							throw InvalidOperation("{0} cannot be called with these {1} arguments",
 								self != null ? selfDesc.NameOf(self, idx) : it.Name, n - 1);
@@ -395,6 +508,7 @@ namespace RedOnion.ROS
 
 					case OpCode.Index:
 					{
+						Dereference(1);
 						ref var lhs = ref vals.Top(-2);
 						if (lhs.IsReference && !lhs.desc.Get(ref lhs, lhs.num.Int))
 							throw CouldNotGet(ref lhs);
@@ -408,6 +522,7 @@ namespace RedOnion.ROS
 					case OpCode.IndexN:
 					{
 						var n = code[at++];
+						Dereference(n-1);
 						ref var it = ref vals.Top(-n);
 						if (it.IsReference && !it.desc.Get(ref it, it.num.Int))
 							throw CouldNotGet(ref it);
@@ -438,9 +553,13 @@ namespace RedOnion.ROS
 					{
 						var name = str[Int(code, at)];
 						at += 4;
+						// lhs is type, TODO: typed variables
+						ref var rhs = ref vals.Top(-1);
+						if (rhs.IsReference && !rhs.desc.Get(ref rhs, rhs.num.Int))
+							throw CouldNotGet(ref rhs);
 						if (ctx == null)
 							ctx = new Context(0, code.Length);
-						var idx = ctx.Add(name, ref vals.Top());
+						var idx = ctx.Add(name, ref rhs);
 						vals.Pop(1);
 						ref var it = ref vals.Top();
 						it.SetRef(ctx, idx);
@@ -604,6 +723,30 @@ namespace RedOnion.ROS
 					case OpCode.Raise:
 					//TODO: try..catch..finally
 					case OpCode.Return:
+						if (stack.size > 0)
+						{
+							ref var top = ref stack.Top();
+							var vtop = top.vtop;
+							ref var result = ref vals.GetRef(vals.Count, vtop - 1);
+							if (top.create)
+								result = self;
+							else
+							{
+								result = vals.Top();
+								if (result.IsReference && !result.desc.Get(ref result, result.num.Int))
+									throw CouldNotGet(ref result);
+							}
+							vals.Pop(vals.Count - top.vtop);
+							this.at = at = top.at;
+							compiled = top.code;
+							this.code = code = compiled.Code;
+							this.str = str = compiled.Strings;
+							self = top.prevSelf;
+							ctx.PopAll();
+							ctx = top.context;
+							stack.Pop();
+							continue;
+						}
 						Exit = op;
 						goto finish;
 
@@ -790,6 +933,51 @@ namespace RedOnion.ROS
 						result = Value.Void;
 						return false;
 
+					case OpCode.Function:
+					{
+						var fname = str[Int(code, at)];
+						at += 4;
+						var size = Int(code, at);
+						at += 4;
+						var body = at + size;
+						Debug.Assert(code[at + 2] == 0); // not generic
+						at += 3;
+						var argc = code[at++];
+						var ftsz = Int(code, at);
+						at += 4;
+						var ftat = at;
+						at += ftsz;
+						var args = argc == 0 ? null : new ArgumentInfo[argc];
+						for (var i = 0; i < argc; i++)
+						{
+							args[i].Name = str[Int(code, at)];
+							at += 4;
+							var tsz = Int(code, at);
+							at += 4;
+							args[i].Type = at;
+							at += tsz;
+							var vsz = Int(code, at);
+							at += 4;
+							args[i].Value = at;
+							at += vsz;
+						}
+						Debug.Assert(at == body);
+						at = body;
+						size = Int(code, at);
+						at += 4;
+						var it = new Function(fname, null,
+							compiled, at, size, ftat, args, ctx);
+						if (fname.Length != 0)
+						{
+							if (ctx == null)
+								ctx = new Context(0, code.Length);
+							ctx.Add(fname, it);
+						}
+						else vals.Add(new Value(it));
+						at += size;
+						continue;
+					}
+
 					default:
 						throw new NotImplementedException("Not implemented: " + op.ToString());
 					}
@@ -799,9 +987,7 @@ namespace RedOnion.ROS
 				if (vals.Count > 0)
 					result = vals.Pop();
 				if (result.IsReference && !result.desc.Get(ref result, result.num.Int))
-					throw InvalidOperation(
-						"Property '{0}' of '{1}' is write only",
-						result.desc.NameOf(result.obj, result.num.Int), result.desc.Name);
+					throw CouldNotGet(ref result);
 				vals.Clear();
 				ctx?.PopAll();
 				Countdown = countdown;
@@ -892,6 +1078,47 @@ namespace RedOnion.ROS
 			throw InvalidOperation("Variable '{0}' not found", name);
 		}
 
+		protected void Dereference(int argc)
+		{
+			for (int i = 0; i < argc; i++)
+			{
+				ref var arg = ref vals.Top(i - argc);
+				if (arg.IsReference && !arg.desc.Get(ref arg, arg.num.Int))
+					throw CouldNotGet(ref arg);
+			}
+		}
+
+		protected int CallFunction(Function fn, Descriptor selfDesc, object self, int argc, bool create)
+		{
+			ref var ret = ref stack.Add();
+			ret.context = ctx;
+			ret.prevSelf = this.self;
+			ret.code = compiled;
+			ret.at = at;
+			ret.vtop = vals.Size - argc;
+			ret.create = create;
+			compiled = fn.Code;
+			code = compiled.Code;
+			str = compiled.Strings;
+			at = fn.CodeAt;
+			ctx = fn.Context;
+			ctx.Push(at, at + fn.CodeSize, OpCode.Function);
+			if (create)
+				this.self = new Value(new UserObject(fn.Prototype));
+			else this.self = new Value(selfDesc, self);
+			var args = new Value[argc];
+			for (int i = 0; i < argc; i++)
+				args[i] = vals.Top(i - argc);
+			ctx.Add("arguments", args);
+			for (int i = 0; i < fn.ArgumentCount; i++)
+			{
+				if (i < argc)
+					ctx.Add(fn.ArgumentName(i), ref args[i]);
+				else ctx.Add(fn.ArgumentName(i), fn.ArgumentDefault(i));
+			}
+			result = Value.Void;
+			return at + fn.CodeSize;
+		}
 
 		public static unsafe float Float(byte[] code, int at)
 		{

@@ -25,6 +25,7 @@ namespace RedOnion.ROS.Objects
 		}
 		protected ListCore<Block> blocks;
 		public int BlockCount => blocks.size;
+		public int BlockLock { get; protected set; }
 		public int BlockStart { get; protected set; }
 		public int BlockEnd { get; protected set; }
 		public int BlockAt1 { get; protected set; }
@@ -60,6 +61,22 @@ namespace RedOnion.ROS.Objects
 			RootStart = rootStart;
 			RootEnd = rootEnd;
 		}
+		public Context(Context src, int rootStart, int rootEnd)
+			: base(typeof(Context))
+		{
+			RootStart = rootStart;
+			RootEnd = rootEnd;
+			if (src == null)
+				return;
+			foreach (var p in src.prop)
+				prop.Add() = p;
+			if (src.dict != null)
+				dict = new Dictionary<string, int>(src.dict);
+			readOnlyTop = src.readOnlyTop;
+			foreach (var b in src.blocks)
+				blocks.Add() = b;
+			BlockLock = blocks.size;
+		}
 
 		public override void Reset()
 		{
@@ -87,7 +104,7 @@ namespace RedOnion.ROS.Objects
 		}
 		public void LockTop()
 		{
-			if (blocks.size == 0)
+			if (blocks.size <= BlockLock)
 				return;
 			ref var top = ref blocks.Top();
 			top.lockSize1 = prop.size;
@@ -95,7 +112,7 @@ namespace RedOnion.ROS.Objects
 		}
 		public void ResetTop()
 		{
-			if (blocks.size == 0)
+			if (blocks.size <= BlockLock)
 				return;
 			ref var top = ref blocks.Top();
 			prop.Count = top.lockSize1;
@@ -114,7 +131,7 @@ namespace RedOnion.ROS.Objects
 		}
 		public int Pop()
 		{
-			if (blocks.size <= 0)
+			if (blocks.size <= BlockLock)
 				throw InvalidOperation("No block left to remove");
 
 			ref var top = ref blocks.Top();
@@ -143,7 +160,7 @@ namespace RedOnion.ROS.Objects
 			BlockAt1 = 0;
 			BlockAt2 = 0;
 			var propSize = prop.size;
-			while (blocks.size > 0)
+			while (blocks.size > BlockLock)
 			{
 				ref var top = ref blocks.Top();
 				propSize = top.propSize;

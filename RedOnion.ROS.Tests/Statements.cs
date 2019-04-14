@@ -52,7 +52,7 @@ namespace RedOnion.ROS.Tests
 	public class ROS_Statements : StatementTests
 	{
 		[TearDown]
-		public void ResetGlobals() => Globals = null;
+		public void Reset() => ResetContext();
 
 		[Test]
 		public void ROS_Stts01_Return()
@@ -132,6 +132,15 @@ namespace RedOnion.ROS.Tests
 				"for var i = 0",
 				"  if ++i > 3; return \"done\"",
 				"  wait");
+			YieldLines(OpCode.Void, 3,
+				"var i = 0",
+				"function f",
+				"  i++",
+				"  yield",
+				"  i++",
+				"  wait",
+				"  return ++i",
+				"f");
 		}
 	}
 }

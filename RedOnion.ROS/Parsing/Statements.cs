@@ -468,7 +468,12 @@ namespace RedOnion.ROS.Parsing
 		{
 			if (name != null)   // null if parsing lambda / inline function
 				Write(name);    // function name (index to string table)
-			else flags |= Flag.Limited;
+			else
+			{
+				flags |= Flag.Limited;
+				if (!HasOption(Option.Prefix))
+					Write("");
+			}
 			Write(0);           // header size
 			int mark = code.size;
 			Write((ushort)0);   // type flags

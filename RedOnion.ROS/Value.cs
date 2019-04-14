@@ -49,7 +49,7 @@ namespace RedOnion.ROS
 		public static readonly Value False = new Value(false);
 		public static readonly Value True = new Value(true);
 
-		public Value(UserObject it) : this(it, it) {}
+		public Value(UserObject it) : this(it ?? Descriptor.Null, it) { }
 		public Value(Type type) : this(Descriptor.Of(type), null) { }
 		public Value(object it) : this()
 		{
@@ -72,7 +72,7 @@ namespace RedOnion.ROS
 				return;
 			}
 			var n = (IConvertible)it;
-			switch((OpCode)desc.Primitive)
+			switch ((OpCode)desc.Primitive)
 			{
 			case OpCode.Char:
 			case OpCode.WideChar:
@@ -180,7 +180,14 @@ namespace RedOnion.ROS
 
 		public bool IsString => desc.Primitive == ExCode.String;
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		public bool IsNumber => desc.Primitive > ExCode.String;
+		public bool IsNumber
+		{
+			get
+			{
+				var type = (OpCode)desc.Primitive;
+				return type > OpCode.String && type < OpCode.Create;
+			}
+		}
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		public bool IsInt => desc.Primitive == ExCode.Int;
 
@@ -358,7 +365,16 @@ namespace RedOnion.ROS
 			}
 		}
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		internal bool IsReference => num.HighInt != 0 && (OpCode)desc.Primitive <= OpCode.String;
+		internal bool IsReference
+		{
+			get
+			{
+				if (num.HighInt == 0)
+					return false;
+				var type = (OpCode)desc.Primitive;
+				return type <= OpCode.String || type >= OpCode.Create;
+			}
+		}
 		internal void SetRef(int idx) => num.Long = (uint)idx | ((long)~idx << 32);
 		internal void SetRef(Context ctx, int idx)
 		{

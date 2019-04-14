@@ -43,6 +43,10 @@ namespace RedOnion.ROS.Objects
 			: this(name, typeof(UserObject))
 			=> this.parent = parent;
 
+		internal UserObject(string name, Type type, ExCode primitive, TypeCode typeCode, UserObject parent)
+			: base(name, type, primitive, typeCode)
+			=> this.parent = parent;
+
 		/// <summary>
 		/// Create new user object inheriting from this one
 		/// </summary>
