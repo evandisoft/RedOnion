@@ -5,6 +5,7 @@ using RedOnion.ROS.Utilities;
 
 namespace RedOnion.ROS.Objects
 {
+	[DebuggerDisplay("{Name}; {prop.DebugString}")]
 	public class UserObject : Descriptor
 	{
 		[DebuggerDisplay("{name} = {value}")]
@@ -26,13 +27,20 @@ namespace RedOnion.ROS.Objects
 			: base(name, typeof(UserObject)) { }
 		public UserObject(string name, Type type)
 			: base(name, type) { }
+		public UserObject(string name, Type type, UserObject parent)
+			: base(name, type)
+			=> this.parent = parent;
+
+		public UserObject(Type type)
+			: base(type.Name, type) { }
+		public UserObject(Type type, UserObject parent)
+			: base(type.Name, type)
+			=> this.parent = parent;
+
 		public UserObject(UserObject parent)
 			: this() => this.parent = parent;
 		public UserObject(string name, UserObject parent)
 			: this(name, typeof(UserObject))
-			=> this.parent = parent;
-		public UserObject(string name, Type type, UserObject parent)
-			: this(name, type)
 			=> this.parent = parent;
 
 		/// <summary>

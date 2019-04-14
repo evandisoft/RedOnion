@@ -215,8 +215,12 @@ namespace RedOnion.ROS.Parsing
 							code.size++;
 						}
 					}
-					else if (root == OpCode.Dot || root.Kind() <= OpKind.Number)
-						Write(OpCode.Autocall);
+					else
+					{
+						if (root == OpCode.Dot || root.Kind() <= OpKind.Number)
+							Write(OpCode.Autocall);
+						Write(OpCode.Pop);
+					}
 				}
 				return;
 			case ExCode.Goto:
@@ -266,84 +270,83 @@ namespace RedOnion.ROS.Parsing
 			case ExCode.Else:
 				throw new ParseError(this, "Unexpected 'else'");
 
+			// prefix:  while/until; cond size; cond; block size; block
+			// postfix: while/until; cond size; cond + marker; block size; block
 			case ExCode.While:
 			case ExCode.Until:
 			{
-				var start = code.size;
-				if (HasOption(Option.Prefix))
-					Write(op);
+				Write(op);
+				Write(0);
+				var condAt = code.size;
 				Next().FullExpression(flags | Flag.Limited);
 				if (!HasOption(Option.Prefix))
-				{
-					Write(op);
-					Write(start - code.size);
-				}
+					Write(OpCode.Cond);
+				Write(code.size-condAt, condAt-4);
 				if (Curr == ';' || Curr == ':' || ExCode == ExCode.Do)
 					Next();
 				ParseBlock(flags);
 				return;
 			}
+			// do; cond size; block size; block; cond
 			case ExCode.Do:
-				if (HasOption(Option.Prefix))
+			{
+				var doAt = Write(op);
+				Write(0);
+				Next().ParseBlock(flags | Flag.WasDo);
+				if (ExCode != ExCode.While)
 				{
-					var doAt = Write(op);
-					Next();
-					ParseBlock(flags | Flag.WasDo);
-					if (ExCode != ExCode.While)
-					{
-						if (ExCode != ExCode.Until)
-							throw new ParseError(this, "Expected 'while' or 'until' for 'do'");
-						code.items[doAt] = ExCode.DoUntil.Code();
-					}
-					var condAt = Write(0);
-					Next().FullExpression(flags);
-					Write(code.size-condAt-4, condAt);
+					if (ExCode != ExCode.Until)
+						throw new ParseError(this, "Expected 'while' or 'until' for 'do'");
+					code.items[doAt] = ExCode.DoUntil.Code();
 				}
-				else
-				{
-					var doAt = Write(op);
-					Write(0);
-					Next();
-					ParseBlock(flags | Flag.WasDo);
-					if (ExCode != ExCode.While)
-					{
-						if (ExCode != ExCode.Until)
-							throw new ParseError(this, "Expected 'while' or 'until' for 'do'");
-						code.items[doAt] = ExCode.DoUntil.Code();
-					}
-					var condAt = code.size;
-					Next().FullExpression(flags);
-					Write(code.size-condAt, doAt+1);
-				}
+				var condAt = code.size;
+				Next().FullExpression(flags);
+				Write(code.size-condAt, doAt+1);
 				return;
-
+			}
+			// for; init size; test size; last size; init; test; last; block size; block
 			case ExCode.For:
 			{
-				var forat = Write(ExCode);
-				Next();
-				FullExpression(flags | Flag.Limited | Flag.NoExpression);
+				var forAt = Write(ExCode);
+
+				Write(0); // size of init expression
+				Write(0); // size of test expression
+				Write(0); // size of last expression
+
+				// init expression
+				var iniAt = code.size;
+				Next().FullExpression(flags | Flag.Limited | Flag.NoExpression);
+				if (!HasOption(Option.Prefix))
+					Write(OpCode.Pop);
+				Write(code.size-iniAt, forAt+1);
 				if (Curr == ':' || ExCode == ExCode.In)
 				{
-					code.items[forat] = ExCode.ForEach.Code();
+					code.items[forAt] = ExCode.ForEach.Code();
 					Next();
 					goto for_in;
 				}
 				if (Curr == ';')
 					Next();
+
+				// test expression
+				var testAt = code.size;
 				FullExpression(flags | Flag.Limited | Flag.NoExpression);
+				if (!HasOption(Option.Prefix))
+					Write(OpCode.Cond);
+				Write(code.size-testAt, forAt+5);
 				if (Curr == ';')
 					Next();
-				if (!PeekExpression(flags))
-					Write(0); // zero-sized block
-				else
-				{
-					Write(0);
-					mark = code.size;
-					FullExpression(flags | Flag.Limited);
-					Write(code.size - mark, mark-4);
-				}
+
+				// last expression
+				var loopAt = code.size;
+				FullExpression(flags | Flag.Limited | Flag.NoExpression);
+				if (!HasOption(Option.Prefix))
+					Write(OpCode.Pop);
+				Write(code.size-loopAt, forAt+9);
 				if (Curr == ';')
 					Next();
+
+				// statements
 				ParseBlock(flags);
 				return;
 			}

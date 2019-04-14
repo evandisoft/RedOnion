@@ -1,6 +1,7 @@
 using RedOnion.ROS.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -10,62 +11,47 @@ namespace RedOnion.ROS.Objects
 	{
 		protected struct Block
 		{
-			public OpCode op;
 			public int start, end;
 			public int at1, at2;
 			public Dictionary<string, int> shadow;
+			public OpCode op;
 		}
 		protected ListCore<Block> blocks;
-		protected int start = int.MinValue;
-		protected int end = int.MaxValue;
-		protected int rootStart = int.MinValue;
-		protected int rootEnd = int.MaxValue;
-		protected int blockAt1, blockAt2;
-		protected OpCode blockCode;
-
 		public int BlockCount => blocks.size;
-		public int BlockAt1 => blockAt1;
-		public int BlockAt2 => blockAt2;
-		public int BlockStart => start;
-		public int BlockEnd => end;
+		public int BlockStart { get; protected set; }
+		public int BlockEnd { get; protected set; }
+		public int BlockAt1 { get; protected set; }
+		public int BlockAt2 { get; protected set; }
+		public OpCode BlockCode { get; set; }
 
-		public OpCode BlockCode
-		{
-			get => blockCode;
-			set
-			{
-				blockCode = value;
-				if (blocks.size > 0)
-					blocks.Top().op = value;
-			}
-		}
-
+		private int rootStart;
 		public int RootStart
 		{
 			get => rootStart;
 			set
 			{
 				rootStart = value;
-				if (blocks.size == 0)
-					start = value;
+				if (BlockCount == 0)
+					BlockStart = value;
 			}
 		}
+		private int rootEnd;
 		public int RootEnd
 		{
 			get => rootEnd;
 			set
 			{
 				rootEnd = value;
-				if (blocks.size == 0)
-					end = value;
+				if (BlockCount == 0)
+					BlockEnd = value;
 			}
 		}
 
-		public Context(int start, int end)
-			: base("Scope Context", typeof(Context))
+		public Context(int rootStart, int rootEnd)
+			: base(typeof(Context))
 		{
-			RootStart = this.start = start;
-			RootEnd = this.end = end;
+			RootStart = rootStart;
+			RootEnd = rootEnd;
 		}
 
 		public override void Reset()
@@ -77,51 +63,61 @@ namespace RedOnion.ROS.Objects
 		public void Push(int start, int end, OpCode op = OpCode.Block, int at1 = 0, int at2 = 0)
 		{
 			ref var block = ref blocks.Add();
-			block.op = blockCode = op;
-			block.start = this.start = start;
-			block.end = this.end = end;
-			block.at1 = blockAt1 = at1;
-			block.at2 = blockAt2 = at2;
+			block.op = BlockCode;
+			block.start = BlockStart;
+			block.end = BlockEnd;
+			block.at1 = BlockAt1;
+			block.at2 = BlockAt2;
+
+			BlockCode = op;
+			BlockStart = start;
+			BlockEnd = end;
+			BlockAt1 = at1;
+			BlockAt2 = at2;
 		}
 		public void ResetTop()
 		{
+			if (blocks.size == 0)
+				return;
 			var shadow = blocks.Top().shadow;
-			if (shadow != null)
-			{
-				foreach (var pair in shadow)
-					dict[pair.Key] = pair.Value;
-				shadow.Clear();
-			}
+			if (shadow == null)
+				return;
+			foreach (var pair in shadow)
+				dict[pair.Key] = pair.Value;
+			shadow.Clear();
 		}
 		public int Pop()
 		{
 			if (blocks.size <= 0)
 				throw InvalidOperation("No block left to remove");
 			ResetTop();
-			if (--blocks.size == 0)
-			{
-				blockCode = OpCode.Void;
-				blockAt1 = 0;
-				blockAt2 = 0;
-				start = RootStart;
-				return end = RootEnd;
-			}
-			else
-			{
-				ref var block = ref blocks.Top();
-				blockCode = block.op;
-				blockAt1 = block.at1;
-				blockAt2 = block.at2;
-				start = block.start;
-				return end = block.end;
-			}
+
+			ref var block = ref blocks.Top();
+			BlockStart = block.start;
+			BlockEnd = block.end;
+			BlockAt1 = block.at1;
+			BlockAt2 = block.at2;
+			BlockCode = block.op;
+			blocks.size--;
+			return BlockEnd;
 		}
 		public void PopAll()
 		{
-			start = RootStart;
-			end = RootEnd;
-			for (int i = 0; i < blocks.size; i++)
-				blocks[i].shadow?.Clear();
+			BlockStart = RootStart;
+			BlockEnd = RootEnd;
+			BlockAt1 = 0;
+			BlockAt2 = 0;
+			while (blocks.size > 0)
+			{
+				var shadow = blocks.Top().shadow;
+				if (shadow != null)
+				{
+					foreach (var pair in shadow)
+						dict[pair.Key] = pair.Value;
+					shadow.Clear();
+				}
+				blocks.size--;
+			}
 			blocks.size = 0;
 		}
 

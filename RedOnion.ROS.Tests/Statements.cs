@@ -11,9 +11,9 @@ namespace RedOnion.ROS.Tests
 		[TearDown]
 		public void ResetGlobals() => Globals = null;
 
-		public void Test(OpCode code, object value, string script, int countdown = 100)
+		public void Test(OpCode code, object value, string script, int countdown = 1000)
 		{
-			Test(script);
+			Test(script, countdown);
 			Assert.AreEqual(code, Exit, "Test: <{0}>", script);
 			var result = Result.Object;
 			Assert.AreEqual(value, result, "Different result: <{0}>", script);
@@ -48,16 +48,16 @@ namespace RedOnion.ROS.Tests
 				"  counter++",
 				"return counter");
 			Lines(OpCode.Return, 3,
-				"var counter = 0",
+				"counter = 0",
 				"until counter > 2",
 				"  counter++",
 				"return counter");
 			Lines(OpCode.Return, 2,
-				"var counter = 0",
+				"counter = 0",
 				"do counter++ while counter < 2",
 				"return counter");
 			Lines(OpCode.Return, 6,
-				"var counter = 0",
+				"counter = 0",
 				"do",
 				"  if ++counter > 5; break",
 				"  if counter > 3; continue",
@@ -66,6 +66,22 @@ namespace RedOnion.ROS.Tests
 				"  counter = 10",
 				"until counter > 10",
 				"return counter");
+		}
+
+		[Test]
+		public void ROS_Stts04_For()
+		{
+			Lines(OpCode.Return, "321",
+				"var s = \"\"",
+				"for var i = 3; i; i -= 1; s += i",
+				"return s");
+			Lines(OpCode.Return, "135",
+				"s = \"\"",
+				"for i = 0; i < 10; i++",
+				"  if i&1 == 0; continue",
+				"  s += i",
+				"  if i == 5; break",
+				"return s");
 		}
 	}
 }

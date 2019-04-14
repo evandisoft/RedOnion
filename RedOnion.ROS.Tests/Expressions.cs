@@ -7,7 +7,7 @@ namespace RedOnion.ROS.Tests
 {
 	public class CoreTests : Core
 	{
-		public void Test(string script, int countdown = 100)
+		public void Test(string script, int countdown = 1000)
 		{
 			try
 			{
@@ -21,14 +21,14 @@ namespace RedOnion.ROS.Tests
 					e.GetType().ToString(), e.Message, script), e);
 			}
 		}
-		public void Test(object value, string script, int countdown = 100)
+		public void Test(object value, string script, int countdown = 1000)
 		{
 			Test(script, countdown);
 			var result = Result.Object;
 			Assert.AreEqual(value, result, "Different result: <{0}>", script);
 			Assert.AreEqual(value?.GetType(), result?.GetType(), "Different type: <{0}>", script);
 		}
-		public void Expect<Ex>(string script, int countdown = 100) where Ex : Exception
+		public void Expect<Ex>(string script, int countdown = 1000) where Ex : Exception
 		{
 			try
 			{

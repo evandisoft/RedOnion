@@ -125,21 +125,23 @@ namespace RedOnion.ROS.Tests
 				CodeCheck( 0, OpCode.Identifier);
 				CodeCheck( 1, 0, "cond");
 				CodeCheck( 5, OpCode.If);
-				CodeCheck( 6, 7); // size of then-block
+				CodeCheck( 6, 8); // size of then-block
 
 				CodeCheck(10, OpCode.Identifier);
 				CodeCheck(11, 1, "v");
 				CodeCheck(15, OpCode.True);
 				CodeCheck(16, OpCode.Assign);
+				CodeCheck(17, OpCode.Pop);
 
-				CodeCheck(17, OpCode.Else);
-				CodeCheck(18, 7); // size of else-block
+				CodeCheck(18, OpCode.Else);
+				CodeCheck(19, 8); // size of else-block
 
-				CodeCheck(22, OpCode.Identifier);
-				CodeCheck(23, 1, "v"); // must not be duplicit in string table
-				CodeCheck(27, OpCode.False);
-				CodeCheck(28, OpCode.Assign);
-				CodeCheck(29);
+				CodeCheck(23, OpCode.Identifier);
+				CodeCheck(24, 1, "v"); // must not be duplicit in string table
+				CodeCheck(28, OpCode.False);
+				CodeCheck(29, OpCode.Assign);
+				CodeCheck(30, OpCode.Pop);
+				CodeCheck(31);
 			});
 		}
 

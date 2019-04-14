@@ -116,8 +116,8 @@ namespace RedOnion.ROS
 							it = ~it;
 							if (it > 0)
 								it--;
-							lineNumber = it;
 						}
+						lineNumber = it;
 					}
 				}
 				return lineNumber;
@@ -231,6 +231,8 @@ namespace RedOnion.ROS
 			Position = position;
 			Text = text;
 		}
+		public override string ToString()
+			=> string.Format(Value.Culture, "{0}: {1}", Position, Text);
 	}
 
 	#endregion

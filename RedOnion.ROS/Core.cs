@@ -7,6 +7,7 @@ using RedOnion.ROS.Utilities;
 
 namespace RedOnion.ROS
 {
+	[DebuggerDisplay("{DebugString}")]
 	public class Core : ICore
 	{
 		protected int at;
@@ -92,10 +93,14 @@ namespace RedOnion.ROS
 						countdown--;
 						switch (ctx.BlockCode)
 						{
+						default:
+							blockEnd = ctx.Pop();
+							continue;
 						case OpCode.While:
 						case OpCode.Until:
+						case OpCode.For:
 							at = ctx.BlockAt1;
-							break;
+							continue;
 						case OpCode.Do:
 						case OpCode.DoUntil:
 						{
@@ -106,13 +111,15 @@ namespace RedOnion.ROS
 								throw InvalidOperation("Could not convert '{0}' to boolean", cond.Name);
 
 							if (cond.num.Bool != (ctx.BlockCode == OpCode.Do))
-								break;
+							{
+								blockEnd = ctx.Pop();
+								continue;
+							}
 							at = ctx.BlockStart;
 							ctx.ResetTop();
 							continue;
 						}
 						}
-						blockEnd = ctx.Pop();
 					}
 					if (countdown <= 0)
 					{
@@ -121,6 +128,7 @@ namespace RedOnion.ROS
 					}
 					countdown--;
 					var op = (OpCode)code[at++];
+					this.at = at;
 					switch (op)
 					{
 					case OpCode.Void:
@@ -598,36 +606,38 @@ namespace RedOnion.ROS
 						{
 						case OpCode.Do:
 						case OpCode.DoUntil:
+						case OpCode.For:
 							at = ctx.BlockAt1;
 							continue;
 						}
 						continue;
 					}
+					// for; init size; test size; last size; init; test; last; block size; block
+					case OpCode.For:
+					{
+						var iniSz = Int(code, at);
+						at += 4;
+						var tstSz = Int(code, at);
+						at += 4;
+						var finSz = Int(code, at);
+						at += 4;
+						var blkAt = at + iniSz + tstSz + finSz + 4;
+						var blkSz = Int(code, blkAt-4);
+						ctx.Push(blkAt, blockEnd = blkAt + blkSz, op, at + iniSz + tstSz, at + iniSz);
+						continue;
+					}
 
-					//TODO: for, foreach
+					// while/until; cond size; cond + marker; block size; block
 					case OpCode.While:
 					case OpCode.Until:
 					{
-						ref var cond = ref vals.Top();
-						if (cond.IsReference && !cond.desc.Get(ref cond, cond.num.Int))
-							throw CouldNotGet(ref cond);
-						if (cond.desc.Primitive != ExCode.Bool && !cond.desc.Convert(ref cond, Descriptor.Bool))
-							throw InvalidOperation("Could not convert '{0}' to boolean", cond.Name);
-
-						var condAt = at + Int(code, at);
+						var csz = Int(code, at);
 						at += 4;
-						int sz = Int(code, at);
-						at += 4;
-						if (cond.num.Bool == (op == OpCode.While))
-						{
-							if (ctx == null)
-								ctx = new Context(0, code.Length);
-							ctx.Push(at, blockEnd = at+sz, op, condAt);
-							continue;
-						}
-						at += sz;
+						var bsz = Int(code, at + csz);
+						ctx.Push(at+csz+4, blockEnd = at+csz+4+bsz, op, at);
 						continue;
 					}
+					// do; cond size; block size; block; cond
 					case OpCode.Do:
 					case OpCode.DoUntil:
 					{
@@ -676,6 +686,39 @@ namespace RedOnion.ROS
 						at += sz + 4;
 						continue;
 					}
+					// while/until; cond size; cond + marker; block size; block
+					// for; ini size; ini; cond size; cond; fin size; fin; block size; block
+					case OpCode.Cond:
+					{
+						ref var cond = ref vals.Top();
+						if (cond.IsReference && !cond.desc.Get(ref cond, cond.num.Int))
+							throw CouldNotGet(ref cond);
+						if (cond.desc.Primitive != ExCode.Bool && !cond.desc.Convert(ref cond, Descriptor.Bool))
+							throw InvalidOperation("Could not convert '{0}' to boolean", cond.Name);
+
+						op = ctx.BlockCode;
+						var test = cond.num.Bool;
+						vals.Pop();
+						if (test != (op == OpCode.While || op == OpCode.For))
+						{
+							at = blockEnd;
+							blockEnd = ctx.Pop();
+							continue;
+						}
+						if (op != OpCode.For)
+						{
+							at += 4;
+							continue;
+						}
+						at = ctx.BlockStart;
+						continue;
+					}
+					case OpCode.Pop:
+						countdown++; // do not even count this instruction
+						result = vals.Pop();
+						if (ctx?.BlockCode == OpCode.For && at == ctx.BlockStart-4)
+							at = ctx.BlockAt2;
+						continue;
 
 					default:
 						throw new NotImplementedException("Not implemented: " + op.ToString());
@@ -683,16 +726,12 @@ namespace RedOnion.ROS
 				}
 				Exit = OpCode.Void;
 			finish:
-				if (vals.Count == 0)
-					result = Value.Void;
-				else
-				{
+				if (vals.Count > 0)
 					result = vals.Pop();
-					if (result.IsReference && !result.desc.Get(ref result, result.num.Int))
-						throw InvalidOperation(
-							"Property '{0}' of '{1}' is write only",
-							result.desc.NameOf(result.obj, result.num.Int), result.desc.Name);
-				}
+				if (result.IsReference && !result.desc.Get(ref result, result.num.Int))
+					throw InvalidOperation(
+						"Property '{0}' of '{1}' is write only",
+						result.desc.NameOf(result.obj, result.num.Int), result.desc.Name);
 				vals.Clear();
 				ctx?.PopAll();
 				Countdown = countdown;
@@ -820,5 +859,29 @@ namespace RedOnion.ROS
 		static internal InvalidOperationException CouldNotGet(ref Value it)
 			=> new InvalidOperationException(string.Format(Value.Culture,
 			"Could not get '{0}' of '{1}'", it.desc.NameOf(it.obj, it.num.Int), it.desc.Name));
+
+		private string DebugString
+		{
+			get
+			{
+				var code = this.compiled;
+				if (code == null)
+					return "null";
+				var lineMap = code.LineMap;
+				if (lineMap == null || lineMap.Length == 0)
+					return "no line map";
+				var lines = code.Lines;
+				if (lines == null)
+					return "no lines";
+				int i = Array.BinarySearch(lineMap, at-1);
+				if (i < 0)
+				{
+					i = ~i;
+					if (i > 0)
+						i--;
+				}
+				return i >= 0 && lines != null && i < lines.Count ? lines[i].ToString() : "#"+i;
+			}
+		}
 	}
 }
