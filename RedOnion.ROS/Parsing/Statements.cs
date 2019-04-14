@@ -330,9 +330,13 @@ namespace RedOnion.ROS.Parsing
 
 				// test expression
 				var testAt = code.size;
-				FullExpression(flags | Flag.Limited | Flag.NoExpression);
+				var test = FullExpression(flags | Flag.Limited | Flag.NoExpression);
 				if (!HasOption(Option.Prefix))
+				{
+					if (test == OpCode.Void && code.size == testAt + 1)
+						Write(OpCode.True, testAt);
 					Write(OpCode.Cond);
+				}
 				Write(code.size-testAt, mark+5);
 				if (Curr == ';')
 					Next();
@@ -438,6 +442,12 @@ namespace RedOnion.ROS.Parsing
 					break;
 				}
 				Write(code.size - mark, mark-4);
+				return;
+
+			case ExCode.Yield:
+			case ExCode.Wait:
+				Write(op);
+				Next();
 				return;
 
 			//--------------------------------------------------------------------------------------

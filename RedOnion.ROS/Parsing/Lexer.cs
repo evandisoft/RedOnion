@@ -321,6 +321,8 @@ namespace RedOnion.ROS.Parsing
 			{ "from",		ExCode.From },
 			{ "select",		ExCode.Select },
 			{ "orderby",	ExCode.OrderBy },
+			{ "yield",		ExCode.Yield },
+			{ "wait",		ExCode.Wait },
 			{ "public",		ExCode.Public },
 			{ "private",	ExCode.Private },
 			{ "protected",	ExCode.Protected },

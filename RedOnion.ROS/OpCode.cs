@@ -217,6 +217,7 @@ namespace RedOnion.ROS
 		Catch			= 0x96, // try..catch..finally
 		With			= 0x97, // with var do stts
 		From			= 0x98, // LINQ
+		Yield			= 0x99,	// wait/yield (cooperative multitasking)
 
 	//	model
 		Import			= 0xD0, // using/import/include
@@ -422,6 +423,8 @@ namespace RedOnion.ROS
 		From			= 0x0098, // LINQ
 		Select			= 0x0198, // (for parsing only)
 		OrderBy			= 0x0298, // (for parsing only)
+		Yield			= 0x0099, // yield (cooperative multitasking)
+		Wait			= 0x0199, // wait (cooperative multitasking)
 
 	//NOTE: acces, scope and other modifiers were moved to TypeFlags
 	//..... could thus be changed to parsing-only codes

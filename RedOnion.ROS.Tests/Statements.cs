@@ -5,12 +5,8 @@ using RedOnion.ROS.Objects;
 
 namespace RedOnion.ROS.Tests
 {
-	[TestFixture]
-	public class ROS_Statements : CoreTests
+	public class StatementTests : CoreTests
 	{
-		[TearDown]
-		public void ResetGlobals() => Globals = null;
-
 		public void Test(OpCode code, object value, string script, int countdown = 1000)
 		{
 			Test(script, countdown);
@@ -23,6 +19,40 @@ namespace RedOnion.ROS.Tests
 			=> Test(code, value, string.Join(Environment.NewLine, lines));
 		public void Lines(OpCode code, object value, int countdown, params string[] lines)
 			=> Test(code, value, string.Join(Environment.NewLine, lines), countdown);
+
+		public void Yield(string script, int countdown = 1000)
+		{
+			try
+			{
+				Code = Compile(script);
+				if (Globals == null) Globals = new Globals();
+				Assert.IsFalse(Execute(countdown));
+				while (!Execute(countdown)) ;
+			}
+			catch (Exception e)
+			{
+				throw new Exception(String.Format("{0} in Eval: {1}; IN: <{2}>",
+					e.GetType().ToString(), e.Message, script), e);
+			}
+		}
+		public void Yield(OpCode code, object value, string script, int countdown = 1000)
+		{
+			Yield(script, countdown);
+			Assert.AreEqual(code, Exit, "Test: <{0}>", script);
+			var result = Result.Object;
+			Assert.AreEqual(value, result, "Different result: <{0}>", script);
+			Assert.AreEqual(value?.GetType(), result?.GetType(), "Different type: <{0}>", script);
+		}
+		public void YieldLines(OpCode code, object value, params string[] lines)
+			=> Yield(code, value, string.Join(Environment.NewLine, lines));
+		public void YieldLines(OpCode code, object value, int countdown, params string[] lines)
+			=> Yield(code, value, string.Join(Environment.NewLine, lines), countdown);
+	}
+	[TestFixture]
+	public class ROS_Statements : StatementTests
+	{
+		[TearDown]
+		public void ResetGlobals() => Globals = null;
 
 		[Test]
 		public void ROS_Stts01_Return()
@@ -92,6 +122,16 @@ namespace RedOnion.ROS.Tests
 				"foreach var e in [\"hello\", \" \", \"world\"]",
 				"  s += e",
 				"s");
+		}
+
+		[Test]
+		public void ROS_Stts06_Yield()
+		{
+			Yield("yield");
+			YieldLines(OpCode.Return, "done",
+				"for var i = 0",
+				"  if ++i > 3; return \"done\"",
+				"  wait");
 		}
 	}
 }

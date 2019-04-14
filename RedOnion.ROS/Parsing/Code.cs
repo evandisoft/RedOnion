@@ -74,9 +74,12 @@ namespace RedOnion.ROS.Parsing
 		/// Write single byte to code buffer at specified position
 		/// </summary>
 		protected void Write(byte value, int codeAt)
-		{
-			code.items[codeAt++] = value;
-		}
+			=> code.items[codeAt] = value;
+		/// <summary>
+		/// Write single byte to code buffer at specified position
+		/// </summary>
+		protected void Write(OpCode value, int codeAt)
+			=> code.items[codeAt] = (byte)value;
 
 		/// <summary>
 		/// Write two bytes to code buffer
