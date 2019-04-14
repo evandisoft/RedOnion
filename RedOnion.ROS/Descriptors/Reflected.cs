@@ -111,9 +111,9 @@ namespace RedOnion.ROS
 				//========================================================================= PROPERTY
 				if (member is PropertyInfo p)
 				{
-					if (p.IsSpecialName)
+					var iargs = p.GetIndexParameters();
+					if (p.IsSpecialName || iargs.Length > 0)
 					{
-						var iargs = p.GetIndexParameters();
 						if (iargs.Length != 1)
 							return;
 						var itype = iargs[0].ParameterType;
@@ -124,23 +124,20 @@ namespace RedOnion.ROS
 							if (p.CanRead)
 							{
 								intIndexGet = Expression.Lambda<Func<object, int, Value>>(
-									Expression.New(IntValueConstructor, new Expression[] {
-										Expression.Call(
-											Expression.Convert(SelfParameter, p.DeclaringType),
-											p.GetGetMethod(), IntIndexParameter)
-									}),
+									GetNewValueExpression(p.PropertyType, Expression.Call(
+										Expression.Convert(SelfParameter, p.DeclaringType),
+										p.GetGetMethod(), IntIndexParameter)),
 									SelfParameter, IntIndexParameter
 								).Compile();
 							}
 							if (p.CanWrite)
 							{
 								intIndexSet = Expression.Lambda<Action<object, int, Value>>(
-									Expression.New(IntValueConstructor, new Expression[] {
-										Expression.Call(
-											Expression.Convert(SelfParameter, p.DeclaringType),
-											p.GetSetMethod(), IntIndexParameter,
-											GetValueConvertExpression(p.PropertyType, ValueParameter))
-									}),
+									Expression.Call(
+										Expression.Convert(SelfParameter, p.DeclaringType),
+										p.GetSetMethod(), IntIndexParameter,
+										GetValueConvertExpression(p.PropertyType, ValueParameter)
+									),
 									SelfParameter, IntIndexParameter, ValueParameter
 								).Compile();
 							}
@@ -152,26 +149,20 @@ namespace RedOnion.ROS
 							if (p.CanRead)
 							{
 								strIndexGet = Expression.Lambda<Func<object, string, Value>>(
-									Expression.New(StrValueConstructor, new Expression[] {
-										Expression.Call(
-											Expression.Convert(SelfParameter, p.DeclaringType),
-											p.GetGetMethod(), StrIndexParameter)
-									}),
+									GetNewValueExpression(p.PropertyType, Expression.Call(
+										Expression.Convert(SelfParameter, p.DeclaringType),
+										p.GetGetMethod(), StrIndexParameter)),
 									SelfParameter, StrIndexParameter
 								).Compile();
 							}
 							if (p.CanWrite)
 							{
-								var obj = Expression.Parameter(typeof(object), "obj");
-								var idx = Expression.Parameter(typeof(string), "idx");
-								var val = Expression.Parameter(typeof(Value), "val");
 								strIndexSet = Expression.Lambda<Action<object, string, Value>>(
-									Expression.New(StrValueConstructor, new Expression[] {
-										Expression.Call(
-											Expression.Convert(obj, p.DeclaringType),
-											p.GetSetMethod(), StrIndexParameter,
-											GetValueConvertExpression(p.PropertyType, ValueParameter))
-									}),
+									Expression.Call(
+										Expression.Convert(SelfParameter, p.DeclaringType),
+										p.GetSetMethod(), StrIndexParameter,
+										GetValueConvertExpression(p.PropertyType, ValueParameter)
+									),
 									SelfParameter, StrIndexParameter, ValueParameter
 								).Compile();
 							}
@@ -239,6 +230,8 @@ namespace RedOnion.ROS
 			protected static Func<object, Value> ReflectMethod(MethodInfo m)
 			{
 				if (m.IsSpecialName)
+					return null;
+				if (m.IsGenericMethod)
 					return null;
 				if (m.ReturnType.IsByRef)
 					return null;
@@ -507,6 +500,20 @@ namespace RedOnion.ROS
 				}
 				//TODO: other operations
 				return false;
+			}
+			public override IEnumerator<Value> Enumerate(ref Value self)
+			{
+				var it = self.obj;
+				if (it is IEnumerable<Value> ev)
+					return ev.GetEnumerator();
+				if (it is IEnumerable eo)
+					return EnumerateNative(eo);
+				return null;
+			}
+			private IEnumerator<Value> EnumerateNative(IEnumerable e)
+			{
+				foreach (var v in e)
+					yield return new Value(e);
 			}
 		}
 	}

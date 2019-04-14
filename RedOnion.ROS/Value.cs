@@ -374,6 +374,8 @@ namespace RedOnion.ROS
 		{
 			get
 			{
+				if (desc == null)
+					return obj == null ? "null" : obj.ToString();
 				if (IsReference)
 				{
 					var name = desc.NameOf(obj, num.Int);

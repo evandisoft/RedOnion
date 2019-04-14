@@ -327,11 +327,11 @@ namespace RedOnion.ROS.Parsing
 									break;
 								if (Curr != ',')
 									throw new ParseError(this, "Expected ',' or ']'");
-								Next();
+								Next(true);
 							}
 						}
 						PrepareOperator(ExCode.Array);
-						Next(true);
+						Next();
 						unary = false;
 						goto next;
 					}

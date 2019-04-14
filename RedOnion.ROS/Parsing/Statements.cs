@@ -304,27 +304,27 @@ namespace RedOnion.ROS.Parsing
 				Write(code.size-condAt, doAt+1);
 				return;
 			}
-			// for; init size; test size; last size; init; test; last; block size; block
+			// for; init size; test size; init; test; last size; last; block size; block
 			case ExCode.For:
 			{
-				var forAt = Write(ExCode);
+				mark = Write(ExCode);
 
 				Write(0); // size of init expression
 				Write(0); // size of test expression
-				Write(0); // size of last expression
 
 				// init expression
 				var iniAt = code.size;
 				Next().FullExpression(flags | Flag.Limited | Flag.NoExpression);
-				if (!HasOption(Option.Prefix))
-					Write(OpCode.Pop);
-				Write(code.size-iniAt, forAt+1);
 				if (Curr == ':' || ExCode == ExCode.In)
 				{
-					code.items[forAt] = ExCode.ForEach.Code();
+					Write(code.size - iniAt, mark + 1);
+					code.items[mark] = ExCode.ForEach.Code();
 					Next();
 					goto for_in;
 				}
+				if (!HasOption(Option.Prefix))
+					Write(OpCode.Pop);
+				Write(code.size - iniAt, mark + 1);
 				if (Curr == ';')
 					Next();
 
@@ -333,16 +333,17 @@ namespace RedOnion.ROS.Parsing
 				FullExpression(flags | Flag.Limited | Flag.NoExpression);
 				if (!HasOption(Option.Prefix))
 					Write(OpCode.Cond);
-				Write(code.size-testAt, forAt+5);
+				Write(code.size-testAt, mark+5);
 				if (Curr == ';')
 					Next();
 
 				// last expression
-				var loopAt = code.size;
+				Write(0);
+				var lastAt = code.size;
 				FullExpression(flags | Flag.Limited | Flag.NoExpression);
 				if (!HasOption(Option.Prefix))
 					Write(OpCode.Pop);
-				Write(code.size-loopAt, forAt+9);
+				Write(code.size-lastAt, lastAt-4);
 				if (Curr == ';')
 					Next();
 
@@ -351,17 +352,30 @@ namespace RedOnion.ROS.Parsing
 				return;
 			}
 			case ExCode.ForEach:
-				Write(ExCode);
-				Next();
-				FullExpression(flags | Flag.Limited | Flag.NoExpression);
+			{
+				mark = Write(ExCode);
+
+				Write(0); // size of var expression
+				Write(0); // size of list expression
+
+				var varAt = code.size;
+				Next().FullExpression(flags | Flag.Limited | Flag.NoExpression);
 				if (Curr == ':' || ExCode == ExCode.In)
 					Next();
+				Write(code.size - varAt, mark + 1);
+			}
 			for_in:
+			{
+				var listAt = code.size;
 				FullExpression(flags | Flag.Limited | Flag.NoExpression);
+				if (!HasOption(Option.Prefix))
+					Write(OpCode.Cond);
+				Write(code.size - listAt, mark + 5);
 				if (Curr == ';')
 					Next();
 				ParseBlock(flags);
 				return;
+			}
 
 			case ExCode.Try:
 				Write(ExCode);

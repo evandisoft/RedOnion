@@ -38,8 +38,22 @@ namespace RedOnion.ROS
 			=> PrimitiveValueConstructors.TryGetValue(type, out var vctor)
 			? vctor : DefaultValueConstructor;
 		public static Expression GetNewValueExpression(Type type, Expression expr)
-			=> type == typeof(Value) ? expr
-			: Expression.New(GetValueConstructor(type), new Expression[] { expr });
+		{
+			if (type == typeof(Value))
+				return expr;
+			if (!PrimitiveValueConstructors.TryGetValue(type, out var vctor))
+			{
+				vctor = DefaultValueConstructor;
+				if (type.IsValueType)
+				{
+					return Expression.New(vctor, new Expression[]
+					{
+						Expression.Convert(expr, typeof(object))
+					});
+				}
+			}
+			return Expression.New(vctor, new Expression[] { expr });
+		}
 
 		internal static readonly MethodInfo ValueToInt
 			= typeof(Value).GetMethod("ToInt");

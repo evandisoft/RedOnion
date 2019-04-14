@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using RedOnion.ROS.Objects;
@@ -115,6 +116,25 @@ namespace RedOnion.ROS
 								blockEnd = ctx.Pop();
 								continue;
 							}
+							at = ctx.BlockStart;
+							ctx.ResetTop();
+							continue;
+						}
+						case OpCode.ForEach:
+						{
+							var enu = (IEnumerator<Value>)vals.Top(-1).obj;
+							if (!enu.MoveNext())
+							{
+								vals.Pop(2);
+								blockEnd = ctx.Pop();
+								continue;
+							}
+							ref var evar = ref vals.Top(-2);
+							var value = enu.Current;
+							if (!evar.desc.Set(ref evar, evar.num.Int, OpCode.Assign, ref value))
+								throw InvalidOperation(
+									"Property '{0}' of '{1}' is read only",
+									evar.desc.NameOf(evar.obj, evar.num.Int), evar.desc.Name);
 							at = ctx.BlockStart;
 							ctx.ResetTop();
 							continue;
@@ -612,18 +632,30 @@ namespace RedOnion.ROS
 						}
 						continue;
 					}
-					// for; init size; test size; last size; init; test; last; block size; block
+					// for; init size; test size; init; test; last size; last; block size; block
 					case OpCode.For:
 					{
 						var iniSz = Int(code, at);
 						at += 4;
 						var tstSz = Int(code, at);
 						at += 4;
-						var finSz = Int(code, at);
-						at += 4;
-						var blkAt = at + iniSz + tstSz + finSz + 4;
+						var finAt = at + iniSz + tstSz + 4;
+						var finSz = Int(code, finAt-4);
+						var blkAt = finAt + finSz + 4;
 						var blkSz = Int(code, blkAt-4);
-						ctx.Push(blkAt, blockEnd = blkAt + blkSz, op, at + iniSz + tstSz, at + iniSz);
+						ctx.Push(blkAt, blockEnd = blkAt + blkSz, op, finAt, at + iniSz);
+						continue;
+					}
+					// foreach; var size; list size; var; list; block size; block
+					case OpCode.ForEach:
+					{
+						var varSz = Int(code, at);
+						at += 4;
+						var listSz = Int(code, at);
+						at += 4;
+						var blkAt = at + varSz + listSz + 4;
+						var blkSz = Int(code, blkAt - 4);
+						ctx.Push(blkAt, blockEnd = blkAt + blkSz, op, at, at + varSz);
 						continue;
 					}
 
@@ -690,6 +722,24 @@ namespace RedOnion.ROS
 					// for; ini size; ini; cond size; cond; fin size; fin; block size; block
 					case OpCode.Cond:
 					{
+						if (ctx.BlockCode == OpCode.ForEach)
+						{
+							ref var evar = ref vals.Top(-2);
+							if (!evar.IsReference)
+								throw InvalidOperation("Enumeration variable is not a reference"); ;
+							ref var list = ref vals.Top(-1);
+							if (list.IsReference && !list.desc.Get(ref list, list.num.Int))
+								throw CouldNotGet(ref list);
+							var enu = list.desc.Enumerate(ref list);
+							if (enu == null)
+								throw InvalidOperation(list.Name + " is not enumerable");
+							list.desc = null;
+							list.obj = enu;
+							list.num.Int = 0;
+							at = blockEnd;
+							ctx.LockTop();
+							continue;
+						}
 						ref var cond = ref vals.Top();
 						if (cond.IsReference && !cond.desc.Get(ref cond, cond.num.Int))
 							throw CouldNotGet(ref cond);

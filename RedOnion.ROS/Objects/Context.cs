@@ -7,13 +7,20 @@ using System.Text;
 
 namespace RedOnion.ROS.Objects
 {
+	[DebuggerDisplay("{BlockCount}/{BlockCode}; {prop.DebugString}")]
 	public class Context : UserObject
 	{
+		protected struct Shadow
+		{
+			public int prev, next;
+		}
 		protected struct Block
 		{
 			public int start, end;
 			public int at1, at2;
-			public Dictionary<string, int> shadow;
+			public int propSize, lockSize1, lockSize2;
+			public Dictionary<string, Shadow> shadow;
+			public ListCore<string> added;
 			public OpCode op;
 		}
 		protected ListCore<Block> blocks;
@@ -68,6 +75,9 @@ namespace RedOnion.ROS.Objects
 			block.end = BlockEnd;
 			block.at1 = BlockAt1;
 			block.at2 = BlockAt2;
+			block.propSize = prop.size;
+			block.lockSize1 = prop.size;
+			block.lockSize2 = 0;
 
 			BlockCode = op;
 			BlockStart = start;
@@ -75,30 +85,55 @@ namespace RedOnion.ROS.Objects
 			BlockAt1 = at1;
 			BlockAt2 = at2;
 		}
+		public void LockTop()
+		{
+			if (blocks.size == 0)
+				return;
+			ref var top = ref blocks.Top();
+			top.lockSize1 = prop.size;
+			top.lockSize2 = top.added.size;
+		}
 		public void ResetTop()
 		{
 			if (blocks.size == 0)
 				return;
-			var shadow = blocks.Top().shadow;
+			ref var top = ref blocks.Top();
+			prop.Count = top.lockSize1;
+			for (var i = top.lockSize2; i < top.added.size; i++)
+				dict.Remove(top.added.items[i]);
+			var shadow = top.shadow;
 			if (shadow == null)
 				return;
 			foreach (var pair in shadow)
-				dict[pair.Key] = pair.Value;
+			{
+				if (pair.Value.next < prop.Count)
+					continue;
+				dict[pair.Key] = pair.Value.prev;
+			}
 			shadow.Clear();
 		}
 		public int Pop()
 		{
 			if (blocks.size <= 0)
 				throw InvalidOperation("No block left to remove");
-			ResetTop();
 
-			ref var block = ref blocks.Top();
-			BlockStart = block.start;
-			BlockEnd = block.end;
-			BlockAt1 = block.at1;
-			BlockAt2 = block.at2;
-			BlockCode = block.op;
+			ref var top = ref blocks.Top();
+			prop.Count = top.propSize;
+			BlockStart = top.start;
+			BlockEnd = top.end;
+			BlockAt1 = top.at1;
+			BlockAt2 = top.at2;
+			BlockCode = top.op;
+			var shadow = top.shadow;
+			foreach (var name in top.added)
+				dict.Remove(name);
 			blocks.size--;
+			if (shadow != null)
+			{
+				foreach (var pair in shadow)
+					dict[pair.Key] = pair.Value.prev;
+				shadow.Clear();
+			}
 			return BlockEnd;
 		}
 		public void PopAll()
@@ -107,18 +142,24 @@ namespace RedOnion.ROS.Objects
 			BlockEnd = RootEnd;
 			BlockAt1 = 0;
 			BlockAt2 = 0;
+			var propSize = prop.size;
 			while (blocks.size > 0)
 			{
-				var shadow = blocks.Top().shadow;
+				ref var top = ref blocks.Top();
+				propSize = top.propSize;
+				var shadow = top.shadow;
+				foreach (var name in top.added)
+					dict.Remove(name);
 				if (shadow != null)
 				{
 					foreach (var pair in shadow)
-						dict[pair.Key] = pair.Value;
+						dict[pair.Key] = pair.Value.next;
 					shadow.Clear();
 				}
 				blocks.size--;
 			}
 			blocks.size = 0;
+			prop.Count = propSize;
 		}
 
 		public override int Add(string name, ref Value value)
@@ -129,12 +170,21 @@ namespace RedOnion.ROS.Objects
 			it.value = value;
 			if (name != null)
 			{
-				if (blocks.size > 0 && dict != null && dict.ContainsKey(name))
+				if (blocks.size > 0)
 				{
-					ref var block = ref blocks.Top();
-					if (block.shadow == null)
-						block.shadow = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-					block.shadow[name] = dict[name];
+					ref var top = ref blocks.Top();
+					if (dict != null && dict.ContainsKey(name))
+					{
+						if (top.shadow == null)
+							top.shadow = new Dictionary<string, Shadow>(StringComparer.OrdinalIgnoreCase);
+						top.shadow[name] = new Shadow()
+						{
+							prev = dict[name],
+							next = idx
+						};
+					}
+					else
+						top.added.Add(name);
 				}
 				if (dict == null)
 					dict = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);

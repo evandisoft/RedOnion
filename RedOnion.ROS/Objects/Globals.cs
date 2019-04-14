@@ -9,6 +9,7 @@ namespace RedOnion.ROS.Objects
 		public Globals() : base("Globals")
 		{
 			Add("object", new Value(new UserObject()));
+			Add("list", new Value(typeof(List<Value>)));
 			Lock();
 		}
 	}

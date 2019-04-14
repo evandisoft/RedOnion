@@ -77,11 +77,21 @@ namespace RedOnion.ROS.Tests
 				"return s");
 			Lines(OpCode.Return, "135",
 				"s = \"\"",
-				"for i = 0; i < 10; i++",
+				"for var i = 0; i < 10; i++",
 				"  if i&1 == 0; continue",
 				"  s += i",
 				"  if i == 5; break",
 				"return s");
+		}
+
+		[Test]
+		public void ROS_Stts05_ForEach()
+		{
+			Lines(OpCode.Void, "hello world",
+				"var s = \"\"",
+				"foreach var e in [\"hello\", \" \", \"world\"]",
+				"  s += e",
+				"s");
 		}
 	}
 }
