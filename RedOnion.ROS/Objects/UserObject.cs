@@ -5,9 +5,16 @@ using RedOnion.ROS.Utilities;
 
 namespace RedOnion.ROS.Objects
 {
+	/// <summary>
+	/// Script object created by `new object` or any function or class in the script.
+	/// The design is based on JavaScript (ECMA-262)
+	/// </summary>
 	[DebuggerDisplay("{Name}; {prop.DebugString}")]
 	public class UserObject : Descriptor
 	{
+		/// <summary>
+		/// Single property of an object (with name and value)
+		/// </summary>
 		[DebuggerDisplay("{name} = {value}")]
 		protected struct Prop
 		{
@@ -16,9 +23,22 @@ namespace RedOnion.ROS.Objects
 			public override string ToString()
 				=> string.Format(Value.Culture, "{0} = {1}", name, value.ToString());
 		}
+		/// <summary>
+		/// All properties of the object
+		/// (properties from parent are auto-added when accessed)
+		/// </summary>
 		protected ListCore<Prop> prop;
+		/// <summary>
+		/// Map of all properties (name-to-index into <see cref="prop"/>)
+		/// </summary>
 		protected Dictionary<string, int> dict;
+		/// <summary>
+		/// Parent object (this one is derived from, null if no such)
+		/// </summary>
 		protected UserObject parent;
+		/// <summary>
+		/// Number of locked / read-only properties
+		/// </summary>
 		protected int readOnlyTop = 0;
 
 		public UserObject()

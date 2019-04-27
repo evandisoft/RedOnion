@@ -161,17 +161,15 @@ def MyClass
     this.counter = 0
 
     // private properties
-    var _private = new object
-	_private.total = 0
+    var _total = 0
 
     // some method
     this.action = def
         counter++   // this.counter++
-        _private.total++
+        _total++    // that private _total
 
     // read-only access to total
-    this.getTotal = def
-		return _private.total
+    this.getTotal = def => _total
 
 var obj = new MyClass
 obj.counter = 10
@@ -179,17 +177,6 @@ obj.action      // now obj.counter is 11
 obj.getTotal    // returns 1
 ");
 			Test(11, "obj.counter");
-		}
-
-		[Test]
-		public void ROS_Scope09_CSharp()
-		{
-			var counter = 0;
-			Action action = () => counter++;
-			action();
-			Action action2 = () => counter += 2;
-			action2();
-			Assert.AreEqual(3, counter);
 		}
 	}
 }

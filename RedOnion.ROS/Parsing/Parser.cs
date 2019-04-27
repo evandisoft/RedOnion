@@ -119,8 +119,10 @@ namespace RedOnion.ROS.Parsing
 			values.Clear();
 			lineMap.Clear();
 			lines.Clear();
-			LabelTable?.Clear();
-			GotoTable?.Clear();
+			ctx?.Clear();
+			stack.Clear();
+			labelTable?.Clear();
+			gotoTable?.Clear();
 			ParentIndent = -1;
 			return this;
 		}
@@ -214,7 +216,8 @@ namespace RedOnion.ROS.Parsing
 				}
 			}
 			while (ParseClasses(Flag.None));
-			var count = ParseBlock(Flag.NoSize);
+
+			ParseBlock(Flag.NoSize);
 		}
 
 		/// <summary>

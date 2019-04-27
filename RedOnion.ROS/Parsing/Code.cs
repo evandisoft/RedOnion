@@ -321,6 +321,10 @@ namespace RedOnion.ROS.Parsing
 					Rewrite(TopInt(mtop), type || create);
 					Debug.Assert(code[idat] == OpCode.Identifier.Code());
 					code[idat] = OpCode.Var.Code(); // rewrite OpCode.Identifier with OpCode.Var
+					int idx = Core.Int(code.items, idat+1);
+					if (ctx == null)
+						ctx = new Context();
+					ctx.Add(strings[idx]);
 					return op;
 				}
 

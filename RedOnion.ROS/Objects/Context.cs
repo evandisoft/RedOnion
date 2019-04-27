@@ -7,29 +7,87 @@ using System.Text;
 
 namespace RedOnion.ROS.Objects
 {
+	/// <summary>
+	/// Function/script execution context.
+	/// Enhanced version of <see cref="Parsing.Parser.Context"/>
+	/// </summary>
 	[DebuggerDisplay("{BlockCount}/{BlockCode}; {prop.DebugString}")]
 	public class Context : UserObject
 	{
-		protected struct Shadow
-		{
-			public int prev, next;
-		}
+		/// <summary>
+		/// Variables added/shadowed by current/inner block (blockStack.Top())
+		/// and stored state of outer block (blockStack.Push()/Pop()).
+		/// Enhanced version of <see cref="Parsing.Parser.Context.Block"/>
+		/// </summary>
 		protected struct Block
 		{
+			// INNER: (used through blockStack.Top() for current block)
+
+			/// <summary>
+			/// Variables added by inner/current block
+			/// (outermost block does not need to track this)
+			/// </summary>
+			public ListCore<string> added;
+			/// <summary>
+			/// Previous indexes of shadowed variables (by inner/current block)
+			/// </summary>
+			public Dictionary<string, int> shadow;
+			/// <summary>
+			/// Starting prop.size (index of first variable in current/inner block)
+			/// </summary>
+			public int varsFrom;
+			/// <summary>
+			/// Number of variables preserved on reset (varsLock >= varsFrom >= prop.size)
+			/// </summary>
+			public int varsLock;
+			/// <summary>
+			/// Number of added variables preserved on reset (addedLock <= added.size)
+			/// </summary>
+			public int addedLock;
+
+			// OUTER: (stored and restored through blockStack.Push()/Pop())
+
 			public int start, end;
 			public int at1, at2;
-			public int propSize, lockSize1, lockSize2;
-			public Dictionary<string, Shadow> shadow;
-			public ListCore<string> added;
+
+			// NOTE: last for better object layout
+
+			/// <summary>
+			/// Code/type of the block
+			/// </summary>
 			public OpCode op;
 		}
-		protected ListCore<Block> blocks;
-		public int BlockCount => blocks.size;
+		/// <summary>
+		/// Stack of blocks
+		/// </summary>
+		protected ListCore<Block> blockStack;
+		/// <summary>
+		/// Number of outer blocks
+		/// </summary>
+		public int BlockCount => blockStack.size;
+
+		// temporary solution - will change
 		public int BlockLock { get; protected set; }
+
+		/// <summary>
+		/// Starting position of the block
+		/// </summary>
 		public int BlockStart { get; protected set; }
+		/// <summary>
+		/// Position after the block
+		/// </summary>
 		public int BlockEnd { get; protected set; }
+		/// <summary>
+		/// First important position in the block (usualy condition of the loop)
+		/// </summary>
 		public int BlockAt1 { get; protected set; }
+		/// <summary>
+		/// Second important position (final expression of for-loop)
+		/// </summary>
 		public int BlockAt2 { get; protected set; }
+		/// <summary>
+		/// Code/type of current block
+		/// </summary>
 		public OpCode BlockCode { get; set; }
 
 		private int rootStart;
@@ -73,9 +131,9 @@ namespace RedOnion.ROS.Objects
 			if (src.dict != null)
 				dict = new Dictionary<string, int>(src.dict);
 			readOnlyTop = src.readOnlyTop;
-			foreach (var b in src.blocks)
-				blocks.Add() = b;
-			BlockLock = blocks.size;
+			foreach (var b in src.blockStack)
+				blockStack.Add() = b;
+			BlockLock = blockStack.size;
 		}
 
 		public override void Reset()
@@ -86,15 +144,15 @@ namespace RedOnion.ROS.Objects
 
 		public void Push(int start, int end, OpCode op = OpCode.Block, int at1 = 0, int at2 = 0)
 		{
-			ref var block = ref blocks.Add();
+			ref var block = ref blockStack.Add();
 			block.op = BlockCode;
 			block.start = BlockStart;
 			block.end = BlockEnd;
 			block.at1 = BlockAt1;
 			block.at2 = BlockAt2;
-			block.propSize = prop.size;
-			block.lockSize1 = prop.size;
-			block.lockSize2 = 0;
+			block.varsFrom = prop.size;
+			block.varsLock = prop.size;
+			block.addedLock = 0;
 
 			BlockCode = op;
 			BlockStart = start;
@@ -104,38 +162,38 @@ namespace RedOnion.ROS.Objects
 		}
 		public void LockTop()
 		{
-			if (blocks.size <= BlockLock)
+			if (blockStack.size <= BlockLock)
 				return;
-			ref var top = ref blocks.Top();
-			top.lockSize1 = prop.size;
-			top.lockSize2 = top.added.size;
+			ref var top = ref blockStack.Top();
+			top.varsLock = prop.size;
+			top.addedLock = top.added.size;
 		}
 		public void ResetTop()
 		{
-			if (blocks.size <= BlockLock)
+			if (blockStack.size <= BlockLock)
 				return;
-			ref var top = ref blocks.Top();
-			prop.Count = top.lockSize1;
-			for (var i = top.lockSize2; i < top.added.size; i++)
+			ref var top = ref blockStack.Top();
+			prop.Count = top.varsLock;
+			for (var i = top.addedLock; i < top.added.size; i++)
 				dict.Remove(top.added.items[i]);
 			var shadow = top.shadow;
 			if (shadow == null)
 				return;
 			foreach (var pair in shadow)
 			{
-				if (pair.Value.next < prop.Count)
+				if (pair.Value < prop.Count)
 					continue;
-				dict[pair.Key] = pair.Value.prev;
+				dict[pair.Key] = pair.Value;
 			}
 			shadow.Clear();
 		}
 		public int Pop()
 		{
-			if (blocks.size <= BlockLock)
+			if (blockStack.size <= BlockLock)
 				throw InvalidOperation("No block left to remove");
 
-			ref var top = ref blocks.Top();
-			prop.Count = top.propSize;
+			ref var top = ref blockStack.Top();
+			prop.Count = top.varsFrom;
 			BlockStart = top.start;
 			BlockEnd = top.end;
 			BlockAt1 = top.at1;
@@ -144,11 +202,11 @@ namespace RedOnion.ROS.Objects
 			var shadow = top.shadow;
 			foreach (var name in top.added)
 				dict.Remove(name);
-			blocks.size--;
+			blockStack.size--;
 			if (shadow != null)
 			{
 				foreach (var pair in shadow)
-					dict[pair.Key] = pair.Value.prev;
+					dict[pair.Key] = pair.Value;
 				shadow.Clear();
 			}
 			return BlockEnd;
@@ -160,22 +218,22 @@ namespace RedOnion.ROS.Objects
 			BlockAt1 = 0;
 			BlockAt2 = 0;
 			var propSize = prop.size;
-			while (blocks.size > BlockLock)
+			while (blockStack.size > BlockLock)
 			{
-				ref var top = ref blocks.Top();
-				propSize = top.propSize;
+				ref var top = ref blockStack.Top();
+				propSize = top.varsFrom;
 				var shadow = top.shadow;
 				foreach (var name in top.added)
 					dict.Remove(name);
 				if (shadow != null)
 				{
 					foreach (var pair in shadow)
-						dict[pair.Key] = pair.Value.next;
+						dict[pair.Key] = pair.Value;
 					shadow.Clear();
 				}
-				blocks.size--;
+				blockStack.size--;
 			}
-			blocks.size = 0;
+			blockStack.size = 0;
 			prop.Count = propSize;
 		}
 
@@ -187,18 +245,14 @@ namespace RedOnion.ROS.Objects
 			it.value = value;
 			if (name != null)
 			{
-				if (blocks.size > 0)
+				if (blockStack.size > 0)
 				{
-					ref var top = ref blocks.Top();
+					ref var top = ref blockStack.Top();
 					if (dict != null && dict.ContainsKey(name))
 					{
 						if (top.shadow == null)
-							top.shadow = new Dictionary<string, Shadow>(StringComparer.OrdinalIgnoreCase);
-						top.shadow[name] = new Shadow()
-						{
-							prev = dict[name],
-							next = idx
-						};
+							top.shadow = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+						top.shadow[name] = dict[name];
 					}
 					else
 						top.added.Add(name);

@@ -40,6 +40,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core.Exec.cs" />
     <Compile Include="Descriptors\ReflectedMethods.cs" />
     <Compile Include="Descriptors\All.cs" />
     <Compile Include="Descriptors\Bool.cs" />
@@ -69,6 +70,7 @@
     <Compile Include="Parsing\Classes.cs" />
     <Compile Include="Parsing\Code.cs" />
     <Compile Include="Parsing\Expressions.cs" />
+    <Compile Include="Parsing\Functions.cs" />
     <Compile Include="Parsing\Lexer.cs" />
     <Compile Include="Parsing\Operators.cs" />
     <Compile Include="Parsing\Errors.cs" />
