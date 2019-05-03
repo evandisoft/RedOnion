@@ -9,8 +9,40 @@ namespace RedOnion.ROS.Objects
 	/// Script object created by `new object` or any function or class in the script.
 	/// The design is based on JavaScript (ECMA-262)
 	/// </summary>
+	public class UserObject : UserObject<UserObject>
+	{
+		public UserObject()	: base() { }
+		public UserObject(string name) : base(name) { }
+		public UserObject(string name, Type type) : base(name, type) { }
+		public UserObject(string name, Type type, UserObject parent) : base(name, type, parent) { }
+
+		public UserObject(Type type) : base(type) { }
+		public UserObject(Type type, UserObject parent) : base(type, parent) { }
+
+		public UserObject(UserObject parent) : base(parent) { }
+		public UserObject(string name, UserObject parent) : base(name, parent) { }
+
+		internal UserObject(string name, Type type,
+			ExCode primitive, TypeCode typeCode, UserObject parent)
+			: base(name, type, primitive, typeCode, parent) { }
+
+		/// <summary>
+		/// Create new user object inheriting from this one
+		/// </summary>
+		public override bool Call(ref Value result, object self, Arguments args, bool create)
+		{
+			var it = new UserObject(this);
+			result = new Value(it, it);
+			return true;
+		}
+	}
+
+	/// <summary>
+	/// Script object created by `new object` or any function or class in the script.
+	/// The design is based on JavaScript (ECMA-262)
+	/// </summary>
 	[DebuggerDisplay("{Name}; {prop.DebugString}")]
-	public class UserObject : Descriptor
+	public class UserObject<P> : Descriptor where P: UserObject<P>
 	{
 		/// <summary>
 		/// Single property of an object (with name and value)
@@ -35,7 +67,7 @@ namespace RedOnion.ROS.Objects
 		/// <summary>
 		/// Parent object (this one is derived from, null if no such)
 		/// </summary>
-		protected UserObject parent;
+		protected P parent;
 		/// <summary>
 		/// Number of locked / read-only properties
 		/// </summary>
@@ -47,35 +79,25 @@ namespace RedOnion.ROS.Objects
 			: base(name, typeof(UserObject)) { }
 		public UserObject(string name, Type type)
 			: base(name, type) { }
-		public UserObject(string name, Type type, UserObject parent)
+		public UserObject(string name, Type type, P parent)
 			: base(name, type)
 			=> this.parent = parent;
 
 		public UserObject(Type type)
 			: base(type.Name, type) { }
-		public UserObject(Type type, UserObject parent)
+		public UserObject(Type type, P parent)
 			: base(type.Name, type)
 			=> this.parent = parent;
 
-		public UserObject(UserObject parent)
+		public UserObject(P parent)
 			: this() => this.parent = parent;
-		public UserObject(string name, UserObject parent)
+		public UserObject(string name, P parent)
 			: this(name, typeof(UserObject))
 			=> this.parent = parent;
 
-		internal UserObject(string name, Type type, ExCode primitive, TypeCode typeCode, UserObject parent)
+		internal UserObject(string name, Type type, ExCode primitive, TypeCode typeCode, P parent)
 			: base(name, type, primitive, typeCode)
 			=> this.parent = parent;
-
-		/// <summary>
-		/// Create new user object inheriting from this one
-		/// </summary>
-		public override bool Call(ref Value result, object self, Arguments args, bool create)
-		{
-			var it = new UserObject(this);
-			result = new Value(it, it);
-			return true;
-		}
 
 		/// <summary>
 		/// Make all current properties read-only

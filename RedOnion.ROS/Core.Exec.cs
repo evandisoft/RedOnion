@@ -12,94 +12,89 @@ namespace RedOnion.ROS
 			var at = this.at;
 			var code = this.code;
 			var str = this.str;
-			int blockEnd = code.Length;
-			if (ctx != null)
-			{
-				ctx.RootStart = 0;
-				ctx.RootEnd = code.Length;
-				blockEnd = ctx.BlockEnd;
-			}
+			int blockEnd = ctx.BlockEnd;
 			try
 			{
 				for (; ; )
 				{
 					#region Block exit and countdown
 
-					if (ctx != null)
+					while (at == blockEnd)
 					{
-						while (at == blockEnd && ctx.BlockCount > 0)
+						if (ctx.BlockCount == 0)
+							goto finishNoReturn;
+
+						if (countdown <= 0)
 						{
-							if (countdown <= 0)
+							this.at = at;
+							Exit = OpCode.Yield;
+							Countdown = countdown;
+							return false;
+						}
+						countdown--;
+
+						switch (ctx.BlockCode)
+						{
+						default:
+							blockEnd = ctx.Pop();
+							continue;
+						case OpCode.While:
+						case OpCode.Until:
+						case OpCode.For:
+							at = ctx.BlockAt1;
+							continue;
+						case OpCode.Do:
+						case OpCode.DoUntil:
+						{
+							ref var cond = ref vals.Top();
+							if (cond.IsReference && !cond.desc.Get(ref cond, cond.num.Int))
+								throw CouldNotGet(ref cond);
+							if (cond.desc.Primitive != ExCode.Bool && !cond.desc.Convert(ref cond, Descriptor.Bool))
+								throw InvalidOperation("Could not convert '{0}' to boolean", cond.Name);
+
+							if (cond.num.Bool != (ctx.BlockCode == OpCode.Do))
 							{
-								this.at = at;
-								Exit = OpCode.Yield;
-								Countdown = countdown;
-								return false;
-							}
-							countdown--;
-							switch (ctx.BlockCode)
-							{
-							default:
 								blockEnd = ctx.Pop();
 								continue;
-							case OpCode.While:
-							case OpCode.Until:
-							case OpCode.For:
-								at = ctx.BlockAt1;
-								continue;
-							case OpCode.Do:
-							case OpCode.DoUntil:
+							}
+							at = ctx.BlockStart;
+							ctx.ResetTop();
+							continue;
+						}
+						case OpCode.ForEach:
+						{
+							var enu = (IEnumerator<Value>)vals.Top(-1).obj;
+							if (!enu.MoveNext())
 							{
-								ref var cond = ref vals.Top();
-								if (cond.IsReference && !cond.desc.Get(ref cond, cond.num.Int))
-									throw CouldNotGet(ref cond);
-								if (cond.desc.Primitive != ExCode.Bool && !cond.desc.Convert(ref cond, Descriptor.Bool))
-									throw InvalidOperation("Could not convert '{0}' to boolean", cond.Name);
-
-								if (cond.num.Bool != (ctx.BlockCode == OpCode.Do))
-								{
-									blockEnd = ctx.Pop();
-									continue;
-								}
-								at = ctx.BlockStart;
-								ctx.ResetTop();
+								vals.Pop(2);
+								blockEnd = ctx.Pop();
 								continue;
 							}
-							case OpCode.ForEach:
-							{
-								var enu = (IEnumerator<Value>)vals.Top(-1).obj;
-								if (!enu.MoveNext())
-								{
-									vals.Pop(2);
-									blockEnd = ctx.Pop();
-									continue;
-								}
-								ref var evar = ref vals.Top(-2);
-								var value = enu.Current;
-								if (!evar.desc.Set(ref evar, evar.num.Int, OpCode.Assign, ref value))
-									throw InvalidOperation(
-										"Property '{0}' of '{1}' is read only",
-										evar.desc.NameOf(evar.obj, evar.num.Int), evar.desc.Name);
-								at = ctx.BlockStart;
-								ctx.ResetTop();
-								continue;
-							}
-							case OpCode.Function:
-								ref var top = ref stack.Top();
-								var vtop = top.vtop;
-								ref var result = ref vals.GetRef(vals.Count, vtop - 1);
-								if (top.create) result = self;
-								vals.Pop(vals.Count - top.vtop);
-								this.at = at = top.at;
-								compiled = top.code;
-								this.code = code = compiled.Code;
-								this.str = str = compiled.Strings;
-								self = top.prevSelf;
-								ctx.PopAll();
-								ctx = top.context;
-								stack.Pop();
-								continue;
-							}
+							ref var evar = ref vals.Top(-2);
+							var value = enu.Current;
+							if (!evar.desc.Set(ref evar, evar.num.Int, OpCode.Assign, ref value))
+								throw InvalidOperation(
+									"Property '{0}' of '{1}' is read only",
+									evar.desc.NameOf(evar.obj, evar.num.Int), evar.desc.Name);
+							at = ctx.BlockStart;
+							ctx.ResetTop();
+							continue;
+						}
+						case OpCode.Function:
+							ref var top = ref stack.Top();
+							var vtop = top.vtop;
+							ref var result = ref vals.GetRef(vals.Count, vtop - 1);
+							if (top.create) result = self;
+							vals.Pop(vals.Count - top.vtop);
+							this.at = at = top.at;
+							compiled = top.code;
+							this.code = code = compiled.Code;
+							this.str = str = compiled.Strings;
+							self = top.prevSelf;
+							ctx.PopAll();
+							ctx = top.context;
+							stack.Pop();
+							continue;
 						}
 					}
 					if (countdown <= 0)
@@ -110,8 +105,6 @@ namespace RedOnion.ROS
 						return false;
 					}
 					countdown--;
-					if (at >= code.Length)
-						break;
 
 					#endregion
 
@@ -121,6 +114,7 @@ namespace RedOnion.ROS
 					this.at = at;
 					switch (op)
 					{
+
 					#region Constants, literals and references
 
 					//--------------------------------------------------------------------- literals
@@ -524,8 +518,6 @@ namespace RedOnion.ROS
 						ref var rhs = ref vals.Top(-1);
 						if (rhs.IsReference && !rhs.desc.Get(ref rhs, rhs.num.Int))
 							throw CouldNotGet(ref rhs);
-						if (ctx == null)
-							ctx = new Context(0, code.Length);
 						var idx = ctx.Add(name, ref rhs);
 						vals.Pop(1);
 						ref var it = ref vals.Top();
@@ -725,6 +717,7 @@ namespace RedOnion.ROS
 							self = top.prevSelf;
 							ctx.PopAll();
 							ctx = top.context;
+							blockEnd = ctx.BlockEnd;
 							stack.Pop();
 							continue;
 						}
@@ -733,8 +726,6 @@ namespace RedOnion.ROS
 
 					case OpCode.Break:
 						at = blockEnd;
-						if (ctx == null)
-							continue;
 						while (ctx.BlockCount > 0
 						&& (ctx.BlockCode < OpCode.For || ctx.BlockCode > OpCode.DoUntil))
 							at = blockEnd = ctx.Pop();
@@ -743,8 +734,6 @@ namespace RedOnion.ROS
 						continue;
 					case OpCode.Continue:
 					{
-						if (ctx == null)
-							throw InvalidOperation("No block to continue");
 						var origin = at;
 						while (ctx.BlockCount > 0
 						&& (ctx.BlockCode < OpCode.For || ctx.BlockCode > OpCode.DoUntil))
@@ -780,8 +769,6 @@ namespace RedOnion.ROS
 						var finSz = Int(code, finAt - 4);
 						var blkAt = finAt + finSz + 4;
 						var blkSz = Int(code, blkAt - 4);
-						if (ctx == null)
-							ctx = new Context(0, code.Length);
 						ctx.Push(blkAt, blockEnd = blkAt + blkSz, op, finAt, at + iniSz);
 						continue;
 					}
@@ -794,8 +781,6 @@ namespace RedOnion.ROS
 						at += 4;
 						var blkAt = at + varSz + listSz + 4;
 						var blkSz = Int(code, blkAt - 4);
-						if (ctx == null)
-							ctx = new Context(0, code.Length);
 						ctx.Push(blkAt, blockEnd = blkAt + blkSz, op, at, at + varSz);
 						continue;
 					}
@@ -807,8 +792,6 @@ namespace RedOnion.ROS
 						var csz = Int(code, at);
 						at += 4;
 						var bsz = Int(code, at + csz);
-						if (ctx == null)
-							ctx = new Context(0, code.Length);
 						ctx.Push(at + csz + 4, blockEnd = at + csz + 4 + bsz, op, at);
 						continue;
 					}
@@ -820,8 +803,6 @@ namespace RedOnion.ROS
 						at += 4;
 						int bsz = Int(code, at);
 						at += 4;
-						if (ctx == null)
-							ctx = new Context(0, code.Length);
 						ctx.Push(at, blockEnd = at + bsz + csz, op, at + bsz);
 						continue;
 					}
@@ -853,8 +834,6 @@ namespace RedOnion.ROS
 					{
 						int sz = Int(code, at);
 						at += 4;
-						if (ctx == null)
-							ctx = new Context(0, code.Length);
 						ctx.Push(at, blockEnd = at + sz);
 						continue;
 					}
@@ -916,7 +895,7 @@ namespace RedOnion.ROS
 					case OpCode.Pop:
 						countdown++; // do not even count this instruction
 						result = vals.Pop();
-						if (ctx?.BlockCode == OpCode.For && at == ctx.BlockStart - 4)
+						if (ctx.BlockCode == OpCode.For && at == ctx.BlockStart - 4)
 							at = ctx.BlockAt2;
 						continue;
 					case OpCode.Yield:
@@ -929,9 +908,31 @@ namespace RedOnion.ROS
 					#region Function
 
 					case OpCode.Function:
+					// byte      OpCode.Function
+					// string    name (int index to strings)
+					// int       size of header (number of following bytes)
+					// ushort    type/access flags (reserved for methods)
+					// byte      number of generic parameters
+					// byte      number of arguments
+					// int       size of return type
+					// code      return type (e.g. OpCode.Void)
+					// arguments - array of
+					//   string    argument name (int index to strings)
+					//   int       argument type size
+					//   code      argument type (OpCode.Void for universal)
+					//   int       argument default value size
+					//   code      argument default value (OpCode.Void for none)
+					// (end of header)
+					// 
+					// int       code size
+					// code      code
+					// int       tail size
+					// int       number of captured variables
+					// string[]  list of captured variables (indexes to strings)
 					{
 						// header
-						var fname = str[Int(code, at)];
+						var fnidx = Int(code, at);
+						var fname = fnidx < 0 ? null : str[fnidx];
 						at += 4;
 						var size = Int(code, at);
 						at += 4;
@@ -963,20 +964,28 @@ namespace RedOnion.ROS
 						at = body;
 						size = Int(code, at);
 						at += 4;
-						var it = new Function(fname, null,
-							compiled, at, size, ftat, args, ctx);
-						if (fname.Length != 0)
-						{
-							if (ctx == null)
-								ctx = new Context(0, code.Length);
-							ctx.Add(fname, it);
-						}
-						else vals.Add(new Value(it));
+						int bodyAt = at;
+						int bodySz = size;
 						at += size;
 
 						// tail
 						size = Int(code, at);
-						at += 4+size;
+						at += 4;
+						HashSet<string> cvars = null;
+						if (size >= 8)
+						{
+							int nvars = Int(code, at);
+							cvars = new HashSet<string>();
+							for (int i = 0, j = at+4; i < nvars; i++, j += 4)
+								cvars.Add(str[Int(code, j)]);
+						}
+						at += size;
+
+						var it = new Function(fname, null,
+							compiled, bodyAt, bodySz, ftat, args, ctx, cvars);
+						if (fname?.Length > 0)
+							ctx.Add(fname, it);
+						else vals.Add(new Value(it));
 						continue;
 					}
 					#endregion
@@ -985,6 +994,7 @@ namespace RedOnion.ROS
 						throw new NotImplementedException("Not implemented: " + op.ToString());
 					}
 				}
+			finishNoReturn:
 				Exit = OpCode.Void;
 			finish:
 				if (vals.Count > 0)
@@ -992,7 +1002,7 @@ namespace RedOnion.ROS
 				if (result.IsReference && !result.desc.Get(ref result, result.num.Int))
 					throw CouldNotGet(ref result);
 				vals.Clear();
-				ctx?.PopAll();
+				ctx.PopAll();
 				Countdown = countdown;
 				return true;
 			}

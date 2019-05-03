@@ -11,8 +11,8 @@ namespace RedOnion.ROS.Objects
 	/// Function/script execution context.
 	/// Enhanced version of <see cref="Parsing.Parser.Context"/>
 	/// </summary>
-	[DebuggerDisplay("{BlockCount}/{BlockCode}; {prop.DebugString}")]
-	public class Context : UserObject
+	[DebuggerDisplay("{Name}: {BlockCount}/{BlockCode}; {prop.DebugString}")]
+	public class Context : UserObject<Context>
 	{
 		/// <summary>
 		/// Variables added/shadowed by current/inner block (blockStack.Top())
@@ -50,8 +50,6 @@ namespace RedOnion.ROS.Objects
 			public int start, end;
 			public int at1, at2;
 
-			// NOTE: last for better object layout
-
 			/// <summary>
 			/// Code/type of the block
 			/// </summary>
@@ -65,9 +63,6 @@ namespace RedOnion.ROS.Objects
 		/// Number of outer blocks
 		/// </summary>
 		public int BlockCount => blockStack.size;
-
-		// temporary solution - will change
-		public int BlockLock { get; protected set; }
 
 		/// <summary>
 		/// Starting position of the block
@@ -89,6 +84,28 @@ namespace RedOnion.ROS.Objects
 		/// Code/type of current block
 		/// </summary>
 		public OpCode BlockCode { get; set; }
+
+		/// <summary>
+		/// Indicator of closure (fully or partially separated from live context)
+		/// </summary>
+		public bool Closure { get; protected set; }
+		/// <summary>
+		/// Captured variables that we cannot copy yet.
+		/// Value is either -1 or index to props (already reserved slot)
+		/// </summary>
+		public HashSet<string> Captured { get; protected set; }
+		/// <summary>
+		/// Parent context
+		/// </summary>
+		public Context Parent => parent;
+		/// <summary>
+		/// Inner closures (functions) that need to be separated
+		/// </summary>
+		public ListCore<Context> closures;
+		/// <summary>
+		/// Link from function-context to its separating closure-context
+		/// </summary>
+		public Context Cousin { get; protected set; }
 
 		private int rootStart;
 		public int RootStart
@@ -113,27 +130,25 @@ namespace RedOnion.ROS.Objects
 			}
 		}
 
-		public Context(int rootStart, int rootEnd)
-			: base(typeof(Context))
+		public Context() : base(typeof(Context)) { }
+
+		public Context(Context parent, Function fn, HashSet<string> cvars)
+			: base("Context of " + fn.Name, typeof(Context), cvars != null ? parent : null)
 		{
-			RootStart = rootStart;
-			RootEnd = rootEnd;
+			RootStart = fn.CodeAt;
+			RootEnd = fn.CodeAt + fn.CodeSize;
+			Captured = cvars;
+			if (cvars != null)
+				parent.closures.Add(this);
 		}
-		public Context(Context src, int rootStart, int rootEnd)
-			: base(typeof(Context))
+		protected Context(Context cousin)
+			: base(cousin.Name.StartsWith("Context of ")
+				  ? "Cousin of " + cousin.Name.Substring(11)
+				  : "Cousin Contex", typeof(Context), cousin)
 		{
-			RootStart = rootStart;
-			RootEnd = rootEnd;
-			if (src == null)
-				return;
-			foreach (var p in src.prop)
-				prop.Add() = p;
-			if (src.dict != null)
-				dict = new Dictionary<string, int>(src.dict);
-			readOnlyTop = src.readOnlyTop;
-			foreach (var b in src.blockStack)
-				blockStack.Add() = b;
-			BlockLock = blockStack.size;
+			RootStart = cousin.RootStart;
+			RootEnd = cousin.RootEnd;
+			Closure = true;
 		}
 
 		public override void Reset()
@@ -162,7 +177,7 @@ namespace RedOnion.ROS.Objects
 		}
 		public void LockTop()
 		{
-			if (blockStack.size <= BlockLock)
+			if (blockStack.size == 0)
 				return;
 			ref var top = ref blockStack.Top();
 			top.varsLock = prop.size;
@@ -170,7 +185,7 @@ namespace RedOnion.ROS.Objects
 		}
 		public void ResetTop()
 		{
-			if (blockStack.size <= BlockLock)
+			if (blockStack.size == 0)
 				return;
 			ref var top = ref blockStack.Top();
 			prop.Count = top.varsLock;
@@ -189,19 +204,22 @@ namespace RedOnion.ROS.Objects
 		}
 		public int Pop()
 		{
-			if (blockStack.size <= BlockLock)
+			if (blockStack.size == 0)
 				throw InvalidOperation("No block left to remove");
 
 			ref var top = ref blockStack.Top();
-			prop.Count = top.varsFrom;
 			BlockStart = top.start;
 			BlockEnd = top.end;
 			BlockAt1 = top.at1;
 			BlockAt2 = top.at2;
 			BlockCode = top.op;
 			var shadow = top.shadow;
-			foreach (var name in top.added)
-				dict.Remove(name);
+			if (closures.size > 0)
+				SeparateVars(ref top.added);
+			else
+				foreach (var name in top.added)
+					dict.Remove(name);
+			prop.Count = top.varsFrom;
 			blockStack.size--;
 			if (shadow != null)
 			{
@@ -218,13 +236,16 @@ namespace RedOnion.ROS.Objects
 			BlockAt1 = 0;
 			BlockAt2 = 0;
 			var propSize = prop.size;
-			while (blockStack.size > BlockLock)
+			while (blockStack.size > 0)
 			{
 				ref var top = ref blockStack.Top();
 				propSize = top.varsFrom;
 				var shadow = top.shadow;
-				foreach (var name in top.added)
-					dict.Remove(name);
+				if (closures.size > 0)
+					SeparateVars(ref top.added);
+				else
+					foreach (var name in top.added)
+						dict.Remove(name);
 				if (shadow != null)
 				{
 					foreach (var pair in shadow)
@@ -235,6 +256,39 @@ namespace RedOnion.ROS.Objects
 			}
 			blockStack.size = 0;
 			prop.Count = propSize;
+		}
+		protected void SeparateVars(ref ListCore<string> added)
+		{
+			Debug.Assert(closures.size > 0);
+			Debug.Assert(!Closure);
+			foreach (var name in added)
+			{
+				foreach (var closure in closures)
+				{
+					if (closure.Captured?.Contains(name) != true)
+						continue;
+					closure.Captured.Remove(name);
+					if (closure.Captured.Count == 0)
+						closure.Captured = null;
+
+					var cousin = Cousin;
+					if (cousin == null)
+						Cousin = cousin = new Context(this);
+					closure.parent = Cousin;
+					if (cousin.dict == null || !cousin.dict.TryGetValue(name, out var newIdx))
+					{
+						newIdx = cousin.prop.size;
+						cousin.prop.Add() = prop[dict[name]];
+						if (cousin.dict == null)
+							cousin.dict = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+						cousin.dict[name] = newIdx;
+					}
+					int idx = closure.Find(name);
+					Debug.Assert(idx >= 0);
+					closure.prop.items[idx].value.SetRef(cousin, newIdx);
+				}
+				dict.Remove(name);
+			}
 		}
 
 		public override int Add(string name, ref Value value)
@@ -262,6 +316,67 @@ namespace RedOnion.ROS.Objects
 				dict[name] = idx;
 			}
 			return idx;
+		}
+
+		public override int Find(string name)
+		{
+			if (dict != null && dict.TryGetValue(name, out var idx))
+				return idx;
+			if (parent == null)
+				return -1;
+
+			if (Captured?.Contains(name) == true)
+			{
+				for (var obj = parent; ;)
+				{
+					if (obj.dict.TryGetValue(name, out var refIdx))
+					{
+						idx = prop.size;
+						ref var link = ref prop.Add();
+						link.name = name;
+						link.value.SetRef(obj, refIdx);
+						return idx;
+					}
+					obj = obj.parent;
+					if (obj == null)
+						return -1;
+				}
+			}
+
+			idx = parent.Find(name);
+			if (idx < 0)
+				return idx;
+			return Add(name, ref parent.prop.items[idx].value);
+		}
+		public override bool Get(ref Value self, int at)
+		{
+			if (at < 0 || at >= prop.size)
+				return false;
+			self = prop.items[at].value;
+			if (self.IsReference)
+				return self.desc.Get(ref self, self.num.Int);
+			return true;
+		}
+		public override bool Set(ref Value self, int at, OpCode op, ref Value value)
+		{
+			if (at < readOnlyTop || at >= prop.size)
+				return false;
+			ref var it = ref prop.items[at].value;
+			if (it.IsReference)
+				return it.desc.Set(ref self, it.num.Int, op, ref value);
+			if (op == OpCode.Assign)
+			{
+				it = value;
+				return true;
+			}
+			if (op.Kind() == OpKind.Assign)
+				return it.desc.Binary(ref it, op + 0x10, ref value);
+			if (op.Kind() != OpKind.PreOrPost)
+				return false;
+			if (op >= OpCode.Inc)
+				return it.desc.Unary(ref it, op);
+			self = it;
+			return it.desc.Unary(ref it, op + 0x08);
 		}
 	}
 }

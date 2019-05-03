@@ -119,8 +119,8 @@ namespace RedOnion.ROS.Parsing
 			values.Clear();
 			lineMap.Clear();
 			lines.Clear();
-			ctx?.Clear();
-			stack.Clear();
+			ctx.Clear();
+			ctxPool.Clear();
 			labelTable?.Clear();
 			gotoTable?.Clear();
 			ParentIndent = -1;

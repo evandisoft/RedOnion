@@ -73,8 +73,8 @@ namespace RedOnion.ROS.Objects
 		/// </summary>
 		public Function(string name, UserObject baseClass,
 			CompiledCode code, int codeAt, int codeSize, int typeAt,
-			ArgumentInfo[] args, Context context)
-			: base(name, typeof(Function), ExCode.Function, TypeCode.Object, baseClass)
+			ArgumentInfo[] args, Context context, HashSet<string> cvars)
+			: base(name ?? "lambda", typeof(Function), ExCode.Function, TypeCode.Object, baseClass)
 		{
 			Code = code;
 			CodeAt = codeAt;
@@ -82,7 +82,7 @@ namespace RedOnion.ROS.Objects
 			TypeAt = typeAt;
 			Arguments = args;
 			ArgsString = args == null ? "" : string.Join(", ", args.Select(x => x.Name).ToArray());
-			Context = new Context(context, codeAt, codeAt + codeSize);
+			Context = new Context(context, this, cvars);
 			Add("prototype", Value.Null);
 		}
 

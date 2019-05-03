@@ -46,6 +46,10 @@ namespace RedOnion.ROS
 				Exit = OpCode.Void;
 				result = Value.Void;
 				compiled = value;
+				if (ctx == null)
+					ctx = new Context();
+				ctx.RootStart = 0;
+				ctx.RootEnd = code.Length;
 			}
 		}
 
@@ -68,7 +72,7 @@ namespace RedOnion.ROS
 		public void Dispose() => Dispose(true);
 		protected virtual void Dispose(bool disposing) { }
 
-		public void ResetContext() => ctx?.Reset();
+		public void ResetContext() => ctx.Reset();
 		public bool Execute(string script, string path = null, int countdown = 1000)
 		{
 			Code = Compile(script, path);
@@ -87,7 +91,7 @@ namespace RedOnion.ROS
 				// encountered this for the first time
 				// => try to find it in local variables
 				name = str[idx];
-				found = ctx?.Find(name) ?? -1;
+				found = ctx.Find(name);
 				if (found >= 0)
 				{
 					// we found it to be local, mark it as such

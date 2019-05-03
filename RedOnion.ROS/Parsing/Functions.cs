@@ -69,7 +69,7 @@ namespace RedOnion.ROS.Parsing
 			public void Clear()
 			{
 				varsCount = 0;
-				vars.Clear();
+				vars?.Clear();
 				blockStack.Clear();
 				captured?.Clear();
 			}
@@ -119,8 +119,8 @@ namespace RedOnion.ROS.Parsing
 				}
 			}
 		}
-		public Context ctx;
-		public ListCore<Context> stack;
+		public Context ctx = new Context();
+		public ListCore<Context> ctxPool;
 
 		/// <summary>
 		/// Map of label to code-point
@@ -209,20 +209,21 @@ namespace RedOnion.ROS.Parsing
 		/// </code></remarks>
 		protected virtual void ParseFunction(string name, Flag flags)
 		{
-			// push and swap context
-			ref var newCtx = ref stack.Add();
-			var oldCtx = newCtx;
-			newCtx = ctx;
-			ctx = oldCtx;
+			// swap context
+			var prevCtx = ctx;
+			ctx = ctxPool.size > 0 ? ctxPool.Pop() : new Context();
 
 			// header
-			if (name != null)   // null if parsing lambda / inline function
+			if (name != null)
+			{
 				Write(name);    // function name (index to string table)
+				prevCtx.Add(name);
+			}
 			else
 			{
 				flags |= Flag.Limited;
 				if (!HasOption(Option.Prefix))
-					Write("");
+					Write(-1);	// lambda
 			}
 			Write(0);           // header size
 			int mark = code.size;
@@ -288,17 +289,33 @@ namespace RedOnion.ROS.Parsing
 			var count = ParseBlock(flags);
 			if (lambda && count == 1)
 			{
-				var op = ((OpCode)code.items[blockAt+4]).Extend();
-				if (op == ExCode.Autocall)
-					code.items[blockAt+4] = OpCode.Return.Code();
-				else if (op.Kind() < OpKind.Statement)
+				if (HasOption(Option.Prefix))
 				{
-					code.EnsureCapacity(code.size+1);
-					var sz = BitConverter.ToInt32(code.items, blockAt);
-					Write(++sz, blockAt);
-					Array.Copy(code.items, blockAt+4, code.items, blockAt+5, code.size-blockAt-5);
-					Write(OpCode.Return.Code(), blockAt+4);
-					code.size++;
+					var op = (OpCode)code.items[blockAt+4];
+					if (op == OpCode.Autocall)
+						code.items[blockAt+4] = OpCode.Return.Code();
+					else if (op.Kind() < OpKind.Statement)
+					{
+						code.EnsureCapacity(code.size+1);
+						var sz = Core.Int(code.items, blockAt);
+						Write(++sz, blockAt);
+						Array.Copy(code.items, blockAt+4, code.items, blockAt+5, code.size-blockAt-5);
+						Write(OpCode.Return.Code(), blockAt+4);
+						code.size++;
+					}
+				}
+				else if (lastCode == OpCode.Pop)
+				{
+					Debug.Assert(lastCodeAt == code.size-1);
+					Debug.Assert(!HasOption(Option.AutocallSimple)
+						|| (prevCode == OpCode.Autocall && prevCodeAt == code.size-2));
+					if (prevCode == OpCode.Autocall)
+					{
+						var sz = Core.Int(code.items, blockAt);
+						Write(--sz, blockAt);
+						code.size--;
+					}
+					code.items[code.size-1] = OpCode.Return.Code();
 				}
 			}
 			RestoreLabels(labels);
@@ -312,15 +329,20 @@ namespace RedOnion.ROS.Parsing
 				Write(4+4*captured.Count);
 				Write(captured.Count);
 				foreach (var vname in captured)
+				{
 					Write(vname);
+					if (prevCtx.vars?.ContainsKey(vname) == true)
+						continue;
+					if (prevCtx.captured == null)
+						prevCtx.captured = new HashSet<string>();
+					prevCtx.captured.Add(vname);
+				}
 			}
 
-			// pop and swap context
-			ctx?.Clear();
-			oldCtx = ctx;
-			ctx = newCtx;
-			newCtx = oldCtx;
-			stack.size--;
+			// swap context
+			ctx.Clear();
+			ctxPool.Push(ctx);
+			ctx = prevCtx;
 		}
 	}
 }

@@ -69,7 +69,7 @@ namespace RedOnion.ROS.Tests
 		}
 
 		[Test]
-		public void ROS_Scope04_Closure()
+		public void ROS_Scope05_Closure()
 		{
 			Lines(2,
 				"var x = 1",
@@ -92,7 +92,7 @@ namespace RedOnion.ROS.Tests
 		}
 
 		[Test]
-		public void ROS_Scope05_Arguments()
+		public void ROS_Scope04_Arguments()
 		{
 			Lines(3,
 				"function f a,b",
@@ -122,12 +122,19 @@ namespace RedOnion.ROS.Tests
 				"function f",
 				"  x = 2",				// global x
 				"f.prototype.x = 3",
-				"return (new f).x");	// prototype.x
+				"return (new f).x");    // prototype.x
 
+			// it is questionable whether `x` inside `f`
+			// shoud be `this.x` or global `x` here,
+			// but we want functions to see each other
+			// regardless of the position in the scope
+			// and therefore have the same behaviour
+			// for variables as well (`f` sees global `x`
+			// which has precedence over `this.x`)
 			Reset();
-			Lines(2,
+			Lines(3,
 				"function f",
-				"  x = 2",				// this.x
+				"  x = 2",				// global x !!
 				"var x = 1",
 				"f.prototype.x = 3",
 				"return (new f).x");	// this.x
