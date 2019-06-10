@@ -1,11 +1,10 @@
 using System;
-using RedOnion.Script;
-using KSP.UI.Screens;
-using MoonSharp.Interpreter;
 using System.Collections.Generic;
-using RedOnion.Script.ReflectedObjects;
+using RedOnion.ROS;
+using MoonSharp.Interpreter;
 using RedOnion.KSP.ReflectionUtil;
 using RedOnion.KSP.Completion;
+using KSP.UI.Screens;
 
 namespace RedOnion.KSP.API
 {
@@ -14,7 +13,6 @@ namespace RedOnion.KSP.API
 	public static class ReflectMembers
 	{
 		public static MemberList MemberList { get; } = new MemberList(
-		ObjectFeatures.Function,
 
 @"Reflects/imports native types provided as namespace-qualified string
 (e.g. ""System.Collections.Hashtable"") or assembly-qualified name
@@ -42,13 +40,14 @@ Example: `reflect.new(""System.Collections.ArrayList"")`.",
 
 		public Reflect() : base(ReflectMembers.MemberList) { }
 
-		public override Value Call(IObject self, Arguments args)
+		public override bool Call(ref Value result, object self, Arguments args, bool create)
 		{
 			if (args.Length != 1)
 				throw new InvalidOperationException(args.Length == 0
 					? "Expected assembly-qualified name"
 					: "Too many arguments");
-			return new ReflectedType(args.Engine, ResolveType(args[0].String));
+			result = new Value(ResolveType(args[0].ToStr()));
+			return true;
 		}
 		public override DynValue Call(ScriptExecutionContext ctx, CallbackArguments args)
 		{
@@ -80,17 +79,11 @@ Example: `reflect.new(""System.Collections.ArrayList"")`.",
 				return t;
 			if (o is string s)
 				return ResolveType(s);
-			if (o is IObject obj)
-			{
-				t = obj.Type;
-				if (t != null)
-					return t;
-			}
 			if (o is Value v)
 			{
 				if (v.IsString)
-					return ResolveType(v.String);
-				return v.Native?.GetType();
+					return ResolveType(v.ToStr());
+				return v.obj?.GetType();
 			}
 			if (o is DynValue dyn)
 			{
@@ -163,12 +156,12 @@ Example: `reflect.new(""System.Collections.ArrayList"")`.",
 		public class Constructor : FunctionBase
 		{
 			public static Constructor Instance { get; } = new Constructor();
-			public override Value Call(Arguments args)
+			public override bool Call(ref Value result, object self, Arguments args, bool create)
 			{
 				if (args.Count == 0)
 					throw new InvalidOperationException("Expected at least one argument");
-				return new Value(new ReflectedType(args.Engine, ResolveType(args[0]))
-					.Create(new Arguments(args, args.Length-1)));
+				var it = new Value(ResolveType(args[0]));
+				return it.desc.Call(ref result, null, new Arguments(args, args.Length-1), true);
 			}
 			public override DynValue Call(ScriptExecutionContext ctx, CallbackArguments args)
 			{
@@ -180,10 +173,18 @@ Example: `reflect.new(""System.Collections.ArrayList"")`.",
 		}
 
 		NamespaceInstance map = NamespaceMappings.DefaultAssemblies.GetNamespace("");
-		public override bool Has(string name) => base.Has(name) || map.Has(name);
-		public override bool Get(string name, out Value value)
-			=> base.Get(name, out value) || map.Get(name, out value);
-
+		public override int Find(object self, string name, bool add)
+			=> map.RosFind(name);
+		public override string NameOf(object self, int at)
+			=> map.RosNameOf(at);
+		public override bool Get(ref Value self, int at)
+		{
+			var member = ((IType)self.obj).Members[at];
+			if (!member.CanRead)
+				return false;
+			self = member.RosGet(self.obj);
+			return true;
+		}
 		public IList<string> PossibleCompletions
 		{
 			get

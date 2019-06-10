@@ -175,6 +175,11 @@ namespace RedOnion.ROS.Objects
 			BlockAt1 = at1;
 			BlockAt2 = at2;
 		}
+		/// <summary>
+		/// Lock current variables
+		/// so that they are not removed by <see cref="ResetTop"/>.
+		/// (Used after initialization of a loop)
+		/// </summary>
 		public void LockTop()
 		{
 			if (blockStack.size == 0)
@@ -183,14 +188,21 @@ namespace RedOnion.ROS.Objects
 			top.varsLock = prop.size;
 			top.addedLock = top.added.size;
 		}
+		/// <summary>
+		/// Reset to block.
+		/// (Called when loop is continued)
+		/// </summary>
 		public void ResetTop()
 		{
 			if (blockStack.size == 0)
 				return;
 			ref var top = ref blockStack.Top();
+			if (closures.size > 0)
+				SeparateVars(ref top.added, top.addedLock);
+			else
+				for (var i = top.addedLock; i < top.added.size; i++)
+					dict.Remove(top.added.items[i]);
 			prop.Count = top.varsLock;
-			for (var i = top.addedLock; i < top.added.size; i++)
-				dict.Remove(top.added.items[i]);
 			var shadow = top.shadow;
 			if (shadow == null)
 				return;
@@ -202,6 +214,11 @@ namespace RedOnion.ROS.Objects
 			}
 			shadow.Clear();
 		}
+		/// <summary>
+		/// Pop/remove one block.
+		/// (Called on block exit)
+		/// </summary>
+		/// <returns><see cref="BlockEnd"/> of reactivated block</returns>
 		public int Pop()
 		{
 			if (blockStack.size == 0)
@@ -229,6 +246,10 @@ namespace RedOnion.ROS.Objects
 			}
 			return BlockEnd;
 		}
+		/// <summary>
+		/// Pop/remove/exit all blocks.
+		/// (Called on script/function exit/return)
+		/// </summary>
 		public void PopAll()
 		{
 			BlockStart = RootStart;
@@ -257,12 +278,19 @@ namespace RedOnion.ROS.Objects
 			blockStack.size = 0;
 			prop.Count = propSize;
 		}
-		protected void SeparateVars(ref ListCore<string> added)
+		/// <summary>
+		/// Copy removed variables (on block-exit or loop)
+		/// to cousin context used by closures
+		/// </summary>
+		/// <param name="added">List of added and now removed variables</param>
+		/// <param name="from">Index of first variable to remove</param>
+		protected void SeparateVars(ref ListCore<string> added, int from = 0)
 		{
 			Debug.Assert(closures.size > 0);
 			Debug.Assert(!Closure);
-			foreach (var name in added)
+			for (var i = from; i < added.size; i++)
 			{
+				var name = added.items[i];
 				foreach (var closure in closures)
 				{
 					if (closure.Captured?.Contains(name) != true)

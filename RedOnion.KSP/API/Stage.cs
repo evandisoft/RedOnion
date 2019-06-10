@@ -1,5 +1,5 @@
 using System;
-using RedOnion.Script;
+using RedOnion.ROS;
 using KSP.UI.Screens;
 using MoonSharp.Interpreter;
 
@@ -10,7 +10,6 @@ namespace RedOnion.KSP.API
 	public class Stage : InteropObject
 	{
 		public static MemberList MemberList { get; } = new MemberList(
-		ObjectFeatures.Function,
 
 @"Used to activate next stage and/or get various information about stage(s).
 Returns true on success, if used as function. False if stage was not ready.",
@@ -26,8 +25,11 @@ Returns true on success, if used as function. False if stage was not ready.",
 		public static Stage Instance { get; } = new Stage();
 		public Stage() : base(MemberList) { }
 
-		public override Value Call(IObject self, Arguments args)
-			=> Activate();
+		public override bool Call(ref Value result, object self, Arguments args, bool create)
+		{
+			result = Activate();
+			return true;
+		}
 		public override DynValue Call(ScriptExecutionContext ctx, CallbackArguments args)
 			=> DynValue.NewBoolean(Activate());
 

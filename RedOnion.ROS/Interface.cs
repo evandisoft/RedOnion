@@ -244,7 +244,7 @@ namespace RedOnion.ROS
 		/// <summary>
 		/// Exit code (of last statement, code block or whole program)
 		/// </summary>
-		OpCode Exit { get; }
+		ExitCode Exit { get; }
 		/// <summary>
 		/// Result of last expression (rvalue)
 		/// </summary>
@@ -271,6 +271,34 @@ namespace RedOnion.ROS
 		/// Log message
 		/// </summary>
 		void Log(string msg);
+	}
+
+	/// <summary>
+	/// Exit code (of last statement, code block or whole program)
+	/// </summary>
+	public enum ExitCode : sbyte
+	{
+		/// <summary>
+		/// End of block/program reached without return statement
+		/// </summary>
+		None = 0,
+		/// <summary>
+		/// Return statement
+		/// </summary>
+		Return = 1,
+		/// <summary>
+		/// Yield/wait statement
+		/// </summary>
+		Yield = 2,
+		/// <summary>
+		/// Countdown reached
+		/// </summary>
+		Countdown = 3,
+
+		/// <summary>
+		/// Exception (raise/throw statement)
+		/// </summary>
+		Exception = -1,
 	}
 
 	/// <summary>

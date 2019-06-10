@@ -10,6 +10,9 @@ namespace RedOnion.ROS
 		public Type Type { get; }
 		public ExCode Primitive { get; }
 		public TypeCode TypeCode { get; }
+		public bool IsNumber => Primitive.Kind() == OpKind.Number;
+		public bool IsNumberOrChar { get; }
+		public bool IsStringOrChar { get; }
 		public virtual object Box(ref Value self) => self.obj;
 		public virtual bool Equals(ref Value self, object obj)
 			=> self.obj.Equals(obj);
@@ -30,6 +33,9 @@ namespace RedOnion.ROS
 			Type = type;
 			Primitive = primitive;
 			TypeCode = typeCode;
+			var code = (OpCode)primitive;
+			IsNumberOrChar = code >= OpCode.Char && code <= OpCode.Hyper;
+			IsStringOrChar = code >= OpCode.String && code <= OpCode.LongChar;
 		}
 
 		public override string ToString() => Name;
@@ -62,7 +68,7 @@ namespace RedOnion.ROS
 				return -1;
 			ref var index = ref args.GetRef(0);
 			int at;
-			if (index.IsNumber)
+			if (index.IsNumerOrChar)
 				return -1;
 			if (!index.desc.Convert(ref index, String))
 				return -1;

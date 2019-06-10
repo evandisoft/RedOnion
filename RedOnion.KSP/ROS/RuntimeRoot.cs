@@ -17,11 +17,11 @@ using RedOnion.KSP.Completion;
 namespace RedOnion.KSP
 {
 	[IgnoreForDocs]
-	public class RuntimeRoot : BasicRoot<ROS.KspRosEngine>, IType
+	public class RuntimeRoot : BasicRoot<ROS.RosCore>, IType
 	{
 		public bool IsRepl { get; }
 
-		public RuntimeRoot(ROS.KspRosEngine engine, bool repl)
+		public RuntimeRoot(ROS.RosCore engine, bool repl)
 			: base(engine, fill: false)
 		{
 			IsRepl = repl;
@@ -161,15 +161,15 @@ namespace RedOnion.KSP
 		{
 			IObject it;
 			CreateObject creator;
-			public delegate IObject CreateObject(ROS.KspRosEngine engine);
+			public delegate IObject CreateObject(ROS.RosCore engine);
 			public LazyGet(CreateObject creator)
 			{
 				it = null;
 				this.creator = creator;
 			}
 			public IObject Get(IEngine e)
-				=> it ?? (it = creator((ROS.KspRosEngine)e));
-			public IObject Get(ROS.KspRosEngine e)
+				=> it ?? (it = creator((ROS.RosCore)e));
+			public IObject Get(ROS.RosCore e)
 				=> it ?? (it = creator(e));
 		}
 
@@ -198,7 +198,7 @@ namespace RedOnion.KSP
 	/// <summary>
 	/// Runtime engine with all the features
 	/// </summary>
-	public class RuntimeEngine : ROS.KspRosEngine
+	public class RuntimeEngine : ROS.RosCore
 	{
 		public RuntimeEngine()
 			: base(engine => new RuntimeRoot(engine, repl: false)) { }
@@ -206,7 +206,7 @@ namespace RedOnion.KSP
 	/// <summary>
 	/// Limited engine whith what is safe in REPL / Immediate Mode
 	/// </summary>
-	public class ImmediateEngine : ROS.KspRosEngine
+	public class ImmediateEngine : ROS.RosCore
 	{
 		public ImmediateEngine()
 			: base(engine => new RuntimeRoot(engine, repl: true))
@@ -220,7 +220,7 @@ namespace RedOnion.KSP
 	/// </summary>
 	public class DocumentingEngine : CompletionEngine
 	{
-		public DocumentingEngine(ROS.KspRosEngine engine)
+		public DocumentingEngine(ROS.RosCore engine)
 			: base(engine) { }
 		public override void Log(string msg)
 			=> UE.Debug.Log("[RedOnion.DOC] " + msg);
@@ -248,7 +248,7 @@ namespace RedOnion.KSP
 	/// </summary>
 	public class ReplHintsEngine : DocumentingEngine
 	{
-		public ReplHintsEngine(ROS.KspRosEngine engine)
+		public ReplHintsEngine(ROS.RosCore engine)
 			: base(engine) { }
 		public override void Log(string msg)
 			=> UE.Debug.Log("[RedOnion.ReplDOC] " + msg);

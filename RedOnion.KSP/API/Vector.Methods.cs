@@ -1,12 +1,12 @@
 using MoonSharp.Interpreter;
-using RedOnion.Script;
+using RedOnion.ROS;
 using System;
 
 namespace RedOnion.KSP.API
 {
 	public partial class Vector
 	{
-		public abstract class VectorMethodBase : MethodBase<Vector>
+		public abstract class VectorMethodBase : FunctionBase
 		{
 			/// <summary>
 			/// Get Vector3d or Double from single argument. Returns true if vector.
@@ -16,9 +16,9 @@ namespace RedOnion.KSP.API
 				if (args.Length != 1)
 					throw new InvalidOperationException("Expected one argument");
 				var it = args[0];
-				if (it.IsNumber)
+				if (it.IsNumerOrChar)
 				{
-					d = it.Double;
+					d = it.ToDouble();
 					result = new Vector3d(d, d, d);
 					return false;
 				}
@@ -32,24 +32,26 @@ namespace RedOnion.KSP.API
 		{
 			public static ScaleMethod Instance { get; } = new ScaleMethod();
 
-			public override Value Call(Vector self, Arguments args)
+			public override bool Call(ref Value result, object self, Arguments args, bool create)
 			{
-				self.Native = GetVectorOrNumber(args, out var v, out var f)
-					? Vector3d.Scale(self.Native, v)
-					: new Vector3d(self.X*f, self.Y*f, self.Z*f);
-				return Value.Void;
+				var me = (Vector)self;
+				me.Native = GetVectorOrNumber(args, out var v, out var f)
+					? Vector3d.Scale(me.Native, v)
+					: new Vector3d(me.X*f, me.Y*f, me.Z*f);
+				return true;
 			}
 		}
 		public class ShrinkMethod : VectorMethodBase
 		{
 			public static ShrinkMethod Instance { get; } = new ShrinkMethod();
 
-			public override Value Call(Vector self, Arguments args)
+			public override bool Call(ref Value result, object self, Arguments args, bool create)
 			{
-				self.Native = GetVectorOrNumber(args, out var v, out var f)
-					? new Vector3d(self.X/v.x, self.Y/v.y, self.Z/v.z)
-					: new Vector3d(self.X/f, self.Y/f, self.Z/f);
-				return Value.Void;
+				var me = (Vector)self;
+				me.Native = GetVectorOrNumber(args, out var v, out var f)
+					? new Vector3d(me.X/v.x, me.Y/v.y, me.Z/v.z)
+					: new Vector3d(me.X/f, me.Y/f, me.Z/f);
+				return true;
 			}
 		}
 	}

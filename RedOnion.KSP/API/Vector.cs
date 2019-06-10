@@ -1,7 +1,7 @@
 using MoonSharp.Interpreter;
-using RedOnion.Script;
-using RedOnion.Script.BasicObjects;
+using RedOnion.ROS;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace RedOnion.KSP.API
@@ -10,7 +10,6 @@ namespace RedOnion.KSP.API
 	public partial class Vector : InteropObject, IEquatable<Vector>
 	{
 		public static MemberList MemberList { get; } = new MemberList(
-		ObjectFeatures.Proxy|ObjectFeatures.Operators|ObjectFeatures.Collection,
 
 @"3D vector / coordinate. All the usual operators were implemented,
 multiplication and division can use both vector (per-axis) and number (all-axes).
@@ -39,12 +38,12 @@ Beware that multiplication is scaling, not cross product or dot - use appropriat
 			new Double<Vector>(
 				"z", "The Z-coordinate",
 				v => v.Z, (v, value) => v.Z = value),
-			new Method<Vector>(
+			new Function(
 				"scale", "void",
 				"Scale the vector by a factor (all axes if number is provided, per-axis if Vector)."
 				+ " Multiplication does the same.",
 				() => ScaleMethod.Instance),
-			new Method<Vector>(
+			new Function(
 				"shrink", "void",
 				"Shrink the vector by a factor (all axes if number is provided, per-axis if Vector)."
 				+ " Division does the same.",
@@ -77,21 +76,21 @@ Beware that multiplication is scaling, not cross product or dot - use appropriat
 		public Vector(double x, double y, double z) : this() => Native = new Vector3d(x, y, z);
 		public Vector(double x, double y) : this() => Native = new Vector3d(x, y);
 		public Vector(double all) : this() => Native = new Vector3d(all, all, all);
-		public Vector(IListObject list) : this()
+		public Vector(IList<Value> list) : this()
 		{
 			switch (list.Count)
 			{
 			case 0:
 				return;
 			case 1:
-				var all = list[0].Double;
+				var all = list[0].ToDouble();
 				Native = new Vector3d(all, all, all);
 				return;
 			case 2:
-				Native = new Vector3d(list[0].Double, list[1].Double);
+				Native = new Vector3d(list[0].ToDouble(), list[1].ToDouble());
 				return;
 			default:
-				Native = new Vector3d(list[0].Double, list[1].Double, list[2].Double);
+				Native = new Vector3d(list[0].ToDouble(), list[1].ToDouble(), list[2].ToDouble());
 				return;
 			}
 		}
@@ -102,7 +101,6 @@ Beware that multiplication is scaling, not cross product or dot - use appropriat
 			get => native;
 			set => native = value;
 		}
-		public override object Target => Native;
 		public double X
 		{
 			get => Native.x;
@@ -139,50 +137,42 @@ Beware that multiplication is scaling, not cross product or dot - use appropriat
 		public override string ToString()
 			=> string.Format(Value.Culture, "[{0}, {1}, {2}]", X, Y, Z);
 
-		public override bool Operator(OpCode op, Value arg, bool selfRhs, out Value result)
+		public override bool Unary(ref Value self, OpCode op)
 		{
-			if (op.Unary())
+			switch (op)
 			{
-				switch (op)
-				{
-				case OpCode.Plus:
-					result = new Value(new Vector(Native));
-					return true;
-				case OpCode.Neg:
-					result = new Value(new Vector(-Native));
-					return true;
-				}
-				result = new Value();
-				return false;
+			case OpCode.Plus:
+				self = new Value(new Vector(Native));
+				return true;
+			case OpCode.Neg:
+				self = new Value(new Vector(-Native));
+				return true;
 			}
-			if (VectorCreator.ToVector3d(arg, out var b))
+			return false;
+		}
+		public override bool Binary(ref Value lhs, OpCode op, ref Value rhs)
+		{
+			if (VectorCreator.ToVector3d(lhs, out var a) && VectorCreator.ToVector3d(rhs, out var b))
 			{
-				var a = Native;
-				if (selfRhs)
-				{
-					a = b;
-					b = Native;
-				}
 				switch (op)
 				{
 				case OpCode.Add:
-					result = new Value(new Vector(a + b));
+					lhs = new Value(new Vector(a + b));
 					return true;
 				case OpCode.Sub:
-					result = new Value(new Vector(a - b));
+					lhs = new Value(new Vector(a - b));
 					return true;
 				case OpCode.Mul:
-					result = new Value(new Vector(a.x * b.x, a.y * b.y, a.z * b.z));
+					lhs = new Value(new Vector(a.x * b.x, a.y * b.y, a.z * b.z));
 					return true;
 				case OpCode.Div:
-					result = new Value(new Vector(a.x / b.x, a.y / b.y, a.z / b.z));
+					lhs = new Value(new Vector(a.x / b.x, a.y / b.y, a.z / b.z));
 					return true;
 				}
 			}
-			result = new Value();
 			return false;
 		}
-		public override DynValue LuaOperator(string metaname)
+		public override DynValue MetaIndex(Script script, string metaname)
 		{
 			switch (metaname)
 			{
@@ -319,6 +309,7 @@ Beware that multiplication is scaling, not cross product or dot - use appropriat
 			get => native[i];
 			set => native[i] = value;
 		}
+		/* TODO
 		public override Value IndexGet(Value index)
 			=> index.IsNumber ? new Value(native[index.Int]) : Get(index.String);
 		public override bool IndexSet(Value index, Value value)
@@ -330,6 +321,7 @@ Beware that multiplication is scaling, not cross product or dot - use appropriat
 			}
 			return Set(index.String, value);
 		}
+		*/
 		public override DynValue Index(MoonSharp.Interpreter.Script script, DynValue index, bool isDirectIndexing)
 		{
 			if (index.Type == DataType.Number)

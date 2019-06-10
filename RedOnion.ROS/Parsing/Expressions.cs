@@ -65,7 +65,8 @@ namespace RedOnion.ROS.Parsing
 				|| kind == OpKind.Number    // type specifier (byte, bool, int, ...)
 				|| op == ExCode.String || op == ExCode.Char	// type names
 				|| op.Code() == ExCode.Function.Code() // function or def
-				|| op == ExCode.Get || op == ExCode.Set)
+				|| op == ExCode.Get || op == ExCode.Set
+				|| op == ExCode.Combine || op == ExCode.Remove)
 			{
 				if (!unary)
 					goto autocall;

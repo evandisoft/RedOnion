@@ -1,66 +1,61 @@
-using RedOnion.Script;
-using RedOnion.Script.ReflectedObjects;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using RedOnion.KSP.ROS;
+using RedOnion.ROS;
+using RedOnion.ROS.Utilities;
 
 namespace RedOnion.KSP.ReflectionUtil
 {
-	public partial class NamespaceInstance : IObject
+	public partial class NamespaceInstance : ISelfDescribing
 	{
-		public bool Has(string name)
-			=> TryGetSubNamespace(name, out var dummy1)
-			|| TryGetType(name, out var dummy2);
-		public Value Get(string name)
+		Descriptor ISelfDescribing.Descriptor => NamespaceInstanceDescriptor.Instance;
+		class NamespaceInstanceDescriptor : Descriptor
 		{
-			if (!Get(name, out var value))
-				throw new NotImplementedException(name + " does not exist");
-			return value;
+			public static NamespaceInstanceDescriptor Instance { get; } = new NamespaceInstanceDescriptor();
+			public NamespaceInstanceDescriptor() : base("namespace", typeof(NamespaceInstance)) { }
+			public override int Find(object self, string name, bool add)
+				=> ((NamespaceInstance)self).RosFind(name);
+			public override bool Get(ref Value self, int at)
+				=> ((NamespaceInstance)self.obj).RosGet(ref self, at);
 		}
-		public bool Get(string name, out Value value)
+		RosProps ros;
+		internal int RosFind(string name)
 		{
+			if (ros.dict != null && ros.dict.TryGetValue(name, out var idx))
+				return idx;
 			if (TryGetSubNamespace(name, out var ns))
 			{
-				value = Value.FromObject(ns);
-				return true;
+				if (ros.dict == null)
+					ros.dict = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+				idx = ros.prop.size;
+				ref var prop = ref ros.prop.Add();
+				prop.name = name;
+				prop.value = new Value(ns);
+				ros.dict[name] = idx;
+				return idx;
 			}
 			if (TryGetType(name, out var type))
 			{
-				value = new Value(new ReflectedType(null, type));
-				return true;
+				if (ros.dict == null)
+					ros.dict = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+				idx = ros.prop.size;
+				ref var prop = ref ros.prop.Add();
+				prop.name = name;
+				prop.value = new Value(type);
+				ros.dict[name] = idx;
+				return idx;
 			}
-			value = Value.Undefined;
-			return false;
+			return -1;
 		}
-		Value IObject.Index(Arguments args)
-			=> args.Length != 1 ? new Value() : Value.IndexRef(this, args[0]);
-		Value IObject.IndexGet(Value index)
+		internal bool RosGet(ref Value self, int at)
 		{
-			Get(index.String, out var result);
-			return result;
+			if (at < 0 || at >= ros.prop.size)
+				return false;
+			self = ros.prop.items[at].value;
+			return true;
 		}
-
-		bool IProperties.Set(string name, Value value) => false;
-		string IObject.Name => NamespaceString;
-		Value IObject.Value => new Value(NamespaceString);
-		IEngine IObject.Engine => null;
-		ObjectFeatures IObject.Features => ObjectFeatures.None;
-		IObject IObject.BaseClass => null;
-		IProperties IObject.BaseProps => null;
-		IProperties IObject.MoreProps => null;
-		Type IObject.Type => null;
-		object IObject.Target => null;
-
-		Value ICallable.Call(IObject self, Arguments args) => throw new NotImplementedException();
-		IObject IObject.Convert(object value) => throw new NotImplementedException();
-		IObject IObject.Create(Arguments args) => throw new NotImplementedException();
-		bool IProperties.Delete(string name) => false;
-		bool IObject.IndexModify(Value index, OpCode op, Value value) => false;
-		bool IObject.IndexSet(Value index, Value value) => false;
-		bool IObject.Modify(string name, OpCode op, Value value) => false;
-		bool IObject.Operator(OpCode op, Value arg, bool selfRhs, out Value result)
-		{
-			result = Value.Undefined;
-			return false;
-		}
-		void IProperties.Reset() { }
+		internal string RosNameOf(int at)
+			=> ros.prop.items[at].name;
 	}
 }

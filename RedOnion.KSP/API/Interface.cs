@@ -1,15 +1,23 @@
 using System;
+using System.Linq;
+using System.Collections;
 using System.Collections.Generic;
-using RedOnion.Script;
+using RedOnion.ROS;
+using RedOnion.KSP.Completion;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
-using RedOnion.Script.Utilities;
-using System.Collections;
-using RedOnion.KSP.Completion;
-using System.Linq;
 
 namespace RedOnion.KSP.API
 {
+	/// <summary>
+	/// Link from instance to creator (ROS object to function).
+	/// </summary>
+	public class CreatorAttribute : Attribute
+	{
+		public Type Creator { get; }
+		public CreatorAttribute(Type creator)
+			=> Creator = creator;
+	}
 	/// <summary>
 	/// Used for <c>Globals</c> and classes derived directly from <c>Table</c>
 	/// to avoid disturbing MoonSharp in RedOnion.Builder. See <c>GlobalMembers</c> for example.
@@ -31,20 +39,20 @@ namespace RedOnion.KSP.API
 	/// </summary>
 	public class MemberList : IEnumerable<IMember>, ICompletable
 	{
-		//TODO: function signatures
-		Dictionary<string, IMember> dict;
-		IMember[] list;
-		public ObjectFeatures Features { get; }
+		readonly Dictionary<string, KeyValuePair<int, IMember>> dict;
+		readonly IMember[] list;
 		public string Help { get; }
-		public MemberList(ObjectFeatures features,
-			string help, IMember[] members)
+		public MemberList(string help, IMember[] members)
 		{
-			Features = features;
 			Help = help;
 			list = members;
-			dict = new Dictionary<string, IMember>(list.Length, StringComparer.OrdinalIgnoreCase);
-			foreach (var member in members)
-				dict.Add(member.Name, member);
+			dict = new Dictionary<string, KeyValuePair<int, IMember>>
+				(list.Length, StringComparer.OrdinalIgnoreCase);
+			for (int i = 0; i < members.Length; i++)
+			{
+				var member = members[i];
+				dict.Add(member.Name, new KeyValuePair<int, IMember>(i, member));
+			}
 		}
 		public IEnumerator<IMember> GetEnumerator()
 		{
@@ -58,19 +66,27 @@ namespace RedOnion.KSP.API
 
 		public IList<string> PossibleCompletions => dict.Keys.ToList();
 
-		public IMember this[int i] => list[i];
+		public IMember this[int i]
+			=> list[i];
 		public IMember this[string name]
-		{
-			get => dict.TryGetValue(name, out var it) ? it : null;
-		}
+			=> dict.TryGetValue(name, out var it) ? it.Value : null;
+		public int Find(string name)
+			=> dict.TryGetValue(name, out var it) ? it.Key : -1;
 		public bool Contains(string name)
 			=> dict.ContainsKey(name);
 		public bool TryGetValue(string name, out IMember member)
-			=> dict.TryGetValue(name, out member);
-
+		{
+			if (dict.TryGetValue(name, out var pair))
+			{
+				member = pair.Value;
+				return true;
+			}
+			member = null;
+			return false;
+		}
 		public bool TryGetCompletion(string completionName, out object completion)
 		{
-			if(TryGetValue(completionName, out IMember member))
+			if (TryGetValue(completionName, out IMember member))
 			{
 				completion = member;
 				return true;
@@ -121,7 +137,7 @@ namespace RedOnion.KSP.API
 		public DynValue LuaGet(object self)
 			=> DynValue.NewBoolean(Get());
 		public void RosSet(object self, Value value)
-			=> Set(value.Bool);
+			=> Set(value.ToBool());
 		public void LuaSet(object self, DynValue value)
 			=> Set(value.Boolean);
 
@@ -140,7 +156,7 @@ namespace RedOnion.KSP.API
 	/// <summary>
 	/// Boolean property.
 	/// </summary>
-	public class Bool<Self> : IMember where Self : IObject
+	public class Bool<Self> : IMember
 	{
 		public string Name { get; }
 		public string Type { get; }
@@ -156,7 +172,7 @@ namespace RedOnion.KSP.API
 		public DynValue LuaGet(object self)
 			=> DynValue.NewBoolean(Get((Self)self));
 		public void RosSet(object self, Value value)
-			=> Set((Self)self, value.Bool);
+			=> Set((Self)self, value.ToBool());
 		public void LuaSet(object self, DynValue value)
 			=> Set((Self)self, value.Boolean);
 
@@ -191,7 +207,7 @@ namespace RedOnion.KSP.API
 		public DynValue LuaGet(object self)
 			=> DynValue.NewNumber(Get());
 		public void RosSet(object self, Value value)
-			=> Set(value.Int);
+			=> Set(value.ToInt());
 		public void LuaSet(object self, DynValue value)
 			=> Set((int)value.Number);
 
@@ -210,7 +226,7 @@ namespace RedOnion.KSP.API
 	/// <summary>
 	/// Integer property.
 	/// </summary>
-	public class Int<Self> : IMember where Self : IObject
+	public class Int<Self> : IMember
 	{
 		public string Name { get; }
 		public string Type { get; }
@@ -226,7 +242,7 @@ namespace RedOnion.KSP.API
 		public DynValue LuaGet(object self)
 			=> DynValue.NewNumber(Get((Self)self));
 		public void RosSet(object self, Value value)
-			=> Set((Self)self, value.Int);
+			=> Set((Self)self, value.ToInt());
 		public void LuaSet(object self, DynValue value)
 			=> Set((Self)self, (int)value.Number);
 
@@ -261,7 +277,7 @@ namespace RedOnion.KSP.API
 		public DynValue LuaGet(object self)
 			=> DynValue.NewNumber(Get());
 		public void RosSet(object self, Value value)
-			=> Set(value.UInt);
+			=> Set(value.ToUInt());
 		public void LuaSet(object self, DynValue value)
 			=> Set((uint)value.Number);
 
@@ -280,7 +296,7 @@ namespace RedOnion.KSP.API
 	/// <summary>
 	/// Unsigned integer property.
 	/// </summary>
-	public class UInt<Self> : IMember where Self : IObject
+	public class UInt<Self> : IMember
 	{
 		public string Name { get; }
 		public string Type { get; }
@@ -296,7 +312,7 @@ namespace RedOnion.KSP.API
 		public DynValue LuaGet(object self)
 			=> DynValue.NewNumber(Get((Self)self));
 		public void RosSet(object self, Value value)
-			=> Set((Self)self, value.UInt);
+			=> Set((Self)self, value.ToUInt());
 		public void LuaSet(object self, DynValue value)
 			=> Set((Self)self, (uint)value.Number);
 
@@ -331,7 +347,7 @@ namespace RedOnion.KSP.API
 		public DynValue LuaGet(object self)
 			=> DynValue.NewNumber(Get());
 		public void RosSet(object self, Value value)
-			=> Set(value.Float);
+			=> Set((float)value.ToDouble());
 		public void LuaSet(object self, DynValue value)
 			=> Set((float)value.Number);
 
@@ -350,7 +366,7 @@ namespace RedOnion.KSP.API
 	/// <summary>
 	/// Single-precision floating-point property.
 	/// </summary>
-	public class Float<Self> : IMember where Self : IObject
+	public class Float<Self> : IMember
 	{
 		public string Name { get; }
 		public string Type { get; }
@@ -366,7 +382,7 @@ namespace RedOnion.KSP.API
 		public DynValue LuaGet(object self)
 			=> DynValue.NewNumber(Get((Self)self));
 		public void RosSet(object self, Value value)
-			=> Set((Self)self, value.Float);
+			=> Set((Self)self, (float)value.ToDouble());
 		public void LuaSet(object self, DynValue value)
 			=> Set((Self)self, (float)value.Number);
 
@@ -401,7 +417,7 @@ namespace RedOnion.KSP.API
 		public DynValue LuaGet(object self)
 			=> DynValue.NewNumber(Get());
 		public void RosSet(object self, Value value)
-			=> Set(value.Double);
+			=> Set(value.ToDouble());
 		public void LuaSet(object self, DynValue value)
 			=> Set(value.Number);
 
@@ -420,7 +436,7 @@ namespace RedOnion.KSP.API
 	/// <summary>
 	/// Double-precision floating-point property.
 	/// </summary>
-	public class Double<Self> : IMember where Self : IObject
+	public class Double<Self> : IMember
 	{
 		public string Name { get; }
 		public string Type { get; }
@@ -436,7 +452,7 @@ namespace RedOnion.KSP.API
 		public DynValue LuaGet(object self)
 			=> DynValue.NewNumber(Get((Self)self));
 		public void RosSet(object self, Value value)
-			=> Set((Self)self, value.Double);
+			=> Set((Self)self, value.ToDouble());
 		public void LuaSet(object self, DynValue value)
 			=> Set((Self)self, value.Number);
 
@@ -471,7 +487,7 @@ namespace RedOnion.KSP.API
 		public DynValue LuaGet(object self)
 			=> DynValue.NewString(Get());
 		public void RosSet(object self, Value value)
-			=> Set(value.String);
+			=> Set(value.ToStr());
 		public void LuaSet(object self, DynValue value)
 			=> Set(value.String);
 
@@ -490,7 +506,7 @@ namespace RedOnion.KSP.API
 	/// <summary>
 	/// Text property.
 	/// </summary>
-	public class String<Self> : IMember where Self : IObject
+	public class String<Self> : IMember
 	{
 		public string Name { get; }
 		public string Type { get; }
@@ -506,7 +522,7 @@ namespace RedOnion.KSP.API
 		public DynValue LuaGet(object self)
 			=> DynValue.NewString(Get((Self)self));
 		public void RosSet(object self, Value value)
-			=> Set((Self)self, value.String);
+			=> Set((Self)self, value.ToStr());
 		public void LuaSet(object self, DynValue value)
 			=> Set((Self)self, value.String);
 
@@ -537,11 +553,11 @@ namespace RedOnion.KSP.API
 		public Action<object> Set { get; }
 
 		public Value RosGet(object self)
-			=> Value.AsNative(Get());
+			=> new Value(Get());
 		public DynValue LuaGet(object self)
 			=> DynValue.FromObject(null, Get());
 		public void RosSet(object self, Value value)
-			=> Set(value.Native);
+			=> Set(value.obj);
 		public void LuaSet(object self, DynValue value)
 			=> Set(value.ToObject());
 
@@ -560,7 +576,7 @@ namespace RedOnion.KSP.API
 	/// <summary>
 	/// Property getting/setting C#-native object.
 	/// </summary>
-	public class Native<Self> : IMember where Self : IObject
+	public class Native<Self> : IMember
 	{
 		public string Name { get; }
 		public string Type { get; }
@@ -572,11 +588,11 @@ namespace RedOnion.KSP.API
 		public Action<Self, object> Set { get; }
 
 		public Value RosGet(object self)
-			=> Value.AsNative(Get((Self)self));
+			=> new Value(Get((Self)self));
 		public DynValue LuaGet(object self)
 			=> DynValue.FromObject(null, Get((Self)self));
 		public void RosSet(object self, Value value)
-			=> Set((Self)self, value.Native);
+			=> Set((Self)self, value.obj);
 		public void LuaSet(object self, DynValue value)
 			=> Set((Self)self, value.ToObject());
 
@@ -595,7 +611,7 @@ namespace RedOnion.KSP.API
 	/// <summary>
 	/// Property getting/setting C#-native object.
 	/// </summary>
-	public class Native<Self, T> : IMember where Self : IObject
+	public class Native<Self, T> : IMember
 	{
 		public string Name { get; }
 		public string Type { get; }
@@ -607,11 +623,11 @@ namespace RedOnion.KSP.API
 		public Action<Self, T> Set { get; }
 
 		public Value RosGet(object self)
-			=> Value.AsNative(Get((Self)self));
+			=> new Value(Get((Self)self));
 		public DynValue LuaGet(object self)
 			=> DynValue.FromObject(null, Get((Self)self));
 		public void RosSet(object self, Value value)
-			=> Set((Self)self, (T)value.Native);
+			=> Set((Self)self, (T)value.obj);
 		public void LuaSet(object self, DynValue value)
 			=> Set((Self)self, (T)value.ToObject());
 
@@ -638,20 +654,20 @@ namespace RedOnion.KSP.API
 		public bool CanRead { get; }
 		public bool CanWrite { get; }
 
-		public Func<IObject> Get { get; }
-		public Action<IObject> Set { get; }
+		public Func<object> Get { get; }
+		public Action<object> Set { get; }
 
 		public Value RosGet(object self)
 			=> new Value(Get());
 		public DynValue LuaGet(object self)
 			=> DynValue.FromObject(null, Get());
 		public void RosSet(object self, Value value)
-			=> Set((IObject)value.Object);
+			=> Set(value.obj);
 		public void LuaSet(object self, DynValue value)
-			=> Set((IObject)value.ToObject());
+			=> Set(value.ToObject());
 
 		public Interop(string name, string type, string help,
-			Func<IObject> read, Action<IObject> write = null)
+			Func<object> read, Action<object> write = null)
 		{
 			Name = name;
 			Type = type;
@@ -665,7 +681,7 @@ namespace RedOnion.KSP.API
 	/// <summary>
 	/// Property getting/setting interop object (usable by both ROS and LUA).
 	/// </summary>
-	public class Interop<Self> : IMember where Self : IObject
+	public class Interop<Self> : IMember
 	{
 		public string Name { get; }
 		public string Type { get; }
@@ -673,8 +689,8 @@ namespace RedOnion.KSP.API
 		public bool CanRead { get; }
 		public bool CanWrite { get; }
 
-		public Func<Self, IObject> Get { get; }
-		public Action<Self, IObject> Set { get; }
+		public Func<Self, object> Get { get; }
+		public Action<Self, object> Set { get; }
 
 		public Value RosGet(object self)
 			=> new Value(Get((Self)self));
@@ -686,7 +702,7 @@ namespace RedOnion.KSP.API
 			=> Set((Self)self, (InteropObject)value.ToObject());
 
 		public Interop(string name, string type, string help,
-			Func<Self, IObject> read, Action<Self, IObject> write = null)
+			Func<Self, object> read, Action<Self, object> write = null)
 		{
 			Name = name;
 			Type = type;
@@ -700,7 +716,7 @@ namespace RedOnion.KSP.API
 	/// <summary>
 	/// Property getting/setting interop object (usable by both ROS and LUA).
 	/// </summary>
-	public class Interop<Self, T> : IMember where Self : IObject where T : IObject
+	public class Interop<Self, T> : IMember
 	{
 		public string Name { get; }
 		public string Type { get; }
@@ -716,7 +732,7 @@ namespace RedOnion.KSP.API
 		public DynValue LuaGet(object self)
 			=> DynValue.FromObject(null, Get((Self)self));
 		public void RosSet(object self, Value value)
-			=> Set((Self)self, (T)value.Object);
+			=> Set((Self)self, (T)value.obj);
 		public void LuaSet(object self, DynValue value)
 			=> Set((Self)self, (T)value.ToObject());
 
@@ -767,24 +783,6 @@ namespace RedOnion.KSP.API
 
 		public Function(string name, string type, string help,
 			Func<FunctionBase> read) : base(name, type, help)
-			=> Get = read;
-	}
-	/// <summary>
-	/// Static property returning a function.
-	/// </summary>
-	public class Method<Self> : Method, IMember where Self : InteropObject
-	{
-		public Func<MethodBase<Self>> Get { get; }
-
-		public override Value RosGet(object self)
-			=> new Value(Get());
-		public override DynValue LuaGet(object self)
-			=> DynValue.FromObject(null, Get());
-		public void RosSet(object self, Value value) { }
-		public void LuaSet(object self, DynValue value) { }
-
-		public Method(string name, string type, string help,
-			Func<MethodBase<Self>> read) : base(name, type, help)
 			=> Get = read;
 	}
 }

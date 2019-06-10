@@ -209,15 +209,16 @@ namespace RedOnion.ROS
 		Cond			= 0x8F, // condition of loops (for/while/unless in postfix)
 
 		Pop				= 0x90,	// discard top value
-		Goto			= 0x91, // goto label
-		GotoCase		= 0x92, // goto case
-		Switch			= 0x93, // switch x: case 1: break; case 2: break; default: continue
-		SwitchCond		= 0x94, // switch x: case < 0: ...; case 0: ...; case > 0: ...
-		Using			= 0x95, // using macro (try..finally dispose)
-		Catch			= 0x96, // try..catch..finally
-		With			= 0x97, // with var do stts
-		From			= 0x98, // LINQ
-		Yield			= 0x99,	// wait/yield (cooperative multitasking)
+		Yield			= 0x91,	// wait/yield (cooperative multitasking)
+
+		Goto			= 0x92, // goto label
+		GotoCase		= 0x93, // goto case
+		Switch			= 0x94, // switch x: case 1: break; case 2: break; default: continue
+		SwitchCond		= 0x95, // switch x: case < 0: ...; case 0: ...; case > 0: ...
+		Using			= 0x96, // using macro (try..finally dispose)
+		Catch			= 0x97, // try..catch..finally
+		With			= 0x98, // with var do stts
+		From			= 0x99, // LINQ
 
 	//	model
 		Import			= 0xD0, // using/import/include
@@ -408,23 +409,23 @@ namespace RedOnion.ROS
 		Cond			= 0x008F, // condition of loops (for/while/unless in postfix)
 
 		Pop				= 0x0090, // discard top value
-		Goto			= 0x0091, // goto label
-		Label			= 0x0191, // label:   (for 1st phase of parsing/compilation)
-		GotoCase		= 0x0092, // goto case
-		Case			= 0x0192, // case 0:  (for parsing only)
-		Switch			= 0x0093, // switch x: case 1: break; case 2: break; default: continue
-		SwitchCond		= 0x0094, // switch x: case < 0: ...; case 0: ...; case > 0: ...
-		Using			= 0x0095, // using macro (try..finally dispose)
-		Catch			= 0x0096, // try..catch..finally
-		Try				= 0x0196, // (for parsing only)
-		Finally			= 0x0296, // (for parsing only)
-		Except			= 0x0396, // catch from Python
-		With			= 0x0097, // with var do stts
-		From			= 0x0098, // LINQ
-		Select			= 0x0198, // (for parsing only)
-		OrderBy			= 0x0298, // (for parsing only)
-		Yield			= 0x0099, // yield (cooperative multitasking)
-		Wait			= 0x0199, // wait (cooperative multitasking)
+		Yield			= 0x0091, // yield (cooperative multitasking)
+		Wait			= 0x0191, // wait (cooperative multitasking)
+		Goto			= 0x0092, // goto label
+		Label			= 0x0192, // label:   (for 1st phase of parsing/compilation)
+		GotoCase		= 0x0093, // goto case
+		Case			= 0x0193, // case 0:  (for parsing only)
+		Switch			= 0x0094, // switch x: case 1: break; case 2: break; default: continue
+		SwitchCond		= 0x0095, // switch x: case < 0: ...; case 0: ...; case > 0: ...
+		Using			= 0x0096, // using macro (try..finally dispose)
+		Catch			= 0x0097, // try..catch..finally
+		Try				= 0x0197, // (for parsing only)
+		Finally			= 0x0297, // (for parsing only)
+		Except			= 0x0397, // catch from Python
+		With			= 0x0098, // with var do stts
+		From			= 0x0099, // LINQ
+		Select			= 0x0199, // (for parsing only)
+		OrderBy			= 0x0299, // (for parsing only)
 
 	//NOTE: acces, scope and other modifiers were moved to TypeFlags
 	//..... could thus be changed to parsing-only codes
@@ -617,8 +618,8 @@ namespace RedOnion.ROS
 		//	statements
 			"{}", null, "return", "throw", "break", "continue", "for", "foreach",
 			"while", "do", "until", "do-until", "if", "unless", "else", null,
-			"pop", "goto", "case", "switch", null, "using", "catch", "with",
-			"from", null,   null,   null,   null,   null,   null,   null,
+			"pop", "yield", "goto", "case", "switch", null, "using", "catch",
+			"with", "from", null,   null,   null,   null,   null,	null,
 		//	access
 			null, "public", "private", "protected",
 			"internal", null, "private internal", "protected internal",

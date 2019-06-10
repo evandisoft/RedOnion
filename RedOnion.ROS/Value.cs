@@ -5,8 +5,25 @@ using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
+/*	The reason for using struct is to avoid memory allocation
+ *	(and therefore frequent garbage collection),
+ *	because these would get created very often being a class.
+ *	Most values are instead held in Core.Arguments (ArgumentList vals),
+ *	which uses Utilities.ListCore<Value>, which maintains Value[].
+ *	Rarely returned from functions, ref Value argument used instead
+ *	(first argument is most often reused for result output,
+ *	just like in real CPUs some register like AX or R0 is used).
+ */
 namespace RedOnion.ROS
 {
+	/// <summary>
+	/// Object that can provide descriptor for itself
+	/// </summary>
+	public interface ISelfDescribing
+	{
+		Descriptor Descriptor { get; }
+	}
+
 	/// <summary>
 	/// Value with descriptor.
 	/// </summary>
@@ -19,26 +36,28 @@ namespace RedOnion.ROS
 		public static CultureInfo Culture = CultureInfo.InvariantCulture;
 
 		/// <summary>
-		/// The descriptor for the object
+		/// The descriptor - how the core interacts with the value
 		/// </summary>
 		public Descriptor desc;
 		/// <summary>
-		/// The object itself (if any)
+		/// The object unless primitive value (number, null, void).
 		/// </summary>
 		public object obj;
 		/// <summary>
-		/// Numeric data
+		/// Numeric / extra data. Only internal / built-in descriptors can use this,
+		/// standard descriptors (of objects) are not allowed to use this,
+		/// because non-zero numeric data marks references (and possibly other things).
 		/// </summary>
 		internal NumericData num;
 
 		/// <summary>
-		/// The descriptor for the object
+		/// The descriptor - how the core interacts with the value
 		/// </summary>
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		public Descriptor Descriptor => desc;
 
 		/// <summary>
-		/// The object or boxed value
+		/// The object unless primitive value (number, null, void).
 		/// </summary>
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		public object Object => desc.Box(ref this);
@@ -65,8 +84,14 @@ namespace RedOnion.ROS
 				obj = desc = d;
 				return;
 			}
+			if (it is ISelfDescribing sd)
+			{
+				obj = it;
+				desc = sd.Descriptor;
+				return;
+			}
 			desc = Descriptor.Of(it is Type t ? t : it.GetType());
-			if (!IsNumber)
+			if (!IsNumerOrChar)
 			{
 				obj = it;
 				return;
@@ -170,26 +195,38 @@ namespace RedOnion.ROS
 		public static implicit operator Value(ushort v) => new Value(v);
 		public static implicit operator Value(ulong v) => new Value(v);
 
-		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		public string Name => desc.Name;
-
 		public override bool Equals(object obj)
 			=> desc.Equals(ref this, obj);
 		public override int GetHashCode()
 			=> desc.GetHashCode(ref this);
 
+		public string Name => desc.Name;
+
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+		public bool IsVoid => desc.Primitive == ExCode.Void;
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+		public bool IsNull => desc.Primitive == ExCode.Null;
+
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		public bool IsString => desc.Primitive == ExCode.String;
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		public bool IsNumber
-		{
-			get
-			{
-				var type = (OpCode)desc.Primitive;
-				return type > OpCode.String && type < OpCode.Create;
-			}
-		}
+		public bool IsStringOrChar => desc.IsStringOrChar;
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+		public bool IsNumber => desc.IsNumber;
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+		public bool IsNumerOrChar => desc.IsNumberOrChar;
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		public bool IsInt => desc.Primitive == ExCode.Int;
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+		internal bool IsReference => num.HighInt != 0 && !IsNumerOrChar;
+		// note: the higher part may get changed (but must be non-zero)
+		internal void SetRef(int idx)
+			=> num.Long = (uint)idx | ((long)~idx << 32);
+		internal void SetRef(Context ctx, int idx)
+		{
+			obj = desc = ctx;
+			num.Long = (uint)idx | ((long)~idx << 32);
+		}
 
 		public int ToInt()
 		{
@@ -363,23 +400,6 @@ namespace RedOnion.ROS
 				get => (int)(Long >> 32);
 				set => Long = (uint)Long | ((long)value << 32);
 			}
-		}
-		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		internal bool IsReference
-		{
-			get
-			{
-				if (num.HighInt == 0)
-					return false;
-				var type = (OpCode)desc.Primitive;
-				return type <= OpCode.String || type >= OpCode.Create;
-			}
-		}
-		internal void SetRef(int idx) => num.Long = (uint)idx | ((long)~idx << 32);
-		internal void SetRef(Context ctx, int idx)
-		{
-			obj = desc = ctx;
-			num.Long = (uint)idx | ((long)~idx << 32);
 		}
 
 		static internal InvalidOperationException InvalidOperation(string msg, params object[] args)

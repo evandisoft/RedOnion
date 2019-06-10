@@ -63,32 +63,9 @@ namespace RedOnion.ROS.Tests
 				"var x = 1",
 				"function f",
 				"	if true",
-				"		var x = 2",
-				"	return x",
+				"		var x = 2",		// this is hidden for the return
+				"	return x",			// global x
 				"f");
-		}
-
-		[Test]
-		public void ROS_Scope05_Closure()
-		{
-			Lines(2,
-				"var x = 1",
-				"function f",
-				"	var x = 2",
-				"	function g",
-				"		return x",
-				"	return g()",
-				"f()");
-
-			Reset();
-			Lines(2,
-				"var x = 1",
-				"function f",
-				"	var x = 2",
-				"	function g",
-				"		return x",
-				"	return g",
-				"f()()");
 		}
 
 		[Test]
@@ -98,10 +75,14 @@ namespace RedOnion.ROS.Tests
 				"function f a,b",
 				"  return arguments.length",
 				"f 1,2,3");
+			Lines(2,
+				"function f",
+				"  return arguments[0]",
+				"f 2");
 		}
 
 		[Test]
-		public void ROS_Scope06_Prototype()
+		public void ROS_Scope05_Prototype()
 		{
 			Lines(1,
 				"function f",
@@ -141,7 +122,7 @@ namespace RedOnion.ROS.Tests
 		}
 
 		[Test]
-		public void ROS_Scope07_SelfScope()
+		public void ROS_Scope06_SelfScope()
 		{
 			Lines(1,
 				"var obj = new object",
@@ -153,9 +134,96 @@ namespace RedOnion.ROS.Tests
 				"return obj.counter");
 		}
 
-		//TODO: live/shared closures (they are currently cloned)
 		[Test]
-		public void ROS_Scope08_DocExample()
+		public void ROS_Scope07_Closure()
+		{
+			Lines(1,
+				"var x = 1",
+				"function f",
+				"  return x",			// global x
+				"f()");
+
+			Reset();
+			Lines(2,
+				"var x = 1",
+				"function f",
+				"	var x = 2",
+				"	function g",
+				"		return x",		// captured var x = 2 from f
+				"	return g()",
+				"f()");
+
+			Reset();
+			Lines(3,
+				"var x = 1",
+				"function f",
+				"	var x = 2",
+				"	function g",
+				"		return x + 1",	// captured var x = 2 from f
+				"	return g",
+				"f()()");
+
+			Reset();
+			Lines(4,
+				"function f x",
+				"  function g",
+				"    return x + 2",		// captured argument of f
+				"  return g()",
+				"f 2");
+
+			Reset();
+			Lines(5,
+				"function f x",
+				"  function g",
+				"    function h x",
+				"      return x + 2",	// argument of h (ignore argument of f)
+				"    return h",
+				"  return g()",
+				"(f 1)(3)");
+		}
+
+		[Test]
+		public void ROS_Scope08_ClosureModify()
+		{
+			Lines(3,
+				"var x = 0",
+				"def inc => ++x",
+				"def add y => x += y",
+				"inc",
+				"add 2");
+
+			/* TODO: create new OpCode.Local and make parser decide the index
+			 * TODO: multiple cousins for closures in loop
+			
+			! Although the following appears to work, I am not sure why, it should not
+			! because all the closures should now share single context `var j=i` does not matter
+			Reset();
+			Lines("123",
+				"var s = \"\"",
+				"var a = new list",
+				"for var i = 0; i < 3; i++",
+				"  a.add def f",
+				"    var j = i",
+				"    s += j + 1",
+				"for var f in a; f",
+				"return s");
+
+			Reset();
+			Lines(6,
+				"var sum = 0",
+				"var vals = [1, 2, 3]",
+				"var fns = new list",
+				"var index = 0",
+				"while index < vals.length",
+				"  var value = vals[index++]",
+				"  fns.add def => sum += value",
+				"do fns[--index]() while index > 0",
+				"return sum");
+			*/
+		}
+
+		[Test]
+		public void ROS_Scope09_DocExample()
 		{
 			Test(1, @"
 def MyClass

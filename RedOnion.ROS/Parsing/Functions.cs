@@ -307,10 +307,9 @@ namespace RedOnion.ROS.Parsing
 				else if (lastCode == OpCode.Pop)
 				{
 					Debug.Assert(lastCodeAt == code.size-1);
-					Debug.Assert(!HasOption(Option.AutocallSimple)
-						|| (prevCode == OpCode.Autocall && prevCodeAt == code.size-2));
 					if (prevCode == OpCode.Autocall)
 					{
+						Debug.Assert(prevCodeAt == code.size-2);
 						var sz = Core.Int(code.items, blockAt);
 						Write(--sz, blockAt);
 						code.size--;

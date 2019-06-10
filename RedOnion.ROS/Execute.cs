@@ -27,7 +27,7 @@ namespace RedOnion.ROS
 						if (countdown <= 0)
 						{
 							this.at = at;
-							Exit = OpCode.Yield;
+							Exit = ExitCode.Countdown;
 							Countdown = countdown;
 							return false;
 						}
@@ -42,6 +42,7 @@ namespace RedOnion.ROS
 						case OpCode.Until:
 						case OpCode.For:
 							at = ctx.BlockAt1;
+							ctx.ResetTop();
 							continue;
 						case OpCode.Do:
 						case OpCode.DoUntil:
@@ -100,7 +101,7 @@ namespace RedOnion.ROS
 					if (countdown <= 0)
 					{
 						this.at = at;
-						Exit = OpCode.Yield;
+						Exit = ExitCode.Countdown;
 						Countdown = countdown;
 						return false;
 					}
@@ -502,7 +503,7 @@ namespace RedOnion.ROS
 						ref var it = ref vals.Top();
 						if (it.IsReference && !it.desc.Get(ref it, it.num.Int))
 							throw CouldNotGet(ref it);
-						if (it.IsNumber)
+						if (it.IsNumerOrChar)
 							throw InvalidOperation("Numbers do not have properties");
 						var idx = it.desc.Find(it.obj, name, true);
 						if (idx < 0)
@@ -721,7 +722,7 @@ namespace RedOnion.ROS
 							stack.Pop();
 							continue;
 						}
-						Exit = op;
+						Exit = op == OpCode.Return ? ExitCode.Return : ExitCode.Exception;
 						goto finish;
 
 					case OpCode.Break:
@@ -895,12 +896,16 @@ namespace RedOnion.ROS
 					case OpCode.Pop:
 						countdown++; // do not even count this instruction
 						result = vals.Pop();
-						if (ctx.BlockCode == OpCode.For && at == ctx.BlockStart - 4)
-							at = ctx.BlockAt2;
+						if (ctx.BlockCode != OpCode.For)
+							continue;
+						if (at == ctx.BlockStart - 4)   // end of final expression
+							at = ctx.BlockAt2;          // test expression
+						else if (at == ctx.BlockAt2)	// end of init expression
+							ctx.LockTop();
 						continue;
 					case OpCode.Yield:
 						this.at = at;
-						Exit = OpCode.Yield;
+						Exit = ExitCode.Yield;
 						result = Value.Void;
 						return false;
 					#endregion
@@ -995,7 +1000,7 @@ namespace RedOnion.ROS
 					}
 				}
 			finishNoReturn:
-				Exit = OpCode.Void;
+				Exit = ExitCode.None;
 			finish:
 				if (vals.Count > 0)
 					result = vals.Pop();

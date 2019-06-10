@@ -5,18 +5,14 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using Ionic.Zip;
-using RedOnion.Script;
-using RedOnion.Script.Utilities;
+using RedOnion.ROS;
+using RedOnion.ROS.Utilities;
 using UE = UnityEngine;
 
 namespace RedOnion.KSP.ROS
 {
-	public class KspRosEngine : Engine
+	public class RosCore : Core
 	{
-		public KspRosEngine(Func<IEngine, IEngineRoot> createRoot)
-			: base(createRoot) { }
-		public KspRosEngine(Func<KspRosEngine, IEngineRoot> createRoot)
-			: base(engine => createRoot((KspRosEngine)engine)) { }
 		public override void Log(string msg)
 			=> UE.Debug.Log("[RedOnion] " + msg);
 

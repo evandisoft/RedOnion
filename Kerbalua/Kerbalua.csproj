@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <KerbalLibs Condition=" '$(KerbalLibs)' == '' And '$(OS)' == 'Windows_NT' And Exists('$(SolutionDir)\ksp')">$(SolutionDir)\ksp\KSP_x64_Data\Managed</KerbalLibs>
@@ -147,25 +147,15 @@
     <None Include="Kerbalua\Completion\Grammar\IncompleteLua.g4" />
     <None Include="Kerbalua\Completion\Grammar\FinalExpLua.g4" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Kerbalua\" />
-    <Folder Include="Kerbalua\Main\" />
-    <Folder Include="Kerbalua\Other\" />
-    <Folder Include="Kerbalua\Gui\" />
-    <Folder Include="Kerbalua\Utility\" />
-    <Folder Include="Kerbalua\Completion\" />
-    <Folder Include="Kerbalua\MoonSharp\" />
-    <Folder Include="Kerbalua\Completion\Grammar\" />
-    <Folder Include="Kerbalua\Parsing\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\RedOnion.KSP\RedOnion.KSP.csproj">
       <Project>{DEC12E09-29AD-4666-9954-8C8A1D7BF454}</Project>
       <Name>RedOnion.KSP</Name>
     </ProjectReference>
-    <ProjectReference Include="..\RedOnion.Script\RedOnion.Script.csproj">
-      <Project>{0D0A04F3-0A82-49CD-8178-7640ACE88BFF}</Project>
-      <Name>RedOnion.Script</Name>
+    <ProjectReference Include="..\RedOnion.ROS\RedOnion.ROS.csproj">
+      <Project>{59399c9e-ebac-4d7c-b2cb-6ece22fe8d6e}</Project>
+      <Name>RedOnion.ROS</Name>
     </ProjectReference>
     <ProjectReference Include="..\RedOnion.UI\RedOnion.UI.csproj">
       <Project>{034C16AB-D16E-4AFE-9837-812499EE2F3D}</Project>

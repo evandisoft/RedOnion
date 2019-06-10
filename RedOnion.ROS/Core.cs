@@ -9,11 +9,14 @@ namespace RedOnion.ROS
 	[DebuggerDisplay("{DebugString}")]
 	public partial class Core : ICore
 	{
+		public Core() { }
+		public Core(UserObject globals) => Globals = globals;
+
 		protected int at;
 		protected byte[] code;
 		protected string[] str;
 		protected ArgumentList vals = new ArgumentList();
-		protected Context ctx;
+		protected Context ctx = new Context();
 		protected Value self; // `this` for current code
 		protected Value result;
 		protected struct SavedContext
@@ -27,7 +30,7 @@ namespace RedOnion.ROS
 		protected ListCore<SavedContext> stack;
 
 		public UserObject Globals { get; set; }
-		public OpCode Exit { get; protected set; }
+		public ExitCode Exit { get; protected set; }
 		public Value Result => result;
 		public int Countdown { get; set; }
 		public ArgumentList Arguments => vals;
@@ -43,11 +46,9 @@ namespace RedOnion.ROS
 				str = value?.Strings;
 				vals.Clear();
 				self = Value.Null;
-				Exit = OpCode.Void;
+				Exit = ExitCode.None;
 				result = Value.Void;
 				compiled = value;
-				if (ctx == null)
-					ctx = new Context();
 				ctx.RootStart = 0;
 				ctx.RootEnd = code.Length;
 			}
@@ -79,11 +80,25 @@ namespace RedOnion.ROS
 			if (Globals == null) Globals = new Globals();
 			return Execute(countdown);
 		}
+		public bool Execute(CompiledCode code, int countdown = 1000)
+		{
+			Code = code;
+			if (Globals == null) Globals = new Globals();
+			return Execute(countdown);
+		}
 
 		protected void Identifier(int at)
 		{
 			var code = this.code;
 			int idx = Int(code, at);
+
+			/* The following optimisation is too dangerous
+			 * because sometimes slots are created at first access
+			 * which then causes problems when invoking the same function
+			 * or lambda/closure for second time, where the slot does not exist yet.
+			 * TODO: Create OpCode.Local and let parser/compiler do the optimisation
+			 * for local variables where we are 100% sure it must have been created already.
+
 			int found;
 			string name;
 			if (idx >= 0)
@@ -94,6 +109,10 @@ namespace RedOnion.ROS
 				found = ctx.Find(name);
 				if (found >= 0)
 				{
+					!! WARNING !!
+					!! exactly that needs some indicator (e.g. int Find(string, out bool local))
+					!! becase found is not automatically local (see closures)
+
 					// we found it to be local, mark it as such
 					// and embed known index to speed things up
 					// TODO: do that in parser/compiler
@@ -135,7 +154,19 @@ namespace RedOnion.ROS
 				idx = found & 0x3FFFFFFF;
 				name = str[idx];
 			}
-			// try this first
+			*/
+
+			string name = str[idx];
+			int found = ctx.Find(name);
+			// if local (or tracked reference in closure)
+			if (found >= 0)
+			{
+				ref var it = ref vals.Push();
+				it.obj = it.desc = ctx;
+				it.num = new Value.NumericData(found, ~found);
+				return;
+			}
+			// try `this` first
 			if (self.obj != null
 			&& (found = self.desc.Find(self.obj, name, false)) >= 0)
 			{

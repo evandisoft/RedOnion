@@ -42,8 +42,10 @@ namespace RedOnion.ROS.Objects
 	/// The design is based on JavaScript (ECMA-262)
 	/// </summary>
 	[DebuggerDisplay("{Name}; {prop.DebugString}")]
-	public class UserObject<P> : Descriptor where P: UserObject<P>
+	public class UserObject<P> : Descriptor, ISelfDescribing where P: UserObject<P>
 	{
+		Descriptor ISelfDescribing.Descriptor => this;
+
 		/// <summary>
 		/// Single property of an object (with name and value)
 		/// </summary>
@@ -220,7 +222,7 @@ namespace RedOnion.ROS.Objects
 				return -1;
 			var index = args[0];
 			int at;
-			if (index.IsNumber)
+			if (index.IsNumerOrChar)
 			{
 				at = index.ToInt();
 				if (at < 0 || at >= prop.size)
