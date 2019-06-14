@@ -188,6 +188,8 @@ namespace RedOnion.ROS.Objects
 			}
 			return add ? Add(name, Value.Void) : -1;
 		}
+		public override int CountProperties()
+			=> prop.size;
 		public override string NameOf(object self, int at)
 			=> prop[at].name ?? "#" + at;
 		public override bool Get(ref Value self, int at)

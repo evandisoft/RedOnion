@@ -16,7 +16,8 @@ namespace RedOnion.ROS
 		protected byte[] code;
 		protected string[] str;
 		protected ArgumentList vals = new ArgumentList();
-		protected Context ctx = new Context();
+		protected Context ctx;
+		protected bool ctxIsPrivate;
 		protected Value self; // `this` for current code
 		protected Value result;
 		protected struct SavedContext
@@ -49,6 +50,11 @@ namespace RedOnion.ROS
 				Exit = ExitCode.None;
 				result = Value.Void;
 				compiled = value;
+				if (ctx == null || ctxIsPrivate)
+				{
+					ctx = new Context();
+					ctxIsPrivate = false;
+				}
 				ctx.RootStart = 0;
 				ctx.RootEnd = code.Length;
 			}
@@ -73,23 +79,48 @@ namespace RedOnion.ROS
 		public void Dispose() => Dispose(true);
 		protected virtual void Dispose(bool disposing) { }
 
-		public void ResetContext() => ctx.Reset();
+		public void ResetContext() => ctx?.Reset();
+
+		/// <summary>
+		/// Execute script from source. Returns true if finished
+		/// (<see cref="Exit" /> is set to <see cref="ExitCode.Countdown"/>
+		/// when returning false).
+		/// </summary>
+		/// <param name="script">Source code of the script</param>
+		/// <param name="path">Path to the script (optional, for error tracking)</param>
+		/// <param name="countdown">Countdown until auto-yield</param>
 		public bool Execute(string script, string path = null, int countdown = 1000)
 		{
 			Code = Compile(script, path);
 			if (Globals == null) Globals = new Globals();
 			return Execute(countdown);
 		}
+		/// <summary>
+		/// Execute compiled script. Returns true if finished
+		/// (<see cref="Exit" /> is set to <see cref="ExitCode.Countdown"/>
+		/// when returning false).
+		/// </summary>
+		/// <param name="code">Compiled script</param>
+		/// <param name="countdown">Countdown until auto-yield</param>
 		public bool Execute(CompiledCode code, int countdown = 1000)
 		{
 			Code = code;
 			if (Globals == null) Globals = new Globals();
 			return Execute(countdown);
 		}
+		/// <summary>
+		/// Execute function without arguments. Returns true if finished
+		/// (<see cref="Exit" /> is set to <see cref="ExitCode.Countdown"/>
+		/// when returning false).
+		/// </summary>
+		/// <param name="fn">The function to execute</param>
+		/// <param name="countdown">Countdown until auto-yield</param>
 		public bool Execute(Function fn, int countdown = 1000)
 		{
-			Code = fn.Code;
 			ctx = fn.Context;
+			ctxIsPrivate = false;
+			Code = fn.Code;
+			ctxIsPrivate = true;
 			ctx.Push(at, at + fn.CodeSize, OpCode.Function);
 			ctx.Add("arguments", new Value[0]);
 			result = Value.Void;

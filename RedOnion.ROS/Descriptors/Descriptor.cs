@@ -13,7 +13,9 @@ namespace RedOnion.ROS
 		public bool IsNumber => Primitive.Kind() == OpKind.Number;
 		public bool IsNumberOrChar { get; }
 		public bool IsStringOrChar { get; }
-		public virtual object Box(ref Value self) => self.obj;
+
+		public virtual object Box(ref Value self)
+			=> self.obj;
 		public virtual bool Equals(ref Value self, object obj)
 			=> self.obj.Equals(obj);
 		public virtual int GetHashCode(ref Value self)
@@ -53,14 +55,16 @@ namespace RedOnion.ROS
 			return false;
 		}
 
-		public virtual bool Unary(ref Value self, OpCode op) => false;
-		public virtual bool Binary(ref Value lhs, OpCode op, ref Value rhs) => false;
-		public virtual bool Call(ref Value result, object self, Arguments args, bool create = false) => false;
+		public virtual int CountProperties() => 0;
 		public virtual int Find(object self, string name, bool add = false) => -1;
 		public virtual string NameOf(object self, int at) => null;
 		public virtual bool Get(ref Value self, int at) => false;
 		public virtual bool Set(ref Value self, int at, OpCode op, ref Value value) => false;
-		public virtual IEnumerator<Value> Enumerate(ref Value self) => null;
+
+		public virtual bool Unary(ref Value self, OpCode op) => false;
+		public virtual bool Binary(ref Value lhs, OpCode op, ref Value rhs) => false;
+		public virtual bool Call(ref Value result, object self, Arguments args, bool create = false) => false;
+		public virtual IEnumerable<Value> Enumerate(ref Value self) => null;
 
 		public virtual int IndexFind(ref Value self, Arguments args)
 		{

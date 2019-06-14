@@ -1,3 +1,4 @@
+using RedOnion.KSP.Autopilot;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -113,6 +114,9 @@ namespace Kerbalua.Other {
 		/// <summary>
 		/// Resets the engine.
 		/// </summary>
-		public abstract void ResetEngine();
+		public virtual void ResetEngine()
+		{
+			FlightControl.GetInstance().Shutdown();
+		}
 	}
 }

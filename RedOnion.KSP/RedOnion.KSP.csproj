@@ -78,6 +78,7 @@
     <Compile Include="ReflectionUtil\NamespaceInstance.ROS.cs" />
     <Compile Include="ROS\RosCore.cs" />
     <Compile Include="ROS\RosProps.cs" />
+    <Compile Include="ROS\RosSuggest.cs" />
     <Compile Include="ROS\UI\Window.cs" />
     <Compile Include="ROS\RosGlobals.cs" />
     <Compile Include="Autopilot\FlightControl.cs" />
