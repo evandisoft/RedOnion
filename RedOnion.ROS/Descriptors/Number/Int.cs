@@ -10,6 +10,9 @@ namespace RedOnion.ROS
 				: base("int", typeof(int), ExCode.Int, TypeCode.Int32) { }
 			public override object Box(ref Value self)
 				=> self.num.Int;
+			// TODO: comparision to double and other types
+			// ..... 3.Equals(3.0) surprisingly returns false
+			// ..... while 3.0.Equals(3) returns true (as 3 probably gets promoted to 3.0)
 			public override bool Equals(ref Value self, object obj)
 				=> self.num.Int.Equals(obj);
 			public override int GetHashCode(ref Value self)

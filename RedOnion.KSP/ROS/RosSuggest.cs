@@ -1,5 +1,6 @@
 using RedOnion.KSP.API;
 using RedOnion.ROS;
+using RedOnion.ROS.Objects;
 using RedOnion.ROS.Parsing;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,7 @@ namespace RedOnion.KSP.ROS
 {
 	public class RosSuggest
 	{
-		RosCore core;
+		protected RosCore core;
 		public RosSuggest(RosCore core)
 			=> this.core = core;
 
@@ -101,8 +102,27 @@ namespace RedOnion.KSP.ROS
 			if (!found.IsVoid)
 			{
 				partial = at == replaceAt ? null : source.Substring(replaceAt, at-replaceAt);
-				FillFrom(found);
-				RemoveDuplicates();
+				foreach (var name in found.desc.EnumerateProperties(ref found))
+					AddSuggestion(name);
+				if (found.desc is Context)
+				{
+					foreach (var name in core.Globals.EnumerateProperties())
+						AddSuggestion(name);
+				}
+				if (_suggestionsCount > 1)
+				{
+					if (partial == null || partial.Length == 0)
+						Array.Sort(_suggestions, 0, _suggestionsCount, StringComparer.OrdinalIgnoreCase);
+					else Array.Sort(_suggestions, 0, _suggestionsCount, new Comparer(partial));
+					int i = 0;
+					for (int j = 1; j < _suggestionsCount; j++)
+					{
+						if (string.Compare(_suggestions[j], _suggestions[i],
+							StringComparison.OrdinalIgnoreCase) != 0)
+							_suggestions[++i] = _suggestions[j];
+					}
+					_suggestionsCount = i + 1;
+				}
 			}
 			return GetSuggestions();
 		}
@@ -116,33 +136,6 @@ namespace RedOnion.KSP.ROS
 			}
 		}
 
-		protected void FillFrom(Value value)
-		{
-			int n = value.desc.CountProperties();
-			for (int i = 0; i < n; i++)
-				AddSuggestion(value.desc.NameOf(value.obj, i));
-			if (value.obj is IType face)
-			{
-				foreach (var member in face.Members)
-					AddSuggestion(member.Name);
-			}
-		}
-		private void RemoveDuplicates()
-		{
-			int i, j;
-			if (_suggestionsCount <= 1)
-				return;
-			if (partial == null || partial.Length == 0)
-				Array.Sort(_suggestions, 0, _suggestionsCount, StringComparer.OrdinalIgnoreCase);
-			else Array.Sort(_suggestions, 0, _suggestionsCount, new Comparer(partial));
-			for (i = 0, j = 1; j < _suggestionsCount; j++)
-			{
-				if (string.Compare(_suggestions[j], _suggestions[i],
-					StringComparison.OrdinalIgnoreCase) != 0)
-					_suggestions[++i] = _suggestions[j];
-			}
-			_suggestionsCount = i + 1;
-		}
 		protected void Execute()
 		{
 			found = Value.Void;
@@ -192,12 +185,13 @@ namespace RedOnion.KSP.ROS
 				break;
 			}
 			replaceTo = j;
+			var obj = (Descriptor)core.Context ?? core.Globals;
 			if (dotAt < 0)
 			{
-				found = new Value(core.Globals);
+				found = new Value(obj);
 				return;
 			}
-			var value = new Value(core.Globals);
+			var value = new Value(obj);
 			for (; ; i = j + 1)
 			{
 				string name = source.Substring(i, dotAt-i);

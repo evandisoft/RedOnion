@@ -15,7 +15,7 @@ namespace RedOnion.KSP.Tests
 		{
 			foreach (var e in list)
 			{
-				if (e == what)
+				if (what.Equals(e, StringComparison.OrdinalIgnoreCase))
 					return;
 			}
 			Assert.Fail("List does not contain '{0}'", what);
@@ -26,6 +26,14 @@ namespace RedOnion.KSP.Tests
 		{
 			var list = GetCompletions("", 0, out var at, out var to);
 			AssertContains("print", list);
+		}
+
+		[Test]
+		public void ROS_Suggest02_Property()
+		{
+			core.Execute("var a = [1,2]");
+			var list = GetCompletions("a.", 2, out var at, out var to);
+			AssertContains("length", list);
 		}
 	}
 }

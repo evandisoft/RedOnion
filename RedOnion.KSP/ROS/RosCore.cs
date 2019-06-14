@@ -115,9 +115,10 @@ namespace RedOnion.KSP.ROS
 			Globals = new RosGlobals();
 		}
 		public RosCore()
-			=> Globals = new RosGlobals();
-		public RosCore(RosGlobals globals)
-			=> Globals = globals;
+		{
+			Globals = new RosGlobals();
+			ctx = new Context();
+		}
 
 		public int UpdateCountdown { get; set; } = 1000;
 		public int StepCountdown { get; set; } = 100;

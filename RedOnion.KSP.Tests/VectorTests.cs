@@ -8,6 +8,26 @@ namespace RedOnion.KSP.Tests
 {
 	public class ApiTestsBase : RosCore
 	{
+		public ApiTestsBase()
+		{
+			Descriptor.Create = CustomCreateDescriptor;
+		}
+		public static Descriptor CustomCreateDescriptor(Type type)
+		{
+			if (typeof(Delegate).IsAssignableFrom(type))
+				return Descriptor.Callable.FromType(type);
+			// to avoid those secirity exceptions mentioning ECall (e.g. on Vector3d.Slerp)
+			if (type.Assembly.FullName.StartsWith("UnityEngine")
+				|| type.Assembly.FullName.StartsWith("Assembly-CSharp"))
+				return new DummyDescriptor(type);
+			return new Descriptor.Reflected(type);
+		}
+		public class DummyDescriptor : Descriptor
+		{
+			public DummyDescriptor(Type type) : this(type.Name, type) { }
+			public DummyDescriptor(string name, Type type) : base(name, type) { }
+		}
+
 		public void Test(string script, int countdown = 100)
 		{
 			try
@@ -148,7 +168,7 @@ namespace RedOnion.KSP.Tests
 			ConvertTest.v3 = UnityEngine.Vector3.zero;
 			Test("test.v3 = v.one");
 			Assert.AreEqual(1f, ConvertTest.v3.x);
-			Test("v.abs -test.v3");
+			Test("v.abs -v test.v3");
 			var v = Result.Object as Vector;
 			Assert.NotNull(v);
 			Assert.AreEqual(1.0, v.X);
@@ -186,7 +206,7 @@ namespace RedOnion.KSP.Tests
 				"return a[0]");
 			Test(2.0, "a[1]");
 			Test(0.0, "a[2]");
-			Test(3.0, "a[2] = 3");
+			Test("a[2] = 3");
 			Test(3.0, "a[2]");
 		}
 	}

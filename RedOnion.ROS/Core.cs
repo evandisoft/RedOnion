@@ -31,6 +31,7 @@ namespace RedOnion.ROS
 		protected ListCore<SavedContext> stack;
 
 		public UserObject Globals { get; set; }
+		public Context Context => ctx;
 		public ExitCode Exit { get; protected set; }
 		public Value Result => result;
 		public int Countdown { get; set; }

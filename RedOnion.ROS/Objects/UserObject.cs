@@ -178,18 +178,9 @@ namespace RedOnion.ROS.Objects
 		}
 		public override int Find(object self, string name, bool add)
 		{
-			if (dict != null && dict.TryGetValue(name, out var idx))
-				return idx;
-			if (parent != null)
-			{
-				idx = parent.Find(name);
-				if (idx >= 0)
-					return Add(name, ref parent.prop.items[idx].value);
-			}
-			return add ? Add(name, Value.Void) : -1;
+			int at = Find(name);
+			return at < 0 && add ? Add(name, Value.Void) : at;
 		}
-		public override int CountProperties()
-			=> prop.size;
 		public override string NameOf(object self, int at)
 			=> prop[at].name ?? "#" + at;
 		public override bool Get(ref Value self, int at)
@@ -252,6 +243,18 @@ namespace RedOnion.ROS.Objects
 				return at;
 			self = prop.items[at].value;
 			return self.desc.IndexFind(ref self, new Arguments(args, args.Length-1));
+		}
+
+		public override IEnumerable<string> EnumerateProperties(ref Value self)
+			=> EnumerateProperties();
+		public virtual IEnumerable<string> EnumerateProperties()
+		{
+			foreach (var p in prop)
+			{
+				var name = p.name;
+				if (name != null)
+					yield return name;
+			}
 		}
 	}
 }
