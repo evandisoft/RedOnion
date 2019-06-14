@@ -1,3 +1,4 @@
+using RedOnion.KSP.API;
 using RedOnion.ROS;
 using RedOnion.ROS.Parsing;
 using System;
@@ -120,6 +121,11 @@ namespace RedOnion.KSP.ROS
 			int n = value.desc.CountProperties();
 			for (int i = 0; i < n; i++)
 				AddSuggestion(value.desc.NameOf(value.obj, i));
+			if (value.obj is IType face)
+			{
+				foreach (var member in face.Members)
+					AddSuggestion(member.Name);
+			}
 		}
 		private void RemoveDuplicates()
 		{

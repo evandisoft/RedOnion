@@ -17,11 +17,12 @@ namespace RedOnion.KSP
 	[IgnoreForDocs]
 	public class RosGlobals : RedOnion.ROS.Objects.Globals, IType
 	{
-		MemberList IType.Members => GlobalMembers.MemberList;
+		protected static MemberList Members => GlobalMembers.MemberList;
+		MemberList IType.Members => Members;
 
-		/*
-		public RuntimeRoot()
+		public RosGlobals()
 		{
+			/*
 			var hard = BaseProps; // will resist overwrite and shadowing in global scope
 			var soft = MoreProps; // can be easily overwritten or shadowed
 
@@ -145,44 +146,38 @@ namespace RedOnion.KSP
 				{ "UIStyle",            this[typeof(UIStyle)] },
 				{ "UIStyleState",       this[typeof(UIStyleState)] },
 			})));
+			*/
 		}
 
-		LazyGet _window = new LazyGet(e => new ROS_UI.WindowFun(e));
-
-		struct LazyGet
+		const int GlobalMark = 0x7F000000;
+		public override int Find(string name)
 		{
-			IObject it;
-			CreateObject creator;
-			public delegate IObject CreateObject(ROS.RosCore engine);
-			public LazyGet(CreateObject creator)
+			int at = Members.Find(name);
+			if (at >= 0) return at + GlobalMark;
+			return base.Find(name);
+		}
+		public override bool Get(ref Value self, int at)
+		{
+			if (at >= GlobalMark)
 			{
-				it = null;
-				this.creator = creator;
-			}
-			public IObject Get(IEngine e)
-				=> it ?? (it = creator((ROS.RosCore)e));
-			public IObject Get(ROS.RosCore e)
-				=> it ?? (it = creator(e));
-		}
-
-		public override IObject Which(string name)
-		{
-			if (Globals.Instance.Has(name))
-				return this;
-			return base.Which(name);
-		}
-		public override bool Get(string name, out Value value)
-		{
-			if (base.Get(name, out value))
+				var member = Members[at - GlobalMark];
+				if (!member.CanRead) return false;
+				self = member.RosGet(self.obj);
 				return true;
-			return Globals.Instance.Get(name, out value);
+			}
+			return base.Get(ref self, at);
 		}
-		public override bool Set(string name, Value value)
+		public override bool Set(ref Value self, int at, OpCode op, ref Value value)
 		{
-			if (!Has(name) && Globals.Instance.Has(name))
-				Globals.Instance.Set(name, value);
-			return base.Set(name, value);
+			if (at >= GlobalMark)
+			{
+				var member = Members[at - GlobalMark];
+				if (!member.CanWrite) return false;
+				if (op != OpCode.Assign) return false;
+				member.RosSet(self.obj, value);
+				return true;
+			}
+			return base.Set(ref self, at, op, ref value);
 		}
-		*/
 	}
 }

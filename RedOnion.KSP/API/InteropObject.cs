@@ -12,7 +12,9 @@ namespace RedOnion.KSP.API
 		public bool ReadOnly { get; protected set; }
 
 		public InteropObject(MemberList members)
-			: base("interop object", typeof(InteropObject))
+			=> Members = members;
+		public InteropObject(string name, MemberList members)
+			: base(name)
 			=> Members = members;
 
 		public virtual DynValue Index(MoonSharp.Interpreter.Script script, DynValue index, bool isDirectIndexing)

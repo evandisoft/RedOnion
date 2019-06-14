@@ -4,7 +4,7 @@ using RedOnion.KSP.API;
 using RedOnion.KSP.ROS;
 using RedOnion.ROS;
 
-namespace RedOnion.KSP.ApiNUnit
+namespace RedOnion.KSP.Tests
 {
 	public class ApiTestsBase : RosCore
 	{
@@ -55,11 +55,6 @@ namespace RedOnion.KSP.ApiNUnit
 	[TestFixture]
 	public class API_VectorTests : ApiTestsBase
 	{
-		[OneTimeSetUp]
-		public void FillGlobals()
-		{
-			Globals.Add("v", new Value(VectorCreator.Instance));
-		}
 		[Test]
 		public void API_Vec01_Create()
 		{

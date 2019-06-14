@@ -25,8 +25,25 @@ namespace RedOnion.ROS
 			: this(type.Name, type) { }
 		protected Descriptor(string name, Type type)
 		{
-			Name = name;
+			Name = name ?? type.Name;
 			Type = type;
+			Primitive = ExCode.Class;
+			TypeCode = TypeCode.Object;
+		}
+		protected Descriptor(string name)
+		{
+			var type = GetType();
+			Name = name ?? type.Name;
+			Type = type;
+			Primitive = ExCode.Class;
+			TypeCode = TypeCode.Object;
+		}
+		protected Descriptor()
+		{
+			var type = GetType();
+			Name = type.Name;
+			Type = type;
+			Primitive = ExCode.Class;
 			TypeCode = TypeCode.Object;
 		}
 		internal Descriptor(string name, Type type, ExCode primitive, TypeCode typeCode)

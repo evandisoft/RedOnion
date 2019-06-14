@@ -7,7 +7,11 @@ namespace RedOnion.KSP.API
 	public class InteropDescriptor : Descriptor
 	{
 		public InteropDescriptor()
-			: base("interop", typeof(IType)) { }
+			: base() { }
+		protected InteropDescriptor(Type type)
+			: base(type) { }
+		protected InteropDescriptor(string name)
+			: base(name) { }
 		protected InteropDescriptor(string name, Type type)
 			: base(name, type) { }
 
