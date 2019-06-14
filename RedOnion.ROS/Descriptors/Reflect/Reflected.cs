@@ -157,16 +157,16 @@ namespace RedOnion.ROS
 				//TODO: other operations
 				return false;
 			}
-			public override IEnumerator<Value> Enumerate(ref Value self)
+			public override IEnumerable<Value> Enumerate(ref Value self)
 			{
 				var it = self.obj;
 				if (it is IEnumerable<Value> ev)
-					return ev.GetEnumerator();
+					return ev;
 				if (it is IEnumerable eo)
 					return EnumerateNative(eo);
 				return null;
 			}
-			private IEnumerator<Value> EnumerateNative(IEnumerable e)
+			private IEnumerable<Value> EnumerateNative(IEnumerable e)
 			{
 				foreach (var v in e)
 					yield return new Value(e);

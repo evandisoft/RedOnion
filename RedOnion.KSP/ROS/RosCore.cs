@@ -77,7 +77,15 @@ namespace RedOnion.KSP.ROS
 			updateList.Clear();
 			idleList.Clear();
 		}
+		/// <summary>
+		/// Event invoked on engine shutdown or reset.
+		/// Return false to auto-remove after invoke.
+		/// </summary>
 		public event Func<Core, bool> Shutdown;
+		/// <summary>
+		/// Reset the engine - clear all event lists
+		/// and reset/recreate globals.
+		/// </summary>
 		public void Reset()
 		{
 			var shutdown = Shutdown;
@@ -128,6 +136,7 @@ namespace RedOnion.KSP.ROS
 			TotalCountdown = UpdateCountdown;
 			watch.Reset();
 			watch.Start();
+
 			if (updateList.Count > 0)
 			{
 				do
@@ -163,7 +172,9 @@ namespace RedOnion.KSP.ROS
 				Execute(countdown);
 				TotalCountdown -= (countdown - Countdown);
 			} while (TotalCountdown > 0 && watch.Elapsed < UpdateTimeout);
+
 			watch.Stop();
+
 			var milli = watch.Elapsed.TotalMilliseconds;
 			if (AverageMillis <= 0)
 				AverageMillis = milli;

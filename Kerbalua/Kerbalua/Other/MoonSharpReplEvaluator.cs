@@ -53,7 +53,7 @@ namespace Kerbalua.Other
 		public override void ResetEngine()
 		{
 			InternalResetEngine();
-			FlightControl.GetInstance().Shutdown();
+			base.ResetEngine();
 			Terminate();
 		}
 

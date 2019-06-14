@@ -7,6 +7,13 @@ namespace RedOnion.ROS
 {
 	partial class Core : ICore
 	{
+		/// <summary>
+		/// Execute or continue executing current code.
+		/// Returns true if finished
+		/// (<see cref="Exit" /> is set to <see cref="ExitCode.Countdown"/>
+		/// when returning false).
+		/// </summary>
+		/// <param name="countdown">Countdown until auto-yield</param>
 		public bool Execute(int countdown = 1000)
 		{
 			var at = this.at;

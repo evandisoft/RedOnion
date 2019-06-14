@@ -97,25 +97,23 @@ namespace Kerbalua.Gui
 
 		public ScriptWindow(Rect param_mainWindowRect)
 		{
-			editorVisible=bool.Parse(Settings.LoadSetting("editorVisible", "true"));
-			replEvaluators["ROS Engine"] = new RedOnionReplEvaluator();
-			replEvaluators["ROS Engine"].PrintAction = (str) =>
+			editorVisible = bool.Parse(Settings.LoadSetting("editorVisible", "true"));
+
+			replEvaluators["ROS Engine"] = new RedOnionReplEvaluator()
 			{
-				repl.outputBox.AddOutput(str);
+				PrintAction = (str) =>
+					repl.outputBox.AddOutput(str),
+				PrintErrorAction = (str) =>
+					repl.outputBox.AddError(str)
 			};
-			replEvaluators["ROS Engine"].PrintErrorAction = (str) =>
+			replEvaluators["Lua Engine"] = new MoonSharpReplEvaluator()
 			{
-				repl.outputBox.AddError(str);
+				PrintAction = (str) =>
+					repl.outputBox.AddOutput(str),
+				PrintErrorAction = (str) =>
+					repl.outputBox.AddError(str)
 			};
-			replEvaluators["Lua Engine"] = new MoonSharpReplEvaluator();
-			replEvaluators["Lua Engine"].PrintAction = (str) =>
-			{
-				repl.outputBox.AddOutput(str);
-			};
-			replEvaluators["Lua Engine"].PrintErrorAction = (str) =>
-			{
-				repl.outputBox.AddError(str);
-			};
+
 			string lastEngineName = Settings.LoadSetting("lastEngine", "Lua Engine");
 			if (replEvaluators.ContainsKey(lastEngineName))
 			{
@@ -132,7 +130,6 @@ namespace Kerbalua.Gui
 					break;
 				}
 			}
-
 
 			recentFiles = new RecentFilesList((string filename) =>
 			{

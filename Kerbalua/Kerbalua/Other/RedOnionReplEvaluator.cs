@@ -12,12 +12,14 @@ namespace Kerbalua.Other
 	public class RedOnionReplEvaluator : ReplEvaluator
 	{
 		RosCore core;
+		RosSuggest suggest;
 		string source, path;
 		bool skipUpdate;
 
 		public RedOnionReplEvaluator()
 		{
 			core = new RosCore();
+			suggest = new RosSuggest(core);
 			Print.Listen += PrintRedirect;
 		}
 		protected override void Dispose(bool disposing)
@@ -81,9 +83,7 @@ namespace Kerbalua.Other
 		{
 			try
 			{
-				//TODO: Completion
-				replaceStart = replaceEnd = cursorPos;
-				return new List<string>();
+				return suggest.GetCompletions(source, cursorPos, out replaceStart, out replaceEnd);
 			}
 			catch (Exception e)
 			{
@@ -99,7 +99,8 @@ namespace Kerbalua.Other
 			source = null;
 			path = null;
 			core.Reset();
-			FlightControl.GetInstance().Shutdown();
+			suggest.Reset();
+			base.ResetEngine();
 		}
 
 		public override void Terminate()
