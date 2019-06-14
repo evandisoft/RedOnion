@@ -79,7 +79,7 @@
     <Compile Include="ROS\RosCore.cs" />
     <Compile Include="ROS\RosProps.cs" />
     <Compile Include="ROS\UI\Window.cs" />
-    <Compile Include="ROS\RuntimeRoot.cs" />
+    <Compile Include="ROS\RosGlobals.cs" />
     <Compile Include="Autopilot\FlightControl.cs" />
     <Compile Include="MathUtil\Vec.cs" />
     <Compile Include="MathUtil\Scalar.cs" />

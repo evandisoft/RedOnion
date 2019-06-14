@@ -9,7 +9,7 @@ namespace RedOnion.ROS
 		/// <summary>
 		/// static void Action(Value arg)
 		/// </summary>
-		internal class Action1 : Descriptor
+		internal class Action1 : Callable
 		{
 			internal static Value CreateValue(MethodInfo m, Type type0)
 				=> new Value(new Action1(m.Name), CreateDelegate(m, type0));
@@ -19,7 +19,7 @@ namespace RedOnion.ROS
 					ValueParameter).Compile();
 
 			public Action1(string name)
-				: base(name, typeof(Action<Value>)) { }
+				: base(name, typeof(Action<Value>), false) { }
 
 			public override bool Call(ref Value result, object self, Arguments args, bool create)
 			{
@@ -33,7 +33,7 @@ namespace RedOnion.ROS
 		/// <summary>
 		/// static Value Function(Value arg)
 		/// </summary>
-		internal class Function1 : Descriptor
+		internal class Function1 : Callable
 		{
 			internal static Value CreateValue(MethodInfo m, Type type0)
 				=> new Value(new Function1(m.Name), CreateDelegate(m, type0));
@@ -44,7 +44,7 @@ namespace RedOnion.ROS
 					ValueParameter).Compile();
 
 			public Function1(string name)
-				: base(name, typeof(Func<Value, Value>)) { }
+				: base(name, typeof(Func<Value, Value>), false) { }
 
 			public override bool Call(ref Value result, object self, Arguments args, bool create)
 			{
@@ -57,9 +57,10 @@ namespace RedOnion.ROS
 		/// <summary>
 		/// void Procedure(Value arg)
 		/// </summary>
-		public class Procedure1<T> : Descriptor
+		public class Procedure1<T> : Callable
 		{
-			public Procedure1(string name) : base(name, typeof(Action<T, Value>)) { }
+			public Procedure1(string name)
+				: base(name, typeof(Action<T, Value>), true) { }
 
 			public override bool Call(ref Value result, object self, Arguments args, bool create)
 			{
@@ -73,9 +74,10 @@ namespace RedOnion.ROS
 		/// <summary>
 		/// Value Method(Value arg)
 		/// </summary>
-		public class Method1<T> : Descriptor
+		public class Method1<T> : Callable
 		{
-			public Method1(string name) : base(name, typeof(Func<T, Value, Value>)) { }
+			public Method1(string name)
+				: base(name, typeof(Func<T, Value, Value>), true) { }
 
 			public override bool Call(ref Value result, object self, Arguments args, bool create)
 			{

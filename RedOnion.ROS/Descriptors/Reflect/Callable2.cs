@@ -9,7 +9,7 @@ namespace RedOnion.ROS
 		/// <summary>
 		/// static void Action(Value arg0, Value arg1)
 		/// </summary>
-		internal class Action2 : Descriptor
+		internal class Action2 : Callable
 		{
 			internal static Value CreateValue(MethodInfo m, ParameterInfo[] args)
 				=> new Value(new Action2(m.Name), CreateDelegate(m, args));
@@ -20,7 +20,7 @@ namespace RedOnion.ROS
 					ValueArg0Parameter, ValueArg1Parameter).Compile();
 
 			public Action2(string name)
-				: base(name, typeof(Action<Value, Value>)) { }
+				: base(name, typeof(Action<Value, Value>), false) { }
 
 			public override bool Call(ref Value result, object self, Arguments args, bool create)
 			{
@@ -34,7 +34,7 @@ namespace RedOnion.ROS
 		/// <summary>
 		/// static Value Function(Value arg0, Value arg1)
 		/// </summary>
-		internal class Function2 : Descriptor
+		internal class Function2 : Callable
 		{
 			internal static Value CreateValue(MethodInfo m, ParameterInfo[] args)
 				=> new Value(new Function2(m.Name), CreateDelegate(m, args));
@@ -46,7 +46,7 @@ namespace RedOnion.ROS
 					ValueArg0Parameter, ValueArg1Parameter).Compile();
 
 			public Function2(string name)
-				: base(name, typeof(Func<Value, Value, Value>)) { }
+				: base(name, typeof(Func<Value, Value, Value>), false) { }
 
 			public override bool Call(ref Value result, object self, Arguments args, bool create)
 			{
@@ -59,9 +59,10 @@ namespace RedOnion.ROS
 		/// <summary>
 		/// void Procedure(Value arg0, Value arg1)
 		/// </summary>
-		public class Procedure2<T> : Descriptor
+		public class Procedure2<T> : Callable
 		{
-			public Procedure2(string name) : base(name, typeof(Action<T, Value, Value>)) { }
+			public Procedure2(string name)
+				: base(name, typeof(Action<T, Value, Value>), true) { }
 
 			public override bool Call(ref Value result, object self, Arguments args, bool create)
 			{
@@ -75,9 +76,10 @@ namespace RedOnion.ROS
 		/// <summary>
 		/// Value Method(Value arg0, Value arg1)
 		/// </summary>
-		public class Method2<T> : Descriptor
+		public class Method2<T> : Callable
 		{
-			public Method2(string name) : base(name, typeof(Func<T, Value, Value>)) { }
+			public Method2(string name)
+				: base(name, typeof(Func<T, Value, Value>), true) { }
 
 			public override bool Call(ref Value result, object self, Arguments args, bool create)
 			{

@@ -206,7 +206,8 @@ namespace RedOnion.ROS
 		public bool IsVoid => desc.Primitive == ExCode.Void;
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		public bool IsNull => desc.Primitive == ExCode.Null;
-
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+		public bool IsFunction => desc.Primitive == ExCode.Function;
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		public bool IsString => desc.Primitive == ExCode.String;
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]

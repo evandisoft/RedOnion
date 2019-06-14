@@ -9,10 +9,10 @@ namespace RedOnion.ROS
 		/// <summary>
 		/// static void Action(Value arg0, Value arg1, Value arg2)
 		/// </summary>
-		internal class ReflectedAction3 : Descriptor
+		internal class Action3 : Callable
 		{
 			internal static Value CreateValue(MethodInfo m, ParameterInfo[] args)
-				=> new Value(new ReflectedAction3(m.Name), CreateDelegate(m, args));
+				=> new Value(new Action3(m.Name), CreateDelegate(m, args));
 			internal static Delegate CreateDelegate(MethodInfo m, ParameterInfo[] args)
 				=> Expression.Lambda<Action<Value, Value, Value>>(Expression.Call(m,
 					GetValueConvertExpression(args[0].ParameterType, ValueArg0Parameter),
@@ -20,8 +20,8 @@ namespace RedOnion.ROS
 					GetValueConvertExpression(args[2].ParameterType, ValueArg2Parameter)),
 					ValueArg0Parameter, ValueArg1Parameter, ValueArg2Parameter).Compile();
 
-			public ReflectedAction3(string name)
-				: base(name, typeof(Action<Value, Value, Value>)) { }
+			public Action3(string name)
+				: base(name, typeof(Action<Value, Value, Value>), false) { }
 
 			public override bool Call(ref Value result, object self, Arguments args, bool create)
 			{
@@ -35,10 +35,10 @@ namespace RedOnion.ROS
 		/// <summary>
 		/// static Value Function(Value arg0, Value arg1, Value arg2)
 		/// </summary>
-		internal class ReflectedFunction3 : Descriptor
+		internal class Function3 : Callable
 		{
 			internal static Value CreateValue(MethodInfo m, ParameterInfo[] args)
-				=> new Value(new ReflectedFunction3(m.Name), CreateDelegate(m, args));
+				=> new Value(new Function3(m.Name), CreateDelegate(m, args));
 			internal static Delegate CreateDelegate(MethodInfo m, ParameterInfo[] args)
 				=> Expression.Lambda<Func<Value, Value, Value, Value>>(GetNewValueExpression(
 					m.ReturnType, Expression.Call(m,
@@ -47,8 +47,8 @@ namespace RedOnion.ROS
 					GetValueConvertExpression(args[2].ParameterType, ValueArg2Parameter))),
 					ValueArg0Parameter, ValueArg1Parameter, ValueArg2Parameter).Compile();
 
-			public ReflectedFunction3(string name)
-				: base(name, typeof(Func<Value, Value, Value, Value>)) { }
+			public Function3(string name)
+				: base(name, typeof(Func<Value, Value, Value, Value>), false) { }
 
 			public override bool Call(ref Value result, object self, Arguments args, bool create)
 			{
@@ -61,9 +61,10 @@ namespace RedOnion.ROS
 		/// <summary>
 		/// void Procedure(Value arg0, Value arg1, Value arg2)
 		/// </summary>
-		public class ReflectedProcedure3<T> : Descriptor
+		public class Procedure3<T> : Callable
 		{
-			public ReflectedProcedure3(string name) : base(name, typeof(Action<T, Value, Value, Value>)) { }
+			public Procedure3(string name)
+				: base(name, typeof(Action<T, Value, Value, Value>), true) { }
 
 			public override bool Call(ref Value result, object self, Arguments args, bool create)
 			{
@@ -77,9 +78,10 @@ namespace RedOnion.ROS
 		/// <summary>
 		/// Value Method(Value arg0, Value arg1, Value arg2)
 		/// </summary>
-		public class ReflectedMethod3<T> : Descriptor
+		public class Method3<T> : Callable
 		{
-			public ReflectedMethod3(string name) : base(name, typeof(Func<T, Value, Value, Value, Value>)) { }
+			public Method3(string name)
+				: base(name, typeof(Func<T, Value, Value, Value, Value>), true) { }
 
 			public override bool Call(ref Value result, object self, Arguments args, bool create)
 			{

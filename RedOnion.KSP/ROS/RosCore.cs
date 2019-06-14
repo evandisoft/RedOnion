@@ -1,11 +1,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Text;
 using Ionic.Zip;
 using RedOnion.ROS;
+using RedOnion.ROS.Objects;
 using RedOnion.ROS.Utilities;
 using UE = UnityEngine;
 
@@ -54,8 +56,8 @@ namespace RedOnion.KSP.ROS
 			return raw;
 		}
 
-		protected UpdateList updateList = new UpdateList();
-		protected UpdateList idleList = new UpdateList();
+		protected EventList updateList = new EventList();
+		protected EventList idleList = new EventList();
 
 		public Event Update
 		{
@@ -75,94 +77,198 @@ namespace RedOnion.KSP.ROS
 			updateList.Clear();
 			idleList.Clear();
 		}
-		public override void Reset()
+		public event Func<Core, bool> Shutdown;
+		public void Reset()
 		{
+			var shutdown = Shutdown;
+			if (shutdown != null)
+			{
+				foreach (Func<Core, bool> handler in shutdown.GetInvocationList())
+				{
+					try
+					{
+						if (!handler(this))
+							Shutdown -= handler;
+					}
+					catch (Exception ex)
+					{
+						Log("Exception in Shutdown: " + ex.Message);
+						if (ex is Error err)
+						{
+							var line = err.Line;
+							Log(line == null ? "Error at line {0}."
+								: "Error at line {0}: {1}", err.LineNumber, line);
+						}
+						Shutdown -= handler;
+					}
+				}
+			}
 			ClearEvents();
-			base.Reset();
+			Globals = new RosGlobals();
 		}
+		public RosCore()
+			=> Globals = new RosGlobals();
+		public RosCore(RosGlobals globals)
+			=> Globals = globals;
 
+		public int UpdateCountdown { get; set; } = 1000;
+		public int StepCountdown { get; set; } = 100;
+		public int UpdatePercent { get; set; } = 50;
+		public int IdlePercent { get; set; } = 80;
+		public TimeSpan UpdateTimeout { get; set; } = TimeSpan.FromMilliseconds(10.0);
+
+		public int TotalCountdown { get; protected set; }
+		public int CountdownPercent => 100 * TotalCountdown / UpdateCountdown;
+		public double AverageMillis { get; protected set; }
+		public double PeakMillis { get; protected set; }
+		Stopwatch watch = new Stopwatch();
 		int idleSkipped;
-		public void FixedUpdate(int countdown = 1000, int percent = 50, int idlePercent = 80)
+		public void FixedUpdate()
 		{
-			ExecutionCountdown = countdown;
+			TotalCountdown = UpdateCountdown;
+			watch.Reset();
+			watch.Start();
 			if (updateList.Count > 0)
 			{
 				do
 				{
-					var call = updateList.GetNext();
-					try
-					{
-						call.Call(null, new Arguments(Arguments, 0));
-					}
-					catch (Exception ex)
-					{
-						updateList.Remove(call);
-						Log("Exception in FixedUpdate: " + ex.Message);
-						if (ex is IErrorWithLine ln)
-						{
-							var line = ln.Line;
-							Log(line == null ? "Error at line {0}."
-								: "Error at line {0}: {1}", ln.LineNumber, line);
-						}
-					}
-				} while (!updateList.AtEnd && CountdownPercent > percent);
+					ref var call = ref updateList.GetNext();
+					if (!Call(ref call))
+						updateList.Remove(call.Value);
+				} while (!updateList.AtEnd
+				&& CountdownPercent > UpdatePercent
+				&& watch.Elapsed < UpdateTimeout);
 			}
 			if (idleList.IsEmpty)
 				idleSkipped = 0;
-			else if (CountdownPercent <= idlePercent && idleSkipped < 10)
+			else if (CountdownPercent <= IdlePercent && idleSkipped < 10)
 				idleSkipped++;
 			else
 			{
 				idleSkipped = 0;
 				do
 				{
-					var call = idleList.GetNext();
-					try
-					{
-						call.Call(null, new Arguments(Arguments, 0));
-					}
-					catch (Exception ex)
-					{
-						updateList.Remove(call);
-						Log("Exception in FixedUpdate: " + ex.Message);
-						if (ex is IErrorWithLine ln)
-						{
-							var line = ln.Line;
-							Log(line == null ? "Error at line {0}."
-								: "Error at line {0}: {1}", ln.LineNumber, line);
-						}
-					}
-				} while (!idleList.AtEnd && CountdownPercent > idlePercent);
+					ref var call = ref idleList.GetNext();
+					if (!Call(ref call))
+						idleList.Remove(call.Value);
+				} while (!idleList.AtEnd
+				&& CountdownPercent > IdlePercent
+				&& watch.Elapsed < UpdateTimeout);
 			}
+			do
+			{
+				if (Exit != ExitCode.Countdown && Exit != ExitCode.Yield)
+					break;
+				var countdown = Math.Min(StepCountdown, TotalCountdown);
+				Execute(countdown);
+				TotalCountdown -= (countdown - Countdown);
+			} while (TotalCountdown > 0 && watch.Elapsed < UpdateTimeout);
+			watch.Stop();
+			var milli = watch.Elapsed.TotalMilliseconds;
+			if (AverageMillis <= 0)
+				AverageMillis = milli;
+			else AverageMillis = (AverageMillis * 9 + milli) * 0.1;
+			if (milli > PeakMillis)
+				PeakMillis = milli;
+		}
+		private bool Call(ref EventList.Element e)
+		{
+			try
+			{
+				if (!e.Value.IsFunction)
+				{
+					var result = Value.Void;
+					e.Value.desc.Call(ref result, null, new Arguments(Arguments, 0));
+				}
+				else if (e.Core != null)
+				{
+					do
+					{
+						if (Exit != ExitCode.Countdown && Exit != ExitCode.Yield)
+							break;
+						var countdown = Math.Min(StepCountdown, TotalCountdown);
+						e.Core.Execute(countdown);
+						TotalCountdown -= (countdown - Countdown);
+					} while (TotalCountdown > 0 && watch.Elapsed < UpdateTimeout);
+					if (Exit != ExitCode.Countdown && Exit != ExitCode.Yield)
+					{
+						// TODO: pool
+						e.Core = null;
+					}
+				} else
+				{
+					e.Core = new Core(Globals);
+					var countdown = Math.Min(StepCountdown, TotalCountdown);
+					var fn = e.Value.obj as Function;
+					e.Core.Execute(fn.Code, countdown);
+				}
+			}
+			catch (Exception ex)
+			{
+				Log("Exception in FixedUpdate: " + ex.Message);
+				if (ex is Error err)
+				{
+					var line = err.Line;
+					Log(line == null ? "Error at line {0}."
+						: "Error at line {0}: {1}", err.LineNumber, line);
+				}
+				return false;
+			}
+			return true;
 		}
 	}
 
 	/// <summary>
 	/// List of callable objects that tracks removals during enumeration
 	/// </summary>
-	public class UpdateList : IList<ICallable>
+	public class EventList : IList<Value>
 	{
-		protected ListCore<ICallable> list;
+		//TODO: doubly-linked list (for fast remove) with free-list (pool to save GC)
+		public struct Element: IEquatable<Element>
+		{
+			/// <summary>
+			/// Function or Action
+			/// </summary>
+			public readonly Value Value;
+			/// <summary>
+			/// Core it is currently running on (if yielding)
+			/// </summary>
+			public Core Core;
+
+			public Element(Value value)
+			{
+				Value = value;
+				Core = null;
+			}
+
+			public bool Equals(Element e)
+				=> Value.Equals(e.Value);
+			public override bool Equals(Object o)
+				=> o is Element e && Equals(e);
+			public override int GetHashCode()
+				=> Value.GetHashCode();
+		}
+		protected ListCore<Element> list;
 		protected internal int index;
 
 		public int Count => list.size;
 		public bool IsEmpty => list.size == 0;
 		public bool AtEnd => index >= list.size;
 
-		public ICallable GetNext()
+		public ref Element GetNext()
 		{
 			if (index >= list.size)
 				index = 0;
-			return list[index++];
+			return ref list.items[index++];
 		}
 
-		public void Add(ICallable item)
-			=> list.Add(item);
-		public void Insert(int index, ICallable item)
+		public void Add(Value item)
+			=> list.Add(new Element(item));
+		public void Insert(int index, Value item)
 		{
 			if (index <= this.index && index >= 0)
 				this.index++;
-			list.Insert(index, item);
+			list.Insert(index, new Element(item));
 		}
 		public void RemoveAt(int index)
 		{
@@ -170,7 +276,7 @@ namespace RedOnion.KSP.ROS
 				this.index--;
 			list.RemoveAt(index);
 		}
-		public bool Remove(ICallable item)
+		public bool Remove(Value item)
 		{
 			int index = IndexOf(item);
 			if (index < 0)
@@ -179,10 +285,10 @@ namespace RedOnion.KSP.ROS
 			return true;
 		}
 
-		public ICallable this[int index]
+		public Value this[int index]
 		{
-			get => list[index];
-			set => list[index] = value;
+			get => list[index].Value;
+			set => list[index] = new Element(value);
 		}
 		public void Clear()
 		{
@@ -190,11 +296,31 @@ namespace RedOnion.KSP.ROS
 			index = 0;
 		}
 
-		public bool Contains(ICallable item) => list.Contains(item);
-		public void CopyTo(ICallable[] array, int index) => list.CopyTo(array, index);
-		public int IndexOf(ICallable item) => list.IndexOf(item);
-		public IEnumerator<ICallable> GetEnumerator() => list.GetEnumerator();
+		public bool Contains(Value item)
+		{
+			foreach (var e in list)
+				if (e.Value.Equals(item))
+					return true;
+			return false;
+		}
+		public void CopyTo(Value[] array, int index)
+		{
+			foreach (var e in list)
+				array[index++] = e.Value;
+		}
+		public int IndexOf(Value item)
+		{
+			for (int i = 0; i < list.size; i++)
+				if (list.items[i].Value.Equals(item))
+					return i;
+			return -1;
+		}
+		public IEnumerator<Value> GetEnumerator()
+		{
+			foreach (var e in list)
+				yield return e.Value;
+		}
 		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-		bool ICollection<ICallable>.IsReadOnly => false;
+		bool ICollection<Value>.IsReadOnly => false;
 	}
 }

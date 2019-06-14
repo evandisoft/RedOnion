@@ -1,21 +1,34 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using RedOnion.ROS.Objects;
+
+//	Note that there is no Invoke/Call method, because functions need special treatement.
+//	They cannot be called through Descriptor.Call, the Core has to use their code directly.
 
 namespace RedOnion.ROS.Utilities
 {
+	/// <summary>
+	/// Event handler helper that works well in scripts (e.g. LUA not having += operator)
+	/// and still allow += operator if used in property with dummy set
+	/// </summary>
 	public struct Event
 	{
 		readonly IList<Value> list;
 		public Event(IList<Value> list) => this.list = list;
 		public void Add(Value call) => list.Add(call);
-		public void Add(Action call) => list.Add(new Value(call));
-		public void Remove(ICallable call) => list.Remove(call);
-		public void Remove(Action call) => list.Remove(new ActionWrapper(call));
+		public void Add(Function call) => list.Add(new Value(call));
+		public void Add(Action call) => list.Add(new Value(Descriptor.Actions[0], call));
+		public void Remove(Value call) => list.Remove(call);
+		public void Remove(Function call) => list.Remove(new Value(call));
+		public void Remove(Action call) => list.Remove(new Value(Descriptor.Actions[0], call));
 		public void Clear() => list.Clear();
-		public void Set(ICallable call)
+
+		public void Set(Value call)
+		{
+			Clear();
+			Add(call);
+		}
+		public void Set(Function call)
 		{
 			Clear();
 			Add(call);
@@ -25,17 +38,12 @@ namespace RedOnion.ROS.Utilities
 			Clear();
 			Add(call);
 		}
-		public void Invoke()
-		{
-			foreach (var call in list)
-				call.Call(null, new Arguments());
-		}
 
 		public struct AddProxy
 		{
-			internal readonly IList<ICallable> list;
-			internal readonly ICallable call;
-			public AddProxy(IList<ICallable> e, ICallable a)
+			internal readonly IList<Value> list;
+			internal readonly Value call;
+			internal AddProxy(IList<Value> e, Value a)
 			{
 				list = e;
 				call = a;
@@ -43,22 +51,22 @@ namespace RedOnion.ROS.Utilities
 		}
 		public struct RemoveProxy
 		{
-			internal readonly IList<ICallable> list;
-			internal readonly ICallable call;
-			public RemoveProxy(IList<ICallable> e, ICallable a)
+			internal readonly IList<Value> list;
+			internal readonly Value call;
+			internal RemoveProxy(IList<Value> e, Value a)
 			{
 				list = e;
 				call = a;
 			}
 		}
-		public static AddProxy operator +(Event e, IObject a)
+		public static AddProxy operator +(Event e, Value a)
 			=> new AddProxy(e.list, a);
 		public static AddProxy operator +(Event e, Action a)
-			=> new AddProxy(e.list, new ActionWrapper(a));
-		public static RemoveProxy operator -(Event e, IObject a)
+			=> new AddProxy(e.list, new Value(Descriptor.Actions[0], a));
+		public static RemoveProxy operator -(Event e, Value a)
 			=> new RemoveProxy(e.list, a);
 		public static RemoveProxy operator -(Event e, Action a)
-			=> new RemoveProxy(e.list, new ActionWrapper(a));
+			=> new RemoveProxy(e.list, new Value(Descriptor.Actions[0], a));
 		public Event(AddProxy p)
 		{
 			list = p.list;
@@ -73,61 +81,5 @@ namespace RedOnion.ROS.Utilities
 			=> new Event(p);
 		public static implicit operator Event(RemoveProxy p)
 			=> new Event(p);
-
-		public class ActionWrapper : ICallable, IEquatable<ActionWrapper>
-		{
-			Action action;
-			public ActionWrapper(Action action)
-				=> this.action = action;
-			public Value Call(IObject self, Arguments args)
-			{
-				action();
-				return new Value();
-			}
-
-			public bool Equals(ActionWrapper obj)
-				=> action == obj.action;
-			public override bool Equals(object obj)
-				=> obj is ActionWrapper wrapper && Equals(wrapper);
-			public override int GetHashCode()
-				=> action?.GetHashCode() ?? ~0;
-		}
-	}
-	public class EventObj : BasicObjects.BasicObject, IPropertyEx
-	{
-		protected Event it;
-		public EventObj(IEngine engine, Event it)
-			: base(engine, null, new Properties(StdProps))
-			=> this.it = it;
-
-		public static IDictionary<string, Value> StdProps { get; } = new Dictionary<string, Value>()
-		{
-			{ "add",	Value.Method<EventObj>((obj, value) => obj.it.Add(value.ToCallable())) },
-			{ "remove",	Value.Method<EventObj>((obj, value) => obj.it.Remove(value.ToCallable())) },
-			{ "set",	Value.Method<EventObj>((obj, value) => obj.it.Set(value.ToCallable(true))) },
-			{ "clear",	Value.Method<EventObj>(obj => obj.it.Clear()) },
-		};
-
-		Value IProperty.Get(IObject self)
-			=> new Value((IObject)this);
-		bool IProperty.Set(IObject self, Value value)
-		{
-			it.Set(value.ToCallable(true));
-			return true;
-		}
-		public bool Modify(IObject self, OpCode op, Value value)
-		{
-			if (op == OpCode.AddAssign)
-			{
-				it.Add(value.ToCallable());
-				return true;
-			}
-			if (op == OpCode.SubAssign)
-			{
-				it.Remove(value.ToCallable());
-				return true;
-			}
-			return false;
-		}
 	}
 }

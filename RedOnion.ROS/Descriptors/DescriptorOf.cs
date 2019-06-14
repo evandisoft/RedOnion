@@ -9,9 +9,7 @@ namespace RedOnion.ROS
 		public static Descriptor StandardCreate(Type type)
 		{
 			if (typeof(Delegate).IsAssignableFrom(type))
-			{
-
-			}
+				return Callable.FromType(type);
 			return new Reflected(type);
 		}
 		public static Func<Type,Descriptor> Create = StandardCreate;
@@ -32,12 +30,14 @@ namespace RedOnion.ROS
 		public static readonly Descriptor[] Actions = new Descriptor[] {
 			new Action0("Action (0 args)"),
 			new Action1("Action (1 arg)"),
-			new Action2("Action (2 args)")
+			new Action2("Action (2 args)"),
+			new Action3("Action (3 args)"),
 		};
 		public static readonly Descriptor[] Functions = new Descriptor[] {
-			new Action0("Function (0 args)"),
-			new Action1("Function (1 arg)"),
-			new Action2("Function (2 args)")
+			new Function0("Function (0 args)"),
+			new Function1("Function (1 arg)"),
+			new Function2("Function (2 args)"),
+			new Function3("Function (3 args)")
 		};
 
 		private readonly static ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();

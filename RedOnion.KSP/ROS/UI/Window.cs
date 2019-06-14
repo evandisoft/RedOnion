@@ -1,53 +1,32 @@
 using System;
-using RedOnion.Script;
-using RedOnion.Script.ReflectedObjects;
+using RedOnion.KSP.ROS;
+using RedOnion.ROS;
+using RedOnion.ROS.Objects;
 
 namespace RedOnion.KSP.ROS_UI
 {
 	public class Window : UI.Window
 	{
-		protected IEngine Engine { get; private set; }
-		public Window(IEngine engine, string name = null, UI.Layout layout = UI.Layout.Vertical)
-			: base(name, layout) => (Engine = engine).Resetting += EngineResetting;
-		void EngineResetting(IEngine obj) => Dispose();
+		WeakReference core;
+		public Window(RosCore core, string name = null, UI.Layout layout = UI.Layout.Vertical)
+			: base(name, layout)
+		{
+			core.Shutdown += CoreShutdown;
+			this.core = new WeakReference(core);
+		}
+		bool CoreShutdown(Core core)
+		{
+			Dispose();
+			return false;
+		}
 		protected override void Dispose(bool disposing)
 		{
-			if (Engine != null)
-			{
-				Engine.Resetting -= EngineResetting;
-				Engine = null;
-			}
+			var core = this.core.Target as RosCore;
+			if (core != null)
+				core.Shutdown -= CoreShutdown;
+			if (disposing)
+				this.core = null;
 			base.Dispose(disposing);
 		}
-	}
-	public class WindowFun : ReflectedType
-	{
-		public WindowFun(IEngine engine) : base(engine, typeof(Window)) { }
-		public override IObject Convert(object value)
-			=> new WindowObj(Engine, (Window)value, this);
-		public override IObject Create(Arguments args)
-		{
-			if (args.Length == 0)
-				return new WindowObj(Engine, new Window(Engine), this);
-			var arg = args[0];
-			if (args.Length == 1)
-			{
-				if (arg.IsNumber)
-					return new WindowObj(Engine, new Window(Engine, null, (UI.Layout)arg.Int), this);
-				return new WindowObj(Engine, new Window(Engine, arg.String), this);
-			}
-			var arg2 = args[1];
-			if (arg2.IsNumber)
-				return new WindowObj(Engine, new Window(Engine, arg.String, (UI.Layout)arg2.Int), this);
-			if (arg.IsNumber)
-				return new WindowObj(Engine, new Window(Engine, arg2.String, (UI.Layout)arg.Int), this);
-			return new WindowObj(Engine, new Window(Engine, arg.String), this);
-		}
-	}
-	public class WindowObj : ReflectedObject<Window>
-	{
-		internal WindowObj(IEngine engine, Window window, WindowFun type)
-			: base(engine, window, type) { }
-		~WindowObj() => It.Dispose();
 	}
 }

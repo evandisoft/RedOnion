@@ -9,7 +9,7 @@ namespace RedOnion.ROS
 		/// <summary>
 		/// static void Action()
 		/// </summary>
-		public class Action0 : Descriptor
+		public class Action0 : Callable
 		{
 			internal static Value CreateValue(MethodInfo m)
 				=> new Value(new Action0(m.Name), CreateDelegate(m));
@@ -17,7 +17,7 @@ namespace RedOnion.ROS
 				=> Delegate.CreateDelegate(typeof(Action), m);
 
 			public Action0(string name)
-				: base(name, typeof(Action)) { }
+				: base(name, typeof(Action), false) { }
 
 			public override bool Call(ref Value result, object self, Arguments args, bool create)
 			{
@@ -31,7 +31,7 @@ namespace RedOnion.ROS
 		/// <summary>
 		/// static Value Function()
 		/// </summary>
-		public class Function0 : Descriptor
+		public class Function0 : Callable
 		{
 			internal static Value CreateValue(MethodInfo m)
 				=> new Value(new Function0(m.Name), CreateDelegate(m));
@@ -40,7 +40,7 @@ namespace RedOnion.ROS
 					m.ReturnType, Expression.Call(m))).Compile();
 
 			public Function0(string name)
-				: base(name, typeof(Func<Value>)) { }
+				: base(name, typeof(Func<Value>), false) { }
 
 			public override bool Call(ref Value result, object self, Arguments args, bool create)
 			{
@@ -53,9 +53,10 @@ namespace RedOnion.ROS
 		/// <summary>
 		/// void Procedure()
 		/// </summary>
-		public class Procedure0<T> : Descriptor
+		public class Procedure0<T> : Callable
 		{
-			public Procedure0(string name) : base(name, typeof(Action<T>)) { }
+			public Procedure0(string name)
+				: base(name, typeof(Action<T>), true) { }
 
 			public override bool Call(ref Value result, object self, Arguments args, bool create)
 			{
@@ -69,9 +70,10 @@ namespace RedOnion.ROS
 		/// <summary>
 		/// Value Method()
 		/// </summary>
-		public class Method0<T> : Descriptor
+		public class Method0<T> : Callable
 		{
-			public Method0(string name) : base(name, typeof(Func<T, Value>)) { }
+			public Method0(string name)
+				: base(name, typeof(Func<T, Value>), true) { }
 
 			public override bool Call(ref Value result, object self, Arguments args, bool create)
 			{

@@ -225,7 +225,7 @@ namespace RedOnion.ROS
 						}
 						case 3:
 						{
-							var value = ReflectedAction3.CreateValue(m, args);
+							var value = Action3.CreateValue(m, args);
 							return obj => value;
 						}
 						}
@@ -251,7 +251,7 @@ namespace RedOnion.ROS
 						}
 						case 3:
 						{
-							var value = ReflectedFunction3.CreateValue(m, args);
+							var value = Function3.CreateValue(m, args);
 							return obj => value;
 						}
 						}
@@ -297,7 +297,7 @@ namespace RedOnion.ROS
 						{
 							var self = Expression.Parameter(m.DeclaringType, "self");
 							var value = new Value((Descriptor)Activator.CreateInstance(
-								typeof(ReflectedProcedure3<>).MakeGenericType(m.DeclaringType), m.Name),
+								typeof(Procedure3<>).MakeGenericType(m.DeclaringType), m.Name),
 								Expression.Lambda(Expression.Call(self, m,
 								GetValueConvertExpression(args[0].ParameterType, ValueArg0Parameter),
 								GetValueConvertExpression(args[1].ParameterType, ValueArg1Parameter),
@@ -348,7 +348,7 @@ namespace RedOnion.ROS
 						{
 							var self = Expression.Parameter(m.DeclaringType, "self");
 							var value = new Value((Descriptor)Activator.CreateInstance(
-								typeof(ReflectedMethod3<>).MakeGenericType(m.DeclaringType), m.Name),
+								typeof(Method3<>).MakeGenericType(m.DeclaringType), m.Name),
 								Expression.Lambda(GetNewValueExpression(m.ReturnType,
 								Expression.Call(self, m,
 								GetValueConvertExpression(args[0].ParameterType, ValueArg0Parameter),

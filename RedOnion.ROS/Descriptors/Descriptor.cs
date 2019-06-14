@@ -55,8 +55,8 @@ namespace RedOnion.ROS
 
 		public virtual bool Unary(ref Value self, OpCode op) => false;
 		public virtual bool Binary(ref Value lhs, OpCode op, ref Value rhs) => false;
-		public virtual bool Call(ref Value result, object self, Arguments args, bool create) => false;
-		public virtual int Find(object self, string name, bool add) => -1;
+		public virtual bool Call(ref Value result, object self, Arguments args, bool create = false) => false;
+		public virtual int Find(object self, string name, bool add = false) => -1;
 		public virtual string NameOf(object self, int at) => null;
 		public virtual bool Get(ref Value self, int at) => false;
 		public virtual bool Set(ref Value self, int at, OpCode op, ref Value value) => false;

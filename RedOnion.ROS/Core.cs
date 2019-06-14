@@ -86,6 +86,17 @@ namespace RedOnion.ROS
 			if (Globals == null) Globals = new Globals();
 			return Execute(countdown);
 		}
+		public bool Execute(Function fn, int countdown = 1000)
+		{
+			Code = fn.Code;
+			ctx = fn.Context;
+			ctx.Push(at, at + fn.CodeSize, OpCode.Function);
+			ctx.Add("arguments", new Value[0]);
+			result = Value.Void;
+			ctx.RootStart = at = fn.CodeAt;
+			ctx.RootEnd = at + fn.CodeSize;
+			return Execute(countdown);
+		}
 
 		protected void Identifier(int at)
 		{

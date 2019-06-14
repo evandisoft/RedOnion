@@ -210,7 +210,7 @@ namespace RedOnion.ROS
 							ref var it = ref vals.Top();
 							if (it.IsReference && !it.desc.Get(ref it, it.num.Int))
 								throw CouldNotGet(ref it);
-							if (it.desc.Primitive == ExCode.Function)
+							if (it.IsFunction)
 							{
 								this.at = at;
 								blockEnd = CallFunction((Function)it.desc, null, null, 0, true);
@@ -237,7 +237,7 @@ namespace RedOnion.ROS
 								if (!it.desc.Get(ref it, idx))
 									throw CouldNotGet(ref it);
 							}
-							if (it.desc.Primitive == ExCode.Function)
+							if (it.IsFunction)
 							{
 								this.at = at;
 								blockEnd = CallFunction((Function)it.desc, selfDesc, self, 0, true);
@@ -266,7 +266,7 @@ namespace RedOnion.ROS
 								if (!it.desc.Get(ref it, idx))
 									throw CouldNotGet(ref it);
 							}
-							if (it.desc.Primitive == ExCode.Function)
+							if (it.IsFunction)
 							{
 								this.at = at;
 								blockEnd = CallFunction((Function)it.desc, selfDesc, self, 1, true);
@@ -296,7 +296,7 @@ namespace RedOnion.ROS
 								if (!it.desc.Get(ref it, idx))
 									throw CouldNotGet(ref it);
 							}
-							if (it.desc.Primitive == ExCode.Function)
+							if (it.IsFunction)
 							{
 								this.at = at;
 								blockEnd = CallFunction((Function)it.desc, selfDesc, self, 2, true);
@@ -327,7 +327,7 @@ namespace RedOnion.ROS
 								if (!it.desc.Get(ref it, idx))
 									throw CouldNotGet(ref it);
 							}
-							if (it.desc.Primitive == ExCode.Function)
+							if (it.IsFunction)
 							{
 								this.at = at;
 								blockEnd = CallFunction((Function)it.desc, selfDesc, self, n - 1, true);
@@ -360,7 +360,7 @@ namespace RedOnion.ROS
 							if (!it.desc.Get(ref it, idx))
 								throw CouldNotGet(ref it);
 						}
-						if (it.desc.Primitive == ExCode.Function)
+						if (it.IsFunction)
 						{
 							this.at = at;
 							blockEnd = CallFunction((Function)it.desc, selfDesc, self, 0, false);
@@ -391,7 +391,7 @@ namespace RedOnion.ROS
 							if (!it.desc.Get(ref it, idx))
 								throw CouldNotGet(ref it);
 						}
-						if (it.desc.Primitive == ExCode.Function)
+						if (it.IsFunction)
 						{
 							this.at = at;
 							blockEnd = CallFunction((Function)it.desc, selfDesc, self, 1, false);
@@ -421,7 +421,7 @@ namespace RedOnion.ROS
 							if (!it.desc.Get(ref it, idx))
 								throw CouldNotGet(ref it);
 						}
-						if (it.desc.Primitive == ExCode.Function)
+						if (it.IsFunction)
 						{
 							this.at = at;
 							blockEnd = CallFunction((Function)it.desc, selfDesc, self, 2, false);
@@ -452,7 +452,7 @@ namespace RedOnion.ROS
 							if (!it.desc.Get(ref it, idx))
 								throw CouldNotGet(ref it);
 						}
-						if (it.desc.Primitive == ExCode.Function)
+						if (it.IsFunction)
 						{
 							this.at = at;
 							blockEnd = CallFunction((Function)it.desc, selfDesc, self, n - 1, false);
