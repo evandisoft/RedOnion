@@ -1,27 +1,32 @@
 using System;
 using System.Collections.Generic;
-using RedOnion.Script;
 using UnityEngine;
+using RedOnion.ROS;
 using RedOnion.KSP;
 using RedOnion.KSP.Autopilot;
-using RedOnion.Script.Parsing;
+using RedOnion.KSP.ROS;
+using RedOnion.ROS.Objects;
 
 namespace Kerbalua.Other
 {
 	public class RedOnionReplEvaluator : ReplEvaluator
 	{
-		ImmediateEngine engine;
-		ReplHintsEngine hints;
+		RosCore core;
 		string source, path;
 		bool skipUpdate;
 
 		public RedOnionReplEvaluator()
 		{
-			engine = new ImmediateEngine();
-			hints = new ReplHintsEngine(engine);
-
-			engine.Printing += msg => PrintAction?.Invoke(msg);
+			core = new RosCore();
+			Print.Listen += PrintRedirect;
 		}
+		protected override void Dispose(bool disposing)
+		{
+			Print.Listen -= PrintRedirect;
+			base.Dispose(disposing);
+		}
+		protected void PrintRedirect(string msg)
+			=> PrintAction?.Invoke(msg);
 
 		public override void FixedUpdate()
 		{
@@ -30,7 +35,7 @@ namespace Kerbalua.Other
 				skipUpdate = false;
 				return;
 			}
-			engine.FixedUpdate();
+			core.FixedUpdate();
 		}
 
 		protected override void ProtectedSetSource(string source, string path)
@@ -44,9 +49,8 @@ namespace Kerbalua.Other
 			try
 			{
 				skipUpdate = true;
-				engine.ExecutionCountdown = 10000;
-				engine.Execute(source);
-				result = engine.Result.ToString();
+				core.Execute(source, path, 10000);
+				result = core.Result.ToString();
 				return true; // for now we always complete immediately
 			}
 			catch (Exception e)
@@ -77,7 +81,9 @@ namespace Kerbalua.Other
 		{
 			try
 			{
-				return hints.Complete(source, cursorPos, out replaceStart, out replaceEnd);
+				//TODO: Completion
+				replaceStart = replaceEnd = cursorPos;
+				return new List<string>();
 			}
 			catch (Exception e)
 			{
@@ -92,8 +98,7 @@ namespace Kerbalua.Other
 		{
 			source = null;
 			path = null;
-			engine.Reset();
-			hints.Reset();
+			core.Reset();
 			FlightControl.GetInstance().Shutdown();
 		}
 
@@ -101,7 +106,7 @@ namespace Kerbalua.Other
 		{
 			source = null;
 			path = null;
-			engine.ClearEvents();
+			core.ClearEvents();
 		}
 	}
 }

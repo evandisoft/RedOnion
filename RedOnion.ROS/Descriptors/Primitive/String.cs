@@ -98,7 +98,7 @@ namespace RedOnion.ROS
 					return -1;
 				var index = args[0];
 				int at;
-				if (index.IsNumber)
+				if (index.IsNumerOrChar)
 				{
 					at = index.ToInt();
 					if (at < 0 || at >= self.obj.ToString().Length)

@@ -85,9 +85,9 @@ namespace RedOnion.ROS.Parsing
 		}
 
 		/// <summary>
-		/// Parse block of statements
+		/// Parse block of statements.
+		/// Returns number of statements parsed
 		/// </summary>
-		/// <returns>Number of statements</returns>
 		protected virtual int ParseBlock(Flag flags)
 		{
 			var ind = Indent;
@@ -137,57 +137,6 @@ namespace RedOnion.ROS.Parsing
 			return count;
 		}
 
-		protected Dictionary<string, int> LabelTable;
-		protected Dictionary<int, string> GotoTable;
-		protected virtual void Label(Flag flags)
-		{
-			if (Word.Length > 127)
-				throw new ParseError(this, "Label too long");
-			if (LabelTable == null)
-				LabelTable = new Dictionary<string, int>();
-			if (LabelTable.ContainsKey(Word))
-				throw new ParseError(this, "Duplicit label name: " + Word);
-			LabelTable[Word] = code.size;
-			Next().Next();
-		}
-		protected struct StoredLabels
-		{
-			public Dictionary<string, int> LabelTable { get; }
-			public Dictionary<int, string> GotoTable { get; }
-			public StoredLabels(Dictionary<string, int> labelTable, Dictionary<int, string> gotoTable)
-			{
-				LabelTable = labelTable;
-				GotoTable = gotoTable;
-			}
-		}
-		protected StoredLabels StoreLabels()
-		{
-			var labelTable = LabelTable;
-			var gotoTable = GotoTable;
-			LabelTable = null;
-			GotoTable = null;
-			return new StoredLabels(labelTable, gotoTable);
-		}
-		protected void RestoreLabels(StoredLabels labels)
-		{
-			//TODO: save line, column and character index for each goto
-			//..... for better exception reporting
-			if (GotoTable != null)
-			{
-				if (LabelTable == null)
-					throw new ParseError(this, "No labels but goto");
-				foreach(var pair in GotoTable)
-				{
-					var label = pair.Value;
-					if (!LabelTable.TryGetValue(label, out var at))
-						throw new ParseError(this, "Missing label: " + label);
-					Write(at - (pair.Key+4), pair.Key); // relative to after goto
-				}
-			}
-			LabelTable = labels.LabelTable;
-			GotoTable = labels.GotoTable;
-		}
-
 		protected virtual void ParseStatement(Flag flags)
 		{
 			int mark;
@@ -215,8 +164,12 @@ namespace RedOnion.ROS.Parsing
 							code.size++;
 						}
 					}
-					else if (root == OpCode.Dot || root.Kind() <= OpKind.Number)
-						Write(OpCode.Autocall);
+					else
+					{
+						if (root == OpCode.Dot || root.Kind() <= OpKind.Number)
+							Write(OpCode.Autocall);
+						Write(OpCode.Pop);
+					}
 				}
 				return;
 			case ExCode.Goto:
@@ -232,9 +185,9 @@ namespace RedOnion.ROS.Parsing
 				if (Word.Length > 127)
 					throw new ParseError(this, "Label too long");
 				Write(OpCode.Goto);
-				if (GotoTable == null)
-					GotoTable = new Dictionary<int, string>();
-				GotoTable[code.size] = Word;
+				if (gotoTable == null)
+					gotoTable = new Dictionary<int, string>();
+				gotoTable[code.size] = Word;
 				return;
 			case ExCode.Return:
 			case ExCode.Raise:
@@ -266,70 +219,116 @@ namespace RedOnion.ROS.Parsing
 			case ExCode.Else:
 				throw new ParseError(this, "Unexpected 'else'");
 
+			// prefix:  while/until; cond size; cond; block size; block
+			// postfix: while/until; cond size; cond + marker; block size; block
 			case ExCode.While:
 			case ExCode.Until:
-				if (HasOption(Option.Prefix)) Write(op);
+			{
+				Write(op);
+				Write(0);
+				var condAt = code.size;
 				Next().FullExpression(flags | Flag.Limited);
-				if (!HasOption(Option.Prefix)) Write(op);
+				if (!HasOption(Option.Prefix))
+					Write(OpCode.Cond);
+				Write(code.size-condAt, condAt-4);
 				if (Curr == ';' || Curr == ':' || ExCode == ExCode.Do)
 					Next();
 				ParseBlock(flags);
 				return;
+			}
+			// do; cond size; block size; block; cond
 			case ExCode.Do:
-				var doat = Write(op);
-				Next();
-				ParseBlock(flags | Flag.WasDo);
+			{
+				var doAt = Write(op);
+				Write(0);
+				Next().ParseBlock(flags | Flag.WasDo);
 				if (ExCode != ExCode.While)
 				{
 					if (ExCode != ExCode.Until)
 						throw new ParseError(this, "Expected 'while' or 'until' for 'do'");
-					code.items[doat] = ExCode.DoUntil.Code();
+					code.items[doAt] = ExCode.DoUntil.Code();
 				}
-				var condAt = Write(0);
+				var condAt = code.size;
 				Next().FullExpression(flags);
-				Write(code.size-condAt-4, condAt);
+				Write(code.size-condAt, doAt+1);
 				return;
-
+			}
+			// for; init size; test size; init; test; last size; last; block size; block
 			case ExCode.For:
-				var forat = Write(ExCode);
-				Next();
-				FullExpression(flags | Flag.Limited | Flag.NoExpression);
+			{
+				mark = Write(ExCode);
+
+				Write(0); // size of init expression
+				Write(0); // size of test expression
+
+				// init expression
+				var iniAt = code.size;
+				Next().FullExpression(flags | Flag.Limited | Flag.NoExpression);
 				if (Curr == ':' || ExCode == ExCode.In)
 				{
-					code.items[forat] = ExCode.ForEach.Code();
+					Write(code.size - iniAt, mark + 1);
+					code.items[mark] = ExCode.ForEach.Code();
 					Next();
 					goto for_in;
 				}
+				if (!HasOption(Option.Prefix))
+					Write(OpCode.Pop);
+				Write(code.size - iniAt, mark + 1);
 				if (Curr == ';')
 					Next();
-				FullExpression(flags | Flag.Limited | Flag.NoExpression);
-				if (Curr == ';')
-					Next();
-				if (!PeekExpression(flags))
-					Write(0); // zero-sized block
-				else
+
+				// test expression
+				var testAt = code.size;
+				var test = FullExpression(flags | Flag.Limited | Flag.NoExpression);
+				if (!HasOption(Option.Prefix))
 				{
-					Write(0);
-					mark = code.size;
-					FullExpression(flags | Flag.Limited);
-					Write(code.size - mark, mark-4);
+					if (test == OpCode.Void && code.size == testAt + 1)
+						Write(OpCode.True, testAt);
+					Write(OpCode.Cond);
 				}
+				Write(code.size-testAt, mark+5);
 				if (Curr == ';')
 					Next();
+
+				// last expression
+				Write(0);
+				var lastAt = code.size;
+				FullExpression(flags | Flag.Limited | Flag.NoExpression);
+				if (!HasOption(Option.Prefix))
+					Write(OpCode.Pop);
+				Write(code.size-lastAt, lastAt-4);
+				if (Curr == ';')
+					Next();
+
+				// statements
 				ParseBlock(flags);
 				return;
+			}
 			case ExCode.ForEach:
-				Write(ExCode);
-				Next();
-				FullExpression(flags | Flag.Limited | Flag.NoExpression);
+			{
+				mark = Write(ExCode);
+
+				Write(0); // size of var expression
+				Write(0); // size of list expression
+
+				var varAt = code.size;
+				Next().FullExpression(flags | Flag.Limited | Flag.NoExpression);
 				if (Curr == ':' || ExCode == ExCode.In)
 					Next();
+				Write(code.size - varAt, mark + 1);
+			}
 			for_in:
+			{
+				var listAt = code.size;
 				FullExpression(flags | Flag.Limited | Flag.NoExpression);
+				if (!HasOption(Option.Prefix))
+					Write(OpCode.Cond);
+				Write(code.size - listAt, mark + 5);
 				if (Curr == ';')
 					Next();
 				ParseBlock(flags);
 				return;
+			}
 
 			case ExCode.Try:
 				Write(ExCode);
@@ -394,6 +393,12 @@ namespace RedOnion.ROS.Parsing
 				Write(code.size - mark, mark-4);
 				return;
 
+			case ExCode.Yield:
+			case ExCode.Wait:
+				Write(op);
+				Next();
+				return;
+
 			//--------------------------------------------------------------------------------------
 			case ExCode.Function:
 			case ExCode.Def:
@@ -406,90 +411,6 @@ namespace RedOnion.ROS.Parsing
 				ParseFunction(fname, flags);
 				return;
 			}
-		}
-
-		protected virtual void ParseFunction(string name, Flag flags)
-		{
-			if (name != null)   // null if parsing lambda / inline function
-				Write(name);    // function name (index to string table)
-			else flags |= Flag.Limited;
-			Write(0);           // header size
-			int mark = code.size;
-			Write((ushort)0);   // type flags
-			Write((byte)0);     // number of generic parameters
-			Write((byte)0);     // number of arguments
-
-			Write(0);           // return type size
-			var typeMark = code.size;
-			Next().OptionalType(flags);
-			Write(code.size - typeMark, typeMark-4);
-
-			var argc = 0;
-			var paren = Curr == '(';
-			if (paren || Curr == ',')
-				Next(true);
-			bool lambda = !paren && ExCode == ExCode.Lambda;
-			while ((paren || (!Eol && Curr != ';')) && !Eof && !lambda)
-			{
-				if (Word == null)
-					throw new ParseError(this, "Expected argument name");
-				if (argc > 127)
-					throw new ParseError(this, "Too many arguments");
-
-				Write(Word);  // argument name (index to string table)
-
-				Write(0);           // argument type size
-				var argMark = code.size;
-				Next().OptionalType(flags);
-				Write(code.size - argMark, argMark-4);
-
-				Write(0);           // argument default value size
-				argMark = code.size;
-				OptionalExpression(flags);
-				Write(code.size - argMark, argMark-4);
-				argc++;
-
-				if (paren && Curr == ')')
-				{
-					Next();
-					break;
-				}
-				if (!paren && ExCode == ExCode.Lambda)
-				{
-					lambda = true;
-					break;
-				}
-				if (Curr == ',')
-					Next(true);
-			}
-			if (lambda)
-			{
-				Next();
-				flags |= Flag.Limited;
-			}
-
-			Write(code.size - mark, mark-4);   // header size
-			code.items[mark + 3] = (byte)argc;    // number of arguments
-
-			var labels = StoreLabels();
-			var blockAt = code.size;
-			var count = ParseBlock(flags);
-			if (lambda && count == 1)
-			{
-				var op = ((OpCode)code.items[blockAt+4]).Extend();
-				if (op == ExCode.Autocall)
-					code.items[blockAt+4] = OpCode.Return.Code();
-				else if (op.Kind() < OpKind.Statement)
-				{
-					code.EnsureCapacity(code.size+1);
-					var sz = BitConverter.ToInt32(code.items, blockAt);
-					Write(++sz, blockAt);
-					Array.Copy(code.items, blockAt+4, code.items, blockAt+5, code.size-blockAt-5);
-					Write(OpCode.Return.Code(), blockAt+4);
-					code.size++;
-				}
-			}
-			RestoreLabels(labels);
 		}
 	}
 }

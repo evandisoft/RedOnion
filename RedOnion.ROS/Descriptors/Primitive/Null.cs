@@ -20,6 +20,19 @@ namespace RedOnion.ROS
 				=> ~0;
 			public override string ToString(ref Value self, string format, IFormatProvider provider, bool debug)
 				=> debug ? "null" : "";
+			public override bool Binary(ref Value lhs, OpCode op, ref Value rhs)
+			{
+				switch (op)
+				{
+				case OpCode.Equals:
+					lhs = lhs.desc == this && rhs.desc == this;
+					return true;
+				case OpCode.Differ:
+					lhs = lhs.desc != this || rhs.desc != this;
+					return true;
+				}
+				return false;
+			}
 		}
 	}
 }

@@ -8,9 +8,13 @@ namespace Kerbalua.Other {
 	/// a string (source) and returns a toString of the result of evaluating
 	/// source.
 	/// </summary>
-	public abstract class ReplEvaluator {
+	public abstract class ReplEvaluator : IDisposable
+	{
 		const int maxHistorySize = 1000;
 
+		~ReplEvaluator() => Dispose(false);
+		public void Dispose() => Dispose(true);
+		protected virtual void Dispose(bool disposing) { }
 
 		public Action<string> PrintAction;
 		public Action<string> PrintErrorAction;

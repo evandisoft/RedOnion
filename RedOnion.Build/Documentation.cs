@@ -1,7 +1,8 @@
 using RedOnion.KSP.API;
-using RedOnion.Script;
+using RedOnion.ROS;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Reflection;
 
@@ -14,10 +15,8 @@ namespace RedOnion.Build
 			public Type type;
 			public string name;
 			public string path;
+			public string display;
 			public MemberList members;
-
-			public bool HasFeature(ObjectFeatures feature)
-				=> (members.Features & feature) != 0;
 		}
 		static Dictionary<string, Document> docs = new Dictionary<string, Document>();
 		static Dictionary<Type, Document> types = new Dictionary<Type, Document>();
@@ -89,11 +88,15 @@ namespace RedOnion.Build
 					}
 					members = ((IType)instance.GetValue(null)).Members;
 				}
+				var dname = doctype.GetCustomAttribute<DisplayNameAttribute>();
+				if (dname == null && proxy != null)
+					dname = type.GetCustomAttribute<DisplayNameAttribute>();
 				var doc = new Document()
 				{
 					type = doctype,
 					name = name,
 					path = "RedOnion.KSP/" + string.Join("/", full.Split('.')),
+					display = dname?.DisplayName ?? name,
 					members = members
 				};
 				docs.Add(name, doc);
@@ -111,12 +114,7 @@ namespace RedOnion.Build
 				{
 					if (cdoc != null)
 					{
-						wr.WriteLine(
-							cdoc.HasFeature(ObjectFeatures.Function)
-							? "## {0} Function" :
-							cdoc.HasFeature(ObjectFeatures.Constructor)
-							? "## {0} Constructor"
-							: "## {0}", doc.name);
+						wr.WriteLine("## {0}", doc.display);
 						Print(wr, cdoc, doc.name);
 						wr.WriteLine();
 					}

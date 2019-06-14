@@ -65,7 +65,8 @@ namespace RedOnion.ROS.Parsing
 				|| kind == OpKind.Number    // type specifier (byte, bool, int, ...)
 				|| op == ExCode.String || op == ExCode.Char	// type names
 				|| op.Code() == ExCode.Function.Code() // function or def
-				|| op == ExCode.Get || op == ExCode.Set)
+				|| op == ExCode.Get || op == ExCode.Set
+				|| op == ExCode.Combine || op == ExCode.Remove)
 			{
 				if (!unary)
 					goto autocall;
@@ -327,11 +328,11 @@ namespace RedOnion.ROS.Parsing
 									break;
 								if (Curr != ',')
 									throw new ParseError(this, "Expected ',' or ']'");
-								Next();
+								Next(true);
 							}
 						}
 						PrepareOperator(ExCode.Array);
-						Next(true);
+						Next();
 						unary = false;
 						goto next;
 					}

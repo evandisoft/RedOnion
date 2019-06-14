@@ -1,34 +1,14 @@
-using RedOnion.ROS.Utilities;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Reflection;
 
 namespace RedOnion.ROS
 {
-	public partial class Descriptor
+	partial class Descriptor
 	{
-		public class Reflected : Descriptor
+		partial class Reflected : Descriptor
 		{
-			[DebuggerDisplay("{name}")]
-			protected struct Prop
-			{
-				public string name;
-				public Func<object, Value> read;
-				public Action<object, Value> write;
-				public override string ToString()
-					=> name;
-			}
-			protected ListCore<Prop> prop;
-			protected Dictionary<string, int> sdict;
-			protected Dictionary<string, int> idict;
-			protected Func<object, int, Value> intIndexGet;
-			protected Action<object, int, Value> intIndexSet;
-			protected Func<object, string, Value> strIndexGet;
-			protected Action<object, string, Value> strIndexSet;
-
 			public class MemberComparer : IComparer<MemberInfo>
 			{
 				public static MemberComparer Instance { get; } = new MemberComparer();
@@ -52,28 +32,6 @@ namespace RedOnion.ROS
 				if (members.Length > 1)
 					Array.Sort(members, MemberComparer.Instance);
 				return members;
-			}
-
-			public Reflected(Type type) : this(type.Name, type) { }
-			public Reflected(string name, Type type) : base(name, type)
-			{
-				foreach (var member in GetMembers(type, null, false))
-					ProcessMember(member, false, ref sdict);
-				foreach (var member in GetMembers(type, null, true))
-					ProcessMember(member, true, ref idict);
-				if (intIndexGet == null && intIndexSet == null)
-				{
-					if (typeof(IList<Value>).IsAssignableFrom(type))
-					{
-						intIndexGet = (obj, idx) => ((IList<Value>)obj)[idx];
-						intIndexSet = (obj, idx, v) => ((IList<Value>)obj)[idx] = v;
-					}
-					else if (typeof(IList).IsAssignableFrom(type))
-					{
-						intIndexGet = (obj, idx) => new Value(((IList)obj)[idx]);
-						intIndexSet = (obj, idx, v) => ((IList)obj)[idx] = v.Object;
-					}
-				}
 			}
 
 			protected virtual void ProcessMember(
@@ -111,9 +69,9 @@ namespace RedOnion.ROS
 				//========================================================================= PROPERTY
 				if (member is PropertyInfo p)
 				{
-					if (p.IsSpecialName)
+					var iargs = p.GetIndexParameters();
+					if (p.IsSpecialName || iargs.Length > 0)
 					{
-						var iargs = p.GetIndexParameters();
 						if (iargs.Length != 1)
 							return;
 						var itype = iargs[0].ParameterType;
@@ -124,23 +82,20 @@ namespace RedOnion.ROS
 							if (p.CanRead)
 							{
 								intIndexGet = Expression.Lambda<Func<object, int, Value>>(
-									Expression.New(IntValueConstructor, new Expression[] {
-										Expression.Call(
-											Expression.Convert(SelfParameter, p.DeclaringType),
-											p.GetGetMethod(), IntIndexParameter)
-									}),
+									GetNewValueExpression(p.PropertyType, Expression.Call(
+										Expression.Convert(SelfParameter, p.DeclaringType),
+										p.GetGetMethod(), IntIndexParameter)),
 									SelfParameter, IntIndexParameter
 								).Compile();
 							}
 							if (p.CanWrite)
 							{
 								intIndexSet = Expression.Lambda<Action<object, int, Value>>(
-									Expression.New(IntValueConstructor, new Expression[] {
-										Expression.Call(
-											Expression.Convert(SelfParameter, p.DeclaringType),
-											p.GetSetMethod(), IntIndexParameter,
-											GetValueConvertExpression(p.PropertyType, ValueParameter))
-									}),
+									Expression.Call(
+										Expression.Convert(SelfParameter, p.DeclaringType),
+										p.GetSetMethod(), IntIndexParameter,
+										GetValueConvertExpression(p.PropertyType, ValueParameter)
+									),
 									SelfParameter, IntIndexParameter, ValueParameter
 								).Compile();
 							}
@@ -152,26 +107,20 @@ namespace RedOnion.ROS
 							if (p.CanRead)
 							{
 								strIndexGet = Expression.Lambda<Func<object, string, Value>>(
-									Expression.New(StrValueConstructor, new Expression[] {
-										Expression.Call(
-											Expression.Convert(SelfParameter, p.DeclaringType),
-											p.GetGetMethod(), StrIndexParameter)
-									}),
+									GetNewValueExpression(p.PropertyType, Expression.Call(
+										Expression.Convert(SelfParameter, p.DeclaringType),
+										p.GetGetMethod(), StrIndexParameter)),
 									SelfParameter, StrIndexParameter
 								).Compile();
 							}
 							if (p.CanWrite)
 							{
-								var obj = Expression.Parameter(typeof(object), "obj");
-								var idx = Expression.Parameter(typeof(string), "idx");
-								var val = Expression.Parameter(typeof(Value), "val");
 								strIndexSet = Expression.Lambda<Action<object, string, Value>>(
-									Expression.New(StrValueConstructor, new Expression[] {
-										Expression.Call(
-											Expression.Convert(obj, p.DeclaringType),
-											p.GetSetMethod(), StrIndexParameter,
-											GetValueConvertExpression(p.PropertyType, ValueParameter))
-									}),
+									Expression.Call(
+										Expression.Convert(SelfParameter, p.DeclaringType),
+										p.GetSetMethod(), StrIndexParameter,
+										GetValueConvertExpression(p.PropertyType, ValueParameter)
+									),
 									SelfParameter, StrIndexParameter, ValueParameter
 								).Compile();
 							}
@@ -240,6 +189,8 @@ namespace RedOnion.ROS
 			{
 				if (m.IsSpecialName)
 					return null;
+				if (m.IsGenericMethod)
+					return null;
 				if (m.ReturnType.IsByRef)
 					return null;
 				var args = m.GetParameters();
@@ -259,22 +210,22 @@ namespace RedOnion.ROS
 						{
 						case 0:
 						{
-							var value = ReflectedAction0.CreateValue(m);
+							var value = Action0.CreateValue(m);
 							return obj => value;
 						}
 						case 1:
 						{
-							var value = ReflectedAction1.CreateValue(m, args[0].ParameterType);
+							var value = Action1.CreateValue(m, args[0].ParameterType);
 							return obj => value;
 						}
 						case 2:
 						{
-							var value = ReflectedAction2.CreateValue(m, args);
+							var value = Action2.CreateValue(m, args);
 							return obj => value;
 						}
 						case 3:
 						{
-							var value = ReflectedAction3.CreateValue(m, args);
+							var value = Action3.CreateValue(m, args);
 							return obj => value;
 						}
 						}
@@ -285,22 +236,22 @@ namespace RedOnion.ROS
 						{
 						case 0:
 						{
-							var value = ReflectedFunction0.CreateValue(m);
+							var value = Function0.CreateValue(m);
 							return obj => value;
 						}
 						case 1:
 						{
-							var value = ReflectedFunction1.CreateValue(m, args[0].ParameterType);
+							var value = Function1.CreateValue(m, args[0].ParameterType);
 							return obj => value;
 						}
 						case 2:
 						{
-							var value = ReflectedFunction2.CreateValue(m, args);
+							var value = Function2.CreateValue(m, args);
 							return obj => value;
 						}
 						case 3:
 						{
-							var value = ReflectedFunction3.CreateValue(m, args);
+							var value = Function3.CreateValue(m, args);
 							return obj => value;
 						}
 						}
@@ -316,7 +267,7 @@ namespace RedOnion.ROS
 						{
 							var self = Expression.Parameter(m.DeclaringType, "self");
 							var value = new Value((Descriptor)Activator.CreateInstance(
-								typeof(ReflectedProcedure0<>).MakeGenericType(m.DeclaringType), m.Name),
+								typeof(Procedure0<>).MakeGenericType(m.DeclaringType), m.Name),
 								Expression.Lambda(Expression.Call(self, m),
 								self).Compile());
 							return obj => value;
@@ -325,7 +276,7 @@ namespace RedOnion.ROS
 						{
 							var self = Expression.Parameter(m.DeclaringType, "self");
 							var value = new Value((Descriptor)Activator.CreateInstance(
-								typeof(ReflectedProcedure1<>).MakeGenericType(m.DeclaringType), m.Name),
+								typeof(Procedure1<>).MakeGenericType(m.DeclaringType), m.Name),
 								Expression.Lambda(Expression.Call(self, m,
 								GetValueConvertExpression(args[0].ParameterType, ValueArg0Parameter)),
 								self, ValueArg0Parameter).Compile());
@@ -335,7 +286,7 @@ namespace RedOnion.ROS
 						{
 							var self = Expression.Parameter(m.DeclaringType, "self");
 							var value = new Value((Descriptor)Activator.CreateInstance(
-								typeof(ReflectedProcedure2<>).MakeGenericType(m.DeclaringType), m.Name),
+								typeof(Procedure2<>).MakeGenericType(m.DeclaringType), m.Name),
 								Expression.Lambda(Expression.Call(self, m,
 								GetValueConvertExpression(args[0].ParameterType, ValueArg0Parameter),
 								GetValueConvertExpression(args[1].ParameterType, ValueArg1Parameter)),
@@ -346,7 +297,7 @@ namespace RedOnion.ROS
 						{
 							var self = Expression.Parameter(m.DeclaringType, "self");
 							var value = new Value((Descriptor)Activator.CreateInstance(
-								typeof(ReflectedProcedure3<>).MakeGenericType(m.DeclaringType), m.Name),
+								typeof(Procedure3<>).MakeGenericType(m.DeclaringType), m.Name),
 								Expression.Lambda(Expression.Call(self, m,
 								GetValueConvertExpression(args[0].ParameterType, ValueArg0Parameter),
 								GetValueConvertExpression(args[1].ParameterType, ValueArg1Parameter),
@@ -364,7 +315,7 @@ namespace RedOnion.ROS
 						{
 							var self = Expression.Parameter(m.DeclaringType, "self");
 							var value = new Value((Descriptor)Activator.CreateInstance(
-								typeof(ReflectedMethod0<>).MakeGenericType(m.DeclaringType), m.Name),
+								typeof(Method0<>).MakeGenericType(m.DeclaringType), m.Name),
 								Expression.Lambda(GetNewValueExpression(m.ReturnType,
 								Expression.Call(self, m)),
 								self).Compile());
@@ -374,7 +325,7 @@ namespace RedOnion.ROS
 						{
 							var self = Expression.Parameter(m.DeclaringType, "self");
 							var value = new Value((Descriptor)Activator.CreateInstance(
-								typeof(ReflectedMethod1<>).MakeGenericType(m.DeclaringType), m.Name),
+								typeof(Method1<>).MakeGenericType(m.DeclaringType), m.Name),
 								Expression.Lambda(GetNewValueExpression(m.ReturnType,
 								Expression.Call(self, m,
 								GetValueConvertExpression(args[0].ParameterType, ValueArg0Parameter))),
@@ -385,7 +336,7 @@ namespace RedOnion.ROS
 						{
 							var self = Expression.Parameter(m.DeclaringType, "self");
 							var value = new Value((Descriptor)Activator.CreateInstance(
-								typeof(ReflectedMethod2<>).MakeGenericType(m.DeclaringType), m.Name),
+								typeof(Method2<>).MakeGenericType(m.DeclaringType), m.Name),
 								Expression.Lambda(GetNewValueExpression(m.ReturnType,
 								Expression.Call(self, m,
 								GetValueConvertExpression(args[0].ParameterType, ValueArg0Parameter),
@@ -397,7 +348,7 @@ namespace RedOnion.ROS
 						{
 							var self = Expression.Parameter(m.DeclaringType, "self");
 							var value = new Value((Descriptor)Activator.CreateInstance(
-								typeof(ReflectedMethod3<>).MakeGenericType(m.DeclaringType), m.Name),
+								typeof(Method3<>).MakeGenericType(m.DeclaringType), m.Name),
 								Expression.Lambda(GetNewValueExpression(m.ReturnType,
 								Expression.Call(self, m,
 								GetValueConvertExpression(args[0].ParameterType, ValueArg0Parameter),
@@ -410,103 +361,6 @@ namespace RedOnion.ROS
 					}
 				}
 				return null;
-			}
-
-			public override int Find(object self, string name, bool add)
-			{
-				if (self != null && idict != null && idict.TryGetValue(name, out var idx))
-					return idx;
-				if (sdict != null && sdict.TryGetValue(name, out idx))
-					return idx;
-				return -1;
-			}
-			public override int IndexFind(ref Value self, Arguments args)
-			{
-				if (args.Length == 0)
-					return -1;
-				ref var index = ref args.GetRef(0);
-				int at;
-				if (index.IsNumber)
-				{
-					if (intIndexGet == null && intIndexSet == null)
-						return -1;
-					var proxy = new Value[1 + args.Length];
-					proxy[0] = self;
-					for (int i = 1; i < proxy.Length; i++)
-						proxy[i] = args[i-1];
-					self.obj = proxy;
-					return int.MaxValue; // complex indexing
-				}
-				if (!index.desc.Convert(ref index, String))
-					return -1;
-				if (strIndexGet != null || strIndexSet != null)
-				{
-					var proxy = new Value[1 + args.Length];
-					proxy[0] = self;
-					for (int i = 1; i < proxy.Length; i++)
-						proxy[i] = args[i-1];
-					self.obj = proxy;
-					return int.MaxValue; // complex indexing
-				}
-				var name = index.obj.ToString();
-				at = Find(self.obj, name, true);
-				if (at < 0 || args.Length == 1)
-					return at;
-				if (!Get(ref self, at))
-					return -1;
-				return self.desc.IndexFind(ref self, new Arguments(args, args.Length-1));
-			}
-			public override string NameOf(object self, int at)
-				=> at < 0 || at >= prop.size ? "[?]" : prop[at].name;
-			public override bool Get(ref Value self, int at)
-			{
-				if (at == int.MaxValue)
-				{
-					var proxy = (Value[])self.obj;
-					ref var index = ref proxy[1];
-					if (index.IsNumber)
-					{
-						if (intIndexGet == null)
-							throw InvalidOperation("{0}[{1}] is write only", Name, proxy[1]);
-						self = intIndexGet(proxy[0].obj, index.num.Int);
-						//TODO: multi-index
-						return true;
-					}
-					if (index.IsString)
-					{
-						if (strIndexGet == null)
-							throw InvalidOperation("{0}[{1}] is write only", Name, proxy[1]);
-						self = strIndexGet(proxy[0].obj, index.obj.ToString());
-						//TODO: multi-index
-						return true;
-					}
-					return false;
-				}
-				if (at < 0 || at >= prop.size)
-					return false;
-				var read = prop.items[at].read;
-				if (read == null) return false;
-				self = read(self.obj);
-				return true;
-			}
-			public override bool Set(ref Value self, int at, OpCode op, ref Value value)
-			{
-				if (at == int.MaxValue)
-				{
-					//TODO: index-set
-					return false;
-				}
-				if (at < 0 || at >= prop.size)
-					return false;
-				if (op == OpCode.Assign)
-				{
-					var write = prop.items[at].write;
-					if (write == null) return false;
-					write(self.obj, value);
-					return true;
-				}
-				//TODO: other operations
-				return false;
 			}
 		}
 	}

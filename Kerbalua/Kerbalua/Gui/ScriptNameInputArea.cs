@@ -58,7 +58,7 @@ namespace Kerbalua.Gui {
 				var previousText = ""; 
 				try
 				{
-					previousText = RedOnion.KSP.ROS.KspRosEngine.LoadScript(content.text).Replace("\r", "");
+					previousText = RedOnion.KSP.ROS.RosCore.LoadScript(content.text).Replace("\r", "");
 				}
 				catch (Exception)
 				{
@@ -82,7 +82,7 @@ namespace Kerbalua.Gui {
 			try { 
 				CommonSaveLoadActions();
 				CreateFullPath();
-				result=RedOnion.KSP.ROS.KspRosEngine.LoadScript(content.text).Replace("\r","");
+				result=RedOnion.KSP.ROS.RosCore.LoadScript(content.text).Replace("\r","");
 			}
 			catch(Exception e) {
 				UnityEngine.Debug.Log(e.StackTrace);
@@ -133,7 +133,7 @@ namespace Kerbalua.Gui {
 		List<string> GetScriptList()
 		{
 			if (scriptList == null || ioDelayWatch.ElapsedMilliseconds > ioDelayMillis) {
-				scriptList = RedOnion.KSP.ROS.KspRosEngine.EnumerateScripts();
+				scriptList = RedOnion.KSP.ROS.RosCore.EnumerateScripts();
 				ioDelayWatch.Reset();
 				ioDelayWatch.Start();
 			}

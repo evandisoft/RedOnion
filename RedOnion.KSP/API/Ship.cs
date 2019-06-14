@@ -1,5 +1,5 @@
 using System;
-using RedOnion.Script;
+using RedOnion.ROS;
 using KSP.UI.Screens;
 using MoonSharp.Interpreter;
 using System.Collections.Generic;
@@ -11,7 +11,6 @@ namespace RedOnion.KSP.API
 	public class Ship : InteropObject
 	{
 		public static MemberList MemberList { get; } = new MemberList(
-		ObjectFeatures.None,
 
 @"Active vessel (in flight) or ship construct (in editor).",
 
@@ -113,8 +112,6 @@ namespace RedOnion.KSP.API
 		public ShipConstruct Construct
 			=> HighLogic.LoadedSceneIsEditor ? EditorLogic.fetch.ship : null;
 
-		public override string Name
-			=> Vessel?.vesselName ?? Construct.shipName ?? "Ship (none)";
 		public Guid ID
 			=> Vessel?.id ?? Guid.Empty;
 		public uint PersistentID

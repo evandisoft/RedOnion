@@ -1,35 +1,27 @@
 using System;
-using RedOnion.Script;
-using RedOnion.Script.BasicObjects;
-using RedOnion.Script.Completion;
-using RedOnion.Script.ReflectedObjects;
+using System.Collections.Generic;
+using RedOnion.ROS;
+using RedOnion.ROS.Objects;
+using RedOnion.ROS.Utilities;
 using UE = UnityEngine;
 using UUI = UnityEngine.UI;
 using KUI = KSP.UI;
 using ROC = RedOnion.UI.Components;
 using RedOnion.KSP.Autopilot;
-using RedOnion.Script.Utilities;
 using KSP.UI.Screens;
 using RedOnion.KSP.API;
-using System.Collections.Generic;
 using RedOnion.KSP.Completion;
 
 namespace RedOnion.KSP
 {
 	[IgnoreForDocs]
-	public class RuntimeRoot : BasicRoot<ROS.KspRosEngine>, IType
+	public class RosGlobals : RedOnion.ROS.Objects.Globals, IType
 	{
-		public bool IsRepl { get; }
+		MemberList IType.Members => GlobalMembers.MemberList;
 
-		public RuntimeRoot(ROS.KspRosEngine engine, bool repl)
-			: base(engine, fill: false)
+		/*
+		public RuntimeRoot()
 		{
-			IsRepl = repl;
-			Fill();
-		}
-		protected override void Fill()
-		{
-			base.Fill();
 			var hard = BaseProps; // will resist overwrite and shadowing in global scope
 			var soft = MoreProps; // can be easily overwritten or shadowed
 
@@ -161,15 +153,15 @@ namespace RedOnion.KSP
 		{
 			IObject it;
 			CreateObject creator;
-			public delegate IObject CreateObject(ROS.KspRosEngine engine);
+			public delegate IObject CreateObject(ROS.RosCore engine);
 			public LazyGet(CreateObject creator)
 			{
 				it = null;
 				this.creator = creator;
 			}
 			public IObject Get(IEngine e)
-				=> it ?? (it = creator((ROS.KspRosEngine)e));
-			public IObject Get(ROS.KspRosEngine e)
+				=> it ?? (it = creator((ROS.RosCore)e));
+			public IObject Get(ROS.RosCore e)
 				=> it ?? (it = creator(e));
 		}
 
@@ -191,66 +183,6 @@ namespace RedOnion.KSP
 				Globals.Instance.Set(name, value);
 			return base.Set(name, value);
 		}
-
-		MemberList IType.Members => GlobalMembers.MemberList;
-	}
-
-	/// <summary>
-	/// Runtime engine with all the features
-	/// </summary>
-	public class RuntimeEngine : ROS.KspRosEngine
-	{
-		public RuntimeEngine()
-			: base(engine => new RuntimeRoot(engine, repl: false)) { }
-	}
-	/// <summary>
-	/// Limited engine whith what is safe in REPL / Immediate Mode
-	/// </summary>
-	public class ImmediateEngine : ROS.KspRosEngine
-	{
-		public ImmediateEngine()
-			: base(engine => new RuntimeRoot(engine, repl: true))
-			=> Options |= EngineOption.Repl;
-		public override void Log(string msg)
-			=> UE.Debug.Log("[RedOnion.REPL] " + msg);
-	}
-
-	/// <summary>
-	/// Engine designed to provide hints and documentation for runtime engine
-	/// </summary>
-	public class DocumentingEngine : CompletionEngine
-	{
-		public DocumentingEngine(ROS.KspRosEngine engine)
-			: base(engine) { }
-		public override void Log(string msg)
-			=> UE.Debug.Log("[RedOnion.DOC] " + msg);
-		protected override void FillFrom(object value)
-		{
-			if (value is IType desc)
-			{
-				foreach (var member in desc.Members)
-					AddSuggestion(member.Name);
-			}
-			if (value is ICompletable cmpl)
-			{
-				var list = cmpl.PossibleCompletions;
-				if (list != null)
-				{
-					foreach (var str in list)
-						AddSuggestion(str);
-				}
-			}
-			base.FillFrom(value);
-		}
-	}
-	/// <summary>
-	/// Engine designed to provide hints and documentation for REPL / Immediate Mode
-	/// </summary>
-	public class ReplHintsEngine : DocumentingEngine
-	{
-		public ReplHintsEngine(ROS.KspRosEngine engine)
-			: base(engine) { }
-		public override void Log(string msg)
-			=> UE.Debug.Log("[RedOnion.ReplDOC] " + msg);
+		*/
 	}
 }

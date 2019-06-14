@@ -213,6 +213,10 @@ namespace RedOnion.ROS.Utilities
 			items[size] = default;
 			return it;
 		}
+		public ref T Top()
+			=> ref items[size-1];
+		public ref T Top(int fromEnd)
+			=> ref items[size+fromEnd];
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		bool ICollection<T>.IsReadOnly => false;

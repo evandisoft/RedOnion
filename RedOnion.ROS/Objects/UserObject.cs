@@ -5,35 +5,26 @@ using RedOnion.ROS.Utilities;
 
 namespace RedOnion.ROS.Objects
 {
-	public class UserObject : Descriptor
+	/// <summary>
+	/// Script object created by `new object` or any function or class in the script.
+	/// The design is based on JavaScript (ECMA-262)
+	/// </summary>
+	public class UserObject : UserObject<UserObject>
 	{
-		[DebuggerDisplay("{name} = {value}")]
-		protected struct Prop
-		{
-			public string name;
-			public Value value;
-			public override string ToString()
-				=> string.Format(Value.Culture, "{0} = {1}", name, value.ToString());
-		}
-		protected ListCore<Prop> prop;
-		protected Dictionary<string, int> dict;
-		protected UserObject parent;
-		protected int readOnlyTop = 0;
+		public UserObject()	: base() { }
+		public UserObject(string name) : base(name) { }
+		public UserObject(string name, Type type) : base(name, type) { }
+		public UserObject(string name, Type type, UserObject parent) : base(name, type, parent) { }
 
-		public UserObject()
-			: base("user object", typeof(UserObject)) { }
-		public UserObject(string name)
-			: base(name, typeof(UserObject)) { }
-		public UserObject(string name, Type type)
-			: base(name, type) { }
-		public UserObject(UserObject parent)
-			: this() => this.parent = parent;
-		public UserObject(string name, UserObject parent)
-			: this(name, typeof(UserObject))
-			=> this.parent = parent;
-		public UserObject(string name, Type type, UserObject parent)
-			: this(name, type)
-			=> this.parent = parent;
+		public UserObject(Type type) : base(type) { }
+		public UserObject(Type type, UserObject parent) : base(type, parent) { }
+
+		public UserObject(UserObject parent) : base(parent) { }
+		public UserObject(string name, UserObject parent) : base(name, parent) { }
+
+		internal UserObject(string name, Type type,
+			ExCode primitive, TypeCode typeCode, UserObject parent)
+			: base(name, type, primitive, typeCode, parent) { }
 
 		/// <summary>
 		/// Create new user object inheriting from this one
@@ -44,6 +35,71 @@ namespace RedOnion.ROS.Objects
 			result = new Value(it, it);
 			return true;
 		}
+	}
+
+	/// <summary>
+	/// Script object created by `new object` or any function or class in the script.
+	/// The design is based on JavaScript (ECMA-262)
+	/// </summary>
+	[DebuggerDisplay("{Name}; {prop.DebugString}")]
+	public class UserObject<P> : Descriptor, ISelfDescribing where P: UserObject<P>
+	{
+		Descriptor ISelfDescribing.Descriptor => this;
+
+		/// <summary>
+		/// Single property of an object (with name and value)
+		/// </summary>
+		[DebuggerDisplay("{name} = {value}")]
+		protected struct Prop
+		{
+			public string name;
+			public Value value;
+			public override string ToString()
+				=> string.Format(Value.Culture, "{0} = {1}", name, value.ToString());
+		}
+		/// <summary>
+		/// All properties of the object
+		/// (properties from parent are auto-added when accessed)
+		/// </summary>
+		protected ListCore<Prop> prop;
+		/// <summary>
+		/// Map of all properties (name-to-index into <see cref="prop"/>)
+		/// </summary>
+		protected Dictionary<string, int> dict;
+		/// <summary>
+		/// Parent object (this one is derived from, null if no such)
+		/// </summary>
+		protected P parent;
+		/// <summary>
+		/// Number of locked / read-only properties
+		/// </summary>
+		protected int readOnlyTop = 0;
+
+		public UserObject()
+			: base("user object", typeof(UserObject)) { }
+		public UserObject(string name)
+			: base(name, typeof(UserObject)) { }
+		public UserObject(string name, Type type)
+			: base(name, type) { }
+		public UserObject(string name, Type type, P parent)
+			: base(name, type)
+			=> this.parent = parent;
+
+		public UserObject(Type type)
+			: base(type.Name, type) { }
+		public UserObject(Type type, P parent)
+			: base(type.Name, type)
+			=> this.parent = parent;
+
+		public UserObject(P parent)
+			: this() => this.parent = parent;
+		public UserObject(string name, P parent)
+			: this(name, typeof(UserObject))
+			=> this.parent = parent;
+
+		internal UserObject(string name, Type type, ExCode primitive, TypeCode typeCode, P parent)
+			: base(name, type, primitive, typeCode)
+			=> this.parent = parent;
 
 		/// <summary>
 		/// Make all current properties read-only
@@ -53,7 +109,7 @@ namespace RedOnion.ROS.Objects
 		/// <summary>
 		/// Remove all writable properties (those added after last <see cref="Lock()"/>)
 		/// </summary>
-		public void Reset()
+		public virtual void Reset()
 		{
 			prop.Count = readOnlyTop;
 			if (dict != null)
@@ -78,7 +134,7 @@ namespace RedOnion.ROS.Objects
 			=> Add(name, new Value(it));
 		public int Add(string name, Value value)
 			=> Add(name, ref value);
-		public int Add(string name, ref Value value)
+		public virtual int Add(string name, ref Value value)
 		{
 			var idx = prop.size;
 			ref var it = ref prop.Add();
@@ -92,7 +148,7 @@ namespace RedOnion.ROS.Objects
 			}
 			return idx;
 		}
-		public int Find(string name)
+		public virtual int Find(string name)
 		{
 			if (dict != null && dict.TryGetValue(name, out var idx))
 				return idx;
@@ -166,7 +222,7 @@ namespace RedOnion.ROS.Objects
 				return -1;
 			var index = args[0];
 			int at;
-			if (index.IsNumber)
+			if (index.IsNumerOrChar)
 			{
 				at = index.ToInt();
 				if (at < 0 || at >= prop.size)

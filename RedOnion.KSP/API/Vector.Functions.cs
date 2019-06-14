@@ -1,5 +1,5 @@
 using MoonSharp.Interpreter;
-using RedOnion.Script;
+using RedOnion.ROS;
 using System;
 
 namespace RedOnion.KSP.API
@@ -30,40 +30,44 @@ namespace RedOnion.KSP.API
 		{
 			public static CrossFunction Instance { get; } = new CrossFunction();
 
-			public override Value Call(Arguments args)
+			public override bool Call(ref Value result, object self, Arguments args, bool create)
 			{
 				GetTwo(args, out var lhs, out var rhs);
-				return new Value(new Vector(Vector3d.Cross(lhs, rhs)));
+				result = new Value(new Vector(Vector3d.Cross(lhs, rhs)));
+				return true;
 			}
 		}
 		public class DotFunction : VectorFunctionBase
 		{
 			public static DotFunction Instance { get; } = new DotFunction();
 
-			public override Value Call(Arguments args)
+			public override bool Call(ref Value result, object self, Arguments args, bool create)
 			{
 				GetTwo(args, out var lhs, out var rhs);
-				return new Value(new Vector(Vector3d.Dot(lhs, rhs)));
+				result = new Value(new Vector(Vector3d.Dot(lhs, rhs)));
+				return true;
 			}
 		}
 		public class AbsFunction : VectorFunctionBase
 		{
 			public static AbsFunction Instance { get; } = new AbsFunction();
 
-			public override Value Call(Arguments args)
+			public override bool Call(ref Value result, object self, Arguments args, bool create)
 			{
 				var v = GetOne(args);
-				return new Value(new Vector(Math.Abs(v.x), Math.Abs(v.y), Math.Abs(v.z)));
+				result = new Value(new Vector(Math.Abs(v.x), Math.Abs(v.y), Math.Abs(v.z)));
+				return true;
 			}
 		}
 		public class AngleFunction : VectorFunctionBase
 		{
 			public static AngleFunction Instance { get; } = new AngleFunction();
 
-			public override Value Call(Arguments args)
+			public override bool Call(ref Value result, object self, Arguments args, bool create)
 			{
 				GetTwo(args, out var lhs, out var rhs);
-				return new Value(new Vector(Vector3d.Angle(lhs, rhs)));
+				result = new Value(new Vector(Vector3d.Angle(lhs, rhs)));
+				return true;
 			}
 		}
 	}

@@ -55,9 +55,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\RedOnion.Script\RedOnion.Script.csproj">
-      <Project>{0d0a04f3-0a82-49cd-8178-7640ace88bff}</Project>
-      <Name>RedOnion.Script</Name>
+    <ProjectReference Include="..\RedOnion.ROS\RedOnion.ROS.csproj">
+      <Project>{59399c9e-ebac-4d7c-b2cb-6ece22fe8d6e}</Project>
+      <Name>RedOnion.ROS</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

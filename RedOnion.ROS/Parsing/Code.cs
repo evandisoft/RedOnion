@@ -49,34 +49,38 @@ namespace RedOnion.ROS.Parsing
 		/// </summary>
 		protected void Write(byte value)
 			=> code.Push(value);
+
+		// needed by lambda in postfix
+		protected OpCode lastCode, prevCode;
+		protected int lastCodeAt, prevCodeAt;
+
 		/// <summary>
 		/// Write instruction to code buffer
 		/// </summary>
 		protected int Write(OpCode value)
 		{
-			var at = code.size;
-			Reserve(1);
-			code[code.size++] = value.Code();
-			return at;
+			prevCode = lastCode;
+			prevCodeAt = lastCodeAt;
+			lastCodeAt = code.size;
+			code.Push((lastCode = value).Code());
+			return lastCodeAt;
 		}
 		/// <summary>
 		/// Write instruction to code buffer
 		/// </summary>
 		protected int Write(ExCode value)
-		{
-			var at = code.size;
-			Reserve(1);
-			code.items[code.size++] = value.Code();
-			return at;
-		}
+			=> Write((OpCode)value);
 
 		/// <summary>
 		/// Write single byte to code buffer at specified position
 		/// </summary>
 		protected void Write(byte value, int codeAt)
-		{
-			code.items[codeAt++] = value;
-		}
+			=> code.items[codeAt] = value;
+		/// <summary>
+		/// Write single byte to code buffer at specified position
+		/// </summary>
+		protected void Write(OpCode value, int codeAt)
+			=> code.items[codeAt] = (byte)value;
 
 		/// <summary>
 		/// Write two bytes to code buffer
@@ -172,12 +176,14 @@ namespace RedOnion.ROS.Parsing
 		/// Copy string literal or identifier from vals to code buffer
 		/// </summary>
 		/// <param name="code">Leading code (type of literal or identifier)</param>
-		protected void CopyString(OpCode code, int top, int start)
+		protected string CopyString(OpCode code, int top, int start)
 		{
 			Debug.Assert(top - start == 4);
 			Write((byte)code);
 			var index = TopInt(top);
-			Write(index == -1 ? "" : stringValues.items[index]);
+			var str = index == -1 ? "" : stringValues.items[index];
+			Write(str);
+			return str;
 		}
 		/// <summary>
 		/// Copy string literal or identifier from vals to code buffer
@@ -309,16 +315,24 @@ namespace RedOnion.ROS.Parsing
 						Rewrite(mtop, true);
 						goto full;
 					}
+					// type
 					var peek = (OpCode)values.items[mtop-5];
 					if (peek >= OpCode.String && peek <= OpCode.Hyper || peek == OpCode.Array)
 						Write(OpCode.Type);
-					Rewrite(mtop, true); // type
-					Rewrite(top); // value
-					var idat = code.size;
-					Rewrite(TopInt(mtop), type || create);
-					Debug.Assert(code[idat] == OpCode.Identifier.Code());
-					code[idat] = OpCode.Var.Code(); // rewrite OpCode.Identifier with OpCode.Var
-					return op;
+					Rewrite(mtop, true);
+					// value
+					Rewrite(top);
+					// name - like `Rewrite(TopInt(mtop), type || create);`
+					// ... but we need to avoid adding the variable to captured
+					// ... and also change the code to OpCode.Var
+					top = TopInt(mtop);
+					start = TopInt(top);
+					top -= 4;
+					op = (OpCode)values.items[--top];
+					Debug.Assert(op == OpCode.Identifier);
+					var name = CopyString(OpCode.Var, top, start);
+					ctx.Add(name);
+					return OpCode.Var;
 				}
 
 				// rewrite first argument (condition, method or variable)
@@ -400,7 +414,14 @@ namespace RedOnion.ROS.Parsing
 		{
 			if (op == OpCode.Identifier || op == OpCode.String)
 			{
-				CopyString(op, top, start);
+				var name = CopyString(op, top, start);
+				if (op != OpCode.Identifier)
+					return;
+				if (ctx.vars?.ContainsKey(name) == true)
+					return;
+				if (ctx.captured == null)
+					ctx.captured = new HashSet<string>();
+				ctx.captured.Add(name);
 				return;
 			}
 			if (op < OpCode.Identifier || op == OpCode.Exception)
