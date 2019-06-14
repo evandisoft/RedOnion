@@ -4,6 +4,8 @@ using System.IO;
 using UnityEngine;
 using KSP.UI.Screens;
 using RedOnion.KSP;
+using RedOnion.KSP.ROS;
+using RedOnion.ROS;
 
 namespace RedOnion
 {
@@ -69,10 +71,10 @@ namespace RedOnion
 			button = null;
 		}
 
-		RuntimeEngine engine;
+		RosCore core;
 		private void RunScript()
 		{
-			var script = RuntimeEngine.LoadScript("launcher.ros");
+			var script = RosCore.LoadScript("launcher.ros");
 			if (script == null)
 			{
 				Log("Could not load launcher.ros script");
@@ -80,19 +82,12 @@ namespace RedOnion
 			}
 			try
 			{
-				engine = new RuntimeEngine();
-				engine.ExecutionCountdown = 10000;
-				engine.Execute(script);
+				core = new RosCore();
+				core.Execute(script, "launcher.ros", 10000);
 			}
-			catch(Script.Parsing.ParseError err)
+			catch(Error err)
 			{
-				Log("ParseError at {0}.{1}: {2}", err.LineNumber+1, err.Column+1, err.Message);
-				Log("Content of the line: " + err.Line);
-				StopScript();
-			}
-			catch(Script.RuntimeError err)
-			{
-				Log("RuntimeError at {0}: {1}", err.LineNumber+1, err.Message);
+				Log("Error at {0}: {1}", err.LineNumber+1, err.Message);
 				Log("Content of the line: " + err.Line);
 				StopScript();
 			}
@@ -109,14 +104,14 @@ namespace RedOnion
 			if (stopping)
 				return;
 			stopping = true;
-			engine?.Dispose();
-			engine = null;
+			core?.Dispose();
+			core = null;
 			stopping = false;
 		}
 
 		private void FixedUpdate()
 		{
-			engine?.FixedUpdate();
+			core?.FixedUpdate();
 		}
 
 		private static void Log(string msg)
