@@ -59,6 +59,10 @@
       <Project>{0D0A04F3-0A82-49CD-8178-7640ACE88BFF}</Project>
       <Name>RedOnion.Script</Name>
     </ProjectReference>
+    <ProjectReference Include="..\RedOnion.ROS\RedOnion.ROS.csproj">
+      <Project>{59399C9E-EBAC-4D7C-B2CB-6ECE22FE8D6E}</Project>
+      <Name>RedOnion.ROS</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="VectorTests.cs" />
