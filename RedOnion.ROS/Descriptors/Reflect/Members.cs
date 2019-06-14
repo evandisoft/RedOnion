@@ -61,8 +61,31 @@ namespace RedOnion.ROS
 						return;
 					// maybe use Reflection.Emit: https://docs.microsoft.com/en-us/dotnet/api/system.reflection.emit.dynamicmethod?view=netframework-3.5
 					if (instance)
-						it.write = (self, value) => f.SetValue(self, value.Object);
-					else it.write = (self, value) => f.SetValue(null, value.Object);
+					{
+						it.write = (self, value) =>
+						{
+							var fv = value.Object;
+							if (!f.FieldType.IsAssignableFrom(fv.GetType()))
+							{
+								value.desc.Convert(ref value, Of(f.FieldType));
+								fv = value.Object;
+							}
+							f.SetValue(self, fv);
+						};
+					}
+					else
+					{
+						it.write = (self, value) =>
+						{
+							var fv = value.Object;
+							if (!f.FieldType.IsAssignableFrom(fv.GetType()))
+							{
+								value.desc.Convert(ref value, Of(f.FieldType));
+								fv = value.Object;
+							}
+							f.SetValue(null, value.Object);
+						};
+					}
 					return;
 				}
 

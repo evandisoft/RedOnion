@@ -78,6 +78,11 @@ Can also convert array / list of numbers (`V([1,2,3])` becomes `V(1,2,3)`).",
 		{
 			if (value != null)
 			{
+				if (value is Vector v)
+				{
+					result = v.native;
+					return true;
+				}
 				if (value is Value val)
 					return ToVector3d(val, out result);
 				if (value is Vector3d v3d)

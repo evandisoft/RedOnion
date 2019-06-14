@@ -68,7 +68,7 @@ namespace RedOnion.ROS
 		public static readonly Value False = new Value(false);
 		public static readonly Value True = new Value(true);
 
-		public Value(UserObject it) : this(it ?? Descriptor.Null, it) { }
+		public Value(Descriptor it) : this(it ?? Descriptor.Null, it) { }
 		public Value(Type type) : this(Descriptor.Of(type), null) { }
 		public Value(object it) : this()
 		{

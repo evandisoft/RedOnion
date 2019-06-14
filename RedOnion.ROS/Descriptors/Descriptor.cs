@@ -25,8 +25,25 @@ namespace RedOnion.ROS
 			: this(type.Name, type) { }
 		protected Descriptor(string name, Type type)
 		{
-			Name = name;
+			Name = name ?? type.Name;
 			Type = type;
+			Primitive = ExCode.Class;
+			TypeCode = TypeCode.Object;
+		}
+		protected Descriptor(string name)
+		{
+			var type = GetType();
+			Name = name ?? type.Name;
+			Type = type;
+			Primitive = ExCode.Class;
+			TypeCode = TypeCode.Object;
+		}
+		protected Descriptor()
+		{
+			var type = GetType();
+			Name = type.Name;
+			Type = type;
+			Primitive = ExCode.Class;
 			TypeCode = TypeCode.Object;
 		}
 		internal Descriptor(string name, Type type, ExCode primitive, TypeCode typeCode)
@@ -55,7 +72,6 @@ namespace RedOnion.ROS
 			return false;
 		}
 
-		public virtual int CountProperties() => 0;
 		public virtual int Find(object self, string name, bool add = false) => -1;
 		public virtual string NameOf(object self, int at) => null;
 		public virtual bool Get(ref Value self, int at) => false;
@@ -64,7 +80,13 @@ namespace RedOnion.ROS
 		public virtual bool Unary(ref Value self, OpCode op) => false;
 		public virtual bool Binary(ref Value lhs, OpCode op, ref Value rhs) => false;
 		public virtual bool Call(ref Value result, object self, Arguments args, bool create = false) => false;
+
 		public virtual IEnumerable<Value> Enumerate(ref Value self) => null;
+		public virtual IEnumerable<string> EnumerateProperties(ref Value self) => NoProperties();
+		private IEnumerable<string> NoProperties()
+		{
+			yield break;
+		}
 
 		public virtual int IndexFind(ref Value self, Arguments args)
 		{
@@ -72,7 +94,7 @@ namespace RedOnion.ROS
 				return -1;
 			ref var index = ref args.GetRef(0);
 			int at;
-			if (index.IsNumerOrChar)
+			if (index.IsNumber)
 				return -1;
 			if (!index.desc.Convert(ref index, String))
 				return -1;

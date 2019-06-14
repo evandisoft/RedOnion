@@ -171,6 +171,13 @@ namespace RedOnion.ROS
 				foreach (var v in e)
 					yield return new Value(e);
 			}
+			public override IEnumerable<string> EnumerateProperties(ref Value self)
+				=> EnumerateProperties();
+			public IEnumerable<string> EnumerateProperties()
+			{
+				foreach (var p in prop)
+					yield return p.name;
+			}
 		}
 	}
 }

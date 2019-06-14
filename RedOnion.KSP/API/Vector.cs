@@ -29,6 +29,7 @@ Beware that multiplication is scaling, not cross product or dot - use appropriat
 				"vector2",
 				"Native UnityEngine.Vector2 (`float x,y`).",
 				v => (Vector3)v.Native, (v, value) => v.Native = (Vector3)value),
+			// change ros indexing if this is not Members[3]
 			new Double<Vector>(
 				"x", "The X-coordinate",
 				v => v.X, (v, value) => v.X = value),
@@ -309,19 +310,7 @@ Beware that multiplication is scaling, not cross product or dot - use appropriat
 			get => native[i];
 			set => native[i] = value;
 		}
-		/* TODO
-		public override Value IndexGet(Value index)
-			=> index.IsNumber ? new Value(native[index.Int]) : Get(index.String);
-		public override bool IndexSet(Value index, Value value)
-		{
-			if (index.IsNumber)
-			{
-				native[index.Int] = value.Double;
-				return true;
-			}
-			return Set(index.String, value);
-		}
-		*/
+
 		public override DynValue Index(MoonSharp.Interpreter.Script script, DynValue index, bool isDirectIndexing)
 		{
 			if (index.Type == DataType.Number)
@@ -336,6 +325,47 @@ Beware that multiplication is scaling, not cross product or dot - use appropriat
 				return true;
 			}
 			return base.SetIndex(script, index, value, isDirectIndexing);
+		}
+
+		public override int IndexFind(ref Value self, Arguments args)
+		{
+			if (args.Length == 1)
+			{
+				ref var index = ref args.GetRef(0);
+				if (index.IsNumber)
+				{
+					var i = index.ToInt();
+					if (i < 0 || i > 2)
+						return -1;
+					return i + 3;
+				}
+			}
+			return base.IndexFind(ref self, args);
+		}
+
+		public override bool Convert(ref Value self, Descriptor to)
+		{
+			if (to.Type == typeof(Vector3d))
+			{
+				self = new Value(to, native);
+				return true;
+			}
+			if (to.Type == typeof(Vector3))
+			{
+				self = new Value(to, (Vector3)native);
+				return true;
+			}
+			if (to.Type == typeof(Vector2d))
+			{
+				self = new Value(to, new Vector2d(X, Y));
+				return true;
+			}
+			if (to.Type == typeof(Vector2))
+			{
+				self = new Value(to, new Vector2((float)X, (float)Y));
+				return true;
+			}
+			return base.Convert(ref self, to);
 		}
 	}
 }

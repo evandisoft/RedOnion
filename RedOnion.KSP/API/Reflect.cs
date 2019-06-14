@@ -185,6 +185,8 @@ Example: `reflect.new(""System.Collections.ArrayList"")`.",
 			self = member.RosGet(self.obj);
 			return true;
 		}
+		public override IEnumerable<string> EnumerateProperties(ref Value self)
+			=> PossibleCompletions;
 		public IList<string> PossibleCompletions
 		{
 			get

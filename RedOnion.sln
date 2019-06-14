@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.168
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29009.5
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedOnion", "RedOnion\RedOnion.csproj", "{3A40C452-1B11-4769-9D6B-FD318F2CB514}"
 EndProject
@@ -33,7 +33,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedOnion.Shell", "RedOnion.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedOnion.Build", "RedOnion.Build\RedOnion.Build.csproj", "{976203CB-DAF8-4320-BA90-A3987EC0F82A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedOnion.KSP.ApiNUnit", "RedOnion.KSP.ApiNUnit\RedOnion.KSP.ApiNUnit.csproj", "{7E7D0224-887F-4DFB-93C3-F3738440271A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedOnion.KSP.Tests", "RedOnion.KSP.Tests\RedOnion.KSP.Tests.csproj", "{7E7D0224-887F-4DFB-93C3-F3738440271A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedOnion.ROS", "RedOnion.ROS\RedOnion.ROS.csproj", "{59399C9E-EBAC-4D7C-B2CB-6ECE22FE8D6E}"
 EndProject
