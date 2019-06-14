@@ -1,32 +1,18 @@
 using System;
 using NUnit.Framework;
 using RedOnion.KSP.API;
-using RedOnion.Script;
-using RedOnion.Script.BasicObjects;
+using RedOnion.KSP.ROS;
+using RedOnion.ROS;
 
 namespace RedOnion.KSP.ApiNUnit
 {
-	public class ApiTestsBase : Engine
+	public class ApiTestsBase : RosCore
 	{
-		public ApiTestsBase()
-		{
-			Options |= EngineOption.Repl;
-			FillRoot();
-		}
-		public override void Reset()
-		{
-			base.Reset();
-			FillRoot();
-		}
-		public virtual void FillRoot()
-		{
-		}
 		public void Test(string script, int countdown = 100)
 		{
 			try
 			{
-				ExecutionCountdown = countdown;
-				Execute(script);
+				Execute(script, null, countdown);
 			}
 			catch (Exception e)
 			{
@@ -37,14 +23,15 @@ namespace RedOnion.KSP.ApiNUnit
 		public void Test(object value, string script, int countdown = 100)
 		{
 			Test(script);
-			Assert.AreEqual(value, Result.Native, "Test: <{0}>", script);
+			Assert.True(Result.Equals(value),
+				"Value: {0}\nExpected: {1}\nTest: <{2}>",
+				Result, value, script);
 		}
 		public void Expect<Ex>(string script, int countdown = 100) where Ex : Exception
 		{
 			try
 			{
-				ExecutionCountdown = countdown;
-				Execute(script);
+				Execute(script, null, countdown);
 				Assert.Fail("Should throw " + typeof(Ex).Name);
 			}
 			catch (Ex)
@@ -68,9 +55,10 @@ namespace RedOnion.KSP.ApiNUnit
 	[TestFixture]
 	public class API_VectorTests : ApiTestsBase
 	{
-		public override void FillRoot()
+		[OneTimeSetUp]
+		public void FillGlobals()
 		{
-			Root.Set("v", new Value(VectorCreator.Instance));
+			Globals.Add("v", new Value(VectorCreator.Instance));
 		}
 		[Test]
 		public void API_Vec01_Create()
@@ -158,7 +146,7 @@ namespace RedOnion.KSP.ApiNUnit
 		[Test]
 		public void API_Vec04_Convert()
 		{
-			Root.AddType("test", typeof(ConvertTest));
+			Globals.Add("test", typeof(ConvertTest));
 			ConvertTest.v3d = Vector3d.zero;
 			Test("test.v3d = v.one");
 			Assert.AreEqual(1.0, ConvertTest.v3d.x);
