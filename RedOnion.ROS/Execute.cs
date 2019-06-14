@@ -867,7 +867,7 @@ namespace RedOnion.ROS
 							if (enu == null)
 								throw InvalidOperation(list.Name + " is not enumerable");
 							list.desc = null;
-							list.obj = enu;
+							list.obj = enu.GetEnumerator();
 							list.num.Int = 0;
 							at = blockEnd;
 							ctx.LockTop();

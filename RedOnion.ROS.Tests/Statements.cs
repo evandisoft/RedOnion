@@ -35,18 +35,18 @@ namespace RedOnion.ROS.Tests
 					e.GetType().ToString(), e.Message, script), e);
 			}
 		}
-		public void Yield(OpCode code, object value, string script, int countdown = 1000)
+		public void Yield(ExitCode exit, object value, string script, int countdown = 1000)
 		{
 			Yield(script, countdown);
-			Assert.AreEqual(code, Exit, "Test: <{0}>", script);
+			Assert.AreEqual(exit, Exit, "Test: <{0}>", script);
 			var result = Result.Object;
 			Assert.AreEqual(value, result, "Different result: <{0}>", script);
 			Assert.AreEqual(value?.GetType(), result?.GetType(), "Different type: <{0}>", script);
 		}
-		public void YieldLines(OpCode code, object value, params string[] lines)
-			=> Yield(code, value, string.Join(Environment.NewLine, lines));
-		public void YieldLines(OpCode code, object value, int countdown, params string[] lines)
-			=> Yield(code, value, string.Join(Environment.NewLine, lines), countdown);
+		public void YieldLines(ExitCode exit, object value, params string[] lines)
+			=> Yield(exit, value, string.Join(Environment.NewLine, lines));
+		public void YieldLines(ExitCode exit, object value, int countdown, params string[] lines)
+			=> Yield(exit, value, string.Join(Environment.NewLine, lines), countdown);
 	}
 	[TestFixture]
 	public class ROS_Statements : StatementTests
@@ -128,11 +128,11 @@ namespace RedOnion.ROS.Tests
 		public void ROS_Stts06_Yield()
 		{
 			Yield("yield");
-			YieldLines(OpCode.Return, "done",
+			YieldLines(ExitCode.Return, "done",
 				"for var i = 0",
 				"  if ++i > 3; return \"done\"",
 				"  wait");
-			YieldLines(OpCode.Void, 3,
+			YieldLines(ExitCode.None, 3,
 				"var i = 0",
 				"function f",
 				"  i++",
