@@ -17,6 +17,42 @@
 # Next Release
 <details><summary>Show/Hide</summary>
 
+Nothing yet! Just had a release!
+
+</details>
+
+# 0.3 
+## 0.3.3
+ROS implements assembly (as described in 0.3.1 changelog). Same caveats apply.
+
+## 0.3.2
+- import wasn't properly limited to the default list I had specified.
+- Our MoonSharp dll now uses a different assembly name (KerbaluaMoonSharp). So I think there is no longer a compatibility problem with other mods that use MoonSharp
+
+## 0.3.1
+import is now limited to a default list of assemblies.
+
+To get access to types in other assemblies (including other mods) access them through assembly.
+
+For example: First name after "assembly" is the assembly name, followed by any namespaces or types.
+
+assembly.UnityEngine.UnityEngine.Vector3
+
+Note: For assembly names with non-word characters like "Assembly-CSharp" this does not work. You will see them listed in the possible completion results, but if you try to complete you will get something that looks to Lua like some sort of different operation. In the following case, for example, it looks like a subtraction operation: `assembly.Assembly-CSharp`. Also, it would treat assembly.System.Core ("System.Core" is an assembly name) as an attempt to find a namespace "Core" in an assembly called "System". For names like this you can do `assembly["Assembly-CSharp"]`.
+
+However, it is still useful to use intellisense in order to see what the names are of the various assemblies. Intellisense will show you all the loaded assemblies when you type `assembly.`. If you have a mod you want to interact with, it will most likely have an assembly name very similar to the name of the mod. And you can use that in `assembly["assemblyName"]`.
+
+Intellisense won't work directly  on `asssembly["assemblyName"].`, but it will work after you've assigned the result to another variable. 
+
+```
+i> a=assembly["assemblyName"]
+r> void
+i> a. -- this will show completions for the assembly named "assemblyName"
+```
+
+Right now "assembly" is not implemented in ROS because ROS is undergoing a redesign. When the redesign is finished features like these will be implemented quickly.
+
+## 0.3.0
 ### New Import System:
 `listtype=import.system.collections.generic.list`. Using the import system you can interact with any loaded
 libraries (included loaded mods) written in C#. You should check out the licenses of those mods/libraries prior to writing any code that depends on them. However, many mods have very permissive licenses. This feature organizes all types in the namespace they are found in C#.
@@ -47,7 +83,7 @@ Now works to some extent with control surfaces.
 Also can set a relative direction consisting of a heading and pitch. Heading is degrees from north (clockwise), and pitch is degrees above the plane perpendicular to the vector connecting the vessel and the body. This is an easier way to specify the direction you want it to point. It is relative to the closest body. 
 
 ```
-ctrl=RedOnion.KSP.Autopilot.FlightControl
+ctrl=import.RedOnion.KSP.Autopilot.FlightControl.GetInstance()
 ctrl.SetRel(90,20) -- Aims ship east with a 20 degree pitch above "horizon" (by horizon I mean the plane perpendicular to the vector connecting the vessel and the body rather than the point at which the sky meets the land.)
 ```
 
@@ -83,9 +119,10 @@ r> 1
 
 ### Better Lua intellisense
 Lua Intellisense now knows whether a reference is static or an instance variable, so it no longer lists all the instance members of a class in the context of a static class reference.
-</details>
 
 # 0.2:
+<details><summary>Show/Hide</summary>
+  
 ## 0.2.1:
 - Misc Changes
 
@@ -113,3 +150,5 @@ Lua Intellisense now knows whether a reference is static or an instance variable
 ### Videos:
 - Demo of majorMalfunction.lua and selfDestruct.lua: https://www.youtube.com/watch?v=xzAghlB2NLw
 - ROS, Autopilot and UI using testFlightGui.ros: https://www.youtube.com/watch?v=CDBNb6jR_Cc 
+
+</details>
