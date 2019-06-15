@@ -13,6 +13,8 @@ namespace RedOnion.ROS
 		public bool IsNumber => Primitive.Kind() == OpKind.Number;
 		public bool IsNumberOrChar { get; }
 		public bool IsStringOrChar { get; }
+		public bool IsFpNumber { get; }
+		public bool IsIntegral { get; }
 
 		public virtual object Box(ref Value self)
 			=> self.obj;
@@ -53,8 +55,10 @@ namespace RedOnion.ROS
 			Primitive = primitive;
 			TypeCode = typeCode;
 			var code = (OpCode)primitive;
-			IsNumberOrChar = code >= OpCode.Char && code <= OpCode.Hyper;
+			IsNumberOrChar = code >= OpCode.Char && code < OpCode.Create;
 			IsStringOrChar = code >= OpCode.String && code <= OpCode.LongChar;
+			IsFpNumber = code >= OpCode.Float && code <= OpCode.LongDouble;
+			IsIntegral = code.Kind() == OpKind.Number && !IsFpNumber;
 		}
 
 		public override string ToString() => Name;

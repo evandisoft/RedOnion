@@ -38,7 +38,8 @@ Example: `reflect.new(""System.Collections.ArrayList"")`.",
 	{
 		public static Reflect Instance { get; } = new Reflect();
 
-		public Reflect() : base(ReflectMembers.MemberList) { }
+		public Reflect() : base(ReflectMembers.MemberList)
+			=> ReadOnly = true;
 
 		public override bool Call(ref Value result, object self, Arguments args, bool create)
 		{

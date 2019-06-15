@@ -64,11 +64,11 @@ namespace RedOnion.ROS
 					{
 						it.write = (self, value) =>
 						{
-							var fv = value.Object;
+							var fv = value.Box();
 							if (!f.FieldType.IsAssignableFrom(fv.GetType()))
 							{
 								value.desc.Convert(ref value, Of(f.FieldType));
-								fv = value.Object;
+								fv = value.Box();
 							}
 							f.SetValue(self, fv);
 						};
@@ -77,13 +77,13 @@ namespace RedOnion.ROS
 					{
 						it.write = (self, value) =>
 						{
-							var fv = value.Object;
+							var fv = value.Box();
 							if (!f.FieldType.IsAssignableFrom(fv.GetType()))
 							{
 								value.desc.Convert(ref value, Of(f.FieldType));
-								fv = value.Object;
+								fv = value.Box();
 							}
-							f.SetValue(null, value.Object);
+							f.SetValue(null, fv);
 						};
 					}
 					return;

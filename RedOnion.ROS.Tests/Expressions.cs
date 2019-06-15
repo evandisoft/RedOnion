@@ -24,9 +24,23 @@ namespace RedOnion.ROS.Tests
 		public void Test(object value, string script, int countdown = 1000)
 		{
 			Test(script, countdown);
-			var result = Result.Object;
-			Assert.AreEqual(value, result, "Different result: <{0}>", script);
-			Assert.AreEqual(value?.GetType(), result?.GetType(), "Different type: <{0}>", script);
+			if (result.IsFpNumber)
+			{
+				Assert.IsTrue(value is double || value is float || value is decimal,
+					"Different type! Actual: {0} Expected: {1}\n<{2}>",
+					Result.desc.Type.Name, value.GetType().Name, script);
+				var result = Result.ToDouble();
+				var expect = ((IConvertible)value).ToDouble(Value.Culture);
+				Assert.IsTrue(Math.Abs(result - expect) < (value is float ? 1e-6 : 1e-12),
+					"Different result! Actual: {0} Expected: {1}\n<{2}>",
+					Result, value, script);
+			}
+			else
+			{
+				var result = Result.Box();
+				Assert.AreEqual(value, result, "Different result: <{0}>", script);
+				Assert.AreEqual(value?.GetType(), result?.GetType(), "Different type: <{0}>", script);
+			}
 		}
 		public void Expect<Ex>(string script, int countdown = 1000) where Ex : Exception
 		{

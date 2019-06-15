@@ -50,18 +50,6 @@ namespace RedOnion.ROS
 		/// </summary>
 		internal NumericData num;
 
-		/// <summary>
-		/// The descriptor - how the core interacts with the value
-		/// </summary>
-		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		public Descriptor Descriptor => desc;
-
-		/// <summary>
-		/// The object unless primitive value (number, null, void).
-		/// </summary>
-		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		public object Object => desc.Box(ref this);
-
 		public static readonly Value Void = new Value(Descriptor.Void, null);
 		public static readonly Value Null = new Value(Descriptor.Null, null);
 		public static readonly Value NaN = new Value(double.NaN);
@@ -72,6 +60,11 @@ namespace RedOnion.ROS
 		public Value(Type type) : this(Descriptor.Of(type), null) { }
 		public Value(object it) : this()
 		{
+			if (it == null)
+			{
+				desc = Descriptor.Null;
+				return;
+			}
 			if (it is Value v)
 			{
 				desc = v.desc;
@@ -217,6 +210,10 @@ namespace RedOnion.ROS
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		public bool IsNumerOrChar => desc.IsNumberOrChar;
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+		public bool IsFpNumber => desc.IsFpNumber;
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+		public bool IsIntegral => desc.IsIntegral;
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		public bool IsInt => desc.Primitive == ExCode.Int;
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		internal bool IsReference => num.HighInt != 0 && !IsNumerOrChar;
@@ -229,6 +226,8 @@ namespace RedOnion.ROS
 			num.Long = (uint)idx | ((long)~idx << 32);
 		}
 
+		public object Box() => desc.Box(ref this);
+		
 		public int ToInt()
 		{
 			var type = desc.Primitive;

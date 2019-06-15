@@ -317,7 +317,7 @@ namespace RedOnion.ROS.Parsing
 					}
 					// type
 					var peek = (OpCode)values.items[mtop-5];
-					if (peek >= OpCode.String && peek <= OpCode.Hyper || peek == OpCode.Array)
+					if (peek >= OpCode.String && peek < OpCode.Create || peek == OpCode.Array)
 						Write(OpCode.Type);
 					Rewrite(mtop, true);
 					// value
@@ -398,7 +398,7 @@ namespace RedOnion.ROS.Parsing
 				if (type && !HasOption(Option.Prefix))
 				{
 					var peek = (OpCode)values.items[next-5];
-					if (peek >= OpCode.String && peek <= OpCode.Hyper || peek == OpCode.Array)
+					if (peek >= OpCode.String && peek < OpCode.Create || peek == OpCode.Array)
 						Write(OpCode.Type);
 				}
 				Rewrite(next, n - 1, type, create);

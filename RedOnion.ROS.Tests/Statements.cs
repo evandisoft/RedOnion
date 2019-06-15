@@ -11,7 +11,7 @@ namespace RedOnion.ROS.Tests
 		{
 			Test(script, countdown);
 			Assert.AreEqual(exit, Exit, "Test: <{0}>", script);
-			var result = Result.Object;
+			var result = Result.Box();
 			Assert.AreEqual(value, result, "Different result: <{0}>", script);
 			Assert.AreEqual(value?.GetType(), result?.GetType(), "Different type: <{0}>", script);
 		}
@@ -39,7 +39,7 @@ namespace RedOnion.ROS.Tests
 		{
 			Yield(script, countdown);
 			Assert.AreEqual(exit, Exit, "Test: <{0}>", script);
-			var result = Result.Object;
+			var result = Result.Box();
 			Assert.AreEqual(value, result, "Different result: <{0}>", script);
 			Assert.AreEqual(value?.GetType(), result?.GetType(), "Different type: <{0}>", script);
 		}

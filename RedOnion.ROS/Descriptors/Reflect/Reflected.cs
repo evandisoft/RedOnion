@@ -46,7 +46,7 @@ namespace RedOnion.ROS
 					else if (typeof(IList).IsAssignableFrom(type))
 					{
 						intIndexGet = (obj, idx) => new Value(((IList)obj)[idx]);
-						intIndexSet = (obj, idx, v) => ((IList)obj)[idx] = v.Object;
+						intIndexSet = (obj, idx, v) => ((IList)obj)[idx] = v.Box();
 					}
 				}
 			}
