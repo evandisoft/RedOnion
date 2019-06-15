@@ -863,7 +863,7 @@ namespace RedOnion.ROS
 							ref var list = ref vals.Top(-1);
 							if (list.IsReference && !list.desc.Get(ref list, list.num.Int))
 								throw CouldNotGet(ref list);
-							var enu = list.desc.Enumerate(ref list);
+							var enu = list.desc.Enumerate(list.obj);
 							if (enu == null)
 								throw InvalidOperation(list.Name + " is not enumerable");
 							list.desc = null;

@@ -34,7 +34,7 @@ Example: `reflect.new(""System.Collections.ArrayList"")`.",
 	}
 
 	[IgnoreForDocs]
-	public class Reflect : InteropObject, ICompletable
+	public class Reflect : InteropObject
 	{
 		public static Reflect Instance { get; } = new Reflect();
 
@@ -152,7 +152,6 @@ Example: `reflect.new(""System.Collections.ArrayList"")`.",
 			throw new Exception("Could not find constructor accepting given args for type " + t);
 		}
 
-
 		public class Constructor : FunctionBase
 		{
 			public static Constructor Instance { get; } = new Constructor();
@@ -174,20 +173,28 @@ Example: `reflect.new(""System.Collections.ArrayList"")`.",
 
 		NamespaceInstance map = NamespaceMappings.DefaultAssemblies.GetNamespace("");
 		public override int Find(object self, string name, bool add)
-			=> map.RosFind(name);
+		{
+			var at = base.Find(self, name, false);
+			if (at >= 0) return at;
+			at = map.RosFind(name);
+			return at < 0 ? at : at + Members.Count;
+		}
 		public override string NameOf(object self, int at)
-			=> map.RosNameOf(at);
+			=> at < Members.Count ? base.NameOf(self, at) : map.RosNameOf(at - Members.Count);
 		public override bool Get(ref Value self, int at)
 		{
-			var member = ((IType)self.obj).Members[at];
-			if (!member.CanRead)
-				return false;
-			self = member.RosGet(self.obj);
-			return true;
+			if (at < Members.Count)
+				return base.Get(ref self, at);
+			return map.RosGet(ref self, at - Members.Count);
 		}
-		public override IEnumerable<string> EnumerateProperties(ref Value self)
-			=> PossibleCompletions;
-		public IList<string> PossibleCompletions
+		public override IEnumerable<string> EnumerateProperties(object self)
+		{
+			foreach (var member in Members)
+				yield return member.Name;
+			foreach (var name in map.PossibleCompletions)
+				yield return name;
+		}
+		public override IList<string> PossibleCompletions
 		{
 			get
 			{
@@ -206,7 +213,8 @@ Example: `reflect.new(""System.Collections.ArrayList"")`.",
 				return it;
 			}
 		}
-		public bool TryGetCompletion(string completionName, out object completion)
-			=> map.TryGetCompletion(completionName, out completion);
+		public override bool TryGetCompletion(string completionName, out object completion)
+			=> Members.TryGetCompletion(completionName, out completion)
+			|| map.TryGetCompletion(completionName, out completion);
 	}
 }

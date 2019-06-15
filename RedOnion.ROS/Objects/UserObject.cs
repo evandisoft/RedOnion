@@ -245,9 +245,7 @@ namespace RedOnion.ROS.Objects
 			return self.desc.IndexFind(ref self, new Arguments(args, args.Length-1));
 		}
 
-		public override IEnumerable<string> EnumerateProperties(ref Value self)
-			=> EnumerateProperties();
-		public virtual IEnumerable<string> EnumerateProperties()
+		public override IEnumerable<string> EnumerateProperties(object self)
 		{
 			foreach (var p in prop)
 			{

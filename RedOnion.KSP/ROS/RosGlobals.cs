@@ -179,7 +179,7 @@ namespace RedOnion.KSP
 			}
 			return base.Set(ref self, at, op, ref value);
 		}
-		public override IEnumerable<string> EnumerateProperties()
+		public override IEnumerable<string> EnumerateProperties(object self)
 		{
 			foreach (var member in Members)
 				yield return member.Name;

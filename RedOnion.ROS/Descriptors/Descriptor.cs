@@ -81,9 +81,8 @@ namespace RedOnion.ROS
 		public virtual bool Binary(ref Value lhs, OpCode op, ref Value rhs) => false;
 		public virtual bool Call(ref Value result, object self, Arguments args, bool create = false) => false;
 
-		public virtual IEnumerable<Value> Enumerate(ref Value self) => null;
-		public virtual IEnumerable<string> EnumerateProperties(ref Value self) => NoProperties();
-		private IEnumerable<string> NoProperties()
+		public virtual IEnumerable<Value> Enumerate(object self) => null;
+		public virtual IEnumerable<string> EnumerateProperties(object self)
 		{
 			yield break;
 		}

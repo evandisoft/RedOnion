@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using RedOnion.ROS;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
+using RedOnion.KSP.Completion;
 
 namespace RedOnion.KSP.API
 {
-	public abstract class InteropObject : InteropDescriptor, IUserDataType, IType
+	public abstract class InteropObject : InteropDescriptor, IUserDataType, IType, ICompletable
 	{
 		public MemberList Members { get; }
 		public bool ReadOnly { get; protected set; }
@@ -48,5 +49,10 @@ namespace RedOnion.KSP.API
 			//	DynValue.FromObject(script, new CallbackFunction(Call));
 			return null;
 		}
+
+		public virtual IList<string> PossibleCompletions
+			=> Members.PossibleCompletions;
+		public virtual bool TryGetCompletion(string completionName, out object completion)
+			=> Members.TryGetCompletion(completionName, out completion);
 	}
 }

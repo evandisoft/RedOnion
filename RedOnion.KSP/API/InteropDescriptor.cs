@@ -37,5 +37,10 @@ namespace RedOnion.KSP.API
 			member.RosSet(self.obj, value);
 			return true;
 		}
+		public override IEnumerable<string> EnumerateProperties(object self)
+		{
+			foreach (var member in ((IType)self).Members)
+				yield return member.Name;
+		}
 	}
 }

@@ -157,12 +157,11 @@ namespace RedOnion.ROS
 				//TODO: other operations
 				return false;
 			}
-			public override IEnumerable<Value> Enumerate(ref Value self)
+			public override IEnumerable<Value> Enumerate(object self)
 			{
-				var it = self.obj;
-				if (it is IEnumerable<Value> ev)
+				if (self is IEnumerable<Value> ev)
 					return ev;
-				if (it is IEnumerable eo)
+				if (self is IEnumerable eo)
 					return EnumerateNative(eo);
 				return null;
 			}
@@ -171,9 +170,7 @@ namespace RedOnion.ROS
 				foreach (var v in e)
 					yield return new Value(e);
 			}
-			public override IEnumerable<string> EnumerateProperties(ref Value self)
-				=> EnumerateProperties();
-			public IEnumerable<string> EnumerateProperties()
+			public override IEnumerable<string> EnumerateProperties(object self)
 			{
 				foreach (var p in prop)
 					yield return p.name;
