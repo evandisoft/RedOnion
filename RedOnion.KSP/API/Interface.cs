@@ -697,7 +697,7 @@ namespace RedOnion.KSP.API
 		public DynValue LuaGet(object self)
 			=> DynValue.FromObject(null, Get((Self)self));
 		public void RosSet(object self, Value value)
-			=> Set((Self)self, (InteropObject)value.Object);
+			=> Set((Self)self, (InteropObject)value.obj);
 		public void LuaSet(object self, DynValue value)
 			=> Set((Self)self, (InteropObject)value.ToObject());
 

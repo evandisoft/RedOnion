@@ -84,6 +84,8 @@ namespace RedOnion.ROS
 		Exception		= 0x08, // exception in catch block
 		Default			= 0x09, // default value	+[index to string table]
 		Identifier		= 0x0A, // identifier		+[index to string table]
+
+		//note: [String, Create) is used for type identification
 		String			= 0x0B, // string			+[index to string table]
 		Char			= 0x0C, // short char		+[byte]
 		WideChar		= 0x0D, // wide char		+[2B char]
@@ -94,18 +96,18 @@ namespace RedOnion.ROS
 		UShort			= 0x11, // u16
 		UInt			= 0x12, // u32
 		ULong			= 0x13, // u64
-		SByte			= 0x14, // s8
-		Short			= 0x15, // s16
-		Int				= 0x16, // s32
-		Long			= 0x17, // s64
-		Float			= 0x18, // f32
-		Double			= 0x19, // f64
-		LongDouble		= 0x1A, // f80
-		Bool			= 0x1B, // used only as type specifier (true/false used in expressions)
-		Complex			= 0x1C, // reserved for complex numbers
-		Decimal			= 0x1D, // f128
-		Quad			= 0x1E, // u128
-		Hyper			= 0x1F, // s128
+		Quad			= 0x14, // u128
+		SByte			= 0x15, // s8
+		Short			= 0x16, // s16
+		Int				= 0x17, // s32
+		Long			= 0x18, // s64
+		Hyper			= 0x19, // s128
+		Bool			= 0x1A, // used only as type specifier (true/false used in expressions)
+		Complex			= 0x1B, // reserved for complex numbers
+		Float			= 0x1C, // f32
+		Double			= 0x1D, // f64
+		LongDouble		= 0x1E, // f80
+		Decimal			= 0x1F, // x128 (fixed point)
 
 	//	special
 		Create			= 0x20, // new
@@ -290,18 +292,18 @@ namespace RedOnion.ROS
 		UShort			= 0x0211, // u16
 		UInt			= 0x0412, // u32
 		ULong			= 0x0813, // u64
-		SByte			= 0x4114, // s8
-		Short			= 0x4215, // s16
-		Int				= 0x4416, // s32
-		Long			= 0x4817, // s64
-		Float			= 0xC418, // f32
-		Double			= 0xC819, // f64
-		LongDouble		= 0xCA1A, // f80
-		Bool			= 0x011B, // used only as type specifier (true/false used in expressions)
-		Complex			= 0x101C, // reserved for complex numbers
-		Decimal			= 0x901D, // f128
-		Quad			= 0x101E, // u128
-		Hyper			= 0x501F, // s128
+		Quad			= 0x1014, // u128
+		SByte			= 0x4115, // s8
+		Short			= 0x4216, // s16
+		Int				= 0x4417, // s32
+		Long			= 0x4818, // s64
+		Hyper			= 0x5019, // s128
+		Bool			= 0x011A, // used only as type specifier (true/false used in expressions)
+		Complex			= 0x101B, // reserved for complex numbers
+		Float			= 0xC41C, // f32
+		Double			= 0xC81D, // f64
+		LongDouble		= 0xCA1E, // f80
+		Decimal			= 0x901F, // f128
 
 	//	special
 		Create			= 0x4020, // new
@@ -573,7 +575,7 @@ namespace RedOnion.ROS
 		private static readonly byte[] _info = new byte[] {
 			// 0    1    2    3    4    5    6    7     8    9    A    B    C    D    E    F
 			0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00, 0x00,0x00,0x00,0x00,0x01,0x02,0x04,0x00, //0 constants
-			0x01,0x02,0x04,0x08,0x41,0x42,0x44,0x48, 0xC4,0xC8,0xCA,0x01,0x10,0x90,0x10,0x50, //1 numbers
+			0x01,0x02,0x04,0x08,0x10,0x41,0x42,0x44, 0x48,0x50,0x01,0x10,0xC4,0xC8,0xCA,0x90, //1 numbers
 			0x40,0x40,0x00,0x20,0x60,0x00,0x60,0x00, 0x20,0x60,0x60,0x60,0x00,0x00,0x00,0x20, //2 special
 			0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01, 0x01,0x01,0x01,0x81,0x81,0x81,0x81,0x81, //3 assign
 			0x81,0x09,0x0A,0x0B,0x0C,0x0C,0x0D,0x0D, 0x0E,0x0E,0x0E,0x8F,0x8F,0x8F,0x8F,0x8F, //4 binary
@@ -595,8 +597,8 @@ namespace RedOnion.ROS
 			"void", "null", "false", "true", "this", "base", "value", null,
 			"exception", "default", null, "string", "char", "wchar", "lchar", "number",
 		//	numbers
-			"byte", "ushort", "uint", "ulong", "sbyte", "short", "int", "long",
-			"float", "double", "long double", "bool", "complex", "decimal", "quad", "hyper",
+			"byte", "ushort", "uint", "ulong", "quad", "sbyte", "short", "int",
+			"long", "hyper", "bool", "complex", "float", "double", "long double", "decimal",
 		//	special
 			"new",  "()",   "()",   "()",   "()",   "[]",   "[]",   ".",
 			"var",  ".[]",  "[]",   "??",   "?.",   "?.()", "?:",   "=>",

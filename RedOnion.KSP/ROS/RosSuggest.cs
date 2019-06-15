@@ -102,11 +102,11 @@ namespace RedOnion.KSP.ROS
 			if (!found.IsVoid)
 			{
 				partial = at == replaceAt ? null : source.Substring(replaceAt, at-replaceAt);
-				foreach (var name in found.desc.EnumerateProperties(ref found))
+				foreach (var name in found.desc.EnumerateProperties(found.obj))
 					AddSuggestion(name);
 				if (found.desc is Context)
 				{
-					foreach (var name in core.Globals.EnumerateProperties())
+					foreach (var name in core.Globals.EnumerateProperties(core.Globals))
 						AddSuggestion(name);
 				}
 				if (_suggestionsCount > 1)
@@ -196,10 +196,19 @@ namespace RedOnion.KSP.ROS
 			{
 				string name = source.Substring(i, dotAt-i);
 				int index = value.desc.Find(value.obj, name);
-				if (index < 0)
-					return;
-				if (!value.desc.Get(ref value, index))
-					return;
+				if (index >= 0)
+				{
+					if (!value.desc.Get(ref value, index))
+						return;
+				} else
+				{
+					if (!(value.obj is Context))
+						return;
+					if ((index = core.Globals.Find(name)) < 0)
+						return;
+					if (!core.Globals.Get(ref value, index))
+						return;
+				}
 				j = dotAt;
 				while (++dotAt < interest)
 				{

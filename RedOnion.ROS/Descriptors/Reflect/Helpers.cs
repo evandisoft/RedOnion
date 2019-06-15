@@ -96,8 +96,8 @@ namespace RedOnion.ROS
 					return Expression.Convert(Expression.Call(expr, ValueToInt), type);
 			}
 			if (type == typeof(object))
-				return Expression.Property(expr, "Object");
-			return Expression.Convert(Expression.Property(expr, "Object"), type);
+				return Expression.Field(expr, "obj");
+			return Expression.Convert(Expression.Field(expr, "obj"), type);
 		}
 
 		internal static readonly ParameterExpression SelfParameter

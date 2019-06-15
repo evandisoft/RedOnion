@@ -79,7 +79,7 @@ namespace RedOnion.KSP.Tests
 		public void API_Vec01_Create()
 		{
 			Test("v(1)");
-			var v = Result.Object as Vector;
+			var v = Result.obj as Vector;
 			Assert.NotNull(v);
 			Assert.AreEqual(1.0, v.X);
 			Assert.AreEqual(1.0, v.Y);
@@ -87,7 +87,7 @@ namespace RedOnion.KSP.Tests
 			Test(1.0, "v(1).x");
 
 			Test("var a = v 1,2u");
-			v = Result.Object as Vector;
+			v = Result.obj as Vector;
 			Assert.NotNull(v);
 			Assert.AreEqual(1.0, v.X);
 			Assert.AreEqual(2.0, v.Y);
@@ -95,7 +95,7 @@ namespace RedOnion.KSP.Tests
 			Test(2.0, "a.y");
 
 			Test("var b = v 1,2f,3.0");
-			v = Result.Object as Vector;
+			v = Result.obj as Vector;
 			Assert.NotNull(v);
 			Assert.AreEqual(1.0, v.X);
 			Assert.AreEqual(2.0, v.Y);
@@ -106,14 +106,14 @@ namespace RedOnion.KSP.Tests
 		public void API_Vec02_Unary()
 		{
 			Test("-v(1)");
-			var v = Result.Object as Vector;
+			var v = Result.obj as Vector;
 			Assert.NotNull(v);
 			Assert.AreEqual(-1.0, v.X);
 			Assert.AreEqual(-1.0, v.Y);
 			Assert.AreEqual(-1.0, v.Z);
 
 			Test("+v(1)");
-			v = Result.Object as Vector;
+			v = Result.obj as Vector;
 			Assert.NotNull(v);
 			Assert.AreEqual(1.0, v.X);
 			Assert.AreEqual(1.0, v.Y);
@@ -125,28 +125,28 @@ namespace RedOnion.KSP.Tests
 			Test("var a = v 1,2,3");
 			Test("var b = v 4,5,6");
 			Test("a + b");
-			var v = Result.Object as Vector;
+			var v = Result.obj as Vector;
 			Assert.NotNull(v);
 			Assert.AreEqual(1.0+4.0, v.X);
 			Assert.AreEqual(2.0+5.0, v.Y);
 			Assert.AreEqual(3.0+6.0, v.Z);
 
 			Test("a - b");
-			v = Result.Object as Vector;
+			v = Result.obj as Vector;
 			Assert.NotNull(v);
 			Assert.AreEqual(1.0-4.0, v.X);
 			Assert.AreEqual(2.0-5.0, v.Y);
 			Assert.AreEqual(3.0-6.0, v.Z);
 
 			Test("a * b");
-			v = Result.Object as Vector;
+			v = Result.obj as Vector;
 			Assert.NotNull(v);
 			Assert.AreEqual(1.0*4.0, v.X);
 			Assert.AreEqual(2.0*5.0, v.Y);
 			Assert.AreEqual(3.0*6.0, v.Z);
 
 			Test("a / b");
-			v = Result.Object as Vector;
+			v = Result.obj as Vector;
 			Assert.NotNull(v);
 			Assert.AreEqual(1.0/4.0, v.X);
 			Assert.AreEqual(2.0/5.0, v.Y);
@@ -169,7 +169,7 @@ namespace RedOnion.KSP.Tests
 			Test("test.v3 = v.one");
 			Assert.AreEqual(1f, ConvertTest.v3.x);
 			Test("v.abs -v test.v3");
-			var v = Result.Object as Vector;
+			var v = Result.obj as Vector;
 			Assert.NotNull(v);
 			Assert.AreEqual(1.0, v.X);
 			Assert.AreEqual(1.0, v.Y);
@@ -184,7 +184,7 @@ namespace RedOnion.KSP.Tests
 				"var a = v.one",
 				"a.scale 2",
 				"return a");
-			var v = Result.Object as Vector;
+			var v = Result.obj as Vector;
 			Assert.NotNull(v);
 			Assert.AreEqual(2.0, v.X);
 			Assert.AreEqual(2.0, v.Y);
