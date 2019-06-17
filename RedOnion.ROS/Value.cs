@@ -34,6 +34,9 @@ namespace RedOnion.ROS
 		/// Culture settings for formatting (invariant by default).
 		/// </summary>
 		public static CultureInfo Culture = CultureInfo.InvariantCulture;
+		public static string Format(string msg) => msg;
+		public static string Format(string msg, params object[] args)
+			=> string.Format(Culture, msg, args);
 
 		/// <summary>
 		/// The descriptor - how the core interacts with the value

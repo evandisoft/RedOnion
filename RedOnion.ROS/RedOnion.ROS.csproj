@@ -69,6 +69,7 @@
     <Compile Include="Core.cs" />
     <Compile Include="Interface.cs" />
     <Compile Include="Objects\Context.cs" />
+    <Compile Include="Processor.cs" />
     <Compile Include="Utilities\Event.cs" />
     <Compile Include="Objects\Function.cs" />
     <Compile Include="Objects\Globals.cs" />

@@ -18,7 +18,7 @@ namespace RedOnion.ROS
 				if (args.Length != 1)
 					continue;
 				var type = args[0].ParameterType;
-				if (!type.IsPrimitive)
+				if (!type.IsPrimitive && type != typeof(Type))
 					continue;
 				dict[type] = ctor;
 			}

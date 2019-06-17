@@ -6,11 +6,12 @@ using RedOnion.ROS;
 
 namespace RedOnion.KSP.Tests
 {
-	public class ApiTestsBase : RosCore
+	public class ApiTestsBase : RosProcessor
 	{
-		public ApiTestsBase()
+		public ApiTestsBase() : base(null)
 		{
 			Descriptor.Create = CustomCreateDescriptor;
+			Globals = new RosGlobals();
 		}
 		public static Descriptor CustomCreateDescriptor(Type type)
 		{

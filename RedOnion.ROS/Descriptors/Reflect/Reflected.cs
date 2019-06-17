@@ -12,6 +12,10 @@ namespace RedOnion.ROS
 	{
 		public partial class Reflected : Descriptor
 		{
+#if DEBUG
+			public static Action<string> DebugLog;
+#endif
+
 			[DebuggerDisplay("{name}")]
 			protected struct Prop
 			{
@@ -33,9 +37,33 @@ namespace RedOnion.ROS
 			public Reflected(string name, Type type) : base(name, type)
 			{
 				foreach (var member in GetMembers(type, null, false))
-					ProcessMember(member, false, ref sdict);
+				{
+					try
+					{
+						ProcessMember(member, false, ref sdict);
+					}
+					catch (Exception ex)
+					{
+#if DEBUG
+						DebugLog?.Invoke(Value.Format("Exception: {0} in ProcessMember({1}.{2}) [static]",
+							ex.GetType().Name, Type.Name, member.Name));
+#endif
+					}
+				}
 				foreach (var member in GetMembers(type, null, true))
-					ProcessMember(member, true, ref idict);
+				{
+					try
+					{
+						ProcessMember(member, true, ref idict);
+					}
+					catch (Exception ex)
+					{
+#if DEBUG
+						DebugLog?.Invoke(Value.Format("Exception: {0} in ProcessMember({1}.{2}) [instance]",
+							ex.GetType().Name, Type.Name, member.Name));
+#endif
+					}
+				}
 				if (intIndexGet == null && intIndexSet == null)
 				{
 					if (typeof(IList<Value>).IsAssignableFrom(type))
@@ -57,6 +85,12 @@ namespace RedOnion.ROS
 				{
 					result = new Value(Activator.CreateInstance(Type));
 					return true;
+				}
+				//TODO: optimize (Delegate[][] - first index by number of arguments)
+				foreach (var ctor in Type.GetConstructors())
+				{
+					if (Callable.TryCall(ctor, ref result, self, args))
+						return true;
 				}
 				return false;
 			}

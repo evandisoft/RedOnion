@@ -37,6 +37,9 @@ namespace RedOnion.ROS
 			protected virtual void ProcessMember(
 				MemberInfo member, bool instance, ref Dictionary<string, int> dict)
 			{
+#if DEBUG
+				DebugLog?.Invoke(Value.Format("ProcessMember: {0}.{1}", Type.Name, member.Name));
+#endif
 				if (dict != null && dict.ContainsKey(member.Name))
 					return; // conflict
 
@@ -50,14 +53,18 @@ namespace RedOnion.ROS
 					it.name = f.Name;
 					var type = f.FieldType;
 					it.read = Expression.Lambda<Func<object, Value>>(
-						// self => new Value(((T)self).name)
-						GetNewValueExpression(type,
+						// WARNING: Mono may crash if const field is fed into Expression.Field!
+						GetNewValueExpression(type, f.IsLiteral ? (Expression)
+							// self => new Value(T.name)
+							Expression.Constant(f.GetValue(null), f.FieldType) :
 							Expression.Field(instance
+								// self => new Value(((T)self).name)
 								? Expression.Convert(SelfParameter, f.DeclaringType)
+								// self => new Value(T.name)
 								: null, f)),
 						SelfParameter
 					).Compile();
-					if (f.IsInitOnly)
+					if (f.IsInitOnly || f.IsLiteral)
 						return;
 					// maybe use Reflection.Emit: https://docs.microsoft.com/en-us/dotnet/api/system.reflection.emit.dynamicmethod?view=netframework-3.5
 					if (instance)

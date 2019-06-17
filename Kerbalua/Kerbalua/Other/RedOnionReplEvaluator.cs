@@ -11,14 +11,14 @@ namespace Kerbalua.Other
 {
 	public class RedOnionReplEvaluator : ReplEvaluator
 	{
-		RosCore core;
+		RosProcessor core;
 		RosSuggest suggest;
 		string source, path;
 		bool skipUpdate;
 
 		public RedOnionReplEvaluator()
 		{
-			core = new RosCore();
+			core = new RosProcessor();
 			suggest = new RosSuggest(core);
 			Print.Listen += PrintRedirect;
 		}

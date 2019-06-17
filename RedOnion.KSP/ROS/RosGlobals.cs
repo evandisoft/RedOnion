@@ -1,16 +1,9 @@
 using System;
 using System.Collections.Generic;
 using RedOnion.ROS;
-using RedOnion.ROS.Objects;
-using RedOnion.ROS.Utilities;
-using UE = UnityEngine;
-using UUI = UnityEngine.UI;
-using KUI = KSP.UI;
-using ROC = RedOnion.UI.Components;
-using RedOnion.KSP.Autopilot;
-using KSP.UI.Screens;
 using RedOnion.KSP.API;
-using RedOnion.KSP.Completion;
+using RedOnion.KSP.API.Namespaces;
+using UE = UnityEngine;
 
 namespace RedOnion.KSP
 {
@@ -22,7 +15,26 @@ namespace RedOnion.KSP
 
 		public RosGlobals()
 		{
+#if DEBUG
+			Reflected.DebugLog = UE.Debug.Log;
+#endif
+			//Add("API", Globals.Instance); //TODO - not InteropObject
+			Add(typeof(Math));
+			//Add(typeof(UE.Debug));
+			//Add(typeof(UE.Color));
+			//Add(typeof(UE.Rect));
+			//Add("UI", UI_Namespace.Instance);
+
 			/*
+			Add("assembly", new Value(new ReflectionUtil.GetMappings()));
+			
+			sys.Set("Vector2", AddType(typeof(UE.Vector2)));
+			var vector =        AddType(typeof(UE.Vector3));
+			soft.Set("Vector", vector);
+			sys.Set("Vector", vector);
+			sys.Set("Vector3", vector);
+			sys.Set("Vector4", AddType(typeof(UE.Vector4)));
+
 			var hard = BaseProps; // will resist overwrite and shadowing in global scope
 			var soft = MoreProps; // can be easily overwritten or shadowed
 
@@ -34,17 +46,6 @@ namespace RedOnion.KSP
 
 			sys.Set("Update", update);
 			sys.Set("Idle", idle);
-			sys.Set("Debug", AddType(typeof(UE.Debug)));
-			sys.Set("Color", AddType(typeof(UE.Color)));
-			sys.Set("Rect", AddType(typeof(UE.Rect)));
-			sys.Set("Vector2", AddType(typeof(UE.Vector2)));
-			var vector =        AddType(typeof(UE.Vector3));
-			soft.Set("Vector", vector);
-			sys.Set("Vector", vector);
-			sys.Set("Vector3", vector);
-			sys.Set("Vector4", AddType(typeof(UE.Vector4)));
-			sys.Set("Math", AddType(typeof(Math)));
-			sys.Set("API", Globals.Instance);
 			if (system == null)
 				BaseProps.Set("System", new SimpleObject(Engine, sys));
 

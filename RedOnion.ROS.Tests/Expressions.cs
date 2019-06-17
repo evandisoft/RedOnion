@@ -5,7 +5,7 @@ using RedOnion.ROS.Objects;
 
 namespace RedOnion.ROS.Tests
 {
-	public class CoreTests : Core
+	public class CoreTests : Processor
 	{
 		public void Test(string script, int countdown = 1000)
 		{
@@ -31,7 +31,9 @@ namespace RedOnion.ROS.Tests
 					Result.desc.Type.Name, value.GetType().Name, script);
 				var result = Result.ToDouble();
 				var expect = ((IConvertible)value).ToDouble(Value.Culture);
-				Assert.IsTrue(Math.Abs(result - expect) < (value is float ? 1e-6 : 1e-12),
+				Assert.IsTrue(
+					double.IsNaN(result) && double.IsNaN(expect) ||
+					Math.Abs(result - expect) < (value is float ? 1e-6 : 1e-12),
 					"Different result! Actual: {0} Expected: {1}\n<{2}>",
 					Result, value, script);
 			}

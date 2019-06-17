@@ -71,10 +71,10 @@ namespace RedOnion
 			button = null;
 		}
 
-		RosCore core;
+		RosProcessor core;
 		private void RunScript()
 		{
-			var script = RosCore.LoadScript("launcher.ros");
+			var script = RosProcessor.LoadScript("launcher.ros");
 			if (script == null)
 			{
 				Log("Could not load launcher.ros script");
@@ -82,7 +82,7 @@ namespace RedOnion
 			}
 			try
 			{
-				core = new RosCore();
+				core = new RosProcessor();
 				core.Execute(script, "launcher.ros", 10000);
 			}
 			catch(Error err)

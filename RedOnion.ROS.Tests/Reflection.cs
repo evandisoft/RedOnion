@@ -125,5 +125,53 @@ namespace RedOnion.ROS.Tests
 			Test(1.0+2f+3, @"test.sum3 1.0, 2f, 3");
 			Test(1.0+2f+3, @"it.sum3 1.0, 2f, 3");
 		}
+
+		public struct Point
+		{
+			public float x, y;
+			public Point(float x, float y)
+			{
+				this.x = x;
+				this.y = y;
+			}
+		}
+		public static class PointUtils
+		{
+			public static float Magnitude(Point pt)
+				=> (float)Math.Sqrt(pt.x*pt.x+pt.y*pt.y);
+		}
+		[Test]
+		public void ROS_Refl04_Struct()
+		{
+			Globals = new Globals();
+			Globals.Add(typeof(Point));
+			Test("var pt = new point 1,2");
+			Test(1f, "pt.x");
+			Globals.Add("ptu", typeof(PointUtils));
+			Test((float)Math.Sqrt(5f), "ptu.magnitude pt");
+		}
+
+		public enum TestEnum : byte
+		{
+			Zero, One, Two, Three
+		}
+		public static class EnumUtils
+		{
+			public static int Enum2Int(TestEnum e)
+				=> (int)e;
+			public static TestEnum Or(TestEnum a, TestEnum b)
+				=> (TestEnum)((int)a | (int)b);
+		}
+		[Test]
+		public void ROS_Refl05_Enum()
+		{
+			Globals = new Globals();
+			Globals.Add(typeof(TestEnum));
+			Globals.Add(typeof(EnumUtils));
+			Test("var zero = testEnum.zero");
+			Test(TestEnum.Zero, "zero");
+			Test(1, "enumUtils.enum2int testEnum.one");
+			Test(TestEnum.Three, "enumUtils.or testEnum.one, testEnum.two");
+		}
 	}
 }

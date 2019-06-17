@@ -239,6 +239,17 @@ namespace RedOnion.ROS
 
 	#region Processor Core, Arguments and related
 
+	/// <summary>
+	/// The root of scripting engine, usually the main core
+	/// </summary>
+	public interface IProcessor
+	{
+		event Func<IProcessor, bool> Shutdown;
+	}
+	/// <summary>
+	/// Single processing core holding the state of execution
+	/// (each yielding process / paused thread runs on its own core)
+	/// </summary>
 	public interface ICore : IDisposable
 	{
 		/// <summary>
@@ -319,6 +330,9 @@ namespace RedOnion.ROS
 	{
 		[DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
 		protected ListCore<Value> list;
+		public IProcessor Processor { get; }
+		public ArgumentList(IProcessor processor)
+			=> Processor = processor;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		public int Length => list.Count;
@@ -376,6 +390,7 @@ namespace RedOnion.ROS
 	{
 		readonly ArgumentList list;
 		public readonly int argc;
+		public IProcessor Processor => list?.Processor;
 		public int Length => argc;
 		public int Count => argc;
 		public int Size => argc;

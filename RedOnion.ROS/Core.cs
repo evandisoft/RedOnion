@@ -9,13 +9,17 @@ namespace RedOnion.ROS
 	[DebuggerDisplay("{DebugString}")]
 	public partial class Core : ICore
 	{
-		public Core() { }
-		public Core(UserObject globals) => Globals = globals;
+		public Core(IProcessor processor)
+			=> vals = new ArgumentList(this.processor = (processor ?? this as IProcessor));
+		public Core(IProcessor processor, UserObject globals)
+			: this(processor)
+			=> Globals = globals;
 
 		protected int at;
 		protected byte[] code;
 		protected string[] str;
-		protected ArgumentList vals = new ArgumentList();
+		protected IProcessor processor;
+		protected ArgumentList vals;
 		protected Context ctx;
 		protected bool ctxIsPrivate;
 		protected Value self; // `this` for current code

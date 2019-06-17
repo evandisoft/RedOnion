@@ -9,7 +9,7 @@ namespace RedOnion.ROS.Tests
 	public class ROS_Scope : StatementTests
 	{
 		[TearDown]
-		public void Reset() => ResetContext();
+		public override void Reset() => base.Reset();
 
 		[Test]
 		public void ROS_Scope01_Global()
