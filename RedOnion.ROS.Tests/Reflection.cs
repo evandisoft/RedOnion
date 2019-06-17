@@ -122,8 +122,8 @@ namespace RedOnion.ROS.Tests
 			Test("hello world", @"test.combine ""hello"", ""world""");
 			Test("hello world", @"it.combine ""hello"", ""world""");
 
-			Test(1.0+2f+3, @"test.sum3 1.0, 2f, 3");
-			Test(1.0+2f+3, @"it.sum3 1.0, 2f, 3");
+			Test(1.0+2f+3, "test.sum3 1.0, 2f, 3");
+			Test(1.0+2f+3, "it.sum3 1.0, 2f, 3");
 		}
 
 		public struct Point

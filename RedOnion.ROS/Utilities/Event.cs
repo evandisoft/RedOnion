@@ -11,7 +11,7 @@ namespace RedOnion.ROS.Utilities
 	/// Event handler helper that works well in scripts (e.g. LUA not having += operator)
 	/// and still allow += operator if used in property with dummy set
 	/// </summary>
-	public struct Event
+	public struct Event : ISelfDescribing
 	{
 		readonly IList<Value> list;
 		public Event(IList<Value> list) => this.list = list;
@@ -81,5 +81,23 @@ namespace RedOnion.ROS.Utilities
 			=> new Event(p);
 		public static implicit operator Event(RemoveProxy p)
 			=> new Event(p);
+
+		public Descriptor Descriptor => EventDescriptor.Instance;
+		public class EventDescriptor : Descriptor.Simple
+		{
+			public static EventDescriptor Instance { get; } = new EventDescriptor();
+			protected EventDescriptor() : base("Event", typeof(Event), Methods) { }
+			protected static Values Methods = new Values(new Value[]
+			{
+				new Value(new Procedure1<Event>("Add"),
+					(Action<Event,Value>)((e, v) => e.Add(v))),
+				new Value(new Procedure1<Event>("Set"),
+					(Action<Event,Value>)((e, v) => e.Set(v))),
+				new Value(new Procedure1<Event>("Remove"),
+					(Action<Event,Value>)((e, v) => e.Remove(v))),
+				new Value(new Procedure0<Event>("Clear"),
+					(Action<Event>)(e => e.Clear())),
+			});
+		}
 	}
 }

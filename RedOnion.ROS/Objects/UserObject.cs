@@ -9,22 +9,9 @@ namespace RedOnion.ROS.Objects
 	/// Script object created by `new object` or any function or class in the script.
 	/// The design is based on JavaScript (ECMA-262)
 	/// </summary>
-	public class UserObject : UserObject<UserObject>
+	public class UserObject : Descriptor, ISelfDescribing
 	{
-		public UserObject()	: base() { }
-		public UserObject(string name) : base(name) { }
-		public UserObject(string name, Type type) : base(name, type) { }
-		public UserObject(string name, Type type, UserObject parent) : base(name, type, parent) { }
-
-		public UserObject(Type type) : base(type) { }
-		public UserObject(Type type, UserObject parent) : base(type, parent) { }
-
-		public UserObject(UserObject parent) : base(parent) { }
-		public UserObject(string name, UserObject parent) : base(name, parent) { }
-
-		internal UserObject(string name, Type type,
-			ExCode primitive, TypeCode typeCode, UserObject parent)
-			: base(name, type, primitive, typeCode, parent) { }
+		Descriptor ISelfDescribing.Descriptor => this;
 
 		/// <summary>
 		/// Create new user object inheriting from this one
@@ -35,22 +22,12 @@ namespace RedOnion.ROS.Objects
 			result = new Value(it, it);
 			return true;
 		}
-	}
-
-	/// <summary>
-	/// Script object created by `new object` or any function or class in the script.
-	/// The design is based on JavaScript (ECMA-262)
-	/// </summary>
-	[DebuggerDisplay("{Name}; {prop.DebugString}")]
-	public class UserObject<P> : Descriptor, ISelfDescribing where P: UserObject<P>
-	{
-		Descriptor ISelfDescribing.Descriptor => this;
 
 		/// <summary>
 		/// Single property of an object (with name and value)
 		/// </summary>
 		[DebuggerDisplay("{name} = {value}")]
-		protected struct Prop
+		protected internal struct Prop
 		{
 			public string name;
 			public Value value;
@@ -61,15 +38,15 @@ namespace RedOnion.ROS.Objects
 		/// All properties of the object
 		/// (properties from parent are auto-added when accessed)
 		/// </summary>
-		protected ListCore<Prop> prop;
+		protected internal ListCore<Prop> prop;
 		/// <summary>
 		/// Map of all properties (name-to-index into <see cref="prop"/>)
 		/// </summary>
-		protected Dictionary<string, int> dict;
+		protected internal Dictionary<string, int> dict;
 		/// <summary>
 		/// Parent object (this one is derived from, null if no such)
 		/// </summary>
-		protected P parent;
+		protected internal UserObject parent;
 		/// <summary>
 		/// Number of locked / read-only properties
 		/// </summary>
@@ -81,23 +58,23 @@ namespace RedOnion.ROS.Objects
 			: base(name, typeof(UserObject)) { }
 		public UserObject(string name, Type type)
 			: base(name, type) { }
-		public UserObject(string name, Type type, P parent)
+		public UserObject(string name, Type type, UserObject parent)
 			: base(name, type)
 			=> this.parent = parent;
 
 		public UserObject(Type type)
 			: base(type.Name, type) { }
-		public UserObject(Type type, P parent)
+		public UserObject(Type type, UserObject parent)
 			: base(type.Name, type)
 			=> this.parent = parent;
 
-		public UserObject(P parent)
+		public UserObject(UserObject parent)
 			: this() => this.parent = parent;
-		public UserObject(string name, P parent)
+		public UserObject(string name, UserObject parent)
 			: this(name, typeof(UserObject))
 			=> this.parent = parent;
 
-		internal UserObject(string name, Type type, ExCode primitive, TypeCode typeCode, P parent)
+		internal UserObject(string name, Type type, ExCode primitive, TypeCode typeCode, UserObject parent)
 			: base(name, type, primitive, typeCode)
 			=> this.parent = parent;
 
@@ -159,6 +136,8 @@ namespace RedOnion.ROS.Objects
 				return idx;
 			return Add(name, ref parent.prop.items[idx].value);
 		}
+		protected int ImportFrom(UserObject space, string name, int at)
+			=> Add(name, ref space.prop.items[at].value);
 		public Value this[string name]
 		{
 			get
@@ -253,6 +232,11 @@ namespace RedOnion.ROS.Objects
 				if (name != null)
 					yield return name;
 			}
+			if (parent == null)
+				yield break;
+			foreach (var name in parent.EnumerateProperties(self))
+				if (!dict.ContainsKey(name))
+					yield return name;
 		}
 	}
 }

@@ -70,7 +70,8 @@ namespace RedOnion.ROS
 			= typeof(Value).GetMethod("ToChar");
 		public static Expression GetValueConvertExpression(Type type, Expression expr)
 		{
-			if (type == typeof(Value)) return expr;
+			if (type == typeof(Value))
+				return expr;
 			if (type.IsPrimitive)
 			{
 				if (type == typeof(int))

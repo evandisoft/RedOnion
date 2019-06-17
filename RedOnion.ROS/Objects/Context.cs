@@ -12,7 +12,7 @@ namespace RedOnion.ROS.Objects
 	/// Enhanced version of <see cref="Parsing.Parser.Context"/>
 	/// </summary>
 	[DebuggerDisplay("{Name}: {BlockCount}/{BlockCode}; {prop.DebugString}")]
-	public class Context : UserObject<Context>
+	public class Context : Namespace
 	{
 		/// <summary>
 		/// Variables added/shadowed by current/inner block (blockStack.Top())
@@ -95,10 +95,6 @@ namespace RedOnion.ROS.Objects
 		/// </summary>
 		public HashSet<string> Captured { get; protected set; }
 		/// <summary>
-		/// Parent context
-		/// </summary>
-		public Context Parent => parent;
-		/// <summary>
 		/// Inner closures (functions) that need to be separated
 		/// </summary>
 		public ListCore<Context> closures;
@@ -130,25 +126,29 @@ namespace RedOnion.ROS.Objects
 			}
 		}
 
-		public Context() : base(typeof(Context)) { }
+		public Context() : base("context", typeof(Context)) { }
 
 		public Context(Context parent, Function fn, HashSet<string> cvars)
-			: base("Context of " + fn.Name, typeof(Context), cvars != null ? parent : null)
+			: base("Context of " + fn.Name, typeof(Context))
 		{
 			RootStart = fn.CodeAt;
 			RootEnd = fn.CodeAt + fn.CodeSize;
 			Captured = cvars;
 			if (cvars != null)
+			{
+				this.parent = parent;
 				parent.closures.Add(this);
+			}
 		}
 		protected Context(Context cousin)
 			: base(cousin.Name.StartsWith("Context of ")
 				  ? "Cousin of " + cousin.Name.Substring(11)
-				  : "Cousin Contex", typeof(Context), cousin)
+				  : "Cousin Contex", typeof(Context))
 		{
 			RootStart = cousin.RootStart;
 			RootEnd = cousin.RootEnd;
 			Closure = true;
+			parent = cousin;
 		}
 
 		public override void Reset()

@@ -244,7 +244,15 @@ namespace RedOnion.ROS
 	/// </summary>
 	public interface IProcessor
 	{
+		/// <summary>
+		/// Event invoked on engine shutdown or reset.
+		/// Return false to auto-remove after invoke.
+		/// </summary>
 		event Func<IProcessor, bool> Shutdown;
+		/// <summary>
+		/// Invoked by print function
+		/// </summary>
+		void Print(string msg);
 	}
 	/// <summary>
 	/// Single processing core holding the state of execution

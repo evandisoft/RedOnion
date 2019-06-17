@@ -31,7 +31,7 @@ namespace RedOnion.Shell
 		}
 		class ShellProcessor: Processor
 		{
-			public ShellProcessor() : base(new ShellGlobals()) { }
+			public ShellProcessor() => Globals = new ShellGlobals();
 			public bool Eof => Parser.Eof;
 		}
 		static void Main(string[] args)
@@ -54,7 +54,7 @@ namespace RedOnion.Shell
 				try
 				{
 					processor = new ShellProcessor();
-					Print.Listen += s => Console.WriteLine(s);
+					processor.Print += s => Console.WriteLine(s);
 					processor.Execute(File.ReadAllText(args[0]));
 					return;
 				}
@@ -72,7 +72,7 @@ namespace RedOnion.Shell
 			Console.WriteLine("Red Onion Script Interactive Console");
 			Console.WriteLine("Type 'return' or 'break' to exit");
 			processor = new ShellProcessor();
-			Print.Listen += s => Console.WriteLine("--  " + s);
+			processor.Print += s => Console.WriteLine("--  " + s);
 
 			var sb = new StringBuilder();
 			for (; ; )

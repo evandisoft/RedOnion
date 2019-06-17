@@ -145,21 +145,24 @@ namespace RedOnion.ROS
 					var call = new object[pars.Length];
 					if (parsFrom > 0)
 						call[0] = args.Processor;
-					for (int i = 0; i < call.Length; i++)
+					for (int i = parsFrom; i < call.Length; i++)
 					{
-						var param = pars[parsFrom+i];
-						var arg = args[i];
-						var type = param.ParameterType;
+						var param = pars[i];
 						if (i >= args.Length)
 							call[i] = param.DefaultValue;
-						else if (type == typeof(string))
-							call[i] = arg.ToStr();
-						else if (type.IsPrimitive || type.IsEnum)
-							call[i] = System.Convert.ChangeType(arg.Box(), type);
-						//else if (typeof(Delegate).IsAssignableFrom(type))
-						//	call[i] = ((BasicObjects.FunctionObj)arg.Object).GetDelegate(type);
 						else
-							call[i] = arg.obj;
+						{
+							var arg = args[i-parsFrom];
+							var type = param.ParameterType;
+							if (type == typeof(string))
+								call[i] = arg.ToStr();
+							else if (type.IsPrimitive || type.IsEnum)
+								call[i] = System.Convert.ChangeType(arg.Box(), type);
+							//else if (typeof(Delegate).IsAssignableFrom(type))
+							//	call[i] = ((BasicObjects.FunctionObj)arg.Object).GetDelegate(type);
+							else
+								call[i] = arg.obj;
+						}
 					}
 
 					if (method is ConstructorInfo ctor)
@@ -172,7 +175,12 @@ namespace RedOnion.ROS
 						: method.Invoke(self, call));
 					return true;
 				}
-				catch { }
+				catch (Exception ex)
+				{
+					Value.DebugLog("Exception {0} when trying to call {1}.{2} ({3} v.s. {4} args): {5}",
+						ex.GetType().Name, method.DeclaringType.Name, method.Name,
+						method.GetParameters().Length, args.Length, ex.Message);
+				}
 				return false;
 			}
 		}

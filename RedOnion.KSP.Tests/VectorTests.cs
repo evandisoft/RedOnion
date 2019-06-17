@@ -11,8 +11,11 @@ namespace RedOnion.KSP.Tests
 		public ApiTestsBase() : base(null)
 		{
 			Descriptor.Create = CustomCreateDescriptor;
+			Value.LogListener = LogListener;
 			Globals = new RosGlobals();
 		}
+		public static void LogListener(string msg)
+			=> System.Diagnostics.Debug.WriteLine(msg);
 		public static Descriptor CustomCreateDescriptor(Type type)
 		{
 			if (typeof(Delegate).IsAssignableFrom(type))

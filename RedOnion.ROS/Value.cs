@@ -38,6 +38,18 @@ namespace RedOnion.ROS
 		public static string Format(string msg, params object[] args)
 			=> string.Format(Culture, msg, args);
 
+		public static Action<string> LogListener;
+		public static void Log(string msg)
+			=> LogListener?.Invoke(msg);
+		public static void Log(string msg, params object[] args)
+			=> LogListener?.Invoke(Format(msg, args));
+		[Conditional("DEBUG")]
+		public static void DebugLog(string msg)
+			=> LogListener?.Invoke(msg);
+		[Conditional("DEBUG")]
+		public static void DebugLog(string msg, params object[] args)
+			=> LogListener?.Invoke(Format(msg, args));
+
 		/// <summary>
 		/// The descriptor - how the core interacts with the value
 		/// </summary>
@@ -86,7 +98,12 @@ namespace RedOnion.ROS
 				desc = sd.Descriptor;
 				return;
 			}
-			desc = Descriptor.Of(it is Type t ? t : it.GetType());
+			if (it is Type t)
+			{
+				desc = Descriptor.Of(t);
+				return;
+			}
+			desc = Descriptor.Of(it.GetType());
 			if (!IsNumerOrChar)
 			{
 				obj = it;
@@ -223,7 +240,7 @@ namespace RedOnion.ROS
 		// note: the higher part may get changed (but must be non-zero)
 		internal void SetRef(int idx)
 			=> num.Long = (uint)idx | ((long)~idx << 32);
-		internal void SetRef(Context ctx, int idx)
+		internal void SetRef(UserObject ctx, int idx)
 		{
 			obj = desc = ctx;
 			num.Long = (uint)idx | ((long)~idx << 32);

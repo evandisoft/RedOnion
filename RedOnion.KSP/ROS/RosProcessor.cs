@@ -17,11 +17,9 @@ namespace RedOnion.KSP.ROS
 	public class RosProcessor : Processor, IProcessor
 	{
 		public RosProcessor()
-			: base(new RosGlobals())
-			=> ctx = new Context();
-		protected RosProcessor(UserObject globals)
-			: base(globals)
-			=> ctx = new Context();
+			=> Globals = new RosGlobals();
+		protected RosProcessor(RedOnion.ROS.Objects.Globals globals)
+			=> Globals = globals;
 		public override void Reset()
 		{
 			base.Reset();
@@ -32,6 +30,8 @@ namespace RedOnion.KSP.ROS
 
 		public override void Log(string msg)
 			=> UE.Debug.Log("[RedOnion] " + msg);
+		static RosProcessor()
+			=> Value.LogListener = msg => UE.Debug.Log("[RedOnion] " + msg);
 
 		private static Ionic.Zip.ZipFile ScriptsZip;
 		public static string LoadScript(string path)

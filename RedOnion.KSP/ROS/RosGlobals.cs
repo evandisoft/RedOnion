@@ -13,17 +13,22 @@ namespace RedOnion.KSP
 		protected static MemberList Members => GlobalMembers.MemberList;
 		MemberList IType.Members => Members;
 
-		public RosGlobals()
+		public override void Fill()
 		{
-#if DEBUG
-			Reflected.DebugLog = UE.Debug.Log;
-#endif
-			//Add("API", Globals.Instance); //TODO - not InteropObject
-			Add(typeof(Math));
-			//Add(typeof(UE.Debug));
-			//Add(typeof(UE.Color));
-			//Add(typeof(UE.Rect));
-			//Add("UI", UI_Namespace.Instance);
+			base.Fill();
+			Add(typeof(UE.Debug));
+			Add(typeof(UE.Color));
+			Add(typeof(UE.Rect));
+
+			Add("UI", UI_Namespace.Instance);
+			Add(typeof(API_UI.Window));
+			Add(typeof(UI.Anchors));
+			Add(typeof(UI.Padding));
+			Add(typeof(UI.Layout));
+			Add(typeof(UI.Panel));
+			Add(typeof(UI.Label));
+			Add(typeof(UI.Button));
+			Add(typeof(UI.TextBox));
 
 			/*
 			Add("assembly", new Value(new ReflectionUtil.GetMappings()));
@@ -182,10 +187,15 @@ namespace RedOnion.KSP
 		}
 		public override IEnumerable<string> EnumerateProperties(object self)
 		{
+			var seen = new HashSet<string>();
 			foreach (var member in Members)
+			{
+				seen.Add(member.Name);
 				yield return member.Name;
-			foreach (var p in prop)
-				yield return p.name;
+			}
+			;
+			foreach (var name in EnumerateProperties(self, seen))
+				yield return name;
 		}
 	}
 }

@@ -8,11 +8,19 @@ namespace RedOnion.KSP.API_UI
 	public class Window : UI.Window
 	{
 		WeakReference core;
+		public Window(IProcessor core)
+			: this(core, null, UI.Layout.Vertical) {}
+		public Window(IProcessor core, UI.Layout layout)
+			: this(core, null, layout) { }
 		public Window(IProcessor core, string name = null, UI.Layout layout = UI.Layout.Vertical)
 			: base(name, layout)
 		{
-			core.Shutdown += CoreShutdown;
-			this.core = new WeakReference(core);
+			Value.DebugLog("Creating new window");
+			if (core != null)
+			{
+				core.Shutdown += CoreShutdown;
+				this.core = new WeakReference(core);
+			}
 		}
 		bool CoreShutdown(IProcessor core)
 		{
@@ -21,6 +29,7 @@ namespace RedOnion.KSP.API_UI
 		}
 		protected override void Dispose(bool disposing)
 		{
+			Value.DebugLog("Disposing window (dispose: {0})", disposing);
 			var core = this.core.Target as IProcessor;
 			if (core != null)
 				core.Shutdown -= CoreShutdown;

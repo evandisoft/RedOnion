@@ -11,20 +11,21 @@ namespace Kerbalua.Other
 {
 	public class RedOnionReplEvaluator : ReplEvaluator
 	{
-		RosProcessor core;
+		RosProcessor processor;
 		RosSuggest suggest;
 		string source, path;
 		bool skipUpdate;
 
 		public RedOnionReplEvaluator()
 		{
-			core = new RosProcessor();
-			suggest = new RosSuggest(core);
-			Print.Listen += PrintRedirect;
+			suggest = new RosSuggest(processor = new RosProcessor());
+			processor.Print += PrintRedirect;
 		}
 		protected override void Dispose(bool disposing)
 		{
-			Print.Listen -= PrintRedirect;
+			processor.Print -= PrintRedirect;
+			if (disposing)
+				processor.Dispose();
 			base.Dispose(disposing);
 		}
 		protected void PrintRedirect(string msg)
@@ -37,7 +38,7 @@ namespace Kerbalua.Other
 				skipUpdate = false;
 				return;
 			}
-			core.FixedUpdate();
+			processor.FixedUpdate();
 		}
 
 		protected override void ProtectedSetSource(string source, string path)
@@ -51,8 +52,8 @@ namespace Kerbalua.Other
 			try
 			{
 				skipUpdate = true;
-				core.Execute(source, path, 10000);
-				result = core.Result.ToString();
+				processor.Execute(source, path, 10000);
+				result = processor.Result.ToString();
 				return true; // for now we always complete immediately
 			}
 			catch (Exception e)
@@ -98,7 +99,7 @@ namespace Kerbalua.Other
 		{
 			source = null;
 			path = null;
-			core.Reset();
+			processor.Reset();
 			suggest.Reset();
 			base.ResetEngine();
 		}
@@ -107,7 +108,7 @@ namespace Kerbalua.Other
 		{
 			source = null;
 			path = null;
-			core.ClearEvents();
+			processor.ClearEvents();
 		}
 	}
 }

@@ -12,7 +12,13 @@ namespace RedOnion.ROS
 	public class Processor : Core, IProcessor
 	{
 		public Processor() : base(null) => ctx = new Context();
-		public Processor(UserObject globals) : base(null, globals) => ctx = new Context();
+		protected override void SetGlobals(Globals value)
+		{
+			if ((globals = value) == null)
+				return;
+			value.Processor = this;
+			value.Fill();
+		}
 
 		public int UpdateCountdown { get; set; } = 1000;
 		public int StepCountdown { get; set; } = 100;
@@ -23,11 +29,10 @@ namespace RedOnion.ROS
 		public int MaxIdleSkips { get; set; } = 10;
 		public TimeSpan UpdateTimeout { get; set; } = TimeSpan.FromMilliseconds(10.0);
 
-		/// <summary>
-		/// Event invoked on engine shutdown or reset.
-		/// Return false to auto-remove after invoke.
-		/// </summary>
 		public event Func<IProcessor, bool> Shutdown;
+		public event Action<string> Print;
+		void IProcessor.Print(string msg) => Print?.Invoke(msg);
+
 		/// <summary>
 		/// Reset the engine - clear all event lists
 		/// and reset/recreate globals.
@@ -58,6 +63,8 @@ namespace RedOnion.ROS
 				}
 			}
 			ClearEvents();
+			Globals.Reset();
+			Globals.Fill();
 			ctx = new Context();
 		}
 
@@ -203,7 +210,8 @@ namespace RedOnion.ROS
 				}
 				else
 				{
-					e.Core = new Core(this, Globals);
+					e.Core = new Core(this);
+					e.Core.Globals = Globals;
 					var countdown = Math.Min(StepCountdown, TotalCountdown);
 					var fn = e.Value.obj as RedOnion.ROS.Objects.Function;
 					e.Core.Execute(fn.Code, countdown);

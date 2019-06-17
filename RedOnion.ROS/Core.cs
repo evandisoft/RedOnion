@@ -11,14 +11,12 @@ namespace RedOnion.ROS
 	{
 		public Core(IProcessor processor)
 			=> vals = new ArgumentList(this.processor = (processor ?? this as IProcessor));
-		public Core(IProcessor processor, UserObject globals)
-			: this(processor)
-			=> Globals = globals;
 
 		protected int at;
 		protected byte[] code;
 		protected string[] str;
 		protected IProcessor processor;
+		protected Globals globals;
 		protected ArgumentList vals;
 		protected Context ctx;
 		protected bool ctxIsPrivate;
@@ -34,7 +32,13 @@ namespace RedOnion.ROS
 		}
 		protected ListCore<SavedContext> stack;
 
-		public UserObject Globals { get; set; }
+		public Globals Globals
+		{
+			get => globals;
+			set => SetGlobals(value);
+		}
+		protected virtual void SetGlobals(Globals value)
+			=> globals = value;
 		public Context Context => ctx;
 		public ExitCode Exit { get; protected set; }
 		public Value Result => result;
