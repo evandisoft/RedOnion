@@ -214,7 +214,7 @@ namespace RedOnion.ROS
 					e.Core.Globals = Globals;
 					var countdown = Math.Min(StepCountdown, TotalCountdown);
 					var fn = e.Value.obj as RedOnion.ROS.Objects.Function;
-					e.Core.Execute(fn.Code, countdown);
+					e.Core.Execute(fn, countdown);
 				}
 			}
 			catch (Exception ex)

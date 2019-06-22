@@ -1021,7 +1021,7 @@ namespace RedOnion.ROS
 						at += size;
 
 						var it = new Function(fname, null,
-							compiled, bodyAt, bodySz, ftat, args, ctx, cvars);
+							compiled, bodyAt, bodySz, ftat, args, ctx, cvars, processor);
 						if (fname?.Length > 0)
 							ctx.Add(fname, it);
 						else vals.Add(new Value(it));

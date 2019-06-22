@@ -8,6 +8,7 @@ namespace RedOnion.ROS.Tests
 	[TestFixture]
 	public class ROS_Reflection : CoreTests
 	{
+		public delegate void MyAction();
 		public static class StaticTest
 		{
 			public static string name;
@@ -17,6 +18,9 @@ namespace RedOnion.ROS.Tests
 			public static void SetInteger(int value) => Integer = value;
 			public static string Combine(string a, string b) => a + " " + b;
 			public static double Sum3(double a, float b, int c) => a + b + c;
+			public static MyAction action;
+			public static void AddAction(MyAction add) => action += add;
+			public static void CallAction() => action?.Invoke();
 		}
 		public class InstanceTest
 		{
@@ -27,6 +31,9 @@ namespace RedOnion.ROS.Tests
 			public void SetInteger(int value) => Integer = value;
 			public string Combine(string a, string b) => a + " " + b;
 			public double Sum3(double a, float b, long c) => a + b + c;
+			public MyAction action;
+			public void AddAction(MyAction add) => action += add;
+			public void CallAction() => action?.Invoke();
 		}
 		public class MixedTest
 		{
@@ -172,6 +179,30 @@ namespace RedOnion.ROS.Tests
 			Test(TestEnum.Zero, "zero");
 			Test(1, "enumUtils.enum2int testEnum.one");
 			Test(TestEnum.Three, "enumUtils.or testEnum.one, testEnum.two");
+		}
+
+		[Test]
+		public void ROS_Refl06_Action()
+		{
+			Globals = new Globals();
+			Globals.Add(typeof(StaticTest));
+			StaticTest.Integer = 0;
+			Test("def action => staticTest.integer = 10");
+			Test("staticTest.addAction action");
+			Assert.AreEqual(0, StaticTest.Integer);
+			StaticTest.CallAction();
+			Assert.AreEqual(0, StaticTest.Integer);
+			FixedUpdate();
+			Assert.AreEqual(10, StaticTest.Integer);
+
+			var it = new InstanceTest();
+			Globals.Add("it", it);
+			Test("it.addAction def => it.name = \"done\"");
+			Assert.IsNull(it.name);
+			it.CallAction();
+			Assert.IsNull(it.name);
+			FixedUpdate();
+			Assert.AreEqual("done", it.name);
 		}
 	}
 }

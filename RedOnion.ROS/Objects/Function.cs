@@ -47,6 +47,11 @@ namespace RedOnion.ROS.Objects
 		/// </summary>
 		public Context Context { get; protected set; }
 		/// <summary>
+		/// The processor this function belongs to
+		/// (needed for ExecuteLater action)
+		/// </summary>
+		public Processor Processor { get; protected internal set; }
+		/// <summary>
 		/// Prototype of this function object (base class for created objects)
 		/// </summary>
 		public UserObject Prototype
@@ -73,7 +78,7 @@ namespace RedOnion.ROS.Objects
 		/// </summary>
 		public Function(string name, UserObject baseClass,
 			CompiledCode code, int codeAt, int codeSize, int typeAt,
-			ArgumentInfo[] args, Context context, HashSet<string> cvars)
+			ArgumentInfo[] args, Context context, HashSet<string> cvars, Processor processor)
 			: base(name ?? "lambda", typeof(Function), ExCode.Function, TypeCode.Object, baseClass)
 		{
 			Code = code;
@@ -83,6 +88,7 @@ namespace RedOnion.ROS.Objects
 			Arguments = args;
 			ArgsString = args == null ? "" : string.Join(", ", args.Select(x => x.Name).ToArray());
 			Context = new Context(context, this, cvars);
+			Processor = processor;
 			Add("prototype", Value.Null);
 		}
 
@@ -98,5 +104,18 @@ namespace RedOnion.ROS.Objects
 
 		public override bool Call(ref Value result, object self, Arguments args, bool create)
 			=> throw InvalidOperation("Function objects cannot be called via Descriptor.Call");
+
+		Action executeLater;
+		public Action ExecuteLater => executeLater
+			?? (executeLater = () => Processor.OneShot.Add(this));
+		public override bool Convert(ref Value self, Descriptor to)
+		{
+			if (to == Descriptor.Actions[0])
+			{
+				self = new Value(ExecuteLater);
+				return true;
+			}
+			return base.Convert(ref self, to);
+		}
 	}
 }

@@ -40,7 +40,7 @@ namespace RedOnion.ROS
 
 			public static Descriptor FromType(Type type)
 			{
-				if (type.IsAssignableFrom(typeof(Delegate)))
+				if (typeof(Delegate).IsAssignableFrom(type))
 				{
 					var info = type.GetMethod("Invoke");
 					var pars = info.GetParameters();

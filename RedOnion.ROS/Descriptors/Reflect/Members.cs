@@ -342,6 +342,7 @@ namespace RedOnion.ROS
 						case 1:
 						{
 							var self = Expression.Parameter(m.DeclaringType, "self");
+							//TODO: cache and reuse the descriptors
 							var value = new Value((Descriptor)Activator.CreateInstance(
 								typeof(Procedure1<>).MakeGenericType(m.DeclaringType), m.Name),
 								Expression.Lambda(Expression.Call(self, m,

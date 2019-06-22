@@ -29,8 +29,8 @@ namespace RedOnion.KSP.API_UI
 		}
 		protected override void Dispose(bool disposing)
 		{
-			Value.DebugLog("Disposing window (dispose: {0})", disposing);
-			var core = this.core.Target as IProcessor;
+			var core = this.core?.Target as IProcessor;
+			Value.DebugLog("Disposing window (dispose: {0}, core: {1})", disposing, core != null);
 			if (core != null)
 				core.Shutdown -= CoreShutdown;
 			if (disposing)

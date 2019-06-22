@@ -17,10 +17,10 @@ namespace RedOnion.ROS.Utilities
 		public Event(IList<Value> list) => this.list = list;
 		public void Add(Value call) => list.Add(call);
 		public void Add(Function call) => list.Add(new Value(call));
-		public void Add(Action call) => list.Add(new Value(Descriptor.Actions[0], call));
+		public void Add(Action call) => list.Add(new Value(call));
 		public void Remove(Value call) => list.Remove(call);
 		public void Remove(Function call) => list.Remove(new Value(call));
-		public void Remove(Action call) => list.Remove(new Value(Descriptor.Actions[0], call));
+		public void Remove(Action call) => list.Remove(new Value(call));
 		public void Clear() => list.Clear();
 
 		public void Set(Value call)
@@ -62,11 +62,11 @@ namespace RedOnion.ROS.Utilities
 		public static AddProxy operator +(Event e, Value a)
 			=> new AddProxy(e.list, a);
 		public static AddProxy operator +(Event e, Action a)
-			=> new AddProxy(e.list, new Value(Descriptor.Actions[0], a));
+			=> new AddProxy(e.list, new Value(a));
 		public static RemoveProxy operator -(Event e, Value a)
 			=> new RemoveProxy(e.list, a);
 		public static RemoveProxy operator -(Event e, Action a)
-			=> new RemoveProxy(e.list, new Value(Descriptor.Actions[0], a));
+			=> new RemoveProxy(e.list, new Value(a));
 		public Event(AddProxy p)
 		{
 			list = p.list;
