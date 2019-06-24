@@ -52,7 +52,7 @@ namespace RedOnion.ROS.Tests
 	public class ROS_Statements : StatementTests
 	{
 		[TearDown]
-		public void Reset() => ResetContext();
+		public override void Reset() => base.Reset();
 
 		[Test]
 		public void ROS_Stts01_Return()

@@ -12,8 +12,8 @@ namespace RedOnion.KSP.ROS
 {
 	public class RosSuggest
 	{
-		protected RosCore core;
-		public RosSuggest(RosCore core)
+		protected RosProcessor core;
+		public RosSuggest(RosProcessor core)
 			=> this.core = core;
 
 		protected bool Matches(string suggestion)

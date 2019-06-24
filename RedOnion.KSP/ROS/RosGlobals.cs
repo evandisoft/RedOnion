@@ -1,16 +1,9 @@
 using System;
 using System.Collections.Generic;
 using RedOnion.ROS;
-using RedOnion.ROS.Objects;
-using RedOnion.ROS.Utilities;
-using UE = UnityEngine;
-using UUI = UnityEngine.UI;
-using KUI = KSP.UI;
-using ROC = RedOnion.UI.Components;
-using RedOnion.KSP.Autopilot;
-using KSP.UI.Screens;
 using RedOnion.KSP.API;
-using RedOnion.KSP.Completion;
+using RedOnion.KSP.API.Namespaces;
+using UE = UnityEngine;
 
 namespace RedOnion.KSP
 {
@@ -20,9 +13,33 @@ namespace RedOnion.KSP
 		protected static MemberList Members => GlobalMembers.MemberList;
 		MemberList IType.Members => Members;
 
-		public RosGlobals()
+		public override void Fill()
 		{
+			base.Fill();
+			Add(typeof(UE.Debug));
+			Add(typeof(UE.Color));
+			Add(typeof(UE.Rect));
+
+			Add("UI", UI_Namespace.Instance);
+			Add(typeof(API_UI.Window));
+			Add(typeof(UI.Anchors));
+			Add(typeof(UI.Padding));
+			Add(typeof(UI.Layout));
+			Add(typeof(UI.Panel));
+			Add(typeof(UI.Label));
+			Add(typeof(UI.Button));
+			Add(typeof(UI.TextBox));
+
 			/*
+			Add("assembly", new Value(new ReflectionUtil.GetMappings()));
+			
+			sys.Set("Vector2", AddType(typeof(UE.Vector2)));
+			var vector =        AddType(typeof(UE.Vector3));
+			soft.Set("Vector", vector);
+			sys.Set("Vector", vector);
+			sys.Set("Vector3", vector);
+			sys.Set("Vector4", AddType(typeof(UE.Vector4)));
+
 			var hard = BaseProps; // will resist overwrite and shadowing in global scope
 			var soft = MoreProps; // can be easily overwritten or shadowed
 
@@ -34,17 +51,6 @@ namespace RedOnion.KSP
 
 			sys.Set("Update", update);
 			sys.Set("Idle", idle);
-			sys.Set("Debug", AddType(typeof(UE.Debug)));
-			sys.Set("Color", AddType(typeof(UE.Color)));
-			sys.Set("Rect", AddType(typeof(UE.Rect)));
-			sys.Set("Vector2", AddType(typeof(UE.Vector2)));
-			var vector =        AddType(typeof(UE.Vector3));
-			soft.Set("Vector", vector);
-			sys.Set("Vector", vector);
-			sys.Set("Vector3", vector);
-			sys.Set("Vector4", AddType(typeof(UE.Vector4)));
-			sys.Set("Math", AddType(typeof(Math)));
-			sys.Set("API", Globals.Instance);
 			if (system == null)
 				BaseProps.Set("System", new SimpleObject(Engine, sys));
 
@@ -181,10 +187,15 @@ namespace RedOnion.KSP
 		}
 		public override IEnumerable<string> EnumerateProperties(object self)
 		{
+			var seen = new HashSet<string>();
 			foreach (var member in Members)
+			{
+				seen.Add(member.Name);
 				yield return member.Name;
-			foreach (var p in prop)
-				yield return p.name;
+			}
+			;
+			foreach (var name in EnumerateProperties(self, seen))
+				yield return name;
 		}
 	}
 }

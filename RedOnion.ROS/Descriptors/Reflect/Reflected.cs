@@ -28,14 +28,36 @@ namespace RedOnion.ROS
 			protected Action<object, int, Value> intIndexSet;
 			protected Func<object, string, Value> strIndexGet;
 			protected Action<object, string, Value> strIndexSet;
+			protected ConstructorInfo defaultCtor;
+			protected ConstructorInfo processorCtor;
 
 			public Reflected(Type type) : this(type.Name, type) { }
 			public Reflected(string name, Type type) : base(name, type)
 			{
 				foreach (var member in GetMembers(type, null, false))
-					ProcessMember(member, false, ref sdict);
+				{
+					try
+					{
+						ProcessMember(member, false, ref sdict);
+					}
+					catch (Exception ex)
+					{
+						Value.Log("Exception {0} when processing static {1}.{2}: {3}",
+							ex.GetType(), Type.Name, member.Name, ex.Message);
+					}
+				}
 				foreach (var member in GetMembers(type, null, true))
-					ProcessMember(member, true, ref idict);
+				{
+					try
+					{
+						ProcessMember(member, true, ref idict);
+					}
+					catch (Exception ex)
+					{
+						Value.Log("Exception {0} when processing {1}.{2}: {3}",
+							ex.GetType(), Type.Name, member.Name, ex.Message);
+					}
+				}
 				if (intIndexGet == null && intIndexSet == null)
 				{
 					if (typeof(IList<Value>).IsAssignableFrom(type))
@@ -53,10 +75,25 @@ namespace RedOnion.ROS
 
 			public override bool Call(ref Value result, object self, Arguments args, bool create)
 			{
+				Value.DebugLog("{0}/{1}.{2} {3}", Name, Type.FullName, create ? "Create" : "Call", result);
+				if (!create && result.obj != null)
+					return false;
 				if (args.Count == 0)
 				{
+					if (processorCtor != null
+						&& Callable.TryCall(processorCtor, ref result, self, args))
+						return true;
+					if (defaultCtor != null
+						&& Callable.TryCall(defaultCtor, ref result, self, args))
+						return true;
 					result = new Value(Activator.CreateInstance(Type));
 					return true;
+				}
+				//TODO: optimize (Delegate[][] - first index by number of arguments)
+				foreach (var ctor in Type.GetConstructors())
+				{
+					if (Callable.TryCall(ctor, ref result, self, args))
+						return true;
 				}
 				return false;
 			}
@@ -118,7 +155,6 @@ namespace RedOnion.ROS
 						if (intIndexGet == null)
 							throw InvalidOperation("{0}[{1}] is write only", Name, proxy[1]);
 						self = intIndexGet(proxy[0].obj, index.num.Int);
-						//TODO: multi-index
 						return true;
 					}
 					if (index.IsString)
@@ -126,7 +162,6 @@ namespace RedOnion.ROS
 						if (strIndexGet == null)
 							throw InvalidOperation("{0}[{1}] is write only", Name, proxy[1]);
 						self = strIndexGet(proxy[0].obj, index.obj.ToString());
-						//TODO: multi-index
 						return true;
 					}
 					return false;
@@ -142,7 +177,24 @@ namespace RedOnion.ROS
 			{
 				if (at == int.MaxValue)
 				{
-					//TODO: index-set
+					if (op != OpCode.Assign)
+						return false;
+					var proxy = (Value[])self.obj;
+					ref var index = ref proxy[1];
+					if (index.IsNumerOrChar)
+					{
+						if (intIndexSet == null)
+							throw InvalidOperation("{0}[{1}] is read only", Name, proxy[1]);
+						intIndexSet(proxy[0].obj, index.num.Int, value);
+						return true;
+					}
+					if (index.IsString)
+					{
+						if (strIndexGet == null)
+							throw InvalidOperation("{0}[{1}] is read only", Name, proxy[1]);
+						strIndexSet(proxy[0].obj, index.obj.ToString(), value);
+						return true;
+					}
 					return false;
 				}
 				if (at < 0 || at >= prop.size)

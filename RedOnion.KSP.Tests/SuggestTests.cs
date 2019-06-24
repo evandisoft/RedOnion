@@ -9,7 +9,7 @@ namespace RedOnion.KSP.Tests
 {
 	public class ROS_Suggest : RosSuggest
 	{
-		public ROS_Suggest() : base(new RosCore()) { }
+		public ROS_Suggest() : base(new ApiTestsBase()) { }
 
 		protected void AssertContains(string what, IList<string> list)
 		{

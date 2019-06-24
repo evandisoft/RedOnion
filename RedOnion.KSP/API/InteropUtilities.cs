@@ -49,7 +49,7 @@ namespace RedOnion.KSP.API
 				to = new Arguments(null, 0);
 				return self;
 			}
-			var list = new ArgumentList();
+			var list = new ArgumentList(null);
 			for (int i = 1; i < from.Count; i++)
 				list.Add(ToRos(from[i]));
 			to = new Arguments(list, list.Count);

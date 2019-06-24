@@ -38,128 +38,156 @@ namespace RedOnion.ROS
 				MemberInfo member, bool instance, ref Dictionary<string, int> dict)
 			{
 				if (dict != null && dict.ContainsKey(member.Name))
-					return; // conflict
-
-				//============================================================================ FIELD
-				if (member is FieldInfo f)
 				{
-					if (dict == null)
-						dict = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-					dict[f.Name] = prop.size;
-					ref var it = ref prop.Add();
-					it.name = f.Name;
-					var type = f.FieldType;
-					it.read = Expression.Lambda<Func<object, Value>>(
-						// self => new Value(((T)self).name)
-						GetNewValueExpression(type,
-							Expression.Field(instance
-								? Expression.Convert(SelfParameter, f.DeclaringType)
-								: null, f)),
-						SelfParameter
-					).Compile();
-					if (f.IsInitOnly)
-						return;
-					// maybe use Reflection.Emit: https://docs.microsoft.com/en-us/dotnet/api/system.reflection.emit.dynamicmethod?view=netframework-3.5
-					if (instance)
-					{
-						it.write = (self, value) =>
-						{
-							var fv = value.Box();
-							if (!f.FieldType.IsAssignableFrom(fv.GetType()))
-							{
-								value.desc.Convert(ref value, Of(f.FieldType));
-								fv = value.Box();
-							}
-							f.SetValue(self, fv);
-						};
-					}
-					else
-					{
-						it.write = (self, value) =>
-						{
-							var fv = value.Box();
-							if (!f.FieldType.IsAssignableFrom(fv.GetType()))
-							{
-								value.desc.Convert(ref value, Of(f.FieldType));
-								fv = value.Box();
-							}
-							f.SetValue(null, fv);
-						};
-					}
-					return;
+					Value.DebugLog("Conflicting name: {0}.{1} [instace: {2}]", Type.Name, member.Name, instance);
+					return; // conflict
 				}
 
-				//========================================================================= PROPERTY
-				if (member is PropertyInfo p)
-				{
-					var iargs = p.GetIndexParameters();
-					if (p.IsSpecialName || iargs.Length > 0)
-					{
-						if (iargs.Length != 1)
-							return;
-						var itype = iargs[0].ParameterType;
+				if (member is FieldInfo f)
+					ProcessField(f, instance, ref dict);
+				else if (member is PropertyInfo p)
+					ProcessProperty(p, instance, ref dict);
+				else if (member is MethodInfo m)
+					ProcessMethod(m, instance, ref dict);
+				else if (instance && member is ConstructorInfo c)
+					ProcessCtor(c, ref dict);
+			}
 
-						//---------------------------------------------------------------- this[int]
-						if (itype == typeof(int))
+			protected virtual void ProcessField(
+				FieldInfo f, bool instance, ref Dictionary<string, int> dict)
+			{
+				Value.DebugLog("Processing field {0}.{1} [instace: {2}]", Type.Name, f.Name, instance);
+				if (dict == null)
+					dict = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+				dict[f.Name] = prop.size;
+				ref var it = ref prop.Add();
+				it.name = f.Name;
+				var type = f.FieldType;
+				it.read = Expression.Lambda<Func<object, Value>>(
+					// WARNING: Mono may crash if const field is fed into Expression.Field!
+					GetNewValueExpression(type, f.IsLiteral ? (Expression)
+						// self => new Value(T.name)
+						Expression.Constant(f.GetValue(null), f.FieldType) :
+						Expression.Field(instance
+							// self => new Value(((T)self).name)
+							? Expression.Convert(SelfParameter, f.DeclaringType)
+							// self => new Value(T.name)
+							: null, f)),
+					SelfParameter
+				).Compile();
+				if (f.IsInitOnly || f.IsLiteral)
+					return;
+				// maybe use Reflection.Emit: https://docs.microsoft.com/en-us/dotnet/api/system.reflection.emit.dynamicmethod?view=netframework-3.5
+				if (instance)
+				{
+					it.write = (self, value) =>
+					{
+						var fv = value.Box();
+						if (!f.FieldType.IsAssignableFrom(fv.GetType()))
 						{
-							if (p.CanRead)
-							{
+							value.desc.Convert(ref value, Of(f.FieldType));
+							fv = value.Box();
+						}
+						f.SetValue(self, fv);
+					};
+				}
+				else
+				{
+					it.write = (self, value) =>
+					{
+						var fv = value.Box();
+						if (!f.FieldType.IsAssignableFrom(fv.GetType()))
+						{
+							value.desc.Convert(ref value, Of(f.FieldType));
+							fv = value.Box();
+						}
+						f.SetValue(null, fv);
+					};
+				}
+				return;
+			}
+
+			protected virtual void ProcessProperty(
+				PropertyInfo p, bool instance, ref Dictionary<string, int> dict)
+			{
+				Value.DebugLog("Processing property {0}.{1} [instace: {2}]", Type.Name, p.Name, instance);
+				var iargs = p.GetIndexParameters();
+				if (p.IsSpecialName || iargs.Length > 0)
+				{
+					if (iargs.Length != 1)
+						return;
+					var itype = iargs[0].ParameterType;
+
+					//---------------------------------------------------------------- this[int]
+					if (itype == typeof(int))
+					{
+						if (p.CanRead)
+						{
+							var read = p.GetGetMethod(false);
+							if (read != null)
 								intIndexGet = Expression.Lambda<Func<object, int, Value>>(
 									GetNewValueExpression(p.PropertyType, Expression.Call(
 										Expression.Convert(SelfParameter, p.DeclaringType),
-										p.GetGetMethod(), IntIndexParameter)),
+										read, IntIndexParameter)),
 									SelfParameter, IntIndexParameter
 								).Compile();
-							}
-							if (p.CanWrite)
-							{
+						}
+						if (p.CanWrite)
+						{
+							var write = p.GetSetMethod(false);
+							if (write != null)
 								intIndexSet = Expression.Lambda<Action<object, int, Value>>(
 									Expression.Call(
 										Expression.Convert(SelfParameter, p.DeclaringType),
-										p.GetSetMethod(), IntIndexParameter,
+										write, IntIndexParameter,
 										GetValueConvertExpression(p.PropertyType, ValueParameter)
 									),
 									SelfParameter, IntIndexParameter, ValueParameter
 								).Compile();
-							}
-							return;
 						}
-						//------------------------------------------------------------- this[string]
-						if (itype == typeof(string))
+						return;
+					}
+					//------------------------------------------------------------- this[string]
+					if (itype == typeof(string))
+					{
+						if (p.CanRead)
 						{
-							if (p.CanRead)
-							{
+							var read = p.GetGetMethod(false);
+							if (read != null)
 								strIndexGet = Expression.Lambda<Func<object, string, Value>>(
 									GetNewValueExpression(p.PropertyType, Expression.Call(
 										Expression.Convert(SelfParameter, p.DeclaringType),
-										p.GetGetMethod(), StrIndexParameter)),
+										read, StrIndexParameter)),
 									SelfParameter, StrIndexParameter
 								).Compile();
-							}
-							if (p.CanWrite)
-							{
+						}
+						if (p.CanWrite)
+						{
+							var write = p.GetSetMethod();
+							if (write != null)
 								strIndexSet = Expression.Lambda<Action<object, string, Value>>(
 									Expression.Call(
 										Expression.Convert(SelfParameter, p.DeclaringType),
-										p.GetSetMethod(), StrIndexParameter,
+										write, StrIndexParameter,
 										GetValueConvertExpression(p.PropertyType, ValueParameter)
 									),
 									SelfParameter, StrIndexParameter, ValueParameter
 								).Compile();
-							}
-							return;
 						}
 						return;
 					}
-					//-------------------------------------------------------------- normal property
-					if (dict == null)
-						dict = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-					dict[p.Name] = prop.size;
-					ref var it = ref prop.Add();
-					it.name = p.Name;
-					var type = p.PropertyType;
-					if (p.CanRead)
-					{
+					return;
+				}
+				//-------------------------------------------------------------- normal property
+				if (dict == null)
+					dict = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+				dict[p.Name] = prop.size;
+				ref var it = ref prop.Add();
+				it.name = p.Name;
+				var type = p.PropertyType;
+				if (p.CanRead)
+				{
+					if (p.GetGetMethod() != null)
 						it.read = Expression.Lambda<Func<object, Value>>(
 							GetNewValueExpression(type,
 								Expression.Property(instance
@@ -167,43 +195,59 @@ namespace RedOnion.ROS
 									: null, p)),
 							SelfParameter
 						).Compile();
-					}
-					if (p.CanWrite)
-					{
+				}
+				if (p.CanWrite)
+				{
+					var write = p.GetSetMethod();
+					if (write != null)
 						it.write = Expression.Lambda<Action<object, Value>>(
 							Expression.Call(instance
 								? Expression.Convert(SelfParameter, p.DeclaringType)
 								: null,
-								p.GetSetMethod(),
+								write,
 								GetValueConvertExpression(type, ValueParameter)),
 							SelfParameter, ValueParameter
 						).Compile();
-					}
 				}
+			}
 
-				//=========================================================================== METHOD
-				if (member is MethodInfo m)
-				{
-					Func<object, Value> read = null;
+			protected virtual void ProcessMethod(
+				MethodInfo m, bool instance, ref Dictionary<string, int> dict)
+			{
 #if DEBUG
-					read = ReflectMethod(m);
-#else
-					try
-					{
-						read = ReflectMethod(m);
-					}
-					catch
-					{
-					}
+				if (!m.IsSpecialName && !m.IsGenericMethod && !m.ReturnType.IsByRef)
+					Value.DebugLog("Processing method {0}.{1} [instace: {2}, args: {3}]",
+						Type.Name, m.Name, instance, m.GetParameters().Length);
 #endif
-					if (read == null)
-						return;
-					if (dict == null)
-						dict = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-					dict[m.Name] = prop.size;
-					ref var it = ref prop.Add();
-					it.name = m.Name;
-					it.read = read;
+				var read = ReflectMethod(m);
+				if (read == null)
+					return;
+				if (dict == null)
+					dict = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+				dict[m.Name] = prop.size;
+				ref var it = ref prop.Add();
+				it.name = m.Name;
+				it.read = read;
+			}
+
+			protected virtual void ProcessCtor(
+				ConstructorInfo c, ref Dictionary<string, int> dict)
+			{
+				var args = c.GetParameters();
+				if (args.Length == 0 || args[0].RawDefaultValue != DBNull.Value)
+				{
+					Value.DebugLog("Found default {0}#ctor [args: {1}]",
+						Type.Name, args.Length);
+					defaultCtor = c;
+					return;
+				}
+				if (args[0].ParameterType == typeof(IProcessor)
+					&& (args.Length == 1 || args[1].RawDefaultValue != DBNull.Value)
+					&& !args[0].ParameterType.IsByRef && !args[0].IsOut)
+				{
+					Value.DebugLog("Found default {0}#ctor accepting processor [args: {1}]",
+						Type.Name, args.Length);
+					processorCtor = c;
 					return;
 				}
 			}
@@ -298,6 +342,7 @@ namespace RedOnion.ROS
 						case 1:
 						{
 							var self = Expression.Parameter(m.DeclaringType, "self");
+							//TODO: cache and reuse the descriptors
 							var value = new Value((Descriptor)Activator.CreateInstance(
 								typeof(Procedure1<>).MakeGenericType(m.DeclaringType), m.Name),
 								Expression.Lambda(Expression.Call(self, m,

@@ -9,13 +9,15 @@ namespace RedOnion.ROS
 	[DebuggerDisplay("{DebugString}")]
 	public partial class Core : ICore
 	{
-		public Core() { }
-		public Core(UserObject globals) => Globals = globals;
+		public Core(Processor processor)
+			=> vals = new ArgumentList(this.processor = (processor ?? this as Processor));
 
 		protected int at;
 		protected byte[] code;
 		protected string[] str;
-		protected ArgumentList vals = new ArgumentList();
+		protected Processor processor;
+		protected Globals globals;
+		protected ArgumentList vals;
 		protected Context ctx;
 		protected bool ctxIsPrivate;
 		protected Value self; // `this` for current code
@@ -30,7 +32,13 @@ namespace RedOnion.ROS
 		}
 		protected ListCore<SavedContext> stack;
 
-		public UserObject Globals { get; set; }
+		public Globals Globals
+		{
+			get => globals;
+			set => SetGlobals(value);
+		}
+		protected virtual void SetGlobals(Globals value)
+			=> globals = value;
 		public Context Context => ctx;
 		public ExitCode Exit { get; protected set; }
 		public Value Result => result;

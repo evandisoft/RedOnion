@@ -11,16 +11,16 @@ namespace RedOnion.ROS.Utilities
 	/// Event handler helper that works well in scripts (e.g. LUA not having += operator)
 	/// and still allow += operator if used in property with dummy set
 	/// </summary>
-	public struct Event
+	public struct Event : ISelfDescribing
 	{
 		readonly IList<Value> list;
 		public Event(IList<Value> list) => this.list = list;
 		public void Add(Value call) => list.Add(call);
 		public void Add(Function call) => list.Add(new Value(call));
-		public void Add(Action call) => list.Add(new Value(Descriptor.Actions[0], call));
+		public void Add(Action call) => list.Add(new Value(call));
 		public void Remove(Value call) => list.Remove(call);
 		public void Remove(Function call) => list.Remove(new Value(call));
-		public void Remove(Action call) => list.Remove(new Value(Descriptor.Actions[0], call));
+		public void Remove(Action call) => list.Remove(new Value(call));
 		public void Clear() => list.Clear();
 
 		public void Set(Value call)
@@ -62,11 +62,11 @@ namespace RedOnion.ROS.Utilities
 		public static AddProxy operator +(Event e, Value a)
 			=> new AddProxy(e.list, a);
 		public static AddProxy operator +(Event e, Action a)
-			=> new AddProxy(e.list, new Value(Descriptor.Actions[0], a));
+			=> new AddProxy(e.list, new Value(a));
 		public static RemoveProxy operator -(Event e, Value a)
 			=> new RemoveProxy(e.list, a);
 		public static RemoveProxy operator -(Event e, Action a)
-			=> new RemoveProxy(e.list, new Value(Descriptor.Actions[0], a));
+			=> new RemoveProxy(e.list, new Value(a));
 		public Event(AddProxy p)
 		{
 			list = p.list;
@@ -81,5 +81,23 @@ namespace RedOnion.ROS.Utilities
 			=> new Event(p);
 		public static implicit operator Event(RemoveProxy p)
 			=> new Event(p);
+
+		public Descriptor Descriptor => EventDescriptor.Instance;
+		public class EventDescriptor : Descriptor.Simple
+		{
+			public static EventDescriptor Instance { get; } = new EventDescriptor();
+			protected EventDescriptor() : base("Event", typeof(Event), Methods) { }
+			protected static Values Methods = new Values(new Value[]
+			{
+				new Value(new Procedure1<Event>("Add"),
+					(Action<Event,Value>)((e, v) => e.Add(v))),
+				new Value(new Procedure1<Event>("Set"),
+					(Action<Event,Value>)((e, v) => e.Set(v))),
+				new Value(new Procedure1<Event>("Remove"),
+					(Action<Event,Value>)((e, v) => e.Remove(v))),
+				new Value(new Procedure0<Event>("Clear"),
+					(Action<Event>)(e => e.Clear())),
+			});
+		}
 	}
 }

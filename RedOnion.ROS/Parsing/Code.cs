@@ -274,7 +274,11 @@ namespace RedOnion.ROS.Parsing
 					if (op != OpCode.Identifier)
 						throw new InvalidOperationException();
 					if (!HasOption(Option.Prefix))
+					{
+						if (create)
+							Write(OpCode.Create);
 						Write(OpCode.Dot);
+					}
 					CopyString(top, start);
 					return op;
 				}

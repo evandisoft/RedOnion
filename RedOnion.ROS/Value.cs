@@ -34,6 +34,21 @@ namespace RedOnion.ROS
 		/// Culture settings for formatting (invariant by default).
 		/// </summary>
 		public static CultureInfo Culture = CultureInfo.InvariantCulture;
+		public static string Format(string msg) => msg;
+		public static string Format(string msg, params object[] args)
+			=> string.Format(Culture, msg, args);
+
+		public static Action<string> LogListener;
+		public static void Log(string msg)
+			=> LogListener?.Invoke(msg);
+		public static void Log(string msg, params object[] args)
+			=> LogListener?.Invoke(Format(msg, args));
+		[Conditional("DEBUG")]
+		public static void DebugLog(string msg)
+			=> LogListener?.Invoke(msg);
+		[Conditional("DEBUG")]
+		public static void DebugLog(string msg, params object[] args)
+			=> LogListener?.Invoke(Format(msg, args));
 
 		/// <summary>
 		/// The descriptor - how the core interacts with the value
@@ -83,7 +98,12 @@ namespace RedOnion.ROS
 				desc = sd.Descriptor;
 				return;
 			}
-			desc = Descriptor.Of(it is Type t ? t : it.GetType());
+			if (it is Type t)
+			{
+				desc = Descriptor.Of(t);
+				return;
+			}
+			desc = Descriptor.Of(it.GetType());
 			if (!IsNumerOrChar)
 			{
 				obj = it;
@@ -194,6 +214,8 @@ namespace RedOnion.ROS
 			=> desc.GetHashCode(ref this);
 
 		public string Name => desc.Name;
+		public object Box() => desc.Box(ref this);
+		public Value(Action action) : this(Descriptor.Actions[0], action) { }
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		public bool IsVoid => desc.Primitive == ExCode.Void;
@@ -220,14 +242,12 @@ namespace RedOnion.ROS
 		// note: the higher part may get changed (but must be non-zero)
 		internal void SetRef(int idx)
 			=> num.Long = (uint)idx | ((long)~idx << 32);
-		internal void SetRef(Context ctx, int idx)
+		internal void SetRef(UserObject ctx, int idx)
 		{
 			obj = desc = ctx;
 			num.Long = (uint)idx | ((long)~idx << 32);
 		}
 
-		public object Box() => desc.Box(ref this);
-		
 		public int ToInt()
 		{
 			var type = desc.Primitive;
@@ -314,6 +334,52 @@ namespace RedOnion.ROS
 			if (it.desc.Convert(ref it, Descriptor.Char))
 				return it.num.Char;
 			throw InvalidOperation("Could not convert {0} to char", this);
+		}
+
+		public T ToType<T>() => (T)ToType(typeof(T));
+		public object ToType(Type type)
+		{
+			if (type == typeof(Value))
+				return this;
+			if (type.IsPrimitive)
+			{
+				if (type == typeof(int))
+					return ToInt();
+				if (type == typeof(string))
+					return ToStr();
+				if (type == typeof(double))
+					return ToDouble();
+				if (type == typeof(float))
+					return (float)ToDouble();
+				if (type == typeof(uint))
+					return ToUInt();
+				if (type == typeof(long))
+					return ToLong();
+				if (type == typeof(ulong))
+					return ToULong();
+				if (type == typeof(bool))
+					return ToBool();
+				if (type == typeof(char))
+					return ToChar();
+				if (type == typeof(byte))
+					return (byte)ToUInt();
+				if (type == typeof(sbyte))
+					return (sbyte)ToInt();
+				if (type == typeof(short))
+					return (short)ToInt();
+				if (type == typeof(ushort))
+					return (ushort)ToUInt();
+			}
+			var it = obj;
+			if (it != null && !type.IsAssignableFrom(it.GetType()))
+			{
+				var tmp = this;
+				desc.Convert(ref tmp, Descriptor.Of(type));
+				it = tmp.obj;
+				if (type.IsSubclassOf(typeof(Delegate)) && it.GetType() != type)
+					it = Delegate.CreateDelegate(type, it, "Invoke");
+			}
+			return it;
 		}
 
 		/// <summary>

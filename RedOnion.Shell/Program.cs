@@ -12,8 +12,7 @@ namespace RedOnion.Shell
 {
 	class Program
 	{
-		static ShellCore core;
-		static ShellGlobals globals;
+		static ShellProcessor processor;
 		class ShellGlobals: Globals
 		{
 			public ShellGlobals()
@@ -30,9 +29,9 @@ namespace RedOnion.Shell
 				Add(typeof(Encoding));
 			}
 		}
-		class ShellCore: Core
+		class ShellProcessor: Processor
 		{
-			public ShellCore() : base(globals = new ShellGlobals()) { }
+			public ShellProcessor() => Globals = new ShellGlobals();
 			public bool Eof => Parser.Eof;
 		}
 		static void Main(string[] args)
@@ -54,9 +53,9 @@ namespace RedOnion.Shell
 				}
 				try
 				{
-					core = new ShellCore();
-					Print.Listen += s => Console.WriteLine(s);
-					core.Execute(File.ReadAllText(args[0]));
+					processor = new ShellProcessor();
+					processor.Print += s => Console.WriteLine(s);
+					processor.Execute(File.ReadAllText(args[0]));
 					return;
 				}
 				catch (Exception ex)
@@ -72,8 +71,8 @@ namespace RedOnion.Shell
 
 			Console.WriteLine("Red Onion Script Interactive Console");
 			Console.WriteLine("Type 'return' or 'break' to exit");
-			core = new ShellCore();
-			Print.Listen += s => Console.WriteLine("--  " + s);
+			processor = new ShellProcessor();
+			processor.Print += s => Console.WriteLine("--  " + s);
 
 			var sb = new StringBuilder();
 			for (; ; )
@@ -85,11 +84,11 @@ namespace RedOnion.Shell
 				CompiledCode code = null;
 				try
 				{
-					code = core.Compile(sb.ToString());
+					code = processor.Compile(sb.ToString());
 				}
 				catch (Exception ex)
 				{
-					if (core.Eof && line != "")
+					if (processor.Eof && line != "")
 						continue;
 					Console.WriteLine(" !  Error: " + ex.Message);
 					if (ex is Error err)
@@ -105,7 +104,7 @@ namespace RedOnion.Shell
 				sb.Length = 0;
 				try
 				{
-					core.Execute(code);
+					processor.Execute(code);
 				}
 				catch (Exception ex)
 				{
@@ -116,9 +115,9 @@ namespace RedOnion.Shell
 							err.LineNumber, err.Line);
 					continue;
 				}
-				if (core.Exit != 0)
+				if (processor.Exit != 0)
 					return;
-				Console.WriteLine("=>  " + core.Result.ToStr());
+				Console.WriteLine("=>  " + processor.Result.ToStr());
 			}
 		}
 	}

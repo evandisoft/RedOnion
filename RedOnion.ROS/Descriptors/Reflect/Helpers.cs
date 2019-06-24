@@ -18,7 +18,7 @@ namespace RedOnion.ROS
 				if (args.Length != 1)
 					continue;
 				var type = args[0].ParameterType;
-				if (!type.IsPrimitive)
+				if (!type.IsPrimitive && type != typeof(Type))
 					continue;
 				dict[type] = ctor;
 			}
@@ -68,9 +68,12 @@ namespace RedOnion.ROS
 			= typeof(Value).GetMethod("ToBool");
 		internal static readonly MethodInfo ValueToChar
 			= typeof(Value).GetMethod("ToChar");
+		internal static readonly MethodInfo ValueToType
+			= typeof(Value).GetMethod("ToType", new Type[] { typeof(Type) });
 		public static Expression GetValueConvertExpression(Type type, Expression expr)
 		{
-			if (type == typeof(Value)) return expr;
+			if (type == typeof(Value))
+				return expr;
 			if (type.IsPrimitive)
 			{
 				if (type == typeof(int))
@@ -97,7 +100,10 @@ namespace RedOnion.ROS
 			}
 			if (type == typeof(object))
 				return Expression.Field(expr, "obj");
-			return Expression.Convert(Expression.Field(expr, "obj"), type);
+			return Expression.Convert(type.IsAssignableFrom(expr.Type)
+				? (Expression)Expression.Field(expr, "obj")
+				: Expression.Call(expr, ValueToType, Expression.Constant(type)),
+				type);
 		}
 
 		internal static readonly ParameterExpression SelfParameter

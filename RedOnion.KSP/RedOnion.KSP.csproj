@@ -66,6 +66,7 @@
     <Compile Include="API\InteropDescriptor.cs" />
     <Compile Include="API\InteropObject.cs" />
     <Compile Include="API\InteropUtilities.cs" />
+    <Compile Include="API\Namespaces\UI.cs" />
     <Compile Include="API\Reflect.cs" />
     <Compile Include="API\Ship.cs" />
     <Compile Include="API\Stage.cs" />
@@ -76,10 +77,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReflectionUtil\GetMappings.ROS.cs" />
     <Compile Include="ReflectionUtil\NamespaceInstance.ROS.cs" />
-    <Compile Include="ROS\RosCore.cs" />
+    <Compile Include="ROS\RosProcessor.cs" />
     <Compile Include="ROS\RosProps.cs" />
     <Compile Include="ROS\RosSuggest.cs" />
-    <Compile Include="ROS\UI\Window.cs" />
+    <Compile Include="API\Namespaces\UI.Window.cs" />
     <Compile Include="ROS\RosGlobals.cs" />
     <Compile Include="Autopilot\FlightControl.cs" />
     <Compile Include="MathUtil\Vec.cs" />

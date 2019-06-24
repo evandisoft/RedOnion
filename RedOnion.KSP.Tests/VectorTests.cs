@@ -6,12 +6,16 @@ using RedOnion.ROS;
 
 namespace RedOnion.KSP.Tests
 {
-	public class ApiTestsBase : RosCore
+	public class ApiTestsBase : RosProcessor
 	{
-		public ApiTestsBase()
+		public ApiTestsBase() : base(null)
 		{
 			Descriptor.Create = CustomCreateDescriptor;
+			Value.LogListener = LogListener;
+			Globals = new RosGlobals();
 		}
+		public static void LogListener(string msg)
+			=> System.Diagnostics.Debug.WriteLine(msg);
 		public static Descriptor CustomCreateDescriptor(Type type)
 		{
 			if (typeof(Delegate).IsAssignableFrom(type))

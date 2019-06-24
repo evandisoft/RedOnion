@@ -1088,5 +1088,54 @@ namespace RedOnion.ROS.Tests
 				}
 			);
 		}
+
+		[Test]
+		public void ROS_PExpr18_NewWithDot()
+		{
+			Test(
+				"var wnd = new ui.window",
+				() =>
+				{
+					ValueCheck	( 0, 0, "wnd");
+					ValueCheck	( 4, OpCode.Identifier);
+					ValueTopMark( 9, 0);
+					ValueCheck	( 9, OpCode.Void);
+					ValueTopMark(14, 9);
+					ValueCheck	(14, 1, "ui");
+					ValueCheck	(18, OpCode.Identifier);
+					ValueTopMark(23, 14);
+					ValueCheck	(23, 2, "window");
+					ValueCheck	(27, OpCode.Identifier);
+					ValueTopMark(32, 23);
+					ValueCheck	(32, OpCode.Dot);
+					ValueCheck	(33, OpCode.Create);
+					ValueTopMark(38, 14);
+				},
+				() =>
+				{
+					CodeCheck( 0, OpCode.Var);
+					CodeCheck( 1, 0, "wnd");
+					CodeCheck( 5, OpCode.Void);
+					CodeCheck( 6, OpCode.Create);
+					CodeCheck( 7, OpCode.Dot);
+					CodeCheck( 8, OpCode.Identifier);
+					CodeCheck( 9, 1, "ui");
+					CodeCheck(13, 2, "window");
+					CodeCheck(17);
+				},
+				() =>
+				{
+					CodeCheck( 0, OpCode.Void);
+					CodeCheck( 1, OpCode.Identifier);
+					CodeCheck( 2, 0, "ui");
+					CodeCheck( 6, OpCode.Create);
+					CodeCheck( 7, OpCode.Dot);
+					CodeCheck( 8, 1, "window");
+					CodeCheck(12, OpCode.Var);
+					CodeCheck(13, 2, "wnd");
+					CodeCheck(17);
+				}
+			);
+		}
 	}
 }

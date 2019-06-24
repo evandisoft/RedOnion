@@ -226,7 +226,35 @@ namespace RedOnion.ROS
 								at = this.at;
 								continue;
 							}
-							if (it.desc.Call(ref it, null, new Arguments(), true))
+							if (it.desc.Call(ref it, null, new Arguments(Arguments, 0), true))
+								continue;
+							throw InvalidOperation("Could not create new {0}", it.Name);
+						}
+						case OpCode.Dot:
+						{
+							var name = str[Int(code, at)];
+							at += 4;
+							ref var it = ref vals.Top();
+							if (it.IsReference && !it.desc.Get(ref it, it.num.Int))
+								throw CouldNotGet(ref it);
+							if (it.IsNumerOrChar)
+								throw InvalidOperation("Numbers do not have properties");
+							var idx = it.desc.Find(it.obj, name, true);
+							if (idx < 0)
+								throw InvalidOperation("'{0}' does not have property '{1}'", it.Name, name);
+							it.SetRef(idx);
+							if (!it.desc.Get(ref it, it.num.Int))
+								throw CouldNotGet(ref it);
+							if (it.IsFunction)
+							{
+								this.at = at;
+								blockEnd = CallFunction((Function)it.desc, null, null, 0, true);
+								code = this.code;
+								str = this.str;
+								at = this.at;
+								continue;
+							}
+							if (it.desc.Call(ref it, null, new Arguments(Arguments, 0), true))
 								continue;
 							throw InvalidOperation("Could not create new {0}", it.Name);
 						}
@@ -253,7 +281,7 @@ namespace RedOnion.ROS
 								at = this.at;
 								continue;
 							}
-							if (it.desc.Call(ref it, self, new Arguments(), true))
+							if (it.desc.Call(ref it, self, new Arguments(Arguments, 0), true))
 								continue;
 							throw InvalidOperation((self != null ? selfDesc.NameOf(self, idx) : it.Name)
 								+ " cannot create object given zero arguments");
@@ -376,7 +404,7 @@ namespace RedOnion.ROS
 							at = this.at;
 							continue;
 						}
-						if (it.desc.Call(ref it, self, new Arguments(), false))
+						if (it.desc.Call(ref it, self, new Arguments(Arguments, 0), false))
 							continue;
 						if (op == OpCode.Autocall)
 							continue;
@@ -504,7 +532,6 @@ namespace RedOnion.ROS
 					}
 					case OpCode.Dot:
 					{
-						//TODO: convert to hard index if we know the type for sure
 						var name = str[Int(code, at)];
 						at += 4;
 						ref var it = ref vals.Top();
@@ -994,7 +1021,7 @@ namespace RedOnion.ROS
 						at += size;
 
 						var it = new Function(fname, null,
-							compiled, bodyAt, bodySz, ftat, args, ctx, cvars);
+							compiled, bodyAt, bodySz, ftat, args, ctx, cvars, processor);
 						if (fname?.Length > 0)
 							ctx.Add(fname, it);
 						else vals.Add(new Value(it));
