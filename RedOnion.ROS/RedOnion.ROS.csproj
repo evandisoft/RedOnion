@@ -68,6 +68,7 @@
     <Compile Include="Descriptors\Number\UShort.cs" />
     <Compile Include="Descriptors\Primitive\Void.cs" />
     <Compile Include="Core.cs" />
+    <Compile Include="Functions\Run.cs" />
     <Compile Include="Interface.cs" />
     <Compile Include="Objects\Context.cs" />
     <Compile Include="Objects\Namespace.cs" />
@@ -75,7 +76,7 @@
     <Compile Include="Utilities\Event.cs" />
     <Compile Include="Objects\Function.cs" />
     <Compile Include="Objects\Globals.cs" />
-    <Compile Include="Objects\Print.cs" />
+    <Compile Include="Functions\Print.cs" />
     <Compile Include="Objects\UserObject.cs" />
     <Compile Include="OpCode.cs" />
     <Compile Include="Parsing\Classes.cs" />

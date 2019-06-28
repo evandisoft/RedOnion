@@ -5,7 +5,7 @@ using RedOnion.ROS.Objects;
 
 namespace RedOnion.ROS
 {
-	partial class Core : ICore
+	partial class Core
 	{
 		/// <summary>
 		/// Execute or continue executing current code.
@@ -28,7 +28,7 @@ namespace RedOnion.ROS
 
 					while (at == blockEnd)
 					{
-						if (ctx.BlockCount == 0)
+						if (ctx.BlockCount == 0 && ctx.BlockCode != OpCode.Return)
 							goto finishNoReturn;
 
 						if (countdown <= 0)
@@ -89,6 +89,7 @@ namespace RedOnion.ROS
 							continue;
 						}
 						case OpCode.Function:
+						{
 							ref var top = ref stack.Top();
 							var vtop = top.vtop;
 							ref var result = ref vals.GetRef(vals.Count, vtop - 1);
@@ -99,10 +100,31 @@ namespace RedOnion.ROS
 							this.code = code = compiled.Code;
 							this.str = str = compiled.Strings;
 							self = top.prevSelf;
-							ctx.PopAll();
-							ctx = top.context;
+							if (ctx != top.context)
+							{
+								ctx.PopAll();
+								ctx = top.context;
+							}
 							stack.Pop();
 							continue;
+						}
+						// library end
+						case OpCode.Return:
+						{
+							Debug.Assert(stack.Count > 0);
+							ref var top = ref stack.Top();
+							Debug.Assert(top.context == ctx);
+							this.at = at = top.at;
+							compiled = top.code;
+							this.code = code = compiled.Code;
+							this.str = str = compiled.Strings;
+							self = top.prevSelf;
+							ctx.BlockCode = top.blockCode;
+							ctx.BlockEnd = top.blockEnd;
+							blockEnd = ctx.BlockEnd;
+							stack.Pop();
+							continue;
+						}
 						}
 					}
 					if (countdown <= 0)
@@ -214,21 +236,13 @@ namespace RedOnion.ROS
 						{
 							Identifier(at);
 							at += 4;
-							ref var it = ref vals.Top();
-							if (it.IsReference && !it.desc.Get(ref it, it.num.Int))
-								throw CouldNotGet(ref it);
-							if (it.IsFunction)
-							{
-								this.at = at;
-								blockEnd = CallFunction((Function)it.desc, null, null, 0, true);
-								code = this.code;
-								str = this.str;
-								at = this.at;
-								continue;
-							}
-							if (it.desc.Call(ref it, null, new Arguments(Arguments, 0), true))
-								continue;
-							throw InvalidOperation("Could not create new {0}", it.Name);
+							this.at = at;
+							Call(0, true, op);
+							code = this.code;
+							str = this.str;
+							at = this.at;
+							blockEnd = ctx.BlockEnd;
+							continue;
 						}
 						case OpCode.Dot:
 						{
@@ -243,138 +257,47 @@ namespace RedOnion.ROS
 							if (idx < 0)
 								throw InvalidOperation("'{0}' does not have property '{1}'", it.Name, name);
 							it.SetRef(idx);
-							if (!it.desc.Get(ref it, it.num.Int))
-								throw CouldNotGet(ref it);
-							if (it.IsFunction)
-							{
-								this.at = at;
-								blockEnd = CallFunction((Function)it.desc, null, null, 0, true);
-								code = this.code;
-								str = this.str;
-								at = this.at;
-								continue;
-							}
-							if (it.desc.Call(ref it, null, new Arguments(Arguments, 0), true))
-								continue;
-							throw InvalidOperation("Could not create new {0}", it.Name);
+							this.at = at;
+							Call(0, true, op);
+							code = this.code;
+							str = this.str;
+							at = this.at;
+							blockEnd = ctx.BlockEnd;
+							continue;
 						}
 						case OpCode.Call0:
-						{
-							object self = null;
-							Descriptor selfDesc = null;
-							int idx = -1;
-							ref var it = ref vals.Top();
-							if (it.IsReference)
-							{
-								selfDesc = it.desc;
-								self = it.obj;
-								idx = it.num.Int;
-								if (!it.desc.Get(ref it, idx))
-									throw CouldNotGet(ref it);
-							}
-							if (it.IsFunction)
-							{
-								this.at = at;
-								blockEnd = CallFunction((Function)it.desc, selfDesc, self, 0, true);
-								code = this.code;
-								str = this.str;
-								at = this.at;
-								continue;
-							}
-							if (it.desc.Call(ref it, self, new Arguments(Arguments, 0), true))
-								continue;
-							throw InvalidOperation((self != null ? selfDesc.NameOf(self, idx) : it.Name)
-								+ " cannot create object given zero arguments");
-						}
+							this.at = at;
+							Call(0, true, op);
+							code = this.code;
+							str = this.str;
+							at = this.at;
+							blockEnd = ctx.BlockEnd;
+							continue;
 						case OpCode.Call1:
-						{
-							Dereference(1);
-							object self = null;
-							Descriptor selfDesc = null;
-							int idx = -1;
-							ref var it = ref vals.Top(-2);
-							if (it.IsReference)
-							{
-								selfDesc = it.desc;
-								self = it.obj;
-								idx = it.num.Int;
-								if (!it.desc.Get(ref it, idx))
-									throw CouldNotGet(ref it);
-							}
-							if (it.IsFunction)
-							{
-								this.at = at;
-								blockEnd = CallFunction((Function)it.desc, selfDesc, self, 1, true);
-								code = this.code;
-								str = this.str;
-								at = this.at;
-								continue;
-							}
-							if (!it.desc.Call(ref it, self, new Arguments(Arguments, 1), true))
-								throw InvalidOperation((self != null ? selfDesc.NameOf(self, idx) : it.Name)
-									+ " cannot create object given that argument");
-							vals.Pop(1);
+							this.at = at;
+							Call(1, true, op);
+							code = this.code;
+							str = this.str;
+							at = this.at;
+							blockEnd = ctx.BlockEnd;
 							continue;
-						}
 						case OpCode.Call2:
-						{
-							Dereference(2);
-							object self = null;
-							Descriptor selfDesc = null;
-							int idx = -1;
-							ref var it = ref vals.Top(-3);
-							if (it.IsReference)
-							{
-								selfDesc = it.desc;
-								self = it.obj;
-								idx = it.num.Int;
-								if (!it.desc.Get(ref it, idx))
-									throw CouldNotGet(ref it);
-							}
-							if (it.IsFunction)
-							{
-								this.at = at;
-								blockEnd = CallFunction((Function)it.desc, selfDesc, self, 2, true);
-								code = this.code;
-								str = this.str;
-								at = this.at;
-								continue;
-							}
-							if (!it.desc.Call(ref it, self, new Arguments(Arguments, 2), true))
-								throw InvalidOperation((self != null ? selfDesc.NameOf(self, idx) : it.Name)
-									+ " cannot create object given these two arguments");
-							vals.Pop(2);
+							this.at = at;
+							Call(2, true, op);
+							code = this.code;
+							str = this.str;
+							at = this.at;
+							blockEnd = ctx.BlockEnd;
 							continue;
-						}
 						case OpCode.CallN:
 						{
 							var n = code[at++];
-							Dereference(n-1);
-							object self = null;
-							Descriptor selfDesc = null;
-							int idx = -1;
-							ref var it = ref vals.Top(-n);
-							if (it.IsReference)
-							{
-								selfDesc = it.desc;
-								self = it.obj;
-								idx = it.num.Int;
-								if (!it.desc.Get(ref it, idx))
-									throw CouldNotGet(ref it);
-							}
-							if (it.IsFunction)
-							{
-								this.at = at;
-								blockEnd = CallFunction((Function)it.desc, selfDesc, self, n - 1, true);
-								code = this.code;
-								str = this.str;
-								at = this.at;
-								continue;
-							}
-							if (!it.desc.Call(ref it, self, new Arguments(Arguments, n - 1), true))
-								throw InvalidOperation("{0} cannot create object given these {1} arguments",
-									self != null ? selfDesc.NameOf(self, idx) : it.Name, n - 1);
-							vals.Pop(n - 1);
+							this.at = at;
+							Call(n-1, true, op);
+							code = this.code;
+							str = this.str;
+							at = this.at;
+							blockEnd = ctx.BlockEnd;
 							continue;
 						}
 						}
@@ -382,124 +305,38 @@ namespace RedOnion.ROS
 
 					case OpCode.Autocall:
 					case OpCode.Call0:
-					{
-						object self = null;
-						Descriptor selfDesc = null;
-						int idx = -1;
-						ref var it = ref vals.Top();
-						if (it.IsReference)
-						{
-							selfDesc = it.desc;
-							self = it.obj;
-							idx = it.num.Int;
-							if (!it.desc.Get(ref it, idx))
-								throw CouldNotGet(ref it);
-						}
-						if (it.IsFunction)
-						{
-							this.at = at;
-							blockEnd = CallFunction((Function)it.desc, selfDesc, self, 0, false);
-							code = this.code;
-							str = this.str;
-							at = this.at;
-							continue;
-						}
-						if (it.desc.Call(ref it, self, new Arguments(Arguments, 0), false))
-							continue;
-						if (op == OpCode.Autocall)
-							continue;
-						throw InvalidOperation((self != null ? selfDesc.NameOf(self, idx) : it.Name)
-							+ " cannot be called with zero arguments");
-					}
+						this.at = at;
+						Call(0, false, op);
+						code = this.code;
+						str = this.str;
+						at = this.at;
+						blockEnd = ctx.BlockEnd;
+						continue;
 					case OpCode.Call1:
-					{
-						Dereference(1);
-						object self = null;
-						Descriptor selfDesc = null;
-						int idx = -1;
-						ref var it = ref vals.Top(-2);
-						if (it.IsReference)
-						{
-							selfDesc = it.desc;
-							self = it.obj;
-							idx = it.num.Int;
-							if (!it.desc.Get(ref it, idx))
-								throw CouldNotGet(ref it);
-						}
-						if (it.IsFunction)
-						{
-							this.at = at;
-							blockEnd = CallFunction((Function)it.desc, selfDesc, self, 1, false);
-							code = this.code;
-							str = this.str;
-							at = this.at;
-							continue;
-						}
-						if (!it.desc.Call(ref it, self, new Arguments(Arguments, 1), false))
-							throw InvalidOperation((self != null ? selfDesc.NameOf(self, idx) : it.Name)
-								+ " cannot be called with that argument");
-						vals.Pop(1);
+						this.at = at;
+						Call(1, false, op);
+						code = this.code;
+						str = this.str;
+						at = this.at;
+						blockEnd = ctx.BlockEnd;
 						continue;
-					}
 					case OpCode.Call2:
-					{
-						Dereference(2);
-						object self = null;
-						Descriptor selfDesc = null;
-						int idx = -1;
-						ref var it = ref vals.Top(-3);
-						if (it.IsReference)
-						{
-							selfDesc = it.desc;
-							self = it.obj;
-							idx = it.num.Int;
-							if (!it.desc.Get(ref it, idx))
-								throw CouldNotGet(ref it);
-						}
-						if (it.IsFunction)
-						{
-							this.at = at;
-							blockEnd = CallFunction((Function)it.desc, selfDesc, self, 2, false);
-							code = this.code;
-							str = this.str;
-							at = this.at;
-							continue;
-						}
-						if (!it.desc.Call(ref it, self, new Arguments(Arguments, 2), false))
-							throw InvalidOperation((self != null ? selfDesc.NameOf(self, idx) : it.Name)
-								+ " cannot be called with these two arguments");
-						vals.Pop(2);
+						this.at = at;
+						Call(2, false, op);
+						code = this.code;
+						str = this.str;
+						at = this.at;
+						blockEnd = ctx.BlockEnd;
 						continue;
-					}
 					case OpCode.CallN:
 					{
 						var n = code[at++];
-						Dereference(n-1);
-						object self = null;
-						Descriptor selfDesc = null;
-						int idx = -1;
-						ref var it = ref vals.Top(-n);
-						if (it.IsReference)
-						{
-							selfDesc = it.desc;
-							self = it.obj;
-							idx = it.num.Int;
-							if (!it.desc.Get(ref it, idx))
-								throw CouldNotGet(ref it);
-						}
-						if (it.IsFunction)
-						{
-							this.at = at;
-							blockEnd = CallFunction((Function)it.desc, selfDesc, self, n - 1, false);
-							code = this.code;
-							str = this.str;
-							at = this.at;
-							continue;
-						}
-						if (!it.desc.Call(ref it, self, new Arguments(Arguments, n - 1), false))
-							throw InvalidOperation("{0} cannot be called with these {1} arguments",
-								self != null ? selfDesc.NameOf(self, idx) : it.Name, n - 1);
-						vals.Pop(n - 1);
+						this.at = at;
+						Call(n-1, false, op);
+						code = this.code;
+						str = this.str;
+						at = this.at;
+						blockEnd = ctx.BlockEnd;
 						continue;
 					}
 
@@ -744,14 +581,22 @@ namespace RedOnion.ROS
 								if (result.IsReference && !result.desc.Get(ref result, result.num.Int))
 									throw CouldNotGet(ref result);
 							}
-							vals.Pop(vals.Count - top.vtop);
 							this.at = at = top.at;
 							compiled = top.code;
 							this.code = code = compiled.Code;
 							this.str = str = compiled.Strings;
 							self = top.prevSelf;
-							ctx.PopAll();
-							ctx = top.context;
+							if (ctx != top.context)
+							{
+								vals.Pop(vals.Count - top.vtop);
+								ctx.PopAll();
+								ctx = top.context;
+							}
+							else
+							{
+								ctx.BlockCode = top.blockCode;
+								ctx.BlockEnd = top.blockEnd;
+							}
 							blockEnd = ctx.BlockEnd;
 							stack.Pop();
 							continue;

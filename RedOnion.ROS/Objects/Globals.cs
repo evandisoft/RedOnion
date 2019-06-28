@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using RedOnion.ROS.Functions;
 using RedOnion.ROS.Utilities;
 
 namespace RedOnion.ROS.Objects
@@ -8,15 +9,24 @@ namespace RedOnion.ROS.Objects
 	{
 		public IProcessor Processor { get; set; }
 		public UserObject System => parent;
+
 		public Globals() : base("Globals", typeof(Globals)) { }
+
+		protected Print print;
+		protected Run run;
+		protected UserObject obj;
+
 		public virtual void Fill()
 		{
 			if (readOnlyTop > 0)
 				return;
 			Add("System", parent = new UserObject());
-			System.Add("print", new Value(new Print(Processor)));
-			System.Add("object", new Value(new UserObject()));
+			System.Add("global", this);
+			System.Add("print", new Value(print = new Print()));
+			System.Add("run", new Value(run = new Run()));
+			System.Add("object", new Value(obj = new UserObject()));
 			System.Add("list", new Value(typeof(List<Value>)));
+			//TODO: better reflection of overloaded methods/functions
 			System.Add("math", typeof(Math));
 
 			if (Processor is Processor processor)
@@ -31,6 +41,9 @@ namespace RedOnion.ROS.Objects
 		{
 			base.Reset();
 			System.Reset();
+			print?.Reset();
+			run?.Reset();
+			obj?.Reset();
 		}
 	}
 }

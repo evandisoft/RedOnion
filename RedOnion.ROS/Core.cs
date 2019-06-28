@@ -7,10 +7,13 @@ using RedOnion.ROS.Utilities;
 namespace RedOnion.ROS
 {
 	[DebuggerDisplay("{DebugString}")]
-	public partial class Core : ICore
+	public partial class Core : IDisposable
 	{
 		public Core(Processor processor)
-			=> vals = new ArgumentList(this.processor = (processor ?? this as Processor));
+		{
+			this.processor = processor ?? this as Processor;
+			vals = new ArgumentList(this);
+		}
 
 		protected int at;
 		protected byte[] code;
@@ -29,6 +32,9 @@ namespace RedOnion.ROS
 			public CompiledCode code;
 			public int at, vtop;
 			public bool create;
+			// run.library (context unchanged)
+			public OpCode blockCode;
+			public int blockEnd;
 		}
 		protected ListCore<SavedContext> stack;
 
@@ -39,6 +45,7 @@ namespace RedOnion.ROS
 		}
 		protected virtual void SetGlobals(Globals value)
 			=> globals = value;
+		public Processor Processor => processor;
 		public Context Context => ctx;
 		public ExitCode Exit { get; protected set; }
 		public Value Result => result;
@@ -69,10 +76,6 @@ namespace RedOnion.ROS
 			}
 		}
 
-		protected Parser Parser { get; } = new Parser();
-		public CompiledCode Compile(string source, string path = null)
-			=> Parser.Compile(source, path);
-
 		public virtual void Log(string msg)
 			=> Debug.Print(msg);
 		public void Log(string msg, params object[] args)
@@ -100,7 +103,8 @@ namespace RedOnion.ROS
 		/// <param name="countdown">Countdown until auto-yield</param>
 		public bool Execute(string script, string path = null, int countdown = 1000)
 		{
-			Code = Compile(script, path);
+			if (script == null) script = processor.ReadScript(path);
+			Code = processor.Compile(script, path);
 			if (Globals == null) Globals = new Globals();
 			return Execute(countdown);
 		}
@@ -248,7 +252,69 @@ namespace RedOnion.ROS
 			}
 		}
 
-		protected int CallFunction(Function fn, Descriptor selfDesc, object self, int argc, bool create)
+		protected void Call(int argc, bool create, OpCode op = OpCode.Void)
+		{
+			if (argc > 0)
+				Dereference(argc);
+			object self = null;
+			Descriptor selfDesc = null;
+			int idx = -1;
+			ref var it = ref vals.Top(-argc-1);
+			if (it.IsReference)
+			{
+				selfDesc = it.desc;
+				self = it.obj;
+				idx = it.num.Int;
+				if (!it.desc.Get(ref it, idx))
+					throw CouldNotGet(ref it);
+			}
+			if (it.IsFunction)
+			{
+				var fn = (Function)it.desc;
+				ref var ret = ref stack.Add();
+				ret.context = ctx;
+				ret.prevSelf = this.self;
+				ret.code = compiled;
+				ret.at = at;
+				ret.vtop = vals.Size - argc;
+				ret.create = create;
+				compiled = fn.Code;
+				code = compiled.Code;
+				str = compiled.Strings;
+				at = fn.CodeAt;
+				ctx = fn.Context;
+				ctx.Push(at, at + fn.CodeSize, OpCode.Function);
+				if (create)
+					this.self = new Value(new UserObject(fn.Prototype));
+				else this.self = new Value(selfDesc, self);
+				var args = new Value[argc];
+				for (int i = 0; i < argc; i++)
+					args[i] = vals.Top(i - argc);
+				ctx.Add("arguments", args);
+				for (int i = 0; i < fn.ArgumentCount; i++)
+				{
+					if (i < argc)
+						ctx.Add(fn.ArgumentName(i), ref args[i]);
+					else ctx.Add(fn.ArgumentName(i), fn.ArgumentDefault(i));
+				}
+				result = Value.Void;
+				return;
+			}
+			if (!it.desc.Call(ref it, self, new Arguments(Arguments, argc), create)
+				&& op != OpCode.Autocall)
+				throw InvalidOperation(create ? op == OpCode.Identifier
+					? "Could not create new {0}" : argc == 0
+					? "{0} cannot create object given zero arguments" : argc == 1
+					? "{0} cannot create object given that argument"
+					: "{0} cannot create object given these arguments" : argc == 0
+					? "{0} cannot be called with zero arguments" : argc == 1
+					? "{0} cannot be called with that argument"
+					: "{0} cannot be called with these two arguments",
+					self != null ? selfDesc.NameOf(self, idx) : it.Name);
+			vals.Pop(argc);
+		}
+		// see Functions.Run
+		internal void CallScript(CompiledCode script, int argc, bool include = false)
 		{
 			ref var ret = ref stack.Add();
 			ret.context = ctx;
@@ -256,28 +322,20 @@ namespace RedOnion.ROS
 			ret.code = compiled;
 			ret.at = at;
 			ret.vtop = vals.Size - argc;
-			ret.create = create;
-			compiled = fn.Code;
+			ret.create = false;
+			compiled = script;
 			code = compiled.Code;
 			str = compiled.Strings;
-			at = fn.CodeAt;
-			ctx = fn.Context;
-			ctx.Push(at, at + fn.CodeSize, OpCode.Function);
-			if (create)
-				this.self = new Value(new UserObject(fn.Prototype));
-			else this.self = new Value(selfDesc, self);
-			var args = new Value[argc];
-			for (int i = 0; i < argc; i++)
-				args[i] = vals.Top(i - argc);
-			ctx.Add("arguments", args);
-			for (int i = 0; i < fn.ArgumentCount; i++)
+			at = 0;
+			if (include)
 			{
-				if (i < argc)
-					ctx.Add(fn.ArgumentName(i), ref args[i]);
-				else ctx.Add(fn.ArgumentName(i), fn.ArgumentDefault(i));
+				ret.blockCode = ctx.BlockCode;
+				ret.blockEnd = ctx.BlockEnd;
+				ctx.BlockEnd = code.Length;
+				ctx.BlockCode = OpCode.Return;
 			}
+			else ctx = new Context() { RootEnd = code.Length };
 			result = Value.Void;
-			return at + fn.CodeSize;
 		}
 
 		public static unsafe float Float(byte[] code, int at)

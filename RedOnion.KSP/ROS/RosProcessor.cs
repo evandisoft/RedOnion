@@ -40,6 +40,8 @@ namespace RedOnion.KSP.ROS
 				"Scripts", ref ScriptsZip, path);
 			return data == null ? null : Encoding.UTF8.GetString(data);
 		}
+		public override string ReadScript(string path)
+			=> LoadScript(path);
 		public static List<string> EnumerateScripts()
 		{
 			// assume asm.Location points to GameData/RedOnion/Plugis/RedOnion.dll (or any other dll)

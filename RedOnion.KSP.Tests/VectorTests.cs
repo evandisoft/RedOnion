@@ -18,7 +18,7 @@ namespace RedOnion.KSP.Tests
 			=> System.Diagnostics.Debug.WriteLine(msg);
 		public static Descriptor CustomCreateDescriptor(Type type)
 		{
-			if (typeof(Delegate).IsAssignableFrom(type))
+			if (type.IsSubclassOf(typeof(Delegate)))
 				return Descriptor.Callable.FromType(type);
 			// to avoid those secirity exceptions mentioning ECall (e.g. on Vector3d.Slerp)
 			if (type.Assembly.FullName.StartsWith("UnityEngine")

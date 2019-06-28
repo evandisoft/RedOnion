@@ -2,9 +2,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using RedOnion.ROS.Objects;
+using RedOnion.ROS.Parsing;
 using RedOnion.ROS.Utilities;
 
 namespace RedOnion.ROS
@@ -30,8 +32,21 @@ namespace RedOnion.ROS
 		public TimeSpan UpdateTimeout { get; set; } = TimeSpan.FromMilliseconds(10.0);
 
 		public event Func<IProcessor, bool> Shutdown;
-		public event Action<string> Print;
+		public Action<string> Print;
 		void IProcessor.Print(string msg) => Print?.Invoke(msg);
+
+		//TODO: cache scripts - both compiled and the source (watch file modification time)
+		protected Parser Parser { get; } = new Parser();
+		public virtual CompiledCode Compile(string source, string path = null)
+			=> Parser.Compile(source, path);
+		public virtual string ReadScript(string path)
+		{
+			if (!Path.IsPathRooted(path))
+				path = Path.Combine(Path.GetDirectoryName(typeof(Processor).Assembly.Location), path);
+			if (File.Exists(path))
+				return File.ReadAllText(path, Encoding.UTF8);
+			return null;
+		}
 
 		/// <summary>
 		/// Reset the engine - clear all event lists
@@ -63,8 +78,11 @@ namespace RedOnion.ROS
 				}
 			}
 			ClearEvents();
-			Globals.Reset();
-			Globals.Fill();
+			if (globals != null)
+			{
+				globals.Reset();
+				globals.Fill();
+			}
 			ctx = new Context();
 		}
 
