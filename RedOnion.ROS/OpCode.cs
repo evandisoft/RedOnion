@@ -195,7 +195,7 @@ namespace RedOnion.ROS
 	//	statements
 		Block			= 0x80, // block with its own scope
 		Autocall		= 0x81, // expression that should be called (like Call0) if it is a function
-		Return			= 0x82, // return
+		Return			= 0x82, // return (also used to mark scripts run as library)
 		Raise			= 0x83, // throw/raise (Python uses raise)
 		Break			= 0x84, // break
 		Continue		= 0x85, // continue

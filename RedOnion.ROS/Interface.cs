@@ -237,7 +237,7 @@ namespace RedOnion.ROS
 
 	#endregion
 
-	#region Processor Core, Arguments and related
+	#region Processor, Arguments and related
 
 	/// <summary>
 	/// The root of scripting engine, usually the main core
@@ -253,38 +253,6 @@ namespace RedOnion.ROS
 		/// Invoked by print function
 		/// </summary>
 		void Print(string msg);
-	}
-	/// <summary>
-	/// Single processing core holding the state of execution
-	/// (each yielding process / paused thread runs on its own core)
-	/// </summary>
-	public interface ICore : IDisposable
-	{
-		/// <summary>
-		/// Exit code (of last statement, code block or whole program)
-		/// </summary>
-		ExitCode Exit { get; }
-		/// <summary>
-		/// Result of last expression (rvalue)
-		/// </summary>
-		Value Result { get; }
-		/// <summary>
-		/// Argument list for function calls
-		/// </summary>
-		ArgumentList Arguments { get; }
-		/// <summary>
-		/// Compiled code for execution
-		/// </summary>
-		CompiledCode Code { get; }
-		/// <summary>
-		/// Compile source to code
-		/// </summary>
-		CompiledCode Compile(string source, string path = null);
-		/// <summary>
-		/// Run the script.
-		/// Returns true if finished, false if countdown reached zero.
-		/// </summary>
-		bool Execute(int countdown = 1000);
 
 		/// <summary>
 		/// Log message
@@ -338,9 +306,10 @@ namespace RedOnion.ROS
 	{
 		[DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
 		protected ListCore<Value> list;
-		public IProcessor Processor { get; }
-		public ArgumentList(IProcessor processor)
-			=> Processor = processor;
+		public Core Core { get; }
+		public Processor Processor => Core?.Processor;
+		public ArgumentList(Core core)
+			=> Core = core;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		public int Length => list.Count;
@@ -398,7 +367,8 @@ namespace RedOnion.ROS
 	{
 		readonly ArgumentList list;
 		public readonly int argc;
-		public IProcessor Processor => list?.Processor;
+		public Processor Processor => list?.Processor;
+		public Core Core => list?.Core;
 		public int Length => argc;
 		public int Count => argc;
 		public int Size => argc;

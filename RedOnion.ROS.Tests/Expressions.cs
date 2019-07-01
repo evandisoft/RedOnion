@@ -139,6 +139,14 @@ namespace RedOnion.ROS.Tests
 			Test(3,			"obj[\"s\"].length");
 			Test(3,			"obj[\"s\"][\"length\"]");
 			Test(3,			"obj[\"s\", \"length\"]");
+
+			Test("obj.test = new obj");     // derived object
+			Test(3.14, "obj.test.x");       // inherited property
+			Test("obj.test.x = 2.7");
+			Test(3.14, "obj.x");            // must not change parent's property
+			Test(2.7, "obj.test.x");
+			Test("var test = new obj.test");
+			Test(2.7, "test.x");
 		}
 
 		[Test]

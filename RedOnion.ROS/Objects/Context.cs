@@ -67,11 +67,11 @@ namespace RedOnion.ROS.Objects
 		/// <summary>
 		/// Starting position of the block
 		/// </summary>
-		public int BlockStart { get; protected set; }
+		public int BlockStart { get; set; }
 		/// <summary>
 		/// Position after the block
 		/// </summary>
-		public int BlockEnd { get; protected set; }
+		public int BlockEnd { get; set; }
 		/// <summary>
 		/// First important position in the block (usualy condition of the loop)
 		/// </summary>

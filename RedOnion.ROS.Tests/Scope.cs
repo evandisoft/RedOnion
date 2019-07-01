@@ -253,5 +253,19 @@ obj.getTotal    // returns 1
 ");
 			Test(11, "obj.counter");
 		}
+
+		[Test]
+		public void ROS_Scope10_Run()
+		{
+			if (Globals == null)
+				Globals = new Globals();
+			Globals.Add("test", "var x = 3.14; return x");
+			Test(3.14, "var x = 2.72; run.source test");
+			Test(2.72, "x");
+			Test(3.14, "run.library.source test");
+			Test(3.14, "x");
+			Globals.Add("test2", "var x = 1.41");
+			Test(ExitCode.Return, 1.41, "run.library.source test2; return x");
+		}
 	}
 }
