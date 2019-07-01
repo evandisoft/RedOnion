@@ -15,7 +15,16 @@ namespace RedOnion.ROS
 			[DebuggerDisplay("{name}")]
 			protected struct Prop
 			{
+				public enum Kind
+				{
+					Unknown,
+					Field,
+					Property,
+					Method,
+					MethodGroup
+				}
 				public string name;
+				public Kind kind;
 				public Func<object, Value> read;
 				public Action<object, Value> write;
 				public override string ToString()

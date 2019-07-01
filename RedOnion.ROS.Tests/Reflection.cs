@@ -204,5 +204,14 @@ namespace RedOnion.ROS.Tests
 			FixedUpdate();
 			Assert.AreEqual("done", it.name);
 		}
+
+		[Test]
+		public void ROS_Refl07_Math()
+		{
+			Globals = new Globals();
+			Test(3.14, "math.abs -3.14");
+			Test(2.7f, "math.abs -2.7f");
+			Test(1.41, "math.max 1.0, 1.41");
+		}
 	}
 }

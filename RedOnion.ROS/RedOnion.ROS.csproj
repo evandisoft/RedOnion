@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="Descriptors\Other\Simple.cs" />
     <Compile Include="Descriptors\Reflect\Callable.cs" />
+    <Compile Include="Descriptors\Reflect\MethodGroup.cs" />
     <Compile Include="Execute.cs" />
     <Compile Include="Descriptors\Reflect\Callable1.cs" />
     <Compile Include="Descriptors\Reflect\Callable2.cs" />

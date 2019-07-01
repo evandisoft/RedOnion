@@ -12,7 +12,7 @@ namespace RedOnion.ROS
 		internal class Action3 : Callable
 		{
 			internal static Value CreateValue(MethodInfo m, ParameterInfo[] args)
-				=> new Value(new Action3(m.Name), CreateDelegate(m, args));
+				=> new Value(new Action3(m), CreateDelegate(m, args));
 			internal static Delegate CreateDelegate(MethodInfo m, ParameterInfo[] args)
 				=> Expression.Lambda<Action<Value, Value, Value>>(Expression.Call(m,
 					GetValueConvertExpression(args[0].ParameterType, ValueArg0Parameter),
@@ -20,8 +20,10 @@ namespace RedOnion.ROS
 					GetValueConvertExpression(args[2].ParameterType, ValueArg2Parameter)),
 					ValueArg0Parameter, ValueArg1Parameter, ValueArg2Parameter).Compile();
 
-			public Action3(string name)
-				: base(name, typeof(Action<Value, Value, Value>), false) { }
+			public Action3(MethodInfo m)
+				: this(m.Name, m) { }
+			public Action3(string name, MethodInfo m = null)
+				: base(name, typeof(Action<Value, Value, Value>), false, m) { }
 
 			public override bool Call(ref Value result, object self, Arguments args, bool create)
 			{
@@ -38,7 +40,7 @@ namespace RedOnion.ROS
 		internal class Function3 : Callable
 		{
 			internal static Value CreateValue(MethodInfo m, ParameterInfo[] args)
-				=> new Value(new Function3(m.Name), CreateDelegate(m, args));
+				=> new Value(new Function3(m), CreateDelegate(m, args));
 			internal static Delegate CreateDelegate(MethodInfo m, ParameterInfo[] args)
 				=> Expression.Lambda<Func<Value, Value, Value, Value>>(GetNewValueExpression(
 					m.ReturnType, Expression.Call(m,
@@ -47,8 +49,10 @@ namespace RedOnion.ROS
 					GetValueConvertExpression(args[2].ParameterType, ValueArg2Parameter))),
 					ValueArg0Parameter, ValueArg1Parameter, ValueArg2Parameter).Compile();
 
-			public Function3(string name)
-				: base(name, typeof(Func<Value, Value, Value, Value>), false) { }
+			public Function3(MethodInfo m)
+				: this(m.Name, m) { }
+			public Function3(string name, MethodInfo m = null)
+				: base(name, typeof(Func<Value, Value, Value, Value>), false, m) { }
 
 			public override bool Call(ref Value result, object self, Arguments args, bool create)
 			{

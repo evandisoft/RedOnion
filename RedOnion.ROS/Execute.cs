@@ -92,8 +92,8 @@ namespace RedOnion.ROS
 						{
 							ref var top = ref stack.Top();
 							var vtop = top.vtop;
-							ref var result = ref vals.GetRef(vals.Count, vtop - 1);
-							if (top.create) result = self;
+							if (top.create)
+								vals.GetRef(vals.Count, vtop - 1) = self;
 							vals.Pop(vals.Count - top.vtop);
 							this.at = at = top.at;
 							compiled = top.code;
@@ -114,6 +114,9 @@ namespace RedOnion.ROS
 							Debug.Assert(stack.Count > 0);
 							ref var top = ref stack.Top();
 							Debug.Assert(top.context == ctx);
+							var vtop = top.vtop;
+							ref var result = ref vals.GetRef(vals.Count, vtop - 1);
+							vals.Pop(vals.Count - top.vtop);
 							this.at = at = top.at;
 							compiled = top.code;
 							this.code = code = compiled.Code;

@@ -8,39 +8,62 @@ namespace RedOnion.ROS
 	{
 		public abstract class Callable : Descriptor
 		{
+			/// <summary>
+			/// Instance method vs. static function
+			/// </summary>
 			public bool IsMethod { get; protected set; }
+			/// <summary>
+			/// Minimal number of arguments (number of required arguments)
+			/// </summary>
 			public int MinArgs { get; protected set; }
+			/// <summary>
+			/// Maximal number of arguments (number of all possible arguments)
+			/// </summary>
 			public int MaxArgs { get; protected set; }
+			/// <summary>
+			/// Method info (optional - may be null)
+			/// </summary>
 			public MethodInfo Info { get; protected set; }
-			protected ParameterInfo[] Params { get; set; }
+			/// <summary>
+			/// Parameter list (optional - may be null)
+			/// </summary>
+			public ParameterInfo[] Params { get; protected set; }
 
-			protected Callable(string name, Type type, bool method)
+			protected Callable(string name, Type type, bool method, MethodInfo invoke = null)
 				: base(name, type)
 			{
-				if (!type.IsAssignableFrom(typeof(Delegate)))
+				if (invoke == null)
 				{
-					MaxArgs = int.MaxValue;
+					if (!type.IsSubclassOf(typeof(Delegate)))
+					{
+						MaxArgs = int.MaxValue;
+						return;
+					}
+					Info = type.GetMethod("Invoke");
+					Params = Info.GetParameters();
+					MaxArgs = Params.Length;
+					if (IsMethod = method)
+						MaxArgs--;
+					MinArgs = MaxArgs;
 					return;
 				}
-				Info = type.GetMethod("Invoke");
-				Params = Info.GetParameters();
-				MaxArgs = Params.Length;
-				if (IsMethod = method)
-					MaxArgs--;
-			}
-			internal Callable(string name, Type type, bool method, MethodInfo invoke)
-				: base(name, type)
-			{
 				Info = invoke;
 				Params = invoke.GetParameters();
+				IsMethod = method;
 				MaxArgs = Params.Length;
-				if (IsMethod = method)
+				while (MinArgs < MaxArgs && Params[MinArgs].RawDefaultValue == DBNull.Value)
+					MinArgs++;
+				if (method)
+				{
 					MaxArgs--;
+					if (MinArgs > 0)
+						MinArgs--;
+				}
 			}
 
 			public static Descriptor FromType(Type type)
 			{
-				if (typeof(Delegate).IsAssignableFrom(type))
+				if (type.IsSubclassOf(typeof(Delegate)))
 				{
 					var info = type.GetMethod("Invoke");
 					var pars = info.GetParameters();

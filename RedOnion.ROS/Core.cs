@@ -314,14 +314,14 @@ namespace RedOnion.ROS
 			vals.Pop(argc);
 		}
 		// see Functions.Run
-		internal void CallScript(CompiledCode script, int argc, bool include = false)
+		internal void CallScript(CompiledCode script, bool include = false)
 		{
 			ref var ret = ref stack.Add();
 			ret.context = ctx;
 			ret.prevSelf = this.self;
 			ret.code = compiled;
 			ret.at = at;
-			ret.vtop = vals.Size - argc;
+			ret.vtop = vals.Size - 1;
 			ret.create = false;
 			compiled = script;
 			code = compiled.Code;
@@ -336,6 +336,7 @@ namespace RedOnion.ROS
 			}
 			else ctx = new Context() { RootEnd = code.Length };
 			result = Value.Void;
+			vals.GetRef(2, 0) = Value.Void;
 		}
 
 		public static unsafe float Float(byte[] code, int at)

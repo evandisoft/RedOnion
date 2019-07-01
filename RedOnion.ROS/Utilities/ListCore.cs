@@ -115,6 +115,22 @@ namespace RedOnion.ROS.Utilities
 
 			return ref items[size++];
 		}
+		public void AddRange(IEnumerable<T> range)
+		{
+			if (range is ICollection<T> col)
+			{
+				AddRange(col);
+				return;
+			}
+			foreach (var e in range)
+				Add(e);
+		}
+		public void AddRange(ICollection<T> range)
+		{
+			EnsureCapacity(size + range.Count);
+			foreach (var e in range)
+				items[size++] = e;
+		}
 
 		public void Insert(int index, T item)
 		{
