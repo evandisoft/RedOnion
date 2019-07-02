@@ -34,7 +34,7 @@ namespace RedOnion.ROS.Functions
 			var path = args[0].ToStr();
 			var src = proc.ReadScript(path);
 			if (src == null) throw InvalidOperation("Could not read " + path);
-			core.CallScript(proc.Compile(src, path), 0); //TODO: args
+			core.CallScript(proc.Compile(src, path));
 			return true;
 		}
 
@@ -48,7 +48,7 @@ namespace RedOnion.ROS.Functions
 				var core = args.Core;
 				var proc = core.Processor;
 				var src = args[0].ToStr();
-				core.CallScript(proc.Compile(src), 0); //TODO: args
+				core.CallScript(proc.Compile(src));
 				return true;
 			}
 		}
@@ -74,7 +74,7 @@ namespace RedOnion.ROS.Functions
 				var path = args[0].ToStr();
 				var src = proc.ReadScript(path);
 				if (src == null) throw InvalidOperation("Could not read " + path);
-				core.CallScript(proc.Compile(src, path), 0, include: true); //TODO: args
+				core.CallScript(proc.Compile(src, path), include: true);
 				return true;
 			}
 		}
@@ -88,7 +88,7 @@ namespace RedOnion.ROS.Functions
 				var core = args.Core;
 				var proc = core.Processor;
 				var src = args[0].ToStr();
-				core.CallScript(proc.Compile(src), 0, include: true); //TODO: args
+				core.CallScript(proc.Compile(src), include: true);
 				return true;
 			}
 		}

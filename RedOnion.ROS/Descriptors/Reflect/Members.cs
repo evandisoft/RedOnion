@@ -37,20 +37,47 @@ namespace RedOnion.ROS
 			protected virtual void ProcessMember(
 				MemberInfo member, bool instance, ref Dictionary<string, int> dict)
 			{
-				if (dict != null && dict.ContainsKey(member.Name))
+				if (instance && member is ConstructorInfo c)
 				{
-					Value.DebugLog("Conflicting name: {0}.{1} [instace: {2}]", Type.Name, member.Name, instance);
-					return; // conflict
+					ProcessCtor(c);
+					return;
 				}
 
+				if (dict == null || !dict.TryGetValue(member.Name, out var idx))
+					idx = -1;
+
 				if (member is FieldInfo f)
-					ProcessField(f, instance, ref dict);
+				{
+					if (idx >= 0)
+						Value.DebugLog("Conflicting name: {0}.{1} [instace: {2}; field]", Type.Name, member.Name, instance);
+					else ProcessField(f, instance, ref dict);
+				}
 				else if (member is PropertyInfo p)
-					ProcessProperty(p, instance, ref dict);
+				{
+					if (idx >= 0)
+						Value.DebugLog("Conflicting name: {0}.{1} [instace: {2}; property]", Type.Name, member.Name, instance);
+					else ProcessProperty(p, instance, ref dict);
+				}
 				else if (member is MethodInfo m)
-					ProcessMethod(m, instance, ref dict);
-				else if (instance && member is ConstructorInfo c)
-					ProcessCtor(c, ref dict);
+				{
+					if (idx >= 0)
+					{
+						ref var slot = ref prop.items[idx];
+						if (slot.kind != Prop.Kind.Method && slot.kind != Prop.Kind.MethodGroup)
+							Value.DebugLog("Conflicting name: {0}.{1} [instace: {2}; method]", Type.Name, member.Name, instance);
+						else if (slot.kind == Prop.Kind.Method)
+						{
+							var call = slot.read(null);
+							var desc = (Callable)call.desc;
+							var group = new MethodGroup(desc.Name, desc.Type, desc.IsMethod);
+							group.list.Add(call);
+							var  value = new Value(group);
+							slot.read = obj => value;
+							slot.kind = Prop.Kind.MethodGroup;
+						}
+					}
+					ProcessMethod(m, instance, ref dict, idx);
+				}
 			}
 
 			protected virtual void ProcessField(
@@ -62,6 +89,7 @@ namespace RedOnion.ROS
 				dict[f.Name] = prop.size;
 				ref var it = ref prop.Add();
 				it.name = f.Name;
+				it.kind = Prop.Kind.Field;
 				var type = f.FieldType;
 				it.read = Expression.Lambda<Func<object, Value>>(
 					// WARNING: Mono may crash if const field is fed into Expression.Field!
@@ -184,6 +212,7 @@ namespace RedOnion.ROS
 				dict[p.Name] = prop.size;
 				ref var it = ref prop.Add();
 				it.name = p.Name;
+				it.kind = Prop.Kind.Property;
 				var type = p.PropertyType;
 				if (p.CanRead)
 				{
@@ -212,26 +241,31 @@ namespace RedOnion.ROS
 			}
 
 			protected virtual void ProcessMethod(
-				MethodInfo m, bool instance, ref Dictionary<string, int> dict)
+				MethodInfo m, bool instance, ref Dictionary<string, int> dict, int idx)
 			{
 #if DEBUG
 				if (!m.IsSpecialName && !m.IsGenericMethod && !m.ReturnType.IsByRef)
 					Value.DebugLog("Processing method {0}.{1} [instace: {2}, args: {3}]",
 						Type.Name, m.Name, instance, m.GetParameters().Length);
 #endif
-				var read = ReflectMethod(m);
-				if (read == null)
+				var value = ReflectMethod(m);
+				if (value.IsVoid)
 					return;
 				if (dict == null)
 					dict = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-				dict[m.Name] = prop.size;
-				ref var it = ref prop.Add();
-				it.name = m.Name;
-				it.read = read;
+				if (idx >= 0)
+					((MethodGroup)prop.items[idx].read(null).desc).list.Add(ref value);
+				else
+				{
+					dict[m.Name] = prop.size;
+					ref var it = ref prop.Add();
+					it.name = m.Name;
+					it.kind = Prop.Kind.Method;
+					it.read = obj => value;
+				}
 			}
 
-			protected virtual void ProcessCtor(
-				ConstructorInfo c, ref Dictionary<string, int> dict)
+			protected virtual void ProcessCtor(ConstructorInfo c)
 			{
 				var args = c.GetParameters();
 				if (args.Length == 0 || args[0].RawDefaultValue != DBNull.Value)
@@ -252,49 +286,32 @@ namespace RedOnion.ROS
 				}
 			}
 
-			protected static Func<object, Value> ReflectMethod(MethodInfo m)
+			protected static Value ReflectMethod(MethodInfo m)
 			{
-				if (m.IsSpecialName)
-					return null;
-				if (m.IsGenericMethod)
-					return null;
-				if (m.ReturnType.IsByRef)
-					return null;
+				if (m.IsSpecialName || m.IsGenericMethod || m.ReturnType.IsByRef)
+					return Value.Void;
 				var args = m.GetParameters();
 				foreach (var arg in args)
 				{
-					if (arg.ParameterType.IsByRef)
-						return null;
-					if (arg.IsOut)
-						return null;
+					if (arg.ParameterType.IsByRef || arg.IsOut)
+						return Value.Void;
 				}
 				var argc = args.Length;
 				if (m.IsStatic)
 				{
 					if (m.ReturnType == typeof(void))
 					{
+						//TODO: more args
 						switch (argc)
 						{
 						case 0:
-						{
-							var value = Action0.CreateValue(m);
-							return obj => value;
-						}
+							return Action0.CreateValue(m);
 						case 1:
-						{
-							var value = Action1.CreateValue(m, args[0].ParameterType);
-							return obj => value;
-						}
+							return Action1.CreateValue(m, args[0].ParameterType);
 						case 2:
-						{
-							var value = Action2.CreateValue(m, args);
-							return obj => value;
-						}
+							return Action2.CreateValue(m, args);
 						case 3:
-						{
-							var value = Action3.CreateValue(m, args);
-							return obj => value;
-						}
+							return Action3.CreateValue(m, args);
 						}
 					}
 					else
@@ -302,25 +319,13 @@ namespace RedOnion.ROS
 						switch (argc)
 						{
 						case 0:
-						{
-							var value = Function0.CreateValue(m);
-							return obj => value;
-						}
+							return Function0.CreateValue(m);
 						case 1:
-						{
-							var value = Function1.CreateValue(m, args[0].ParameterType);
-							return obj => value;
-						}
+							return Function1.CreateValue(m, args[0].ParameterType);
 						case 2:
-						{
-							var value = Function2.CreateValue(m, args);
-							return obj => value;
-						}
+							return Function2.CreateValue(m, args);
 						case 3:
-						{
-							var value = Function3.CreateValue(m, args);
-							return obj => value;
-						}
+							return Function3.CreateValue(m, args);
 						}
 					}
 				}
@@ -333,45 +338,41 @@ namespace RedOnion.ROS
 						case 0:
 						{
 							var self = Expression.Parameter(m.DeclaringType, "self");
-							var value = new Value((Descriptor)Activator.CreateInstance(
+							return new Value((Descriptor)Activator.CreateInstance(
 								typeof(Procedure0<>).MakeGenericType(m.DeclaringType), m.Name),
 								Expression.Lambda(Expression.Call(self, m),
 								self).Compile());
-							return obj => value;
 						}
 						case 1:
 						{
 							var self = Expression.Parameter(m.DeclaringType, "self");
 							//TODO: cache and reuse the descriptors
-							var value = new Value((Descriptor)Activator.CreateInstance(
+							return new Value((Descriptor)Activator.CreateInstance(
 								typeof(Procedure1<>).MakeGenericType(m.DeclaringType), m.Name),
 								Expression.Lambda(Expression.Call(self, m,
 								GetValueConvertExpression(args[0].ParameterType, ValueArg0Parameter)),
 								self, ValueArg0Parameter).Compile());
-							return obj => value;
 						}
 						case 2:
 						{
 							var self = Expression.Parameter(m.DeclaringType, "self");
-							var value = new Value((Descriptor)Activator.CreateInstance(
+							return new Value((Descriptor)Activator.CreateInstance(
 								typeof(Procedure2<>).MakeGenericType(m.DeclaringType), m.Name),
 								Expression.Lambda(Expression.Call(self, m,
 								GetValueConvertExpression(args[0].ParameterType, ValueArg0Parameter),
 								GetValueConvertExpression(args[1].ParameterType, ValueArg1Parameter)),
 								self, ValueArg0Parameter, ValueArg1Parameter).Compile());
-							return obj => value;
 						}
 						case 3:
 						{
 							var self = Expression.Parameter(m.DeclaringType, "self");
-							var value = new Value((Descriptor)Activator.CreateInstance(
+							return new Value((Descriptor)Activator.CreateInstance(
 								typeof(Procedure3<>).MakeGenericType(m.DeclaringType), m.Name),
 								Expression.Lambda(Expression.Call(self, m,
 								GetValueConvertExpression(args[0].ParameterType, ValueArg0Parameter),
 								GetValueConvertExpression(args[1].ParameterType, ValueArg1Parameter),
 								GetValueConvertExpression(args[2].ParameterType, ValueArg2Parameter)),
 								self, ValueArg0Parameter, ValueArg1Parameter, ValueArg2Parameter).Compile());
-							return obj => value;
 						}
 						}
 					}
@@ -382,40 +383,37 @@ namespace RedOnion.ROS
 						case 0:
 						{
 							var self = Expression.Parameter(m.DeclaringType, "self");
-							var value = new Value((Descriptor)Activator.CreateInstance(
+							return new Value((Descriptor)Activator.CreateInstance(
 								typeof(Method0<>).MakeGenericType(m.DeclaringType), m.Name),
 								Expression.Lambda(GetNewValueExpression(m.ReturnType,
 								Expression.Call(self, m)),
 								self).Compile());
-							return obj => value;
 						}
 						case 1:
 						{
 							var self = Expression.Parameter(m.DeclaringType, "self");
-							var value = new Value((Descriptor)Activator.CreateInstance(
+							return new Value((Descriptor)Activator.CreateInstance(
 								typeof(Method1<>).MakeGenericType(m.DeclaringType), m.Name),
 								Expression.Lambda(GetNewValueExpression(m.ReturnType,
 								Expression.Call(self, m,
 								GetValueConvertExpression(args[0].ParameterType, ValueArg0Parameter))),
 								self, ValueArg0Parameter).Compile());
-							return obj => value;
 						}
 						case 2:
 						{
 							var self = Expression.Parameter(m.DeclaringType, "self");
-							var value = new Value((Descriptor)Activator.CreateInstance(
+							return new Value((Descriptor)Activator.CreateInstance(
 								typeof(Method2<>).MakeGenericType(m.DeclaringType), m.Name),
 								Expression.Lambda(GetNewValueExpression(m.ReturnType,
 								Expression.Call(self, m,
 								GetValueConvertExpression(args[0].ParameterType, ValueArg0Parameter),
 								GetValueConvertExpression(args[1].ParameterType, ValueArg1Parameter))),
 								self, ValueArg0Parameter, ValueArg1Parameter).Compile());
-							return obj => value;
 						}
 						case 3:
 						{
 							var self = Expression.Parameter(m.DeclaringType, "self");
-							var value = new Value((Descriptor)Activator.CreateInstance(
+							return new Value((Descriptor)Activator.CreateInstance(
 								typeof(Method3<>).MakeGenericType(m.DeclaringType), m.Name),
 								Expression.Lambda(GetNewValueExpression(m.ReturnType,
 								Expression.Call(self, m,
@@ -423,12 +421,11 @@ namespace RedOnion.ROS
 								GetValueConvertExpression(args[1].ParameterType, ValueArg1Parameter),
 								GetValueConvertExpression(args[2].ParameterType, ValueArg2Parameter))),
 								self, ValueArg0Parameter, ValueArg1Parameter, ValueArg2Parameter).Compile());
-							return obj => value;
 						}
 						}
 					}
 				}
-				return null;
+				return Value.Void;
 			}
 		}
 	}

@@ -12,12 +12,14 @@ namespace RedOnion.ROS
 		public class Action0 : Callable
 		{
 			internal static Value CreateValue(MethodInfo m)
-				=> new Value(new Action0(m.Name), CreateDelegate(m));
+				=> new Value(new Action0(m), CreateDelegate(m));
 			internal static Delegate CreateDelegate(MethodInfo m)
 				=> Delegate.CreateDelegate(typeof(Action), m);
 
-			public Action0(string name)
-				: base(name, typeof(Action), false) { }
+			public Action0(MethodInfo m)
+				: this(m.Name, m) { }
+			public Action0(string name, MethodInfo m = null)
+				: base(name, typeof(Action), false, m) { }
 
 			public override bool Call(ref Value result, object self, Arguments args, bool create)
 			{
@@ -34,13 +36,15 @@ namespace RedOnion.ROS
 		public class Function0 : Callable
 		{
 			internal static Value CreateValue(MethodInfo m)
-				=> new Value(new Function0(m.Name), CreateDelegate(m));
+				=> new Value(new Function0(m), CreateDelegate(m));
 			internal static Delegate CreateDelegate(MethodInfo m)
 				=> Expression.Lambda<Func<Value>>(GetNewValueExpression(
 					m.ReturnType, Expression.Call(m))).Compile();
 
-			public Function0(string name)
-				: base(name, typeof(Func<Value>), false) { }
+			public Function0(MethodInfo m)
+				: this(m.Name, m) { }
+			public Function0(string name, MethodInfo m = null)
+				: base(name, typeof(Func<Value>), false, m) { }
 
 			public override bool Call(ref Value result, object self, Arguments args, bool create)
 			{

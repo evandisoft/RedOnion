@@ -12,15 +12,17 @@ namespace RedOnion.ROS
 		internal class Action2 : Callable
 		{
 			internal static Value CreateValue(MethodInfo m, ParameterInfo[] args)
-				=> new Value(new Action2(m.Name), CreateDelegate(m, args));
+				=> new Value(new Action2(m), CreateDelegate(m, args));
 			internal static Delegate CreateDelegate(MethodInfo m, ParameterInfo[] args)
 				=> Expression.Lambda<Action<Value, Value>>(Expression.Call(m,
 					GetValueConvertExpression(args[0].ParameterType, ValueArg0Parameter),
 					GetValueConvertExpression(args[1].ParameterType, ValueArg1Parameter)),
 					ValueArg0Parameter, ValueArg1Parameter).Compile();
 
-			public Action2(string name)
-				: base(name, typeof(Action<Value, Value>), false) { }
+			public Action2(MethodInfo m)
+				: this(m.Name, m) { }
+			public Action2(string name, MethodInfo m = null)
+				: base(name, typeof(Action<Value, Value>), false, m) { }
 
 			public override bool Call(ref Value result, object self, Arguments args, bool create)
 			{
@@ -37,7 +39,7 @@ namespace RedOnion.ROS
 		internal class Function2 : Callable
 		{
 			internal static Value CreateValue(MethodInfo m, ParameterInfo[] args)
-				=> new Value(new Function2(m.Name), CreateDelegate(m, args));
+				=> new Value(new Function2(m), CreateDelegate(m, args));
 			internal static Delegate CreateDelegate(MethodInfo m, ParameterInfo[] args)
 				=> Expression.Lambda<Func<Value, Value, Value>>(GetNewValueExpression(
 					m.ReturnType, Expression.Call(m,
@@ -45,8 +47,10 @@ namespace RedOnion.ROS
 					GetValueConvertExpression(args[1].ParameterType, ValueArg1Parameter))),
 					ValueArg0Parameter, ValueArg1Parameter).Compile();
 
-			public Function2(string name)
-				: base(name, typeof(Func<Value, Value, Value>), false) { }
+			public Function2(MethodInfo m)
+				: this(m.Name, m) { }
+			public Function2(string name, MethodInfo m = null)
+				: base(name, typeof(Func<Value, Value, Value>), false, m) { }
 
 			public override bool Call(ref Value result, object self, Arguments args, bool create)
 			{
