@@ -1,0 +1,27 @@
+var targetAltitude = 80000
+var karmanAltitude = 70000
+var ascentHeading = 90
+
+def checkStaging
+  if !stage.ready
+    return
+  var sdv = ship.deltaV
+  if !sdv.isready
+    return
+  var nfo = sdv.operatingStageInfo
+  var idx = stage.number - 1
+  if idx >= nfo.count
+    return
+  if nfo[idx].deltaVActual < 0.01
+    stage
+
+var ctrl = ksp.flightControl
+
+def getApoapsis => ship.native.orbit.apa
+until getApoapsis() > targetAltitude
+  checkStaging()
+  var ratio = ship.altitude / karmanAltitude
+  if ratio > 1 then ratio = 1
+  if ratio < 0 then ratio = 0
+  ctrl.setRel ascentHeading, math.cos ratio
+  wait

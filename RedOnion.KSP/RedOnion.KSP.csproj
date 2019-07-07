@@ -66,7 +66,9 @@
     <Compile Include="API\InteropDescriptor.cs" />
     <Compile Include="API\InteropObject.cs" />
     <Compile Include="API\InteropUtilities.cs" />
+    <Compile Include="API\Namespaces\KSP.cs" />
     <Compile Include="API\Namespaces\UI.cs" />
+    <Compile Include="API\Namespaces\Unity.cs" />
     <Compile Include="API\Reflect.cs" />
     <Compile Include="API\Ship.cs" />
     <Compile Include="API\Stage.cs" />
@@ -74,6 +76,7 @@
     <Compile Include="API\Vector.Functions.cs" />
     <Compile Include="API\Vector.Methods.cs" />
     <Compile Include="API\VectorCreator.cs" />
+    <Compile Include="Autopilot\PID.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReflectionUtil\GetMappings.ROS.cs" />
     <Compile Include="ReflectionUtil\NamespaceInstance.ROS.cs" />

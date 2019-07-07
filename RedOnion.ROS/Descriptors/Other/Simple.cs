@@ -29,6 +29,8 @@ namespace RedOnion.ROS
 					return true;
 				}
 			}
+			public Simple(string name, Values values)
+				: this(name, typeof(Simple), values) {}
 			public Simple(string name, Type type, Values values)
 				: base(name, type)
 				=> this.values = values;

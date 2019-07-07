@@ -18,6 +18,17 @@ namespace RedOnion.ROS
 				=> self.num.Bool.GetHashCode();
 			public override string ToString(ref Value self, string format, IFormatProvider provider, bool debug)
 				=> self.num.Bool.ToString(provider);
+
+			public override bool Unary(ref Value self, OpCode op)
+			{
+				switch(op)
+				{
+				case OpCode.Not:
+					self.num.Bool = !self.num.Bool;
+					return true;
+				}
+				return false;
+			}
 		}
 	}
 }

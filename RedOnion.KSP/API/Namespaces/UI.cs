@@ -1,26 +1,22 @@
 using System;
-using RedOnion.UI;
 
 namespace RedOnion.KSP.API.Namespaces
 {
-	public class UI_Namespace
+	public static class UI_Namespace
 	{
-		public static UI_Namespace Instance { get; } = new UI_Namespace();
-		private UI_Namespace() { }
-
-		public Type Window = typeof(API_UI.Window);
-		public Type Anchors = typeof(UI.Anchors);
-		public Type Padding = typeof(UI.Padding);
-		public Type Layout = typeof(UI.Layout);
-		public Type LayoutPadding = typeof(UI.LayoutPadding);
-		public Type SizeConstraint = typeof(UI.SizeConstraint);
-		public Type SizeConstraints = typeof(UI.SizeConstraints);
-		public Type Constraint = typeof(UI.SizeConstraint);
-		public Type Constraints = typeof(UI.SizeConstraints);
-		public Type Element = typeof(UI.Element);
-		public Type Panel = typeof(UI.Panel);
-		public Type Label = typeof(UI.Label);
-		public Type Button = typeof(UI.Button);
-		public Type TextBox = typeof(UI.TextBox);
+		public static Type Window = typeof(API_UI.Window);
+		public static Type Anchors = typeof(UI.Anchors);
+		public static Type Padding = typeof(UI.Padding);
+		public static Type Layout = typeof(UI.Layout);
+		public static Type LayoutPadding = typeof(UI.LayoutPadding);
+		public static Type SizeConstraint = typeof(UI.SizeConstraint);
+		public static Type SizeConstraints = typeof(UI.SizeConstraints);
+		public static Type Constraint = typeof(UI.SizeConstraint);
+		public static Type Constraints = typeof(UI.SizeConstraints);
+		public static Type Element = typeof(UI.Element);
+		public static Type Panel = typeof(UI.Panel);
+		public static Type Label = typeof(UI.Label);
+		public static Type Button = typeof(UI.Button);
+		public static Type TextBox = typeof(UI.TextBox);
 	}
 }
