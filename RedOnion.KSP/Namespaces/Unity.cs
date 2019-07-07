@@ -4,10 +4,20 @@ using UUI = UnityEngine.UI;
 using ROC = RedOnion.UI.Components;
 using KSP.UI;
 
-namespace RedOnion.KSP.API.Namespaces
+namespace RedOnion.KSP.Namespaces
 {
 	public static class Unity_Namespace
 	{
+		public static Type Vector2 = typeof(UE.Vector2);
+		public static Type Vector3 = typeof(UE.Vector3);
+		public static Type Vector4 = typeof(UE.Vector4);
+		public static Type Quaternion = typeof(UE.Quaternion);
+
+		public static Type Vector2d = typeof(UE.Vector2d);
+		public static Type Vector3d = typeof(Vector3d);
+		public static Type Vector4d = typeof(UE.Vector4d);
+		public static Type QuaternionD = typeof(UE.QuaternionD);
+
 		public static Type Object = typeof(UE.Object);
 		public static Type GameObject = typeof(UE.GameObject);
 		public static Type Canvas = typeof(UE.Canvas);

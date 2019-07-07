@@ -3,11 +3,112 @@ using RedOnion.ROS;
 using KSP.UI.Screens;
 using MoonSharp.Interpreter;
 using System.Collections.Generic;
-
-//NOTE: Never move Instance above MemberList ;)
+using System.ComponentModel;
+using RedOnion.KSP.Parts;
 
 namespace RedOnion.KSP.API
 {
+	public class Ship : IDisposable
+	{
+		static Ship active;
+		[Browsable(false), MoonSharpHidden]
+		public static object Active
+		{
+			get
+			{
+				if (!HighLogic.LoadedSceneIsFlight)
+				{
+					if (active != null)
+						ClearActive();
+					return null;
+				}
+				var vessel = FlightGlobals.ActiveVessel;
+				if (active?.Native != vessel)
+				{
+					ClearActive();
+					if (vessel != null)
+					{
+						active = new Ship(vessel);
+						GameEvents.onVesselChange.Add(VesselChange);
+					}
+				}
+				return active;
+			}
+		}
+		static void ClearActive()
+		{
+			if (active == null)
+				return;
+			active.Dispose();
+			active = null;
+			GameEvents.onVesselChange.Remove(VesselChange);
+
+		}
+		static void VesselChange(Vessel vessel)
+			=> ClearActive();
+
+		Vessel native;
+		PartList parts;
+		protected Ship(Vessel vessel)
+		{
+			native = vessel;
+			GameEvents.onGameSceneLoadRequested.Add(SceneChange);
+		}
+
+		~Ship() => Dispose(false);
+		[Browsable(false), MoonSharpHidden]
+		public void Dispose()
+		{
+			GC.SuppressFinalize(this);
+			Dispose(true);
+		}
+		protected virtual void Dispose(bool disposing)
+		{
+			if (ReferenceEquals(active, this))
+				ClearActive();
+			if (parts != null)
+			{
+				parts.Dispose();
+				parts = null;
+			}
+			if (native != null)
+			{
+				GameEvents.onGameSceneLoadRequested.Remove(SceneChange);
+				native = null;
+			}
+		}
+		void SceneChange(GameScenes scene)
+		{
+			if (scene != GameScenes.FLIGHT)
+				Dispose();
+		}
+
+		public Vessel Native => native;
+		public PartList Parts
+		{
+			get
+			{
+				if (parts == null)
+					parts = new PartList(this);
+				return parts;
+			}
+		}
+		public PartBase Root => Parts.Root;
+
+		public Guid ID => native.id;
+		public uint PersistentID => native.persistentId;
+		public VesselType VesselType => native.vesselType;
+		public float Mass => native.GetTotalMass();
+		public bool Packed => native.packed;
+		public bool Landed => native.Landed;
+		public bool Splashed => native.Splashed;
+		public double Longitude => native.longitude;
+		public double Latitude => native.latitude;
+		public double Altitude => native.altitude;
+		public double RadarAltitude => native.radarAltitude;
+	}
+
+	/*
 	public class Ship : InteropObject
 	{
 		public static MemberList MemberList { get; } = new MemberList(
@@ -161,4 +262,5 @@ namespace RedOnion.KSP.API
 		public double RadarAltitude
 			=> Vessel?.radarAltitude ?? double.NaN;
 	}
+	*/
 }

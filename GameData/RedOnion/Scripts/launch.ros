@@ -1,5 +1,5 @@
 var targetAltitude = 80000
-var karmanAltitude = 70000
+var karmanAltitude = 75000
 var ascentHeading = 90
 
 def checkStaging
@@ -9,10 +9,9 @@ def checkStaging
   if !sdv.isready
     return
   var nfo = sdv.operatingStageInfo
-  var idx = stage.number - 1
-  if idx >= nfo.count
+  if nfo.count == 0
     return
-  if nfo[idx].deltaVActual < 0.01
+  if nfo[0].deltaVActual < 0.01
     stage
 
 var ctrl = ksp.flightControl
@@ -20,8 +19,8 @@ var ctrl = ksp.flightControl
 def getApoapsis => ship.native.orbit.apa
 until getApoapsis() > targetAltitude
   checkStaging()
-  var ratio = ship.altitude / karmanAltitude
+  var ratio = getApoapsis() / karmanAltitude
   if ratio > 1 then ratio = 1
   if ratio < 0 then ratio = 0
-  ctrl.setRel ascentHeading, math.cos ratio
+  ctrl.setRel ascentHeading, math.acos(ratio) * 180 / math.pi
   wait

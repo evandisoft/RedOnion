@@ -1,10 +1,10 @@
 using System;
 
-namespace RedOnion.KSP.API.Namespaces
+namespace RedOnion.KSP.Namespaces
 {
 	public static class UI_Namespace
 	{
-		public static Type Window = typeof(API_UI.Window);
+		public static Type Window = typeof(Window);
 		public static Type Anchors = typeof(UI.Anchors);
 		public static Type Padding = typeof(UI.Padding);
 		public static Type Layout = typeof(UI.Layout);

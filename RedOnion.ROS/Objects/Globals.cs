@@ -12,6 +12,7 @@ namespace RedOnion.ROS.Objects
 
 		public Globals() : base("Globals", typeof(Globals)) { }
 
+		protected UserObject math;
 		protected Print print;
 		protected Run run;
 		protected UserObject obj;
@@ -22,12 +23,11 @@ namespace RedOnion.ROS.Objects
 				return;
 			Add("System", parent = new UserObject());
 			System.Add("global", this);
+			System.Add("math", typeof(RosMath));
 			System.Add("print", new Value(print = new Print()));
 			System.Add("run", new Value(run = new Run()));
 			System.Add("object", new Value(obj = new UserObject()));
 			System.Add("list", new Value(typeof(List<Value>)));
-			//TODO: better reflection of overloaded methods/functions
-			System.Add("math", typeof(Math));
 
 			if (Processor is Processor processor)
 			{
@@ -41,6 +41,7 @@ namespace RedOnion.ROS.Objects
 		{
 			base.Reset();
 			System.Reset();
+			math?.Reset();
 			print?.Reset();
 			run?.Reset();
 			obj?.Reset();

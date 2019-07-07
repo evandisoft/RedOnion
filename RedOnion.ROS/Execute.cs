@@ -20,6 +20,7 @@ namespace RedOnion.ROS
 			var code = this.code;
 			var str = this.str;
 			int blockEnd = ctx.BlockEnd;
+			var op = OpCode.Void;
 			try
 			{
 				for (; ; )
@@ -143,7 +144,7 @@ namespace RedOnion.ROS
 
 					//##############################################################################
 
-					var op = (OpCode)code[at++];
+					op = (OpCode)code[at++];
 					this.at = at;
 					switch (op)
 					{
@@ -896,6 +897,7 @@ namespace RedOnion.ROS
 			catch (Exception ex)
 			{
 				this.at = at;
+				ctxIsPrivate = true; // force context reset on next execute
 				if (ex is RuntimeError)
 					throw;
 				throw new RuntimeError(compiled, at, ex);

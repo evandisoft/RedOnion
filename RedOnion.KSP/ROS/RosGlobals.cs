@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using RedOnion.ROS;
 using RedOnion.KSP.API;
-using RedOnion.KSP.API.Namespaces;
+using RedOnion.KSP.Namespaces;
 using RedOnion.KSP.Autopilot;
 using UE = UnityEngine;
 
@@ -24,7 +24,7 @@ namespace RedOnion.KSP
 			System.Add("PIDloop", typeof(PID));
 
 			System.Add("UI", typeof(UI_Namespace));
-			Add(typeof(API_UI.Window));
+			Add(typeof(Window));
 			Add(typeof(UI.Anchors));
 			Add(typeof(UI.Padding));
 			Add(typeof(UI.Layout));
@@ -35,23 +35,6 @@ namespace RedOnion.KSP
 
 			Add("KSP", typeof(KSP_Namespace));
 			Add("Unity", typeof(Unity_Namespace));
-
-			/*
-			Add("assembly", new Value(new ReflectionUtil.GetMappings()));
-			
-			sys.Set("Vector2", AddType(typeof(UE.Vector2)));
-			var vector =        AddType(typeof(UE.Vector3));
-			soft.Set("Vector", vector);
-			sys.Set("Vector", vector);
-			sys.Set("Vector3", vector);
-			sys.Set("Vector4", AddType(typeof(UE.Vector4)));
-
-			var hard = BaseProps; // will resist overwrite and shadowing in global scope
-			var soft = MoreProps; // can be easily overwritten or shadowed
-
-			AddType(typeof(VesselType));
-			Add("assembly", Value.FromObject(new ReflectionUtil.GetMappings()));
-			*/
 		}
 
 		const int GlobalMark = 0x7F000000;

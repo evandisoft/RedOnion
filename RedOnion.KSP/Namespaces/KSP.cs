@@ -3,7 +3,7 @@ using RedOnion.KSP.Autopilot;
 using KSP.UI.Screens;
 using UE = UnityEngine;
 
-namespace RedOnion.KSP.API.Namespaces
+namespace RedOnion.KSP.Namespaces
 {
 	public static class KSP_Namespace
 	{

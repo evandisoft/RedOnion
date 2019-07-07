@@ -3,7 +3,7 @@ using RedOnion.KSP.API;
 using RedOnion.KSP.ROS;
 using RedOnion.ROS;
 
-namespace RedOnion.KSP.API_UI
+namespace RedOnion.KSP
 {
 	public class Window : UI.Window
 	{

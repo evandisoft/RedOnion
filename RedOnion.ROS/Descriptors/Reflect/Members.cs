@@ -22,7 +22,7 @@ namespace RedOnion.ROS
 						: x.MetadataToken.CompareTo(y.MetadataToken);
 				}
 			}
-			public static MemberInfo[] GetMembers(Type type, string name, bool instance)
+			public static MemberInfo[] GetMembers(Type type, string name = null, bool instance = true)
 			{
 				var flags = BindingFlags.IgnoreCase|BindingFlags.Public
 				| (instance ? BindingFlags.Instance : BindingFlags.Static);
@@ -80,6 +80,22 @@ namespace RedOnion.ROS
 				}
 			}
 
+			protected virtual void ProcessNested(Type nested)
+			{
+				Value.DebugLog("Processing nested type {0}.{1}", Type.Name, nested.Name);
+				if (sdict == null)
+					sdict = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+				sdict[nested.Name] = prop.size;
+				ref var it = ref prop.Add();
+				it.name = nested.Name;
+				it.kind = Prop.Kind.Type;
+				it.read = Expression.Lambda<Func<object, Value>>(
+					GetNewValueExpression(nested,
+						Expression.Constant(nested)),
+					SelfParameter
+				).Compile();
+			}
+
 			protected virtual void ProcessField(
 				FieldInfo f, bool instance, ref Dictionary<string, int> dict)
 			{
@@ -132,7 +148,6 @@ namespace RedOnion.ROS
 						f.SetValue(null, fv);
 					};
 				}
-				return;
 			}
 
 			protected virtual void ProcessProperty(

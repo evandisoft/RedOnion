@@ -540,10 +540,10 @@ namespace RedOnion.ROS
 			=> (OpKind)(self & (OpCode)ExCode.mKind);
 		public static OpKind Kind(this ExCode self)
 			=> (OpKind)(self & ExCode.mKind);
-		public static bool IsNumber(this ExCode self)
-			=> (OpCode)self > OpCode.String;
-		public static bool IsNumber(this OpCode self)
-			=> self > OpCode.String;
+		public static bool IsNumberOrChar(this ExCode self)
+			=> (OpCode)self > OpCode.String && (OpCode)self < OpCode.Create;
+		public static bool IsNumberOrChar(this OpCode self)
+			=> self > OpCode.String && self < OpCode.Create;
 		public static bool IsSigned(this ExCode self)
 			=> (self & ExCode.fSig) != 0;
 		public static bool IsFloatPoint(this ExCode self)

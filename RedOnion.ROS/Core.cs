@@ -73,6 +73,7 @@ namespace RedOnion.ROS
 				}
 				ctx.RootStart = 0;
 				ctx.RootEnd = code.Length;
+				ctx.PopAll();
 			}
 		}
 
