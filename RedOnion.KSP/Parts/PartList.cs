@@ -11,7 +11,7 @@ using KSP.UI.Screens;
 
 namespace RedOnion.KSP.Parts
 {
-	public class PartList<Part> : ICollection<Part> where Part : PartBase
+	public class ReadOnlyPartList<Part> : IList<Part> where Part : PartBase
 	{
 		protected ListCore<Part> parts;
 		public int Count => parts.Count;
@@ -24,32 +24,84 @@ namespace RedOnion.KSP.Parts
 		IEnumerator IEnumerable.GetEnumerator() => parts.GetEnumerator();
 		public IEnumerator<Part> GetEnumerator() => parts.GetEnumerator();
 
+		public Part this[int index] => parts[index];
+		public int IndexOf(Part item) => parts.IndexOf(item);
+
 		bool ICollection<Part>.IsReadOnly => true;
+		Part IList<Part>.this[int index]
+		{
+			get => parts[index];
+			set => throw new NotImplementedException();
+		}
 		void ICollection<Part>.Add(Part item) => throw new NotImplementedException();
 		void ICollection<Part>.Clear() => throw new NotImplementedException();
 		bool ICollection<Part>.Remove(Part item) => throw new NotImplementedException();
+		void IList<Part>.Insert(int index, Part item) => throw new NotImplementedException();
+		void IList<Part>.RemoveAt(int index) => throw new NotImplementedException();
 	}
-	public class PartList : ICollection<PartBase>, IDisposable
+	public class ReadOnlyPartSet<Part> : IList<Part> where Part : PartBase
+	{
+		protected ListCore<Part> parts;
+		protected HashSet<Part> set = new HashSet<Part>();
+		public int Count => parts.Count;
+		public bool Contains(Part item) => set.Contains(item);
+		public void CopyTo(Part[] array, int index) => parts.CopyTo(array, index);
+
+		protected internal void Clear()
+		{
+			parts.Clear();
+			set.Clear();
+		}
+		protected internal bool Add(Part item)
+		{
+			if (!set.Add(item))
+				return false;
+			parts.Add(item);
+			return true;
+		}
+
+		IEnumerator IEnumerable.GetEnumerator() => parts.GetEnumerator();
+		public IEnumerator<Part> GetEnumerator() => parts.GetEnumerator();
+
+		public Part this[int index] => parts[index];
+		public int IndexOf(Part item) => parts.IndexOf(item);
+
+		bool ICollection<Part>.IsReadOnly => true;
+		Part IList<Part>.this[int index] { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+		void ICollection<Part>.Add(Part item) => throw new NotImplementedException();
+		void ICollection<Part>.Clear() => throw new NotImplementedException();
+		bool ICollection<Part>.Remove(Part item) => throw new NotImplementedException();
+		void IList<Part>.Insert(int index, Part item) => throw new NotImplementedException();
+		void IList<Part>.RemoveAt(int index) => throw new NotImplementedException();
+	}
+	public class ShipPartList : IList<PartBase>, IDisposable
 	{
 		protected ListCore<PartBase> parts;
 		protected Dictionary<Part, PartBase> cache;
+		protected internal bool dirty
+		{
+			get => parts.Count == 0;
+			set { if (value) parts.Clear(); }
+		}
 
 		public Ship Ship { get; protected set; }
 		public PartBase Root { get; protected set; }
 		public Decoupler NextDecoupler { get; protected set; }
-		public PartList<Decoupler> Decouplers { get; protected set; }
-		public PartList<DockingPort> DockingPorts { get; protected set; }
-		public PartList<Engine> Engines { get; protected set; }
+		public int NextDecouplerStage => NextDecoupler?.Stage ?? -1;
+		public ReadOnlyPartList<Decoupler> Decouplers { get; protected set; }
+		public ReadOnlyPartList<DockingPort> DockingPorts { get; protected set; }
+		public ReadOnlyPartList<Engine> Engines { get; protected set; }
 
-		protected internal PartList(Ship ship)
+		protected internal ShipPartList(Ship ship)
 		{
 			Ship = ship;
-			Decouplers = new PartList<Decoupler>();
-			DockingPorts = new PartList<DockingPort>();
-			Engines = new PartList<Engine>();
+			Decouplers = new ReadOnlyPartList<Decoupler>();
+			DockingPorts = new ReadOnlyPartList<DockingPort>();
+			Engines = new ReadOnlyPartList<Engine>();
 		}
 
-		~PartList() => Dispose(false);
+		~ShipPartList() => Dispose(false);
 		[Browsable(false), MoonSharpHidden]
 		public void Dispose()
 		{
@@ -80,6 +132,7 @@ namespace RedOnion.KSP.Parts
 			DockingPorts.Clear();
 			Engines.Clear();
 			Construct(Ship.Native.rootPart, null, null);
+			dirty = false;
 		}
 		protected void Construct(Part part, PartBase parent, Decoupler decoupler)
 		{
@@ -131,10 +184,10 @@ namespace RedOnion.KSP.Parts
 					}
 					Decouplers.Add(decoupler);
 					// ignore leftover decouplers
-					if (decoupler.Part.inverseStage >= StageManager.CurrentStage)
+					if (decoupler.Native.inverseStage >= StageManager.CurrentStage)
 						break;
 					// check if we just created closer decoupler (see StageValues.CreatePartSet)
-					if (NextDecoupler == null || decoupler.Part.inverseStage > NextDecoupler.Part.inverseStage)
+					if (NextDecoupler == null || decoupler.Native.inverseStage > NextDecoupler.Native.inverseStage)
 						NextDecoupler = decoupler;
 					break;
 				}
@@ -161,20 +214,20 @@ namespace RedOnion.KSP.Parts
 		{
 			get
 			{
-				if (parts.Count == 0)
+				if (dirty)
 					Refresh();
 				return parts.Count;
 			}
 		}
 		public bool Contains(PartBase item)
 		{
-			if (parts.Count == 0)
+			if (dirty)
 				Refresh();
 			return parts.Contains(item);
 		}
 		public void CopyTo(PartBase[] array, int index)
 		{
-			if (parts.Count == 0)
+			if (dirty)
 				Refresh();
 			parts.CopyTo(array, index);
 		}
@@ -182,14 +235,46 @@ namespace RedOnion.KSP.Parts
 		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 		public IEnumerator<PartBase> GetEnumerator()
 		{
-			if (parts.Count == 0)
+			if (dirty)
 				Refresh();
 			return parts.GetEnumerator();
 		}
 
+		public PartBase this[int index]
+		{
+			get
+			{
+				if (dirty)
+					Refresh();
+				return parts[index];
+			}
+		}
+		public PartBase this[Part part]
+		{
+			get
+			{
+				if (dirty)
+					Refresh();
+				return cache[part];
+			}
+		}
+		public int IndexOf(PartBase item)
+		{
+			if (dirty)
+				Refresh();
+			return parts.IndexOf(item);
+		}
+
 		bool ICollection<PartBase>.IsReadOnly => true;
+		PartBase IList<PartBase>.this[int index]
+		{
+			get => this[index];
+			set => throw new NotImplementedException();
+		}
 		void ICollection<PartBase>.Add(PartBase item) => throw new NotImplementedException();
 		void ICollection<PartBase>.Clear() => throw new NotImplementedException();
 		bool ICollection<PartBase>.Remove(PartBase item) => throw new NotImplementedException();
+		void IList<PartBase>.Insert(int index, PartBase item) => throw new NotImplementedException();
+		void IList<PartBase>.RemoveAt(int index) => throw new NotImplementedException();
 	}
 }

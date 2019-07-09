@@ -11,14 +11,17 @@ namespace RedOnion.KSP.Parts
 	public class PartBase
 	{
 		public Ship Ship { get; }
-		public Part Part { get; }
+		public Part Native { get; }
 		public PartBase Parent { get; }
 		public Decoupler Decoupler { get; }
-		
-		protected internal PartBase(Ship ship, Part part, PartBase parent, Decoupler decoupler)
+		public int Stage => Native.inverseStage;
+		public int DecoupledIn => Decoupler?.Stage ?? -1;
+		public PartStates State => Native.State;
+
+		protected internal PartBase(Ship ship, Part native, PartBase parent, Decoupler decoupler)
 		{
 			Ship = ship;
-			Part = part;
+			Native = native;
 			Parent = parent;
 			Decoupler = decoupler;
 		}

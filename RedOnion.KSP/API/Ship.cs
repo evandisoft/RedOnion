@@ -12,7 +12,7 @@ namespace RedOnion.KSP.API
 	{
 		static Ship active;
 		[Browsable(false), MoonSharpHidden]
-		public static object Active
+		public static Ship Active
 		{
 			get
 			{
@@ -29,17 +29,20 @@ namespace RedOnion.KSP.API
 					if (vessel != null)
 					{
 						active = new Ship(vessel);
+						Stage.SetDirty();
 						GameEvents.onVesselChange.Add(VesselChange);
 					}
 				}
 				return active;
 			}
 		}
-		static void ClearActive()
+		static void ClearActive(bool disposing = false)
 		{
 			if (active == null)
 				return;
-			active.Dispose();
+			Stage.SetDirty();
+			if (!disposing)
+				active.Dispose();
 			active = null;
 			GameEvents.onVesselChange.Remove(VesselChange);
 
@@ -47,11 +50,10 @@ namespace RedOnion.KSP.API
 		static void VesselChange(Vessel vessel)
 			=> ClearActive();
 
-		Vessel native;
-		PartList parts;
 		protected Ship(Vessel vessel)
 		{
-			native = vessel;
+			Native = vessel;
+			Parts = new ShipPartList(this);
 			GameEvents.onGameSceneLoadRequested.Add(SceneChange);
 		}
 
@@ -65,16 +67,16 @@ namespace RedOnion.KSP.API
 		protected virtual void Dispose(bool disposing)
 		{
 			if (ReferenceEquals(active, this))
-				ClearActive();
-			if (parts != null)
+				ClearActive(disposing: true);
+			if (Parts != null)
 			{
-				parts.Dispose();
-				parts = null;
+				Parts.Dispose();
+				Parts = null;
 			}
-			if (native != null)
+			if (Native != null)
 			{
 				GameEvents.onGameSceneLoadRequested.Remove(SceneChange);
-				native = null;
+				Native = null;
 			}
 		}
 		void SceneChange(GameScenes scene)
@@ -83,29 +85,21 @@ namespace RedOnion.KSP.API
 				Dispose();
 		}
 
-		public Vessel Native => native;
-		public PartList Parts
-		{
-			get
-			{
-				if (parts == null)
-					parts = new PartList(this);
-				return parts;
-			}
-		}
+		public Vessel Native { get; private set; }
+		public ShipPartList Parts { get; private set; }
 		public PartBase Root => Parts.Root;
 
-		public Guid ID => native.id;
-		public uint PersistentID => native.persistentId;
-		public VesselType VesselType => native.vesselType;
-		public float Mass => native.GetTotalMass();
-		public bool Packed => native.packed;
-		public bool Landed => native.Landed;
-		public bool Splashed => native.Splashed;
-		public double Longitude => native.longitude;
-		public double Latitude => native.latitude;
-		public double Altitude => native.altitude;
-		public double RadarAltitude => native.radarAltitude;
+		public Guid ID => Native.id;
+		public uint PersistentID => Native.persistentId;
+		public VesselType VesselType => Native.vesselType;
+		public float Mass => Native.GetTotalMass();
+		public bool Packed => Native.packed;
+		public bool Landed => Native.Landed;
+		public bool Splashed => Native.Splashed;
+		public double Longitude => Native.longitude;
+		public double Latitude => Native.latitude;
+		public double Altitude => Native.altitude;
+		public double RadarAltitude => Native.radarAltitude;
 	}
 
 	/*

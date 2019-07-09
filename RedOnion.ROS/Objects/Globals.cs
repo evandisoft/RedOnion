@@ -12,7 +12,6 @@ namespace RedOnion.ROS.Objects
 
 		public Globals() : base("Globals", typeof(Globals)) { }
 
-		protected UserObject math;
 		protected Print print;
 		protected Run run;
 		protected UserObject obj;
@@ -41,7 +40,6 @@ namespace RedOnion.ROS.Objects
 		{
 			base.Reset();
 			System.Reset();
-			math?.Reset();
 			print?.Reset();
 			run?.Reset();
 			obj?.Reset();

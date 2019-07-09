@@ -44,6 +44,7 @@ namespace RedOnion.ROS
 			public Reflected(Type type) : this(type.Name, type) { }
 			public Reflected(string name, Type type) : base(name, type)
 			{
+				//TODO: ignore members with [Browsable(false)]
 				foreach (var member in GetMembers(type, null, false))
 				{
 					try

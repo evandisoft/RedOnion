@@ -2,9 +2,11 @@ using System;
 using RedOnion.KSP.Autopilot;
 using KSP.UI.Screens;
 using UE = UnityEngine;
+using System.ComponentModel;
 
 namespace RedOnion.KSP.Namespaces
 {
+	[DisplayName("KSP")]
 	public static class KSP_Namespace
 	{
 		public static Type Vessel = typeof(Vessel);

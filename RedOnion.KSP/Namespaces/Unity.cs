@@ -3,9 +3,11 @@ using UE = UnityEngine;
 using UUI = UnityEngine.UI;
 using ROC = RedOnion.UI.Components;
 using KSP.UI;
+using System.ComponentModel;
 
 namespace RedOnion.KSP.Namespaces
 {
+	[DisplayName("Unity")]
 	public static class Unity_Namespace
 	{
 		public static Type Vector2 = typeof(UE.Vector2);
