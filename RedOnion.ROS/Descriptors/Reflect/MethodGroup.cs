@@ -43,6 +43,7 @@ namespace RedOnion.ROS
 					}
 					if (args.Length > 0 && args[0].IsNumber)
 					{
+						// exact type
 						var type = args[0].desc.Type;
 						foreach (var m in list)
 						{
@@ -55,6 +56,32 @@ namespace RedOnion.ROS
 									result = it;
 									return true;
 								}
+							}
+						}
+						// floating point number
+						if (args[0].IsFpNumber)
+						{
+							foreach (var m in list)
+							{
+								var desc = (Callable)m.desc;
+								var ptype = desc.Params[0].ParameterType;
+								if (ptype == typeof(double) || ptype == typeof(float))
+								{
+									var it = m;
+									if (it.desc.Call(ref it, self, args, create))
+									{
+										result = it;
+										return true;
+									}
+								}
+							}
+						}
+						// integral number if atmost 32 bits
+						else if (args[0].desc.Primitive.NumberSize() <= 4)
+						{
+							if (args[0].desc.Primitive.IsSigned())
+							{
+
 							}
 						}
 					}

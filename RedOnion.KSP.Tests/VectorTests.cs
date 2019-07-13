@@ -20,8 +20,10 @@ namespace RedOnion.KSP.Tests
 		{
 			if (type.IsSubclassOf(typeof(Delegate)))
 				return Descriptor.Callable.FromType(type);
-			// to avoid those secirity exceptions mentioning ECall (e.g. on Vector3d.Slerp)
-			if (type.Assembly.FullName.StartsWith("UnityEngine")
+			// to avoid those security exceptions mentioning ECall (e.g. on Vector3d.Slerp)
+			if ((type.FullName.StartsWith("RedOnion.KSP.API.Namespaces.")
+				&& type.Name.EndsWith("_Namespace"))
+				|| type.Assembly.FullName.StartsWith("UnityEngine")
 				|| type.Assembly.FullName.StartsWith("Assembly-CSharp"))
 				return new DummyDescriptor(type);
 			return new Descriptor.Reflected(type);

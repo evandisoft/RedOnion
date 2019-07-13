@@ -212,6 +212,7 @@ namespace RedOnion.ROS.Tests
 			Test(3.14, "math.abs -3.14");
 			Test(2.7f, "math.abs -2.7f");
 			Test(1.41, "math.max 1.0, 1.41");
+			Test(30.0, "math.deg.asin 0.5");
 		}
 	}
 }

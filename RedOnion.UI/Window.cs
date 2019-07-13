@@ -74,23 +74,25 @@ namespace RedOnion.UI
 			}
 		}
 
-		public FramePanel Frame { get; private set; }
-		public Panel Content { get; private set; }
-
 		public string Name
 		{
 			get => Frame.Name;
 			set => Frame.Name = value;
 		}
+		public SceneFlags Scenes { get; set; }
+		public FramePanel Frame { get; private set; }
+		public Panel Content { get; private set; }
 
 		public Window(Layout layout)
 			: this(null, layout) { }
 		public Window(string name = null, Layout layout = Layout.Vertical)
 		{
+			Scenes = (SceneFlags)(1 << (int)HighLogic.LoadedScene);
 			Frame = new FramePanel(name);
 			Content = Frame.Content;
 			Content.Layout = layout;
 			Frame.Close.Click += Close;
+			GameEvents.onGameSceneLoadRequested.Add(SceneChange);
 		}
 
 		~Window() => Dispose(false);
@@ -101,6 +103,12 @@ namespace RedOnion.UI
 				return;
 			Frame.Dispose();
 			Frame = null;
+			GameEvents.onGameSceneLoadRequested.Remove(SceneChange);
+		}
+		void SceneChange(GameScenes scene)
+		{
+			if (((int)Scenes & (1 << (int)scene)) == 0)
+				Dispose();
 		}
 
 		public void Show()

@@ -88,7 +88,7 @@ namespace RedOnion.ROS
 				var rtype = rhs.desc.Primitive;
 				if (rtype != ExCode.ULong)
 				{
-					if (!rtype.IsNumber())
+					if (!rtype.IsNumberOrChar())
 						return false;
 					if (rtype.IsFloatPoint())
 					{

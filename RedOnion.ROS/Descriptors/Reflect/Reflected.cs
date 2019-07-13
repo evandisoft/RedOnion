@@ -18,6 +18,7 @@ namespace RedOnion.ROS
 				public enum Kind
 				{
 					Unknown,
+					Type,
 					Field,
 					Property,
 					Method,
@@ -43,6 +44,7 @@ namespace RedOnion.ROS
 			public Reflected(Type type) : this(type.Name, type) { }
 			public Reflected(string name, Type type) : base(name, type)
 			{
+				//TODO: ignore members with [Browsable(false)]
 				foreach (var member in GetMembers(type, null, false))
 				{
 					try
@@ -65,6 +67,18 @@ namespace RedOnion.ROS
 					{
 						Value.Log("Exception {0} when processing {1}.{2}: {3}",
 							ex.GetType(), Type.Name, member.Name, ex.Message);
+					}
+				}
+				foreach (var nested in type.GetNestedTypes())
+				{
+					try
+					{
+						ProcessNested(nested);
+					}
+					catch (Exception ex)
+					{
+						Value.Log("Exception {0} when processing {1}.{2}: {3}",
+							ex.GetType(), Type.Name, nested.Name, ex.Message);
 					}
 				}
 				if (intIndexGet == null && intIndexSet == null)

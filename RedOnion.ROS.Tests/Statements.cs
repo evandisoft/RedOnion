@@ -122,6 +122,11 @@ namespace RedOnion.ROS.Tests
 				"foreach var e in [\"hello\", \" \", \"world\"]",
 				"  s += e",
 				"s");
+			Lines(ExitCode.Return, "123",
+				"var s = \"\"",
+				"for var e in [1,2,3]",
+				"  s += e",
+				"return s");
 		}
 
 		[Test]
