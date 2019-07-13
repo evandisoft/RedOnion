@@ -77,6 +77,11 @@ namespace Kerbalua.Other
 					state = processor.Execute(source, path, 10000)
 						? processor.HasEvents ? State.Events : State.Idle : State.Yielding;
 				}
+				else if (state == State.Yielding
+				  && (processor.Exit != ExitCode.Countdown && processor.Exit != ExitCode.Yield))
+					state = processor.HasEvents ? State.Events : State.Idle;
+				else if (state == State.Events && !processor.HasEvents)
+					state = State.Idle;
 				if (prevState <= State.Yielding
 					&& (state == State.Events || state == State.Idle))
 				{
