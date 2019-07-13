@@ -33,6 +33,11 @@ namespace RedOnion.ROS.Objects
 				System.Add("update", new Value(Event.EventDescriptor.Instance, processor.Update));
 				System.Add("idle", new Value(Event.EventDescriptor.Instance, processor.Update));
 			}
+
+			System.Add("null", Value.Null);
+			System.Add("true", Value.True);
+			System.Add("false", Value.False);
+
 			System.Lock();
 			Lock();
 		}

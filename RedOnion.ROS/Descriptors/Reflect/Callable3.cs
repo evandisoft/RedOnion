@@ -42,12 +42,19 @@ namespace RedOnion.ROS
 			internal static Value CreateValue(MethodInfo m, ParameterInfo[] args)
 				=> new Value(new Function3(m), CreateDelegate(m, args));
 			internal static Delegate CreateDelegate(MethodInfo m, ParameterInfo[] args)
-				=> Expression.Lambda<Func<Value, Value, Value, Value>>(GetNewValueExpression(
-					m.ReturnType, Expression.Call(m,
+			{
+				Type convert = null;
+				var convertAttrs = m.ReturnTypeCustomAttributes
+					.GetCustomAttributes(typeof(ConvertAttribute), true);
+				if (convertAttrs.Length == 1)
+					convert = ((ConvertAttribute)convertAttrs[0]).Type;
+				return Expression.Lambda<Func<Value, Value, Value, Value>>(GetNewValueExpression(
+					convert ?? m.ReturnType, GetConvertExpression(Expression.Call(m,
 					GetValueConvertExpression(args[0].ParameterType, ValueArg0Parameter),
 					GetValueConvertExpression(args[1].ParameterType, ValueArg1Parameter),
-					GetValueConvertExpression(args[2].ParameterType, ValueArg2Parameter))),
-					ValueArg0Parameter, ValueArg1Parameter, ValueArg2Parameter).Compile();
+					GetValueConvertExpression(args[2].ParameterType, ValueArg2Parameter)),
+					convert)), ValueArg0Parameter, ValueArg1Parameter, ValueArg2Parameter).Compile();
+			}
 
 			public Function3(MethodInfo m)
 				: this(m.Name, m) { }

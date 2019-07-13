@@ -45,11 +45,134 @@ namespace RedOnion.ROS
 				{
 					return Expression.New(vctor, new Expression[]
 					{
-						Expression.Convert(expr, typeof(object))
+						GetConvertExpression(expr, typeof(object))
 					});
 				}
 			}
 			return Expression.New(vctor, new Expression[] { expr });
+		}
+		public static Expression GetConvertExpression(Expression from, Type to)
+		{
+			if (to == null)
+				return from;
+			var type = from.Type;
+			if (type == to)
+				return from;
+			if (IsPrimitiveConversion(type, to) || IsReferenceConversion(type, to))
+				return Expression.Convert(from, to);
+			var op = GetUnaryOperator("op_Explicit", type, type, to);
+			if (op == null)
+				op = GetUnaryOperator("op_Implicit", type, type, to);
+			if (op == null)
+				op = GetUnaryOperator("op_Explicit", to, type, to);
+			if (op == null)
+				op = GetUnaryOperator("op_Implicit", to, type, to);
+			if (op != null)
+				return Expression.Convert(from, to, op);
+			var ctor = to.GetConstructor(new Type[] { type });
+			if (ctor != null)
+				return Expression.New(ctor, from);
+			throw Value.InvalidOperation("Cannot convert from {0} to {1}", type.FullName, to.FullName);
+		}
+		public static bool IsNullable(Type type)
+			=> type.IsValueType && IsGenericInstanceOf(type, typeof(Nullable<>));
+		public static Type GetNotNullableType(Type type)
+			=> !IsNullable(type) ? type : type.GetGenericArguments()[0];
+		public static bool IsAssignableTo(Type from, Type to)
+			=> to.IsAssignableFrom(from) || ArrayTypeIsAssignableTo(from, to);
+		public static bool ArrayTypeIsAssignableTo(Type from, Type to)
+		{
+			if (!from.IsArray || !to.IsArray)
+				return false;
+			if (from.GetArrayRank() != to.GetArrayRank())
+				return false;
+			return IsAssignableTo(from.GetElementType(), to.GetElementType());
+		}
+		public static bool IsAssignableToParameterType(Type type, ParameterInfo param)
+		{
+			Type to = param.ParameterType;
+			if (to.IsByRef)
+				to = to.GetElementType();
+			return IsAssignableTo(GetNotNullableType(type), to);
+		}
+		public static bool IsGenericInstanceOf(Type type, Type generic)
+		{
+			if (!type.IsGenericType)
+				return false;
+			return type.GetGenericTypeDefinition() == generic;
+		}
+		public static bool IsPrimitiveConversion(Type from, Type to)
+		{
+			if (from == to)
+				return true;
+			if (IsNullable(from) && to == GetNotNullableType(from))
+				return true;
+			if (IsNullable(to) && from == GetNotNullableType(to))
+				return true;
+			if (IsConvertiblePrimitive(from) && IsConvertiblePrimitive(to))
+				return true;
+			return false;
+		}
+		public static bool IsConvertiblePrimitive(Type type)
+		{
+			Type notNullableType = GetNotNullableType(type);
+			if (notNullableType == typeof(bool))
+				return false;
+			if (notNullableType.IsEnum)
+				return true;
+			return notNullableType.IsPrimitive;
+		}
+		public static bool IsReferenceConversion(Type from, Type to)
+		{
+			if (from == to)
+				return true;
+			if (from == typeof(object) || to == typeof(object))
+				return true;
+			if (from.IsInterface || to.IsInterface)
+				return true;
+			if (from.IsValueType || to.IsValueType)
+				return false;
+			if (IsAssignableTo(from, to) || IsAssignableTo(to, from))
+				return true;
+			return false;
+		}
+
+		public static MethodInfo GetUnaryOperator(string name, Type type, Type param, Type ret)
+		{
+			foreach (var method in GetNotNullableType(type)
+				.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.FlattenHierarchy))
+			{
+				if (method.Name != name)
+					continue;
+				if (method.IsGenericMethod)
+					continue;
+				if (ret != null && method.ReturnType != ret && method.ReturnType != GetNotNullableType(ret))
+					continue;
+				var parameters = method.GetParameters();
+				if (parameters.Length == 1
+					&& IsAssignableToParameterType(GetNotNullableType(param), parameters[0]))
+					return method;
+			}
+			return null;
+		}
+		public static MethodInfo GetBinaryOperator(string name, Type type, Expression left, Expression right, Type ret = null)
+		{
+			foreach (var method in type
+				.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.FlattenHierarchy))
+			{
+				if (method.Name != name)
+					continue;
+				if (method.IsGenericMethod)
+					continue;
+				if (ret != null && method.ReturnType != ret && method.ReturnType != GetNotNullableType(ret))
+					continue;
+				ParameterInfo[] parameters = method.GetParameters();
+				if (parameters.Length == 2
+					&& IsAssignableToParameterType(left.Type, parameters[0])
+					&& IsAssignableToParameterType(right.Type, parameters[1]))
+					return method;
+			}
+			return null;
 		}
 
 		internal static readonly MethodInfo ValueToInt
@@ -83,7 +206,7 @@ namespace RedOnion.ROS
 				if (type == typeof(double))
 					return Expression.Call(expr, ValueToDouble);
 				if (type == typeof(float))
-					return Expression.Convert(Expression.Call(expr, ValueToDouble), type);
+					return GetConvertExpression(Expression.Call(expr, ValueToDouble), type);
 				if (type == typeof(uint))
 					return Expression.Call(expr, ValueToUInt);
 				if (type == typeof(long))
@@ -96,11 +219,11 @@ namespace RedOnion.ROS
 					return Expression.Call(expr, ValueToChar);
 				if (type == typeof(byte) || type == typeof(sbyte)
 				|| type == typeof(short) || type == typeof(ushort))
-					return Expression.Convert(Expression.Call(expr, ValueToInt), type);
+					return GetConvertExpression(Expression.Call(expr, ValueToInt), type);
 			}
 			if (type == typeof(object))
 				return Expression.Field(expr, "obj");
-			return Expression.Convert(type.IsAssignableFrom(expr.Type)
+			return GetConvertExpression(type.IsAssignableFrom(expr.Type)
 				? (Expression)Expression.Field(expr, "obj")
 				: Expression.Call(expr, ValueToType, Expression.Constant(type)),
 				type);

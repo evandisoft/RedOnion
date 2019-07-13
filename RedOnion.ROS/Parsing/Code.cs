@@ -282,7 +282,7 @@ namespace RedOnion.ROS.Parsing
 					CopyString(top, start);
 					return op;
 				}
-				if (op != OpCode.LogicAnd && op != OpCode.LogicOr)
+				if (op != OpCode.LogicAnd && op != OpCode.LogicOr && op != OpCode.NullCol)
 				{
 					if (HasOption(Option.Prefix))
 						goto full;

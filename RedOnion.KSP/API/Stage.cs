@@ -26,7 +26,7 @@ Returns true on success, if used as function. False if stage was not ready.",
 			new Interop("parts", "PartSet", "Parts that belong to this stage, upto next decoupler",
 				() => Parts),
 			new Interop("crossParts", "PartSet", "Active engines and all accessible tanks upto next decoupler",
-				() => Parts),
+				() => CrossParts),
 			new Interop("engines", "PartSet", "List of active engines",
 				() => Engines),
 			new Double("solidFuel", "Amount of solid fuel in active engines",
@@ -72,7 +72,7 @@ Returns true on success, if used as function. False if stage was not ready.",
 		public static double SolidFuel
 			=> Engines.Resources.GetAmountOf("SolidFuel");
 		public static double LiquidFuel
-			=> CrossParts.Resources.GetAmountOf("LiquidFuel");
+			=> CrossParts.Resources.GetAmountOf("LiquidFuel");			
 
 		[Description("Propellants used by active engines"), ReadOnlyItems]
 		public static ReadOnlyList<Propellant> Propellants { get; }
@@ -81,11 +81,13 @@ Returns true on success, if used as function. False if stage was not ready.",
 			= new HashSet<string>();
 
 		static protected internal bool Dirty { get; private set; } = true;
-		static protected internal void SetDirty()
+		static protected internal void SetDirty(string reason = null)
 		{
 			if (Dirty) return;
-			RedOnion.ROS.Value.DebugLog("Stage Dirty");
+			Value.DebugLog(reason == null ? "Stage Dirty" : "Stage Dirty: " + reason);
 			GameEvents.onEngineActiveChange.Remove(Instance.EngineChange);
+			GameEvents.onStageActivate.Remove(Instance.StageActivated);
+			GameEvents.onStageSeparation.Remove(Instance.StageSeparation);
 			Dirty = true;
 			Parts.SetDirty();
 			CrossParts.SetDirty();
@@ -99,7 +101,11 @@ Returns true on success, if used as function. False if stage was not ready.",
 
 		}
 		void EngineChange(ModuleEngines engine)
-			=> SetDirty();
+			=> SetDirty("EngineChange");
+		void StageActivated(int stage)
+			=> SetDirty("StageActivated");
+		void StageSeparation(EventReport e)
+			=> SetDirty("StageSeparation");
 
 		static protected void Refresh()
 		{
@@ -145,7 +151,9 @@ Returns true on success, if used as function. False if stage was not ready.",
 			CrossParts.Dirty = false;
 			Engines.Dirty = false;
 			GameEvents.onEngineActiveChange.Add(Instance.EngineChange);
-			RedOnion.ROS.Value.DebugLog("Stage Refreshed (Decouple: {0}, Engines: {1})", nextDecoupler, Engines.Count);
+			GameEvents.onStageActivate.Add(Instance.StageActivated);
+			GameEvents.onStageSeparation.Add(Instance.StageSeparation);
+			Value.DebugLog("Stage Refreshed (Decouple: {0}, Engines: {1})", nextDecoupler, Engines.Count);
 		}
 	}
 }

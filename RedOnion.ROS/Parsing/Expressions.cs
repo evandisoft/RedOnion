@@ -227,6 +227,8 @@ namespace RedOnion.ROS.Parsing
 					Next();
 					unary = false;
 					goto next;
+				case ExCode.NullCol:
+					goto binary_check;
 				case ExCode.Ternary://--------------------------------------------------- ternary ?:
 					while (operators.size > bottom)
 						PrepareOperator(PopOperator());

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -37,6 +38,10 @@ namespace RedOnion.ROS
 			protected virtual void ProcessMember(
 				MemberInfo member, bool instance, ref Dictionary<string, int> dict)
 			{
+				var browsable = member.GetCustomAttributes(typeof(BrowsableAttribute), true);
+				if (browsable.Length == 1 && !((BrowsableAttribute)browsable[0]).Browsable)
+					return;
+
 				if (instance && member is ConstructorInfo c)
 				{
 					ProcessCtor(c);
@@ -82,7 +87,12 @@ namespace RedOnion.ROS
 
 			protected virtual void ProcessNested(Type nested)
 			{
+				var browsable = nested.GetCustomAttributes(typeof(BrowsableAttribute), true);
+				if (browsable.Length == 1 && !((BrowsableAttribute)browsable[0]).Browsable)
+					return;
+
 				Value.DebugLog("Processing nested type {0}.{1}", Type.Name, nested.Name);
+
 				if (sdict == null)
 					sdict = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 				sdict[nested.Name] = prop.size;
@@ -99,7 +109,14 @@ namespace RedOnion.ROS
 			protected virtual void ProcessField(
 				FieldInfo f, bool instance, ref Dictionary<string, int> dict)
 			{
-				Value.DebugLog("Processing field {0}.{1} [instace: {2}]", Type.Name, f.Name, instance);
+				Type convert = null;
+				var convertAttrs = f.GetCustomAttributes(typeof(ConvertAttribute), true);
+				if (convertAttrs.Length == 1)
+					convert = ((ConvertAttribute)convertAttrs[0]).Type;
+
+				Value.DebugLog("Processing field {0}.{1} [instace: {2}, convert: {3}]",
+					Type.Name, f.Name, instance, convert?.Name ?? "False");
+
 				if (dict == null)
 					dict = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 				dict[f.Name] = prop.size;
@@ -109,14 +126,16 @@ namespace RedOnion.ROS
 				var type = f.FieldType;
 				it.read = Expression.Lambda<Func<object, Value>>(
 					// WARNING: Mono may crash if const field is fed into Expression.Field!
-					GetNewValueExpression(type, f.IsLiteral ? (Expression)
+					GetNewValueExpression(convert ?? type,
+					GetConvertExpression(f.IsLiteral ? (Expression)
 						// self => new Value(T.name)
 						Expression.Constant(f.GetValue(null), f.FieldType) :
 						Expression.Field(instance
 							// self => new Value(((T)self).name)
-							? Expression.Convert(SelfParameter, f.DeclaringType)
+							? GetConvertExpression(SelfParameter, f.DeclaringType)
 							// self => new Value(T.name)
-							: null, f)),
+							: null,
+						f),	convert)),
 					SelfParameter
 				).Compile();
 				if (f.IsInitOnly || f.IsLiteral)
@@ -153,7 +172,14 @@ namespace RedOnion.ROS
 			protected virtual void ProcessProperty(
 				PropertyInfo p, bool instance, ref Dictionary<string, int> dict)
 			{
-				Value.DebugLog("Processing property {0}.{1} [instace: {2}]", Type.Name, p.Name, instance);
+				Type convert = null;
+				var convertAttrs = p.GetCustomAttributes(typeof(ConvertAttribute), true);
+				if (convertAttrs.Length == 1)
+					convert = ((ConvertAttribute)convertAttrs[0]).Type;
+
+				Value.DebugLog("Processing property {0}.{1} [instace: {2}, convert: {3}]",
+					Type.Name, p.Name, instance, convert?.Name ?? "False");
+
 				var iargs = p.GetIndexParameters();
 				if (p.IsSpecialName || iargs.Length > 0)
 				{
@@ -169,9 +195,10 @@ namespace RedOnion.ROS
 							var read = p.GetGetMethod(false);
 							if (read != null)
 								intIndexGet = Expression.Lambda<Func<object, int, Value>>(
-									GetNewValueExpression(p.PropertyType, Expression.Call(
-										Expression.Convert(SelfParameter, p.DeclaringType),
-										read, IntIndexParameter)),
+									GetNewValueExpression(convert ?? p.PropertyType,
+									GetConvertExpression(Expression.Call(
+										GetConvertExpression(SelfParameter, p.DeclaringType),
+										read, IntIndexParameter), convert)),
 									SelfParameter, IntIndexParameter
 								).Compile();
 						}
@@ -181,9 +208,11 @@ namespace RedOnion.ROS
 							if (write != null)
 								intIndexSet = Expression.Lambda<Action<object, int, Value>>(
 									Expression.Call(
-										Expression.Convert(SelfParameter, p.DeclaringType),
+										GetConvertExpression(SelfParameter, p.DeclaringType),
 										write, IntIndexParameter,
-										GetValueConvertExpression(p.PropertyType, ValueParameter)
+										GetConvertExpression(GetValueConvertExpression(
+											convert ?? p.PropertyType, ValueParameter),
+											convert == null ? null : p.PropertyType)
 									),
 									SelfParameter, IntIndexParameter, ValueParameter
 								).Compile();
@@ -198,9 +227,10 @@ namespace RedOnion.ROS
 							var read = p.GetGetMethod(false);
 							if (read != null)
 								strIndexGet = Expression.Lambda<Func<object, string, Value>>(
-									GetNewValueExpression(p.PropertyType, Expression.Call(
-										Expression.Convert(SelfParameter, p.DeclaringType),
-										read, StrIndexParameter)),
+									GetNewValueExpression(convert ?? p.PropertyType,
+									GetConvertExpression(Expression.Call(
+										GetConvertExpression(SelfParameter, p.DeclaringType),
+										read, StrIndexParameter), convert)),
 									SelfParameter, StrIndexParameter
 								).Compile();
 						}
@@ -210,9 +240,11 @@ namespace RedOnion.ROS
 							if (write != null)
 								strIndexSet = Expression.Lambda<Action<object, string, Value>>(
 									Expression.Call(
-										Expression.Convert(SelfParameter, p.DeclaringType),
+										GetConvertExpression(SelfParameter, p.DeclaringType),
 										write, StrIndexParameter,
-										GetValueConvertExpression(p.PropertyType, ValueParameter)
+										GetConvertExpression(GetValueConvertExpression(
+											convert ?? p.PropertyType, ValueParameter),
+											convert == null ? null : p.PropertyType)
 									),
 									SelfParameter, StrIndexParameter, ValueParameter
 								).Compile();
@@ -233,10 +265,11 @@ namespace RedOnion.ROS
 				{
 					if (p.GetGetMethod() != null)
 						it.read = Expression.Lambda<Func<object, Value>>(
-							GetNewValueExpression(type,
-								Expression.Property(instance
-									? Expression.Convert(SelfParameter, p.DeclaringType)
-									: null, p)),
+							GetNewValueExpression(convert ?? type,
+							GetConvertExpression(Expression.Property(instance
+								? GetConvertExpression(SelfParameter, p.DeclaringType)
+								: null,
+							p), convert)),
 							SelfParameter
 						).Compile();
 				}
@@ -246,10 +279,12 @@ namespace RedOnion.ROS
 					if (write != null)
 						it.write = Expression.Lambda<Action<object, Value>>(
 							Expression.Call(instance
-								? Expression.Convert(SelfParameter, p.DeclaringType)
+								? GetConvertExpression(SelfParameter, p.DeclaringType)
 								: null,
 								write,
-								GetValueConvertExpression(type, ValueParameter)),
+								GetConvertExpression(GetValueConvertExpression(
+									convert ?? type, ValueParameter),
+									convert == null ? null : p.PropertyType)),
 							SelfParameter, ValueParameter
 						).Compile();
 				}
@@ -393,6 +428,11 @@ namespace RedOnion.ROS
 					}
 					else
 					{
+						Type convert = null;
+						var convertAttrs = m.ReturnTypeCustomAttributes
+							.GetCustomAttributes(typeof(ConvertAttribute), true);
+						if (convertAttrs.Length == 1)
+							convert = ((ConvertAttribute)convertAttrs[0]).Type;
 						switch (argc)
 						{
 						case 0:
@@ -400,42 +440,42 @@ namespace RedOnion.ROS
 							var self = Expression.Parameter(m.DeclaringType, "self");
 							return new Value((Descriptor)Activator.CreateInstance(
 								typeof(Method0<>).MakeGenericType(m.DeclaringType), m.Name),
-								Expression.Lambda(GetNewValueExpression(m.ReturnType,
-								Expression.Call(self, m)),
-								self).Compile());
+								Expression.Lambda(GetNewValueExpression(convert ?? m.ReturnType,
+								GetConvertExpression(Expression.Call(self, m),
+								convert)), self).Compile());
 						}
 						case 1:
 						{
 							var self = Expression.Parameter(m.DeclaringType, "self");
 							return new Value((Descriptor)Activator.CreateInstance(
 								typeof(Method1<>).MakeGenericType(m.DeclaringType), m.Name),
-								Expression.Lambda(GetNewValueExpression(m.ReturnType,
-								Expression.Call(self, m,
-								GetValueConvertExpression(args[0].ParameterType, ValueArg0Parameter))),
-								self, ValueArg0Parameter).Compile());
+								Expression.Lambda(GetNewValueExpression(convert ?? m.ReturnType,
+								GetConvertExpression(Expression.Call(self, m,
+								GetValueConvertExpression(args[0].ParameterType, ValueArg0Parameter)),
+								convert)), self, ValueArg0Parameter).Compile());
 						}
 						case 2:
 						{
 							var self = Expression.Parameter(m.DeclaringType, "self");
 							return new Value((Descriptor)Activator.CreateInstance(
 								typeof(Method2<>).MakeGenericType(m.DeclaringType), m.Name),
-								Expression.Lambda(GetNewValueExpression(m.ReturnType,
-								Expression.Call(self, m,
+								Expression.Lambda(GetNewValueExpression(convert ?? m.ReturnType,
+								GetConvertExpression(Expression.Call(self, m,
 								GetValueConvertExpression(args[0].ParameterType, ValueArg0Parameter),
-								GetValueConvertExpression(args[1].ParameterType, ValueArg1Parameter))),
-								self, ValueArg0Parameter, ValueArg1Parameter).Compile());
+								GetValueConvertExpression(args[1].ParameterType, ValueArg1Parameter)),
+								convert)), self, ValueArg0Parameter, ValueArg1Parameter).Compile());
 						}
 						case 3:
 						{
 							var self = Expression.Parameter(m.DeclaringType, "self");
 							return new Value((Descriptor)Activator.CreateInstance(
 								typeof(Method3<>).MakeGenericType(m.DeclaringType), m.Name),
-								Expression.Lambda(GetNewValueExpression(m.ReturnType,
-								Expression.Call(self, m,
+								Expression.Lambda(GetNewValueExpression(convert ?? m.ReturnType,
+								GetConvertExpression(Expression.Call(self, m,
 								GetValueConvertExpression(args[0].ParameterType, ValueArg0Parameter),
 								GetValueConvertExpression(args[1].ParameterType, ValueArg1Parameter),
-								GetValueConvertExpression(args[2].ParameterType, ValueArg2Parameter))),
-								self, ValueArg0Parameter, ValueArg1Parameter, ValueArg2Parameter).Compile());
+								GetValueConvertExpression(args[2].ParameterType, ValueArg2Parameter)),
+								convert)), self, ValueArg0Parameter, ValueArg1Parameter, ValueArg2Parameter).Compile());
 						}
 						}
 					}

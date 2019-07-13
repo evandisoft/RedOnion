@@ -499,17 +499,20 @@ namespace RedOnion.ROS
 						continue;
 					}
 					//------------------------------------------------------------------ other logic
+					case OpCode.NullCol:
 					case OpCode.LogicOr:
 					case OpCode.LogicAnd:
 					{
 						ref var lhs = ref vals.Top();
 						if (lhs.IsReference && !lhs.desc.Get(ref lhs, lhs.num.Int))
 							throw CouldNotGet(ref lhs);
-						if (lhs.desc.Primitive != ExCode.Bool && !lhs.desc.Convert(ref lhs, Descriptor.Bool))
+						if (op != OpCode.NullCol
+							&& lhs.desc.Primitive != ExCode.Bool
+							&& !lhs.desc.Convert(ref lhs, Descriptor.Bool))
 							throw InvalidOperation("Could not convert '{0}' to boolean", lhs.Name);
 						int sz = Int(code, at);
 						at += 4;
-						if (lhs.num.Bool == (op == OpCode.LogicOr))
+						if (op == OpCode.NullCol ? !lhs.IsNull : lhs.num.Bool == (op == OpCode.LogicOr))
 						{
 							at += sz;
 							continue;

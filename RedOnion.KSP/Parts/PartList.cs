@@ -97,6 +97,12 @@ namespace RedOnion.KSP.Parts
 		protected Dictionary<global::Part, Part> cache = new Dictionary<global::Part, Part>();
 		protected ResourceList resources;
 		public ResourceList Resources => resources ?? (resources = new ResourceList(this));
+		protected internal override void SetDirty()
+		{
+			base.SetDirty();
+			if (resources != null)
+				resources.SetDirty();
+		}
 
 		protected internal PartSet() { }
 		protected internal PartSet(Action refresh) : base(refresh) { }

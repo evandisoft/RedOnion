@@ -255,6 +255,10 @@ Beware that multiplication is scaling, not cross product or dot - use appropriat
 		public static implicit operator Vector3(Vector v) => v.Native;
 		public static implicit operator Vector2d(Vector v) => new Vector2d(v.X, v.Y);
 		public static implicit operator Vector2(Vector v) => new Vector2((float)v.X, (float)v.Y);
+		public static explicit operator Vector(Vector3d v) => new Vector(v);
+		public static explicit operator Vector(Vector3 v) => new Vector(v);
+		public static explicit operator Vector(Vector2d v) => new Vector(v);
+		public static explicit operator Vector(Vector2 v) => new Vector(v);
 
 		public static Vector operator +(Vector a)
 			=> new Vector(a.Native);
