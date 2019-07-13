@@ -84,6 +84,7 @@ namespace RedOnion.ROS
 				globals.Fill();
 			}
 			ctx = new Context();
+			Exit = ExitCode.None;
 		}
 
 		protected EventList updateList = new EventList();

@@ -10,48 +10,58 @@ namespace RedOnion.KSP.Autopilot
 {
 	public class PID
 	{
-		[Description("Proportional factor (direct control)")]
+		[Description("Proportional factor (strength of direct control)")]
 		public double P { get; set; } = 1.0;
-		[Description("Integral factor (error-correction)")]
+		[Description("Integral factor (dynamic error-correction, causes oscillation as side-effect)")]
 		public double I { get; set; } = 0.1;
-		[Description("Derivative factor (dumpening - applied to output)")]
+		[Description("Derivative factor (dumpening - applied to output, reduces the oscillation)")]
 		public double D { get; set; } = 0.05;
 		[Description("Reduction factor for accumulator"
-			+ " (dumpening - applied to accumulator used by integral factor)")]
+			+ " (dumpening - applied to accumulator used by integral factor,"
+			+ " works well against both oscillation and windup)")]
 		public double R { get; set; } = 0.05;
 
-		[Description("Feedback (true state - e.g. current pitch)")]
-		public double Input { get; set; }
-		[Description("Desired state (set point - e.g. desired/wanted pitch)")]
-		public double Target { get; set; }
+		[Description("Feedback (true state - e.g. current pitch;"
+			+ " error/difference if Target is NaN)")]
+		public double Input { get; set; } = double.NaN;
+		[Description("Desired state (set point - e.g. desired/wanted pitch;"
+			+ " NaN for pure error/difference mode, which is the default)."
+			+ " The computed control signal is added to Input if Target is valid,"
+			+ " use error/difference mode if you want to add it to Target.")]
+		public double Target { get; set; } = double.NaN;
 
 		[Description("Last computed output value (control signal,"
-			+ " call Update() after changing Input/Desired)")]
+			+ " call Update() after changing Input/Target)")]
 		public double Output => output;
 		[Description("Highest output allowed")]
 		public double MaxOutput { get; set; } = double.PositiveInfinity;
 		[Description("Lowest output allowed")]
 		public double MinOutput { get; set; } = double.NegativeInfinity;
 
-		[Description("Limit of abs(input-output) per second for both the output"
-			+ " and error calculation (for integral and reduction factors)."
-			+ " Helps preventing overshooting especially after change of Target (anti-windup).")]
-		public double ChangeLimit { get; set; } = double.PositiveInfinity;
+		[Description("Maximal abs(Target - previous Target) per second."
+			+ " NaN or +Inf means no limit (which is default)."
+			+ " This can make the output smoother (more human-like control)"
+			+ " and help prevent oscillation after target change (windup).")]
+		public double TargetChangeLimit { get; set; } = double.PositiveInfinity;
+		[Description("Maximal abs(output-input)"
+			+ " and also abs(target-input) for integral and reduction factors)."
+			+ " Helps preventing overshooting especially after change of Target (windup)."
+			+ " NaN or +Inf means no limit (which is default)")]
+		public double OutputChangeLimit { get; set; } = double.PositiveInfinity;
 		[Description("Limit of abs(accumulator) used by I and R factors."
 			+ " Another anti-windup measure to prevent overshooting.")]
-		public double AccuLimit { get; set; } = double.PositiveInfinity;
+		public double AccumulatorLimit { get; set; } = double.PositiveInfinity;
 
-		protected double stamp = double.NaN;
-		protected double output = double.NaN;
-		protected double accu, prevInput = double.NaN;
-
+		protected double stamp, input, target, output, accu;
+		public PID() => Reset();
 		[Description("Reset internal state of the regulator (won't change PIDR and limits)")]
 		public void Reset()
 		{
 			stamp = double.NaN;
+			input = double.NaN;
+			target = double.NaN;
 			output = double.NaN;
 			accu = 0.0;
-			prevInput = double.NaN;
 		}
 
 		[Description("Update output according to time elapsed (and Input and Target)")]
@@ -97,10 +107,12 @@ namespace RedOnion.KSP.Autopilot
 				output = Input;
 			else
 			{
-
-				double error = Target - Input;
-				if (Math.Abs(error) > ChangeLimit)
-					error = error < 0 ? -ChangeLimit : ChangeLimit;
+				var targetLimit = TargetChangeLimit * dt;
+				target = Math.Abs(Target - target) > targetLimit ? Target < 0
+					? target - targetLimit
+					: target + targetLimit
+					: Target; // this accounts for any of Target, this.target or targetLimit being NaN
+				double error = double.IsNaN(target) ? Input : target - Input;
 				double result = 0;
 				if (!double.IsNaN(error))
 				{
@@ -108,24 +120,24 @@ namespace RedOnion.KSP.Autopilot
 						result = P * error;
 					if (!double.IsNaN(I))
 						accu += I * error * dt;
-					if (!double.IsNaN(prevInput))
+					if (!double.IsNaN(input))
 					{
-						double change = Input - prevInput;
+						double change = Input - input;
 						if (!double.IsNaN(D))
 							result -= D * change / dt;
 						if (!double.IsNaN(R))
 							accu -= R * change * dt;
 					}
 				}
-				if (Math.Abs(accu) > AccuLimit)
-					accu = accu < 0 ? -AccuLimit : AccuLimit;
+				if (Math.Abs(accu) > AccumulatorLimit)
+					accu = accu < 0 ? -AccumulatorLimit : AccumulatorLimit;
 				result += accu;
-				var limit = ChangeLimit * dt;
-				if (Math.Abs(result) > limit)
-					result = result < 0 ? -limit : limit;
-				output = Input + result;
+				var outputLimit = OutputChangeLimit * dt;
+				if (Math.Abs(result) > outputLimit)
+					result = result < 0 ? -outputLimit : outputLimit;
+				output = double.IsNaN(target) ? result : Input + result;
 			}
-			prevInput = Input;
+			input = Input;
 			if (output > MaxOutput)
 				output = MaxOutput;
 			if (output < MinOutput)

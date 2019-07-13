@@ -97,7 +97,7 @@ namespace RedOnion.ROS
 		/// <summary>
 		/// Execute script from source. Returns true if finished
 		/// (<see cref="Exit" /> is set to <see cref="ExitCode.Countdown"/>
-		/// when returning false).
+		/// or <see cref="ExitCode.Yield"/> when returning false).
 		/// </summary>
 		/// <param name="script">Source code of the script</param>
 		/// <param name="path">Path to the script (optional, for error tracking)</param>

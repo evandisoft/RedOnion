@@ -401,4 +401,32 @@ namespace RedOnion.ROS
 	}
 
 	#endregion
+
+	#region Attributes
+
+	//TODO: use this in reflected descriptors to disable modification
+
+	[AttributeUsage(AttributeTargets.Property|AttributeTargets.Field|AttributeTargets.ReturnValue|AttributeTargets.Parameter)]
+	public class ConvertAttribute : Attribute
+	{
+		public Type Type { get; }
+		public ConvertAttribute(Type type) => Type = type;
+	}
+
+	[AttributeUsage(AttributeTargets.Property|AttributeTargets.Field|AttributeTargets.ReturnValue)]
+	public class ReadOnlyContent : Attribute
+	{
+		public bool ContentIsReadOnly { get; }
+		public ReadOnlyContent() => ContentIsReadOnly = true;
+		public ReadOnlyContent(bool contentIsReadOnly) => ContentIsReadOnly = contentIsReadOnly;
+	}
+	[AttributeUsage(AttributeTargets.Property|AttributeTargets.Field|AttributeTargets.ReturnValue)]
+	public class ReadOnlyItems : Attribute
+	{
+		public bool ItemsAreReadOnly { get; }
+		public ReadOnlyItems() => ItemsAreReadOnly = true;
+		public ReadOnlyItems(bool itemsAreReadOnly) => ItemsAreReadOnly = itemsAreReadOnly;
+	}
+
+	#endregion
 }

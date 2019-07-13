@@ -23,6 +23,16 @@ Returns true on success, if used as function. False if stage was not ready.",
 				() => StageManager.CurrentStage),
 			new Bool("ready", "Whether ready for activating next stage or not.",
 				() => StageManager.CanSeparate),
+			new Interop("parts", "PartSet", "Parts that belong to this stage, upto next decoupler",
+				() => Parts),
+			new Interop("crossParts", "PartSet", "Active engines and all accessible tanks upto next decoupler",
+				() => Parts),
+			new Interop("engines", "PartSet", "List of active engines",
+				() => Engines),
+			new Double("solidFuel", "Amount of solid fuel in active engines",
+				() => SolidFuel),
+			new Double("liquidFuel", "Amount of liquid fuel in tanks of current stage",
+				() => LiquidFuel)
 		});
 
 		public static Stage Instance { get; } = new Stage();
@@ -49,71 +59,93 @@ Returns true on success, if used as function. False if stage was not ready.",
 			return true;
 		}
 
-		static protected internal ReadOnlyPartList<PartBase> parts;
-		static protected internal ReadOnlyPartSet<PartBase> crossParts;
+		[Description("Parts that belong to this stage, upto next decoupler")]
+		public static PartSet<PartBase> Parts { get; }
+			= new PartSet<PartBase>(Refresh);
+		[Description("Active engines and all accessible tanks upto next decoupler")]
+		public static PartSet<PartBase> CrossParts { get; }
+			= new PartSet<PartBase>(Refresh);
+		[Description("Active engines")]
+		public static PartSet<Engine> Engines { get; }
+			= new PartSet<Engine>(Refresh);
+
+		public static double SolidFuel
+			=> Engines.Resources.GetAmountOf("SolidFuel");
+		public static double LiquidFuel
+			=> CrossParts.Resources.GetAmountOf("LiquidFuel");
+
+		[Description("Propellants used by active engines"), ReadOnlyItems]
+		public static ReadOnlyList<Propellant> Propellants { get; }
+			= new ReadOnlyList<Propellant>(Refresh);
+		static readonly HashSet<string> propellantNames
+			= new HashSet<string>();
+
 		static protected internal bool Dirty { get; private set; } = true;
 		static protected internal void SetDirty()
 		{
-			if (Dirty)
-				return;
-			GameEvents.onEngineActiveChange.Remove(EngineChange);
+			if (Dirty) return;
+			RedOnion.ROS.Value.DebugLog("Stage Dirty");
+			GameEvents.onEngineActiveChange.Remove(Instance.EngineChange);
 			Dirty = true;
+			Parts.SetDirty();
+			CrossParts.SetDirty();
+			Engines.SetDirty();
+			Propellants.SetDirty();
+			Parts.Clear();
+			CrossParts.Clear();
+			Engines.Clear();
+			Propellants.Clear();
+			propellantNames.Clear();
+
 		}
-		private static void EngineChange(ModuleEngines engine)
+		void EngineChange(ModuleEngines engine)
 			=> SetDirty();
-		[Description("Parts that belong to this stage, upto next decoupler")]
-		public static IList<PartBase> Parts
-		{
-			get
-			{
-				if (Dirty)
-					Refresh();
-				return parts;
-			}
-		}
-		[Description("Active engines and all accessible tanks upto next decoupler")]
-		public static IList<PartBase> CrossParts
-		{
-			get
-			{
-				if (Dirty)
-					Refresh();
-				return crossParts;
-			}
-		}
+
 		static protected void Refresh()
 		{
+			Parts.Clear();
+			CrossParts.Clear();
+			Engines.Clear();
+			Propellants.Clear();
+			propellantNames.Clear();
 			var ship = Ship.Active;
 			if (ship == null)
 			{
-				parts?.Clear();
-				crossParts?.Clear();
 				Dirty = false;
+				Parts.Dirty = false;
+				CrossParts.Dirty = false;
+				Engines.Dirty = false;
 				return;
 			}
-			if (parts == null)
-				parts = new ReadOnlyPartList<PartBase>();
-			if (crossParts == null)
-				crossParts = new ReadOnlyPartSet<PartBase>();
 			var shipParts = ship.Parts;
 			var nextDecoupler = shipParts.NextDecouplerStage;
-			foreach (var p in ship.Parts)
+			foreach (var p in shipParts)
 			{
 				if (p.DecoupledIn >= nextDecoupler)
-					parts.Add(p);
-				if (p.State == PartStates.ACTIVE)
-				{// active engine
-					crossParts.Add(p);
-					foreach (var crossPart in p.Native.crossfeedPartSet.GetParts())
-					{
-						var part = shipParts[crossPart];
-						if (part.DecoupledIn >= nextDecoupler)
-							crossParts.Add(part);
-					}
+					Parts.Add(p);
+			}
+			foreach (var e in ship.Engines)
+			{
+				if (e.State != PartStates.ACTIVE)
+					continue;
+				Engines.Add(e);
+				foreach (var propellant in e.Propellants)
+					if (propellantNames.Add(propellant.name))
+						Propellants.Add(propellant);
+				CrossParts.Add(e);
+				foreach (var crossPart in e.Native.crossfeedPartSet.GetParts())
+				{
+					var part = shipParts[crossPart];
+					if (part.DecoupledIn >= nextDecoupler)
+						CrossParts.Add(part);
 				}
 			}
 			Dirty = false;
-			GameEvents.onEngineActiveChange.Add(EngineChange);
+			Parts.Dirty = false;
+			CrossParts.Dirty = false;
+			Engines.Dirty = false;
+			GameEvents.onEngineActiveChange.Add(Instance.EngineChange);
+			RedOnion.ROS.Value.DebugLog("Stage Refreshed (Decouple: {0}, Engines: {1})", nextDecoupler, Engines.Count);
 		}
 	}
 }

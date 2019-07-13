@@ -10,5 +10,10 @@ namespace RedOnion.KSP.Parts
 	{
 		protected internal LaunchClamp(Ship ship, Part part, PartBase parent, Decoupler decoupler)
 			: base(ship, part, parent, decoupler) { }
+
+		public override bool IsType(string name)
+			=> name.Equals("clamp", StringComparison.OrdinalIgnoreCase)
+			|| name.Equals("launchClamp", StringComparison.OrdinalIgnoreCase)
+			|| base.IsType(name);
 	}
 }

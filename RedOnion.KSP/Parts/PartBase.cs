@@ -18,6 +18,9 @@ namespace RedOnion.KSP.Parts
 		public int DecoupledIn => Decoupler?.Stage ?? -1;
 		public PartStates State => Native.State;
 
+		// TODO: make this generic feature of ROS (typeof operator)
+		public virtual bool IsType(string name) => false;
+
 		protected internal PartBase(Ship ship, Part native, PartBase parent, Decoupler decoupler)
 		{
 			Ship = ship;

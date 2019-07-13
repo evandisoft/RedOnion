@@ -14,7 +14,9 @@ namespace Kerbalua.Other
 		RosProcessor processor;
 		RosSuggest suggest;
 		string source, path;
-		bool skipUpdate;
+		State state;
+		enum State { Idle, NewSource, Yielding, Events }
+
 
 		public RedOnionReplEvaluator()
 		{
@@ -33,28 +35,56 @@ namespace Kerbalua.Other
 
 		public override void FixedUpdate()
 		{
-			if (skipUpdate)
-			{
-				skipUpdate = false;
+			if (state < State.Yielding)
 				return;
+			try
+			{
+				processor.FixedUpdate();
 			}
-			processor.FixedUpdate();
+			catch (Exception e)
+			{
+				PrintErrorAction?.Invoke(e.Message);
+
+				string FormatLine(int lineNumber, string line)
+					=> string.Format(Value.Culture,
+					line == null ? "At line {0}." : "At line {0}: {1}",
+					lineNumber+1, line);
+
+				if (e is RuntimeError runError)
+					PrintErrorAction?.Invoke(FormatLine(runError.LineNumber, runError.Line));
+				else if (e is ParseError parseError)
+					PrintErrorAction?.Invoke(FormatLine(parseError.LineNumber, parseError.Line));
+
+				Debug.Log(e);
+				Terminate();
+			}
 		}
 
 		protected override void ProtectedSetSource(string source, string path)
 		{
 			this.source = source;
 			this.path = path;
+			state = State.NewSource;
 			//TODO: unsubscribe events from last execution if path is the same
 		}
 		public override bool Evaluate(out string result)
 		{
 			try
 			{
-				skipUpdate = true;
-				processor.Execute(source, path, 10000);
-				result = processor.Result.ToString();
-				return true; // for now we always complete immediately
+				var prevState = state;
+				if (state == State.NewSource)
+				{
+					state = processor.Execute(source, path, 10000)
+						? processor.HasEvents ? State.Events : State.Idle : State.Yielding;
+				}
+				if (prevState <= State.Yielding
+					&& (state == State.Events || state == State.Idle))
+				{
+					result = processor.Result.ToString();
+					return true;
+				}
+				result = "";
+				return state != State.Yielding;
 			}
 			catch (Exception e)
 			{
@@ -97,6 +127,7 @@ namespace Kerbalua.Other
 
 		public override void ResetEngine()
 		{
+			state = State.Idle;
 			source = null;
 			path = null;
 			processor.Reset();
@@ -106,6 +137,7 @@ namespace Kerbalua.Other
 
 		public override void Terminate()
 		{
+			state = State.Idle;
 			source = null;
 			path = null;
 			processor.ClearEvents();

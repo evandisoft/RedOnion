@@ -1,4 +1,5 @@
 using RedOnion.KSP.API;
+using RedOnion.ROS;
 using RedOnion.ROS.Objects;
 using System;
 using System.Collections.Generic;
@@ -18,6 +19,9 @@ namespace RedOnion.KSP.Parts
 
 		public bool MultiMode { get { return SecondModule != null; } }
 		public bool HasGimbal { get { return GimbalModule != null; } }
+
+		public override bool IsType(string name)
+			=> name.Equals("engine", StringComparison.OrdinalIgnoreCase);
 
 		protected internal Engine(Ship ship, Part part, PartBase parent, Decoupler decoupler)
 			: base(ship, part, parent, decoupler)
@@ -55,6 +59,7 @@ namespace RedOnion.KSP.Parts
 		public bool Operational => ActiveModule.isOperational;
 		public bool Ignited => ActiveModule.EngineIgnited;
 		public bool Flameout => ActiveModule.flameout;
+		public bool Staged => ActiveModule.staged;
 		public void Activate() => ActiveModule.Activate();
 		public void Shutdown() => ActiveModule.Shutdown();
 
@@ -67,11 +72,16 @@ namespace RedOnion.KSP.Parts
 		public float SeeLevelIsp => ActiveModule.atmosphereCurve.Evaluate(1);
 
 		public float Thrust => ActiveModule.finalThrust;
-
 		public float ThrustPercentage
 		{
 			get => ActiveModule.thrustPercentage;
 			set => ActiveModule.thrustPercentage = RosMath.Clamp(value, 0f, 100f);
 		}
+
+		public double RatioSum => ActiveModule.ratioSum;
+		public double MixtureDensity => ActiveModule.mixtureDensity;
+		public double MixtureDensityRecip => ActiveModule.mixtureDensityRecip;
+		[ReadOnlyContent, ReadOnlyItems]
+		public List<Propellant> Propellants => ActiveModule.propellants;
 	}
 }

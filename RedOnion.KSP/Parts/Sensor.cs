@@ -10,6 +10,9 @@ namespace RedOnion.KSP.Parts
 			: base(ship, part, parent, decoupler)
 			=> this.module = module;
 
+		public override bool IsType(string name)
+			=> name.Equals("sensor", StringComparison.OrdinalIgnoreCase);
+
 		public bool Active => module.sensorActive;
 		public void Toggle() => module.Toggle();
 		public ModuleEnviroSensor.SensorType Type => module.sensorType;

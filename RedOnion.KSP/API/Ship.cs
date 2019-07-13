@@ -30,7 +30,7 @@ namespace RedOnion.KSP.API
 					{
 						active = new Ship(vessel);
 						Stage.SetDirty();
-						GameEvents.onVesselChange.Add(VesselChange);
+						GameEvents.onVesselChange.Add(active.VesselChange);
 					}
 				}
 				return active;
@@ -40,20 +40,22 @@ namespace RedOnion.KSP.API
 		{
 			if (active == null)
 				return;
+			GameEvents.onVesselChange.Remove(active.VesselChange);
 			Stage.SetDirty();
 			if (!disposing)
 				active.Dispose();
 			active = null;
-			GameEvents.onVesselChange.Remove(VesselChange);
-
 		}
-		static void VesselChange(Vessel vessel)
+		// this would be static if EventData<T>.EvtDelegate
+		// would not try to access evt.Target.GetType().Name
+		// (evt.Target is null for static functions)
+		void VesselChange(Vessel vessel)
 			=> ClearActive();
 
 		protected Ship(Vessel vessel)
 		{
 			Native = vessel;
-			Parts = new ShipPartList(this);
+			Parts = new ShipPartSet(this);
 			GameEvents.onGameSceneLoadRequested.Add(SceneChange);
 		}
 
@@ -86,8 +88,13 @@ namespace RedOnion.KSP.API
 		}
 
 		public Vessel Native { get; private set; }
-		public ShipPartList Parts { get; private set; }
+		public ShipPartSet Parts { get; private set; }
 		public PartBase Root => Parts.Root;
+		public Decoupler NextDecoupler => Parts.NextDecoupler;
+		public int NextDecouplerStage => Parts.NextDecouplerStage;
+		public ReadOnlyList<Decoupler> Decouplers => Parts.Decouplers;
+		public ReadOnlyList<DockingPort> DockingPorts => Parts.DockingPorts;
+		public ReadOnlyList<Engine> Engines => Parts.Engines;
 
 		public Guid ID => Native.id;
 		public uint PersistentID => Native.persistentId;
@@ -100,6 +107,30 @@ namespace RedOnion.KSP.API
 		public double Latitude => Native.latitude;
 		public double Altitude => Native.altitude;
 		public double RadarAltitude => Native.radarAltitude;
+
+		public Orbit Orbit => Native.orbit;
+		public CelestialBody Body => Native.orbit.referenceBody;
+		public double Eccentricity => Native.orbit.eccentricity;
+		public double SemiMajorAxis => Native.orbit.semiMajorAxis;
+		public double SemiMinorAxis => Native.orbit.semiMinorAxis;
+		public double ApoApsis => Native.orbit.ApA;
+		public double PeriApsis => Native.orbit.PeA;
+		public double ApoCenter => Native.orbit.ApR;
+		public double PeriCenter => Native.orbit.PeR;
+		public double TimeToAp => Native.orbit.timeToAp;
+		public double TimeToPe => Native.orbit.timeToPe;
+		public double Period => Native.orbit.period;
+		public double TrueAnomaly => Native.orbit.trueAnomaly;
+		public double MeanAnomaly => Native.orbit.meanAnomaly;
+
+		[Convert(typeof(Vector))]
+		public Vector3d Position => Native.orbit.pos;
+		[Convert(typeof(Vector))]
+		public Vector3d Velocity => Native.orbit.vel;
+		[return: Convert(typeof(Vector))]
+		public Vector3d PositionAt(double time) => Native.orbit.getPositionAtUT(time);
+		[return: Convert(typeof(Vector))]
+		public Vector3d VelocityAt(double time) => Native.orbit.getOrbitalVelocityAtUT(time);
 	}
 
 	/*

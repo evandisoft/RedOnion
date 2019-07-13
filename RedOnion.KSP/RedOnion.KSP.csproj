@@ -83,6 +83,7 @@
     <Compile Include="API\Vector.Methods.cs" />
     <Compile Include="API\VectorCreator.cs" />
     <Compile Include="Autopilot\PID.cs" />
+    <Compile Include="Parts\Resource.cs" />
     <Compile Include="Parts\Sensor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReflectionUtil\GetMappings.ROS.cs" />
