@@ -38,8 +38,16 @@ namespace RedOnion.ROS
 			internal static Value CreateValue(MethodInfo m)
 				=> new Value(new Function0(m), CreateDelegate(m));
 			internal static Delegate CreateDelegate(MethodInfo m)
-				=> Expression.Lambda<Func<Value>>(GetNewValueExpression(
-					m.ReturnType, Expression.Call(m))).Compile();
+			{
+				Type convert = null;
+				var convertAttrs = m.ReturnTypeCustomAttributes
+					.GetCustomAttributes(typeof(ConvertAttribute), true);
+				if (convertAttrs.Length == 1)
+					convert = ((ConvertAttribute)convertAttrs[0]).Type;
+				return Expression.Lambda<Func<Value>>(GetNewValueExpression(
+					convert ?? m.ReturnType, GetConvertExpression(
+						Expression.Call(m), convert))).Compile();
+			}
 
 			public Function0(MethodInfo m)
 				: this(m.Name, m) { }

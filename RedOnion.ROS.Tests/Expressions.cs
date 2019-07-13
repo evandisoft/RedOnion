@@ -160,6 +160,7 @@ namespace RedOnion.ROS.Tests
 			Test(false,		"true && false");
 			Test(false,		"false && true");
 			Test(true,		"true && true");
+			Test(true,      "null ?? true");
 
 			Test("var s = \"hello\"");
 			Test(false, "s.length <= 3 || s[3] == '.'");
