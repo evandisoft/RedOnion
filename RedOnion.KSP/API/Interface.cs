@@ -646,7 +646,7 @@ namespace RedOnion.KSP.API
 	/// <summary>
 	/// Static property getting/setting interop object (usable by both ROS and LUA).
 	/// </summary>
-	public class Interop : IMember
+	public class Interop : IMember, IHasCompletionProxy
 	{
 		public string Name { get; }
 		public string Type { get; }
@@ -656,6 +656,8 @@ namespace RedOnion.KSP.API
 
 		public Func<object> Get { get; }
 		public Action<object> Set { get; }
+
+		public object CompletionProxy => Get();
 
 		public Value RosGet(object self)
 			=> new Value(Get());

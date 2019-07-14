@@ -56,6 +56,7 @@ Returns true on success, if used as function. False if stage was not ready.",
 			if (!StageManager.CanSeparate)
 				return false;
 			StageManager.ActivateNextStage();
+			
 			return true;
 		}
 
