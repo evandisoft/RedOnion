@@ -337,9 +337,9 @@ namespace RedOnion.ROS
 		ModAssign		= 0x013A, // %=
 
 	//	binary
-		BitOr			= 0x0A41, // |		!! changed priority !! 4 in C#
-		BitXor			= 0x0B42, // ^		!! changed priority !! 5 in C#
-		BitAnd			= 0x0C43, // &		!! changed priority !! 6 in C#
+		BitOr			= 0x0A41, // |		!! changed priority !! 5 in C#
+		BitXor			= 0x0B42, // ^		!! changed priority !! 6 in C#
+		BitAnd			= 0x0C43, // &		!! changed priority !! 7 in C#
 		ShiftLeft		= 0x0D44, // <<
 		ShiftRight		= 0x0D45, // >>
 		Add				= 0x0E46, // +
