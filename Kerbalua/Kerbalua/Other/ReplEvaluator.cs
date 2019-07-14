@@ -112,6 +112,20 @@ namespace Kerbalua.Other {
 		public abstract IList<string> GetCompletions(string source, int cursorPos,out int replaceStart,out int replaceEnd);
 
 		/// <summary>
+		/// Gets the displayable completions. These will be the completions that the
+		/// user is to see when deciding what option to select. For example
+		/// the actual completion might be to turn 'anobject.completion' 
+		/// into 'anobject["completion"]'. But the user would see just 'completion'
+		/// in the list.
+		/// </summary>
+		/// <returns>The displayable completions.</returns>
+		/// <param name="source">Source.</param>
+		/// <param name="cursorPos">Cursor position.</param>
+		/// <param name="replaceStart">Replace start.</param>
+		/// <param name="replaceEnd">Replace end.</param>
+		public abstract IList<string> GetDisplayableCompletions(string source, int cursorPos, out int replaceStart, out int replaceEnd);
+
+		/// <summary>
 		/// Resets the engine.
 		/// </summary>
 		public virtual void ResetEngine()

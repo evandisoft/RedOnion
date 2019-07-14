@@ -1,4 +1,4 @@
-var targetAltitude = 80000
+var targetAltitude = 800000000
 var karmanAltitude = 75000
 var ascentHeading = 90
 
@@ -31,7 +31,7 @@ until ship.apoapsis > targetAltitude
   var ratio = ship.apoapsis / karmanAltitude
   if ratio > 1 then ratio = 1
   if ratio < 0 then ratio = 0
-  ctrl.setRel ascentHeading, math.deg.acos ratio
+  ctrl.setRel ascentHeading, 90
   wait
 
 print "Apoapsis reached"

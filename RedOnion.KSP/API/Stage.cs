@@ -38,6 +38,7 @@ namespace RedOnion.KSP.API
 			if (!StageManager.CanSeparate)
 				return false;
 			StageManager.ActivateNextStage();
+			
 			return true;
 		}
 

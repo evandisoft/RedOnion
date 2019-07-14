@@ -1,0 +1,33 @@
+var targetAltitude = 80000000000
+var karmanAltitude = 75000
+var ascentHeading = 90
+
+var vessel=native.FlightGlobals.ActiveVessel
+var vdv=vessel.VesselDeltaV
+var s=vdv.GetStage(vessel.currentStage)
+
+
+
+def checkStaging
+    var s=vdv.GetStage(vessel.currentStage)
+    if s==null
+        stage
+        return
+    
+    if s.fuelMass<0.1
+        print "Fuel Mass is "+s.fuelMass
+        stage
+        return
+    return
+
+print "Target apoapsis: " + targetAltitude
+var ctrl = ksp.flightControl
+until ship.apoapsis > targetAltitude
+  checkStaging()
+  var ratio = ship.apoapsis / karmanAltitude
+  if ratio > 1 then ratio = 1
+  if ratio < 0 then ratio = 0
+  ctrl.setRel ascentHeading, 90
+  wait
+
+print "Apoapsis reached"
