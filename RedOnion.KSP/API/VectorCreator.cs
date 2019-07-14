@@ -2,52 +2,63 @@ using MoonSharp.Interpreter;
 using RedOnion.ROS;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using UnityEngine;
-
-//NOTE: Never move Instance above MemberList ;)
 
 namespace RedOnion.KSP.API
 {
-	public partial class VectorCreator : InteropObject
+	[Description("Function to create 3D vector / coordinate, also aliased as simple `V`."
+		+ " Receives either three arguments (x,y,z), two (x,y - z=0), or one (x=y=z)."
+		+ " Can also convert array / list of numbers (`V([1,2,3])` becomes `V(1,2,3)`).")]
+	public class VectorCreator : ICallable, IType
 	{
-		public static MemberList MemberList { get; } = new MemberList(
-
-@"Function to create 3D vector / coordinate, also aliased as simple `V`.
-Receives either three arguments (x,y,z), two (x,y - z=0), or one (x=y=z).
-Can also convert array / list of numbers (`V([1,2,3])` becomes `V(1,2,3)`).",
-
-		new IMember[]
-		{
-			new Interop("zero", "Vector", "Vector(0, 0, 0).", () => Zero),
-			new Interop("one",  "Vector", "Vector(1, 1, 1).", () => One),
-			new Interop("forward","Vector","Vector(0, 0, 1).", () => Forward),
-			new Interop("fwd",  "Vector", "Alias to forward - Vector(0, 0, 1).", () => Forward),
-			new Interop("back", "Vector", "Vector(0, 0, -1).", () => Back),
-			new Interop("up",   "Vector", "Vector(0, 1, 0).", () => Up),
-			new Interop("down", "Vector", "Vector(0, -1, 0).", () => Down),
-			new Interop("left", "Vector", "Vector(-1, 0, 0).", () => Left),
-			new Interop("right","Vector", "Vector(1, 0, 0).", () => Right),
-
-			new Function("cross", "Vector", "Cross product.", () => CrossFunction.Instance),
-			new Function("crs", "Vector", "Cross product. (Alias to cross.)", () => CrossFunction.Instance),
-			new Function("dot", "Vector", "Dot product.", () => DotFunction.Instance),
-			new Function("abs", "Vector", "Vector with coordinates changed to non-negative.", () => AbsFunction.Instance),
-			new Function("angle", "Vector", "Angle between vectors (0..180).", () => AngleFunction.Instance),
-		});
-
+		[Browsable(false), MoonSharpHidden]
 		public static VectorCreator Instance { get; } = new VectorCreator();
-		public VectorCreator() : base(MemberList) { }
+		protected VectorCreator() { }
 
-		public static Vector Zero = new Vector(Vector3d.zero, true);
-		public static Vector One = new Vector(Vector3d.one, true);
-		public static Vector Forward = new Vector(Vector3d.forward, true);
-		public static Vector Back = new Vector(Vector3d.back, true);
-		public static Vector Up = new Vector(Vector3d.up, true);
-		public static Vector Down = new Vector(Vector3d.down, true);
-		public static Vector Left = new Vector(Vector3d.left, true);
-		public static Vector Right = new Vector(Vector3d.right, true);
+		Type IType.Type => typeof(Vector);
+		bool IType.IsType(object type)
+			=> type is string str ? str.Equals("vector", StringComparison.OrdinalIgnoreCase)
+			: type is Type t ? t.IsAssignableFrom(typeof(Vector)) : false;
 
-		public override bool Call(ref Value result, object self, Arguments args, bool create)
+		[Description("Vector(0, 0, 0).")]
+		public static readonly ConstVector Zero = new ConstVector(Vector3d.zero);
+		[Description("Vector(1, 1, 1).")]
+		public static readonly ConstVector One = new ConstVector(Vector3d.one);
+		[Description("Vector(0, 0, 1).")]
+		public static readonly ConstVector Forward = new ConstVector(Vector3d.forward);
+		[Description("Alias to forward - Vector(0, 0, 1).")]
+		public static readonly ConstVector Fwd = Forward;
+		[Description("Vector(0, 0, -1).")]
+		public static readonly ConstVector Back = new ConstVector(Vector3d.back);
+		[Description("Vector(0, 1, 0).")]
+		public static readonly ConstVector Up = new ConstVector(Vector3d.up);
+		[Description("Vector(0, -1, 0).")]
+		public static readonly ConstVector Down = new ConstVector(Vector3d.down);
+		[Description("Vector(-1, 0, 0).")]
+		public static readonly ConstVector Left = new ConstVector(Vector3d.left);
+		[Description("Vector(1, 0, 0).")]
+		public static readonly ConstVector Right = new ConstVector(Vector3d.right);
+
+		[Description("Cross product.")]
+		public static Vector Cross(ConstVector a, ConstVector b)
+			=> new Vector(Vector3d.Cross(a.Native, b.Native));
+		[Description("Cross product. (Alias to cross)")]
+		public static Vector Crs(ConstVector a, ConstVector b)
+			=> new Vector(Vector3d.Cross(a.Native, b.Native));
+		[Description("Dot product.")]
+		public static Vector Dot(ConstVector a, ConstVector b)
+			=> new Vector(Vector3d.Dot(a.Native, b.Native));
+		[Description("Vector with coordinates changed to non-negative.")]
+		public static Vector Abs(ConstVector v)
+			=> new Vector(Math.Abs(v.X), Math.Abs(v.Y), Math.Abs(v.Z));
+		[Description("Angle between vectors(0..180).")]
+		public static double Angle(ConstVector a, ConstVector b)
+			=> Vector3d.Angle(a.Native, b.Native);
+
+		bool ICallable.Call(ref Value result, object self, Arguments args, bool create)
+			=> Call(ref result, self, args, create);
+		static bool Call(ref Value result, object self, Arguments args, bool create)
 		{
 			switch (args.Length)
 			{
@@ -70,17 +81,31 @@ Can also convert array / list of numbers (`V([1,2,3])` becomes `V(1,2,3)`).",
 				return true;
 			}
 		}
+		[MoonSharpUserDataMetamethod("__call"), Browsable(false)]
+		static DynValue Call(ScriptExecutionContext ctx, CallbackArguments args)
+		{
+			var result = Value.Void;
+			var self = args.ToRos(out var ros);
+			return Call(ref result, self, ros, false) ? result.ToLua() : DynValue.Void;
+		}
+
 		public static Vector ToVector(object value)
 			=> ToVector3d(value, out var v) ? new Vector(v) : null;
 		public static Vector ToVector(Value value)
 			=> ToVector3d(value, out var v) ? new Vector(v) : null;
+		[Browsable(false), MoonSharpHidden]
+		public static ConstVector ToConstVector(object value)
+			=> ToVector3d(value, out var v) ? new ConstVector(v) : null;
+		[Browsable(false), MoonSharpHidden]
+		public static ConstVector ToConstVector(Value value)
+			=> ToVector3d(value, out var v) ? new ConstVector(v) : null;
 		public static bool ToVector3d(object value, out Vector3d result)
 		{
 			if (value != null)
 			{
-				if (value is Vector v)
+				if (value is ConstVector v)
 				{
-					result = v.native;
+					result = v.Native;
 					return true;
 				}
 				if (value is Value val)

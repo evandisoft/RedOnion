@@ -1,10 +1,8 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace RedOnion.ROS.Objects
 {
+	[System.ComponentModel.DisplayName("Math")]
 	public static class RosMath
 	{
 		public const double PI = Math.PI;

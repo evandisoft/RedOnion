@@ -73,7 +73,7 @@ namespace Kerbalua.MoonSharp
 						PrintErrorAction?.Invoke("UnityAction callback unable to finish");
 					}
 				}));
-			Globals.MetaTable = API.Globals.Instance;
+			Globals.MetaTable = API.LuaGlobals.Instance;
 			//Globals["Vessel"] = FlightGlobals.ActiveVessel;
 			var defaultMappings = NamespaceMappings.DefaultAssemblies;
 			//Globals["KSP"] = new KspApi();

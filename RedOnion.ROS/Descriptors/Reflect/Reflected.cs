@@ -12,6 +12,8 @@ namespace RedOnion.ROS
 	{
 		public partial class Reflected : Descriptor
 		{
+			public static bool LowerFirstLetter = true;
+
 			[DebuggerDisplay("{name}")]
 			protected struct Prop
 			{
@@ -99,6 +101,8 @@ namespace RedOnion.ROS
 			public override bool Call(ref Value result, object self, Arguments args, bool create)
 			{
 				Value.DebugLog("{0}/{1}.{2} {3}", Name, Type.FullName, create ? "Create" : "Call", result);
+				if (self is ICallable call)
+					return call.Call(ref result, self, args, create);
 				if (!create && result.obj != null)
 					return false;
 				if (args.Count == 0)
@@ -120,6 +124,17 @@ namespace RedOnion.ROS
 				}
 				return false;
 			}
+
+			//TODO: reflect operators
+			public override bool Unary(ref Value self, OpCode op)
+				=> self.obj is IOperators ops ? ops.Unary(ref self, op) : false;
+			public override bool Binary(ref Value lhs, OpCode op, ref Value rhs)
+				=> lhs.obj is IOperators ops ? ops.Binary(ref lhs, op, ref rhs)
+				: rhs.obj is IOperators ops2 ? ops2.Binary(ref lhs, op, ref rhs)
+				: false;
+			public override bool Convert(ref Value self, Descriptor to)
+				=> self.obj is IConvert cvt && cvt.Convert(ref self, to)
+				|| base.Convert(ref self, to);
 
 			public override int Find(object self, string name, bool add)
 			{

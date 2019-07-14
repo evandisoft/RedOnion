@@ -26,7 +26,7 @@ namespace RedOnion.ROS
 			public static MemberInfo[] GetMembers(Type type, string name = null, bool instance = true)
 			{
 				var flags = BindingFlags.IgnoreCase|BindingFlags.Public
-				| (instance ? BindingFlags.Instance : BindingFlags.Static);
+				| (instance ? BindingFlags.Instance : BindingFlags.Static|BindingFlags.FlattenHierarchy);
 				var members = name == null
 				? type.GetMembers(flags)
 				: type.GetMember(name, flags);
@@ -35,12 +35,39 @@ namespace RedOnion.ROS
 				return members;
 			}
 
+			public static string GetName(ICustomAttributeProvider provider)
+			{
+				string name = provider is MemberInfo member ? member.Name
+					: provider is Type type ? type.Name : null;
+				var displayName = provider.GetCustomAttributes(typeof(DisplayNameAttribute), true);
+				if (displayName.Length == 1)
+				{
+					var display = ((DisplayNameAttribute)displayName[0]).DisplayName;
+					if (display?.Length > 0	&& (char.IsLetter(display, 0) || display[0] == '_'))
+					{
+						foreach (char c in display)
+							if (c != '_' && !char.IsLetterOrDigit(c))
+								goto mangle;
+						return display;
+					}
+				}
+			mangle:
+				if (LowerFirstLetter
+					&& name?.Length > 0
+					&& char.IsUpper(name, 0)
+					&& (name.Length == 1
+					|| char.IsLower(name, 1)))
+					name = char.ToLowerInvariant(name[0]) + name.Substring(1);
+				return name;
+			}
+
 			protected virtual void ProcessMember(
 				MemberInfo member, bool instance, ref Dictionary<string, int> dict)
 			{
 				var browsable = member.GetCustomAttributes(typeof(BrowsableAttribute), true);
 				if (browsable.Length == 1 && !((BrowsableAttribute)browsable[0]).Browsable)
 					return;
+				string name = GetName(member);
 
 				if (instance && member is ConstructorInfo c)
 				{

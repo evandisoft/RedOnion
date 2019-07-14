@@ -402,10 +402,51 @@ namespace RedOnion.ROS
 
 	#endregion
 
-	#region Attributes
+	#region Attributes and interfaces for reflection
 
-	//TODO: use this in reflected descriptors to disable modification
+	public interface ICallable
+	{
+		bool Call(ref Value result, object self, Arguments args, bool create);
+	}
+	public interface IOperators
+	{
+		bool Unary(ref Value self, OpCode op);
+		bool Binary(ref Value lhs, OpCode op, ref Value rhs);
+	}
+	public interface IConvert
+	{
+		bool Convert(ref Value self, Descriptor to);
+	}
+	public interface IType
+	{
+		Type Type { get; }
+		bool IsType(object type);
+	}
 
+	/// <summary>
+	/// Alternative name for a member (if name not null),
+	/// or readonly string field with path to implementation.
+	/// </summary>
+	public class AliasAttribute : Attribute
+	{
+		public string Name { get; }
+		public AliasAttribute() { }
+		public AliasAttribute(string name) => Name = name;
+	}
+
+	/// <summary>
+	/// Link from instance to creator (ROS object to function).
+	/// </summary>
+	public class CreatorAttribute : Attribute
+	{
+		public Type Creator { get; }
+		public CreatorAttribute(Type creator)
+			=> Creator = creator;
+	}
+
+	/// <summary>
+	/// Convert values to specified type (when presenting to script)
+	/// </summary>
 	[AttributeUsage(AttributeTargets.Property|AttributeTargets.Field|AttributeTargets.ReturnValue|AttributeTargets.Parameter)]
 	public class ConvertAttribute : Attribute
 	{
@@ -413,6 +454,11 @@ namespace RedOnion.ROS
 		public ConvertAttribute(Type type) => Type = type;
 	}
 
+	//TODO: use this in reflected descriptors to disable modification
+
+	/// <summary>
+	/// Make the value read-only for the script (disable writes and most methods)
+	/// </summary>
 	[AttributeUsage(AttributeTargets.Property|AttributeTargets.Field|AttributeTargets.ReturnValue)]
 	public class ReadOnlyContent : Attribute
 	{
@@ -420,6 +466,9 @@ namespace RedOnion.ROS
 		public ReadOnlyContent() => ContentIsReadOnly = true;
 		public ReadOnlyContent(bool contentIsReadOnly) => ContentIsReadOnly = contentIsReadOnly;
 	}
+	/// <summary>
+	/// Make items of collection read-only for the script (disable writes and most methods)
+	/// </summary>
 	[AttributeUsage(AttributeTargets.Property|AttributeTargets.Field|AttributeTargets.ReturnValue)]
 	public class ReadOnlyItems : Attribute
 	{

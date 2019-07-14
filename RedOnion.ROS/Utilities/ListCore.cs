@@ -234,6 +234,11 @@ namespace RedOnion.ROS.Utilities
 		public ref T Top(int fromEnd)
 			=> ref items[size+fromEnd];
 
+		public void Sort(IComparer<T> cmp)
+		{
+			if (size > 1)
+				Array.Sort(items, 0, size, cmp);
+		}
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		bool ICollection<T>.IsReadOnly => false;
 
