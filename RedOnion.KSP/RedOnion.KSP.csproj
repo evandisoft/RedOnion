@@ -61,11 +61,8 @@
     <Reference Include="mscorlib" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="API\FunctionBase.cs" />
+    <Compile Include="API\ConstVector.cs" />
     <Compile Include="API\Globals.cs" />
-    <Compile Include="API\Interface.cs" />
-    <Compile Include="API\InteropDescriptor.cs" />
-    <Compile Include="API\InteropObject.cs" />
     <Compile Include="API\InteropUtilities.cs" />
     <Compile Include="Namespaces\KSP.cs" />
     <Compile Include="Namespaces\UI.cs" />
@@ -80,8 +77,6 @@
     <Compile Include="Parts\PartList.cs" />
     <Compile Include="API\Stage.cs" />
     <Compile Include="API\Vector.cs" />
-    <Compile Include="API\Vector.Functions.cs" />
-    <Compile Include="API\Vector.Methods.cs" />
     <Compile Include="API\VectorCreator.cs" />
     <Compile Include="Autopilot\PID.cs" />
     <Compile Include="Parts\Resource.cs" />
@@ -93,7 +88,6 @@
     <Compile Include="ROS\RosProps.cs" />
     <Compile Include="ROS\RosSuggest.cs" />
     <Compile Include="Namespaces\UI.Window.cs" />
-    <Compile Include="ROS\RosGlobals.cs" />
     <Compile Include="Autopilot\FlightControl.cs" />
     <Compile Include="MathUtil\Vec.cs" />
     <Compile Include="MathUtil\Scalar.cs" />

@@ -4,71 +4,133 @@ using RedOnion.ROS;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
 using RedOnion.KSP.Completion;
+using System.ComponentModel;
+using System.Reflection;
+using RedOnion.KSP.Autopilot;
+using RedOnion.KSP.Namespaces;
 
 namespace RedOnion.KSP.API
 {
-	// this is here to mitigate problems with MoonSharp when RedOnion.Builder was touching Globals
-	[ProxyDocs(typeof(Globals))]
-	public static class GlobalMembers
+	[Description("Global variables, objects and functions.")]
+	public static class Globals
 	{
-		public static MemberList MemberList { get; } = new MemberList(
-		"Global variables, objects and functions.",
+		[Description("All the reflection stuff and namespaces.")]
+		public static Reflect Reflect => Reflect.Instance;
+		[Description("Alias to `reflect` because of the namespaces.")]
+		public static Reflect Native => Reflect.Instance;
 
-		new IMember[]
-		{
-			new Interop("reflect", "Reflect", "All the reflection stuff and namespaces.",
-				() => Reflect.Instance),
-			new Interop("native", "Reflect", "Alias to `reflect` because of the namespaces.",
-				() => Reflect.Instance),
-			new Interop("ship", "Ship", "Active vessel (in flight only, null otherwise).",
-				() => Ship.Active),
-			new Interop("stage", "Stage", "Staging logic.",
-				() => Stage.Instance),
-			new Interop("Vector", "VectorCreator", "Function for creating 3D vector / coordinate.",
-				() => VectorCreator.Instance),
-			new Interop("V", "VectorCreator", "Alias to Vector Function for creating 3D vector / coordinate.",
-				() => VectorCreator.Instance),
-			new Function("vdot", "Vector", "Alias to `Vector.dot` (or `v.dot`).",
-				() => VectorCreator.DotFunction.Instance),
-			new Function("vcrs", "Vector", "Alias to `Vector.cross` (or `v.cross`).",
-				() => VectorCreator.CrossFunction.Instance),
-			new Function("vcross", "Vector", "Alias to `Vector.cross` (or `v.cross`).",
-				() => VectorCreator.CrossFunction.Instance),
-			new Function("vangle", "double", "alias to `Vector.angle` (or `v.angle`).",
-				() => VectorCreator.AngleFunction.Instance),
-			new Function("vang", "double", "alias to `Vector.angle` (or `v.angle`).",
-				() => VectorCreator.AngleFunction.Instance),
-		});
+		[Description("Active vessel (in flight only, null otherwise).")]
+		public static Ship Ship => Ship.Active;
+		[Description("Staging logic.")]
+		public static Stage Stage => Stage.Instance;
+
+		[Description("Function for creating 3D vector / coordinate.")]
+		public static VectorCreator Vector => VectorCreator.Instance;
+		[Description("Alias to Vector Function for creating 3D vector / coordinate.")]
+		public static VectorCreator V => VectorCreator.Instance;
+
+		[Alias, Description("Alias to `Vector.dot` (or `v.dot`).")]
+		public static readonly string vdot = "Vector.dot";
+		[Alias, Description("Alias to `Vector.cross` (or `v.cross`).")]
+		public static readonly string vcrs = "Vector.cross";
+		[Alias, Description("Alias to `Vector.cross` (or `v.cross`).")]
+		public static readonly string vcross = "Vector.cross";
+		[Alias, Description("Alias to `Vector.angle` (or `v.angle`).")]
+		public static readonly string vangle = "Vector.angle";
+		[Alias, Description("Alias to `Vector.angle` (or `v.angle`).")]
+		public static readonly string vang = "Vector.angle";
 	}
-	[IgnoreForDocs]
-	public class Globals : Table, IType, IHasCompletionProxy
-	{
-		public MemberList Members => GlobalMembers.MemberList;
-		public static Globals Instance { get; } = new Globals();
 
-		public Globals() : base(null)
+	public class RosGlobals : RedOnion.ROS.Objects.Globals
+	{
+		public override void Fill()
+		{
+			base.Fill();
+			System.Add(typeof(UnityEngine.Debug));
+			System.Add(typeof(UnityEngine.Color));
+			System.Add(typeof(UnityEngine.Rect));
+			System.Add(typeof(PID));
+			System.Add("PIDloop", typeof(PID));
+
+			System.Add("UI", typeof(UI_Namespace));
+			Add(typeof(Window));
+			Add(typeof(UI.Anchors));
+			Add(typeof(UI.Padding));
+			Add(typeof(UI.Layout));
+			Add(typeof(UI.Panel));
+			Add(typeof(UI.Label));
+			Add(typeof(UI.Button));
+			Add(typeof(UI.TextBox));
+
+			Add("KSP", typeof(KSP_Namespace));
+			Add("Unity", typeof(Unity_Namespace));
+
+			foreach (var prop in typeof(Globals).GetProperties(BindingFlags.Public|BindingFlags.Static))
+				Add(prop.Name, prop.GetValue(null, null));
+			foreach (var alias in typeof(Globals).GetFields(BindingFlags.Public|BindingFlags.Static))
+			{
+				if (alias.FieldType != typeof(string))
+					continue;
+				var fullPath = (string)alias.GetValue(null);
+				var path = fullPath.Split('.');
+				int at = Find(path[0]);
+				if (at < 0)
+				{
+					Value.DebugLog("Globals: Could not find `{0}`", path[0]);
+					continue;
+				}
+				var item = Value.Void;
+				if (!Get(ref item, at))
+				{
+					Value.DebugLog("Globals: Could not get `{0}`", path[0]);
+					continue;
+				}
+				for (int i = 1; i < path.Length; i++)
+				{
+					at = item.desc.Find(item.obj, path[i]);
+					if (at < 0)
+					{
+						Value.DebugLog("Globals: Could not find `{0}` in {1}", path[i], fullPath);
+						goto skip;
+					}
+					if (!Get(ref item, at))
+					{
+						Value.DebugLog("Globals: Could not get `{0}`", path[i], fullPath);
+						goto skip;
+					}
+				}
+				Add(alias.Name, item);
+			skip:;
+			}
+		}
+	}
+
+	public class LuaGlobals : Table
+	{
+		public static LuaGlobals Instance { get; } = new LuaGlobals();
+		public LuaGlobals() : base(null)
 		{
 			this["__index"] = new Func<Table, DynValue, DynValue>(Get);
-			this["__newindex"] = new Func<Table, DynValue, DynValue, DynValue>(Set);
 		}
-
-		public virtual DynValue Get(Table table, DynValue index)
+		DynValue Get(Table table, DynValue index)
 		{
-			if (Members.TryGetValue(index.String, out var member) && member.CanRead)
-				return member.LuaGet(this);
-			return null;
-		}
-		public virtual DynValue Set(Table table, DynValue index, DynValue value)
-		{
-			if (Members.TryGetValue(index.String, out var member) && member.CanWrite)
+			var name = index.String;
+			var prop = typeof(Globals).GetProperty(name, BindingFlags.Static|BindingFlags.Public);
+			if (prop != null)
+				return DynValue.FromObject(table.OwnerScript, prop.GetValue(null, null));
+			var alias = typeof(Globals).GetField(name, BindingFlags.Static|BindingFlags.Public);
+			if (alias == null || alias.FieldType != typeof(string))
+				return null;
+			var path = ((string)alias.GetValue(null)).Split('.');
+			var item = table.RawGet(path[0]);
+			for (int i = 1; i < path.Length; i++)
 			{
-				member.LuaSet(this, value);
-				return DynValue.NewBoolean(true);
+				var data = item?.UserData;
+				if (data == null)
+					return null;
+				item = data.Descriptor.Index(table.OwnerScript, data.Object, DynValue.NewString(path[i]), false);
 			}
-			table[index] = value;
-			return DynValue.NewBoolean(false);
+			return item;
 		}
-
-		public object CompletionProxy => Members;
 	}
 }

@@ -1,255 +1,121 @@
-using MoonSharp.Interpreter;
-using RedOnion.ROS;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using RedOnion.ROS;
 using UnityEngine;
 
 namespace RedOnion.KSP.API
 {
 	[Creator(typeof(VectorCreator))]
-	public partial class Vector : InteropObject, IEquatable<Vector>
+	[Description("3D vector / coordinate. All the usual operators were implemented,"
+		+ " multiplication and division can use both vector (per-axis) and number (all-axes)."
+		+ " Beware that multiplication is scaling, not cross product or dot - use appropriate function for these.")]
+	public class Vector : ConstVector
 	{
-		public static MemberList MemberList { get; } = new MemberList(
+		public Vector() { }
+		public Vector(ConstVector src) : base(src) { }
+		public Vector(Vector src) : base(src) { }
+		public Vector(Vector3d src) : base(src) { }
+		public Vector(Vector3 src) : base(src) { }
+		public Vector(Vector2d src) : base(src) { }
+		public Vector(Vector2 src) : base(src) { }
+		public Vector(double x, double y, double z) : base(x, y, z) { }
+		public Vector(double x, double y) : base(x, y) { }
+		public Vector(double all) : base(all) { }
+		public Vector(IList<Value> src) : base(src) { }
+		public Vector(IList<double> src) : base(src) { }
+		public Vector(IList<float> src) : base(src) { }
 
-@"3D vector / coordinate. All the usual operators were implemented,
-multiplication and division can use both vector (per-axis) and number (all-axes).
-Beware that multiplication is scaling, not cross product or dot - use appropriate function for these.",
-
-		new IMember[]
-		{
-			new Native<Vector, Vector3d>(
-				"native",
-				"Native Vector3d (`double x,y,z`).",
-				v => v.Native, (v, value) => v.Native = value),
-			new Native<Vector, Vector3>(
-				"vector3",
-				"Native UnityEngine.Vector3 (`float x,y,z`).",
-				v => v.Native, (v, value) => v.Native = value),
-			new Native<Vector, Vector2>(
-				"vector2",
-				"Native UnityEngine.Vector2 (`float x,y`).",
-				v => (Vector3)v.Native, (v, value) => v.Native = (Vector3)value),
-			// change ros indexing if this is not Members[3]
-			new Double<Vector>(
-				"x", "The X-coordinate",
-				v => v.X, (v, value) => v.X = value),
-			new Double<Vector>(
-				"y", "The Y-coordinate",
-				v => v.Y, (v, value) => v.Y = value),
-			new Double<Vector>(
-				"z", "The Z-coordinate",
-				v => v.Z, (v, value) => v.Z = value),
-			new Function(
-				"scale", "void",
-				"Scale the vector by a factor (all axes if number is provided, per-axis if Vector)."
-				+ " Multiplication does the same.",
-				() => ScaleMethod.Instance),
-			new Function(
-				"shrink", "void",
-				"Shrink the vector by a factor (all axes if number is provided, per-axis if Vector)."
-				+ " Division does the same.",
-				() => ShrinkMethod.Instance),
-			new Double<Vector>(
-				"size",
-				"Size of the vector - `sqrt(x*x+y*y+z*z)`. Scale if setting.",
-				v => v.Size, (v, value) => v.Size = value),
-			new Double<Vector>(
-				"magnitude",
-				"Alias to size of the vector - `sqrt(x*x+y*y+z*z)`. Scale if setting.",
-				v => v.Size, (v, value) => v.Size = value),
-			new Double<Vector>(
-				"squareSize",
-				"Square size of the vector - `x*x+y*y+z*z`. Scale if setting.",
-				v => v.SquareSize, (v, value) => v.SquareSize = value),
-			new Interop<Vector>(
-				"normalized", "Vector",
-				"Get normalized vector (size 1).",
-				v => v.Normalized),
-		});
-
-		public Vector() : base(MemberList) { }
-		public Vector(Vector src) : this() => Native = src.Native;
-		public Vector(Vector3d native) : this() => Native = native;
-		public Vector(Vector3d native, bool readOnly) : this(native) => ReadOnly = readOnly;
-		public Vector(Vector3 native) : this() => Native = native;
-		public Vector(Vector2d native) : this() => Native = native;
-		public Vector(Vector2 native) : this() => Native = new Vector3d(native.x, native.y);
-		public Vector(double x, double y, double z) : this() => Native = new Vector3d(x, y, z);
-		public Vector(double x, double y) : this() => Native = new Vector3d(x, y);
-		public Vector(double all) : this() => Native = new Vector3d(all, all, all);
-		public Vector(IList<Value> list) : this()
-		{
-			switch (list.Count)
-			{
-			case 0:
-				return;
-			case 1:
-				var all = list[0].ToDouble();
-				Native = new Vector3d(all, all, all);
-				return;
-			case 2:
-				Native = new Vector3d(list[0].ToDouble(), list[1].ToDouble());
-				return;
-			default:
-				Native = new Vector3d(list[0].ToDouble(), list[1].ToDouble(), list[2].ToDouble());
-				return;
-			}
-		}
-
-		public Vector3d native;
-		public Vector3d Native
+		[Description("Native Vector3d(`double x, y, z`).")]
+		public new Vector3d Native
 		{
 			get => native;
 			set => native = value;
 		}
-		public double X
-		{
-			get => Native.x;
-			set => Native = new Vector3d(value, Y, Z);
-		}
-		public double Y
-		{
-			get => Native.y;
-			set => Native = new Vector3d(X, value, Z);
-		}
-		public double Z
-		{
-			get => Native.z;
-			set => Native = new Vector3d(X, Y, value);
-		}
-		public double Size
-		{
-			get => Native.magnitude;
-			set => Native *= value/Native.magnitude;
-		}
-		public double Magnitude
-		{
-			get => Native.magnitude;
-			set => Native *= value/Native.magnitude;
-		}
-		public double SquareSize
-		{
-			get => Native.sqrMagnitude;
-			set => Native *= value*value/Native.magnitude;
-		}
-		public Vector Normalized
-			=> new Vector(Native.normalized);
 
-		public override string ToString()
-			=> string.Format(Value.Culture, "[{0}, {1}, {2}]", X, Y, Z);
-
-		public override bool Unary(ref Value self, OpCode op)
+		[Description("The X-coordinate")]
+		public new double X
 		{
-			switch (op)
-			{
-			case OpCode.Plus:
-				self = new Value(new Vector(Native));
-				return true;
-			case OpCode.Neg:
-				self = new Value(new Vector(-Native));
-				return true;
-			}
-			return false;
+			get => native.x;
+			set => native = new Vector3d(value, Y, Z);
 		}
-		public override bool Binary(ref Value lhs, OpCode op, ref Value rhs)
+		[Description("The Y-coordinate")]
+		public new double Y
 		{
-			if (VectorCreator.ToVector3d(lhs, out var a) && VectorCreator.ToVector3d(rhs, out var b))
-			{
-				switch (op)
-				{
-				case OpCode.Add:
-					lhs = new Value(new Vector(a + b));
-					return true;
-				case OpCode.Sub:
-					lhs = new Value(new Vector(a - b));
-					return true;
-				case OpCode.Mul:
-					lhs = new Value(new Vector(a.x * b.x, a.y * b.y, a.z * b.z));
-					return true;
-				case OpCode.Div:
-					lhs = new Value(new Vector(a.x / b.x, a.y / b.y, a.z / b.z));
-					return true;
-				}
-			}
-			return false;
+			get => native.y;
+			set => native = new Vector3d(X, value, Z);
 		}
-		public override DynValue MetaIndex(Script script, string metaname)
+		[Description("The Z-coordinate")]
+		public new double Z
 		{
-			switch (metaname)
-			{
-			case "__unm":
-				return DynValue.NewCallback(Neg);
-			case "__add":
-				return DynValue.NewCallback(Add);
-			case "__sub":
-				return DynValue.NewCallback(Sub);
-			case "__mul":
-				return DynValue.NewCallback(Mul);
-			case "__div":
-				return DynValue.NewCallback(Div);
-			}
-			return null;
-		}
-		DynValue Neg(ScriptExecutionContext ctx, CallbackArguments args)
-		{
-			if (args.Count != 1)
-				throw new InvalidOperationException("Unexpected number of arguments: " + args.Count);
-			return UserData.Create(
-				-VectorCreator.ToVector(args[0].ToObject()));
-		}
-		DynValue Add(ScriptExecutionContext ctx, CallbackArguments args)
-		{
-			if (args.Count != 2)
-				throw new InvalidOperationException("Unexpected number of arguments: " + args.Count);
-			return UserData.Create(
-				VectorCreator.ToVector(args[0].ToObject())
-				+ VectorCreator.ToVector(args[1].ToObject()));
-		}
-		DynValue Sub(ScriptExecutionContext ctx, CallbackArguments args)
-		{
-			if (args.Count != 2)
-				throw new InvalidOperationException("Unexpected number of arguments: " + args.Count);
-			return UserData.Create(
-				VectorCreator.ToVector(args[0].ToObject())
-				- VectorCreator.ToVector(args[1].ToObject()));
-		}
-		DynValue Mul(ScriptExecutionContext ctx, CallbackArguments args)
-		{
-			if (args.Count != 2)
-				throw new InvalidOperationException("Unexpected number of arguments: " + args.Count);
-			return UserData.Create(
-				VectorCreator.ToVector(args[0].ToObject())
-				* VectorCreator.ToVector(args[1].ToObject()));
-		}
-		DynValue Div(ScriptExecutionContext ctx, CallbackArguments args)
-		{
-			if (args.Count != 2)
-				throw new InvalidOperationException("Unexpected number of arguments: " + args.Count);
-			return UserData.Create(
-				VectorCreator.ToVector(args[0].ToObject())
-				/ VectorCreator.ToVector(args[1].ToObject()));
+			get => native.z;
+			set => native = new Vector3d(X, Y, value);
 		}
 
-		public bool Equals(Vector other)
-			=> other != null && Native == other.Native;
-		public override bool Equals(object obj)
+		[Description("Size of the vector - `sqrt(x*x+y*y+z*z)`. Scale if setting.")]
+		public new double Size
 		{
-			if (obj is Vector v)
-				return Equals(v);
-			if (obj is Vector3d v3d)
-				return Native == v3d;
-			if (obj is Vector3 v3)
-				return (Vector3)Native == v3;
-			if (Z < 0 || Z > 0) // zero and NaN are acceptable
-				return false;
-			if (obj is Vector2d v2d)
-				return X == v2d.x && Y == v2d.y;
-			if (obj is Vector2 v2)
-				return (float)X == v2.x && (float)Y == v2.y;
-			return false;
+			get => native.magnitude;
+			set => native *= value/native.magnitude;
 		}
-		public override int GetHashCode()
-			=> Native.GetHashCode();
+		[Description("Alias to size of the vector - `sqrt(x*x+y*y+z*z)`. Scale if setting.")]
+		public new double Magnitude
+		{
+			get => native.magnitude;
+			set => native *= value/native.magnitude;
+		}
+		[Description("Square size of the vector - `x*x+y*y+z*z`. Scale if setting.")]
+		public new double SquareSize
+		{
+			get => native.sqrMagnitude;
+			set => native *= value*value/native.magnitude;
+		}
+		[Description("Normalize vector (set size to 1).")]
+		public void Normalize()
+			=> native = native.normalized;
+
+		[Description("Native UnityEngine.Vector3 (`float x,y,z`).")]
+		public new Vector3 Vector3
+		{
+			get => native;
+			set => native = value;
+		}
+		[Description("Native UnityEngine.Vector2 (`float x,y`).")]
+		public new Vector2 Vector2
+		{
+			get => Vector3;
+			set => Vector3 = value;
+		}
+		[Description("Index the coordinates as double[3]")]
+		public new double this[int i]
+		{
+			get => native[i];
+			set => native[i] = value;
+		}
+
+		[Description("Scale the vector by a factor (all axes). Multiplication does the same.")]
+		public void Scale(double factor)
+			=> native *= factor;
+		[Description("Scale individual axis. Multiplication does the same.")]
+		public void Scale(ConstVector v)
+			=> native = Vector3d.Scale(native, v.Native);
+
+		public void Scale(Vector3d v)
+			=> native = Vector3d.Scale(native, v);
+		public void Scale(Vector3 v)
+			=> native = Vector3d.Scale(native, v);
+
+		[Description("Shrink the vector by a factor (all axes). Division does the same.")]
+		public void Shrink(double factor)
+			=> native /= factor;
+		[Description("Shrink individual axis. Division does the same.")]
+		public void Shrink(ConstVector v)
+			=> native = new Vector3d(X / v.X, Y / v.Y, Z / v.Z);
+
+		public void Shrink(Vector3d v)
+			=> native = new Vector3d(X / v.x, Y / v.y, Z / v.z);
+		public void Shrink(Vector3 v)
+			=> native = new Vector3d(X / v.x, Y / v.y, Z / v.z);
 
 		public static implicit operator Vector3d(Vector v) => v.Native;
 		public static implicit operator Vector3(Vector v) => v.Native;
@@ -259,117 +125,5 @@ Beware that multiplication is scaling, not cross product or dot - use appropriat
 		public static explicit operator Vector(Vector3 v) => new Vector(v);
 		public static explicit operator Vector(Vector2d v) => new Vector(v);
 		public static explicit operator Vector(Vector2 v) => new Vector(v);
-
-		public static Vector operator +(Vector a)
-			=> new Vector(a.Native);
-		public static Vector operator -(Vector a)
-			=> new Vector(-a.Native);
-
-		public static Vector operator +(Vector a, Vector b)
-			=> new Vector(a.Native + b.Native);
-		public static Vector operator +(Vector3d a, Vector b)
-			=> new Vector(a + b.Native);
-		public static Vector operator +(Vector a, Vector3d b)
-			=> new Vector(a.Native + b);
-		public static Vector operator +(Vector3 a, Vector b)
-			=> new Vector(a + b.Native);
-		public static Vector operator +(Vector a, Vector3 b)
-			=> new Vector(a.Native + b);
-
-		public static Vector operator -(Vector a, Vector b)
-			=> new Vector(a.Native - b.Native);
-		public static Vector operator -(Vector3d a, Vector b)
-			=> new Vector(a - b.Native);
-		public static Vector operator -(Vector a, Vector3d b)
-			=> new Vector(a.Native - b);
-		public static Vector operator -(Vector3 a, Vector b)
-			=> new Vector(a - b.Native);
-		public static Vector operator -(Vector a, Vector3 b)
-			=> new Vector(a.Native - b);
-
-		public static Vector operator *(Vector a, Vector b)
-			=> new Vector(a.X * b.X, a.Y * b.Y, a.Z * b.Z);
-		public static Vector operator *(Vector3d a, Vector b)
-			=> new Vector(a.x * b.X, a.y * b.Y, a.z * b.Z);
-		public static Vector operator *(Vector a, Vector3d b)
-			=> new Vector(a.X * b.x, a.Y * b.y, a.Z * b.z);
-		public static Vector operator *(Vector3 a, Vector b)
-			=> new Vector(a.x * b.X, a.y * b.Y, a.z * b.Z);
-		public static Vector operator *(Vector a, Vector3 b)
-			=> new Vector(a.X * b.x, a.Y * b.y, a.Z * b.z);
-
-		public static Vector operator /(Vector a, Vector b)
-			=> new Vector(a.X / b.X, a.Y / b.Y, a.Z / b.Z);
-		public static Vector operator /(Vector3d a, Vector b)
-			=> new Vector(a.x / b.X, a.y / b.Y, a.z / b.Z);
-		public static Vector operator /(Vector a, Vector3d b)
-			=> new Vector(a.X / b.x, a.Y / b.y, a.Z / b.z);
-		public static Vector operator /(Vector3 a, Vector b)
-			=> new Vector(a.x / b.X, a.y / b.Y, a.z / b.Z);
-		public static Vector operator /(Vector a, Vector3 b)
-			=> new Vector(a.X / b.x, a.Y / b.y, a.Z / b.z);
-
-		public double this[int i]
-		{
-			get => native[i];
-			set => native[i] = value;
-		}
-
-		public override DynValue Index(MoonSharp.Interpreter.Script script, DynValue index, bool isDirectIndexing)
-		{
-			if (index.Type == DataType.Number)
-				return DynValue.NewNumber(native[(int)index.Number]);
-			return base.Index(script, index, isDirectIndexing);
-		}
-		public override bool SetIndex(MoonSharp.Interpreter.Script script, DynValue index, DynValue value, bool isDirectIndexing)
-		{
-			if (index.Type == DataType.Number)
-			{
-				native[(int)index.Number] = value.Number;
-				return true;
-			}
-			return base.SetIndex(script, index, value, isDirectIndexing);
-		}
-
-		public override int IndexFind(ref Value self, Arguments args)
-		{
-			if (args.Length == 1)
-			{
-				ref var index = ref args.GetRef(0);
-				if (index.IsNumber)
-				{
-					var i = index.ToInt();
-					if (i < 0 || i > 2)
-						return -1;
-					return i + 3;
-				}
-			}
-			return base.IndexFind(ref self, args);
-		}
-
-		public override bool Convert(ref Value self, Descriptor to)
-		{
-			if (to.Type == typeof(Vector3d))
-			{
-				self = new Value(to, native);
-				return true;
-			}
-			if (to.Type == typeof(Vector3))
-			{
-				self = new Value(to, (Vector3)native);
-				return true;
-			}
-			if (to.Type == typeof(Vector2d))
-			{
-				self = new Value(to, new Vector2d(X, Y));
-				return true;
-			}
-			if (to.Type == typeof(Vector2))
-			{
-				self = new Value(to, new Vector2((float)X, (float)Y));
-				return true;
-			}
-			return base.Convert(ref self, to);
-		}
 	}
 }

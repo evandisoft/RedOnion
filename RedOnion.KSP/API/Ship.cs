@@ -8,6 +8,7 @@ using RedOnion.KSP.Parts;
 
 namespace RedOnion.KSP.API
 {
+	[Description("Active vessel")]
 	public class Ship : IDisposable
 	{
 		static Ship active;
@@ -113,10 +114,10 @@ namespace RedOnion.KSP.API
 		public double Eccentricity => Native.orbit.eccentricity;
 		public double SemiMajorAxis => Native.orbit.semiMajorAxis;
 		public double SemiMinorAxis => Native.orbit.semiMinorAxis;
-		public double ApoApsis => Native.orbit.ApA;
-		public double PeriApsis => Native.orbit.PeA;
-		public double ApoCenter => Native.orbit.ApR;
-		public double PeriCenter => Native.orbit.PeR;
+		public double Apoapsis => Native.orbit.ApA;
+		public double Periapsis => Native.orbit.PeA;
+		public double Apocenter => Native.orbit.ApR;
+		public double Pericenter => Native.orbit.PeR;
 		public double TimeToAp => Native.orbit.timeToAp;
 		public double TimeToPe => Native.orbit.timeToPe;
 		public double Period => Native.orbit.period;

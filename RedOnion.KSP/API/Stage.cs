@@ -6,49 +6,31 @@ using RedOnion.KSP.Parts;
 using System.Collections.Generic;
 using System.ComponentModel;
 
-//NOTE: Never move Instance above MemberList ;)
-
 namespace RedOnion.KSP.API
 {
-	public class Stage : InteropObject
+	[Description("Used to activate next stage and/or get various information about stage(s)."
+	+ " Returns true on success, if used as function. False if stage was not ready.")]
+	public class Stage : ICallable
 	{
-		public static MemberList MemberList { get; } = new MemberList(
-
-@"Used to activate next stage and/or get various information about stage(s).
-Returns true on success, if used as function. False if stage was not ready.",
-
-		new IMember[]
-		{
-			new Int("number", "Stage number.",
-				() => StageManager.CurrentStage),
-			new Bool("ready", "Whether ready for activating next stage or not.",
-				() => StageManager.CanSeparate),
-			new Interop("parts", "PartSet", "Parts that belong to this stage, upto next decoupler",
-				() => Parts),
-			new Interop("crossParts", "PartSet", "Active engines and all accessible tanks upto next decoupler",
-				() => CrossParts),
-			new Interop("engines", "PartSet", "List of active engines",
-				() => Engines),
-			new Double("solidFuel", "Amount of solid fuel in active engines",
-				() => SolidFuel),
-			new Double("liquidFuel", "Amount of liquid fuel in tanks of current stage",
-				() => LiquidFuel)
-		});
-
+		[Browsable(false), MoonSharpHidden]
 		public static Stage Instance { get; } = new Stage();
-		protected Stage() : base(MemberList) { }
+		protected Stage() { }
 
-		public override bool Call(ref Value result, object self, Arguments args, bool create)
+		bool ICallable.Call(ref Value result, object self, Arguments args, bool create)
 		{
 			result = Activate();
 			return true;
 		}
-		public override DynValue Call(ScriptExecutionContext ctx, CallbackArguments args)
+		[MoonSharpUserDataMetamethod("__call"), Browsable(false)]
+		static DynValue Call(ScriptExecutionContext ctx, CallbackArguments args)
 			=> DynValue.NewBoolean(Activate());
 
+		[Description("Stage number.")]
 		public static int Number => StageManager.CurrentStage;
+		[Description("Whether ready for activating next stage or not.")]
 		public static bool Ready => StageManager.CanSeparate;
 
+		[Description("Activate next stage (can simply call stage() instead)")]
 		public static bool Activate()
 		{
 			if (!HighLogic.LoadedSceneIsFlight)
@@ -70,13 +52,18 @@ Returns true on success, if used as function. False if stage was not ready.",
 		public static PartSet<Engine> Engines { get; }
 			= new PartSet<Engine>(Refresh);
 
+		[Description("Amount of solid fuel in active engines."
+			+ " Shortcut to Engines.Resources.GetAmountOf(\"SolidFuel\")")]
 		public static double SolidFuel
 			=> Engines.Resources.GetAmountOf("SolidFuel");
+		[Description("Amount of liquid fuel in tanks of current stage."
+			+ " Shortcut to CrossParts.Resources.GetAmountOf(\"LiquidFuel\")")]
 		public static double LiquidFuel
-			=> CrossParts.Resources.GetAmountOf("LiquidFuel");			
+			=> CrossParts.Resources.GetAmountOf("LiquidFuel");
 
+		// TODO: aggregate to custom PropellantInfo
 		[Description("Propellants used by active engines"), ReadOnlyItems]
-		public static ReadOnlyList<Propellant> Propellants { get; }
+		static ReadOnlyList<Propellant> Propellants { get; }
 			= new ReadOnlyList<Propellant>(Refresh);
 		static readonly HashSet<string> propellantNames
 			= new HashSet<string>();
@@ -89,6 +76,10 @@ Returns true on success, if used as function. False if stage was not ready.",
 			GameEvents.onEngineActiveChange.Remove(Instance.EngineChange);
 			GameEvents.onStageActivate.Remove(Instance.StageActivated);
 			GameEvents.onStageSeparation.Remove(Instance.StageSeparation);
+			GameEvents.StageManager.OnGUIStageSequenceModified.Remove(Instance.StageSequenceModified);
+			GameEvents.StageManager.OnStagingSeparationIndices.Remove(Instance.StagingSeparationIndices);
+			GameEvents.StageManager.OnGUIStageAdded.Remove(Instance.StagesChanged);
+			GameEvents.StageManager.OnGUIStageRemoved.Remove(Instance.StagesChanged);
 			Dirty = true;
 			Parts.SetDirty();
 			CrossParts.SetDirty();
@@ -107,6 +98,12 @@ Returns true on success, if used as function. False if stage was not ready.",
 			=> SetDirty("StageActivated");
 		void StageSeparation(EventReport e)
 			=> SetDirty("StageSeparation");
+		void StageSequenceModified()
+			=> SetDirty("StageSequenceModified");
+		void StagingSeparationIndices()
+			=> SetDirty("StagingSeparationIndices");
+		void StagesChanged(int stage)
+			=> SetDirty("StagesChanged");
 
 		static protected void Refresh()
 		{
@@ -151,9 +148,14 @@ Returns true on success, if used as function. False if stage was not ready.",
 			Parts.Dirty = false;
 			CrossParts.Dirty = false;
 			Engines.Dirty = false;
+			Propellants.Dirty = false;
 			GameEvents.onEngineActiveChange.Add(Instance.EngineChange);
 			GameEvents.onStageActivate.Add(Instance.StageActivated);
 			GameEvents.onStageSeparation.Add(Instance.StageSeparation);
+			GameEvents.StageManager.OnGUIStageSequenceModified.Add(Instance.StageSequenceModified);
+			GameEvents.StageManager.OnStagingSeparationIndices.Add(Instance.StagingSeparationIndices);
+			GameEvents.StageManager.OnGUIStageAdded.Add(Instance.StagesChanged);
+			GameEvents.StageManager.OnGUIStageRemoved.Add(Instance.StagesChanged);
 			Value.DebugLog("Stage Refreshed (Decouple: {0}, Engines: {1})", nextDecoupler, Engines.Count);
 		}
 	}
