@@ -137,5 +137,11 @@ namespace Kerbalua.Other
 		{
 			// do nothing, LUA/MoonSharp Engine does not use events
 		}
+
+		public override IList<string> GetDisplayableCompletions(string source, int cursorPos, out int replaceStart, out int replaceEnd)
+		{
+
+			return GetCompletions(source, cursorPos, out replaceStart, out replaceEnd);
+		}
 	}
 }

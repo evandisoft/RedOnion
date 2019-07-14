@@ -1,4 +1,4 @@
-## Vector Function
+## Vector
 
 Function to create 3D vector / coordinate, also aliased as simple `V`.
 Receives either three arguments (x,y,z), two (x,y - z=0), or one (x=y=z).

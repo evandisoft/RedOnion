@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Kerbalua.Completion;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
@@ -88,6 +89,7 @@ namespace KerbaluaNUnit
 		{
 			Setup();
 			var allMappings = NamespaceMappings.ForAllAssemblies;
+
 			globals["Native"] = allMappings.GetNamespace("");
 			//globals["Adf"] = new Adf();
 			string source =
@@ -130,7 +132,9 @@ namespace KerbaluaNUnit
 				.GetSubNamespace("System").GetType("Action"));
 			var completions = GetCompletions(source);
 			//PrintAll(completions);
-			Assert.AreEqual(450, completions.Count);
+		
+			//Console.WriteLine("expected was " + expected);
+			Assert.AreEqual(454, completions.Count);
 
 			//Assert.AreEqual(11, completions.Count);
 		}
@@ -185,7 +189,7 @@ namespace KerbaluaNUnit
 			//Console.WriteLine(allMappings.GetNamespace("")
 			//.GetSubNamespace("System").GetType("Action"));
 			var completions = GetCompletions(source);
-			PrintAll(completions);
+			//PrintAll(completions);
 			Assert.AreEqual(1, completions.Count);
 
 			//Assert.AreEqual(11, completions.Count);
