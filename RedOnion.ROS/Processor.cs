@@ -83,6 +83,7 @@ namespace RedOnion.ROS
 				globals.Reset();
 				globals.Fill();
 			}
+			stack.Clear();
 			ctx = new Context();
 			Exit = ExitCode.None;
 		}

@@ -16,6 +16,8 @@ namespace RedOnion.ROS
 		/// <param name="countdown">Countdown until auto-yield</param>
 		public bool Execute(int countdown = 1000)
 		{
+			if (Exit == ExitCode.Exception)
+				return true;
 			var at = this.at;
 			var code = this.code;
 			var str = this.str;
@@ -900,10 +902,15 @@ namespace RedOnion.ROS
 			catch (Exception ex)
 			{
 				this.at = at;
-				ctxIsPrivate = true; // force context reset on next execute
-				if (ex is RuntimeError)
+				Exit = ExitCode.Exception;
+				if (ex is RuntimeError re)
+				{
+					result = new Value(re);
 					throw;
-				throw new RuntimeError(compiled, at, ex);
+				}
+				re = new RuntimeError(compiled, at, ex);
+				result = new Value(re);
+				throw re;
 			}
 		}
 	}

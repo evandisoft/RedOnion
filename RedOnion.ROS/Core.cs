@@ -58,6 +58,11 @@ namespace RedOnion.ROS
 			get => compiled;
 			protected set
 			{
+				if (stack.size > 0)
+				{
+					ctx = stack[0].context;
+					stack.Clear();
+				}
 				at = 0;
 				code = value?.Code;
 				str = value?.Strings;
@@ -92,7 +97,15 @@ namespace RedOnion.ROS
 		public void Dispose() => Dispose(true);
 		protected virtual void Dispose(bool disposing) { }
 
-		public void ResetContext() => ctx?.Reset();
+		public void ResetContext()
+		{
+			if (stack.size > 0)
+			{
+				ctx = stack[0].context;
+				stack.Clear();
+			}
+			ctx?.Reset();
+		}
 
 		/// <summary>
 		/// Execute script from source. Returns true if finished
