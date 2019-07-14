@@ -187,7 +187,7 @@ namespace RedOnion.KSP.Tests
 		public void API_Vec05_Methods()
 		{
 			Lines(
-				"var a = v.one",
+				"var a = +v.one",
 				"a.scale 2",
 				"return a");
 			var v = Result.obj as Vector;

@@ -39,8 +39,8 @@ returned by `AppDomain.CurrentDomain.GetAssemblies()`.")]
 				var it = new Value(ResolveType(args[0]));
 				return it.desc.Call(ref result, null, new Arguments(args, args.Length-1), true);
 			}
-			[MoonSharpUserDataMetamethod("__call")]
-			static DynValue Call(ScriptExecutionContext ctx, CallbackArguments args)
+			[MoonSharpUserDataMetamethod("__call"), Browsable(false)]
+			public DynValue Call(ScriptExecutionContext ctx, CallbackArguments args)
 			{
 				if (args.Count <= 1)
 					throw new InvalidOperationException("Expected at least one argument");
@@ -146,8 +146,8 @@ returned by `AppDomain.CurrentDomain.GetAssemblies()`.")]
 			throw new Exception("Could not find constructor accepting given args for type " + t);
 		}
 
-		[MoonSharpUserDataMetamethod("__call")]
-		static DynValue Call(ScriptExecutionContext ctx, CallbackArguments args)
+		[MoonSharpUserDataMetamethod("__call"), Browsable(false)]
+		public DynValue Call(ScriptExecutionContext ctx, CallbackArguments args)
 		{
 			if (args.Count != 1)
 				throw new InvalidOperationException(args.Count == 0

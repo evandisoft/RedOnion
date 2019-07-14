@@ -22,7 +22,7 @@ namespace RedOnion.KSP.API
 			return true;
 		}
 		[MoonSharpUserDataMetamethod("__call"), Browsable(false)]
-		static DynValue Call(ScriptExecutionContext ctx, CallbackArguments args)
+		public DynValue Call(ScriptExecutionContext ctx, CallbackArguments args)
 			=> DynValue.NewBoolean(Activate());
 
 		[Description("Stage number.")]

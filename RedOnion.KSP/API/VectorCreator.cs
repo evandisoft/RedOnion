@@ -82,7 +82,7 @@ namespace RedOnion.KSP.API
 			}
 		}
 		[MoonSharpUserDataMetamethod("__call"), Browsable(false)]
-		static DynValue Call(ScriptExecutionContext ctx, CallbackArguments args)
+		public static DynValue Call(ScriptExecutionContext ctx, CallbackArguments args)
 		{
 			var result = Value.Void;
 			var self = args.ToRos(out var ros);
