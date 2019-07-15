@@ -161,7 +161,7 @@ namespace KerbaluaNUnit
 		public void LUA_IntellisenseTest_Interop()
 		{
 			Setup();
-			globals.MetaTable = RedOnion.KSP.API.Globals.Instance;
+			globals.MetaTable = RedOnion.KSP.API.LuaGlobals.Instance;
 			var allMappings = NamespaceMappings.ForAllAssemblies;
 			//globals[""] = allMappings.GetNamespace("");
 			//globals["Adf"] = new Adf();
@@ -180,7 +180,7 @@ namespace KerbaluaNUnit
 		public void LUA_IntellisenseTest_Interop2()
 		{
 			Setup();
-			globals.MetaTable = RedOnion.KSP.API.Globals.Instance;
+			globals.MetaTable = RedOnion.KSP.API.LuaGlobals.Instance;
 			var allMappings = NamespaceMappings.ForAllAssemblies;
 			//globals[""] = allMappings.GetNamespace("");
 			//globals["Adf"] = new Adf();
