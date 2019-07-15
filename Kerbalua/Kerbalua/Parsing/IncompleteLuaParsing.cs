@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
@@ -7,7 +6,7 @@ using UnityEngine;
 
 namespace Kerbalua.Parsing
 {
-	public class IncompleteLuaParsing
+	public partial class IncompleteLuaParsing
 	{
 		public IncompleteLuaParsing()
 		{
@@ -22,22 +21,6 @@ namespace Kerbalua.Parsing
 			var implicitReturn = parser.implicitReturn();
 			return !errorListener.HasError;
 			//return implicitReturn.exception==null;
-		}
-
-		/// <summary>
-		/// This just listens for any errors.
-		/// Perhaps there is a simpler way to be strict.
-		/// But I found this method quickly
-		/// </summary>
-		class AnyErrorsListener : IAntlrErrorListener<IToken>
-		{
-			public bool HasError = false;
-
-			public void SyntaxError(TextWriter output, IRecognizer recognizer, IToken offendingSymbol, int line, int charPositionInLine, string msg, RecognitionException e)
-			{
-				//Console.WriteLine("Found Errors");
-				HasError = true;
-			}
 		}
 
 		static public IncompleteLuaParser GetParser(string source)
