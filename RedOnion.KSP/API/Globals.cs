@@ -105,9 +105,12 @@ namespace RedOnion.KSP.API
 		}
 	}
 
-	public class LuaGlobals : Table
+	public class LuaGlobals : Table, IHasCompletionProxy
 	{
 		public static LuaGlobals Instance { get; } = new LuaGlobals();
+
+		public object CompletionProxy => UserData.CreateStatic(typeof(Globals));
+
 		public LuaGlobals() : base(null)
 		{
 			this["__index"] = new Func<Table, DynValue, DynValue>(Get);
