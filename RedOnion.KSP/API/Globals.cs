@@ -26,7 +26,7 @@ namespace RedOnion.KSP.API
 
 		[Description("Function for creating 3D vector / coordinate.")]
 		public static VectorCreator Vector => VectorCreator.Instance;
-		[Description("Alias to Vector Function for creating 3D vector / coordinate.")]
+		[DisplayName("V"), Description("Alias to Vector Function for creating 3D vector / coordinate.")]
 		public static VectorCreator V => VectorCreator.Instance;
 
 		[Alias, Description("Alias to `Vector.dot` (or `v.dot`).")]
@@ -79,12 +79,14 @@ namespace RedOnion.KSP.API
 					Value.DebugLog("Globals: Could not find `{0}`", path[0]);
 					continue;
 				}
+				Value.DebugLog("Globals: `{0}` at {1}", path[0], at);
 				var item = Value.Void;
 				if (!Get(ref item, at))
 				{
 					Value.DebugLog("Globals: Could not get `{0}`", path[0]);
 					continue;
 				}
+				Value.DebugLog("Globals: Got `{0}` at {1}", item.ToString(), at);
 				for (int i = 1; i < path.Length; i++)
 				{
 					at = item.desc.Find(item.obj, path[i]);
@@ -93,7 +95,7 @@ namespace RedOnion.KSP.API
 						Value.DebugLog("Globals: Could not find `{0}` in {1}", path[i], fullPath);
 						goto skip;
 					}
-					if (!Get(ref item, at))
+					if (!item.desc.Get(ref item, at))
 					{
 						Value.DebugLog("Globals: Could not get `{0}`", path[i], fullPath);
 						goto skip;
@@ -123,9 +125,18 @@ namespace RedOnion.KSP.API
 				return DynValue.FromObject(table.OwnerScript, prop.GetValue(null, null));
 			var alias = typeof(Globals).GetField(name, BindingFlags.Static|BindingFlags.Public);
 			if (alias == null || alias.FieldType != typeof(string))
+			{
+				if (name.Length == 0 || !char.IsLower(name, 0) || name == "v")
+					return null;
+				name = char.ToUpperInvariant(name[0]) + name.Substring(1);
+				prop = typeof(Globals).GetProperty(name, BindingFlags.Static|BindingFlags.Public);
+				if (prop != null)
+					return DynValue.FromObject(table.OwnerScript, prop.GetValue(null, null));
 				return null;
-			var path = ((string)alias.GetValue(null)).Split('.');
-			var item = table.RawGet(path[0]);
+			}
+			var fullPath = (string)alias.GetValue(null);
+			var path = fullPath.Split('.');
+			var item = Get(table, DynValue.NewString(path[0]));
 			for (int i = 1; i < path.Length; i++)
 			{
 				var data = item?.UserData;
