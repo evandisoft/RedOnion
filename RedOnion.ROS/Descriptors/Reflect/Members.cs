@@ -39,7 +39,7 @@ namespace RedOnion.ROS
 			{
 				string name = provider is MemberInfo member ? member.Name
 					: provider is Type type ? type.Name : null;
-				var displayName = provider.GetCustomAttributes(typeof(DisplayNameAttribute), true);
+				var displayName = provider.GetCustomAttributes(typeof(DisplayNameAttribute), !(provider is Type));
 				if (displayName.Length == 1)
 				{
 					var display = ((DisplayNameAttribute)displayName[0]).DisplayName;

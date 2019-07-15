@@ -3,11 +3,13 @@ using RedOnion.ROS;
 using RedOnion.ROS.Objects;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 
 namespace RedOnion.KSP.Parts
 {
+	[Description("Engine of a ship (wehicle/vessel).")]
 	public class Engine : PartBase
 	{
 		public MultiModeEngine MultiModule { get; protected set; }

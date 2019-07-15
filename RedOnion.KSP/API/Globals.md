@@ -2,14 +2,14 @@
 
 Global variables, objects and functions.
 
-- `vdot`: String - Alias to `Vector.dot` (or `v.dot`).
-- `vcrs`: String - Alias to `Vector.cross` (or `v.cross`).
-- `vcross`: String - Alias to `Vector.cross` (or `v.cross`).
-- `vangle`: String - Alias to `Vector.angle` (or `v.angle`).
-- `vang`: String - Alias to `Vector.angle` (or `v.angle`).
-- `reflect`: [Reflect](Reflect.md) - All the reflection stuff and namespaces.
-- `native`: [Reflect](Reflect.md) - Alias to `reflect` because of the namespaces.
-- `ship`: [Ship](Ship.md) - Active vessel (in flight only, null otherwise).
-- `stage()`: [Stage](Stage.md) - Staging logic.
-- `vector()`: [Vector Function](Vector.md) - Function for creating 3D vector / coordinate.
-- `v()`: [Vector Function](Vector.md) - Alias to Vector Function for creating 3D vector / coordinate.
+- `Reflect`: [Reflect](Reflect.md) - All the reflection stuff and namespaces.
+- `Native`: [Reflect](Reflect.md) - Alias to `reflect` because of the namespaces.
+- `Ship`: [Ship](Ship.md) - Active vessel (in flight only, null otherwise).
+- `Stage()`: [Stage](Stage.md) - Staging logic.
+- `Vector()`: [Vector](Vector.md) - Function for creating 3D vector / coordinate.
+- `V()`: [Vector](Vector.md) - Alias to Vector Function for creating 3D vector / coordinate.
+- `vdot` - Alias to `Vector.dot` (or `v.dot`).
+- `vcrs` - Alias to `Vector.cross` (or `v.cross`).
+- `vcross` - Alias to `Vector.cross` (or `v.cross`).
+- `vangle` - Alias to `Vector.angle` (or `v.angle`).
+- `vang` - Alias to `Vector.angle` (or `v.angle`).

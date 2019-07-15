@@ -52,7 +52,7 @@ namespace RedOnion.KSP.API
 		[Description("Vector with coordinates changed to non-negative.")]
 		public static Vector Abs(ConstVector v)
 			=> new Vector(Math.Abs(v.X), Math.Abs(v.Y), Math.Abs(v.Z));
-		[Description("Angle between vectors(0..180).")]
+		[Description("Angle between vectors (0..180).")]
 		public static double Angle(ConstVector a, ConstVector b)
 			=> Vector3d.Angle(a.Native, b.Native);
 

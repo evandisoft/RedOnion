@@ -6,6 +6,6 @@ Reflects/imports native types provided as namespace-qualified string
 then search in `Assembly-CSharp`, then in `UnityEngine` and then in all assemblies
 returned by `AppDomain.CurrentDomain.GetAssemblies()`.
 
-- `new()`: Constructor - Construct new object given type or object and arguments. Example: `reflect.new("System.Collections.ArrayList")`.
-- `create()`: Constructor - Alias to new().
-- `construct()`: Constructor - Alias to new().
+- `New()`: Constructor - Construct new object given type or object and arguments. Example: `reflect.new("System.Collections.ArrayList")`.
+- `Create()`: Constructor - Alias to new().
+- `Construct()`: Constructor - Alias to new().

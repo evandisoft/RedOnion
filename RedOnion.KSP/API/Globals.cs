@@ -79,14 +79,12 @@ namespace RedOnion.KSP.API
 					Value.DebugLog("Globals: Could not find `{0}`", path[0]);
 					continue;
 				}
-				Value.DebugLog("Globals: `{0}` at {1}", path[0], at);
 				var item = Value.Void;
 				if (!Get(ref item, at))
 				{
 					Value.DebugLog("Globals: Could not get `{0}`", path[0]);
 					continue;
 				}
-				Value.DebugLog("Globals: Got `{0}` at {1}", item.ToString(), at);
 				for (int i = 1; i < path.Length; i++)
 				{
 					at = item.desc.Find(item.obj, path[i]);

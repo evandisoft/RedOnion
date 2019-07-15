@@ -165,12 +165,11 @@ namespace RedOnion.KSP.Parts
 	}
 	public class ShipPartSet : PartSet<PartBase>, IDisposable
 	{
+		[Description("Ship (vessel/vehicle) this list of parts belongs to.")]
 		public Ship Ship { get; protected set; }
-		public ReadOnlyList<Decoupler> Decouplers { get; protected set; }
-		public ReadOnlyList<DockingPort> DockingPorts { get; protected set; }
-		public ReadOnlyList<Engine> Engines { get; protected set; }
 
 		protected PartBase root;
+		[Description("Root part.")]
 		public PartBase Root
 		{
 			get
@@ -181,6 +180,7 @@ namespace RedOnion.KSP.Parts
 		}
 
 		protected Decoupler nextDecoupler;
+		[Description("One of the decouplers that will get activated by nearest stage. (Same as `Parts.NextDecoupler`.)")]
 		public Decoupler NextDecoupler
 		{
 			get
@@ -189,8 +189,18 @@ namespace RedOnion.KSP.Parts
 				return nextDecoupler;
 			}
 		}
-		public int NextDecoupleStage => NextDecoupler?.Stage ?? -1;
+		[Description("Stage number of the nearest decoupler or -1. (`NextDecoupler?.Stage ?? -1`)")]
 		public int NextDecouplerStage => NextDecoupler?.Stage ?? -1;
+
+		[Description("List of all decouplers, separators, launch clamps and docks with staging enabled."
+			+ " (Docking ports without staging enabled not included.)")]
+		public ReadOnlyList<Decoupler> Decouplers { get; protected set; }
+		[Description("List of all docking ports (regardless of staging).")]
+		public ReadOnlyList<DockingPort> DockingPorts { get; protected set; }
+		[Description("All engines (regardless of state).")]
+		public ReadOnlyList<Engine> Engines { get; protected set; }
+		[Description("All sensors.")]
+		public ReadOnlyList<Sensor> Sensors { get; protected set; }
 
 		protected internal ShipPartSet(Ship ship)
 		{
@@ -208,7 +218,9 @@ namespace RedOnion.KSP.Parts
 			Decouplers.SetDirty();
 			DockingPorts.SetDirty();
 			Engines.SetDirty();
-			Stage.SetDirty();
+			Sensors.SetDirty();
+			if (Ship == Ship.Active)
+				Stage.SetDirty();
 		}
 		void VesselModified(Vessel vessel)
 		{
@@ -225,18 +237,25 @@ namespace RedOnion.KSP.Parts
 		}
 		protected virtual void Dispose(bool disposing)
 		{
-			if (cache != null)
+			if (cache == null)
+				return;
+			GameEvents.onVesselWasModified.Remove(VesselModified);
+			cache = null;
+			Ship = null;
+			root = null;
+			nextDecoupler = null;
+			if (disposing)
 			{
-				GameEvents.onVesselWasModified.Remove(VesselModified);
 				list.Clear();
-				cache = null;
-				Ship = null;
-				root = null;
-				nextDecoupler = null;
-				Decouplers = null;
-				DockingPorts = null;
-				Engines = null;
+				Decouplers.Clear();
+				DockingPorts.Clear();
+				Engines.Clear();
+				Sensors.Clear();
 			}
+			Decouplers = null;
+			DockingPorts = null;
+			Engines = null;
+			Sensors = null;
 		}
 
 		//TODO: reuse wrappers
@@ -247,6 +266,7 @@ namespace RedOnion.KSP.Parts
 			Decouplers.Clear();
 			DockingPorts.Clear();
 			Engines.Clear();
+			Sensors.Clear();
 			Construct(Ship.Native.rootPart, null, null);
 			base.DoRefresh();
 			Decouplers.Dirty = false;
@@ -315,7 +335,9 @@ namespace RedOnion.KSP.Parts
 				var sensor = module as ModuleEnviroSensor;
 				if (sensor != null)
 				{
-					self = new Sensor(Ship, part, parent, decoupler, sensor);
+					var sense = new Sensor(Ship, part, parent, decoupler, sensor);
+					Sensors.Add(sense);
+					self = sense;
 					break;
 				}
 			}

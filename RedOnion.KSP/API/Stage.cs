@@ -38,19 +38,24 @@ namespace RedOnion.KSP.API
 			if (!StageManager.CanSeparate)
 				return false;
 			StageManager.ActivateNextStage();
-			
 			return true;
 		}
 
-		[Description("Parts that belong to this stage, upto next decoupler")]
+		[Description("Parts that will be separated by next decoupler")]
 		public static PartSet<PartBase> Parts { get; }
 			= new PartSet<PartBase>(Refresh);
-		[Description("Active engines and all accessible tanks upto next decoupler")]
-		public static PartSet<PartBase> CrossParts { get; }
-			= new PartSet<PartBase>(Refresh);
-		[Description("Active engines")]
+		[Description("Active engines (regardless of decouplers)."
+			+ " `Engines.Resources` reflect total amounts of fuels"
+			+ " inside boosters with fuel that cannot flow (like solid fuel).")]
 		public static PartSet<Engine> Engines { get; }
 			= new PartSet<Engine>(Refresh);
+		[Description("Active engines and all accessible tanks upto next decoupler."
+			+ " `CrossParts.Resources` reflect total amounts of fuels accessible to active engines,"
+			+ " but only in parts that will be separated by next decoupler."
+			+ " This includes liquid fuel and oxidizer and can be used for automated staging,"
+			+ " Especially so called Asparagus and any design throwing off tanks (with or without engiens).")]
+		public static PartSet<PartBase> CrossParts { get; }
+			= new PartSet<PartBase>(Refresh);
 
 		[Description("Amount of solid fuel in active engines."
 			+ " Shortcut to Engines.Resources.GetAmountOf(\"SolidFuel\")")]

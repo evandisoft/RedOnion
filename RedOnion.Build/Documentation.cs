@@ -48,20 +48,20 @@ namespace RedOnion.Build
 				return;
 			if (type.IsGenericType)
 				type = type.GetGenericTypeDefinition();
-			if (discovered.Add(type))
+			var desc = type.GetCustomAttribute<DescriptionAttribute>()?.Description;
+			if (desc != null && discovered.Add(type))
 				queue.Add(type);
 		}
 		internal static void Exec()
 		{
+			Descriptor.Reflected.LowerFirstLetter = false;
 			RegisterType(typeof(Globals));
 			var members = new Dictionary<string, MemberInfo>();
 			for (int i = 0; i < queue.size; i++)
 			{
 				var type = queue[i];
 				var desc = type.GetCustomAttribute<DescriptionAttribute>()?.Description;
-				if (desc == null)
-					continue;
-				var name = type.GetCustomAttribute<DisplayNameAttribute>()?.DisplayName ?? type.Name;
+				var name = type.GetCustomAttribute<DisplayNameAttribute>(false)?.DisplayName ?? type.Name;
 				var full = type.FullName;
 				if (full.StartsWith("RedOnion.KSP."))
 					full = full.Substring("RedOnion.KSP.".Length);
@@ -118,21 +118,22 @@ namespace RedOnion.Build
 				{
 					if (cdoc != null)
 					{
-						wr.WriteLine("## " + doc.name);
+						wr.WriteLine("## {0} (Function)", doc.name);
 						Print(wr, cdoc, doc.name);
 						wr.WriteLine();
 					}
-					wr.WriteLine("## " + doc.name);
+					wr.WriteLine(cdoc == null ? "## {0}" : "## {0} (Instance)", doc.name);
 					Print(wr, doc, doc.name);
 				}
 			}
 		}
 
+		// Compare by RID (record ID)
 		class MetaCmp : IComparer<MemberInfo>
 		{
 			public static readonly MetaCmp It = new MetaCmp();
 			public int Compare(MemberInfo x, MemberInfo y)
-				=> x.MetadataToken.CompareTo(y.MetadataToken);
+				=> (x.MetadataToken & 0xffffff).CompareTo(y.MetadataToken & 0xffffff);
 		}
 		static void Print(StreamWriter wr, Document doc, string name)
 		{
@@ -155,39 +156,70 @@ namespace RedOnion.Build
 				}
 				if (member is MethodInfo m)
 				{
-					// for now
-					PrintSimpleMember(wr, doc, mname, member, m.ReturnType);
+					PrintMethod(wr, doc, mname, m);
 					continue;
 				}
 			}
 		}
 
-		static void PrintSimpleMember(StreamWriter wr, Document doc, string name, MemberInfo member, Type type)
+		static string ResolveType(Document doc, Type type, out string name)
 		{
-			string typePath = null;
-			string typeName = type.Name;
-			var desc = member.GetCustomAttribute<DescriptionAttribute>().Description;
+			string path = null;
+			name = type.Name;
 			if (types.TryGetValue(type, out var tdoc))
 			{
-				typeName = tdoc.name;
+				name = tdoc.name;
 				if (type != doc.type)
 				{
 					if (fn2obj.TryGetValue(tdoc.type, out var objtype))
 					{
 						tdoc = docs[objtype.Name];
-						typeName = objtype.Name + " Function";
+						name = objtype.Name;
 					}
-					typePath = GetRelativePath(doc.path, tdoc.path) + ".md";
+					path = GetRelativePath(doc.path, tdoc.path) + ".md";
 				}
 			}
+			return path;
+		}
+		static void PrintSimpleMember(StreamWriter wr, Document doc, string name, MemberInfo member, Type type)
+		{
+			var desc = member.GetCustomAttribute<DescriptionAttribute>().Description;
+			var alias = member.GetCustomAttribute<AliasAttribute>();
+			if (alias != null && alias.Name == null)
+			{
+				//TODO link to the alias
+				wr.WriteLine("- `{0}` - {1}", name, desc);
+				return;
+			}
+			var typePath = ResolveType(doc, type, out var typeName);
 			if (member is MethodInfo || typeof(ICallable).IsAssignableFrom(type))
-				name = name + "()";
+				name += "()";
 			else if (member is PropertyInfo p && p.GetIndexParameters().Length > 0)
 				name = "[index]";
 			wr.WriteLine(typePath == null
 				? "- `{0}`: {1} - {3}"
 				: "- `{0}`: [{1}]({2}) - {3}",
 				name, typeName, typePath, desc);
+		}
+
+		static void PrintMethod(StreamWriter wr, Document doc, string name, MethodInfo method)
+		{
+			var desc = method.GetCustomAttribute<DescriptionAttribute>().Description;
+			var type = method.ReturnType;
+			var typePath = ResolveType(doc, type, out var typeName);
+			var pars = method.GetParameters();
+			wr.Write("- `{0}()`: ", name);
+			wr.Write(typePath == null ? "{0}" : "[{0}]({1})", typeName, typePath);
+			foreach (var par in pars)
+			{
+				type = par.ParameterType;
+				typePath = ResolveType(doc, type, out typeName);
+				wr.Write(typePath == null ? ", {0} {1}" : ", {0} [{1}]({2})",
+					par.Name, typeName, typePath);
+			}
+			if (pars.Length > 0)
+				wr.WriteLine();
+			wr.WriteLine(pars.Length == 0 ? " - {0}" : "  - {0}", desc);
 		}
 
 		static string GetRelativePath(string fromPath, string toPath)

@@ -88,14 +88,27 @@ namespace RedOnion.KSP.API
 				Dispose();
 		}
 
+		[Description("Native `Vessel` for unrestricted access to KSP API."
+			+ " Same as `FlightGlobals.ActiveVessel` if accessed through global `ship`.")]
 		public Vessel Native { get; private set; }
+		[Description("All parts of this ship/vessel/vehicle.")]
 		public ShipPartSet Parts { get; private set; }
+		[Description("Root part (same as `Parts.Root`).")]
 		public PartBase Root => Parts.Root;
+		[Description("One of the decouplers that will get activated by nearest stage. (Same as `Parts.NextDecoupler`.)")]
 		public Decoupler NextDecoupler => Parts.NextDecoupler;
+		[Description("Stage number of the nearest decoupler or -1. (Same as `Parts.NextDecouplerStage`.)")]
 		public int NextDecouplerStage => Parts.NextDecouplerStage;
+
+		[Description("List of all decouplers, separators, launch clamps and docks with staging."
+			+ " (Docking ports without staging enabled not included.)")]
 		public ReadOnlyList<Decoupler> Decouplers => Parts.Decouplers;
+		[Description("List of all docking ports (regardless of staging).")]
 		public ReadOnlyList<DockingPort> DockingPorts => Parts.DockingPorts;
+		[Description("All engines (regardless of state).")]
 		public ReadOnlyList<Engine> Engines => Parts.Engines;
+		[Description("All sensors.")]
+		public ReadOnlyList<Sensor> Sensors => Parts.Sensors;
 
 		public Guid ID => Native.id;
 		public uint PersistentID => Native.persistentId;
