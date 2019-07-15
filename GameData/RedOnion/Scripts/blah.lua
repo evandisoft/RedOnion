@@ -1,3 +1,1 @@
-function a()
-    print(1)
-end
+b=new(import.System.Collections.Generic.List)
