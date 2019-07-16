@@ -9,7 +9,7 @@ namespace Kerbalua.Completion
 		public virtual IList<string> GetPossibleCompletions(object obj, BindingFlags flags)
 		{
 			Type t = obj as Type;
-			return CompletionReflectionUtil.GetMembers(t,flags);
+			return CompletionReflectionUtil.GetMemberNames(t,flags);
 		}
 
 		public virtual bool TryProcessGetMember(object obj, CompletionOperations operations, out object outObj, BindingFlags flags)

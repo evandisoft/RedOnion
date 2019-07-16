@@ -134,6 +134,7 @@
     <Compile Include="Kerbalua\Completion\CompletionReflectionUtil.cs" />
     <Compile Include="Kerbalua\Completion\Instance.cs" />
     <Compile Include="Kerbalua\Completion\OperationsProcessorNative.cs" />
+    <Compile Include="Kerbalua\Parsing\AnyErrorsListener.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
