@@ -1,4 +1,4 @@
-var targetAltitude = 80000
+var targetAltitude = 80000000
 var safeAltitude   = 72000
 var ascentHeading  = 90
 
@@ -22,8 +22,8 @@ def checkStaging
     print "Releasing launch clamps"
     stage
     return
-  if stage.engines.count == 0
-    print "No active engines"
+  if !stage.engines.anyOperational
+    print "No operational engine"
     stage
     return
   if stage.solidFuel + stage.liquidFuel <= 0.1
@@ -35,7 +35,7 @@ print "Target apoapsis: " + targetAltitude
 print "Safe altitude:   " + safeAltitude
 var lastApoAbove = 0.0
 wait
-until altitude > safeAltitude
+until altitude >= safeAltitude and apoapsis >= targetAltitude 
   checkStaging()
 
   setPitch math.deg.acos math.clamp apoapsis / safeAltitude, 0, 1

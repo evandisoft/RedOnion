@@ -1,8 +1,11 @@
 ## EngineSet
 
-Read-only list (or set). Enumerable (can be used in `foreach`).
-Used e.g. for parts and all lists and sets you are not allowed to modify.
+Read-only set of engines.
 
+- `AnyOperational`: Boolean - Whether any engine in the set is operational.
+- `AllOperational`: Boolean - Whether all the engines in the set are operational.
+- `AnyFlameout`: Boolean - Wheter any engine in the set flamed out.
+- `AllFlameout`: Boolean - Wheter all engines in the set flamed out.
 - `Count`: Int32 - Number of elements in the list (or set).
 - `[index]`: [Engine](Engine.md) - Get element by index. Will throw exception if index is out of range.
 - `Contains()`: Boolean, item [Engine](Engine.md)

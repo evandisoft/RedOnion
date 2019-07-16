@@ -64,15 +64,7 @@ namespace RedOnion.KSP.API
 		[Description("Amount of liquid fuel available in tanks of current stage to active engines."
 			+ " Shortcut to `CrossParts.Resources.GetAmountOf(\"LiquidFuel\")`.")]
 		public static double LiquidFuel
-			=> CrossParts.Resources.GetAmountOf("LiquidFuel") - MinLiquidFuel;
-
-		/* NOT WORKING
-		[Description("Amount of liquid fuel that will be left in tanks when all of the engines flame out."
-			+ " This assumes that no tank is fully empty (below what engines can drain)."
-			+ " `CrossParts.Resources.GetPartCountOf(\"LiquidFuel\") * Engines.Propellants.GetMinimalOf(\"LiquidFuel\")`.")]
-		*/
-		public static double MinLiquidFuel
-			=> CrossParts.Resources.GetPartCountOf("LiquidFuel") * Engines.Propellants.GetMinimalOf("LiquidFuel");
+			=> CrossParts.Resources.GetAmountOf("LiquidFuel");
 
 		static protected internal bool Dirty { get; private set; } = true;
 		static protected internal void SetDirty(string reason = null)

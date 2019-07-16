@@ -5,6 +5,7 @@ using RedOnion.ROS.Utilities;
 
 namespace RedOnion.KSP.Parts
 {
+	[Description("Read-only set of engines.")]
 	public class EngineSet : PartSet<Engine>
 	{
 		protected internal EngineSet() { }
@@ -18,6 +19,59 @@ namespace RedOnion.KSP.Parts
 			base.SetDirty();
 			if (propellants != null)
 				propellants.SetDirty();
+		}
+
+		[Description("Whether any engine in the set is operational.")]
+		public bool AnyOperational
+		{
+			get
+			{
+				foreach (var e in this)
+				{
+					if (e.Operational)
+						return true;
+				}
+				return false;
+			}
+		}
+		[Description("Whether all the engines in the set are operational.")]
+		public bool AllOperational
+		{
+			get
+			{
+				foreach (var e in this)
+				{
+					if (!e.Operational)
+						return false;
+				}
+				return true;
+			}
+		}
+		[Description("Wheter any engine in the set flamed out.")]
+		public bool AnyFlameout
+		{
+			get
+			{
+				foreach (var e in this)
+				{
+					if (e.Flameout)
+						return true;
+				}
+				return false;
+			}
+		}
+		[Description("Wheter all engines in the set flamed out.")]
+		public bool AllFlameout
+		{
+			get
+			{
+				foreach (var e in this)
+				{
+					if (!e.Flameout)
+						return false;
+				}
+				return true;
+			}
 		}
 	}
 
