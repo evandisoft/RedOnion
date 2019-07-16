@@ -47,8 +47,8 @@ namespace RedOnion.KSP.API
 		[Description("Active engines (regardless of decouplers)."
 			+ " `Engines.Resources` reflect total amounts of fuels"
 			+ " inside boosters with fuel that cannot flow (like solid fuel).")]
-		public static PartSet<Engine> Engines { get; }
-			= new PartSet<Engine>(Refresh);
+		public static EngineSet Engines { get; }
+			= new EngineSet(Refresh);
 		[Description("Active engines and all accessible tanks upto next decoupler."
 			+ " `CrossParts.Resources` reflect total amounts of fuels accessible to active engines,"
 			+ " but only in parts that will be separated by next decoupler."
@@ -57,21 +57,22 @@ namespace RedOnion.KSP.API
 		public static PartSet<PartBase> CrossParts { get; }
 			= new PartSet<PartBase>(Refresh);
 
-		[Description("Amount of solid fuel in active engines."
-			+ " Shortcut to Engines.Resources.GetAmountOf(\"SolidFuel\")")]
+		[Description("Amount of solid fuel available in active engines."
+			+ " Shortcut to `Engines.Resources.GetAmountOf(\"SolidFuel\")`.")]
 		public static double SolidFuel
 			=> Engines.Resources.GetAmountOf("SolidFuel");
-		[Description("Amount of liquid fuel in tanks of current stage."
-			+ " Shortcut to CrossParts.Resources.GetAmountOf(\"LiquidFuel\")")]
+		[Description("Amount of liquid fuel available in tanks of current stage to active engines."
+			+ " Shortcut to `CrossParts.Resources.GetAmountOf(\"LiquidFuel\")`.")]
 		public static double LiquidFuel
-			=> CrossParts.Resources.GetAmountOf("LiquidFuel");
+			=> CrossParts.Resources.GetAmountOf("LiquidFuel") - MinLiquidFuel;
 
-		// TODO: aggregate to custom PropellantInfo
-		[Description("Propellants used by active engines"), ReadOnlyItems]
-		static ReadOnlyList<Propellant> Propellants { get; }
-			= new ReadOnlyList<Propellant>(Refresh);
-		static readonly HashSet<string> propellantNames
-			= new HashSet<string>();
+		/* NOT WORKING
+		[Description("Amount of liquid fuel that will be left in tanks when all of the engines flame out."
+			+ " This assumes that no tank is fully empty (below what engines can drain)."
+			+ " `CrossParts.Resources.GetPartCountOf(\"LiquidFuel\") * Engines.Propellants.GetMinimalOf(\"LiquidFuel\")`.")]
+		*/
+		public static double MinLiquidFuel
+			=> CrossParts.Resources.GetPartCountOf("LiquidFuel") * Engines.Propellants.GetMinimalOf("LiquidFuel");
 
 		static protected internal bool Dirty { get; private set; } = true;
 		static protected internal void SetDirty(string reason = null)
@@ -89,12 +90,9 @@ namespace RedOnion.KSP.API
 			Parts.SetDirty();
 			CrossParts.SetDirty();
 			Engines.SetDirty();
-			Propellants.SetDirty();
 			Parts.Clear();
 			CrossParts.Clear();
 			Engines.Clear();
-			Propellants.Clear();
-			propellantNames.Clear();
 
 		}
 		void EngineChange(ModuleEngines engine)
@@ -115,8 +113,6 @@ namespace RedOnion.KSP.API
 			Parts.Clear();
 			CrossParts.Clear();
 			Engines.Clear();
-			Propellants.Clear();
-			propellantNames.Clear();
 			var ship = Ship.Active;
 			if (ship == null)
 			{
@@ -138,9 +134,6 @@ namespace RedOnion.KSP.API
 				if (e.State != PartStates.ACTIVE)
 					continue;
 				Engines.Add(e);
-				foreach (var propellant in e.Propellants)
-					if (propellantNames.Add(propellant.name))
-						Propellants.Add(propellant);
 				CrossParts.Add(e);
 				foreach (var crossPart in e.Native.crossfeedPartSet.GetParts())
 				{
@@ -153,7 +146,6 @@ namespace RedOnion.KSP.API
 			Parts.Dirty = false;
 			CrossParts.Dirty = false;
 			Engines.Dirty = false;
-			Propellants.Dirty = false;
 			GameEvents.onEngineActiveChange.Add(Instance.EngineChange);
 			GameEvents.onStageActivate.Add(Instance.StageActivated);
 			GameEvents.onStageSeparation.Add(Instance.StageSeparation);

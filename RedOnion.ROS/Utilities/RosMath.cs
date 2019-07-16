@@ -1,6 +1,6 @@
 using System;
 
-namespace RedOnion.ROS.Objects
+namespace RedOnion.ROS.Utilities
 {
 	[System.ComponentModel.DisplayName("Math")]
 	public static class RosMath
@@ -42,6 +42,13 @@ namespace RedOnion.ROS.Objects
 			public static float Asin(float r) => (float)(Math.Asin(r) * Rad2Deg);
 			public static float Atan(float r) => (float)(Math.Atan(r) * Rad2Deg);
 			public static float Atan2(float y, float x) => (float)(Math.Atan2(y, x) * Rad2Deg);
+
+			public static double Clamp360(double a)
+			{
+				a = a % 360;
+				if (a < 0) a += 360;
+				return a;
+			}
 		}
 
 		public static double Abs(double value) => Math.Abs(value);
@@ -163,6 +170,5 @@ namespace RedOnion.ROS.Objects
 		public static double Log(double d) => Math.Log(d);
 		public static double Log10(double d) => Math.Log10(d);
 		public static double Pow(double x, double y) => Math.Pow(x, y);
-
 	}
 }

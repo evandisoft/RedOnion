@@ -37,6 +37,8 @@ namespace RedOnion.ROS.Objects
 			System.Add("null", Value.Null);
 			System.Add("true", Value.True);
 			System.Add("false", Value.False);
+			System.Add("NaN", Value.NaN);
+			System.Add("Inf", double.PositiveInfinity);
 
 			System.Lock();
 			Lock();

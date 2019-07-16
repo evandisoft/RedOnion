@@ -25,7 +25,7 @@ namespace Kerbalua.MoonSharp
 	{
 		public FlightControl FlightControl = FlightControl.GetInstance();
 		public FlightGlobals FlightGlobals = FlightGlobals.fetch;
-		public Time Time = new Time();
+		public UnityEngine.Time Time = new UnityEngine.Time();
 		public Mathf Mathf = new Mathf();
 		public Scalar Scalar = new Scalar();
 		public Vec Vec = new Vec();

@@ -15,88 +15,15 @@ namespace RedOnion.KSP.Parts
 		void SetDirty();
 		event Action Refresh;
 	}
-	public class ReadOnlyList<T> : IList<T>
-	{
-		protected ListCore<T> list;
-		protected internal Action Refresh;
-		protected internal bool Dirty { get; set; } = true;
-		protected internal virtual void SetDirty() => Dirty = true;
-		protected virtual void DoRefresh()
-		{
-			Refresh?.Invoke();
-			Dirty = false;
-		}
-
-		protected internal ReadOnlyList() { }
-		protected internal ReadOnlyList(Action refresh) => Refresh = refresh;
-
-		public int Count
-		{
-			get
-			{
-				if (Dirty) DoRefresh();
-				return list.Count;
-			}
-		}
-		public virtual bool Contains(T item)
-		{
-			if (Dirty) DoRefresh();
-			return list.Contains(item);
-		}
-		public void CopyTo(T[] array, int index)
-		{
-			if (Dirty) DoRefresh();
-			list.CopyTo(array, index);
-		}
-
-		protected internal virtual void Clear() => list.Clear();
-		protected internal virtual bool Add(T item)
-		{
-			list.Add(item);
-			return true;
-		}
-
-		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-		public virtual IEnumerator<T> GetEnumerator()
-		{
-			if (Dirty) DoRefresh();
-			return list.GetEnumerator();
-		}
-
-		public T this[int index]
-		{
-			get
-			{
-				if (Dirty) DoRefresh();
-				return list[index];
-			}
-		}
-		public int IndexOf(T item)
-		{
-			if (Dirty) DoRefresh();
-			return list.IndexOf(item);
-		}
-
-		bool ICollection<T>.IsReadOnly => true;
-		T IList<T>.this[int index]
-		{
-			get => this[index];
-			set => throw new NotImplementedException();
-		}
-		void ICollection<T>.Add(T item) => throw new NotImplementedException();
-		void ICollection<T>.Clear() => throw new NotImplementedException();
-		bool ICollection<T>.Remove(T item) => throw new NotImplementedException();
-		void IList<T>.Insert(int index, T item) => throw new NotImplementedException();
-		void IList<T>.RemoveAt(int index) => throw new NotImplementedException();
-	}
 	public class PartSet<Part>
 		: ReadOnlyList<Part>
 		, IPartSet
 		where Part : PartBase
 	{
 		protected Dictionary<global::Part, Part> cache = new Dictionary<global::Part, Part>();
-		protected ResourceList resources;
 		public ResourceList Resources => resources ?? (resources = new ResourceList(this));
+		protected ResourceList resources;
+
 		protected internal override void SetDirty()
 		{
 			base.SetDirty();
@@ -159,7 +86,7 @@ namespace RedOnion.KSP.Parts
 			get
 			{
 				if (Dirty) DoRefresh();
-				return cache[part];
+				return cache.TryGetValue(part, out var it) ? it : null;
 			}
 		}
 	}
@@ -198,7 +125,7 @@ namespace RedOnion.KSP.Parts
 		[Description("List of all docking ports (regardless of staging).")]
 		public ReadOnlyList<DockingPort> DockingPorts { get; protected set; }
 		[Description("All engines (regardless of state).")]
-		public ReadOnlyList<Engine> Engines { get; protected set; }
+		public EngineSet Engines { get; protected set; }
 		[Description("All sensors.")]
 		public ReadOnlyList<Sensor> Sensors { get; protected set; }
 
@@ -207,7 +134,8 @@ namespace RedOnion.KSP.Parts
 			Ship = ship;
 			Decouplers = new ReadOnlyList<Decoupler>(DoRefresh);
 			DockingPorts = new ReadOnlyList<DockingPort>(DoRefresh);
-			Engines = new ReadOnlyList<Engine>(DoRefresh);
+			Engines = new EngineSet(DoRefresh);
+			Sensors = new ReadOnlyList<Sensor>(DoRefresh);
 		}
 		protected internal override void SetDirty()
 		{

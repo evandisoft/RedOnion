@@ -48,6 +48,8 @@ namespace RedOnion.Build
 				return;
 			if (type.IsGenericType)
 				type = type.GetGenericTypeDefinition();
+			if (type.IsGenericParameter || type.FullName == null)
+				return;
 			var desc = type.GetCustomAttribute<DescriptionAttribute>()?.Description;
 			if (desc != null && discovered.Add(type))
 				queue.Add(type);
@@ -61,7 +63,8 @@ namespace RedOnion.Build
 			{
 				var type = queue[i];
 				var desc = type.GetCustomAttribute<DescriptionAttribute>()?.Description;
-				var name = type.GetCustomAttribute<DisplayNameAttribute>(false)?.DisplayName ?? type.Name;
+				var name = type.GetCustomAttribute<DisplayNameAttribute>(false)?.DisplayName
+					?? type.Name.Replace('`', '.');
 				var full = type.FullName;
 				if (full.StartsWith("RedOnion.KSP."))
 					full = full.Substring("RedOnion.KSP.".Length);
@@ -76,7 +79,7 @@ namespace RedOnion.Build
 				{
 					type = type,
 					name = name,
-					path = "RedOnion.KSP/" + string.Join("/", full.Split('.')),
+					path = "RedOnion.KSP/" + string.Join("/", full.Split('.')).Replace('`', '.'),
 					desc = desc
 				};
 				docs.Add(name, doc);

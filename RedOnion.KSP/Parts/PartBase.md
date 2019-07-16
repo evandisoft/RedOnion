@@ -8,5 +8,7 @@ Part of the ship (wehicle/vessel).
 - `Decoupler`: [Decoupler](Decoupler.md) - Decoupler that will decouple this part when staged.
 - `Stage`: Int32 - Stage number as provided by KSP API. (`Native.inverseStage`)
 - `DecoupledIn`: Int32 - Stage number where this part will be decoupled or -1. (`Decoupler?.Stage ?? -1`)
+- `Resources`: [ResourceList](ResourceList.md) - Resources contained within this part.
+- `State`: PartStates - State of the part (IDLE, ACTIVE (e.g. engine), DEACTIVATED, DEAD, FAILED).
 - `IsType()`: Boolean, name String
   - Method to test the type of the part (e.g. `.IsType("LaunchClamp")`)

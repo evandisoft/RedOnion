@@ -19,10 +19,17 @@ namespace RedOnion.KSP.API
 		[Description("Alias to `reflect` because of the namespaces.")]
 		public static Reflect Native => Reflect.Instance;
 
+		[Description("Current time")]
+		public static Time Time => Time.Instance;
+
 		[Description("Active vessel (in flight only, null otherwise).")]
 		public static Ship Ship => Ship.Active;
 		[Description("Staging logic.")]
 		public static Stage Stage => Stage.Instance;
+		[Description("Autopilot for active vessel.")]
+		public static Autopilot Autopilot => Ship.Autopilot;
+		[Description("User/player controls.")]
+		public static User User => User.Instance;
 
 		[Description("Function for creating 3D vector / coordinate.")]
 		public static VectorCreator Vector => VectorCreator.Instance;
@@ -39,6 +46,13 @@ namespace RedOnion.KSP.API
 		public static readonly string vangle = "Vector.angle";
 		[Alias, Description("Alias to `Vector.angle` (or `v.angle`).")]
 		public static readonly string vang = "Vector.angle";
+
+		[Description("Alias to `Ship.Altitude`")]
+		public static double Altitude => Ship.Altitude;
+		[Description("Alias to `Ship.Apoapsis`.")]
+		public static double Apoapsis => Ship.Apoapsis;
+		[Description("Alias to `Ship.Periapsis`.")]
+		public static double Periapsis => Ship.Periapsis;
 	}
 
 	public class RosGlobals : RedOnion.ROS.Objects.Globals
@@ -64,44 +78,98 @@ namespace RedOnion.KSP.API
 
 			Add("KSP", typeof(KSP_Namespace));
 			Add("Unity", typeof(Unity_Namespace));
+		}
 
-			foreach (var prop in typeof(Globals).GetProperties(BindingFlags.Public|BindingFlags.Static))
-				Add(prop.Name, prop.GetValue(null, null));
-			foreach (var alias in typeof(Globals).GetFields(BindingFlags.Public|BindingFlags.Static))
+		class ReflectedGlobals : Reflected
+		{
+			public ReflectedGlobals() : base(typeof(Globals)) { }
+			public int Count => prop.Count;
+			public ref Prop this[int idx] => ref prop.items[idx];
+			public IEnumerator<string> GetEnumerator()
 			{
-				if (alias.FieldType != typeof(string))
-					continue;
-				var fullPath = (string)alias.GetValue(null);
-				var path = fullPath.Split('.');
-				int at = Find(path[0]);
+				for (int i = 0; i < prop.size; i++)
+					yield return prop.items[i].name;
+			}
+		}
+		const int mark = 0x7F000000;
+		static ReflectedGlobals reflected = new ReflectedGlobals();
+
+		public override int Find(string name)
+		{
+			int at = reflected.Find(null, name, false);
+			if (at >= 0) return at + mark;
+			return base.Find(name);
+		}
+		public override bool Get(ref Value self, int at)
+		{
+			if (at < mark)
+				return base.Get(ref self, at);
+			if ((at -= mark) >= reflected.Count)
+				return false;
+			ref var member = ref reflected[at];
+			if (member.read == null)
+				return false;
+			if (member.kind != Reflected.Prop.Kind.Field || member.write != null)
+			{
+				self = member.read(self.obj);
+				return true;
+			}
+			var fullPath = member.read(self.obj).ToStr();
+			var path = fullPath.Split('.');
+			at = Find(path[0]);
+			if (at < 0)
+			{
+				Value.DebugLog("Globals: Could not find `{0}`", path[0]);
+				return false;
+			}
+			var item = Value.Void;
+			if (!Get(ref item, at))
+			{
+				Value.DebugLog("Globals: Could not get `{0}`", path[0]);
+				return false;
+			}
+			for (int i = 1; i < path.Length; i++)
+			{
+				at = item.desc.Find(item.obj, path[i]);
 				if (at < 0)
 				{
-					Value.DebugLog("Globals: Could not find `{0}`", path[0]);
-					continue;
+					Value.DebugLog("Globals: Could not find `{0}` in {1}", path[i], fullPath);
+					return false;
 				}
-				var item = Value.Void;
-				if (!Get(ref item, at))
+				if (!item.desc.Get(ref item, at))
 				{
-					Value.DebugLog("Globals: Could not get `{0}`", path[0]);
-					continue;
+					Value.DebugLog("Globals: Could not get `{0}`", path[i], fullPath);
+					return false;
 				}
-				for (int i = 1; i < path.Length; i++)
-				{
-					at = item.desc.Find(item.obj, path[i]);
-					if (at < 0)
-					{
-						Value.DebugLog("Globals: Could not find `{0}` in {1}", path[i], fullPath);
-						goto skip;
-					}
-					if (!item.desc.Get(ref item, at))
-					{
-						Value.DebugLog("Globals: Could not get `{0}`", path[i], fullPath);
-						goto skip;
-					}
-				}
-				Add(alias.Name, item);
-			skip:;
 			}
+			self = item;
+			return true;
+		}
+		public override bool Set(ref Value self, int at, OpCode op, ref Value value)
+		{
+			if (at < mark)
+				return base.Set(ref self, at, op, ref value);
+			if ((at -= mark) >= reflected.Count)
+				return false;
+			ref var member = ref reflected[at];
+			if (member.write == null)
+				return false;
+			if (op != OpCode.Assign)
+				return false;
+			member.write(self.obj, value);
+			return true;
+		}
+		public override IEnumerable<string> EnumerateProperties(object self)
+		{
+			var seen = new HashSet<string>();
+			foreach (var member in reflected)
+			{
+				seen.Add(member);
+				yield return member;
+			}
+			;
+			foreach (var name in EnumerateProperties(self, seen))
+				yield return name;
 		}
 	}
 

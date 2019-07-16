@@ -23,9 +23,14 @@ namespace RedOnion.KSP.Parts
 		[Description("Stage number where this part will be decoupled or -1. (`Decoupler?.Stage ?? -1`)")]
 		public int DecoupledIn => Decoupler?.Stage ?? -1;
 
+		[Description("Resources contained within this part.")]
+		public ResourceList Resources => resources ?? (resources = new ResourceList(this));
+		ResourceList resources;
+
+		[Description("State of the part (IDLE, ACTIVE (e.g. engine), DEACTIVATED, DEAD, FAILED).")]
 		public PartStates State => Native.State;
 
-		// TODO: make this generic feature of ROS (typeof operator)
+		// TODO: make this generic feature of ROS (`typeof` and `is` operators)
 		[Description("Method to test the type of the part (e.g. `.IsType(\"LaunchClamp\")`)")]
 		public virtual bool IsType(string name) => false;
 

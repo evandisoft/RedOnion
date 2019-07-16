@@ -15,7 +15,7 @@ namespace RedOnion.ROS
 			public static bool LowerFirstLetter = true;
 
 			[DebuggerDisplay("{name}")]
-			protected struct Prop
+			public struct Prop
 			{
 				public enum Kind
 				{
@@ -100,7 +100,6 @@ namespace RedOnion.ROS
 
 			public override bool Call(ref Value result, object self, Arguments args, bool create)
 			{
-				Value.DebugLog("{0}/{1}.{2} {3}", Name, Type.FullName, create ? "Create" : "Call", result);
 				if (result.obj is ICallable call)
 					return call.Call(ref result, self, args, create);
 				if (!create && result.obj != null)

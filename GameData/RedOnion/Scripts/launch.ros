@@ -1,8 +1,16 @@
 var targetAltitude = 80000
-var karmanAltitude = 75000
-var ascentHeading = 90
+var safeAltitude   = 72000
+var ascentHeading  = 90
 
-var vessel=native.FlightGlobals.ActiveVessel
+ship.throttle = 0
+user.throttle = 1
+
+var lastPitchReport = 0.0
+def setPitch pitch
+  ksp.flightControl.setRel ascentHeading, pitch
+  if time() - lastPitchReport > 10
+    lastPitchReport = time()
+    print "Pitch: " + pitch
 
 def checkStaging
   if !stage.ready
@@ -18,20 +26,38 @@ def checkStaging
     print "No active engines"
     stage
     return
-  var sum = stage.solidFuel + stage.liquidFuel
-  if sum < 0.1
+  if stage.solidFuel + stage.liquidFuel <= 0.1
     print "Stage out of fuel"
     stage
     return
 
 print "Target apoapsis: " + targetAltitude
-var ctrl = ksp.flightControl
-until ship.apoapsis > targetAltitude
+print "Safe altitude:   " + safeAltitude
+var lastApoAbove = 0.0
+wait
+until altitude > safeAltitude
   checkStaging()
-  var ratio = ship.apoapsis / karmanAltitude
-  if ratio > 1 then ratio = 1
-  if ratio < 0 then ratio = 0
-  ctrl.setRel ascentHeading, math.deg.acos ratio
+
+  setPitch math.deg.acos math.clamp apoapsis / safeAltitude, 0, 1
+
+  if apoapsis >= targetAltitude
+    ship.throttle = 0
+    if lastApoAbove == 0.0
+      print "Apoapsis reached"
+    lastApoAbove = time()
+  else if lastApoAbove != 0 and time() - lastApoAbove < 10
+    ship.throttle = 0
+  else
+    var power = 1
+    if apoapsis > safeAltitude and altitude < safeAltitude
+      power = math.max 0.3, (targetAltitude-apoapsis) / math.max(1.0, targetAltitude-safeAltitude)
+    if apoapsis > targetAltitude * 0.95
+      power = math.min power, 0.01+20*(1-apoapsis/targetAltitude)
+    ship.throttle = math.min power, user.throttle
+
   wait
 
-print "Apoapsis reached"
+print "Safe altitude reached"
+user.throttle = 0
+ship.throttle = math.nan
+ksp.FlightControl.disable
