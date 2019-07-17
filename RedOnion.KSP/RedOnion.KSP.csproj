@@ -109,6 +109,8 @@
     <Compile Include="ReflectionUtil\DualCaseSensitivityDict.cs" />
     <Compile Include="ReflectionUtil\GetMappings.cs" />
     <Compile Include="ReflectionUtil\GetMappings.Lua.cs" />
+    <Compile Include="API\AutoRun.cs" />
+    <Compile Include="Settings\GlobalSettings.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RedOnion.ROS\RedOnion.ROS.csproj">
@@ -123,5 +125,8 @@
   <ItemGroup />
   <ItemGroup />
   <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Settings\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

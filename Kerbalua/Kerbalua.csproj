@@ -119,7 +119,6 @@
     <Compile Include="Kerbalua\Completion\Grammar\IncompleteLuaVisitor.cs" />
     <Compile Include="Kerbalua\Completion\ProcessedIncompleteVar.cs" />
     <Compile Include="Kerbalua\Completion\LuaIntellisenseException.cs" />
-    <Compile Include="Kerbalua\Utility\Settings.cs" />
     <Compile Include="Kerbalua\Other\Evaluation.cs" />
     <Compile Include="Kerbalua\Parsing\IncompleteLuaParsing.cs" />
     <Compile Include="Kerbalua\MoonSharp\KerbaluaScript.cs" />

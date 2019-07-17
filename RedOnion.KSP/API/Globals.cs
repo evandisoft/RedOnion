@@ -14,6 +14,9 @@ namespace RedOnion.KSP.API
 	[Description("Global variables, objects and functions.")]
 	public static class Globals
 	{
+		[Description("An api for setting which scripts will be ran when an engine is reset.")]
+		public static AutoRun autorun => AutoRun.Instance;
+
 		[Description("All the reflection stuff and namespaces.")]
 		public static Reflect Reflect => Reflect.Instance;
 		[Description("Alias to `reflect` because of the namespaces.")]

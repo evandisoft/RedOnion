@@ -12,4 +12,4 @@ Global variables, objects and functions.
 - `ship`: [Ship](Ship.md) - Active vessel (in flight only, null otherwise).
 - `stage()`: [Stage](Stage.md) - Staging logic.
 - `vector()`: [Vector Function](Vector.md) - Function for creating 3D vector / coordinate.
-- `v()`: [Vector Function](Vector.md) - Alias to Vector Function for creating 3D vector / coordinate.
+- `V()`: [Vector Function](Vector.md) - Alias to Vector Function for creating 3D vector / coordinate.

@@ -5,9 +5,9 @@ using UnityEngine;
 using Kerbalua.MoonSharp;
 using Kerbalua.Completion;
 using MoonSharp.Interpreter.Loaders;
-using Kerbalua.Utility;
 using RedOnion.KSP.Lua;
 using RedOnion.KSP.Autopilot;
+using RedOnion.KSP.Settings;
 
 namespace Kerbalua.Other
 {
@@ -47,7 +47,7 @@ namespace Kerbalua.Other
 			
 			scriptEngine.Options.ScriptLoader = new FileSystemScriptLoader();
 			((ScriptLoaderBase)scriptEngine.Options.ScriptLoader).IgnoreLuaPathGlobal = true;
-			((ScriptLoaderBase)scriptEngine.Options.ScriptLoader).ModulePaths = new string[] { Settings.BaseScriptsPath+"/?.lua" };
+			((ScriptLoaderBase)scriptEngine.Options.ScriptLoader).ModulePaths = new string[] { GlobalSettings.BaseScriptsPath+"/?.lua" };
 		}
 
 		public override void ResetEngine()

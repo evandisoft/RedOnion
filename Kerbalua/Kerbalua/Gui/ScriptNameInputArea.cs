@@ -4,6 +4,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Kerbalua.Utility;
+using RedOnion.KSP.Settings;
 
 namespace Kerbalua.Gui {
 	public class ScriptNameInputArea:EditingArea, ICompletableElement {
@@ -14,9 +15,9 @@ namespace Kerbalua.Gui {
 
 		public ScriptNameInputArea()
 		{
-			content.text = Settings.LoadSetting("lastScriptName",defaultScriptFilename);
-			if (!File.Exists(Path.Combine(Settings.BaseScriptsPath, content.text))) {
-				IList<string> recentFiles = Settings.LoadListSetting("recentFiles");
+			content.text = GlobalSettings.LoadSetting("lastScriptName",defaultScriptFilename);
+			if (!File.Exists(Path.Combine(GlobalSettings.BaseScriptsPath, content.text))) {
+				IList<string> recentFiles = GlobalSettings.LoadListSetting("recentFiles");
 				if (recentFiles.Count > 0) {
 					content.text = recentFiles[0];
 				} else {
@@ -49,7 +50,7 @@ namespace Kerbalua.Gui {
 
 		void CommonSaveLoadActions()
 		{
-			Settings.SaveSetting("lastScriptName", content.text);
+			GlobalSettings.SaveSetting("lastScriptName", content.text);
 		}
 
 		public void Save(string text)
@@ -96,8 +97,8 @@ namespace Kerbalua.Gui {
 				content.text = defaultScriptFilename;
 			}
 
-			Directory.CreateDirectory(Settings.BaseScriptsPath);
-			string fullPath = Path.Combine(Settings.BaseScriptsPath, content.text);
+			Directory.CreateDirectory(GlobalSettings.BaseScriptsPath);
+			string fullPath = Path.Combine(GlobalSettings.BaseScriptsPath, content.text);
 
 			if (forSave && !File.Exists(fullPath)) {
 				File.WriteAllText(fullPath, "");
