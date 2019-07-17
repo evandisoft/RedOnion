@@ -110,7 +110,7 @@
     <Compile Include="ReflectionUtil\GetMappings.cs" />
     <Compile Include="ReflectionUtil\GetMappings.Lua.cs" />
     <Compile Include="API\AutoRun.cs" />
-    <Compile Include="Settings\GlobalSettings.cs" />
+    <Compile Include="Settings\SavedSettings.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RedOnion.ROS\RedOnion.ROS.csproj">

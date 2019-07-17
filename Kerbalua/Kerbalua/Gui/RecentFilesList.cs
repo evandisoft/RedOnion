@@ -23,13 +23,13 @@ namespace Kerbalua.Gui {
 		{
 
 			if (scriptList == null || ioDelayWatch.ElapsedMilliseconds > ioDelayMillis) {
-				List<string> recentFiles = new List<string>(GlobalSettings.LoadListSetting("recentFiles"));
-				recentFiles.RemoveAll((string filename) => !File.Exists(Path.Combine(GlobalSettings.BaseScriptsPath, filename)));
+				List<string> recentFiles = new List<string>(SavedSettings.LoadListSetting("recentFiles"));
+				recentFiles.RemoveAll((string filename) => !File.Exists(Path.Combine(SavedSettings.BaseScriptsPath, filename)));
 				scriptList = recentFiles;
 				////scriptList = new List<string>(Directory.GetFiles(baseFolderPath));
 				scriptList.Sort((string s1, string s2) => {
-					var t1 = Directory.GetLastWriteTime(Path.Combine(GlobalSettings.BaseScriptsPath, s1));
-					var t2 = Directory.GetLastWriteTime(Path.Combine(GlobalSettings.BaseScriptsPath, s2));
+					var t1 = Directory.GetLastWriteTime(Path.Combine(SavedSettings.BaseScriptsPath, s1));
+					var t2 = Directory.GetLastWriteTime(Path.Combine(SavedSettings.BaseScriptsPath, s2));
 					if (t1 < t2) return 1;
 					if (t1 > t2) return -1;
 					return 0;

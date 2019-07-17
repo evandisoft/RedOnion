@@ -54,8 +54,8 @@ namespace Kerbalua.Gui
 
 		internal void OnDestroy()
 		{
-			GlobalSettings.SaveSetting("WindowPositionX", mainWindowRect.x.ToString());
-			GlobalSettings.SaveSetting("WindowPositionY", mainWindowRect.y.ToString());
+			SavedSettings.SaveSetting("WindowPositionX", mainWindowRect.x.ToString());
+			SavedSettings.SaveSetting("WindowPositionY", mainWindowRect.y.ToString());
 			//Debug.Log("On Destroy was called");
 		}
 
@@ -98,7 +98,7 @@ namespace Kerbalua.Gui
 
 		public ScriptWindow(Rect param_mainWindowRect)
 		{
-			editorVisible = bool.Parse(GlobalSettings.LoadSetting("editorVisible", "true"));
+			editorVisible = bool.Parse(SavedSettings.LoadSetting("editorVisible", "true"));
 
 			replEvaluators["ROS Engine"] = new RedOnionReplEvaluator()
 			{
@@ -115,7 +115,7 @@ namespace Kerbalua.Gui
 					repl.outputBox.AddError(str)
 			};
 
-			string lastEngineName = GlobalSettings.LoadSetting("lastEngine", "Lua Engine");
+			string lastEngineName = SavedSettings.LoadSetting("lastEngine", "Lua Engine");
 			if (replEvaluators.ContainsKey(lastEngineName))
 			{
 				currentReplEvaluator = replEvaluators[lastEngineName];
@@ -127,7 +127,7 @@ namespace Kerbalua.Gui
 				{
 					currentReplEvaluator = replEvaluators[evaluatorName];
 					replEvaluatorLabel.content.text = evaluatorName;
-					GlobalSettings.SaveSetting("lastEngine", evaluatorName);
+					SavedSettings.SaveSetting("lastEngine", evaluatorName);
 					break;
 				}
 			}
@@ -139,8 +139,8 @@ namespace Kerbalua.Gui
 			});
 
 			mainWindowRect = param_mainWindowRect;
-			mainWindowRect.x = float.Parse(GlobalSettings.LoadSetting("WindowPositionX", param_mainWindowRect.x.ToString()));
-			mainWindowRect.y = float.Parse(GlobalSettings.LoadSetting("WindowPositionY", param_mainWindowRect.y.ToString()));
+			mainWindowRect.x = float.Parse(SavedSettings.LoadSetting("WindowPositionX", param_mainWindowRect.x.ToString()));
+			mainWindowRect.y = float.Parse(SavedSettings.LoadSetting("WindowPositionY", param_mainWindowRect.y.ToString()));
 			completionManager = new CompletionManager(completionBox);
 			completionManager.AddCompletable(scriptIOTextArea);
 			completionManager.AddCompletable(new EditingAreaCompletionAdapter(editor, this));
@@ -180,11 +180,11 @@ namespace Kerbalua.Gui
 
 			widgetBar.renderables.Add(new Button("<<", () => {
 				editorVisible = !editorVisible;
-				GlobalSettings.SaveSetting("editorVisible", editorVisible.ToString());
+				SavedSettings.SaveSetting("editorVisible", editorVisible.ToString());
 				}));
 			widgetBar.renderables.Add(new Button(">>", () => {
 				replVisible = !replVisible;
-				GlobalSettings.SaveSetting("editorVisible", editorVisible.ToString());
+				SavedSettings.SaveSetting("editorVisible", editorVisible.ToString());
 			}));
 			//widgetBar.renderables.Add(scriptIOTextArea);
 			widgetBar.renderables.Add(new Button("Save", () =>
@@ -215,7 +215,7 @@ namespace Kerbalua.Gui
 				widgetBar.renderables.Add(new Button(evaluatorName, () =>
 				{
 					SetCurrentEvaluator(evaluatorName);
-					GlobalSettings.SaveSetting("lastEngine", evaluatorName);
+					SavedSettings.SaveSetting("lastEngine", evaluatorName);
 				}));
 			}
 			widgetBar.renderables.Add(replEvaluatorLabel);
@@ -478,16 +478,16 @@ Any other key gives focus to input box.
 					GUILayout.Label("Tabs");
 					if (GUILayout.Button("+"))
 					{
-						List<string> recentFilesList = new List<string>(GlobalSettings.LoadListSetting("recentFiles"));
+						List<string> recentFilesList = new List<string>(SavedSettings.LoadListSetting("recentFiles"));
 						if (!recentFilesList.Contains(scriptIOTextArea.content.text))
 						{
 							recentFilesList.Add(scriptIOTextArea.content.text);
 						}
-						recentFilesList.RemoveAll((string filename) => !File.Exists(Path.Combine(GlobalSettings.BaseScriptsPath, filename)));
+						recentFilesList.RemoveAll((string filename) => !File.Exists(Path.Combine(SavedSettings.BaseScriptsPath, filename)));
 						recentFilesList.Sort((string s1, string s2) =>
 						{
-							var t1 = Directory.GetLastWriteTime(Path.Combine(GlobalSettings.BaseScriptsPath, s1));
-							var t2 = Directory.GetLastWriteTime(Path.Combine(GlobalSettings.BaseScriptsPath, s2));
+							var t1 = Directory.GetLastWriteTime(Path.Combine(SavedSettings.BaseScriptsPath, s1));
+							var t2 = Directory.GetLastWriteTime(Path.Combine(SavedSettings.BaseScriptsPath, s2));
 							if (t1 < t2) return 1;
 							if (t1 > t2) return -1;
 							return 0;
@@ -496,22 +496,22 @@ Any other key gives focus to input box.
 						{
 							recentFilesList.RemoveAt(recentFilesList.Count - 1);
 						}
-						GlobalSettings.SaveListSetting("recentFiles", recentFilesList);
+						SavedSettings.SaveListSetting("recentFiles", recentFilesList);
 					}
 					if (GUILayout.Button("-"))
 					{
-						List<string> recentFilesList = new List<string>(GlobalSettings.LoadListSetting("recentFiles"));
+						List<string> recentFilesList = new List<string>(SavedSettings.LoadListSetting("recentFiles"));
 						if (!recentFilesList.Contains(scriptIOTextArea.content.text))
 						{
 							recentFilesList.Add(scriptIOTextArea.content.text);
 						}
-						recentFilesList.RemoveAll((string filename) => !File.Exists(Path.Combine(GlobalSettings.BaseScriptsPath, filename)));
+						recentFilesList.RemoveAll((string filename) => !File.Exists(Path.Combine(SavedSettings.BaseScriptsPath, filename)));
 						recentFilesList.Remove(scriptIOTextArea.content.text);
 						if (recentFilesList.Count > 10)
 						{
 							recentFilesList.RemoveAt(recentFilesList.Count - 1);
 						}
-						GlobalSettings.SaveListSetting("recentFiles", recentFilesList);
+						SavedSettings.SaveListSetting("recentFiles", recentFilesList);
 					}
 				}
 				GUILayout.EndHorizontal();

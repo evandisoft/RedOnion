@@ -47,7 +47,7 @@ namespace Kerbalua.Other
 			
 			scriptEngine.Options.ScriptLoader = new FileSystemScriptLoader();
 			((ScriptLoaderBase)scriptEngine.Options.ScriptLoader).IgnoreLuaPathGlobal = true;
-			((ScriptLoaderBase)scriptEngine.Options.ScriptLoader).ModulePaths = new string[] { GlobalSettings.BaseScriptsPath+"/?.lua" };
+			((ScriptLoaderBase)scriptEngine.Options.ScriptLoader).ModulePaths = new string[] { SavedSettings.BaseScriptsPath+"/?.lua" };
 		}
 
 		public override void ResetEngine()

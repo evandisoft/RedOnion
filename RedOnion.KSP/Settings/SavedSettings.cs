@@ -3,12 +3,12 @@ using System.IO;
 using System.Collections.Generic;
 
 namespace RedOnion.KSP.Settings {
-	static public class GlobalSettings {
+	static public class SavedSettings {
 		// will need some changes about loading scripts if that gets changed!
 		public static readonly string BaseScriptsPath;
 		public static readonly string SettingsFile;
 
-		static GlobalSettings()
+		static SavedSettings()
 		{
 			BaseScriptsPath = Path.Combine(KSPUtil.ApplicationRootPath, "GameData/RedOnion/Scripts");
 			SettingsFile = Path.Combine(BaseScriptsPath, ".settings");

@@ -15,9 +15,9 @@ namespace Kerbalua.Gui {
 
 		public ScriptNameInputArea()
 		{
-			content.text = GlobalSettings.LoadSetting("lastScriptName",defaultScriptFilename);
-			if (!File.Exists(Path.Combine(GlobalSettings.BaseScriptsPath, content.text))) {
-				IList<string> recentFiles = GlobalSettings.LoadListSetting("recentFiles");
+			content.text = SavedSettings.LoadSetting("lastScriptName",defaultScriptFilename);
+			if (!File.Exists(Path.Combine(SavedSettings.BaseScriptsPath, content.text))) {
+				IList<string> recentFiles = SavedSettings.LoadListSetting("recentFiles");
 				if (recentFiles.Count > 0) {
 					content.text = recentFiles[0];
 				} else {
@@ -50,7 +50,7 @@ namespace Kerbalua.Gui {
 
 		void CommonSaveLoadActions()
 		{
-			GlobalSettings.SaveSetting("lastScriptName", content.text);
+			SavedSettings.SaveSetting("lastScriptName", content.text);
 		}
 
 		public void Save(string text)
@@ -97,8 +97,8 @@ namespace Kerbalua.Gui {
 				content.text = defaultScriptFilename;
 			}
 
-			Directory.CreateDirectory(GlobalSettings.BaseScriptsPath);
-			string fullPath = Path.Combine(GlobalSettings.BaseScriptsPath, content.text);
+			Directory.CreateDirectory(SavedSettings.BaseScriptsPath);
+			string fullPath = Path.Combine(SavedSettings.BaseScriptsPath, content.text);
 
 			if (forSave && !File.Exists(fullPath)) {
 				File.WriteAllText(fullPath, "");
