@@ -12,8 +12,6 @@ using System.Linq;
 
 namespace RedOnion.KSP.API
 {
-#pragma warning disable IDE1006 // Naming Styles
-
 	[Description("Global variables, objects and functions.")]
 	public static class Globals
 	{
@@ -41,7 +39,7 @@ namespace RedOnion.KSP.API
 		[Description("Staging logic.")]
 		public static Stage stage => Stage.Instance;
 		[Description("Autopilot for active vessel.")]
-		public static Autopilot autopilot => ship.Autopilot;
+		public static Autopilot autopilot => ship.autopilot;
 		[Description("User/player controls.")]
 		public static Player player => Player.Instance;
 		[Description("User/player controls.")]
@@ -53,11 +51,11 @@ namespace RedOnion.KSP.API
 		public static VectorCreator V => VectorCreator.Instance;
 
 		[Description("Alias to `ship.Altitude`")]
-		public static double altitude => ship.Altitude;
+		public static double altitude => ship.altitude;
 		[Description("Alias to `ship.Apoapsis`.")]
-		public static double apoapsis => ship.Apoapsis;
+		public static double apoapsis => ship.apoapsis;
 		[Description("Alias to `ship.Periapsis`.")]
-		public static double periapsis => ship.Periapsis;
+		public static double periapsis => ship.periapsis;
 
 		// TODO: move aliases to startup/setup script/library
 		[Alias, Description("Alias to `Vector.dot` (or `v.dot`).")]
@@ -71,7 +69,6 @@ namespace RedOnion.KSP.API
 		[Alias, Description("Alias to `Vector.angle` (or `v.angle`).")]
 		public static readonly string vang = "Vector.angle";
 	}
-#pragma warning restore IDE1006 // Naming Styles
 
 	public class RosGlobals : RedOnion.ROS.Objects.Globals
 	{

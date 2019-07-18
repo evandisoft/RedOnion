@@ -23,9 +23,9 @@ returned by `AppDomain.CurrentDomain.GetAssemblies()`.")]
 			+ " Example: `reflect.new(\"System.Collections.ArrayList\")`.")]
 		public static Constructor New => Constructor.Instance;
 		[Description("Alias to new().")]
-		public static Constructor Create => Constructor.Instance;
+		public static Constructor create => Constructor.Instance;
 		[Description("Alias to new().")]
-		public static Constructor Construct => Constructor.Instance;
+		public static Constructor construct => Constructor.Instance;
 
 		[Browsable(false)]
 		public class Constructor : ICallable

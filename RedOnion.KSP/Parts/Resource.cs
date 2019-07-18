@@ -48,7 +48,7 @@ namespace RedOnion.KSP.Parts
 		}
 		protected void Process(PartBase part)
 		{
-			foreach (var native in part.Native.Resources)
+			foreach (var native in part.native.Resources)
 			{
 				var name = native.resourceName;
 				if (!cache.TryGetValue(name, out var res))
@@ -72,13 +72,13 @@ namespace RedOnion.KSP.Parts
 			}
 		}
 		[Description("Get amount of resource (in part or set/list) by name. Returns zero for non-existent resources.")]
-		public double GetAmountOf(string name)
+		public double getAmountOf(string name)
 			=> this[name]?.Amount ?? 0.0;
 		[Description("Get maximum storable amount of resource by name. Returs zero for non-existent resources.")]
-		public double GetMaxAmountOf(string name)
+		public double getMaxAmountOf(string name)
 			=> this[name]?.MaxAmount ?? 0.0;
 		[Description("Get number of parts that can store the named resource. Returns zero for non-existent resources.")]
-		public int GetPartCountOf(string name)
+		public int getPartCountOf(string name)
 			=> this[name]?.PartCount ?? 0;
 	}
 	public class Resource

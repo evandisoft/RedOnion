@@ -22,52 +22,52 @@ namespace RedOnion.KSP.Parts
 		}
 
 		[Description("Whether any engine in the set is operational.")]
-		public bool AnyOperational
+		public bool anyOperational
 		{
 			get
 			{
 				foreach (var e in this)
 				{
-					if (e.Operational)
+					if (e.operational)
 						return true;
 				}
 				return false;
 			}
 		}
 		[Description("Whether all the engines in the set are operational.")]
-		public bool AllOperational
+		public bool allOperational
 		{
 			get
 			{
 				foreach (var e in this)
 				{
-					if (!e.Operational)
+					if (!e.operational)
 						return false;
 				}
 				return true;
 			}
 		}
 		[Description("Wheter any engine in the set flamed out.")]
-		public bool AnyFlameout
+		public bool anyFlameout
 		{
 			get
 			{
 				foreach (var e in this)
 				{
-					if (e.Flameout)
+					if (e.flameout)
 						return true;
 				}
 				return false;
 			}
 		}
 		[Description("Wheter all engines in the set flamed out.")]
-		public bool AllFlameout
+		public bool allFlameout
 		{
 			get
 			{
 				foreach (var e in this)
 				{
-					if (!e.Flameout)
+					if (!e.flameout)
 						return false;
 				}
 				return true;
@@ -79,26 +79,26 @@ namespace RedOnion.KSP.Parts
 	public class Engine : PartBase
 	{
 		[Description("KSP API. Module of multi-mode engine, if present (null otherwise).")]
-		public MultiModeEngine MultiModule { get; protected set; }
+		public MultiModeEngine multiModule { get; protected set; }
 		[Description("KSP API. Module of first engine.")]
-		public ModuleEngines FirstModule { get; protected set; }
+		public ModuleEngines firstModule { get; protected set; }
 		[Description("KSP API. Module of second engine, if present (null otherwise).")]
-		public ModuleEngines SecondModule { get; protected set; }
+		public ModuleEngines secondModule { get; protected set; }
 		[Description("Running primary engine (or the only one).")]
-		public bool FirstIsActive => SecondModule == null || MultiModule.runningPrimary;
+		public bool firstIsActive => secondModule == null || multiModule.runningPrimary;
 		[Description("Running secondary engine.")]
-		public bool SecondIsActive => !FirstIsActive;
+		public bool secondIsActive => !firstIsActive;
 		[Description("KSP API. Active engine module.")]
-		public ModuleEngines ActiveModule => FirstIsActive ? FirstModule : SecondModule;
+		public ModuleEngines activeModule => firstIsActive ? firstModule : secondModule;
 		[Description("KSP API. Gimbal module, if present (null otherwise).")]
-		public ModuleGimbal GimbalModule { get; private set; }
+		public ModuleGimbal gimbalModule { get; private set; }
 		[Description("Is multi-mode engine (or not).")]
-		public bool MultiMode { get { return SecondModule != null; } }
+		public bool multiMode { get { return secondModule != null; } }
 		[Description("Has gimbal module.")]
-		public bool HasGimbal { get { return GimbalModule != null; } }
+		public bool hasGimbal { get { return gimbalModule != null; } }
 
 		[Description("Accepts `sensor`. (Case insensitive)")]
-		public override bool IsType(string name)
+		public override bool istype(string name)
 			=> name.Equals("engine", StringComparison.OrdinalIgnoreCase);
 
 		protected internal Engine(Ship ship, Part part, PartBase parent, Decoupler decoupler)
@@ -108,75 +108,75 @@ namespace RedOnion.KSP.Parts
 			{
 				if (module is MultiModeEngine multi)
 				{
-					if (MultiModule != null)
-						MultiModule = multi;
+					if (multiModule != null)
+						multiModule = multi;
 				}
 				else if (module is ModuleEngines engines)
 				{
-					if (FirstModule == null)
-						FirstModule = engines;
-					else if (SecondModule == null)
-						SecondModule = engines;
+					if (firstModule == null)
+						firstModule = engines;
+					else if (secondModule == null)
+						secondModule = engines;
 				}
 				else if (module is ModuleGimbal gimbal)
 				{
-					if (GimbalModule == null)
-						GimbalModule = gimbal;
+					if (gimbalModule == null)
+						gimbalModule = gimbal;
 				}
 			}
-			if (MultiModule == null)
-				SecondModule = null;
-			else if (SecondModule != null && MultiModule.primaryEngineID == SecondModule.engineID)
+			if (multiModule == null)
+				secondModule = null;
+			else if (secondModule != null && multiModule.primaryEngineID == secondModule.engineID)
 			{
-				var second = FirstModule;
-				FirstModule = SecondModule;
-				SecondModule = second;
+				var second = firstModule;
+				firstModule = secondModule;
+				secondModule = second;
 			}
 		}
 
 		[DisplayName("Whether engine is operational (ignited and not flameout).")]
-		public bool Operational => ActiveModule.isOperational;
+		public bool operational => activeModule.isOperational;
 		[DisplayName("Wheter engine is ignited.")]
-		public bool Ignited => ActiveModule.EngineIgnited;
+		public bool ignited => activeModule.EngineIgnited;
 		[DisplayName("Wheter engine flamed out.")]
-		public bool Flameout => ActiveModule.flameout;
+		public bool flameout => activeModule.flameout;
 		[DisplayName("Wheter engine is staged (activated by staging).")]
-		public bool Staged => ActiveModule.staged;
+		public bool staged => activeModule.staged;
 		[DisplayName("Activate the engine.")]
-		public void Activate() => ActiveModule.Activate();
+		public void activate() => activeModule.Activate();
 		[DisplayName("Shutdown / deactivate the engine.")]
-		public void Shutdown() => ActiveModule.Shutdown();
+		public void shutdown() => activeModule.Shutdown();
 
 		[DisplayName("Current ISP. (Specific impulse)")]
-		public float Isp => ActiveModule.realIsp;
+		public float isp => activeModule.realIsp;
 		[DisplayName("Vacuum ISP.")]
-		public float VIsp => ActiveModule.atmosphereCurve.Evaluate(0f);
+		public float visp => activeModule.atmosphereCurve.Evaluate(0f);
 		[DisplayName("Sea-level ISP.")]
-		public float GIsp => ActiveModule.atmosphereCurve.Evaluate(1f);
+		public float gisp => activeModule.atmosphereCurve.Evaluate(1f);
 		[DisplayName("Sea-level ISP.")]
-		public float SLIsp => ActiveModule.atmosphereCurve.Evaluate(1f);
+		public float slisp => activeModule.atmosphereCurve.Evaluate(1f);
 		[DisplayName("Vacuum ISP.")]
-		public float VacuumIsp => ActiveModule.atmosphereCurve.Evaluate(0f);
+		public float vacuumIsp => activeModule.atmosphereCurve.Evaluate(0f);
 		[DisplayName("Sea-level ISP.")]
-		public float GroundIsp => ActiveModule.atmosphereCurve.Evaluate(1f);
+		public float groundIsp => activeModule.atmosphereCurve.Evaluate(1f);
 		[DisplayName("Sea-level ISP.")]
-		public float SeeLevelIsp => ActiveModule.atmosphereCurve.Evaluate(1f);
+		public float seaLevelIsp => activeModule.atmosphereCurve.Evaluate(1f);
 
 		[Description("Avalable thrust at current pressure, ignoring the limiter"
 			+ " (`ThrustPercentage` and current throttle).")]
-		public float Thrust => ActiveModule.finalThrust;
+		public float thrust => activeModule.finalThrust;
 		[Description("Thrust limiter in percents.")]
-		public float ThrustPercentage
+		public float thrustPercentage
 		{
-			get => ActiveModule.thrustPercentage;
-			set => ActiveModule.thrustPercentage = RosMath.Clamp(value, 0f, 100f);
+			get => activeModule.thrustPercentage;
+			set => activeModule.thrustPercentage = RosMath.Clamp(value, 0f, 100f);
 		}
 		[Description("Get thrust at atmospheric pressure"
 			+ " (0 = vacuum, 1 = Kerbin sea-level pressure, NaN = current pressure)"
 			+ " and throttle (default 1 = full throttle). Ignores `ThrustPercentage`.")]
-		public float GetThrust(float atm = float.NaN, float throttle = 1f)
+		public float getThrust(float atm = float.NaN, float throttle = 1f)
 		{
-			var module = ActiveModule;
+			var module = activeModule;
 			if (float.IsNaN(atm))
 				atm = (float)module.part.staticPressureAtm;
 			return module.GetEngineThrust(module.atmosphereCurve.Evaluate(
@@ -184,13 +184,13 @@ namespace RedOnion.KSP.Parts
 				RosMath.Clamp(throttle, 0f, 1f));
 		}
 
-		public double RatioSum => ActiveModule.ratioSum;
-		public double MixtureDensity => ActiveModule.mixtureDensity;
-		public double MixtureDensityRecip => ActiveModule.mixtureDensityRecip;
+		public double RatioSum => activeModule.ratioSum;
+		public double MixtureDensity => activeModule.mixtureDensity;
+		public double MixtureDensityRecip => activeModule.mixtureDensityRecip;
 
 		ReadOnlyList<Propellant> propellants, propellants2;
-		public ReadOnlyList<Propellant> Propellants => FirstIsActive ? Propellants1 : Propellants2;
+		public ReadOnlyList<Propellant> Propellants => firstIsActive ? Propellants1 : Propellants2;
 		public ReadOnlyList<Propellant> Propellants1 => propellants ?? (propellants = new ReadOnlyList<Propellant>());
-		public ReadOnlyList<Propellant> Propellants2 => propellants2 ?? (MultiMode ? propellants2 = new ReadOnlyList<Propellant>() : null);
+		public ReadOnlyList<Propellant> Propellants2 => propellants2 ?? (multiMode ? propellants2 = new ReadOnlyList<Propellant>() : null);
 	}
 }

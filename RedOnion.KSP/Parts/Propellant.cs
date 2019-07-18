@@ -36,7 +36,7 @@ namespace RedOnion.KSP.Parts
 			{
 				foreach (var e in engines)
 				{
-					foreach (var p in e.ActiveModule.propellants)
+					foreach (var p in e.activeModule.propellants)
 					{
 						if (dict.TryGetValue(p.name, out var it))
 						{
@@ -65,7 +65,7 @@ namespace RedOnion.KSP.Parts
 			}
 		}
 		[Description("Get minimal amount of propellant required by the engine(s).")]
-		public double GetMinimalOf(string name)
+		public double getMinimalOf(string name)
 			=> this[name]?.Minimal ?? 0.0;
 	}
 	public class Propellant

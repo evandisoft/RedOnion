@@ -10,10 +10,10 @@ namespace RedOnion.KSP.Parts
 			: base(ship, part, parent, decoupler)
 			=> this.module = module;
 
-		public override bool IsType(string name)
+		public override bool istype(string name)
 			=> name.Equals("port", StringComparison.OrdinalIgnoreCase)
 			|| name.Equals("dockingPort", StringComparison.OrdinalIgnoreCase)
-			|| base.IsType(name);
+			|| base.istype(name);
 
 		public ModuleDockingNode Module => module;
 		public float AcquireForce => module.acquireForce;

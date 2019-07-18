@@ -22,39 +22,39 @@ namespace RedOnion.KSP.API
 			: type is Type t ? t.IsAssignableFrom(typeof(Vector)) : false;
 
 		[Description("Vector(0, 0, 0).")]
-		public static readonly ConstVector Zero = new ConstVector(Vector3d.zero);
+		public static readonly ConstVector zero = new ConstVector(Vector3d.zero);
 		[Description("Vector(1, 1, 1).")]
-		public static readonly ConstVector One = new ConstVector(Vector3d.one);
+		public static readonly ConstVector one = new ConstVector(Vector3d.one);
 		[Description("Vector(0, 0, 1).")]
-		public static readonly ConstVector Forward = new ConstVector(Vector3d.forward);
+		public static readonly ConstVector forward = new ConstVector(Vector3d.forward);
 		[Description("Alias to forward - Vector(0, 0, 1).")]
-		public static readonly ConstVector Fwd = Forward;
+		public static readonly ConstVector fwd = forward;
 		[Description("Vector(0, 0, -1).")]
-		public static readonly ConstVector Back = new ConstVector(Vector3d.back);
+		public static readonly ConstVector back = new ConstVector(Vector3d.back);
 		[Description("Vector(0, 1, 0).")]
-		public static readonly ConstVector Up = new ConstVector(Vector3d.up);
+		public static readonly ConstVector up = new ConstVector(Vector3d.up);
 		[Description("Vector(0, -1, 0).")]
-		public static readonly ConstVector Down = new ConstVector(Vector3d.down);
+		public static readonly ConstVector down = new ConstVector(Vector3d.down);
 		[Description("Vector(-1, 0, 0).")]
-		public static readonly ConstVector Left = new ConstVector(Vector3d.left);
+		public static readonly ConstVector left = new ConstVector(Vector3d.left);
 		[Description("Vector(1, 0, 0).")]
-		public static readonly ConstVector Right = new ConstVector(Vector3d.right);
+		public static readonly ConstVector right = new ConstVector(Vector3d.right);
 
 		[Description("Cross product.")]
-		public static Vector Cross(ConstVector a, ConstVector b)
-			=> new Vector(Vector3d.Cross(a.Native, b.Native));
+		public static Vector cross(ConstVector a, ConstVector b)
+			=> new Vector(Vector3d.Cross(a.native, b.native));
 		[Description("Cross product. (Alias to cross)")]
-		public static Vector Crs(ConstVector a, ConstVector b)
-			=> new Vector(Vector3d.Cross(a.Native, b.Native));
+		public static Vector crs(ConstVector a, ConstVector b)
+			=> new Vector(Vector3d.Cross(a.native, b.native));
 		[Description("Dot product.")]
-		public static Vector Dot(ConstVector a, ConstVector b)
-			=> new Vector(Vector3d.Dot(a.Native, b.Native));
+		public static Vector dot(ConstVector a, ConstVector b)
+			=> new Vector(Vector3d.Dot(a.native, b.native));
 		[Description("Vector with coordinates changed to non-negative.")]
-		public static Vector Abs(ConstVector v)
-			=> new Vector(Math.Abs(v.X), Math.Abs(v.Y), Math.Abs(v.Z));
+		public static Vector abs(ConstVector v)
+			=> new Vector(Math.Abs(v.x), Math.Abs(v.y), Math.Abs(v.z));
 		[Description("Angle between vectors (0..180).")]
-		public static double Angle(ConstVector a, ConstVector b)
-			=> Vector3d.Angle(a.Native, b.Native);
+		public static double angle(ConstVector a, ConstVector b)
+			=> Vector3d.Angle(a.native, b.native);
 
 		bool ICallable.Call(ref Value result, object self, Arguments args, bool create)
 			=> Call(ref result, self, args, create);
@@ -105,7 +105,7 @@ namespace RedOnion.KSP.API
 			{
 				if (value is ConstVector v)
 				{
-					result = v.Native;
+					result = v.native;
 					return true;
 				}
 				if (value is Value val)

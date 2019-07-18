@@ -13,18 +13,18 @@ namespace RedOnion.KSP.Parts
 			=> this.module = module;
 
 		[Description("Accepts `sensor`. (Case insensitive)")]
-		public override bool IsType(string name)
+		public override bool istype(string name)
 			=> name.Equals("sensor", StringComparison.OrdinalIgnoreCase);
 
 		[Description("State of the sensor.")]
-		public bool Active => module.sensorActive;
+		public bool active => module.sensorActive;
 		[Description("Toggle the state.")]
-		public void Toggle() => module.Toggle();
+		public void toggle() => module.Toggle();
 		[Description("Sensor type.")]
 		public ModuleEnviroSensor.SensorType Type => module.sensorType;
 		[Description("Sensor read-out.")]
-		public string Display => module.readoutInfo;
+		public string display => module.readoutInfo;
 		[Description("Sensor electric consumption.")]
-		public double Consumption => module.resHandler?.GetAverageInput() ?? 0.0;		
+		public double consumption => module.resHandler?.GetAverageInput() ?? 0.0;		
 	}
 }

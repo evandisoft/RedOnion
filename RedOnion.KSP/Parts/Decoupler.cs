@@ -11,7 +11,7 @@ namespace RedOnion.KSP.Parts
 			: base(ship, part, parent, decoupler) { }
 
 		[Description("Accepts `decoupler` and `separator`. (Case insensitive)")]
-		public override bool IsType(string name)
+		public override bool istype(string name)
 			=> name.Equals("decoupler", StringComparison.OrdinalIgnoreCase)
 			|| name.Equals("separator", StringComparison.OrdinalIgnoreCase);
 	}

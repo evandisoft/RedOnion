@@ -18,20 +18,20 @@ namespace RedOnion.KSP.API
 
 		bool ICallable.Call(ref Value result, object self, Arguments args, bool create)
 		{
-			result = Activate();
+			result = activate();
 			return true;
 		}
 		[MoonSharpUserDataMetamethod("__call"), Browsable(false)]
 		public DynValue Call(ScriptExecutionContext ctx, CallbackArguments args)
-			=> DynValue.NewBoolean(Activate());
+			=> DynValue.NewBoolean(activate());
 
 		[Description("Stage number.")]
-		public static int Number => StageManager.CurrentStage;
+		public static int number => StageManager.CurrentStage;
 		[Description("Whether ready for activating next stage or not.")]
-		public static bool Ready => StageManager.CanSeparate;
+		public static bool ready => StageManager.CanSeparate;
 
 		[Description("Activate next stage (can simply call stage() instead)")]
-		public static bool Activate()
+		public static bool activate()
 		{
 			if (!HighLogic.LoadedSceneIsFlight)
 				throw new InvalidOperationException("Can only activate stages in flight");
@@ -42,29 +42,32 @@ namespace RedOnion.KSP.API
 		}
 
 		[Description("Parts that will be separated by next decoupler")]
-		public static PartSet<PartBase> Parts { get; }
+		public static PartSet<PartBase> parts { get; }
 			= new PartSet<PartBase>(Refresh);
 		[Description("Active engines (regardless of decouplers)."
 			+ " `Engines.Resources` reflect total amounts of fuels"
 			+ " inside boosters with fuel that cannot flow (like solid fuel).")]
-		public static EngineSet Engines { get; }
+		public static EngineSet engines { get; }
 			= new EngineSet(Refresh);
 		[Description("Active engines and all accessible tanks upto next decoupler."
 			+ " `CrossParts.Resources` reflect total amounts of fuels accessible to active engines,"
 			+ " but only in parts that will be separated by next decoupler."
 			+ " This includes liquid fuel and oxidizer and can be used for automated staging,"
 			+ " Especially so called Asparagus and any design throwing off tanks (with or without engiens).")]
-		public static PartSet<PartBase> CrossParts { get; }
+		public static PartSet<PartBase> crossparts { get; }
 			= new PartSet<PartBase>(Refresh);
 
 		[Description("Amount of solid fuel available in active engines."
 			+ " Shortcut to `Engines.Resources.GetAmountOf(\"SolidFuel\")`.")]
-		public static double SolidFuel
-			=> Engines.Resources.GetAmountOf("SolidFuel");
+		public static double solidfuel
+			=> engines.Resources.getAmountOf("SolidFuel");
 		[Description("Amount of liquid fuel available in tanks of current stage to active engines."
 			+ " Shortcut to `CrossParts.Resources.GetAmountOf(\"LiquidFuel\")`.")]
-		public static double LiquidFuel
-			=> CrossParts.Resources.GetAmountOf("LiquidFuel");
+		public static double liquidfuel
+			=> crossparts.Resources.getAmountOf("LiquidFuel");
+
+		[Description("Total amount of fuel avialable in active engines.")]
+		public static double fuel => solidfuel + liquidfuel;
 
 		static protected internal bool Dirty { get; private set; } = true;
 		static protected internal void SetDirty(string reason = null)
@@ -79,12 +82,12 @@ namespace RedOnion.KSP.API
 			GameEvents.StageManager.OnGUIStageAdded.Remove(Instance.StagesChanged);
 			GameEvents.StageManager.OnGUIStageRemoved.Remove(Instance.StagesChanged);
 			Dirty = true;
-			Parts.SetDirty();
-			CrossParts.SetDirty();
-			Engines.SetDirty();
-			Parts.Clear();
-			CrossParts.Clear();
-			Engines.Clear();
+			parts.SetDirty();
+			crossparts.SetDirty();
+			engines.SetDirty();
+			parts.Clear();
+			crossparts.Clear();
+			engines.Clear();
 
 		}
 		void EngineChange(ModuleEngines engine)
@@ -102,42 +105,42 @@ namespace RedOnion.KSP.API
 
 		static protected void Refresh()
 		{
-			Parts.Clear();
-			CrossParts.Clear();
-			Engines.Clear();
+			parts.Clear();
+			crossparts.Clear();
+			engines.Clear();
 			var ship = Ship.Active;
 			if (ship == null)
 			{
 				Dirty = false;
-				Parts.Dirty = false;
-				CrossParts.Dirty = false;
-				Engines.Dirty = false;
+				parts.Dirty = false;
+				crossparts.Dirty = false;
+				engines.Dirty = false;
 				return;
 			}
-			var shipParts = ship.Parts;
-			var nextDecoupler = shipParts.NextDecouplerStage;
+			var shipParts = ship.parts;
+			var nextDecoupler = shipParts.nextDecouplerStage;
 			foreach (var p in shipParts)
 			{
-				if (p.DecoupledIn >= nextDecoupler)
-					Parts.Add(p);
+				if (p.decoupledin >= nextDecoupler)
+					parts.Add(p);
 			}
-			foreach (var e in ship.Engines)
+			foreach (var e in ship.engines)
 			{
-				if (e.State != PartStates.ACTIVE)
+				if (e.state != PartStates.ACTIVE)
 					continue;
-				Engines.Add(e);
-				CrossParts.Add(e);
-				foreach (var crossPart in e.Native.crossfeedPartSet.GetParts())
+				engines.Add(e);
+				crossparts.Add(e);
+				foreach (var crossPart in e.native.crossfeedPartSet.GetParts())
 				{
 					var part = shipParts[crossPart];
-					if (part.DecoupledIn >= nextDecoupler)
-						CrossParts.Add(part);
+					if (part.decoupledin >= nextDecoupler)
+						crossparts.Add(part);
 				}
 			}
 			Dirty = false;
-			Parts.Dirty = false;
-			CrossParts.Dirty = false;
-			Engines.Dirty = false;
+			parts.Dirty = false;
+			crossparts.Dirty = false;
+			engines.Dirty = false;
 			GameEvents.onEngineActiveChange.Add(Instance.EngineChange);
 			GameEvents.onStageActivate.Add(Instance.StageActivated);
 			GameEvents.onStageSeparation.Add(Instance.StageSeparation);
@@ -145,7 +148,7 @@ namespace RedOnion.KSP.API
 			GameEvents.StageManager.OnStagingSeparationIndices.Add(Instance.StagingSeparationIndices);
 			GameEvents.StageManager.OnGUIStageAdded.Add(Instance.StagesChanged);
 			GameEvents.StageManager.OnGUIStageRemoved.Add(Instance.StagesChanged);
-			Value.DebugLog("Stage Refreshed (Decouple: {0}, Engines: {1})", nextDecoupler, Engines.Count);
+			Value.DebugLog("Stage Refreshed (Decouple: {0}, Engines: {1})", nextDecoupler, engines.Count);
 		}
 	}
 }

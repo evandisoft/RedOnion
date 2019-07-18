@@ -25,7 +25,7 @@ namespace RedOnion.KSP.API
 					return null;
 				}
 				var vessel = FlightGlobals.ActiveVessel;
-				if (active?.Native != vessel)
+				if (active?.native != vessel)
 				{
 					ClearActive();
 					if (vessel != null)
@@ -56,8 +56,8 @@ namespace RedOnion.KSP.API
 
 		protected Ship(Vessel vessel)
 		{
-			Native = vessel;
-			Parts = new ShipPartSet(this);
+			native = vessel;
+			parts = new ShipPartSet(this);
 			GameEvents.onGameSceneLoadRequested.Add(SceneChange);
 		}
 
@@ -72,20 +72,20 @@ namespace RedOnion.KSP.API
 		{
 			if (ReferenceEquals(active, this))
 				ClearActive(disposing: true);
-			if (Parts != null)
+			if (parts != null)
 			{
-				Parts.Dispose();
-				Parts = null;
+				parts.Dispose();
+				parts = null;
 			}
-			if (Native != null)
+			if (native != null)
 			{
 				GameEvents.onGameSceneLoadRequested.Remove(SceneChange);
-				Native = null;
+				native = null;
 			}
-			if (autopilot != null)
+			if (protectedAutopilot != null)
 			{
-				autopilot.Dispose();
-				autopilot = null;
+				protectedAutopilot.Dispose();
+				protectedAutopilot = null;
 			}
 		}
 		void SceneChange(GameScenes scene)
@@ -95,102 +95,102 @@ namespace RedOnion.KSP.API
 		}
 
 		[Description("Autopilot of this ship (vehicle/wessel).")]
-		public Autopilot Autopilot => autopilot ?? (autopilot = new Autopilot(this));
-		protected Autopilot autopilot;
+		public Autopilot autopilot => protectedAutopilot ?? (protectedAutopilot = new Autopilot(this));
+		protected Autopilot protectedAutopilot;
 		[Description("Current throttle (assign redirects to `Autopilot`, reads control state if autopilot disabled)")]
-		public float Throttle
+		public float throttle
 		{
-			get => autopilot == null || float.IsNaN(autopilot.Throttle)
-				? Native.ctrlState.mainThrottle : autopilot.Throttle;
+			get => protectedAutopilot == null || float.IsNaN(protectedAutopilot.Throttle)
+				? native.ctrlState.mainThrottle : protectedAutopilot.Throttle;
 			set
 			{
-				if (autopilot == null && float.IsNaN(value))
+				if (protectedAutopilot == null && float.IsNaN(value))
 					return;
-				Autopilot.Throttle = value;
+				autopilot.Throttle = value;
 			}
 		}
 
 		[Description("Native `Vessel` for unrestricted access to KSP API."
 			+ " Same as `FlightGlobals.ActiveVessel` if accessed through global `ship`.")]
-		public Vessel Native { get; private set; }
+		public Vessel native { get; private set; }
 		[Description("All parts of this ship/vessel/vehicle.")]
-		public ShipPartSet Parts { get; private set; }
+		public ShipPartSet parts { get; private set; }
 		[Description("Root part (same as `Parts.Root`).")]
-		public PartBase Root => Parts.Root;
+		public PartBase root => parts.Root;
 		[Description("One of the decouplers that will get activated by nearest stage. (Same as `Parts.NextDecoupler`.)")]
-		public Decoupler NextDecoupler => Parts.NextDecoupler;
+		public Decoupler nextDecoupler => parts.NextDecoupler;
 		[Description("Stage number of the nearest decoupler or -1. (Same as `Parts.NextDecouplerStage`.)")]
-		public int NextDecouplerStage => Parts.NextDecouplerStage;
+		public int nextDecouplerStage => parts.nextDecouplerStage;
 
 		[Description("List of all decouplers, separators, launch clamps and docks with staging."
 			+ " (Docking ports without staging enabled not included.)")]
-		public ReadOnlyList<Decoupler> Decouplers => Parts.Decouplers;
+		public ReadOnlyList<Decoupler> decouplers => parts.decouplers;
 		[Description("List of all docking ports (regardless of staging).")]
-		public ReadOnlyList<DockingPort> DockingPorts => Parts.DockingPorts;
+		public ReadOnlyList<DockingPort> dockingports => parts.dockingports;
 		[Description("All engines (regardless of state).")]
-		public EngineSet Engines => Parts.Engines;
+		public EngineSet engines => parts.engines;
 		[Description("All sensors.")]
-		public ReadOnlyList<Sensor> Sensors => Parts.Sensors;
+		public ReadOnlyList<Sensor> sensors => parts.sensors;
 
 		[Description("Unique identifier of the ship (wehicle/vessel). Can change when docking/undocking.")]
-		public Guid ID => Native.id;
+		public Guid ID => native.id;
 		[Description("Unique identifier of the ship (wehicle/vessel). Should be same as it was before docking (after undocking).")]
-		public uint PersistentID => Native.persistentId;
+		public uint PersistentID => native.persistentId;
 		[Description("KSP API. Vessel type as selected by user (or automatically).")]
-		public VesselType VesselType => Native.vesselType;
+		public VesselType vesseltype => native.vesselType;
 		[Description("Total mass of the ship (wehicle/vessel).")]
-		public float Mass => Native.GetTotalMass();
+		public float mass => native.GetTotalMass();
 		[Description("Wheter the ship is still packed (reduced physics).")]
-		public bool Packed => Native.packed;
+		public bool packed => native.packed;
 		[Description("Wheter the ship is landed (on the ground or on/in water).")]
-		public bool Landed => Native.Landed;
+		public bool landed => native.Landed;
 		[Description("Wheter the ship is in water.")]
-		public bool Splashed => Native.Splashed;
+		public bool splashed => native.Splashed;
 		[Description("Longitude of current position in degrees.")]
-		public double Longitude => Native.longitude;
+		public double longitude => native.longitude;
 		[Description("Latitude of current position in degrees.")]
-		public double Latitude => Native.latitude;
+		public double latitude => native.latitude;
 		[Description("Altitude of current position (above sea level) in meters.")]
-		public double Altitude => Native.altitude;
+		public double altitude => native.altitude;
 		[Description("True height above ground in meters.")]
-		public double RadarAltitude => Native.radarAltitude;
+		public double radarAltitude => native.radarAltitude;
 
 		[Description("KSP API. Orbited body.")]
-		public CelestialBody Body => Native.mainBody;
+		public CelestialBody body => native.mainBody;
 		[Description("KSP API. Orbit parameters.")]
-		public Orbit Orbit => Native.orbit;
+		public Orbit orbit => native.orbit;
 		[Description("Eccentricity of current orbit.")]
-		public double Eccentricity => Native.orbit.eccentricity;
+		public double eccentricity => native.orbit.eccentricity;
 		[Description("Semi-major axis of current orbit.")]
-		public double SemiMajorAxis => Native.orbit.semiMajorAxis;
+		public double semimajoraxis => native.orbit.semiMajorAxis;
 		[Description("Semi-minor axis of current orbit.")]
-		public double SemiMinorAxis => Native.orbit.semiMinorAxis;
+		public double semiminoraxis => native.orbit.semiMinorAxis;
 		[Description("Height above ground of highest point of current orbit).")]
-		public double Apoapsis => Native.orbit.ApA;
+		public double apoapsis => native.orbit.ApA;
 		[Description("Height above ground of lowest point of current orbit).")]
-		public double Periapsis => Native.orbit.PeA;
+		public double periapsis => native.orbit.PeA;
 		[Description("Highest distance between center of orbited body and any point of current orbit.")]
-		public double Apocenter => Native.orbit.ApR;
+		public double apocenter => native.orbit.ApR;
 		[Description("Lowest distance between center of orbited body and any point of current orbit.")]
-		public double Pericenter => Native.orbit.PeR;
+		public double pericenter => native.orbit.PeR;
 		[Description("Eta to apoapsis in seconds.")]
-		public double TimeToAp => Native.orbit.timeToAp;
+		public double timetoap => native.orbit.timeToAp;
 		[Description("Eta to periapsis in seconds.")]
-		public double TimeToPe => Native.orbit.timeToPe;
+		public double timetope => native.orbit.timeToPe;
 		[Description("Period of current orbit in seconds.")]
-		public double Period => Native.orbit.period;
+		public double period => native.orbit.period;
 		[Description("Angle in degrees between the direction of periapsis and the current position.")]
-		public double TrueAnomaly => RosMath.Deg.Clamp360(Native.orbit.trueAnomaly * RosMath.Rad2Deg);
+		public double trueanomaly => RosMath.Deg.Clamp360(native.orbit.trueAnomaly * RosMath.Rad2Deg);
 		[Description("Angle in degrees between the direction of periapsis and the current position extrapolated on circular orbit.")]
-		public double MeanAnomaly => Native.orbit.meanAnomaly;
+		public double meananomaly => native.orbit.meanAnomaly;
 
 		[Convert(typeof(Vector)), Description("Current position.")]
-		public Vector3d Position => Native.orbit.pos;
+		public Vector3d position => native.orbit.pos;
 		[Convert(typeof(Vector)), Description("Current velocity.")]
-		public Vector3d Velocity => Native.orbit.vel;
+		public Vector3d velocity => native.orbit.vel;
 		[return: Convert(typeof(Vector)), Description("Predicted position at specified time")]
-		public Vector3d PositionAt(double time) => Native.orbit.getPositionAtUT(time);
+		public Vector3d positionat(double time) => native.orbit.getPositionAtUT(time);
 		[return: Convert(typeof(Vector)), Description("Predicted velocity at specified time")]
-		public Vector3d VelocityAt(double time) => Native.orbit.getOrbitalVelocityAtUT(time);
+		public Vector3d velocityat(double time) => native.orbit.getOrbitalVelocityAtUT(time);
 	}
 }

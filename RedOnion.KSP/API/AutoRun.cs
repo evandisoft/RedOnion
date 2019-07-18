@@ -18,8 +18,6 @@ namespace RedOnion.KSP.API
 		public static AutoRun Instance = new AutoRun();
 
 
-#pragma warning disable IDE1006 // Naming Styles
-
 		[Description("Returns a list of the current autorun scripts")]
 		public IList<string> scripts() => SavedSettings.LoadListSetting(AutoRunSettingName);
 
@@ -44,7 +42,5 @@ namespace RedOnion.KSP.API
 			s.Remove(scriptname);
 			save(s);
 		}
-
-#pragma warning restore IDE1006 // Naming Styles
 	}
 }

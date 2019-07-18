@@ -28,58 +28,58 @@ namespace RedOnion.KSP.API
 		public Vector(IList<float> src) : base(src) { }
 
 		[Description("Native Vector3d(`double x, y, z`).")]
-		public new Vector3d Native
+		public new Vector3d native
 		{
-			get => native;
-			set => native = value;
+			get => base.protectedNative;
+			set => base.protectedNative = value;
 		}
 
 		[Description("The X-coordinate")]
-		public new double X
+		public new double x
 		{
-			get => native.x;
-			set => native = new Vector3d(value, Y, Z);
+			get => base.protectedNative.x;
+			set => base.protectedNative = new Vector3d(value, y, z);
 		}
 		[Description("The Y-coordinate")]
-		public new double Y
+		public new double y
 		{
-			get => native.y;
-			set => native = new Vector3d(X, value, Z);
+			get => base.protectedNative.y;
+			set => base.protectedNative = new Vector3d(x, value, z);
 		}
 		[Description("The Z-coordinate")]
-		public new double Z
+		public new double z
 		{
-			get => native.z;
-			set => native = new Vector3d(X, Y, value);
+			get => base.protectedNative.z;
+			set => base.protectedNative = new Vector3d(x, y, value);
 		}
 
 		[Description("Size of the vector - `sqrt(x*x+y*y+z*z)`. Scale if setting.")]
-		public new double Size
+		public new double size
 		{
-			get => native.magnitude;
-			set => native *= value/native.magnitude;
+			get => base.protectedNative.magnitude;
+			set => base.protectedNative *= value/ base.protectedNative.magnitude;
 		}
 		[Description("Alias to size of the vector - `sqrt(x*x+y*y+z*z)`. Scale if setting.")]
-		public new double Magnitude
+		public new double magnitude
 		{
-			get => native.magnitude;
-			set => native *= value/native.magnitude;
+			get => base.protectedNative.magnitude;
+			set => base.protectedNative *= value/ base.protectedNative.magnitude;
 		}
 		[Description("Square size of the vector - `x*x+y*y+z*z`. Scale if setting.")]
-		public new double SquareSize
+		public new double squareSize
 		{
-			get => native.sqrMagnitude;
-			set => native *= value*value/native.magnitude;
+			get => base.protectedNative.sqrMagnitude;
+			set => base.protectedNative *= value* value / base.protectedNative.magnitude;
 		}
 		[Description("Normalize vector (set size to 1).")]
-		public void Normalize()
-			=> native = native.normalized;
+		public void normalize()
+			=> base.protectedNative = base.protectedNative.normalized;
 
 		[Description("Native UnityEngine.Vector3 (`float x,y,z`).")]
 		public new Vector3 Vector3
 		{
-			get => native;
-			set => native = value;
+			get => base.protectedNative;
+			set => base.protectedNative = value;
 		}
 		[Description("Native UnityEngine.Vector2 (`float x,y`).")]
 		public new Vector2 Vector2
@@ -90,38 +90,38 @@ namespace RedOnion.KSP.API
 		[Description("Index the coordinates as double[3]")]
 		public new double this[int i]
 		{
-			get => native[i];
-			set => native[i] = value;
+			get => base.protectedNative[i];
+			set => base.protectedNative[i] = value;
 		}
 
 		[Description("Scale the vector by a factor (all axes). Multiplication does the same.")]
-		public void Scale(double factor)
-			=> native *= factor;
+		public void scale(double factor)
+			=> base.protectedNative *= factor;
 		[Description("Scale individual axis. Multiplication does the same.")]
-		public void Scale(ConstVector v)
-			=> native = Vector3d.Scale(native, v.Native);
+		public void scale(ConstVector v)
+			=> base.protectedNative = Vector3d.Scale(base.protectedNative, v.native);
 
-		public void Scale(Vector3d v)
-			=> native = Vector3d.Scale(native, v);
-		public void Scale(Vector3 v)
-			=> native = Vector3d.Scale(native, v);
+		public void scale(Vector3d v)
+			=> base.protectedNative = Vector3d.Scale(base.protectedNative, v);
+		public void scale(Vector3 v)
+			=> base.protectedNative = Vector3d.Scale(base.protectedNative, v);
 
 		[Description("Shrink the vector by a factor (all axes). Division does the same.")]
-		public void Shrink(double factor)
-			=> native /= factor;
+		public void shrink(double factor)
+			=> base.protectedNative /= factor;
 		[Description("Shrink individual axis. Division does the same.")]
-		public void Shrink(ConstVector v)
-			=> native = new Vector3d(X / v.X, Y / v.Y, Z / v.Z);
+		public void shrink(ConstVector v)
+			=> base.protectedNative = new Vector3d(x / v.x, y / v.y, z / v.z);
 
-		public void Shrink(Vector3d v)
-			=> native = new Vector3d(X / v.x, Y / v.y, Z / v.z);
-		public void Shrink(Vector3 v)
-			=> native = new Vector3d(X / v.x, Y / v.y, Z / v.z);
+		public void shrink(Vector3d v)
+			=> base.protectedNative = new Vector3d(x / v.x, y / v.y, z / v.z);
+		public void shrink(Vector3 v)
+			=> base.protectedNative = new Vector3d(x / v.x, y / v.y, z / v.z);
 
-		public static implicit operator Vector3d(Vector v) => v.Native;
-		public static implicit operator Vector3(Vector v) => v.Native;
-		public static implicit operator Vector2d(Vector v) => new Vector2d(v.X, v.Y);
-		public static implicit operator Vector2(Vector v) => new Vector2((float)v.X, (float)v.Y);
+		public static implicit operator Vector3d(Vector v) => v.native;
+		public static implicit operator Vector3(Vector v) => v.native;
+		public static implicit operator Vector2d(Vector v) => new Vector2d(v.x, v.y);
+		public static implicit operator Vector2(Vector v) => new Vector2((float)v.x, (float)v.y);
 		public static explicit operator Vector(Vector3d v) => new Vector(v);
 		public static explicit operator Vector(Vector3 v) => new Vector(v);
 		public static explicit operator Vector(Vector2d v) => new Vector(v);

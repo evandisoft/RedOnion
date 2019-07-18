@@ -40,7 +40,7 @@ namespace RedOnion.KSP.API
 		{
 			if (hooked != null)
 				return;
-			hooked = ship?.Native;
+			hooked = ship?.native;
 			if (hooked == null)
 				return;
 			hooked.OnFlyByWire += Callback;
