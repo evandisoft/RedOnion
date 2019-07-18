@@ -9,7 +9,8 @@ using RedOnion.KSP.Completion;
 
 namespace RedOnion.KSP.API
 {
-	[Description("A dictionary mapping body names to CelestialBody instances")]
+	[Description("A dictionary mapping body names to CelestialBody instances. The bodies will be whatever"
+	+" is returned by FlightGlobals.Bodies")]
 	public class BodiesDictionary : ScriptStringKeyedConstDictionary<CelestialBody>
 	{
 		BodiesDictionary()
@@ -27,7 +28,7 @@ namespace RedOnion.KSP.API
 					var bodiesArray = FlightGlobals.Bodies;
 					foreach(var body in bodiesArray)
 					{
-						instance.Add(body.bodyName.ToLower(), body);
+						instance.Add(body.bodyName.Replace(' ','_').ToLower(), body);
 					}
 				}
 				return instance;
