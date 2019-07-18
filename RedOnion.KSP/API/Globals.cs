@@ -23,6 +23,11 @@ namespace RedOnion.KSP.API
 		[Description("A map of planet names to planet bodies")]
 		public static BodiesDictionary bodies => BodiesDictionary.Instance;
 
+		//Not sure if I want to add this yet. It works, but not sure it will be
+		// structured this way.
+		//[Description("A map of kerbal names to kerbals for kerbals in the crew.")]
+		//public static KerbalsDictionary kerbals => KerbalsDictionary.Instance;
+
 		[Description("All the reflection stuff and namespaces.")]
 		public static Reflect reflect => Reflect.Instance;
 		[Description("Alias to `reflect` because of the namespaces.")]
