@@ -8,11 +8,11 @@ using System.Text;
 
 namespace RedOnion.KSP.API
 {
-	public class User
+	public class Player
 	{
 		[Browsable(false), MoonSharpHidden]
-		public static User Instance { get; } = new User();
-		protected User() { }
+		public static Player Instance { get; } = new Player();
+		protected Player() { }
 
 		public float Throttle
 		{

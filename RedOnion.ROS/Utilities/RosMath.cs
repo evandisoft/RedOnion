@@ -12,13 +12,45 @@ namespace RedOnion.ROS.Utilities
 		public const double Deg2Rad = PI / 180.0;
 		public const double Rad2Deg = 180.0 / PI;
 
-		public const float FPI = (float)PI;
-		public const float FE = (float)E;
-		public const float FNaN = (float)NaN;
-		public const float FInf = (float)Inf;
-		public const float FDeg2Rad = (float)Deg2Rad;
-		public const float FRad2Deg = (float)Rad2Deg;
+		public static bool Radians = false;
+		public static bool Degrees
+		{
+			get => !Radians;
+			set => Radians = !value;
+		}
 
+		public static class Rad
+		{
+			public static double Sin(double a) => Math.Sin(a);
+			public static double Cos(double a) => Math.Cos(a);
+			public static double Tan(double a) => Math.Tan(a);
+			public static double Sinh(double a) => Math.Sinh(a);
+			public static double Cosh(double a) => Math.Cosh(a);
+			public static double Tanh(double a) => Math.Tanh(a);
+			public static double Acos(double r) => Math.Acos(r);
+			public static double Asin(double r) => Math.Asin(r);
+			public static double Atan(double r) => Math.Atan(r);
+			public static double Atan2(double y, double x) => Math.Atan2(y, x);
+
+			public static float Sin(float a) => (float)Math.Sin(a);
+			public static float Cos(float a) => (float)Math.Cos(a);
+			public static float Tan(float a) => (float)Math.Tan(a);
+			public static float Sinh(float a) => (float)Math.Sinh(a);
+			public static float Cosh(float a) => (float)Math.Cosh(a);
+			public static float Tanh(float a) => (float)Math.Tanh(a);
+			public static float Acos(float r) => (float)Math.Acos(r);
+			public static float Asin(float r) => (float)Math.Asin(r);
+			public static float Atan(float r) => (float)Math.Atan(r);
+			public static float Atan2(float y, float x) => (float)Math.Atan2(y, x);
+
+			public static double Clamp2pi(double a)
+			{
+				var pi2 = PI * 2.0;
+				a %= pi2;
+				if (a < 0) a += pi2;
+				return a;
+			}
+		}
 		public static class Deg
 		{
 			public static double Sin(double a) => Math.Sin(a * Deg2Rad);
@@ -45,7 +77,7 @@ namespace RedOnion.ROS.Utilities
 
 			public static double Clamp360(double a)
 			{
-				a = a % 360;
+				a %= 360;
 				if (a < 0) a += 360;
 				return a;
 			}
@@ -103,6 +135,9 @@ namespace RedOnion.ROS.Utilities
 		public static byte Clamp(byte val, byte min, byte max) => Math.Min(Math.Max(val, min), max);
 		public static decimal Clamp(decimal val, decimal min, decimal max) => Math.Min(Math.Max(val, min), max);
 
+		public static double Clamp360(double a) => Deg.Clamp360(a);
+		public static double Clamp2pi(double a) => Rad.Clamp2pi(a);
+
 		public static double Round(double a) => Math.Round(a);
 		public static double Round(double value, int digits) => Math.Round(value, digits);
 		public static double Round(double value, MidpointRounding mode) => Math.Round(value, mode);
@@ -138,27 +173,27 @@ namespace RedOnion.ROS.Utilities
 		public static int FloorToInt(double d) => (int)Math.Floor(d);
 		public static int TruncToInt(double d) => (int)Math.Truncate(d);
 
-		public static double Sin(double a) => Math.Sin(a);
-		public static double Cos(double a) => Math.Cos(a);
-		public static double Tan(double a) => Math.Tan(a);
-		public static double Sinh(double a) => Math.Sinh(a);
-		public static double Cosh(double a) => Math.Cosh(a);
-		public static double Tanh(double a) => Math.Tanh(a);
-		public static double Acos(double r) => Math.Acos(r);
-		public static double Asin(double r) => Math.Asin(r);
-		public static double Atan(double r) => Math.Atan(r);
-		public static double Atan2(double y, double x) => Math.Atan2(y, x);
+		public static double Sin(double a) => Radians ? Math.Sin(a) : Deg.Sin(a);
+		public static double Cos(double a) => Radians ? Math.Cos(a) : Deg.Cos(a);
+		public static double Tan(double a) => Radians ? Math.Tan(a) : Deg.Tan(a);
+		public static double Sinh(double a) => Radians ? Math.Sinh(a) : Deg.Sinh(a);
+		public static double Cosh(double a) => Radians ? Math.Cosh(a) : Deg.Cosh(a);
+		public static double Tanh(double a) => Radians ? Math.Tanh(a) : Deg.Tanh(a);
+		public static double Acos(double r) => Radians ? Math.Acos(r) : Deg.Acos(r);
+		public static double Asin(double r) => Radians ? Math.Asin(r) : Deg.Asin(r);
+		public static double Atan(double r) => Radians ? Math.Atan(r) : Deg.Atan(r);
+		public static double Atan2(double y, double x) => Radians ? Math.Atan2(y, x) : Deg.Atan2(y, x);
 
-		public static float Sin(float a) => (float)Math.Sin(a);
-		public static float Cos(float a) => (float)Math.Cos(a);
-		public static float Tan(float a) => (float)Math.Tan(a);
-		public static float Sinh(float a) => (float)Math.Sinh(a);
-		public static float Cosh(float a) => (float)Math.Cosh(a);
-		public static float Tanh(float a) => (float)Math.Tanh(a);
-		public static float Acos(float r) => (float)Math.Acos(r);
-		public static float Asin(float r) => (float)Math.Asin(r);
-		public static float Atan(float r) => (float)Math.Atan(r);
-		public static float Atan2(float y, float x) => (float)Math.Atan2(y, x);
+		public static float Sin(float a) => (float)Sin(a);
+		public static float Cos(float a) => (float)Cos(a);
+		public static float Tan(float a) => (float)Tan(a);
+		public static float Sinh(float a) => (float)Sinh(a);
+		public static float Cosh(float a) => (float)Cosh(a);
+		public static float Tanh(float a) => (float)Tanh(a);
+		public static float Acos(float r) => (float)Acos(r);
+		public static float Asin(float r) => (float)Asin(r);
+		public static float Atan(float r) => (float)Atan(r);
+		public static float Atan2(float y, float x) => (float)Atan2(y, x);
 
 		public static double Sqrt(double d) => Math.Sqrt(d);
 		public static long BigMul(int a, int b) => Math.BigMul(a, b);

@@ -29,7 +29,9 @@ namespace RedOnion.KSP.API
 		[Description("Autopilot for active vessel.")]
 		public static Autopilot Autopilot => Ship.Autopilot;
 		[Description("User/player controls.")]
-		public static User User => User.Instance;
+		public static Player Player => Player.Instance;
+		[Description("User/player controls.")]
+		public static Player User => Player.Instance;
 
 		[Description("Function for creating 3D vector / coordinate.")]
 		public static VectorCreator Vector => VectorCreator.Instance;

@@ -155,10 +155,10 @@ namespace RedOnion.KSP.API
 		[Description("True height above ground in meters.")]
 		public double RadarAltitude => Native.radarAltitude;
 
+		[Description("KSP API. Orbited body.")]
+		public CelestialBody Body => Native.mainBody;
 		[Description("KSP API. Orbit parameters.")]
 		public Orbit Orbit => Native.orbit;
-		[Description("KSP API. Orbited body.")]
-		public CelestialBody Body => Native.orbit.referenceBody;
 		[Description("Eccentricity of current orbit.")]
 		public double Eccentricity => Native.orbit.eccentricity;
 		[Description("Semi-major axis of current orbit.")]

@@ -68,7 +68,7 @@
     <Compile Include="API\ReadOnlyList.cs" />
     <Compile Include="API\ReadOnlySet.cs" />
     <Compile Include="API\Time.cs" />
-    <Compile Include="API\User.cs" />
+    <Compile Include="API\Player.cs" />
     <Compile Include="Namespaces\KSP.cs" />
     <Compile Include="Namespaces\UI.cs" />
     <Compile Include="Namespaces\Unity.cs" />
