@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using RedOnion.KSP.Parts;
 using RedOnion.ROS.Utilities;
+using UnityEngine;
 
 namespace RedOnion.KSP.API
 {
@@ -188,9 +189,16 @@ namespace RedOnion.KSP.API
 		public Vector3d position => native.orbit.pos;
 		[Convert(typeof(Vector)), Description("Current velocity.")]
 		public Vector3d velocity => native.orbit.vel;
-		[return: Convert(typeof(Vector)), Description("Predicted position at specified time")]
+		[return: Convert(typeof(Vector)), Description("Predicted position at specified time.")]
 		public Vector3d positionat(double time) => native.orbit.getPositionAtUT(time);
-		[return: Convert(typeof(Vector)), Description("Predicted velocity at specified time")]
+		[return: Convert(typeof(Vector)), Description("Predicted velocity at specified time.")]
 		public Vector3d velocityat(double time) => native.orbit.getOrbitalVelocityAtUT(time);
+
+		[Convert(typeof(Vector)), Description("Angular velocity, how fast the ship rotates")]
+		public Vector3d AngularVelocity => native.angularVelocityD;
+		[Convert(typeof(Vector)), Description("Angular momentum aka moment of momentum or rotational momentum.")]
+		public Vector3 AngularMomentum => native.angularMomentum;
+		[Convert(typeof(Vector)), Description("Moment of inertia aka angular mass or rotational inertia.")]
+		public Vector3 MomentOfInertia => native.MOI;
 	}
 }
