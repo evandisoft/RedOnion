@@ -87,6 +87,10 @@ namespace RedOnion.KSP.API
 
 				pidPitch.Input = angularVelocity.x;
 				pidPitch.Target = 0;
+				// Have to clamp these values or the game will happily accept
+				// that you have available torque greater than 100%.
+				// I don't know if that will confuse the PID.
+				// Is that what OutputChangeLimit is for?
 				// flightControlState.pitch = Math.Clamp(pidPitch.Output,-1,1)
 				pidRoll.Input = angularVelocity.y;
 				pidRoll.Target = 0;
