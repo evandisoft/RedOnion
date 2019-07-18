@@ -17,19 +17,18 @@ namespace RedOnion.KSP.CommonAPIHelpers
 	/// global "bodies" in the future without having to create a custom per-engine
 	/// definition per dictionary-like-thing.
 	/// </summary>
-	public class ScriptStringKeyedConstDictionary<T> : ICompletable, IUserDataType, ISelfDescribing
+	public class ScriptStringKeyedConstDictionary<T> : Dictionary<string, T>, ICompletable, IUserDataType
 	{
 		public ScriptStringKeyedConstDictionary()
 		{
 		}
 
-		public Dictionary<string, T> baseDict = new Dictionary<string, T>();
 
-		public IList<string> PossibleCompletions =>baseDict.Keys.ToList();
+		public IList<string> PossibleCompletions => Keys.ToList();
 
 		public bool TryGetCompletion(string completionName, out object completion)
 		{
-			if(baseDict.TryGetValue(completionName, out T completionT))
+			if(TryGetValue(completionName, out T completionT))
 			{
 				completion = completionT;
 				return true;
@@ -38,8 +37,6 @@ namespace RedOnion.KSP.CommonAPIHelpers
 			return false;
 		}
 
-		public Descriptor Descriptor => throw new NotImplementedException("RedOnion.KSP.CommonAPIHelpers.StringKeyedConstDictionary<T> needs an implementation of ISelfDescribing");
-
 		public DynValue Index(Script script, DynValue index, bool isDirectIndexing)
 		{
 			if (index.Type != DataType.String)
@@ -47,7 +44,7 @@ namespace RedOnion.KSP.CommonAPIHelpers
 				throw new Exception("Type of index must be string.");
 			}
 
-			if (baseDict.TryGetValue(index.String,out T value))
+			if (TryGetValue(index.String,out T value))
 			{
 				return DynValue.FromObject(script,value);
 			}

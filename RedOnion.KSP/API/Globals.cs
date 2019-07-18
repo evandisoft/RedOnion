@@ -8,6 +8,7 @@ using System.ComponentModel;
 using System.Reflection;
 using RedOnion.KSP.Autopilot;
 using RedOnion.KSP.Namespaces;
+using System.Linq;
 
 namespace RedOnion.KSP.API
 {
@@ -116,11 +117,30 @@ namespace RedOnion.KSP.API
 		}
 	}
 
-	public class LuaGlobals : Table, IHasCompletionProxy
+	public class LuaGlobals : Table, ICompletable
 	{
 		public static LuaGlobals Instance { get; } = new LuaGlobals();
 
-		public object CompletionProxy => UserData.CreateStatic(typeof(Globals));
+		public IList<string> PossibleCompletions
+		{
+			get
+			{
+				IList<string> completions =
+					typeof(Globals).GetProperties().Select(t => t.Name).Concat(
+						typeof(Globals).GetFields().Select(t => t.Name)).ToList();
+				return completions;
+			}
+		}
+
+		public bool TryGetCompletion(string completionName, out object completion)
+		{
+			completion = Get(this, DynValue.NewString(completionName));
+			if (completion == null)
+			{
+				return false;
+			}
+			return true;
+		}
 
 		public LuaGlobals() : base(null)
 		{
@@ -155,5 +175,7 @@ namespace RedOnion.KSP.API
 			}
 			return item;
 		}
+
+
 	}
 }
