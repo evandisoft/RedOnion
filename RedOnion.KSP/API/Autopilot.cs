@@ -67,6 +67,12 @@ namespace RedOnion.KSP.API
 				st.mainThrottle = RosMath.Clamp(throttle, 0f, 1f);
 		}
 
+		/// <summary>
+		/// Just the logic behind a PID for stopping the spin of a vehicle. If you can
+		/// aggressively and accurately stop the spin, you can aggresively and accurately
+		/// set a spin in the direction of the desired point, and aggresively and 
+		/// accurately stop the vehicle at a desired point.
+		/// </summary>
 		void AnUpdate()
 		{
 			var angularVelocity = FlightControl.Instance.GetAngularVelocity(ship.native);
