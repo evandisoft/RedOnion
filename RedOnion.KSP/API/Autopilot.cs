@@ -76,7 +76,7 @@ namespace RedOnion.KSP.API
 		void StopSpin()
 		{
 			var angularVelocity = FlightControl.Instance.GetAngularVelocity(ship.native);
-
+			
 			var pidPitch = new PID();
 			var pidRoll = new PID();
 			var pidYaw = new PID();
