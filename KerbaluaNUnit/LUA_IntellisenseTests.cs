@@ -176,6 +176,8 @@ namespace KerbaluaNUnit
 			//Assert.AreEqual(11, completions.Count);
 		}
 
+
+
 		[Test()]
 		public void LUA_IntellisenseTest_Interop2()
 		{
@@ -193,6 +195,26 @@ namespace KerbaluaNUnit
 			Assert.AreEqual(1, completions.Count);
 
 			//Assert.AreEqual(11, completions.Count);
+		}
+
+		[Test()]
+		public void LUA_IntellisenseTest_Bodies()
+		{
+			Setup();
+			globals.MetaTable = RedOnion.KSP.API.LuaGlobals.Instance;
+			string source = "bodies";
+			var completions = GetCompletions(source);
+			Assert.AreEqual(1, completions.Count);
+		}
+
+		[Test()]
+		public void LUA_IntellisenseTest_Bodies2()
+		{
+			Setup();
+			globals.MetaTable = RedOnion.KSP.API.LuaGlobals.Instance;
+			string source = "bodies.";
+			var completions = GetCompletions(source);
+			Assert.AreEqual("Sun", completions[0]);
 		}
 	}
 }

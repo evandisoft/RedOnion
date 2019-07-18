@@ -8,36 +8,53 @@ using System.ComponentModel;
 using System.Reflection;
 using RedOnion.KSP.Autopilot;
 using RedOnion.KSP.Namespaces;
+using System.Linq;
 
 namespace RedOnion.KSP.API
 {
+#pragma warning disable IDE1006 // Naming Styles
+
 	[Description("Global variables, objects and functions.")]
 	public static class Globals
 	{
+		[Description("An api for setting which scripts will be ran when an engine is reset.")]
+		public static AutoRun autorun => AutoRun.Instance;
+
+		[Description("A map of planet names to planet bodies")]
+		public static BodiesDictionary bodies => BodiesDictionary.Instance;
+
 		[Description("All the reflection stuff and namespaces.")]
-		public static Reflect Reflect => Reflect.Instance;
+		public static Reflect reflect => Reflect.Instance;
 		[Description("Alias to `reflect` because of the namespaces.")]
-		public static Reflect Native => Reflect.Instance;
+		public static Reflect native => Reflect.Instance;
 
 		[Description("Current time")]
-		public static Time Time => Time.Instance;
+		public static Time time => Time.Instance;
 
 		[Description("Active vessel (in flight only, null otherwise).")]
-		public static Ship Ship => Ship.Active;
+		public static Ship ship => Ship.Active;
 		[Description("Staging logic.")]
-		public static Stage Stage => Stage.Instance;
+		public static Stage stage => Stage.Instance;
 		[Description("Autopilot for active vessel.")]
-		public static Autopilot Autopilot => Ship.Autopilot;
+		public static Autopilot autopilot => ship.Autopilot;
 		[Description("User/player controls.")]
-		public static Player Player => Player.Instance;
+		public static Player player => Player.Instance;
 		[Description("User/player controls.")]
-		public static Player User => Player.Instance;
+		public static Player user => Player.Instance;
 
 		[Description("Function for creating 3D vector / coordinate.")]
-		public static VectorCreator Vector => VectorCreator.Instance;
+		public static VectorCreator vector => VectorCreator.Instance;
 		[DisplayName("V"), Description("Alias to Vector Function for creating 3D vector / coordinate.")]
 		public static VectorCreator V => VectorCreator.Instance;
 
+		[Description("Alias to `ship.Altitude`")]
+		public static double altitude => ship.Altitude;
+		[Description("Alias to `ship.Apoapsis`.")]
+		public static double apoapsis => ship.Apoapsis;
+		[Description("Alias to `ship.Periapsis`.")]
+		public static double periapsis => ship.Periapsis;
+
+		// TODO: move aliases to startup/setup script/library
 		[Alias, Description("Alias to `Vector.dot` (or `v.dot`).")]
 		public static readonly string vdot = "Vector.dot";
 		[Alias, Description("Alias to `Vector.cross` (or `v.cross`).")]
@@ -48,14 +65,8 @@ namespace RedOnion.KSP.API
 		public static readonly string vangle = "Vector.angle";
 		[Alias, Description("Alias to `Vector.angle` (or `v.angle`).")]
 		public static readonly string vang = "Vector.angle";
-
-		[Description("Alias to `Ship.Altitude`")]
-		public static double Altitude => Ship.Altitude;
-		[Description("Alias to `Ship.Apoapsis`.")]
-		public static double Apoapsis => Ship.Apoapsis;
-		[Description("Alias to `Ship.Periapsis`.")]
-		public static double Periapsis => Ship.Periapsis;
 	}
+#pragma warning restore IDE1006 // Naming Styles
 
 	public class RosGlobals : RedOnion.ROS.Objects.Globals
 	{
@@ -175,11 +186,30 @@ namespace RedOnion.KSP.API
 		}
 	}
 
-	public class LuaGlobals : Table, IHasCompletionProxy
+	public class LuaGlobals : Table, ICompletable
 	{
 		public static LuaGlobals Instance { get; } = new LuaGlobals();
 
-		public object CompletionProxy => UserData.CreateStatic(typeof(Globals));
+		public IList<string> PossibleCompletions
+		{
+			get
+			{
+				IList<string> completions =
+					typeof(Globals).GetProperties().Select(t => t.Name).Concat(
+						typeof(Globals).GetFields().Select(t => t.Name)).ToList();
+				return completions;
+			}
+		}
+
+		public bool TryGetCompletion(string completionName, out object completion)
+		{
+			completion = Get(this, DynValue.NewString(completionName));
+			if (completion == null)
+			{
+				return false;
+			}
+			return true;
+		}
 
 		public LuaGlobals() : base(null)
 		{
@@ -194,9 +224,12 @@ namespace RedOnion.KSP.API
 			var alias = typeof(Globals).GetField(name, BindingFlags.Static|BindingFlags.Public);
 			if (alias == null || alias.FieldType != typeof(string))
 			{
-				if (name.Length == 0 || !char.IsLower(name, 0) || name == "v")
+				if (name.Length == 0 || !char.IsLetter(name, 0) || name == "v")
 					return null;
-				name = char.ToUpperInvariant(name[0]) + name.Substring(1);
+				name = (char.IsLower(name[0])
+					? char.ToUpperInvariant(name[0])
+					: char.ToLowerInvariant(name[0]))
+					+ name.Substring(1);
 				prop = typeof(Globals).GetProperty(name, BindingFlags.Static|BindingFlags.Public);
 				if (prop != null)
 					return DynValue.FromObject(table.OwnerScript, prop.GetValue(null, null));
@@ -214,5 +247,7 @@ namespace RedOnion.KSP.API
 			}
 			return item;
 		}
+
+
 	}
 }

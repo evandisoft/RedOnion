@@ -56,6 +56,7 @@ namespace RedOnion.ROS
 			{ typeof(char),   Char },
 			{ typeof(string), String },
 		};
+		// TODO: single descriptor for generic types
 		public static Descriptor Of(Type type)
 		{
 			if (type == null)
