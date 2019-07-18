@@ -1,4 +1,5 @@
 using MoonSharp.Interpreter;
+using RedOnion.KSP.Autopilot;
 using RedOnion.ROS.Utilities;
 using System;
 using System.Collections.Generic;
@@ -65,5 +66,30 @@ namespace RedOnion.KSP.API
 			if (!float.IsNaN(throttle))
 				st.mainThrottle = RosMath.Clamp(throttle, 0f, 1f);
 		}
+
+		void AnUpdate()
+		{
+			var angularVelocity = FlightControl.Instance.GetAngularVelocity(ship.native);
+
+			var pidPitch = new PID();
+			var pidRoll = new PID();
+			var pidYaw = new PID();
+
+			while (true)
+			{
+				angularVelocity = FlightControl.Instance.GetAngularVelocity(ship.native);
+
+				pidPitch.Input = angularVelocity.x;
+				pidPitch.Target = 0;
+				// flightControlState.pitch = pidPitch.Output
+				pidRoll.Input = angularVelocity.y;
+				pidRoll.Target = 0;
+				// flightControlState.roll = pidRoll.Output
+				pidYaw.Input = angularVelocity.z;
+				pidYaw.Target = 0;
+				// flightControlState.yaw = pidYaw.Output
+			}
+		}
+		// 
 	}
 }

@@ -60,11 +60,11 @@ namespace RedOnion.KSP.API
 		[Description("Amount of solid fuel available in active engines."
 			+ " Shortcut to `Engines.Resources.GetAmountOf(\"SolidFuel\")`.")]
 		public static double solidfuel
-			=> engines.Resources.getAmountOf("SolidFuel");
+			=> engines.resources.getAmountOf("SolidFuel");
 		[Description("Amount of liquid fuel available in tanks of current stage to active engines."
 			+ " Shortcut to `CrossParts.Resources.GetAmountOf(\"LiquidFuel\")`.")]
 		public static double liquidfuel
-			=> crossparts.Resources.getAmountOf("LiquidFuel");
+			=> crossparts.resources.getAmountOf("LiquidFuel");
 
 		[Description("Total amount of fuel avialable in active engines.")]
 		public static double fuel => solidfuel + liquidfuel;

@@ -16,6 +16,7 @@ namespace RedOnion.KSP.API
 	public static class Globals
 	{
 		[Description("An api for setting which scripts will be ran when an engine is reset.")]
+
 		public static AutoRun autorun => AutoRun.Instance;
 
 		[Description("A map of planet names to planet bodies")]
