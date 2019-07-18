@@ -46,15 +46,30 @@ namespace RedOnion.KSP.API
 		[Description("Cross product. (Alias to cross)")]
 		public static Vector crs(ConstVector a, ConstVector b)
 			=> new Vector(Vector3d.Cross(a.native, b.native));
-		[Description("Dot product.")]
-		public static Vector dot(ConstVector a, ConstVector b)
-			=> new Vector(Vector3d.Dot(a.native, b.native));
+		[Description("Scale vector by vector. Per axis. Multiplication does the same.")]
+		public static Vector scale(ConstVector a, ConstVector b)
+			=> a * b;
+		[Description("Shrink vector by vector. Per axis. Division does the same.")]
+		public static Vector shrink(ConstVector a, ConstVector b)
+			=> a / b;
 		[Description("Vector with coordinates changed to non-negative.")]
 		public static Vector abs(ConstVector v)
 			=> new Vector(Math.Abs(v.x), Math.Abs(v.y), Math.Abs(v.z));
+		[Description("Dot product.")]
+		public static double dot(ConstVector a, ConstVector b)
+			=> Vector3d.Dot(a.native, b.native);
 		[Description("Angle between vectors (0..180).")]
 		public static double angle(ConstVector a, ConstVector b)
 			=> Vector3d.Angle(a.native, b.native);
+
+		public static Vector3d scale(Vector3d a, Vector3d b)
+			=> new Vector3d(a.x * b.x, a.y * b.y, a.z * b.z);
+		public static Vector3d shrink(Vector3d a, Vector3d b)
+			=> new Vector3d(a.x / b.x, a.y / b.y, a.z / b.z);
+		public static Vector3 scale(Vector3 a, Vector3 b)
+			=> new Vector3(a.x * b.x, a.y * b.y, a.z * b.z);
+		public static Vector3 shrink(Vector3 a, Vector3 b)
+			=> new Vector3(a.x / b.x, a.y / b.y, a.z / b.z);
 
 		bool ICallable.Call(ref Value result, object self, Arguments args, bool create)
 			=> Call(ref result, self, args, create);

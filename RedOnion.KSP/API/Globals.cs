@@ -51,11 +51,11 @@ namespace RedOnion.KSP.API
 		[DisplayName("V"), Description("Alias to Vector Function for creating 3D vector / coordinate.")]
 		public static VectorCreator V => VectorCreator.Instance;
 
-		[Description("Alias to `ship.Altitude`")]
+		[Description("Alias to `ship.altitude`")]
 		public static double altitude => ship.altitude;
-		[Description("Alias to `ship.Apoapsis`.")]
+		[Description("Alias to `ship.apoapsis`.")]
 		public static double apoapsis => ship.apoapsis;
-		[Description("Alias to `ship.Periapsis`.")]
+		[Description("Alias to `ship.periapsis`.")]
 		public static double periapsis => ship.periapsis;
 
 		// TODO: move aliases to startup/setup script/library
@@ -227,6 +227,7 @@ namespace RedOnion.KSP.API
 			var alias = typeof(Globals).GetField(name, BindingFlags.Static|BindingFlags.Public);
 			if (alias == null || alias.FieldType != typeof(string))
 			{
+				/*
 				if (name.Length == 0 || !char.IsLetter(name, 0) || name == "v")
 					return null;
 				name = (char.IsLower(name[0])
@@ -236,6 +237,7 @@ namespace RedOnion.KSP.API
 				prop = typeof(Globals).GetProperty(name, BindingFlags.Static|BindingFlags.Public);
 				if (prop != null)
 					return DynValue.FromObject(table.OwnerScript, prop.GetValue(null, null));
+				*/
 				return null;
 			}
 			var fullPath = (string)alias.GetValue(null);

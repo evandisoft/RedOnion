@@ -8,72 +8,144 @@ using UnityEngine;
 
 namespace RedOnion.KSP.Autopilot
 {
-	public class PID
+	[Description("PID(R) regulator parameters.")]
+	public class PidParams
 	{
+		public PidParams() { }
+		public PidParams(PidParams copyFrom)
+		{
+			P = copyFrom.P;
+			I = copyFrom.I;
+			D = copyFrom.D;
+			R = copyFrom.R;
+			targetChangeLimit = copyFrom.targetChangeLimit;
+			outputChangeLimit = copyFrom.outputChangeLimit;
+			accumulatorLimit = copyFrom.accumulatorLimit;
+		}
+		public PidParams(
+			double P = 1.0,
+			double I = 0.0,
+			double D = 0.0,
+			double R = 0.0)
+		{
+			this.P = P;
+			this.I = I;
+			this.D = D;
+			this.R = R;
+		}
+
 		[Description("Proportional factor (strength of direct control)")]
-		public double P { get; set; } = 1.0;
+		public double P = 1.0;
 		[Description("Integral factor (dynamic error-correction, causes oscillation as side-effect)")]
-		public double I { get; set; } = 0.1;
+		public double I = 0.0;
 		[Description("Derivative factor (dumpening - applied to output, reduces the oscillation)")]
-		public double D { get; set; } = 0.05;
+		public double D = 0.0;
 		[Description("Reduction factor for accumulator"
 			+ " (dumpening - applied to accumulator used by integral factor,"
 			+ " works well against both oscillation and windup)")]
-		public double R { get; set; } = 0.05;
-
-		[Description("Feedback (true state - e.g. current pitch;"
-			+ " error/difference if Target is NaN)")]
-		public double Input { get; set; } = double.NaN;
-		[Description("Desired state (set point - e.g. desired/wanted pitch;"
-			+ " NaN for pure error/difference mode, which is the default)."
-			+ " The computed control signal is added to Input if Target is valid,"
-			+ " use error/difference mode if you want to add it to Target.")]
-		public double Target { get; set; } = double.NaN;
-
-		[Description("Last computed output value (control signal,"
-			+ " call Update() after changing Input/Target)")]
-		public double Output => output;
-		[Description("Highest output allowed")]
-		public double MaxOutput { get; set; } = double.PositiveInfinity;
-		[Description("Lowest output allowed")]
-		public double MinOutput { get; set; } = double.NegativeInfinity;
+		public double R = 0.0;
 
 		[Description("Maximal abs(Target - previous Target) per second."
 			+ " NaN or +Inf means no limit (which is default)."
 			+ " This can make the output smoother (more human-like control)"
 			+ " and help prevent oscillation after target change (windup).")]
-		public double TargetChangeLimit { get; set; } = double.PositiveInfinity;
+		public double targetChangeLimit = double.PositiveInfinity;
+
 		[Description("Maximal abs(output-input)"
 			+ " and also abs(target-input) for integral and reduction factors)."
 			+ " Helps preventing overshooting especially after change of Target (windup)."
 			+ " NaN or +Inf means no limit (which is default)")]
-		public double OutputChangeLimit { get; set; } = double.PositiveInfinity;
+		public double outputChangeLimit = double.PositiveInfinity;
+
 		[Description("Limit of abs(accumulator) used by I and R factors."
 			+ " Another anti-windup measure to prevent overshooting.")]
-		public double AccumulatorLimit { get; set; } = double.PositiveInfinity;
+		public double accumulatorLimit = double.PositiveInfinity;
+	}
+	[Description("PID(R) regulator.")]
+	public class PID
+	{
+		protected PidParams _param = new PidParams();
+		protected double _stamp, _input, _target, _output, _accu;
 
-		protected double stamp, input, target, output, accu;
-		public PID() => Reset();
-		[Description("Reset internal state of the regulator (won't change PIDR and limits)")]
-		public void Reset()
+		[Description("Proportional factor (strength of direct control)")]
+		public double P { get => _param.P; set => _param.P = value; }
+		[Description("Integral factor (dynamic error-correction, causes oscillation as side-effect)")]
+		public double I { get => _param.I; set => _param.I = value; }
+		[Description("Derivative factor (dumpening - applied to output, reduces the oscillation)")]
+		public double D { get => _param.D; set => _param.D = value; }
+		[Description("Reduction factor for accumulator"
+			+ " (dumpening - applied to accumulator used by integral factor,"
+			+ " works well against both oscillation and windup)")]
+		public double R { get => _param.R; set => _param.R = value; }
+
+		[Description("Maximal abs(Target - previous Target) per second."
+			+ " NaN or +Inf means no limit (which is default)."
+			+ " This can make the output smoother (more human-like control)"
+			+ " and help prevent oscillation after target change (windup).")]
+		public double targetChangeLimit
 		{
-			stamp = double.NaN;
-			input = double.NaN;
-			target = double.NaN;
-			output = double.NaN;
-			accu = 0.0;
+			get => _param.targetChangeLimit;
+			set => _param.targetChangeLimit = value;
 		}
+		[Description("Maximal abs(output-input)"
+			+ " and also abs(target-input) for integral and reduction factors)."
+			+ " Helps preventing overshooting especially after change of Target (windup)."
+			+ " NaN or +Inf means no limit (which is default)")]
+		public double outputChangeLimit
+		{
+			get => _param.outputChangeLimit;
+			set => _param.outputChangeLimit = value;
+		}
+		[Description("Limit of abs(accumulator) used by I and R factors."
+			+ " Another anti-windup measure to prevent overshooting.")]
+		public double accumulatorLimit
+		{
+			get => _param.accumulatorLimit;
+			set => _param.outputChangeLimit = value;
+		}
+
+		[Description("Feedback (true state - e.g. current pitch;"
+			+ " error/difference if Target is NaN)")]
+		public double input { get; set; } = double.NaN;
+
+		[Description("Desired state (set point - e.g. desired/wanted pitch;"
+			+ " NaN for pure error/difference mode, which is the default)."
+			+ " The computed control signal is added to Input if Target is valid,"
+			+ " use error/difference mode if you want to add it to Target.")]
+		public double target { get; set; } = double.NaN;
+
+		[Description("Last computed output value (control signal,"
+			+ " call Update() after changing Input/Target)")]
+		public double output => _output;
+		[Description("Highest output allowed")]
+		public double maxOutput { get; set; } = double.PositiveInfinity;
+		[Description("Lowest output allowed")]
+		public double minOutput { get; set; } = double.NegativeInfinity;
+
+		public PID() => reset();
+		[Description("Reset internal state of the regulator (won't change PIDR and limits)")]
+		public void reset()
+		{
+			_stamp = double.NaN;
+			_input = double.NaN;
+			_target = double.NaN;
+			_output = double.NaN;
+			_accu = 0.0;
+		}
+		[Description("Reset accumulator to zero.")]
+		public void resetAccu()
+			=> _accu = 0.0;
 
 		[Description("Update output according to time elapsed (and Input and Target)")]
 		public double Update()
 		{
 			var now = Planetarium.GetUniversalTime();
-			if (now != stamp)
+			if (now != _stamp)
 			{
-				Update(now - stamp);
-				stamp = now;
+				Update(now - _stamp);
+				_stamp = now;
 			}
-			return output;
+			return _output;
 		}
 		[Description("Set input and update output according to time elapsed (provided as dt)")]
 		public double Update(
@@ -82,7 +154,7 @@ namespace RedOnion.KSP.Autopilot
 			[Description("New input/feedback")]
 			double input)
 		{
-			Input = input;
+			this.input = input;
 			return Update(dt);
 		}
 		[Description("Set input and target and update output according to time elapsed (provided as dt)")]
@@ -94,8 +166,8 @@ namespace RedOnion.KSP.Autopilot
 			[Description("New target / desired state")]
 			double target)
 		{
-			Input = input;
-			Target = target;
+			this.input = input;
+			this.target = target;
 			return Update(dt);
 		}
 		[Description("Update output according to time elapsed (provided as dt, using current Input and Target)")]
@@ -104,45 +176,45 @@ namespace RedOnion.KSP.Autopilot
 			double dt)
 		{
 			if (double.IsNaN(dt))
-				output = Input;
+				_output = input;
 			else
 			{
-				var targetLimit = TargetChangeLimit * dt;
-				target = Math.Abs(Target - target) > targetLimit ? Target < 0
-					? target - targetLimit
-					: target + targetLimit
-					: Target; // this accounts for any of Target, this.target or targetLimit being NaN
-				double error = double.IsNaN(target) ? Input : target - Input;
+				var targetLimit = targetChangeLimit * dt;
+				_target = Math.Abs(target - _target) > targetLimit ? target < 0
+					? _target - targetLimit
+					: _target + targetLimit
+					: target; // this accounts for any of Target, this.target or targetLimit being NaN
+				double error = double.IsNaN(_target) ? input : _target - input;
 				double result = 0;
 				if (!double.IsNaN(error))
 				{
 					if (!double.IsNaN(P))
 						result = P * error;
 					if (!double.IsNaN(I))
-						accu += I * error * dt;
-					if (!double.IsNaN(input))
+						_accu += I * error * dt;
+					if (!double.IsNaN(_input))
 					{
-						double change = Input - input;
+						double change = input - _input;
 						if (!double.IsNaN(D))
 							result -= D * change / dt;
 						if (!double.IsNaN(R))
-							accu -= R * change * dt;
+							_accu -= R * change * dt;
 					}
 				}
-				if (Math.Abs(accu) > AccumulatorLimit)
-					accu = accu < 0 ? -AccumulatorLimit : AccumulatorLimit;
-				result += accu;
-				var outputLimit = OutputChangeLimit * dt;
+				if (Math.Abs(_accu) > accumulatorLimit)
+					_accu = _accu < 0 ? -accumulatorLimit : accumulatorLimit;
+				result += _accu;
+				var outputLimit = outputChangeLimit * dt;
 				if (Math.Abs(result) > outputLimit)
 					result = result < 0 ? -outputLimit : outputLimit;
-				output = double.IsNaN(target) ? result : Input + result;
+				_output = double.IsNaN(_target) ? result : input + result;
 			}
-			input = Input;
-			if (output > MaxOutput)
-				output = MaxOutput;
-			if (output < MinOutput)
-				output = MinOutput;
-			return output;
+			_input = input;
+			if (_output > maxOutput)
+				_output = maxOutput;
+			if (_output < minOutput)
+				_output = minOutput;
+			return _output;
 		}
 	}
 }

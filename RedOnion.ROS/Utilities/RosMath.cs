@@ -50,6 +50,29 @@ namespace RedOnion.ROS.Utilities
 				if (a < 0) a += pi2;
 				return a;
 			}
+			public static float Clamp2pi(float a)
+			{
+				var pi2 = (float)(PI * 2.0);
+				a %= pi2;
+				if (a < 0) a += pi2;
+				return a;
+			}
+			public static double ClampSpi(double a)
+			{
+				var pi2 = PI * 2.0;
+				a %= pi2;
+				if (a < PI) a += pi2;
+				else if (a > PI) a -= pi2;
+				return a;
+			}
+			public static float ClampSpi(float a)
+			{
+				var pi2 = (float)(PI * 2.0);
+				a %= pi2;
+				if (a < (float)PI) a += pi2;
+				else if (a > (float)PI) a -= pi2;
+				return a;
+			}
 		}
 		public static class Deg
 		{
@@ -79,6 +102,26 @@ namespace RedOnion.ROS.Utilities
 			{
 				a %= 360;
 				if (a < 0) a += 360;
+				return a;
+			}
+			public static float Clamp360(float a)
+			{
+				a %= 360;
+				if (a < 0) a += 360;
+				return a;
+			}
+			public static double ClampS180(double a)
+			{
+				a %= 360;
+				if (a < -180) a += 360;
+				else if (a > 180) a -= 360;
+				return a;
+			}
+			public static float ClampS180(float a)
+			{
+				a %= 360;
+				if (a < -180) a += 360;
+				else if (a > 180) a -= 360;
 				return a;
 			}
 		}
@@ -137,6 +180,13 @@ namespace RedOnion.ROS.Utilities
 
 		public static double Clamp360(double a) => Deg.Clamp360(a);
 		public static double Clamp2pi(double a) => Rad.Clamp2pi(a);
+		public static float Clamp360(float a) => Deg.Clamp360(a);
+		public static float Clamp2pi(float a) => Rad.Clamp2pi(a);
+
+		public static double ClampS180(double a) => Deg.ClampS180(a);
+		public static double ClampSpi(double a) => Rad.ClampSpi(a);
+		public static float ClampS180(float a) => Deg.ClampS180(a);
+		public static float ClampSpi(float a) => Rad.ClampSpi(a);
 
 		public static double Round(double a) => Math.Round(a);
 		public static double Round(double value, int digits) => Math.Round(value, digits);

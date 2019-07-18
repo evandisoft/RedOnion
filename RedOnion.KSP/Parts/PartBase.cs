@@ -7,10 +7,10 @@ using RedOnion.KSP.API;
 
 namespace RedOnion.KSP.Parts
 {
-	[DisplayName("Part"), Description("Part of the ship (wehicle/vessel).")]
+	[DisplayName("Part"), Description("Part of the ship (vehicle/vessel).")]
 	public class PartBase
 	{
-		[Description("Ship (wehicle/vessel) this part belongs to.")]
+		[Description("Ship (vehicle/vessel) this part belongs to.")]
 		public Ship ship { get; }
 		[Description("Native `Part` - KSP API.")]
 		public Part native { get; }

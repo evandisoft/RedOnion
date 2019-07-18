@@ -75,7 +75,7 @@ namespace RedOnion.KSP.Parts
 		}
 	}
 
-	[Description("Engine of a ship (wehicle/vessel).")]
+	[Description("Engine of a ship (vehicle/vessel).")]
 	public class Engine : PartBase
 	{
 		[Description("KSP API. Module of multi-mode engine, if present (null otherwise).")]
@@ -184,9 +184,9 @@ namespace RedOnion.KSP.Parts
 				RosMath.Clamp(throttle, 0f, 1f));
 		}
 
-		public double RatioSum => activeModule.ratioSum;
-		public double MixtureDensity => activeModule.mixtureDensity;
-		public double MixtureDensityRecip => activeModule.mixtureDensityRecip;
+		public double ratioSum => activeModule.ratioSum;
+		public double mixtureDensity => activeModule.mixtureDensity;
+		public double mixtureDensityRecip => activeModule.mixtureDensityRecip;
 
 		ReadOnlyList<Propellant> propellants, propellants2;
 		public ReadOnlyList<Propellant> Propellants => firstIsActive ? Propellants1 : Propellants2;

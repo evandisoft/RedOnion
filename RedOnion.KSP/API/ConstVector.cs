@@ -11,22 +11,22 @@ namespace RedOnion.KSP.API
 		+ " used for Vector.zero and other constants. Can also be used for properties.")]
 	public class ConstVector : IEquatable<ConstVector>, IEquatable<Vector>, IOperators, IConvert
 	{
-		protected Vector3d protectedNative;
+		protected Vector3d _native;
 		[Description("Native Vector3d(`double x, y, z`).")]
-		public Vector3d native => protectedNative;
+		public Vector3d native => _native;
 
 		public override string ToString()
 			=> string.Format(Value.Culture, "[{0}, {1}, {2}]", x, y, z);
 
 		public ConstVector() { }
-		public ConstVector(ConstVector src) => protectedNative = src.protectedNative;
-		public ConstVector(Vector3d src) => protectedNative = src;
-		public ConstVector(Vector3 src) => protectedNative = src;
-		public ConstVector(Vector2d src) => protectedNative = src;
-		public ConstVector(Vector2 src) => protectedNative = new Vector3d(src.x, src.y);
-		public ConstVector(double x, double y, double z) => protectedNative = new Vector3d(x, y, z);
-		public ConstVector(double x, double y) => protectedNative = new Vector3d(x, y);
-		public ConstVector(double all) => protectedNative = new Vector3d(all, all, all);
+		public ConstVector(ConstVector src) => _native = src._native;
+		public ConstVector(Vector3d src) => _native = src;
+		public ConstVector(Vector3 src) => _native = src;
+		public ConstVector(Vector2d src) => _native = src;
+		public ConstVector(Vector2 src) => _native = new Vector3d(src.x, src.y);
+		public ConstVector(double x, double y, double z) => _native = new Vector3d(x, y, z);
+		public ConstVector(double x, double y) => _native = new Vector3d(x, y);
+		public ConstVector(double all) => _native = new Vector3d(all, all, all);
 
 		public ConstVector(IList<Value> src)
 		{
@@ -36,13 +36,13 @@ namespace RedOnion.KSP.API
 				return;
 			case 1:
 				var all = src[0].ToDouble();
-				protectedNative = new Vector3d(all, all, all);
+				_native = new Vector3d(all, all, all);
 				return;
 			case 2:
-				protectedNative = new Vector3d(src[0].ToDouble(), src[1].ToDouble());
+				_native = new Vector3d(src[0].ToDouble(), src[1].ToDouble());
 				return;
 			default:
-				protectedNative = new Vector3d(src[0].ToDouble(), src[1].ToDouble(), src[2].ToDouble());
+				_native = new Vector3d(src[0].ToDouble(), src[1].ToDouble(), src[2].ToDouble());
 				return;
 			}
 		}
@@ -54,13 +54,13 @@ namespace RedOnion.KSP.API
 				return;
 			case 1:
 				var all = src[0];
-				protectedNative = new Vector3d(all, all, all);
+				_native = new Vector3d(all, all, all);
 				return;
 			case 2:
-				protectedNative = new Vector3d(src[0], src[1]);
+				_native = new Vector3d(src[0], src[1]);
 				return;
 			default:
-				protectedNative = new Vector3d(src[0], src[1], src[2]);
+				_native = new Vector3d(src[0], src[1], src[2]);
 				return;
 			}
 		}
@@ -72,38 +72,38 @@ namespace RedOnion.KSP.API
 				return;
 			case 1:
 				var all = src[0];
-				protectedNative = new Vector3d(all, all, all);
+				_native = new Vector3d(all, all, all);
 				return;
 			case 2:
-				protectedNative = new Vector3d(src[0], src[1]);
+				_native = new Vector3d(src[0], src[1]);
 				return;
 			default:
-				protectedNative = new Vector3d(src[0], src[1], src[2]);
+				_native = new Vector3d(src[0], src[1], src[2]);
 				return;
 			}
 		}
 
 		[Description("The X-coordinate")]
-		public double x => protectedNative.x;
+		public double x => _native.x;
 		[Description("The Y-coordinate")]
-		public double y => protectedNative.y;
+		public double y => _native.y;
 		[Description("The Z-coordinate")]
-		public double z => protectedNative.z;
+		public double z => _native.z;
 		[Description("Size of the vector - `sqrt(x*x+y*y+z*z)`.")]
-		public double size => protectedNative.magnitude;
+		public double size => _native.magnitude;
 		[Description("Alias to size of the vector - `sqrt(x*x+y*y+z*z)`.")]
-		public double magnitude => protectedNative.magnitude;
+		public double magnitude => _native.magnitude;
 		[Description("Square size of the vector - `x*x+y*y+z*z`.")]
-		public double squareSize => protectedNative.sqrMagnitude;
+		public double squareSize => _native.sqrMagnitude;
 		[Description("Get normalized vector (size 1).")]
-		public Vector normalized => new Vector(protectedNative.normalized);
+		public Vector normalized => new Vector(_native.normalized);
 
 		[Description("Native UnityEngine.Vector3 (`float x,y,z`).")]
-		public Vector3 Vector3 => protectedNative;
+		public Vector3 Vector3 => _native;
 		[Description("Native UnityEngine.Vector2 (`float x,y`).")]
 		public Vector2 Vector2 => Vector3;
 		[Description("Index the coordinates as double[3]")]
-		public double this[int i] => protectedNative[i];
+		public double this[int i] => _native[i];
 
 		public static implicit operator Vector3d(ConstVector v) => v.native;
 		public static implicit operator Vector3(ConstVector v) => v.native;
@@ -171,9 +171,9 @@ namespace RedOnion.KSP.API
 			=> new Vector(a.x / f, a.y / f, a.z / f);
 
 		public bool Equals(ConstVector other)
-			=> other != null && protectedNative == other.native;
+			=> other != null && _native == other.native;
 		public bool Equals(Vector other)
-			=> other != null && protectedNative == other.native;
+			=> other != null && _native == other.native;
 		public override bool Equals(object obj)
 		{
 			if (obj is Vector v)

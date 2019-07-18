@@ -240,12 +240,22 @@ namespace RedOnion.KSP.Autopilot
 			{
 				return new Vector3();
 			}
+			// vessel.transform.up is actually the forward vector for the vessel
 			Vector3 currentDir = vessel.transform.up;
-			Vector3 angularSpeed = GetAngularVelocity(vessel);
-			Vector3 worldSpaceAngularSpeed = vessel.transform.localToWorldMatrix * angularSpeed;
-			Vector3 halfWayDir = Quaternion.AngleAxis(worldSpaceAngularSpeed.magnitude * Time.deltaTime / 2, worldSpaceAngularSpeed) * currentDir;
+			Vector3 angularVelocity = GetAngularVelocity(vessel);
+			// angularVelocity gives a local direction for its axis.
+			// worldSpaceAngularVelocity is that direction in world space.
+			Vector3 worldSpaceAngularVelocity = vessel.transform.localToWorldMatrix * angularVelocity;
 
+			// I aim for a halfway point because otherwise it fails to stop oscillating
+			Vector3 halfWayDir = Quaternion.AngleAxis(worldSpaceAngularVelocity.magnitude * Time.deltaTime / 2, worldSpaceAngularVelocity) * currentDir;
+
+			/// We take the cross of currentDir and halfWayDir to get the axis along which
+			/// we need to rotate to bring currentDir to halfWayDir. Then we translate it into local coordinates.
+			/// in order to bring it into the same coordinate system as angularVelocity
 			Vector3 currentDistanceAxis = vessel.transform.worldToLocalMatrix * Vector3.Cross(halfWayDir, target);
+
+			// just angle between halfWayDir and targetDir
 			float angularDistance = Vector3.Angle(halfWayDir, target) / 360 * 2 * Mathf.PI;
 			//Vector3 currentDistanceAxis = vessel.transform.worldToLocalMatrix * Vector3.Cross(currentDir, target);
 			//float angularDistance = Vector3.Angle(currentDir, target) / 360 * 2 * Mathf.PI;
@@ -279,17 +289,33 @@ namespace RedOnion.KSP.Autopilot
 			return absSpeed / 2 * minStoppingTime;
 		}
 
+		/// <summary>
+		/// Find the input needed to either get/stay on course to the desired
+		/// direction
+		/// return (angularSpeed - maxAngularSpeed * Mathf.Sign(distance)) / (maxAccel * Time.deltaTime);
+		/// 
+		/// or check if it is time to stop and return the input less than 1
+		/// (minStopDistance / distance), that is needed.
+		/// </summary>
+		/// <returns>The needed.</returns>
+		/// <param name="distance">Distance.</param>
+		/// <param name="angularSpeed">Angular speed.</param>
+		/// <param name="maxAccel">Max accel.</param>
 		float InputNeeded(float distance, float angularSpeed, float maxAccel)
 		{
+			// Only check if we are headed toward the desired direction.
 			if (distance * angularSpeed > 0)
 			{
 				float minStopDistance = MinStoppingDistance(angularSpeed, maxAccel);
 				if (minStopDistance > Math.Abs(distance) / 2)
 				{
+					// Since minStopDistance corresponds to maxAccel (max input)
+					// this ratio corresponds to neededInput/MaxInput. (max input is 1)
 					return minStopDistance / distance;
 				}
 			}
 
+			// take any deviation from maxAngularSpeed and return an input that will correct for it
 			return (angularSpeed - maxAngularSpeed * Mathf.Sign(distance)) / (maxAccel * Time.deltaTime);
 		}
 
@@ -312,22 +338,33 @@ namespace RedOnion.KSP.Autopilot
 			// Craft whose current torque is dominated by control surfaces.
 			if (posAllTorque.magnitude < posInstantTorque.magnitude * 2)
 			{
-				Vector3 currentDir = vessel.transform.up;
-				Vector3 angularVelocity = GetAngularVelocity(vessel);
-				float angularDistance = Vector3.Angle(currentDir, targetDir) / 360 * 2 * Mathf.PI;
-				////(d-vt)*2/t^2=a
-				////accel=(angularDistance-angularSpeed*Time.deltaTime)/Time.deltaTime^2
-				Vector3 distanceAxis = vessel.transform.worldToLocalMatrix * Vector3.Cross(currentDir.normalized, targetDir.normalized);
-				GetMaxAcceleration(vessel, out Vector3 posAccel, out Vector3 negAccel);
-				//Vector3 desiredAccel=(-distanceAxis + angularSpeed * Time.deltaTime) * 2 / (float)Math.Pow(Time.deltaTime,2);
+				// Remember. X = pitch, Y = roll, and Z = yaw. And we're dealing with
+				// rotational speed, not absolute orientation with those values.
 
+				// vessel.transform.up is what I consider the forward vector of the vessel
+				Vector3 currentDir = vessel.transform.up;
+
+				Vector3 angularVelocity = GetAngularVelocity(vessel);
+
+				/// We take the cross of currentDir and targetDir to get the axis along which
+				/// we need to rotate to bring currentDir to targetDir. Then we translate it into local coordinates.
+				/// in order to bring it into the same coordinate system as angularVelocity
+				Vector3 distanceAxis = vessel.transform.worldToLocalMatrix * Vector3.Cross(currentDir.normalized, targetDir.normalized);
+
+				// We figure out how much potential rotational acceleration we have on all axis of rotations
+				// This is same coordinate system as angularVelocity and distanceAxis
+				GetMaxAcceleration(vessel, out Vector3 posAccel, out Vector3 negAccel);
 
 				Vector3 inputNeeded = new Vector3();
 
+				// We are separately finding the inputs needed for each of pitch (x), roll (y), and yaw (z)
+				// we chose to not specify roll. We just give the input needed to stop it.
 				inputNeeded.x = InputNeeded(distanceAxis.x, angularVelocity.x, posAccel.x);
 				inputNeeded.y = angularVelocity.y / (posAccel.y * Time.deltaTime); ;//InputNeeded(distanceAxis.y, angularVelocity.y, maxAccel.y);
 				inputNeeded.z = InputNeeded(distanceAxis.z, angularVelocity.z, posAccel.z);
 
+				// We set these, and they need to be clamped in SetPitchRollYaw because
+				// our inputNeeded values are often much greater than 1 or less than -1.
 				SetPitchRollYaw(flightCtrlState, inputNeeded);
 			}
 			// TargetSpinNeeded + setSpin works way better for handling control surfaces.
