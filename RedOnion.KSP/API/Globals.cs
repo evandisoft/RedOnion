@@ -15,7 +15,11 @@ namespace RedOnion.KSP.API
 	public static class Globals
 	{
 		[Description("An api for setting which scripts will be ran when an engine is reset.")]
+#pragma warning disable IDE1006 // Naming Styles
 		public static AutoRun autorun => AutoRun.Instance;
+
+		[Description("A map of planet names to planet bodies")]
+		public static BodiesDictionary bodies => BodiesDictionary.Instance;
 
 		[Description("All the reflection stuff and namespaces.")]
 		public static Reflect Reflect => Reflect.Instance;
@@ -42,6 +46,8 @@ namespace RedOnion.KSP.API
 		public static readonly string vangle = "Vector.angle";
 		[Alias, Description("Alias to `Vector.angle` (or `v.angle`).")]
 		public static readonly string vang = "Vector.angle";
+
+#pragma warning restore IDE1006 // Naming Styles
 	}
 
 	public class RosGlobals : RedOnion.ROS.Objects.Globals

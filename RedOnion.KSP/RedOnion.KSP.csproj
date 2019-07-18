@@ -111,6 +111,8 @@
     <Compile Include="ReflectionUtil\GetMappings.Lua.cs" />
     <Compile Include="API\AutoRun.cs" />
     <Compile Include="Settings\SavedSettings.cs" />
+    <Compile Include="API\BodiesDictionary.cs" />
+    <Compile Include="CommonAPIHelpers\ScriptStringKeyedConstDictionary.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RedOnion.ROS\RedOnion.ROS.csproj">
@@ -127,6 +129,7 @@
   <ItemGroup />
   <ItemGroup>
     <Folder Include="Settings\" />
+    <Folder Include="CommonAPIHelpers\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
