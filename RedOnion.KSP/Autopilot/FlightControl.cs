@@ -232,8 +232,8 @@ namespace RedOnion.KSP.Autopilot
 		/// Gets spin needed to approach target direction
 		/// </summary>
 		/// <returns>The needed spin.</returns>
-		/// <param name="target">Target dir.</param>
-		public Vector3 TargetSpinNeeded(Vector3 target)
+		/// <param name="targetDir">Target dir.</param>
+		public Vector3 TargetSpinNeeded(Vector3 targetDir)
 		{
 			Vessel vessel = FlightGlobals.ActiveVessel;
 			if (vessel == null)
@@ -253,10 +253,10 @@ namespace RedOnion.KSP.Autopilot
 			/// We take the cross of currentDir and halfWayDir to get the axis along which
 			/// we need to rotate to bring currentDir to halfWayDir. Then we translate it into local coordinates.
 			/// in order to bring it into the same coordinate system as angularVelocity
-			Vector3 currentDistanceAxis = vessel.transform.worldToLocalMatrix * Vector3.Cross(halfWayDir, target);
+			Vector3 currentDistanceAxis = vessel.transform.worldToLocalMatrix * Vector3.Cross(halfWayDir, targetDir);
 
 			// just angle between halfWayDir and targetDir
-			float angularDistance = Vector3.Angle(halfWayDir, target) / 360 * 2 * Mathf.PI;
+			float angularDistance = Vector3.Angle(halfWayDir, targetDir) / 360 * 2 * Mathf.PI;
 			//Vector3 currentDistanceAxis = vessel.transform.worldToLocalMatrix * Vector3.Cross(currentDir, target);
 			//float angularDistance = Vector3.Angle(currentDir, target) / 360 * 2 * Mathf.PI;
 			//(d-vt)*2/t^2=a
@@ -271,8 +271,10 @@ namespace RedOnion.KSP.Autopilot
 			// d.x+v.x*t+
 
 
-
+			// angular speed at which we are rotating 
 			float spinMagnitude = Math.Min(angularDistance / Time.deltaTime, maxAngularSpeed);
+
+			// 
 			return currentDistanceAxis * spinMagnitude; //*fudgeFactor;
 		}
 
@@ -296,27 +298,36 @@ namespace RedOnion.KSP.Autopilot
 		/// 
 		/// or check if it is time to stop and return the input less than 1
 		/// (minStopDistance / distance), that is needed.
+		/// 
+		/// I don't know the units of angularDistance/angularSpeed. But they are all
+		/// in the same units, whatever those units may be.
 		/// </summary>
 		/// <returns>The needed.</returns>
-		/// <param name="distance">Distance.</param>
+		/// <param name="angularDistance">Distance.</param>
 		/// <param name="angularSpeed">Angular speed.</param>
 		/// <param name="maxAccel">Max accel.</param>
-		float InputNeeded(float distance, float angularSpeed, float maxAccel)
+		float InputNeeded(float angularDistance, float angularSpeed, float maxAccel)
 		{
 			// Only check if we are headed toward the desired direction.
-			if (distance * angularSpeed > 0)
+			if (angularDistance * angularSpeed > 0)
 			{
+				// The minimum amount of angular distance we will be able to stop 
+				// rotating in.
 				float minStopDistance = MinStoppingDistance(angularSpeed, maxAccel);
-				if (minStopDistance > Math.Abs(distance) / 2)
+				// if the angular distance remaining is less than twice the minimum needed to stop
+				// we will start providing a response designed to slow us down to a stop
+				// right on the desired point.
+				// If I did this at less than the minStopDistance we wouldn't be able to stop in time.
+				if (minStopDistance > Math.Abs(angularDistance) / 2)
 				{
 					// Since minStopDistance corresponds to maxAccel (max input)
 					// this ratio corresponds to neededInput/MaxInput. (max input is 1)
-					return minStopDistance / distance;
+					return minStopDistance / angularDistance;
 				}
 			}
 
 			// take any deviation from maxAngularSpeed and return an input that will correct for it
-			return (angularSpeed - maxAngularSpeed * Mathf.Sign(distance)) / (maxAccel * Time.deltaTime);
+			return (angularSpeed - maxAngularSpeed * Mathf.Sign(angularDistance)) / (maxAccel * Time.deltaTime);
 		}
 
 		void SetDir(FlightCtrlState flightCtrlState)
