@@ -21,14 +21,14 @@ namespace RedOnion.KSP.Parts
 		where Part : PartBase
 	{
 		protected Dictionary<global::Part, Part> cache = new Dictionary<global::Part, Part>();
-		public ResourceList Resources => resources ?? (resources = new ResourceList(this));
-		protected ResourceList resources;
+		public ResourceList resources => protectedResources ?? (protectedResources = new ResourceList(this));
+		protected ResourceList protectedResources;
 
 		protected internal override void SetDirty()
 		{
 			base.SetDirty();
-			if (resources != null)
-				resources.SetDirty();
+			if (protectedResources != null)
+				protectedResources.SetDirty();
 		}
 
 		protected internal PartSet() { }
@@ -93,31 +93,31 @@ namespace RedOnion.KSP.Parts
 	public class ShipPartSet : PartSet<PartBase>, IDisposable
 	{
 		[Description("Ship (vessel/vehicle) this list of parts belongs to.")]
-		public Ship Ship { get; protected set; }
+		public Ship ship { get; protected set; }
 
-		protected PartBase root;
+		protected PartBase protectedRoot;
 		[Description("Root part.")]
-		public PartBase Root
+		public PartBase root
 		{
 			get
 			{
 				if (Dirty) DoRefresh();
-				return root;
+				return protectedRoot;
 			}
 		}
 
-		protected Decoupler nextDecoupler;
+		protected Decoupler protectedNextDecoupler;
 		[Description("One of the decouplers that will get activated by nearest stage. (Same as `Parts.NextDecoupler`.)")]
-		public Decoupler NextDecoupler
+		public Decoupler nextDecoupler
 		{
 			get
 			{
 				if (Dirty) DoRefresh();
-				return nextDecoupler;
+				return protectedNextDecoupler;
 			}
 		}
 		[Description("Stage number of the nearest decoupler or -1. (`NextDecoupler?.Stage ?? -1`)")]
-		public int nextDecouplerStage => NextDecoupler?.stage ?? -1;
+		public int nextDecouplerStage => nextDecoupler?.stage ?? -1;
 
 		[Description("List of all decouplers, separators, launch clamps and docks with staging enabled."
 			+ " (Docking ports without staging enabled not included.)")]
@@ -131,7 +131,7 @@ namespace RedOnion.KSP.Parts
 
 		protected internal ShipPartSet(Ship ship)
 		{
-			Ship = ship;
+			this.ship = ship;
 			decouplers = new ReadOnlyList<Decoupler>(DoRefresh);
 			dockingports = new ReadOnlyList<DockingPort>(DoRefresh);
 			engines = new EngineSet(DoRefresh);
@@ -147,12 +147,12 @@ namespace RedOnion.KSP.Parts
 			dockingports.SetDirty();
 			engines.SetDirty();
 			sensors.SetDirty();
-			if (Ship == Ship.Active)
+			if (ship == Ship.Active)
 				Stage.SetDirty();
 		}
 		void VesselModified(Vessel vessel)
 		{
-			if (vessel == Ship.native)
+			if (vessel == ship.native)
 				SetDirty();
 		}
 
@@ -169,9 +169,9 @@ namespace RedOnion.KSP.Parts
 				return;
 			GameEvents.onVesselWasModified.Remove(VesselModified);
 			cache = null;
-			Ship = null;
-			root = null;
-			nextDecoupler = null;
+			ship = null;
+			protectedRoot = null;
+			protectedNextDecoupler = null;
 			if (disposing)
 			{
 				list.Clear();
@@ -189,13 +189,13 @@ namespace RedOnion.KSP.Parts
 		//TODO: reuse wrappers
 		protected override void DoRefresh()
 		{
-			root = null;
-			nextDecoupler = null;
+			protectedRoot = null;
+			protectedNextDecoupler = null;
 			decouplers.Clear();
 			dockingports.Clear();
 			engines.Clear();
 			sensors.Clear();
-			Construct(Ship.native.rootPart, null, null);
+			Construct(ship.native.rootPart, null, null);
 			base.DoRefresh();
 			decouplers.Dirty = false;
 			dockingports.Dirty = false;
@@ -213,7 +213,7 @@ namespace RedOnion.KSP.Parts
 			{
 				if (module is IEngineStatus)
 				{
-					var engine = new Engine(Ship, part, parent, decoupler);
+					var engine = new Engine(ship, part, parent, decoupler);
 					engines.Add(engine);
 					self = engine;
 					break;
@@ -223,7 +223,7 @@ namespace RedOnion.KSP.Parts
 					var dock = module as ModuleDockingNode;
 					if (dock != null)
 					{
-						var port = new DockingPort(Ship, part, parent, decoupler, dock);
+						var port = new DockingPort(ship, part, parent, decoupler, dock);
 						dockingports.Add(port);
 						self = port;
 						if (!module.StagingEnabled())
@@ -238,13 +238,13 @@ namespace RedOnion.KSP.Parts
 							continue;
 						if (module is global::LaunchClamp)
 						{
-							var clamp = new LaunchClamp(Ship, part, parent, decoupler);
+							var clamp = new LaunchClamp(ship, part, parent, decoupler);
 							self = clamp;
 							decoupler = clamp;
 						}
 						else if (module is ModuleDecouple || module is ModuleAnchoredDecoupler)
 						{
-							var separator = new Decoupler(Ship, part, parent, decoupler);
+							var separator = new Decoupler(ship, part, parent, decoupler);
 							self = separator;
 							decoupler = separator;
 						}
@@ -256,23 +256,23 @@ namespace RedOnion.KSP.Parts
 					if (decoupler.native.inverseStage >= StageManager.CurrentStage)
 						break;
 					// check if we just created closer decoupler (see StageValues.CreatePartSet)
-					if (nextDecoupler == null || decoupler.native.inverseStage > nextDecoupler.native.inverseStage)
-						nextDecoupler = decoupler;
+					if (protectedNextDecoupler == null || decoupler.native.inverseStage > protectedNextDecoupler.native.inverseStage)
+						protectedNextDecoupler = decoupler;
 					break;
 				}
 				var sensor = module as ModuleEnviroSensor;
 				if (sensor != null)
 				{
-					var sense = new Sensor(Ship, part, parent, decoupler, sensor);
+					var sense = new Sensor(ship, part, parent, decoupler, sensor);
 					sensors.Add(sense);
 					self = sense;
 					break;
 				}
 			}
 			if (self == null)
-				self = new PartBase(Ship, part, parent, decoupler);
-			if (root == null)
-				root = self;
+				self = new PartBase(ship, part, parent, decoupler);
+			if (protectedRoot == null)
+				protectedRoot = self;
 			if (cache == null)
 				cache = new Dictionary<Part, PartBase>();
 			cache[part] = self;

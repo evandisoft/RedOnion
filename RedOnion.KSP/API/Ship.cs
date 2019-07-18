@@ -117,9 +117,9 @@ namespace RedOnion.KSP.API
 		[Description("All parts of this ship/vessel/vehicle.")]
 		public ShipPartSet parts { get; private set; }
 		[Description("Root part (same as `Parts.Root`).")]
-		public PartBase root => parts.Root;
+		public PartBase root => parts.root;
 		[Description("One of the decouplers that will get activated by nearest stage. (Same as `Parts.NextDecoupler`.)")]
-		public Decoupler nextDecoupler => parts.NextDecoupler;
+		public Decoupler nextDecoupler => parts.nextDecoupler;
 		[Description("Stage number of the nearest decoupler or -1. (Same as `Parts.NextDecouplerStage`.)")]
 		public int nextDecouplerStage => parts.nextDecouplerStage;
 

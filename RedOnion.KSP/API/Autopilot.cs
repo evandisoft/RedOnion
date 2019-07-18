@@ -1,4 +1,5 @@
 using MoonSharp.Interpreter;
+using RedOnion.KSP.Autopilot;
 using RedOnion.ROS.Utilities;
 using System;
 using System.Collections.Generic;
@@ -65,5 +66,40 @@ namespace RedOnion.KSP.API
 			if (!float.IsNaN(throttle))
 				st.mainThrottle = RosMath.Clamp(throttle, 0f, 1f);
 		}
+
+		/// <summary>
+		/// Just the logic behind a PID for stopping the spin of a vehicle. If you can
+		/// aggressively and accurately stop the spin, you can aggresively and accurately
+		/// set a spin in the direction of the desired point, and aggresively and 
+		/// accurately stop the vehicle at a desired point.
+		/// </summary>
+		void StopSpin()
+		{
+			var angularVelocity = FlightControl.Instance.GetAngularVelocity(ship.native);
+
+			var pidPitch = new PID();
+			var pidRoll = new PID();
+			var pidYaw = new PID();
+
+			while (true)
+			{
+				angularVelocity = FlightControl.Instance.GetAngularVelocity(ship.native);
+
+				pidPitch.Input = angularVelocity.x;
+				pidPitch.Target = 0;
+				// Have to clamp these values or the game will happily accept
+				// that you have available torque greater than 100%.
+				// I don't know if that will confuse the PID.
+				// Is that what OutputChangeLimit is for?
+				// flightControlState.pitch = Math.Clamp(pidPitch.Output,-1,1)
+				pidRoll.Input = angularVelocity.y;
+				pidRoll.Target = 0;
+				// flightControlState.roll = Math.Clamp(pidRoll.Output,-1,1)
+				pidYaw.Input = angularVelocity.z;
+				pidYaw.Target = 0;
+				// flightControlState.yaw = Math.Clamp(pidYaw.Output,-1,1)
+			}
+		}
+		// 
 	}
 }
