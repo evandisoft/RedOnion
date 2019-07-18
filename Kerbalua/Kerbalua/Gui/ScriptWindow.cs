@@ -9,6 +9,7 @@ using MoonSharp.Interpreter.Interop;
 using Kerbalua.Utility;
 using RedOnion.KSP.Autopilot;
 using RedOnion.KSP.Settings;
+using RedOnion.KSP.API;
 //using RedOnion.Script;
 
 namespace Kerbalua.Gui
@@ -46,7 +47,7 @@ namespace Kerbalua.Gui
 
 		const float titleHeight = 20;
 
-		Evaluation currentEvaluation = null;
+		List<Evaluation> evaluationList = new List<Evaluation>();
 		bool inputIsLocked;
 		//bool evaluationNotFinished = false;
 
@@ -72,18 +73,54 @@ namespace Kerbalua.Gui
 			replEvaluatorLabel.content.text = evaluatorName;
 		}
 
+
+		void RunStartupScripts(string engineName)
+		{
+			if(engineName=="Lua Engine")
+			{
+				RunLuaStartupScripts();
+			}
+			if(engineName=="ROS Engine")
+			{
+				RunRosStartupScripts();
+			}
+		}
+
+		void RunLuaStartupScripts()
+		{
+			var scriptnames = AutoRun.Instance.scripts();
+			foreach(var scriptname in scriptnames)
+			{
+				string extension = Path.GetExtension(scriptname).ToLower();
+				string basename = Path.GetFileNameWithoutExtension(scriptname);
+				if (extension==".lua")
+				{
+					repl.outputBox.AddFileContent("loading "+scriptname+"...");
+					var newEvaluation = new Evaluation("require(\"" + basename + "\")",scriptname,replEvaluators["Lua Engine"]);
+					evaluationList.Add(newEvaluation);
+				}
+			}
+		}
+
+		void RunRosStartupScripts()
+		{
+
+		}
+
 		public void FixedUpdate()
 		{
-			if (currentEvaluation != null)
+			if (evaluationList.Count!=0)
 			{
+				var currentEvaluation = evaluationList[0];
 				if (currentEvaluation.Evaluate())
 				{
 					repl.outputBox.AddReturnValue(currentEvaluation.Result);
-					currentEvaluation = null;
+					evaluationList.RemoveAt(0);
 				}
 			}
-			foreach (var repl in replEvaluators.Values)
+			foreach(var engineName in replEvaluators.Keys)
 			{
+				var repl = replEvaluators[engineName];
 				try
 				{
 					repl.FixedUpdate();
@@ -92,6 +129,7 @@ namespace Kerbalua.Gui
 				{
 					Debug.Log("Exception in REPL.FixedUpdate: " + ex.Message);
 					repl.ResetEngine();
+					RunStartupScripts(engineName);
 				}
 			}
 		}
@@ -107,6 +145,7 @@ namespace Kerbalua.Gui
 				PrintErrorAction = (str) =>
 					repl.outputBox.AddError(str)
 			};
+			RunRosStartupScripts();
 			replEvaluators["Lua Engine"] = new MoonSharpReplEvaluator()
 			{
 				PrintAction = (str) =>
@@ -114,6 +153,7 @@ namespace Kerbalua.Gui
 				PrintErrorAction = (str) =>
 					repl.outputBox.AddError(str)
 			};
+			RunLuaStartupScripts();
 
 			string lastEngineName = SavedSettings.LoadSetting("lastEngine", "Lua Engine");
 			if (replEvaluators.ContainsKey(lastEngineName))
@@ -199,11 +239,18 @@ namespace Kerbalua.Gui
 			{
 				scriptIOTextArea.Save(editor.content.text);
 				repl.outputBox.AddFileContent(scriptIOTextArea.content.text);
-				currentEvaluation = new Evaluation(editor.content.text, scriptIOTextArea.content.text, currentReplEvaluator);
+				evaluationList.Add(new Evaluation(editor.content.text, scriptIOTextArea.content.text, currentReplEvaluator));
 			}));
 			widgetBar.renderables.Add(new Button("Reset Engine", () =>
 			{
 				currentReplEvaluator.ResetEngine();
+				foreach(var evaluatorname in replEvaluators.Keys)
+				{
+					if (replEvaluators[evaluatorname] == currentReplEvaluator)
+					{
+						RunStartupScripts(evaluatorname);
+					}
+				}
 			}));
 			widgetBar.renderables.Add(new Button("Show Hotkeys", () =>
 			{
@@ -336,17 +383,17 @@ Any other key gives focus to input box.
 			{
 				scriptIOTextArea.Save(editor.content.text);
 				repl.outputBox.AddFileContent(scriptIOTextArea.content.text);
-				currentEvaluation = new Evaluation(editor.content.text, scriptIOTextArea.content.text, currentReplEvaluator);
+				evaluationList.Add(new Evaluation(editor.content.text, scriptIOTextArea.content.text, currentReplEvaluator));
 			});
 			repl.inputBox.KeyBindings.Add(new EventKey(KeyCode.E, true), () =>
 			{
 				repl.outputBox.AddSourceString(repl.inputBox.content.text);
-				currentEvaluation = new Evaluation(repl.inputBox.content.text, null, currentReplEvaluator);
+				evaluationList.Add(new Evaluation(repl.inputBox.content.text, null, currentReplEvaluator));
 			});
 			repl.inputBox.KeyBindings.Add(new EventKey(KeyCode.Return), () =>
 			{
 				repl.outputBox.AddSourceString(repl.inputBox.content.text);
-				currentEvaluation = new Evaluation(repl.inputBox.content.text, null, currentReplEvaluator, true);
+				evaluationList.Add(new Evaluation(repl.inputBox.content.text, null, currentReplEvaluator, true));
 				repl.inputBox.content.text = "";
 				completionBox.content.text = "";
 			});
@@ -435,18 +482,21 @@ Any other key gives focus to input box.
 		void MainWindow(int id)
 		{
 
-			if (currentEvaluation != null
+			if (evaluationList.Count!=0
 					&& Event.current.type == EventType.KeyDown
 					&& Event.current.keyCode == KeyCode.C
 					&& Event.current.control)
 			{
 				GUIUtil.ConsumeAndMarkNextCharEvent(Event.current);
-				currentEvaluation.Terminate();
-				currentEvaluation = null;
+				evaluationList.Clear();
+				foreach(var replEvaluator in replEvaluators.Values)
+				{
+					replEvaluator.Terminate();
+				}
 				repl.outputBox.AddError("Execution Manually Terminated");
 			}
 
-			if (currentEvaluation != null)
+			if (evaluationList.Count != 0)
 			{
 				EventType t = Event.current.type;
 				if (t == EventType.KeyDown || t == EventType.MouseDown)

@@ -27,8 +27,15 @@ namespace RedOnion.KSP.API
 
 		public void add(string scriptname)
 		{
-			var s = scripts();
+			var s = new List<string>(scripts());
 			s.Add(scriptname);
+			save(s);
+		}
+
+		public void remove(string scriptname)
+		{
+			var s = new List<string>(scripts());
+			s.Remove(scriptname);
 			save(s);
 		}
 
