@@ -87,13 +87,13 @@ namespace RedOnion.KSP.API
 
 				pidPitch.Input = angularVelocity.x;
 				pidPitch.Target = 0;
-				// flightControlState.pitch = pidPitch.Output
+				// flightControlState.pitch = Math.Clamp(pidPitch.Output,-1,1)
 				pidRoll.Input = angularVelocity.y;
 				pidRoll.Target = 0;
-				// flightControlState.roll = pidRoll.Output
+				// flightControlState.roll = Math.Clamp(pidRoll.Output,-1,1)
 				pidYaw.Input = angularVelocity.z;
 				pidYaw.Target = 0;
-				// flightControlState.yaw = pidYaw.Output
+				// flightControlState.yaw = Math.Clamp(pidYaw.Output,-1,1)
 			}
 		}
 		// 
