@@ -318,6 +318,7 @@ namespace RedOnion.KSP.Autopilot
 				// we will start providing a response designed to slow us down to a stop
 				// right on the desired point.
 				// If I did this at less than the minStopDistance we wouldn't be able to stop in time.
+				// If I did this at a greater distance, we would stop more slowly.
 				if (minStopDistance > Math.Abs(angularDistance) / 2)
 				{
 					// Since minStopDistance corresponds to maxAccel (max input)
