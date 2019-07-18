@@ -15,12 +15,17 @@ namespace RedOnion.KSP.API
 	[Description("Global variables, objects and functions.")]
 	public static class Globals
 	{
-		[Description("An api for setting which scripts will be ran when an engine is reset.")]
 #pragma warning disable IDE1006 // Naming Styles
+		[Description("An api for setting which scripts will be ran when an engine is reset.")]
 		public static AutoRun autorun => AutoRun.Instance;
 
 		[Description("A map of planet names to planet bodies")]
 		public static BodiesDictionary bodies => BodiesDictionary.Instance;
+
+		//Not sure if I want to add this yet. It works, but not sure it will be
+		// structured this way.
+		//[Description("A map of kerbal names to kerbals for kerbals in the crew.")]
+		//public static KerbalsDictionary kerbals => KerbalsDictionary.Instance;
 
 		[Description("All the reflection stuff and namespaces.")]
 		public static Reflect Reflect => Reflect.Instance;

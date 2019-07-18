@@ -104,7 +104,18 @@ namespace Kerbalua.Gui
 
 		void RunRosStartupScripts()
 		{
-
+			var scriptnames = AutoRun.Instance.scripts();
+			foreach (var scriptname in scriptnames)
+			{
+				string extension = Path.GetExtension(scriptname).ToLower();
+				string basename = Path.GetFileNameWithoutExtension(scriptname);
+				if (extension == ".ros")
+				{
+					repl.outputBox.AddFileContent("loading " + scriptname + "...");
+					var newEvaluation = new Evaluation("run \"" + scriptname+"\"", scriptname, replEvaluators["ROS Engine"]);
+					evaluationList.Add(newEvaluation);
+				}
+			}
 		}
 
 		public void FixedUpdate()

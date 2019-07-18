@@ -113,6 +113,7 @@
     <Compile Include="Settings\SavedSettings.cs" />
     <Compile Include="API\BodiesDictionary.cs" />
     <Compile Include="CommonAPIHelpers\ScriptStringKeyedConstDictionary.cs" />
+    <Compile Include="API\KerbalsDictionary.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RedOnion.ROS\RedOnion.ROS.csproj">
