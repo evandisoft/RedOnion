@@ -1,22 +1,42 @@
 using MoonSharp.Interpreter;
 using RedOnion.KSP.Autopilot;
+using RedOnion.ROS;
 using RedOnion.ROS.Utilities;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using UnityEngine;
 
 namespace RedOnion.KSP.API
 {
+	[Description("Autopilot (throttle and steering) for a ship (vehicle/vessel).")]
 	public class Autopilot : IDisposable
 	{
-		protected Ship ship;
-		protected Vessel hooked;
-		protected float throttle;
+		protected Ship _ship;
+		protected Vessel _hooked;
+		protected float _throttle, _elevation, _heading, _bank;
+		// these are manipulate the direction (and do the hard work)
+		protected PID pidElevation = new PID();
+		protected PID pidHeading = new PID();
+		protected PID pidBank = new PID();
+		// these are merely for smooth control (limit rate of change)
+		protected PID pidPitch = new PID();
+		protected PID pidRoll = new PID();
+		protected PID pidYaw = new PID();
+
+		[Description("Disable the autopilot, setting all values to NaN.")]
+		public void Disable()
+		{
+			_throttle = float.NaN;
+			_elevation = float.NaN;
+			_heading = float.NaN;
+			_bank = float.NaN;
+		}
 
 		protected internal Autopilot(Ship ship)
-			=> this.ship = ship;
+			=> this._ship = ship;
 
 		~Autopilot() => Dispose(false);
 		[Browsable(false), MoonSharpHidden]
@@ -27,79 +47,80 @@ namespace RedOnion.KSP.API
 		}
 		protected virtual void Dispose(bool disposing)
 		{
-			ship = null;
+			_ship = null;
 			Unhook();
 		}
 
-		public float Throttle
+		[Description("Throttle control (0..1). NaN for releasing the control.")]
+		public float throttle
 		{
-			get => throttle;
-			set => Check(throttle = RosMath.Clamp(value, 0f, 1f));
+			get => _throttle;
+			set => Check(_throttle = RosMath.Clamp(value, 0f, 1f));
+		}
+		[Description("Target elevation (aka pitch, -180..+180)."
+			+ " Values outside -90..+90 flip heading."
+			+ "NaN for releasing the control.")]
+		public float elevation
+		{
+			get => _elevation;
+			set => Check(_elevation = RosMath.ClampS180(value));
 		}
 
 		protected void Hook()
 		{
-			if (hooked != null)
+			if (_hooked != null)
 				return;
-			hooked = ship?.native;
-			if (hooked == null)
+			_hooked = _ship?.native;
+			if (_hooked == null)
 				return;
-			hooked.OnFlyByWire += Callback;
+			_hooked.OnFlyByWire += Callback;
+			pidElevation.reset();
+			pidHeading.reset();
+			pidBank.reset();
+			pidPitch.reset();
+			pidRoll.reset();
+			pidYaw.reset();
 		}
 		protected void Unhook()
 		{
-			if (hooked == null)
+			if (_hooked == null)
 				return;
-			hooked.OnFlyByWire -= Callback;
-			hooked = null;
+			_hooked.OnFlyByWire -= Callback;
+			_hooked = null;
 		}
 		protected void Check(float value)
 		{
 			if (!float.IsNaN(value))
 				Hook();
-			else if (float.IsNaN(throttle))
+			else if (float.IsNaN(_throttle)
+				&& float.IsNaN(_elevation)
+				&& float.IsNaN(_heading)
+				&& float.IsNaN(_bank))
 				Unhook();
 		}
 
 		protected virtual void Callback(FlightCtrlState st)
 		{
-			if (!float.IsNaN(throttle))
-				st.mainThrottle = RosMath.Clamp(throttle, 0f, 1f);
-		}
-
-		/// <summary>
-		/// Just the logic behind a PID for stopping the spin of a vehicle. If you can
-		/// aggressively and accurately stop the spin, you can aggresively and accurately
-		/// set a spin in the direction of the desired point, and aggresively and 
-		/// accurately stop the vehicle at a desired point.
-		/// </summary>
-		void StopSpin()
-		{
-			var angularVelocity = FlightControl.Instance.GetAngularVelocity(ship.native);
-
-			var pidPitch = new PID();
-			var pidRoll = new PID();
-			var pidYaw = new PID();
-
-			while (true)
+			if (_hooked == null)
+				return;
+			if (!float.IsNaN(_throttle))
+				st.mainThrottle = RosMath.Clamp(_throttle, 0f, 1f);
+			/*
+			// TODO: get current elevation/pitch and heading/yaw if one is NaN
+			if (!float.IsNaN(_elevation) && !float.IsNaN(_heading))
 			{
-				angularVelocity = FlightControl.Instance.GetAngularVelocity(ship.native);
+				var pos = _ship.relative;
+				var npos = pos.normalized;
+				var north = Vector3.Cross(Vector3.forward, npos).normalized;
+				var pitched = Quaternion.AngleAxis(_elevation, west) * north;
+				var target = Quaternion.AngleAxis(_heading, pos) * pitched;
 
-				pidPitch.Input = angularVelocity.x;
-				pidPitch.Target = 0;
-				// Have to clamp these values or the game will happily accept
-				// that you have available torque greater than 100%.
-				// I don't know if that will confuse the PID.
-				// Is that what OutputChangeLimit is for?
-				// flightControlState.pitch = Math.Clamp(pidPitch.Output,-1,1)
-				pidRoll.Input = angularVelocity.y;
-				pidRoll.Target = 0;
-				// flightControlState.roll = Math.Clamp(pidRoll.Output,-1,1)
-				pidYaw.Input = angularVelocity.z;
-				pidYaw.Target = 0;
-				// flightControlState.yaw = Math.Clamp(pidYaw.Output,-1,1)
+				var input = vessel.transform.up;
+				var axis = vessel.transform.worldToLocalMatrix
+					* Vector3.Cross(input.normalized, target.normalized);
+				var speed = (Vector3)_ship.angularVelocity;
 			}
+			*/
 		}
-		// 
 	}
 }

@@ -1,12 +1,9 @@
 using System;
-using RedOnion.ROS;
-using KSP.UI.Screens;
-using MoonSharp.Interpreter;
-using System.Collections.Generic;
 using System.ComponentModel;
-using RedOnion.KSP.Parts;
+using MoonSharp.Interpreter;
+using RedOnion.ROS;
 using RedOnion.ROS.Utilities;
-using UnityEngine;
+using RedOnion.KSP.Parts;
 
 namespace RedOnion.KSP.API
 {
@@ -101,13 +98,13 @@ namespace RedOnion.KSP.API
 		[Description("Current throttle (assign redirects to `Autopilot`, reads control state if autopilot disabled)")]
 		public float throttle
 		{
-			get => protectedAutopilot == null || float.IsNaN(protectedAutopilot.Throttle)
-				? native.ctrlState.mainThrottle : protectedAutopilot.Throttle;
+			get => protectedAutopilot == null || float.IsNaN(protectedAutopilot.throttle)
+				? native.ctrlState.mainThrottle : protectedAutopilot.throttle;
 			set
 			{
 				if (protectedAutopilot == null && float.IsNaN(value))
 					return;
-				autopilot.Throttle = value;
+				autopilot.throttle = value;
 			}
 		}
 
@@ -116,7 +113,7 @@ namespace RedOnion.KSP.API
 		public Vessel native { get; private set; }
 		[Description("All parts of this ship/vessel/vehicle.")]
 		public ShipPartSet parts { get; private set; }
-		[Description("Root part (same as `Parts.Root`).")]
+		[Description("Root part (same as `parts.root`).")]
 		public PartBase root => parts.root;
 		[Description("One of the decouplers that will get activated by nearest stage. (Same as `Parts.NextDecoupler`.)")]
 		public Decoupler nextDecoupler => parts.nextDecoupler;
@@ -133,13 +130,13 @@ namespace RedOnion.KSP.API
 		[Description("All sensors.")]
 		public ReadOnlyList<Sensor> sensors => parts.sensors;
 
-		[Description("Unique identifier of the ship (wehicle/vessel). Can change when docking/undocking.")]
+		[Description("Unique identifier of the ship (vehicle/vessel). Can change when docking/undocking.")]
 		public Guid ID => native.id;
-		[Description("Unique identifier of the ship (wehicle/vessel). Should be same as it was before docking (after undocking).")]
+		[Description("Unique identifier of the ship (vehicle/vessel). Should be same as it was before docking (after undocking).")]
 		public uint PersistentID => native.persistentId;
 		[Description("KSP API. Vessel type as selected by user (or automatically).")]
 		public VesselType vesseltype => native.vesselType;
-		[Description("Total mass of the ship (wehicle/vessel).")]
+		[Description("Total mass of the ship (vehicle/vessel).")]
 		public float mass => native.GetTotalMass();
 		[Description("Wheter the ship is still packed (reduced physics).")]
 		public bool packed => native.packed;
@@ -163,9 +160,9 @@ namespace RedOnion.KSP.API
 		[Description("Eccentricity of current orbit.")]
 		public double eccentricity => native.orbit.eccentricity;
 		[Description("Semi-major axis of current orbit.")]
-		public double semimajoraxis => native.orbit.semiMajorAxis;
+		public double semiMajorAxis => native.orbit.semiMajorAxis;
 		[Description("Semi-minor axis of current orbit.")]
-		public double semiminoraxis => native.orbit.semiMinorAxis;
+		public double semiMinorAxis => native.orbit.semiMinorAxis;
 		[Description("Height above ground of highest point of current orbit).")]
 		public double apoapsis => native.orbit.ApA;
 		[Description("Height above ground of lowest point of current orbit).")]
@@ -175,30 +172,82 @@ namespace RedOnion.KSP.API
 		[Description("Lowest distance between center of orbited body and any point of current orbit.")]
 		public double pericenter => native.orbit.PeR;
 		[Description("Eta to apoapsis in seconds.")]
-		public double timetoap => native.orbit.timeToAp;
+		public double timeToAp => native.orbit.timeToAp;
 		[Description("Eta to periapsis in seconds.")]
-		public double timetope => native.orbit.timeToPe;
+		public double timeToPe => native.orbit.timeToPe;
 		[Description("Period of current orbit in seconds.")]
 		public double period => native.orbit.period;
 		[Description("Angle in degrees between the direction of periapsis and the current position.")]
-		public double trueanomaly => RosMath.Deg.Clamp360(native.orbit.trueAnomaly * RosMath.Rad2Deg);
+		public double trueAnomaly => RosMath.Deg.Clamp360(native.orbit.trueAnomaly * RosMath.Rad2Deg);
 		[Description("Angle in degrees between the direction of periapsis and the current position extrapolated on circular orbit.")]
-		public double meananomaly => native.orbit.meanAnomaly;
+		public double meanAnomaly => native.orbit.meanAnomaly;
 
 		[Convert(typeof(Vector)), Description("Current position.")]
 		public Vector3d position => native.orbit.pos;
+		[Convert(typeof(Vector)), Description("Position relative to orbited body.")]
+		public Vector3d relative => native.transform.position - native.mainBody.transform.position;
 		[Convert(typeof(Vector)), Description("Current velocity.")]
 		public Vector3d velocity => native.orbit.vel;
-		[return: Convert(typeof(Vector)), Description("Predicted position at specified time.")]
-		public Vector3d positionat(double time) => native.orbit.getPositionAtUT(time);
-		[return: Convert(typeof(Vector)), Description("Predicted velocity at specified time.")]
-		public Vector3d velocityat(double time) => native.orbit.getOrbitalVelocityAtUT(time);
+		[Description("Predicted position at specified time.")]
+		[return: Convert(typeof(Vector))]
+		public Vector3d positionAt(double time) => native.orbit.getPositionAtUT(time);
+		[DisplayName("velocityAt"), Description("Predicted velocity at specified time.")]
+		[return: Convert(typeof(Vector))]
+		public Vector3d velocityAt(double time) => native.orbit.getOrbitalVelocityAtUT(time);
 
-		[Convert(typeof(Vector)), Description("Angular velocity, how fast the ship rotates")]
-		public Vector3d AngularVelocity => native.angularVelocityD;
-		[Convert(typeof(Vector)), Description("Angular momentum aka moment of momentum or rotational momentum.")]
-		public Vector3 AngularMomentum => native.angularMomentum;
-		[Convert(typeof(Vector)), Description("Moment of inertia aka angular mass or rotational inertia.")]
-		public Vector3 MomentOfInertia => native.MOI;
+		[Convert(typeof(Vector)), Description("Center of mass")]
+		public Vector3d centerOfMass => native.CoMD;
+
+		[Convert(typeof(Vector)), Description("Angular velocity (ω, rad/s), how fast the ship rotates")]
+		public Vector3d angularVelocity => native.angularVelocityD;
+		[Convert(typeof(Vector)), Description("Moment of inertia (I, kg*m²) aka angular mass or rotational inertia.")]
+		public Vector3d momentOfInertia => native.MOI;
+		[Convert(typeof(Vector)), Description("Angular momentum (L = Iω, kg*m²/s) aka moment of momentum or rotational momentum.")]
+		public Vector3d angularMomentum => native.angularMomentum;
+
+		protected double _torqueStamp;
+		protected Vector3d _maxTorque, _maxAngular;
+		protected void UpdateTorque()
+		{
+			var positiveTorque = Vector3d.zero;
+			var negativeTorque = Vector3d.zero;
+			foreach (var part in native.parts)
+			{
+				foreach (var module in part.Modules)
+				{
+					if (!(module is ITorqueProvider provider))
+						continue;
+					provider.GetPotentialTorque(out var pos, out var neg);
+					positiveTorque += pos;
+					negativeTorque += neg;
+				}
+			}
+			_torqueStamp = Time.now;
+			_maxTorque.x = Math.Max(positiveTorque.x, negativeTorque.x);
+			_maxTorque.y = Math.Max(positiveTorque.y, negativeTorque.y);
+			_maxTorque.z = Math.Max(positiveTorque.z, negativeTorque.z);
+			_maxAngular = VectorCreator.shrink(_maxTorque, momentOfInertia);
+		}
+
+		[Convert(typeof(Vector)), Description("Maximal ship torque (aka moment of force or turning effect, maximum of positive and negative).")]
+		public Vector3d maxTorque
+		{
+			get
+			{
+				if (Time.since(_torqueStamp) > 0)
+					UpdateTorque();
+				return _maxTorque;
+			}
+		}
+		[Convert(typeof(Vector)), Description("Maximal angular acceleration (rad/s²)")]
+		public Vector3d maxAngular
+		{
+			get
+			{
+				if (Time.since(_torqueStamp) > 0)
+					UpdateTorque();
+				return _maxAngular;
+			}
+		}
 	}
 }

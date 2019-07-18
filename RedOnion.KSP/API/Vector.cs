@@ -30,56 +30,56 @@ namespace RedOnion.KSP.API
 		[Description("Native Vector3d(`double x, y, z`).")]
 		public new Vector3d native
 		{
-			get => base.protectedNative;
-			set => base.protectedNative = value;
+			get => _native;
+			set => _native = value;
 		}
 
 		[Description("The X-coordinate")]
 		public new double x
 		{
-			get => base.protectedNative.x;
-			set => base.protectedNative = new Vector3d(value, y, z);
+			get => _native.x;
+			set => _native = new Vector3d(value, y, z);
 		}
 		[Description("The Y-coordinate")]
 		public new double y
 		{
-			get => base.protectedNative.y;
-			set => base.protectedNative = new Vector3d(x, value, z);
+			get => _native.y;
+			set => _native = new Vector3d(x, value, z);
 		}
 		[Description("The Z-coordinate")]
 		public new double z
 		{
-			get => base.protectedNative.z;
-			set => base.protectedNative = new Vector3d(x, y, value);
+			get => _native.z;
+			set => _native = new Vector3d(x, y, value);
 		}
 
 		[Description("Size of the vector - `sqrt(x*x+y*y+z*z)`. Scale if setting.")]
 		public new double size
 		{
-			get => base.protectedNative.magnitude;
-			set => base.protectedNative *= value/ base.protectedNative.magnitude;
+			get => _native.magnitude;
+			set => _native *= value/ _native.magnitude;
 		}
 		[Description("Alias to size of the vector - `sqrt(x*x+y*y+z*z)`. Scale if setting.")]
 		public new double magnitude
 		{
-			get => base.protectedNative.magnitude;
-			set => base.protectedNative *= value/ base.protectedNative.magnitude;
+			get => _native.magnitude;
+			set => _native *= value/ _native.magnitude;
 		}
 		[Description("Square size of the vector - `x*x+y*y+z*z`. Scale if setting.")]
 		public new double squareSize
 		{
-			get => base.protectedNative.sqrMagnitude;
-			set => base.protectedNative *= value* value / base.protectedNative.magnitude;
+			get => _native.sqrMagnitude;
+			set => _native *= value* value / _native.magnitude;
 		}
 		[Description("Normalize vector (set size to 1).")]
 		public void normalize()
-			=> base.protectedNative = base.protectedNative.normalized;
+			=> _native = _native.normalized;
 
 		[Description("Native UnityEngine.Vector3 (`float x,y,z`).")]
 		public new Vector3 Vector3
 		{
-			get => base.protectedNative;
-			set => base.protectedNative = value;
+			get => _native;
+			set => _native = value;
 		}
 		[Description("Native UnityEngine.Vector2 (`float x,y`).")]
 		public new Vector2 Vector2
@@ -90,33 +90,33 @@ namespace RedOnion.KSP.API
 		[Description("Index the coordinates as double[3]")]
 		public new double this[int i]
 		{
-			get => base.protectedNative[i];
-			set => base.protectedNative[i] = value;
+			get => _native[i];
+			set => _native[i] = value;
 		}
 
 		[Description("Scale the vector by a factor (all axes). Multiplication does the same.")]
 		public void scale(double factor)
-			=> base.protectedNative *= factor;
+			=> _native *= factor;
 		[Description("Scale individual axis. Multiplication does the same.")]
 		public void scale(ConstVector v)
-			=> base.protectedNative = Vector3d.Scale(base.protectedNative, v.native);
+			=> _native = Vector3d.Scale(_native, v.native);
 
 		public void scale(Vector3d v)
-			=> base.protectedNative = Vector3d.Scale(base.protectedNative, v);
+			=> _native = Vector3d.Scale(_native, v);
 		public void scale(Vector3 v)
-			=> base.protectedNative = Vector3d.Scale(base.protectedNative, v);
+			=> _native = Vector3d.Scale(_native, v);
 
 		[Description("Shrink the vector by a factor (all axes). Division does the same.")]
 		public void shrink(double factor)
-			=> base.protectedNative /= factor;
+			=> _native /= factor;
 		[Description("Shrink individual axis. Division does the same.")]
 		public void shrink(ConstVector v)
-			=> base.protectedNative = new Vector3d(x / v.x, y / v.y, z / v.z);
+			=> _native = new Vector3d(x / v.x, y / v.y, z / v.z);
 
 		public void shrink(Vector3d v)
-			=> base.protectedNative = new Vector3d(x / v.x, y / v.y, z / v.z);
+			=> _native = new Vector3d(x / v.x, y / v.y, z / v.z);
 		public void shrink(Vector3 v)
-			=> base.protectedNative = new Vector3d(x / v.x, y / v.y, z / v.z);
+			=> _native = new Vector3d(x / v.x, y / v.y, z / v.z);
 
 		public static implicit operator Vector3d(Vector v) => v.native;
 		public static implicit operator Vector3(Vector v) => v.native;
