@@ -68,8 +68,10 @@
     <Compile Include="API\InteropUtilities.cs" />
     <Compile Include="API\ReadOnlyList.cs" />
     <Compile Include="API\ReadOnlySet.cs" />
+    <Compile Include="API\Bodies.cs" />
     <Compile Include="API\Time.cs" />
     <Compile Include="API\Player.cs" />
+    <Compile Include="API\VectorDraw.cs" />
     <Compile Include="Namespaces\KSP.cs" />
     <Compile Include="Namespaces\UI.cs" />
     <Compile Include="Namespaces\Unity.cs" />
@@ -135,9 +137,6 @@
   <ItemGroup />
   <ItemGroup />
   <ItemGroup />
-  <ItemGroup>
-    <Folder Include="Settings\" />
-    <Folder Include="CommonAPIHelpers\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

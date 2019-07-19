@@ -404,24 +404,41 @@ namespace RedOnion.ROS
 
 	#region Attributes and interfaces for reflection
 
+	/// <summary>
+	/// Callable object (function which can also have properties).
+	/// </summary>
 	public interface ICallable
 	{
 		bool Call(ref Value result, object self, Arguments args, bool create);
 	}
+	/// <summary>
+	/// Object with custom operator implementation.
+	/// </summary>
 	public interface IOperators
 	{
 		bool Unary(ref Value self, OpCode op);
 		bool Binary(ref Value lhs, OpCode op, ref Value rhs);
 	}
+	/// <summary>
+	/// Object that is able to convert itself into different type.
+	/// </summary>
 	public interface IConvert
 	{
 		bool Convert(ref Value self, Descriptor to);
 	}
+	/// <summary>
+	/// Interface for type system ('is' and 'as' operators).
+	/// </summary>
 	public interface IType
 	{
 		Type Type { get; }
 		bool IsType(object type);
 	}
+
+	/// <summary>
+	/// Marker for potentially dangerous API.
+	/// </summary>
+	public class UnsafeAttribute : Attribute { }
 
 	/// <summary>
 	/// Alternative name for a member (if name not null),

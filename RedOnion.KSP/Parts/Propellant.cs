@@ -64,7 +64,8 @@ namespace RedOnion.KSP.Parts
 				return dict.TryGetValue(name, out var it) ? it : null;
 			}
 		}
-		[Description("Get minimal amount of propellant required by the engine(s).")]
+
+		// this turned out not to be what I was searching for
 		public double getMinimalOf(string name)
 			=> this[name]?.Minimal ?? 0.0;
 	}
@@ -78,7 +79,9 @@ namespace RedOnion.KSP.Parts
 			Minimal = p.minResToLeave;
 		}
 
+		[Description("Name of the propelant (like `LiquidFuel').")]
 		public string Name => list[0].name;
+		// not what I was searching for, we need Engine.ignitionThreshold or something like that
 		public double Minimal { get; protected internal set; }
 	}
 }

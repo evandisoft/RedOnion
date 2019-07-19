@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel;
 using RedOnion.KSP.API;
+using RedOnion.ROS;
 using RedOnion.ROS.Utilities;
 
 namespace RedOnion.KSP.Parts
@@ -78,19 +79,19 @@ namespace RedOnion.KSP.Parts
 	[Description("Engine of a ship (vehicle/vessel).")]
 	public class Engine : PartBase
 	{
-		[Description("KSP API. Module of multi-mode engine, if present (null otherwise).")]
+		[Unsafe, Description("KSP API. Module of multi-mode engine, if present (null otherwise).")]
 		public MultiModeEngine multiModule { get; protected set; }
-		[Description("KSP API. Module of first engine.")]
+		[Unsafe, Description("KSP API. Module of first engine.")]
 		public ModuleEngines firstModule { get; protected set; }
-		[Description("KSP API. Module of second engine, if present (null otherwise).")]
+		[Unsafe, Description("KSP API. Module of second engine, if present (null otherwise).")]
 		public ModuleEngines secondModule { get; protected set; }
 		[Description("Running primary engine (or the only one).")]
 		public bool firstIsActive => secondModule == null || multiModule.runningPrimary;
 		[Description("Running secondary engine.")]
 		public bool secondIsActive => !firstIsActive;
-		[Description("KSP API. Active engine module.")]
+		[Unsafe, Description("KSP API. Active engine module.")]
 		public ModuleEngines activeModule => firstIsActive ? firstModule : secondModule;
-		[Description("KSP API. Gimbal module, if present (null otherwise).")]
+		[Unsafe, Description("KSP API. Gimbal module, if present (null otherwise).")]
 		public ModuleGimbal gimbalModule { get; private set; }
 		[Description("Is multi-mode engine (or not).")]
 		public bool multiMode { get { return secondModule != null; } }
@@ -163,7 +164,7 @@ namespace RedOnion.KSP.Parts
 		public float seaLevelIsp => activeModule.atmosphereCurve.Evaluate(1f);
 
 		[Description("Avalable thrust at current pressure, ignoring the limiter"
-			+ " (`ThrustPercentage` and current throttle).")]
+			+ " (`thrustPercentage` and current throttle).")]
 		public float thrust => activeModule.finalThrust;
 		[Description("Thrust limiter in percents.")]
 		public float thrustPercentage
@@ -173,7 +174,7 @@ namespace RedOnion.KSP.Parts
 		}
 		[Description("Get thrust at atmospheric pressure"
 			+ " (0 = vacuum, 1 = Kerbin sea-level pressure, NaN = current pressure)"
-			+ " and throttle (default 1 = full throttle). Ignores `ThrustPercentage`.")]
+			+ " and throttle (default 1 = full throttle). Ignores `thrustPercentage`.")]
 		public float getThrust(float atm = float.NaN, float throttle = 1f)
 		{
 			var module = activeModule;
@@ -183,6 +184,9 @@ namespace RedOnion.KSP.Parts
 				RosMath.Clamp((float)atm, 0f, 10f)),
 				RosMath.Clamp(throttle, 0f, 1f));
 		}
+
+		// TODO: find out the amount of fuel left in tanks by this engine
+		// ..... there is some 'ignition threshold'
 
 		public double ratioSum => activeModule.ratioSum;
 		public double mixtureDensity => activeModule.mixtureDensity;
