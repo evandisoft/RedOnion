@@ -20,7 +20,10 @@ namespace RedOnion.KSP.API
 		public static AutoRun autorun => AutoRun.Instance;
 
 		[Unsafe, Description("A map of planet names to planet bodies")]
-		public static BodiesDictionary bodies => BodiesDictionary.Instance;
+		public static BodiesDictionary getbody => BodiesDictionary.Instance;
+
+		[Description("A list/map of planet names to SpaceBodies")]
+		public static Bodies bodies => Bodies.Instance;
 
 		//Not sure if I want to add this yet. It works, but not sure it will be
 		// structured this way.
