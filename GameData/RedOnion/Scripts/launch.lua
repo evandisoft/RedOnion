@@ -22,6 +22,7 @@ end
 
 function checkStaging()
     local s=vdv.GetStage(vessel.currentStage)
+    local snext=vdv.GetStage(vessel.currentStage-1)
     
     if not stager.CanSeparate then
         -- print("couldn't separate")
@@ -35,6 +36,12 @@ function checkStaging()
     end
     
     if s.enginesInStage.Count == 0 then
+        stage()
+        return
+    end
+    
+    if s.stageMass < snext.stageMass then
+        print("current stage mass less than next stage mass")
         stage()
         return
     end

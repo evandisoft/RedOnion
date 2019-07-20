@@ -25,7 +25,7 @@ namespace RedOnion.KSP.API
 			}
 			return new Value();
 		}
-		public static DynValue ToLua(this Value value)
+		public static DynValue ToLua(this Value value, Script script = null)
 		{
 			if (value.IsNumerOrChar)
 				return DynValue.NewNumber(value.ToDouble());
@@ -33,7 +33,7 @@ namespace RedOnion.KSP.API
 				return DynValue.NewString(value.ToStr());
 			if (value.IsVoid)
 				return DynValue.Void;
-			return DynValue.FromObject(null, value.obj);
+			return DynValue.FromObject(script, value.obj);
 		}
 		public static object ToRos(this CallbackArguments from, out Arguments to)
 		{

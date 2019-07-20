@@ -1,9 +1,7 @@
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
 using RedOnion.KSP.API;
+using RedOnion.ROS;
 
 namespace RedOnion.KSP.Parts
 {
@@ -12,7 +10,7 @@ namespace RedOnion.KSP.Parts
 	{
 		[Description("Ship (vehicle/vessel) this part belongs to.")]
 		public Ship ship { get; }
-		[Description("Native `Part` - KSP API.")]
+		[Unsafe, Description("Native `Part` - KSP API.")]
 		public Part native { get; }
 		[Description("Parent part (this part is attached to).")]
 		public PartBase parent { get; }

@@ -9,6 +9,7 @@ using System.Reflection;
 using RedOnion.KSP.Autopilot;
 using RedOnion.KSP.Namespaces;
 using System.Linq;
+using RedOnion.KSP.UnsafeAPI;
 
 namespace RedOnion.KSP.API
 {
@@ -16,20 +17,19 @@ namespace RedOnion.KSP.API
 	public static class Globals
 	{
 		[Description("An api for setting which scripts will be ran when an engine is reset.")]
-
 		public static AutoRun autorun => AutoRun.Instance;
 
-		[Description("A map of planet names to planet bodies")]
+		[Unsafe, Description("A map of planet names to planet bodies")]
 		public static BodiesDictionary bodies => BodiesDictionary.Instance;
 
 		//Not sure if I want to add this yet. It works, but not sure it will be
 		// structured this way.
-		//[Description("A map of kerbal names to kerbals for kerbals in the crew.")]
+		//[Unsafe, Description("A map of kerbal names to kerbals for kerbals in the crew.")]
 		//public static KerbalsDictionary kerbals => KerbalsDictionary.Instance;
 
-		[Description("All the reflection stuff and namespaces.")]
+		[Unsafe, Description("All the reflection stuff and namespaces.")]
 		public static Reflect reflect => Reflect.Instance;
-		[Description("Alias to `reflect` because of the namespaces.")]
+		[Unsafe, Description("Alias to `reflect` because of the namespaces.")]
 		public static Reflect native => Reflect.Instance;
 
 		[Description("Current time")]

@@ -34,9 +34,9 @@ namespace RedOnion.KSP.Parts
 			stamp = now;
 			foreach (var res in list)
 			{
-				res.PartCount = 0;
-				res.amount = 0;
-				res.maxAmount = 0;
+				res.partCount = 0;
+				res._amount = 0;
+				res._maxAmount = 0;
 			}
 			if (part != null)
 				Process(part);
@@ -57,8 +57,8 @@ namespace RedOnion.KSP.Parts
 					Add(res);
 					cache[name] = res;
 				}
-				res.amount += native.amount;
-				res.maxAmount += native.maxAmount;
+				res._amount += native.amount;
+				res._maxAmount += native.maxAmount;
 			}
 		}
 
@@ -73,31 +73,35 @@ namespace RedOnion.KSP.Parts
 		}
 		[Description("Get amount of resource (in part or set/list) by name. Returns zero for non-existent resources.")]
 		public double getAmountOf(string name)
-			=> this[name]?.Amount ?? 0.0;
+			=> this[name]?.amount ?? 0.0;
 		[Description("Get maximum storable amount of resource by name. Returs zero for non-existent resources.")]
 		public double getMaxAmountOf(string name)
-			=> this[name]?.MaxAmount ?? 0.0;
+			=> this[name]?.maxAmount ?? 0.0;
 		[Description("Get number of parts that can store the named resource. Returns zero for non-existent resources.")]
 		public int getPartCountOf(string name)
-			=> this[name]?.PartCount ?? 0;
+			=> this[name]?.partCount ?? 0;
 	}
+	[Description("Resource like LiquidFuel etc.")]
 	public class Resource
 	{
 		// null for aggregate, assigned if List.part != null
 		protected PartResource native;
 		public ResourceList List { get; }
+		[Description("Name of the resource (e.g. LiquidFuel).")]
 		public string Name { get; }
+		[Description("Identificator of the resource (for resource library; hash of the name).")]
 		public int ID { get; }
 
-		protected int count;
-		public int PartCount
+		[Description("Number of parts (in parent list/set) able to contain this resource.")]
+		public int partCount
 		{
 			get;
 			protected internal set;
 		}
 
-		internal double amount, maxAmount;
-		public double Amount
+		internal double _amount, _maxAmount;
+		[Description("Current amount of the resource.")]
+		public double amount
 		{
 			get
 			{
@@ -105,10 +109,11 @@ namespace RedOnion.KSP.Parts
 					return native.amount;
 				double now = Planetarium.GetUniversalTime();
 				if (now != List.stamp) List.Update(now);
-				return amount;
+				return _amount;
 			}
 		}
-		public double MaxAmount
+		[Description("Maximal amount of the resource that can be stored.")]
+		public double maxAmount
 		{
 			get
 			{
@@ -116,7 +121,7 @@ namespace RedOnion.KSP.Parts
 					return native.maxAmount;
 				double now = Planetarium.GetUniversalTime();
 				if (now != List.stamp) List.Update(now);
-				return maxAmount;
+				return _maxAmount;
 			}
 		}
 
@@ -127,7 +132,7 @@ namespace RedOnion.KSP.Parts
 			Name = name;
 			ID = name.GetHashCode();
 			if (native != null)
-				PartCount = 1;
+				partCount = 1;
 		}
 	}
 }

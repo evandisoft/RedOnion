@@ -33,6 +33,8 @@ namespace RedOnion.KSP.API
 		protected internal ReadOnlyList(Action refresh) => Refresh = refresh;
 
 		[Description("Number of elements in the list (or set).")]
+		public int count => Count;
+		[Browsable(false), MoonSharpHidden]
 		public int Count
 		{
 			get
@@ -51,12 +53,16 @@ namespace RedOnion.KSP.API
 			}
 		}
 		[Description("Get index of element. -1 if not found.")]
+		public int indexOf(T item) => IndexOf(item);
+		[Browsable(false), MoonSharpHidden]
 		public int IndexOf(T item)
 		{
 			if (Dirty) DoRefresh();
 			return list.IndexOf(item);
 		}
 		[Description("Test wether the list (or set) contains specified element.")]
+		public bool contains(T item) => Contains(item);
+		[Browsable(false), MoonSharpHidden]
 		public virtual bool Contains(T item)
 		{
 			if (Dirty) DoRefresh();
