@@ -7,7 +7,7 @@ using MoonSharp.Interpreter.Interop;
 using RedOnion.KSP.CommonAPIHelpers;
 using RedOnion.KSP.Completion;
 
-namespace RedOnion.KSP.API
+namespace RedOnion.KSP.UnsafeAPI
 {
 	[Description("A dictionary mapping body names to CelestialBody instances. The bodies will be whatever"
 	+" is returned by FlightGlobals.Bodies")]

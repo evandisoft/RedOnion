@@ -118,9 +118,10 @@
     <Compile Include="ReflectionUtil\GetMappings.Lua.cs" />
     <Compile Include="API\AutoRun.cs" />
     <Compile Include="Settings\SavedSettings.cs" />
-    <Compile Include="API\BodiesDictionary.cs" />
     <Compile Include="CommonAPIHelpers\ScriptStringKeyedConstDictionary.cs" />
-    <Compile Include="API\KerbalsDictionary.cs" />
+    <Compile Include="UnsafeAPI\BodiesDictionary.cs" />
+    <Compile Include="UnsafeAPI\KerbalsDictionary.cs" />
+    <Compile Include="UnsafeAPI\UnsafeAPI.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RedOnion.ROS\RedOnion.ROS.csproj">
@@ -138,6 +139,7 @@
   <ItemGroup>
     <Folder Include="Settings\" />
     <Folder Include="CommonAPIHelpers\" />
+    <Folder Include="UnsafeAPI\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

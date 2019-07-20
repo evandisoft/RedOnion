@@ -2,7 +2,7 @@ using System;
 using System.ComponentModel;
 using RedOnion.KSP.CommonAPIHelpers;
 
-namespace RedOnion.KSP.API
+namespace RedOnion.KSP.UnsafeAPI
 {
 	/// <summary>
 	/// Not sure if I want to add this.
