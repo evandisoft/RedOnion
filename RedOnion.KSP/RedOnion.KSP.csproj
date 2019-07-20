@@ -124,7 +124,6 @@
     <Compile Include="UnsafeAPI\BodiesDictionary.cs" />
     <Compile Include="UnsafeAPI\KerbalsDictionary.cs" />
     <Compile Include="UnsafeAPI\UnsafeAPI.cs" />
-    <Compile Include="OS\ROOS.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RedOnion.ROS\RedOnion.ROS.csproj">
@@ -140,8 +139,5 @@
   <ItemGroup />
   <ItemGroup />
   <ItemGroup />
-  <ItemGroup>
-    <Folder Include="OS\" />
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

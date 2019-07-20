@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <KerbalLibs Condition=" '$(KerbalLibs)' == '' And '$(OS)' == 'Windows_NT' And Exists('$(SolutionDir)\ksp')">$(SolutionDir)\ksp\KSP_x64_Data\Managed</KerbalLibs>
+    <KerbalLibs Condition=" '$(KerbalLibs)' == '' And '$(OS)' != 'Windows_NT' And Exists('$(SolutionDir)\ksp')">$(SolutionDir)\ksp\KSP_Data\Managed</KerbalLibs>
+    <KerbalLibs Condition=" '$(KerbalLibs)' == '' And '$(OS)' == 'Windows_NT' ">C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\KSP_x64_Data\Managed</KerbalLibs>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{9A325200-04F2-42D2-994E-06E7711EF9AA}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>LiveRepl</RootNamespace>
+    <AssemblyName>LiveRepl</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <ReleaseVersion>0.3.0</ReleaseVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="Antlr4.Runtime.Standard">
+      <HintPath>..\packages\Antlr4.Runtime.Standard.4.7.1.1\lib\net35\Antlr4.Runtime.Standard.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Security">
+      <HintPath>$(KerbalLibs)\Mono.Security.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="mscorlib">
+      <HintPath>$(KerbalLibs)\mscorlib.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Core">
+      <HintPath>$(KerbalLibs)\System.Core.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System">
+      <HintPath>$(KerbalLibs)\System.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Xml">
+      <HintPath>$(KerbalLibs)\System.Xml.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>$(KerbalLibs)\Assembly-CSharp.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Assembly-CSharp-firstpass">
+      <HintPath>$(KerbalLibs)\Assembly-CSharp-firstpass.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>$(KerbalLibs)\UnityEngine.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="KerbaluaMoonSharp">
+      <HintPath>..\OtherDLLs\KerbaluaMoonSharp\KerbaluaMoonSharp.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="LiveRepl\Main\KerbaluaMain.cs" />
+    <Compile Include="LiveRepl\Gui\AutoLayoutBox.cs" />
+    <Compile Include="LiveRepl\Gui\Button.cs" />
+    <Compile Include="LiveRepl\Gui\CompletionBox.cs" />
+    <Compile Include="LiveRepl\Gui\CompletionManager.cs" />
+    <Compile Include="LiveRepl\Gui\EditingArea.cs" />
+    <Compile Include="LiveRepl\Gui\Editor.cs" />
+    <Compile Include="LiveRepl\Gui\EventKey.cs" />
+    <Compile Include="LiveRepl\Gui\GUILibUtil.cs" />
+    <Compile Include="LiveRepl\Gui\ICompletableElement.cs" />
+    <Compile Include="LiveRepl\Gui\ICompletionSelector.cs" />
+    <Compile Include="LiveRepl\Gui\IFocusable.cs" />
+    <Compile Include="LiveRepl\Gui\ILayoutRenderer.cs" />
+    <Compile Include="LiveRepl\Gui\InputBox.cs" />
+    <Compile Include="LiveRepl\Gui\IRectRenderer.cs" />
+    <Compile Include="LiveRepl\Gui\IRenderer.cs" />
+    <Compile Include="LiveRepl\Gui\KeyBindings.cs" />
+    <Compile Include="LiveRepl\Gui\Label.cs" />
+    <Compile Include="LiveRepl\Gui\OutputBox.cs" />
+    <Compile Include="LiveRepl\Gui\RecentFilesList.cs" />
+    <Compile Include="LiveRepl\Gui\Repl.cs" />
+    <Compile Include="LiveRepl\Gui\ScriptNameInputArea.cs" />
+    <Compile Include="LiveRepl\Gui\ScrollableTextArea.cs" />
+    <Compile Include="LiveRepl\Gui\TextArea.cs" />
+    <Compile Include="LiveRepl\Gui\UIElement.cs" />
+    <Compile Include="LiveRepl\Other\EditAreaCompletionAdapter.cs" />
+    <Compile Include="LiveRepl\Main\ScriptWindow.cs" />
+    <Compile Include="LiveRepl\Main\KerbaluaRepl.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="LiveRepl\" />
+    <Folder Include="LiveRepl\Main\" />
+    <Folder Include="LiveRepl\Gui\" />
+    <Folder Include="LiveRepl\Other\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\RedOnion.KSP\RedOnion.KSP.csproj">
+      <Project>{DEC12E09-29AD-4666-9954-8C8A1D7BF454}</Project>
+      <Name>RedOnion.KSP</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RedOnion.ROS\RedOnion.ROS.csproj">
+      <Project>{59399C9E-EBAC-4D7C-B2CB-6ECE22FE8D6E}</Project>
+      <Name>RedOnion.ROS</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RedOnion.UI\RedOnion.UI.csproj">
+      <Project>{034C16AB-D16E-4AFE-9837-812499EE2F3D}</Project>
+      <Name>RedOnion.UI</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Kerbalua\Kerbalua.csproj">
+      <Project>{F590B1DB-8F33-4986-8383-180952D63CDA}</Project>
+      <Name>Kerbalua</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+</Project>

@@ -1,4 +1,3 @@
-using System.Runtime.Remoting.Proxies;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
 using RedOnion.KSP.Autopilot;
@@ -10,13 +9,11 @@ using RedOnion.KSP.Lua.Proxies;
 using Kerbalua.Parsing;
 using RedOnion.UI;
 using System.Reflection;
-using System.Globalization;
 using UnityEngine.Events;
 using System.Collections.Generic;
 using System.Linq;
 using API = RedOnion.KSP.API;
 using RedOnion.KSP.ReflectionUtil;
-using RedOnion.KSP.API;
 using static RedOnion.KSP.API.Reflect;
 
 namespace Kerbalua.MoonSharp
@@ -79,6 +76,7 @@ namespace Kerbalua.MoonSharp
 				.SetScriptToClrCustomConversion(DataType.Function
 					, typeof(System.Action<object>), (f) => new Action<object>((item) =>
 				{
+
 					var co = CreateCoroutine(f);
 					co.Coroutine.AutoYieldCounter = 10000;
 					co.Coroutine.Resume(item);

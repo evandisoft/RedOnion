@@ -4,6 +4,7 @@
     <KerbalLibs Condition=" '$(KerbalLibs)' == '' And '$(OS)' == 'Windows_NT' And Exists('$(SolutionDir)\ksp')">$(SolutionDir)\ksp\KSP_x64_Data\Managed</KerbalLibs>
     <KerbalLibs Condition=" '$(KerbalLibs)' == '' And '$(OS)' != 'Windows_NT' And Exists('$(SolutionDir)\ksp')">$(SolutionDir)\ksp\KSP_Data\Managed</KerbalLibs>
     <KerbalLibs Condition=" '$(KerbalLibs)' == '' And '$(OS)' == 'Windows_NT' ">C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\KSP_x64_Data\Managed</KerbalLibs>
+
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{F590B1DB-8F33-4986-8383-180952D63CDA}</ProjectGuid>
@@ -33,6 +34,18 @@
     <NoWarn>3021</NoWarn>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="UnityEngine">
+      <HintPath>$(KerbalLibs)\UnityEngine.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>$(KerbalLibs)\Assembly-CSharp.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Assembly-CSharp-firstpass">
+      <HintPath>$(KerbalLibs)\Assembly-CSharp-firstpass.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Antlr4.Runtime.Standard">
       <HintPath>..\packages\Antlr4.Runtime.Standard.4.7.1.1\lib\net35\Antlr4.Runtime.Standard.dll</HintPath>
     </Reference>
@@ -56,57 +69,17 @@
       <HintPath>$(KerbalLibs)\System.Xml.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Assembly-CSharp">
-      <HintPath>$(KerbalLibs)\Assembly-CSharp.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Assembly-CSharp-firstpass">
-      <HintPath>$(KerbalLibs)\Assembly-CSharp-firstpass.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="UnityEngine">
-      <HintPath>$(KerbalLibs)\UnityEngine.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="KerbaluaMoonSharp">
       <HintPath>..\OtherDLLs\KerbaluaMoonSharp\KerbaluaMoonSharp.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Kerbalua\Main\KerbaluaMain.cs" />
     <Compile Include="Kerbalua\Other\MoonSharpReplEvaluator.cs" />
-    <Compile Include="Kerbalua\Gui\KerbaluaRepl.cs" />
     <Compile Include="Kerbalua\Utility\prin.cs" />
     <Compile Include="Kerbalua\Utility\QueueLogger.cs" />
-    <Compile Include="Kerbalua\Gui\InputBox.cs" />
-    <Compile Include="Kerbalua\Gui\ScriptWindow.cs" />
-    <Compile Include="Kerbalua\Gui\Repl.cs" />
-    <Compile Include="Kerbalua\Gui\OutputBox.cs" />
-    <Compile Include="Kerbalua\Gui\CompletionBox.cs" />
-    <Compile Include="Kerbalua\Gui\TextArea.cs" />
-    <Compile Include="Kerbalua\Gui\AutoLayoutBox.cs" />
-    <Compile Include="Kerbalua\Gui\Button.cs" />
-    <Compile Include="Kerbalua\Gui\ScrollableTextArea.cs" />
-    <Compile Include="Kerbalua\Gui\GUIUtil.cs" />
-    <Compile Include="Kerbalua\Gui\ILayoutRenderer.cs" />
-    <Compile Include="Kerbalua\Gui\Editor.cs" />
-    <Compile Include="Kerbalua\Gui\UIElement.cs" />
-    <Compile Include="Kerbalua\Gui\EditingArea.cs" />
     <Compile Include="Kerbalua\Other\ReplEvaluator.cs" />
     <Compile Include="Kerbalua\Other\RedOnionReplEvaluator.cs" />
-    <Compile Include="Kerbalua\Gui\EventKey.cs" />
-    <Compile Include="Kerbalua\Gui\KeyBindings.cs" />
-    <Compile Include="Kerbalua\Gui\ScriptNameInputArea.cs" />
-    <Compile Include="Kerbalua\Gui\CompletionManager.cs" />
-    <Compile Include="Kerbalua\Gui\ICompletionSelector.cs" />
-    <Compile Include="Kerbalua\Gui\ICompletableElement.cs" />
-    <Compile Include="Kerbalua\Gui\IFocusable.cs" />
-    <Compile Include="Kerbalua\Other\EditAreaCompletionAdapter.cs" />
-    <Compile Include="Kerbalua\Gui\IRectRenderer.cs" />
-    <Compile Include="Kerbalua\Gui\IRenderer.cs" />
-    <Compile Include="Kerbalua\Gui\RecentFilesList.cs" />
-    <Compile Include="Kerbalua\Gui\Label.cs" />
     <Compile Include="Kerbalua\MoonSharp\KerbaluaExecutionManager.cs" />
     <Compile Include="Kerbalua\MoonSharp\ExecutionLimitException.cs" />
     <Compile Include="Kerbalua\Completion\LuaIntellisense.cs" />
