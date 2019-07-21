@@ -31,7 +31,7 @@ namespace LiveRepl
                 toolbarTexture
                 );
             }
-			Debug.Log("The ghjk is awake");
+
             // We have to connect it with a function that has relevance in this
             // particular scene. If ToggleGui was already set, it was with
             // a delegate from another scene.
