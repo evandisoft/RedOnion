@@ -5,7 +5,7 @@ using System.IO;
 using UnityEngine;
 using RedOnion.KSP.Settings;
 
-namespace LiveRepl.Gui {
+namespace Kerbalui.Gui {
 	public class RecentFilesList:AutoLayoutBox {
 		const int ioDelayMillis = 1000;
 		public int MaxFiles = 10;

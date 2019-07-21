@@ -2,7 +2,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-namespace LiveRepl.Gui {
+namespace Kerbalui.Gui {
 	/// <summary>
 	/// Manages an interaction between focusable objects that can produce a 
 	/// list of possible completions (ICompletable) and an object for displaying 

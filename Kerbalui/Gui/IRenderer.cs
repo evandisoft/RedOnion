@@ -1,5 +1,5 @@
 ﻿using System;
-namespace LiveRepl.Gui {
+namespace Kerbalui.Gui {
 	public interface IRenderer:IRectRenderer,ILayoutRenderer {
 	}
 }

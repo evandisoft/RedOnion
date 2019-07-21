@@ -1,4 +1,4 @@
-﻿namespace LiveRepl.Gui {
+﻿namespace Kerbalui.Gui {
     public interface IFocusable {
 		string ControlName { get; }
 		bool HasFocus();

@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace LiveRepl.Gui {
+namespace Kerbalui.Gui {
 	/// <summary>
 	/// Can render itself with GUILayout.
 	/// </summary>

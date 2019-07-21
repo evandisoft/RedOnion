@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using RedOnion.KSP.Settings;
 
-namespace LiveRepl.Gui {
+namespace Kerbalui.Gui {
 	public class ScriptNameInputArea:EditingArea, ICompletableElement {
 		public bool receivedInput;
 

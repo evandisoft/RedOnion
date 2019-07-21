@@ -1,15 +1,14 @@
 ﻿using System;
 using UnityEngine;
 
-namespace LiveRepl.Gui
+namespace Kerbalui.Gui
 {
-	public class Label : UIElement
+	public class TextArea : UIElement
 	{
 		public GUIContent content = new GUIContent("");
-		public Label(string text)
-		{
-			content.text = text;
-		}
+		// 
+		public int cursorIndex = 0;
+		public int selectIndex = 0;
 
 		protected override void ProtectedUpdate(Rect rect)
 		{
@@ -17,11 +16,11 @@ namespace LiveRepl.Gui
 			{
 				if (style != null)
 				{
-					GUI.Label(rect, content.text, style);
+					content.text = GUI.TextArea(rect, content.text, style);
 				}
 				else
 				{
-					GUI.Label(rect, content.text);
+					content.text = GUI.TextArea(rect, content.text);
 				}
 			}
 		}
@@ -32,11 +31,11 @@ namespace LiveRepl.Gui
 			{
 				if (style != null)
 				{
-					GUILayout.Label(content.text, style);
+					content.text = GUILayout.TextArea(content.text, style);
 				}
 				else
 				{
-					GUILayout.Label(content.text);
+					content.text = GUILayout.TextArea(content.text);
 				}
 			}
 		}

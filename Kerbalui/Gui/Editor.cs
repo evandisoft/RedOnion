@@ -1,8 +1,12 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
+using System.Collections.Generic;
+using System;
 
-namespace LiveRepl.Gui {
-	public class InputBox:EditingArea {
+namespace Kerbalui.Gui {
+    public class Editor:EditingArea{
+		/// <summary>
+		/// These bindings intentionally shadow the base class bindings.
+		/// </summary>
 		public new KeyBindings KeyBindings = new KeyBindings();
 
 		protected override void ProtectedUpdate(Rect rect)
@@ -10,7 +14,7 @@ namespace LiveRepl.Gui {
 			if (HasFocus()) KeyBindings.ExecuteAndConsumeIfMatched(Event.current);
 			//if (HasFocus()) {
 			//	int id = GUIUtility.keyboardControl;
-			//	Debug.Log("Id for inputBox is " + id);
+			//	Debug.Log("Id for editor is " + id);
 			//}
 			base.ProtectedUpdate(rect);
 		}

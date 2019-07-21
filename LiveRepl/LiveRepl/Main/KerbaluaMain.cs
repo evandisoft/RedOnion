@@ -13,7 +13,6 @@ namespace LiveRepl
             foreach (var o in os) {
                 Console.WriteLine(message + " " + o);
             }
-
         }
         public static void Printall(string message, List<string> os)
         {

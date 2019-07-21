@@ -3,7 +3,7 @@ using System;
 using System.Text;
 using System.Collections.Generic;
 
-namespace LiveRepl.Gui {
+namespace Kerbalui.Gui {
 	public class CompletionBox:EditingArea,ICompletionSelector {
 		IList<string> contentStrings = new List<string>();
 		int partialLength;

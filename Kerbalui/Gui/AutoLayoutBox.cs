@@ -2,7 +2,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-namespace LiveRepl.Gui {
+namespace Kerbalui.Gui {
 	public class AutoLayoutBox {
 		public List<ILayoutRenderer> renderables = new List<ILayoutRenderer>();
 

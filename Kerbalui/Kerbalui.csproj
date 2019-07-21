@@ -4,12 +4,13 @@
     <KerbalLibs Condition=" '$(KerbalLibs)' == '' And '$(OS)' == 'Windows_NT' And Exists('$(SolutionDir)\ksp')">$(SolutionDir)\ksp\KSP_x64_Data\Managed</KerbalLibs>
     <KerbalLibs Condition=" '$(KerbalLibs)' == '' And '$(OS)' != 'Windows_NT' And Exists('$(SolutionDir)\ksp')">$(SolutionDir)\ksp\KSP_Data\Managed</KerbalLibs>
     <KerbalLibs Condition=" '$(KerbalLibs)' == '' And '$(OS)' == 'Windows_NT' ">C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\KSP_x64_Data\Managed</KerbalLibs>
+  
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{9A325200-04F2-42D2-994E-06E7711EF9AA}</ProjectGuid>
+    <ProjectGuid>{7A943166-A67E-420A-BCA0-5231D57A18BD}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>LiveRepl</RootNamespace>
-    <AssemblyName>LiveRepl</AssemblyName>
+    <RootNamespace>Kerbalui</RootNamespace>
+    <AssemblyName>Kerbalui</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <ReleaseVersion>0.3.0</ReleaseVersion>
   </PropertyGroup>
@@ -73,36 +74,38 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="LiveRepl\Main\KerbaluaMain.cs" />
-    <Compile Include="LiveRepl\Other\EditAreaCompletionAdapter.cs" />
-    <Compile Include="LiveRepl\Main\ScriptWindow.cs" />
-    <Compile Include="LiveRepl\Main\KerbaluaRepl.cs" />
+    <Compile Include="Gui\AutoLayoutBox.cs" />
+    <Compile Include="Gui\Button.cs" />
+    <Compile Include="Gui\CompletionBox.cs" />
+    <Compile Include="Gui\CompletionManager.cs" />
+    <Compile Include="Gui\EditingArea.cs" />
+    <Compile Include="Gui\Editor.cs" />
+    <Compile Include="Gui\EventKey.cs" />
+    <Compile Include="Gui\GUILibUtil.cs" />
+    <Compile Include="Gui\ICompletableElement.cs" />
+    <Compile Include="Gui\ICompletionSelector.cs" />
+    <Compile Include="Gui\IFocusable.cs" />
+    <Compile Include="Gui\ILayoutRenderer.cs" />
+    <Compile Include="Gui\InputBox.cs" />
+    <Compile Include="Gui\IRectRenderer.cs" />
+    <Compile Include="Gui\IRenderer.cs" />
+    <Compile Include="Gui\KeyBindings.cs" />
+    <Compile Include="Gui\Label.cs" />
+    <Compile Include="Gui\OutputBox.cs" />
+    <Compile Include="Gui\RecentFilesList.cs" />
+    <Compile Include="Gui\Repl.cs" />
+    <Compile Include="Gui\ScriptNameInputArea.cs" />
+    <Compile Include="Gui\ScrollableTextArea.cs" />
+    <Compile Include="Gui\TextArea.cs" />
+    <Compile Include="Gui\UIElement.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="LiveRepl\" />
-    <Folder Include="LiveRepl\Main\" />
-    <Folder Include="LiveRepl\Other\" />
+    <Folder Include="Gui\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RedOnion.KSP\RedOnion.KSP.csproj">
       <Project>{DEC12E09-29AD-4666-9954-8C8A1D7BF454}</Project>
       <Name>RedOnion.KSP</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\RedOnion.ROS\RedOnion.ROS.csproj">
-      <Project>{59399C9E-EBAC-4D7C-B2CB-6ECE22FE8D6E}</Project>
-      <Name>RedOnion.ROS</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\RedOnion.UI\RedOnion.UI.csproj">
-      <Project>{034C16AB-D16E-4AFE-9837-812499EE2F3D}</Project>
-      <Name>RedOnion.UI</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Kerbalua\Kerbalua.csproj">
-      <Project>{F590B1DB-8F33-4986-8383-180952D63CDA}</Project>
-      <Name>Kerbalua</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Kerbalui\Kerbalui.csproj">
-      <Project>{7A943166-A67E-420A-BCA0-5231D57A18BD}</Project>
-      <Name>Kerbalui</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

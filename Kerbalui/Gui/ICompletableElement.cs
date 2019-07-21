@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace LiveRepl.Gui {
+namespace Kerbalui.Gui {
 	/// <summary>
 	/// Interface for focusable objects that can complete. Completable objects
 	/// can produce a list of possible completions, and can complete the indexth

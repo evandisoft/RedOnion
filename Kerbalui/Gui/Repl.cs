@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace LiveRepl.Gui {
+namespace Kerbalui.Gui {
 	public class Repl:IRectRenderer {
 		public InputBox inputBox = new InputBox();
 		public OutputBox outputBox = new OutputBox();

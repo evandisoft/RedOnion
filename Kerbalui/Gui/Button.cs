@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace LiveRepl.Gui {
+namespace Kerbalui.Gui {
 	public class Button:UIElement {
 		public GUIContent content = new GUIContent("");
 		public Action action;

@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace LiveRepl.Gui {
+namespace Kerbalui.Gui {
 	public class OutputBox:ScrollableTextArea {
 		public const int OUTPUT_LENGTH_LIMIT = 10000;
 

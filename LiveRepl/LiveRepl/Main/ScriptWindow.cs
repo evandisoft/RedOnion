@@ -6,7 +6,7 @@ using System.IO;
 using RedOnion.KSP.Autopilot;
 using RedOnion.KSP.Settings;
 using RedOnion.KSP.API;
-using LiveRepl.Gui;
+using Kerbalui.Gui;
 using LiveRepl.Other;
 
 namespace LiveRepl

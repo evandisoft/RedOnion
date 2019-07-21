@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace LiveRepl.Gui {
+namespace Kerbalui.Gui {
 	public struct EventKey {
 		public KeyCode keyCode;
 		public bool control;
