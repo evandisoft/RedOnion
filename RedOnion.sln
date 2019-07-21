@@ -27,6 +27,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Resources", "Resources", "{
 	ProjectSection(SolutionItems) = preProject
 		GameData\RedOnion\Resources\RedOnionLauncherIcon.png = GameData\RedOnion\Resources\RedOnionLauncherIcon.png
 		GameData\RedOnion\Resources\WindowCloseButtonIcon.png = GameData\RedOnion\Resources\WindowCloseButtonIcon.png
+		GameData\RedOnion\Resources\LiveRepl.png = GameData\RedOnion\Resources\LiveRepl.png
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedOnion.Shell", "RedOnion.Shell\RedOnion.Shell.csproj", "{94420503-B08C-4944-8820-D8596AEBACF2}"

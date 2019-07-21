@@ -7,38 +7,12 @@ namespace LiveRepl
 {
     [KSPAddon(KSPAddon.Startup.AllGameScenes, false)]
     public class KerbaluaMain : MonoBehaviour
-    {
-        public static void Printall(string message, IEnumerable<object> os)
-        {
-            foreach (var o in os) {
-                Console.WriteLine(message + " " + o);
-            }
-        }
-        public static void Printall(string message, List<string> os)
-        {
-            foreach (var o in os) {
-                Console.WriteLine(message + " " + o);
-            }
-        }
-        
+    {        
 		static Texture2D toolbarTexture=null;
 
 		bool guiActive = false;
         KerbaluaRepl repl;
-
-        public class KSPRaw {
-            // Most of these don't work. Just testing this out.
-            public FlightGlobals flightGlobals = new FlightGlobals();
-            //public EditorDriver editorDriver = FindObjectOfType<EditorDriver>();
-            ////public EditorFacility editorFacility = FindObjectOfType<EditorFacility>();
-            //public EditorLogic editorLogic = FindObjectOfType<EditorLogic>();
-            //public FlightDriver flightDriver = FindObjectOfType<FlightDriver>();
-            //public Planetarium planetarium = FindObjectOfType<Planetarium>();
-            //public Reputation reputation = FindObjectOfType<Reputation>();
-            //public TimeWarp timeWarp = FindObjectOfType<TimeWarp>();
-
-        }
-
+        
         public delegate void ToggleGUI();
         // ToggleGui has to be reset to a new relevant value each time we 
         // enter a new scene, otherwise its referencing stuff that
@@ -57,7 +31,7 @@ namespace LiveRepl
                 toolbarTexture
                 );
             }
-
+			Debug.Log("The ghjk is awake");
             // We have to connect it with a function that has relevance in this
             // particular scene. If ToggleGui was already set, it was with
             // a delegate from another scene.
@@ -71,7 +45,7 @@ namespace LiveRepl
         }
 
         public void Start(){
-            repl = new KerbaluaRepl(new KSPRaw());
+            repl = new KerbaluaRepl();
         }
 
 		// Doesn't seem to work

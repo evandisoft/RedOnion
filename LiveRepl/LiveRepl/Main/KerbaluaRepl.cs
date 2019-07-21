@@ -4,13 +4,10 @@ using UnityEngine;
 
 namespace LiveRepl {
 	public class KerbaluaRepl {
-		KerbaluaMain.KSPRaw kspApi;
 		public ScriptWindow scriptWindow;
 
-		public KerbaluaRepl(KerbaluaMain.KSPRaw kspApi)
+		public KerbaluaRepl()
 		{
-			this.kspApi = kspApi;
-
 			InputLockManager.ClearControlLocks();
 
 			scriptWindow = new ScriptWindow(new Rect(100, 100, 1000, 600));

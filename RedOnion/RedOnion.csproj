@@ -79,6 +79,18 @@
       <Project>{034c16ab-d16e-4afe-9837-812499ee2f3d}</Project>
       <Name>RedOnion.UI</Name>
     </ProjectReference>
+    <ProjectReference Include="..\LiveRepl\LiveRepl.csproj">
+      <Project>{9A325200-04F2-42D2-994E-06E7711EF9AA}</Project>
+      <Name>LiveRepl</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Kerbalui\Kerbalui.csproj">
+      <Project>{7A943166-A67E-420A-BCA0-5231D57A18BD}</Project>
+      <Name>Kerbalui</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RedOnion.OS\RedOnion.OS.csproj">
+      <Project>{3B9ED14D-ED22-4F94-91BF-951BF9B01552}</Project>
+      <Name>RedOnion.OS</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
