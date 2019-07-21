@@ -6,6 +6,7 @@ using RedOnion.KSP.ReflectionUtil;
 using RedOnion.KSP.Completion;
 using KSP.UI.Screens;
 using System.ComponentModel;
+using MoonSharp.Interpreter.Interop;
 
 namespace RedOnion.KSP.API
 {
@@ -14,14 +15,14 @@ namespace RedOnion.KSP.API
 (""UnityEngine.Vector2,UnityEngine""). It will first try `Type.GetType`,
 then search in `Assembly-CSharp`, then in `UnityEngine` and then in all assemblies
 returned by `AppDomain.CurrentDomain.GetAssemblies()`.")]
-	public class Reflect : ISelfDescribing, IHasCompletionProxy
+	public class Reflect : Descriptor, IUserDataType, ICompletable
 	{
 		public static Reflect Instance { get; } = new Reflect();
 		protected Reflect() { }
 
 		[Description("Construct new object given type or object and arguments."
 			+ " Example: `reflect.new(\"System.Collections.ArrayList\")`.")]
-		public static Constructor New => Constructor.Instance;
+		public static Constructor @new => Constructor.Instance;
 		[Description("Alias to new().")]
 		public static Constructor create => Constructor.Instance;
 		[Description("Alias to new().")]
@@ -30,8 +31,13 @@ returned by `AppDomain.CurrentDomain.GetAssemblies()`.")]
 		[Browsable(false)]
 		public class Constructor : ICallable
 		{
+			static internal readonly string[] names = new string[]
+			{
+				"new", "create", "construct"
+			};
 			[Browsable(false), MoonSharpHidden]
 			public static Constructor Instance { get; } = new Constructor();
+
 			bool ICallable.Call(ref Value result, object self, Arguments args, bool create)
 			{
 				if (args.Count == 0)
@@ -46,6 +52,26 @@ returned by `AppDomain.CurrentDomain.GetAssemblies()`.")]
 					throw new InvalidOperationException("Expected at least one argument");
 				return DynValue.FromObject(ctx.OwnerScript, LuaNew(args[1], args.GetArray(2)));
 			}
+		}
+
+		public override bool Call(ref Value result, object self, Arguments args, bool create)
+		{
+			if (args.Length != 1)
+				throw new InvalidOperationException(args.Length == 0
+					? "Expected assembly-qualified name"
+					: "Too many arguments");
+			result = new Value(ResolveType(args[0].ToStr()));
+			return true;
+		}
+
+		[MoonSharpUserDataMetamethod("__call"), Browsable(false)]
+		public DynValue Call(ScriptExecutionContext ctx, CallbackArguments args)
+		{
+			if (args.Count != 1)
+				throw new InvalidOperationException(args.Count == 0
+					? "Expected assembly-qualified name"
+					: "Too many arguments");
+			return UserData.CreateStatic(ResolveType(args[0].String));
 		}
 
 		[Browsable(false), MoonSharpHidden]
@@ -146,89 +172,77 @@ returned by `AppDomain.CurrentDomain.GetAssemblies()`.")]
 			throw new Exception("Could not find constructor accepting given args for type " + t);
 		}
 
-		[MoonSharpUserDataMetamethod("__call"), Browsable(false)]
-		public DynValue Call(ScriptExecutionContext ctx, CallbackArguments args)
+		static NamespaceInstance _map;
+		static NamespaceInstance Map => _map ?? (_map = NamespaceMappings.DefaultAssemblies.GetNamespace(""));
+
+		DynValue IUserDataType.MetaIndex(Script script, string metaname) => null;
+		bool IUserDataType.SetIndex(Script script, DynValue index, DynValue value, bool isDirectIndexing)
+			=> throw InvalidOperation("Cannot modify fields of this const dictionary.");
+		DynValue IUserDataType.Index(Script script, DynValue index, bool isDirectIndexing)
 		{
-			if (args.Count != 1)
-				throw new InvalidOperationException(args.Count == 0
-					? "Expected assembly-qualified name"
-					: "Too many arguments");
-			return UserData.CreateStatic(ResolveType(args[0].String));
+			if (index.Type != DataType.String)
+				throw InvalidOperation("Can only index with strings");
+			var name = index.String;
+			foreach (var alias in Constructor.names)
+				if (name.Equals(alias, StringComparison.OrdinalIgnoreCase))
+					return DynValue.FromObject(script, Constructor.Instance);
+			return Map.Index(script, index, isDirectIndexing);
 		}
 
-		SelfDescriptor descriptor;
-		Descriptor ISelfDescribing.Descriptor => descriptor ?? (descriptor = new SelfDescriptor());
-		object IHasCompletionProxy.CompletionProxy => descriptor ?? (descriptor = new SelfDescriptor());
-
-		class SelfDescriptor : Descriptor.Reflected, ICompletable
+		public override int Find(object self, string name, bool add)
 		{
-			static NamespaceInstance _map;
-			static NamespaceInstance Map => _map ?? (_map = NamespaceMappings.DefaultAssemblies.GetNamespace(""));
-			public SelfDescriptor() : base(typeof(Reflect)) { }
-			public override bool Call(ref Value result, object self, Arguments args, bool create)
+			foreach (var alias in Constructor.names)
+				if (name.Equals(alias, StringComparison.OrdinalIgnoreCase))
+					return 0;
+			var at = Map.RosFind(name);
+			return at < 0 ? at : at + 1;
+		}
+		public override string NameOf(object self, int at)
+			=> at == 0 ? Constructor.names[0] : Map.RosNameOf(at - 1);
+		public override bool Get(ref Value self, int at)
+		{
+			if (at == 0)
 			{
-				if (args.Length != 1)
-					throw new InvalidOperationException(args.Length == 0
-						? "Expected assembly-qualified name"
-						: "Too many arguments");
-				result = new Value(ResolveType(args[0].ToStr()));
+				self = new Value(Constructor.Instance);
 				return true;
 			}
-			public override int Find(object self, string name, bool add)
-			{
-				var at = base.Find(self, name, false);
-				if (at >= 0) return at;
-				at = Map.RosFind(name);
-				return at < 0 ? at : at + prop.Count;
-			}
-			public override string NameOf(object self, int at)
-				=> at < prop.Count ? base.NameOf(self, at) : Map.RosNameOf(at - prop.Count);
-			public override bool Get(ref Value self, int at)
-			{
-				if (at < prop.Count)
-					return base.Get(ref self, at);
-				return Map.RosGet(ref self, at - prop.Count);
-			}
-			public override IEnumerable<string> EnumerateProperties(object self)
-			{
-				foreach (var p in prop)
-					yield return p.name;
-				foreach (var name in Map.PossibleCompletions)
-					yield return name;
-			}
+			return Map.RosGet(ref self, at - 1);
+		}
+		public override IEnumerable<string> EnumerateProperties(object self)
+		{
+			foreach (var name in Constructor.names)
+				yield return name;
+			foreach (var name in Map.PossibleCompletions)
+				yield return name;
+		}
 
-			IList<string> ICompletable.PossibleCompletions
+		IList<string> ICompletable.PossibleCompletions
+		{
+			get
 			{
-				get
+				var map = Map.PossibleCompletions;
+				var it = new string[Constructor.names.Length + map.Count];
+				Constructor.names.CopyTo(it, 0);
+				int i = Constructor.names.Length, j = 0;
+				while (i < it.Length)
+					it[i++] = map[j++];
+				return it;
+			}
+		}
+		bool ICompletable.TryGetCompletion(string completionName, out object completion)
+		{
+			var at = Find(null, completionName, false);
+			if (at >= 0)
+			{
+				var it = Value.Void;
+				if (Get(ref it, at))
 				{
-					var map = Map.PossibleCompletions;
-					var it = new string[prop.Count+map.Count];
-					int i = 0;
-					while (i < prop.Count)
-					{
-						it[i] = prop[i].name;
-						i++;
-					}
-					int j = 0;
-					while (i < it.Length)
-						it[i++] = map[j++];
-					return it;
+					completion = it.Box();
+					return true;
 				}
 			}
-			bool ICompletable.TryGetCompletion(string completionName, out object completion)
-			{
-				var at = Find(null, completionName, false);
-				if (at >= 0)
-				{
-					var it = Value.Void;
-					if (Get(ref it, at))
-					{
-						completion = it.Box();
-						return true;
-					}
-				}
-				return Map.TryGetCompletion(completionName, out completion);
-			}
+			completion = null;
+			return false;
 		}
 	}
 }

@@ -7,7 +7,7 @@ namespace RedOnion.KSP.ReflectionUtil
 {
 	public partial class NamespaceInstance : IUserDataType
 	{
-		DynValue IUserDataType.Index(MoonSharp.Interpreter.Script script, DynValue index, bool isDirectIndexing)
+		public DynValue Index(MoonSharp.Interpreter.Script script, DynValue index, bool isDirectIndexing)
 		{
 			//Debug.Log(index);
 
