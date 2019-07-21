@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Kerbalui.Gui;
 
@@ -24,7 +24,7 @@ namespace LiveRepl.Other {
 
 		public void Complete(int index)
 		{
-			var completions = scriptWindow.currentProcess.GetCompletions(editingArea.content.text, editingArea.cursorIndex,out int replaceStart,out int replaceEnd);
+			var completions = scriptWindow.currentReplEvaluator.GetCompletions(editingArea.content.text, editingArea.cursorIndex,out int replaceStart,out int replaceEnd);
 			if (completions.Count > index) {
 				int partialLength = replaceEnd - replaceStart;
 				int partialStart = replaceStart;
@@ -40,7 +40,7 @@ namespace LiveRepl.Other {
 
 		public IList<string> GetCompletionContent(out int replaceStart,out int replaceEnd)
 		{
-			return scriptWindow.currentProcess.GetDisplayableCompletions(
+			return scriptWindow.currentReplEvaluator.GetDisplayableCompletions(
 				editingArea.content.text,
 				editingArea.cursorIndex,
 				out replaceStart,
