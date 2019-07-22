@@ -23,7 +23,7 @@ but our goal now is to:
 [**Lua**](https://github.com/evandisoft/RedOnion/blob/master/Kerbalua/README.md)
 is well known scripting language
 and may offer more comfort and safety, while
-[**ROS** (Red Onion Script)](https://github.com/evandisoft/RedOnion/blob/master/RedOnion.Script/README.md)
+[**ROS** (Red Onion Script)](https://github.com/evandisoft/RedOnion/blob/master/RedOnion.ROS/README.md)
 aims to make coding easier.
 **ROS** was created anew and may contain bugs,
 **LUA** may lack some features but should be more stable.
