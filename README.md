@@ -11,7 +11,7 @@ We plan to eventually implement a switch to limit the power
 (disable what is now marked `[Unsafe]` in the code),
 but our goal now is to:
 
-- Do whatever users wish to do to the game environment to have fun.
+- Allow users to do whatever they wish to do to the game environment to have fun.
 - Help modders develop and debug their mods using this mod.
 - Help anybody to explore KSP API, their own or other's mods.
 
