@@ -231,7 +231,9 @@ namespace RedOnion.ROS.Parsing
 				if (!HasOption(Option.Prefix))
 					Write(OpCode.Cond);
 				Write(code.size-condAt, condAt-4);
-				if (Curr == ';' || Curr == ':' || ExCode == ExCode.Do)
+				if (ExCode == ExCode.Do)
+					Next();
+				if (Curr == ';' || Curr == ':')
 					Next();
 				ParseBlock(flags);
 				return;
@@ -297,7 +299,9 @@ namespace RedOnion.ROS.Parsing
 				if (!HasOption(Option.Prefix))
 					Write(OpCode.Pop);
 				Write(code.size-lastAt, lastAt-4);
-				if (Curr == ';')
+				if (ExCode == ExCode.Do)
+					Next();
+				if (Curr == ';' || Curr == ':')
 					Next();
 
 				// statements
@@ -324,7 +328,9 @@ namespace RedOnion.ROS.Parsing
 				if (!HasOption(Option.Prefix))
 					Write(OpCode.Cond);
 				Write(code.size - listAt, mark + 5);
-				if (Curr == ';')
+				if (ExCode == ExCode.Do)
+					Next();
+				if (Curr == ';' || Curr == ':')
 					Next();
 				ParseBlock(flags);
 				return;

@@ -67,6 +67,8 @@ namespace RedOnion.ROS.Tests
 		{
 			Test(ExitCode.Return, true, "if true then return true");
 			Test(ExitCode.Return, false, "if false: return true else: return false");
+			Test(ExitCode.Return, 1, "if true; return 1; else return 2");
+			Test(ExitCode.Return, 2, "unless true: return 1; else return 2");
 		}
 
 		[Test]
@@ -121,6 +123,10 @@ namespace RedOnion.ROS.Tests
 				"var s = \"\"",
 				"foreach var e in [\"hello\", \" \", \"world\"]",
 				"  s += e",
+				"s");
+			Lines(ExitCode.None, "hello world",
+				"var s = \"\"",
+				"foreach var e in [\"hello\", \" \", \"world\"]: s += e",
 				"s");
 			Lines(ExitCode.Return, "123",
 				"var s = \"\"",

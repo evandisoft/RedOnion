@@ -302,6 +302,7 @@ namespace RedOnion.ROS.Parsing
 			{ "do",         ExCode.Do },
 			{ "until",      ExCode.Until },
 			{ "if",         ExCode.If },
+			{ "unless",		ExCode.Unless },
 			{ "then",       ExCode.Then },
 			{ "else",       ExCode.Else },
 			{ "with",       ExCode.With },

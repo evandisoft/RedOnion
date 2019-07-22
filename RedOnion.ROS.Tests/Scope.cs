@@ -79,6 +79,11 @@ namespace RedOnion.ROS.Tests
 				"function f",
 				"  return arguments[0]",
 				"f 2");
+			/* TODO: default arguments
+			Lines(2,
+				"def second a = 1, b = 2 => b",
+				"second 1");
+			*/
 		}
 
 		[Test]

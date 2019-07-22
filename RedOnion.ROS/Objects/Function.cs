@@ -41,7 +41,7 @@ namespace RedOnion.ROS.Objects
 		public string ArgumentName(int i)
 			=> i >= ArgumentCount ? null : Arguments[i].Name;
 		public Value ArgumentDefault(int i)
-			=> Value.Void; //TODO: default arguments
+			=> throw new NotImplementedException();
 		/// <summary>
 		/// Private variables/fields
 		/// </summary>
