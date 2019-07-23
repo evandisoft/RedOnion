@@ -2,41 +2,52 @@
 
 Active vessel
 
-- `Autopilot`: Autopilot - Autopilot of this ship (vehicle/wessel).
-- `Throttle`: Single - Current throttle (assign redirects to `Autopilot`, reads control state if autopilot disabled)
-- `Native`: Vessel - Native `Vessel` for unrestricted access to KSP API. Same as `FlightGlobals.ActiveVessel` if accessed through global `ship`.
-- `Parts`: [ShipPartSet](../Parts/ShipPartSet.md) - All parts of this ship/vessel/vehicle.
-- `Root`: [Part](../Parts/PartBase.md) - Root part (same as `Parts.Root`).
-- `NextDecoupler`: [Decoupler](../Parts/Decoupler.md) - One of the decouplers that will get activated by nearest stage. (Same as `Parts.NextDecoupler`.)
-- `NextDecouplerStage`: Int32 - Stage number of the nearest decoupler or -1. (Same as `Parts.NextDecouplerStage`.)
-- `Decouplers`: ReadOnlyList`1 - List of all decouplers, separators, launch clamps and docks with staging. (Docking ports without staging enabled not included.)
-- `DockingPorts`: ReadOnlyList`1 - List of all docking ports (regardless of staging).
-- `Engines`: [EngineSet](../Parts/EngineSet.md) - All engines (regardless of state).
-- `Sensors`: ReadOnlyList`1 - All sensors.
-- `ID`: Guid - Unique identifier of the ship (wehicle/vessel). Can change when docking/undocking.
-- `PersistentID`: UInt32 - Unique identifier of the ship (wehicle/vessel). Should be same as it was before docking (after undocking).
-- `VesselType`: VesselType - KSP API. Vessel type as selected by user (or automatically).
-- `Mass`: Single - Total mass of the ship (wehicle/vessel).
-- `Packed`: Boolean - Wheter the ship is still packed (reduced physics).
-- `Landed`: Boolean - Wheter the ship is landed (on the ground or on/in water).
-- `Splashed`: Boolean - Wheter the ship is in water.
-- `Longitude`: Double - Longitude of current position in degrees.
-- `Latitude`: Double - Latitude of current position in degrees.
-- `Altitude`: Double - Altitude of current position (above sea level) in meters.
-- `RadarAltitude`: Double - True height above ground in meters.
-- `Orbit`: Orbit - KSP API. Orbit parameters.
-- `Body`: CelestialBody - KSP API. Orbited body.
-- `Eccentricity`: Double - Eccentricity of current orbit.
-- `SemiMajorAxis`: Double - Semi-major axis of current orbit.
-- `SemiMinorAxis`: Double - Semi-minor axis of current orbit.
-- `Apoapsis`: Double - Height above ground of highest point of current orbit).
-- `Periapsis`: Double - Height above ground of lowest point of current orbit).
-- `Apocenter`: Double - Highest distance between center of orbited body and any point of current orbit.
-- `Pericenter`: Double - Lowest distance between center of orbited body and any point of current orbit.
-- `TimeToAp`: Double - Eta to apoapsis in seconds.
-- `TimeToPe`: Double - Eta to periapsis in seconds.
-- `Period`: Double - Period of current orbit in seconds.
-- `TrueAnomaly`: Double - Angle in degrees between the direction of periapsis and the current position.
-- `MeanAnomaly`: Double - Angle in degrees between the direction of periapsis and the current position extrapolated on circular orbit.
-- `Position`: Vector3d - Current position.
-- `Velocity`: Vector3d - Current velocity.
+- `autopilot`: [Autopilot](Autopilot.md) - Autopilot of this ship (vehicle/wessel).
+- `throttle`: Single - Current throttle (assign redirects to `Autopilot`, reads control state if autopilot disabled)
+- `native`: Vessel - Native `Vessel` for unrestricted access to KSP API. Same as `FlightGlobals.ActiveVessel` if accessed through global `ship`.
+- `parts`: [ShipPartSet](../Parts/ShipPartSet.md) - All parts of this ship/vessel/vehicle.
+- `root`: [Part](../Parts/PartBase.md) - Root part (same as `parts.root`).
+- `nextDecoupler`: [Decoupler](../Parts/Decoupler.md) - One of the decouplers that will get activated by nearest stage. (Same as `Parts.NextDecoupler`.)
+- `nextDecouplerStage`: Int32 - Stage number of the nearest decoupler or -1. (Same as `Parts.NextDecouplerStage`.)
+- `decouplers`: ReadOnlyList`1 - List of all decouplers, separators, launch clamps and docks with staging. (Docking ports without staging enabled not included.)
+- `dockingports`: ReadOnlyList`1 - List of all docking ports (regardless of staging).
+- `engines`: [EngineSet](../Parts/EngineSet.md) - All engines (regardless of state).
+- `sensors`: ReadOnlyList`1 - All sensors.
+- `ID`: Guid - Unique identifier of the ship (vehicle/vessel). Can change when docking/undocking.
+- `PersistentID`: UInt32 - Unique identifier of the ship (vehicle/vessel). Should be same as it was before docking (after undocking).
+- `vesseltype`: VesselType - KSP API. Vessel type as selected by user (or automatically).
+- `mass`: Single - Total mass of the ship (vehicle/vessel).
+- `packed`: Boolean - Wheter the ship is still packed (reduced physics).
+- `landed`: Boolean - Wheter the ship is landed (on the ground or on/in water).
+- `splashed`: Boolean - Wheter the ship is in water.
+- `longitude`: Double - Longitude of current position in degrees.
+- `latitude`: Double - Latitude of current position in degrees.
+- `altitude`: Double - Altitude of current position (above sea level) in meters.
+- `radarAltitude`: Double - True height above ground in meters.
+- `body`: SpaceBody - KSP API. Orbited body.
+- `orbit`: Orbit - KSP API. Orbit parameters.
+- `eccentricity`: Double - Eccentricity of current orbit.
+- `semiMajorAxis`: Double - Semi-major axis of current orbit.
+- `semiMinorAxis`: Double - Semi-minor axis of current orbit.
+- `apoapsis`: Double - Height above ground of highest point of current orbit).
+- `periapsis`: Double - Height above ground of lowest point of current orbit).
+- `apocenter`: Double - Highest distance between center of orbited body and any point of current orbit.
+- `pericenter`: Double - Lowest distance between center of orbited body and any point of current orbit.
+- `timeToAp`: Double - Eta to apoapsis in seconds.
+- `timeToPe`: Double - Eta to periapsis in seconds.
+- `period`: Double - Period of current orbit in seconds.
+- `trueAnomaly`: Double - Angle in degrees between the direction of periapsis and the current position.
+- `meanAnomaly`: Double - Angle in degrees between the direction of periapsis and the current position extrapolated on circular orbit.
+- `position`: Vector3d - Current position relative to active ship (so `ship.position` always reads zero).
+- `relative`: Vector3d - Position relative to orbited body.
+- `velocity`: Vector3d - Current velocity.
+- `centerOfMass`: Vector3d - Center of mass
+- `angularVelocity`: Vector3d - Angular velocity (ω, rad/s), how fast the ship rotates
+- `momentOfInertia`: Vector3d - Moment of inertia (I, kg*m²) aka angular mass or rotational inertia.
+- `angularMomentum`: Vector3d - Angular momentum (L = Iω, kg*m²/s) aka moment of momentum or rotational momentum.
+- `maxTorque`: Vector3d - Maximal ship torque (aka moment of force or turning effect, maximum of positive and negative).
+- `maxAngular`: Vector3d - Maximal angular acceleration (rad/s²)
+- `positionAt()`: Vector3d, time Double
+  - Predicted position at specified time.
+- `velocityAt()`: Vector3d, time Double
+  - Predicted velocity at specified time.

@@ -105,11 +105,11 @@ or if line ends with `\` or comma (when in function call).
 def each list, actionOrCondition, action
   if arguments.length == 2
     for var e in list
-      actionOrCondition
+      actionOrCondition e
     return
   for var e in list
     if actionOrCondition()
-      action
+      action e
 each [1,2,3],
   (def e => e % 2 == 1), // better always use parens here
   (def e => print e)     // parens here are optional (last arg)
