@@ -139,7 +139,7 @@ via `arguments` variable, as seen in previous example
 
 Every named argument actually passed is also accessible
 as a variable under the name specified in the definition.
-Arguments not provided will not exist at all.
+Arguments not provided will have the value of `null`.
 
 ```
 def sum
@@ -149,12 +149,15 @@ def sum
   return it
 
 function fill list, element
-  var e = arguments.length == 1 ? null : element
   for var i = 0; i < list.length; i++
-    list[i] = e
+    list[i] = element
+
+var a = [1,2,3]
+fill a    // a = [null, null, null]
+fill a, 1 // a = [1,1,1]
 ```
 
-Future plan: default arguments (`function fill list, element = null`).
+*Future plan: default arguments.*
 
 ## Statements
 
