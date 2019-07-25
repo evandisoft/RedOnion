@@ -250,6 +250,10 @@ namespace RedOnion.ROS
 		/// </summary>
 		event Func<IProcessor, bool> Shutdown;
 		/// <summary>
+		/// Event invoked on every FixedUpdate (if possible).
+		/// </summary>
+		event Action Update;
+		/// <summary>
 		/// Invoked by print function
 		/// </summary>
 		void Print(string msg);
