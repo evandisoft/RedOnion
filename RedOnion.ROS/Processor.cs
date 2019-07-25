@@ -22,18 +22,63 @@ namespace RedOnion.ROS
 			value.Fill();
 		}
 
-		public int UpdateCountdown { get; set; } = 1000;
-		public int StepCountdown { get; set; } = 100;
-		public int UpdatePercent { get; set; } = 50;
-		public int OneShotPercent { get; set; } = 75;
-		public int IdlePercent { get; set; } = 80;
-		public int MaxOneShotSkips { get; set; } = 1;
-		public int MaxIdleSkips { get; set; } = 10;
+		/// <summary>
+		/// Total time-limit for all handlers (one of each type can still be executed).
+		/// Main loop always gets at least StepCountdown (100 by default) instructions executed.
+		/// </summary>
 		public TimeSpan UpdateTimeout { get; set; } = TimeSpan.FromMilliseconds(10.0);
+		/// <summary>
+		/// Limit of instructions per fixed update
+		/// (not a hard max-limit, can be breached by some small multiple of StepCountdown).
+		/// </summary>
+		public int UpdateCountdown { get; set; } = 1000;
+		/// <summary>
+		/// Minimum number of instructions executed by sub-cycle
+		/// (limits are checked after reaching this number of instructions, or yield/wait instruction).
+		/// </summary>
+		public int StepCountdown { get; set; } = 100;
+		/// <summary>
+		/// The percentage of the limit (going down from 100% to zero)
+		/// when to stop executing update handlers.
+		/// At least one handler is always executed (with at least StepCountdown instructions).
+		/// 50% by default (500 instructions total with default StepCountdown).
+		/// </summary>
+		public int UpdatePercent { get; set; } = 50;
+		/// <summary>
+		/// The percentage of the limit (going down from 100% to zero)
+		/// when to stop executing one-shot handlers.
+		/// 40% by default (at least 100 instructions total with default StepCountdown,
+		/// upto 600 if no update handlers).
+		/// At least one handler is always executed every (MaxOneShotSkips+1) updates
+		/// (every other fixed update by default).
+		/// </summary>
+		public int OneShotPercent { get; set; } = 40;
+		/// <summary>
+		/// The percentage of the limit (going down from 100% to zero)
+		/// when to stop executing idle handlers.
+		/// 60% by default (skipped if update + one-shot already used 400 instructions,
+		/// upto 400 if update + one-shot used none).
+		/// At least one handler is always executed every (MaxIdleSkips+1) updates
+		/// (every 10th update by default).
+		/// </summary>
+		public int IdlePercent { get; set; } = 60;
+		/// <summary>
+		/// Maximum number of updates when no one-shot handler was executed (if there was any).
+		/// </summary>
+		public int MaxOneShotSkips { get; set; } = 1;
+		/// <summary>
+		/// Maximum number of updates when no idle handler was executed (if there was any).
+		/// </summary>
+		public int MaxIdleSkips { get; set; } = 9;
 
 		public event Func<IProcessor, bool> Shutdown;
 		public Action<string> Print;
 		void IProcessor.Print(string msg) => Print?.Invoke(msg);
+		event Action IProcessor.Update
+		{
+			add => updateList.Add(value);
+			remove => updateList.Remove(value);
+		}
 
 		//TODO: cache scripts - both compiled and the source (watch file modification time)
 		protected Parser Parser { get; } = new Parser();
@@ -295,13 +340,15 @@ namespace RedOnion.ROS
 				return ref list.items[index++];
 			}
 
-			public void Add(Value item)
-				=> list.Add(new Element(item));
-			public void Insert(int index, Value item)
+			public void Add(Value value)
+				=> list.Add(new Element(value));
+			public void Add(Action action)
+				=> list.Add(new Element(new Value(action)));
+			public void Insert(int index, Value value)
 			{
 				if (index <= this.index && index >= 0)
 					this.index++;
-				list.Insert(index, new Element(item));
+				list.Insert(index, new Element(value));
 			}
 			public void RemoveAt(int index)
 			{
@@ -309,14 +356,16 @@ namespace RedOnion.ROS
 					this.index--;
 				list.RemoveAt(index);
 			}
-			public bool Remove(Value item)
+			public bool Remove(Value value)
 			{
-				int index = IndexOf(item);
+				int index = IndexOf(value);
 				if (index < 0)
 					return false;
 				RemoveAt(index);
 				return true;
 			}
+			public bool Remove(Action action)
+				=> Remove(new Value(action));
 
 			public Value this[int index]
 			{
@@ -329,10 +378,10 @@ namespace RedOnion.ROS
 				index = 0;
 			}
 
-			public bool Contains(Value item)
+			public bool Contains(Value value)
 			{
 				foreach (var e in list)
-					if (e.Value.Equals(item))
+					if (e.Value.Equals(value))
 						return true;
 				return false;
 			}
@@ -341,10 +390,10 @@ namespace RedOnion.ROS
 				foreach (var e in list)
 					array[index++] = e.Value;
 			}
-			public int IndexOf(Value item)
+			public int IndexOf(Value value)
 			{
 				for (int i = 0; i < list.size; i++)
-					if (list.items[i].Value.Equals(item))
+					if (list.items[i].Value.Equals(value))
 						return i;
 				return -1;
 			}
