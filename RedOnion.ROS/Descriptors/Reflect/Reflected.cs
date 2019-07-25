@@ -137,7 +137,8 @@ namespace RedOnion.ROS
 
 			public override int Find(object self, string name, bool add)
 			{
-				if (self != null && idict != null && idict.TryGetValue(name, out var idx))
+				if (self != null && idict != null && !(self is Type)
+					&& idict.TryGetValue(name, out var idx))
 					return idx;
 				if (sdict != null && sdict.TryGetValue(name, out idx))
 					return idx;
@@ -261,6 +262,16 @@ namespace RedOnion.ROS
 			}
 			public override IEnumerable<string> EnumerateProperties(object self)
 			{
+				// static only
+				if (self == null || self is Type)
+				{
+					if (sdict != null)
+					{
+						foreach (var name in sdict.Keys)
+							yield return name;
+					}
+					yield break;
+				}
 				foreach (var p in prop)
 					yield return p.name;
 			}

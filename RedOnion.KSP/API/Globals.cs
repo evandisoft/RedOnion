@@ -19,11 +19,10 @@ namespace RedOnion.KSP.API
 		[Description("An api for setting which scripts will be ran when an engine is reset.")]
 		public static AutoRun autorun => AutoRun.Instance;
 
-		[Unsafe, Description("A map of planet names to planet bodies")]
-		public static BodiesDictionary getbody => BodiesDictionary.Instance;
-
-		[Description("A list/map of planet names to SpaceBodies")]
+		[Description("A collection of space/celestial bodies. (Safe API)")]
 		public static Bodies bodies => Bodies.Instance;
+		[Unsafe, Description("A map of planet names to planet bodies. (Unsafe API)")]
+		public static BodiesDictionary getbody => BodiesDictionary.Instance;
 
 		//Not sure if I want to add this yet. It works, but not sure it will be
 		// structured this way.

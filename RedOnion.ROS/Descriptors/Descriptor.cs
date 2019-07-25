@@ -110,9 +110,9 @@ namespace RedOnion.ROS
 			return self.desc.IndexFind(ref self, new Arguments(args, args.Length-1));
 		}
 
-		static internal InvalidOperationException InvalidOperation(string msg)
+		static protected InvalidOperationException InvalidOperation(string msg)
 			=> new InvalidOperationException(msg);
-		static internal InvalidOperationException InvalidOperation(string msg, params object[] args)
+		static protected InvalidOperationException InvalidOperation(string msg, params object[] args)
 			=> new InvalidOperationException(string.Format(Value.Culture, msg, args));
 	}
 }

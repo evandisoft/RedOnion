@@ -64,13 +64,13 @@ namespace RedOnion.ROS.Parsing
 			if (op == ExCode.Identifier   //------------------------------------------- identifier
 				|| kind == OpKind.Number    // type specifier (byte, bool, int, ...)
 				|| op == ExCode.String || op == ExCode.Char	// type names
-				|| op.Code() == ExCode.Function.Code() // function or def
+				|| op == ExCode.Function || op == ExCode.Def
 				|| op == ExCode.Get || op == ExCode.Set
 				|| op == ExCode.Combine || op == ExCode.Remove)
 			{
 				if (!unary)
 					goto autocall;
-				if (Word.Length > 127)
+				if (Word?.Length > 127)
 					throw new ParseError(this, "Identifier name too long");
 				if (op.Code() == OpCode.Function.Code())
 				{
@@ -406,7 +406,7 @@ namespace RedOnion.ROS.Parsing
 				throw new ParseError(this, "Unexpected literal (autocall is disabled)");
 			Debug.Assert(!unary);
 			wasBlock = ParseExpression(flags | Flag.Limited);
-			if (this.Curr != ',')
+			if (Curr != ',')
 			{
 				PrepareOperator(ExCode.Call1);
 				if (wasBlock)
@@ -419,7 +419,7 @@ namespace RedOnion.ROS.Parsing
 				PushOperator(ExCode.Comma);
 				wasBlock = Next().ParseExpression(flags | Flag.Limited);
 			}
-			while (this.Curr == ',');
+			while (Curr == ',');
 			PrepareOperator(ExCode.CallN);
 			if (wasBlock)
 				goto blockend;

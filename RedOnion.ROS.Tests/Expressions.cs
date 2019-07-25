@@ -158,9 +158,12 @@ namespace RedOnion.ROS.Tests
 			Test(true,		"true || false");
 			Test(true,		"false || true");
 			Test(false,		"true && false");
-			Test(false,		"false && true");
+			Test(false,		"false and true");
 			Test(true,		"true && true");
 			Test(true,      "null ?? true");
+			Test(false,		"false ?? true");
+			Test(1,			"0 or 1");
+			Test(1,			"1 || 2");
 
 			Test("var s = \"hello\"");
 			Test(false, "s.length <= 3 || s[3] == '.'");
@@ -213,7 +216,9 @@ namespace RedOnion.ROS.Tests
 			foreach (var s in new[]
 			{
 				"(\n+1\n)",
-				//"def pass x => x\npass(\n1\n)"
+				"def pass x => x\npass(\n1\n)",
+				"def sum2 x,y => x+y"
+				+ "\nsum2 pass(2),\npass(-1)"
 			})
 			{
 				Test(1, s);

@@ -502,19 +502,33 @@ namespace RedOnion.ROS
 					}
 					//------------------------------------------------------------------ other logic
 					case OpCode.NullCol:
+					{
+						ref var lhs = ref vals.Top();
+						if (lhs.IsReference && !lhs.desc.Get(ref lhs, lhs.num.Int))
+							throw CouldNotGet(ref lhs);
+						int sz = Int(code, at);
+						at += 4;
+						if (!lhs.IsNull)
+						{
+							at += sz;
+							continue;
+						}
+						vals.Pop(1);
+						continue;
+					}
 					case OpCode.LogicOr:
 					case OpCode.LogicAnd:
 					{
 						ref var lhs = ref vals.Top();
 						if (lhs.IsReference && !lhs.desc.Get(ref lhs, lhs.num.Int))
 							throw CouldNotGet(ref lhs);
-						if (op != OpCode.NullCol
-							&& lhs.desc.Primitive != ExCode.Bool
-							&& !lhs.desc.Convert(ref lhs, Descriptor.Bool))
-							throw InvalidOperation("Could not convert '{0}' to boolean", lhs.Name);
+						var test = lhs;
+						if (test.desc.Primitive != ExCode.Bool
+							&& !test.desc.Convert(ref test, Descriptor.Bool))
+							throw InvalidOperation("Could not convert '{0}' to boolean", test.Name);
 						int sz = Int(code, at);
 						at += 4;
-						if (op == OpCode.NullCol ? !lhs.IsNull : lhs.num.Bool == (op == OpCode.LogicOr))
+						if (test.num.Bool == (op == OpCode.LogicOr))
 						{
 							at += sz;
 							continue;

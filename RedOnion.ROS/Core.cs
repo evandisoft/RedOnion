@@ -309,7 +309,9 @@ namespace RedOnion.ROS
 				{
 					if (i < argc)
 						ctx.Add(fn.ArgumentName(i), ref args[i]);
-					else ctx.Add(fn.ArgumentName(i), fn.ArgumentDefault(i));
+					// we go with null for now, but will need some extra code
+					// for assigning default values to arguments
+					else ctx.Add(fn.ArgumentName(i), Value.Null);
 				}
 				result = Value.Void;
 				return;
