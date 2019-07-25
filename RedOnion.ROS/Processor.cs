@@ -173,6 +173,7 @@ namespace RedOnion.ROS
 		public double PeakMillis { get; set; }
 		Stopwatch watch = new Stopwatch();
 		int oneShotSkipped, idleSkipped;
+
 		public void FixedUpdate()
 		{
 			TotalCountdown = UpdateCountdown;
@@ -185,7 +186,7 @@ namespace RedOnion.ROS
 				do
 				{
 					ref var call = ref updateList.GetNext();
-					if (!Call(ref call))
+					if (!Call(ref call, UpdatePercent))
 						updateList.Remove(call.Value);
 				} while (!updateList.AtEnd
 				&& CountdownPercent > UpdatePercent
@@ -203,7 +204,7 @@ namespace RedOnion.ROS
 				do
 				{
 					ref var call = ref oneShotList.GetNext();
-					Call(ref call);
+					Call(ref call, OneShotPercent);
 					oneShotList.Remove(call.Value);
 				} while (!oneShotList.AtEnd
 				&& CountdownPercent > OneShotPercent
@@ -221,7 +222,7 @@ namespace RedOnion.ROS
 				do
 				{
 					ref var call = ref idleList.GetNext();
-					if (!Call(ref call))
+					if (!Call(ref call, IdlePercent))
 						idleList.Remove(call.Value);
 				} while (!idleList.AtEnd
 				&& CountdownPercent > IdlePercent
@@ -248,7 +249,7 @@ namespace RedOnion.ROS
 			if (milli > PeakMillis)
 				PeakMillis = milli;
 		}
-		private bool Call(ref EventList.Element e)
+		private bool Call(ref EventList.Element e, int downtoPercent)
 		{
 			try
 			{
@@ -266,7 +267,7 @@ namespace RedOnion.ROS
 						var countdown = Math.Min(StepCountdown, TotalCountdown);
 						e.Core.Execute(countdown);
 						TotalCountdown -= (countdown - Countdown);
-					} while (TotalCountdown > 0 && watch.Elapsed < UpdateTimeout);
+					} while (CountdownPercent > downtoPercent && watch.Elapsed < UpdateTimeout);
 					if (Exit != ExitCode.Countdown && Exit != ExitCode.Yield)
 					{
 						// TODO: pool
