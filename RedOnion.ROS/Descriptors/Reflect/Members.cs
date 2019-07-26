@@ -16,7 +16,7 @@ namespace RedOnion.ROS
 				public int Compare(MemberInfo x, MemberInfo y)
 				{
 					// BIG letters first to prefer properties over fields
-					int cmp = string.CompareOrdinal(x.Name, y.Name);
+					int cmp = string.CompareOrdinal(y.Name, x.Name);
 					// sorting by MetadataToken ensures stability
 					// (to avoid problems with reflection cache)
 					return cmp != 0 ? cmp
