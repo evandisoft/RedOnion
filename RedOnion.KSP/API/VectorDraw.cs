@@ -45,21 +45,23 @@ namespace RedOnion.KSP.API
 			}
 			protected virtual void Dispose(bool disposing)
 			{
-				if (_processor != null)
-					Hide();
-				if (disposing)
-					_processor = null;
+				if (_processor == null)
+					return;
+				Hide();
+				_processor = null;
 			}
 			// this is to avoid direct hard-link from processor to vector draw,
 			// so that it can be garbage-collected when no direct link exists
 			protected Hooks hooks;
 			protected class Hooks : IDisposable
 			{
-				WeakReference draw;
+				protected WeakReference _draw;
+				protected IProcessor _processor;
 				public Hooks(Draw draw)
 				{
-					this.draw = new WeakReference(draw);
-					draw._processor.Update += Update;
+					_draw = new WeakReference(draw);
+					_processor = draw._processor;
+					_processor.Update += Update;
 				}
 				~Hooks() => Dispose(false);
 				public void Dispose()
@@ -69,14 +71,19 @@ namespace RedOnion.KSP.API
 				}
 				protected virtual void Dispose(bool disposing)
 				{
-					var draw = this.draw?.Target as Draw;
-					if (draw != null)
+					if (_processor == null)
 						return;
-					this.draw = null;
-					draw._processor.Update -= Update;
+					_processor.Update -= Update;
+					_processor = null;
+					_draw = null;
 				}
 				protected void Update()
-					=> (draw.Target as Draw)?.Update();
+				{
+					var draw = _draw.Target as Draw;
+					if (draw != null)
+						draw.Update();
+					else Dispose();
+				}
 			}
 
 			public void Show()

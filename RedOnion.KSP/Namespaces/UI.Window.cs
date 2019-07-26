@@ -7,7 +7,7 @@ namespace RedOnion.KSP
 {
 	public class Window : UI.Window
 	{
-		IProcessor _processor;
+		protected IProcessor _processor;
 		public Window(IProcessor processor)
 			: this(processor, null, UI.Layout.Vertical) {}
 		public Window(IProcessor processor, UI.Layout layout)
@@ -41,10 +41,12 @@ namespace RedOnion.KSP
 		protected class Hooks : IDisposable
 		{
 			protected WeakReference _window;
+			protected IProcessor _processor;
 			public Hooks(Window window)
 			{
 				_window = new WeakReference(window);
-				window._processor.Shutdown += Shutdown;
+				_processor = window._processor;
+				_processor.Shutdown += Shutdown;
 			}
 			~Hooks() => Dispose(false);
 			public void Dispose()
@@ -54,11 +56,12 @@ namespace RedOnion.KSP
 			}
 			protected virtual void Dispose(bool disposing)
 			{
-				var window = _window?.Target as Window;
-				if (window != null)
+				if (_processor == null)
 					return;
+				_processor.Shutdown -= Shutdown;
+				_processor = null;
 				_window = null;
-				window._processor.Shutdown -= Shutdown;
+				
 			}
 			protected bool Shutdown(IProcessor processor)
 			{
