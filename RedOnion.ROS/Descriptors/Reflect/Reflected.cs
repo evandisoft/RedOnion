@@ -161,7 +161,8 @@ namespace RedOnion.ROS
 					self.obj = proxy;
 					return int.MaxValue; // complex indexing
 				}
-				if (!index.desc.Convert(ref index, String))
+				var strIndex = index;
+				if (!strIndex.desc.Convert(ref strIndex, String))
 					return -1;
 				if (strIndexGet != null || strIndexSet != null)
 				{
@@ -172,7 +173,7 @@ namespace RedOnion.ROS
 					self.obj = proxy;
 					return int.MaxValue; // complex indexing
 				}
-				var name = index.obj.ToString();
+				var name = strIndex.obj.ToString();
 				at = Find(self.obj, name, true);
 				if (at < 0 || args.Length == 1)
 					return at;
