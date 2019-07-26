@@ -23,7 +23,7 @@ namespace RedOnion.UI
 		public static void DebugLog(string msg, params object[] args)
 			=> Log(msg, args);
 
-		protected static readonly int UILayer = LayerMask.NameToLayer("UI");
+		protected static readonly int UILayer = LayerMask.NameToLayer("UI"); // should be 5
 
 		private static UISkinDef _Skin = UISkinManager.defaultSkin;
 		public static UISkinDef Skin

@@ -279,7 +279,7 @@ namespace RedOnion.ROS
 					e.Core = new Core(this);
 					e.Core.Globals = Globals;
 					var countdown = Math.Min(StepCountdown, TotalCountdown);
-					var fn = e.Value.obj as RedOnion.ROS.Objects.Function;
+					var fn = e.Value.obj as Function;
 					e.Core.Execute(fn, countdown);
 				}
 			}

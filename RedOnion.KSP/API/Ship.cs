@@ -153,8 +153,10 @@ namespace RedOnion.KSP.API
 		[Description("True height above ground in meters.")]
 		public double radarAltitude => native.radarAltitude;
 
+
 		[Description("KSP API. Orbited body.")]
 		public SpaceBody body => Bodies.Instance[native.mainBody];
+		ISpaceObject ISpaceObject.body => body;
 		[Unsafe, Description("KSP API. Orbit parameters.")]
 		public Orbit orbit => native.orbit;
 		[Description("Eccentricity of current orbit.")]
@@ -195,10 +197,14 @@ namespace RedOnion.KSP.API
 		[return: Convert(typeof(Vector))]
 		public Vector3d velocityAt(double time) => native.orbit.getOrbitalVelocityAtUT(time);
 
-		[Convert(typeof(Vector)), Description("Center of mass")]
+		[Convert(typeof(Vector)), Description("Center of mass.")]
 		public Vector3d centerOfMass => native.CoMD;
+		Vector3d ISpaceObject.position => centerOfMass;
+		[Convert(typeof(Vector)), Description("Vector pointing up.")]
 		public Vector3d up => native.up;
+		[Convert(typeof(Vector)), Description("Vector pointing north.")]
 		public Vector3d north => native.north;
+		[Convert(typeof(Vector)), Description("Vector pointing east.")]
 		public Vector3d east => native.east;
 
 		[Convert(typeof(Vector)), Description("Angular velocity (ω, rad/s), how fast the ship rotates")]
@@ -252,7 +258,5 @@ namespace RedOnion.KSP.API
 				return _maxAngular;
 			}
 		}
-
-		ISpaceObject ISpaceObject.body => throw new NotImplementedException();
 	}
 }
