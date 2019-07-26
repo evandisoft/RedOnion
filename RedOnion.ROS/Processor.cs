@@ -174,6 +174,7 @@ namespace RedOnion.ROS
 		Stopwatch watch = new Stopwatch();
 		int oneShotSkipped, idleSkipped;
 
+		// TODO: use percentages of update timeout as well
 		public void FixedUpdate()
 		{
 			TotalCountdown = UpdateCountdown;
@@ -255,7 +256,7 @@ namespace RedOnion.ROS
 			{
 				if (!e.Value.IsFunction)
 				{
-					var result = Value.Void;
+					var result = e.Value;
 					e.Value.desc.Call(ref result, null, new Arguments(Arguments, 0));
 				}
 				else if (e.Core != null)

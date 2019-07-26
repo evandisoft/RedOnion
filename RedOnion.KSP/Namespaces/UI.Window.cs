@@ -19,16 +19,16 @@ namespace RedOnion.KSP
 			if (processor != null)
 			{
 				_processor = processor;
-				hooks = new Hooks(this);
+				_hooks = new Hooks(this);
 			}
 		}
 		protected override void Dispose(bool disposing)
 		{
 			Value.DebugLog("Disposing window (dispose: {0}, processor: {1})", disposing, _processor != null);
-			if (hooks != null)
+			if (_hooks != null)
 			{
-				hooks.Dispose();
-				hooks = null;
+				_hooks.Dispose();
+				_hooks = null;
 			}
 			if (disposing)
 				_processor = null;
@@ -37,7 +37,7 @@ namespace RedOnion.KSP
 
 		// this is to avoid direct hard-link from processor to window,
 		// so that it can be garbage-collected when no direct link exists
-		protected Hooks hooks;
+		protected Hooks _hooks;
 		protected class Hooks : IDisposable
 		{
 			protected WeakReference _window;
