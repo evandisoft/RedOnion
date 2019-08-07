@@ -112,6 +112,7 @@ namespace RedOnion.ROS.Objects
 				rootStart = value;
 				if (BlockCount == 0)
 					BlockStart = value;
+				else blockStack.items[0].start = value;
 			}
 		}
 		private int rootEnd;
@@ -123,6 +124,7 @@ namespace RedOnion.ROS.Objects
 				rootEnd = value;
 				if (BlockCount == 0)
 					BlockEnd = value;
+				else blockStack.items[0].start = value;
 			}
 		}
 
@@ -131,6 +133,7 @@ namespace RedOnion.ROS.Objects
 		public Context(Context parent, Function fn, HashSet<string> cvars)
 			: base("Context of " + fn.Name, typeof(Context))
 		{
+			BlockCode = OpCode.Break;
 			RootStart = fn.CodeAt;
 			RootEnd = fn.CodeAt + fn.CodeSize;
 			Captured = cvars;
@@ -260,6 +263,7 @@ namespace RedOnion.ROS.Objects
 			while (blockStack.size > 0)
 			{
 				ref var top = ref blockStack.Top();
+				BlockCode = top.op;
 				propSize = top.varsFrom;
 				var shadow = top.shadow;
 				if (closures.size > 0)

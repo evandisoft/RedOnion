@@ -112,12 +112,7 @@ namespace RedOnion.ROS
 					catch (Exception ex)
 					{
 						Log("Exception in Shutdown: " + ex.Message);
-						if (ex is Error err)
-						{
-							var line = err.Line;
-							Log(line == null ? "Error at line {0}."
-								: "Error at line {0}: {1}", err.LineNumber, line);
-						}
+						Log(ex);
 						Shutdown -= handler;
 					}
 				}
@@ -169,12 +164,12 @@ namespace RedOnion.ROS
 
 		public int TotalCountdown { get; protected set; }
 		public int CountdownPercent => 100 * TotalCountdown / UpdateCountdown;
+		public int TimeoutPercent => (int)(100 * (1 - watch.Elapsed.TotalMilliseconds / UpdateTimeout.TotalMilliseconds));
 		public double AverageMillis { get; set; }
 		public double PeakMillis { get; set; }
 		Stopwatch watch = new Stopwatch();
 		int oneShotSkipped, idleSkipped;
 
-		// TODO: use percentages of update timeout as well
 		public void FixedUpdate()
 		{
 			TotalCountdown = UpdateCountdown;
@@ -187,11 +182,11 @@ namespace RedOnion.ROS
 				do
 				{
 					ref var call = ref updateList.GetNext();
-					if (!Call(ref call, UpdatePercent))
+					if (!Call(ref call, "Update", UpdatePercent))
 						updateList.Remove(call.Value);
 				} while (!updateList.AtEnd
 				&& CountdownPercent > UpdatePercent
-				&& watch.Elapsed < UpdateTimeout);
+				&& TimeoutPercent > UpdatePercent);
 			}
 
 			// one shot
@@ -205,11 +200,11 @@ namespace RedOnion.ROS
 				do
 				{
 					ref var call = ref oneShotList.GetNext();
-					Call(ref call, OneShotPercent);
+					Call(ref call, "OneShot", OneShotPercent);
 					oneShotList.Remove(call.Value);
 				} while (!oneShotList.AtEnd
 				&& CountdownPercent > OneShotPercent
-				&& watch.Elapsed < UpdateTimeout);
+				&& TimeoutPercent > OneShotPercent);
 			}
 
 			// idle
@@ -223,22 +218,23 @@ namespace RedOnion.ROS
 				do
 				{
 					ref var call = ref idleList.GetNext();
-					if (!Call(ref call, IdlePercent))
+					if (!Call(ref call, "Idle", IdlePercent))
 						idleList.Remove(call.Value);
 				} while (!idleList.AtEnd
 				&& CountdownPercent > IdlePercent
-				&& watch.Elapsed < UpdateTimeout);
+				&& TimeoutPercent > IdlePercent);
 			}
 
 			// main
 			do
 			{
-				if (Exit != ExitCode.Countdown && Exit != ExitCode.Yield)
+				if (!Paused)
 					break;
 				var countdown = Math.Min(StepCountdown, TotalCountdown);
 				Execute(countdown);
 				TotalCountdown -= (countdown - Countdown);
-			} while (TotalCountdown > 0 && watch.Elapsed < UpdateTimeout);
+			} while (Exit == ExitCode.Countdown
+			&& TotalCountdown > 0 && watch.Elapsed < UpdateTimeout);
 
 			// watch
 			watch.Stop();
@@ -250,7 +246,7 @@ namespace RedOnion.ROS
 			if (milli > PeakMillis)
 				PeakMillis = milli;
 		}
-		private bool Call(ref EventList.Element e, int downtoPercent)
+		private bool Call(ref EventList.Element e, string name, int downtoPercent)
 		{
 			try
 			{
@@ -259,40 +255,33 @@ namespace RedOnion.ROS
 					var result = e.Value;
 					e.Value.desc.Call(ref result, null, new Arguments(Arguments, 0));
 				}
-				else if (e.Core != null)
+				else
 				{
 					do
 					{
-						if (Exit != ExitCode.Countdown && Exit != ExitCode.Yield)
-							break;
 						var countdown = Math.Min(StepCountdown, TotalCountdown);
-						e.Core.Execute(countdown);
+						if (e.Core == null)
+						{
+							e.Core = new Core(this);
+							e.Core.Globals = Globals;
+							var fn = e.Value.obj as Function;
+							e.Core.Execute(fn, countdown);
+						}
+						else e.Core.Execute(countdown);
 						TotalCountdown -= (countdown - Countdown);
-					} while (CountdownPercent > downtoPercent && watch.Elapsed < UpdateTimeout);
-					if (Exit != ExitCode.Countdown && Exit != ExitCode.Yield)
+					} while (e.Core.Exit == ExitCode.Countdown
+					&& CountdownPercent > downtoPercent && UpdatePercent > downtoPercent);
+					if (!e.Core.Paused)
 					{
 						// TODO: pool
 						e.Core = null;
 					}
 				}
-				else
-				{
-					e.Core = new Core(this);
-					e.Core.Globals = Globals;
-					var countdown = Math.Min(StepCountdown, TotalCountdown);
-					var fn = e.Value.obj as Function;
-					e.Core.Execute(fn, countdown);
-				}
 			}
 			catch (Exception ex)
 			{
-				Log("Exception in FixedUpdate: " + ex.Message);
-				if (ex is Error err)
-				{
-					var line = err.Line;
-					Log(line == null ? "Error at line {0}."
-						: "Error at line {0}: {1}", err.LineNumber, line);
-				}
+				Log("Exception in FixedUpdate.{0}: {1}", name, ex.Message);
+				Log(ex);
 				return false;
 			}
 			return true;

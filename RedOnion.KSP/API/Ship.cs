@@ -188,8 +188,10 @@ namespace RedOnion.KSP.API
 		public Vector3d position => native.transform.position;
 		[Convert(typeof(Vector)), Description("Position relative to orbited body.")]
 		public Vector3d relative => native.transform.position - native.mainBody.transform.position;
-		[Convert(typeof(Vector)), Description("Current velocity.")]
-		public Vector3d velocity => native.orbit.vel;
+		[Convert(typeof(Vector)), Description("Current orbital velocity.")]
+		public Vector3d velocity => native.obt_velocity;
+		[Convert(typeof(Vector)), Description("Current surface velocity.")]
+		public Vector3d srfVelocity => native.srf_velocity;
 		[Description("Predicted position at specified time.")]
 		[return: Convert(typeof(Vector))]
 		public Vector3d positionAt(double time) => native.orbit.getPositionAtUT(time);
@@ -200,12 +202,12 @@ namespace RedOnion.KSP.API
 		[Convert(typeof(Vector)), Description("Center of mass.")]
 		public Vector3d centerOfMass => native.CoMD;
 		Vector3d ISpaceObject.position => centerOfMass;
-		[Convert(typeof(Vector)), Description("Vector pointing up.")]
-		public Vector3d up => native.up;
 		[Convert(typeof(Vector)), Description("Vector pointing north.")]
 		public Vector3d north => native.north;
 		[Convert(typeof(Vector)), Description("Vector pointing east.")]
 		public Vector3d east => native.east;
+		[Convert(typeof(Vector)), Description("Vector pointing up/forward.")]
+		public Vector3d forward => native.transform.up;
 
 		[Convert(typeof(Vector)), Description("Angular velocity (ω, rad/s), how fast the ship rotates")]
 		public Vector3d angularVelocity => native.angularVelocityD;

@@ -162,9 +162,9 @@ namespace RedOnion.KSP.API
 					origin *= factor;
 					direction *= factor;
 					center = ScaledSpace.LocalToScaledSpace(center);
-					width *= Math.Max(1.0,
+					width *= Math.Max(0.2,
 						(PlanetariumCamera.Camera.transform.localPosition
-						- center).magnitude / 100);
+						- center).magnitude / 200);
 				}
 				else
 				{

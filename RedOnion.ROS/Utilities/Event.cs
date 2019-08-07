@@ -85,19 +85,23 @@ namespace RedOnion.ROS.Utilities
 		public Descriptor Descriptor => EventDescriptor.Instance;
 		public class EventDescriptor : Descriptor.Simple
 		{
-			public static EventDescriptor Instance { get; } = new EventDescriptor();
-			protected EventDescriptor() : base("Event", typeof(Event), Methods) { }
+			// keep Methods above Instance!
 			protected static Values Methods = new Values(new Value[]
 			{
-				new Value(new Procedure1<Event>("Add"),
+				new Value(new Procedure1<Event>("add"),
 					(Action<Event,Value>)((e, v) => e.Add(v))),
-				new Value(new Procedure1<Event>("Set"),
+				new Value(new Procedure1<Event>("set"),
 					(Action<Event,Value>)((e, v) => e.Set(v))),
-				new Value(new Procedure1<Event>("Remove"),
+				new Value(new Procedure1<Event>("rem"),
 					(Action<Event,Value>)((e, v) => e.Remove(v))),
-				new Value(new Procedure0<Event>("Clear"),
+				new Value(new Procedure1<Event>("remove"),
+					(Action<Event,Value>)((e, v) => e.Remove(v))),
+				new Value(new Procedure0<Event>("clear"),
 					(Action<Event>)(e => e.Clear())),
 			});
+
+			public static EventDescriptor Instance { get; } = new EventDescriptor();
+			protected EventDescriptor() : base("Event", typeof(Event), Methods) { }
 		}
 	}
 }

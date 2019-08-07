@@ -122,6 +122,8 @@ namespace RedOnion.ROS.Tests
 			Test(10,        "--x");         // pre-decrement
 			Test(-10,        "-x");         // unary minus
 			Test(10,         "+x");         // unary plus
+			Test(11,        "x+=1");        // compound assignment - add
+			Test(22,		"x*=2");		// compound assignment - mul
 		}
 
 		[Test]
@@ -216,6 +218,7 @@ namespace RedOnion.ROS.Tests
 			foreach (var s in new[]
 			{
 				"(\n+1\n)",
+				"-1\\\n+ 2",
 				"def pass x => x\npass(\n1\n)",
 				"def sum2 x,y => x+y"
 				+ "\nsum2 pass(2),\npass(-1)"

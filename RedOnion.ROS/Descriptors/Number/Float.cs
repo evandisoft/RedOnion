@@ -108,6 +108,9 @@ namespace RedOnion.ROS
 				case OpCode.Div:
 					lhs.num.Float /= rhs.num.Float;
 					return true;
+				case OpCode.BitXor:
+					lhs.num.Float = (float)Math.Pow(lhs.num.Float, rhs.num.Float);
+					return true;
 
 				case OpCode.Equals:
 					lhs = lhs.num.Float == rhs.num.Float;

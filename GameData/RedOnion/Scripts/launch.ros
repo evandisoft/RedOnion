@@ -1,9 +1,12 @@
-var targetAltitude = 80000000
-var safeAltitude   = 72000
-var ascentHeading  = 90
-
 ship.throttle = 0
 user.throttle = 1
+
+var targetAltitude = 80000
+var safeAltitude   = 72000
+var ascentHeading  = 90
+var firstAltitude  = 1000
+var narrowAltitude = 100
+var firstAngle     = 5
 
 var lastPitchReport = 0.0
 def setPitch pitch
@@ -12,7 +15,32 @@ def setPitch pitch
     lastPitchReport = time()
     print "Pitch: " + pitch
 
-def checkStaging
+def steer
+  if altitude <= narrowAltitude
+    setPitch 90
+  else if altitude <= firstAltitude
+    setPitch 90 - firstAngle * altitude/firstAltitude
+  else setPitch (90 - firstAngle) * math.deg.acos(
+    math.clamp (apoapsis / safeAltitude)^1.4, 0, 1) / 90
+    
+var lastApoAbove = 0.0
+def throttle
+  if apoapsis >= targetAltitude
+    ship.throttle = 0
+    if lastApoAbove == 0.0
+      print "Apoapsis reached"
+    lastApoAbove = time()
+  else if lastApoAbove != 0 and time() - lastApoAbove < 10
+    ship.throttle = 0
+  else
+    var power = 1
+    if apoapsis > safeAltitude and altitude < safeAltitude
+      power = math.max 0.3, (targetAltitude-apoapsis) / math.max(1.0, targetAltitude-safeAltitude)
+    if apoapsis > targetAltitude * 0.95
+      power = math.min power, 0.01+20*(1-apoapsis/targetAltitude)
+    ship.throttle = math.min power, user.throttle
+
+def staging
   if !stage.ready
     return
   var nextDecoupler = ship.parts.nextDecoupler
@@ -31,33 +59,36 @@ def checkStaging
     stage
     return
 
+var vd1 = new vector.draw
+var vd2 = new vector.draw
+vd1.scale = 10
+vd2.scale = 10
+vd2.color = color.blue
+def vectors
+  vd1.vector = new vector ship.forward
+  vd2.vector = new vector ship.srfVelocity.normalized
+  vd1.show
+  vd2.show
+
+system.update.add steer
+system.update.add throttle
+system.update.add vectors
+system.idle.add staging
+
 print "Target apoapsis: " + targetAltitude
 print "Safe altitude:   " + safeAltitude
-var lastApoAbove = 0.0
-wait
-until altitude >= safeAltitude and apoapsis >= targetAltitude 
-  checkStaging()
-
-  setPitch math.deg.acos math.clamp apoapsis / safeAltitude, 0, 1
-
-  if apoapsis >= targetAltitude
-    ship.throttle = 0
-    if lastApoAbove == 0.0
-      print "Apoapsis reached"
-    lastApoAbove = time()
-  else if lastApoAbove != 0 and time() - lastApoAbove < 10
-    ship.throttle = 0
-  else
-    var power = 1
-    if apoapsis > safeAltitude and altitude < safeAltitude
-      power = math.max 0.3, (targetAltitude-apoapsis) / math.max(1.0, targetAltitude-safeAltitude)
-    if apoapsis > targetAltitude * 0.95
-      power = math.min power, 0.01+20*(1-apoapsis/targetAltitude)
-    ship.throttle = math.min power, user.throttle
-
+until altitude >= safeAltitude and apoapsis >= targetAltitude*.99
   wait
 
-print "Safe altitude reached"
+system.update.rem steer
+system.update.rem throttle
+system.update.rem vectors
+system.idle.rem staging
+vd1.hide
+vd2.hide
+
 user.throttle = 0
 ship.throttle = math.nan
 ksp.FlightControl.disable
+
+print "Safe altitude reached"

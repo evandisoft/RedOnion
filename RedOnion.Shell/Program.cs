@@ -117,7 +117,7 @@ namespace RedOnion.Shell
 				}
 				if (processor.Exit != 0)
 					return;
-				Console.WriteLine("=>  " + processor.Result.ToStr());
+				Console.WriteLine("=>  " + processor.Result.ToString());
 			}
 		}
 	}

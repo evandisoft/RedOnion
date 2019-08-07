@@ -77,8 +77,7 @@ namespace Kerbalua.Other
 					state = processor.Execute(source, path, 10000)
 						? processor.HasEvents ? State.Events : State.Idle : State.Yielding;
 				}
-				else if (state == State.Yielding
-				  && (processor.Exit != ExitCode.Countdown && processor.Exit != ExitCode.Yield))
+				else if (state == State.Yielding && !processor.Paused)
 					state = processor.HasEvents ? State.Events : State.Idle;
 				else if (state == State.Events && !processor.HasEvents)
 					state = State.Idle;
@@ -93,19 +92,17 @@ namespace Kerbalua.Other
 			}
 			catch (Exception e)
 			{
+				Debug.Log(e);
 				PrintErrorAction?.Invoke(e.Message);
 
-				string FormatLine(int lineNumber, string line)
-					=> string.Format(Value.Culture,
-					line == null ? "At line {0}." : "At line {0}: {1}",
-					lineNumber+1, line);
-
-				if (e is RuntimeError runError)
-					PrintErrorAction?.Invoke(FormatLine(runError.LineNumber, runError.Line));
-				else if (e is ParseError parseError)
-					PrintErrorAction?.Invoke(FormatLine(parseError.LineNumber, parseError.Line));
-
-				Debug.Log(e);
+				if (e is Error err)
+				{
+					var atLine = string.Format(Value.Culture,
+					err.Line == null ? "At line {0}." : "At line {0}: {1}",
+					err.LineNumber+1, err.Line);
+					Debug.Log(atLine);
+					PrintErrorAction?.Invoke(atLine);
+				}
 			}
 			Terminate();
 			result = "";

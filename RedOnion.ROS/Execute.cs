@@ -93,6 +93,8 @@ namespace RedOnion.ROS
 						}
 						case OpCode.Function:
 						{
+							if (stack.Count == 0)
+								goto finishNoReturn;
 							ref var top = ref stack.Top();
 							var vtop = top.vtop;
 							if (top.create)
@@ -107,6 +109,7 @@ namespace RedOnion.ROS
 							{
 								ctx.PopAll();
 								ctx = top.context;
+								blockEnd = ctx.BlockEnd;
 							}
 							stack.Pop();
 							continue;
@@ -723,7 +726,11 @@ namespace RedOnion.ROS
 							throw InvalidOperation("Could not convert '{0}' to boolean", cond.Name);
 
 						if (cond.num.Bool == (op == OpCode.If))
+						{
+							vals.Pop(1);
 							goto case OpCode.Block;
+						}
+						vals.Pop(1);
 						int sz = Int(code, at);
 						at += 4 + sz;
 						if (at == blockEnd)
@@ -923,6 +930,15 @@ namespace RedOnion.ROS
 					throw;
 				}
 				re = new RuntimeError(compiled, at, ex);
+#if DEBUG
+				Value.DebugLog("ROS.Core.Execute: Exception " + ex.Message);
+				if (compiled.Path != null)
+					Value.DebugLog("Script path: " + compiled.Path);
+				if (re.LineNumber >= 0 || re.Line != null)
+					Value.DebugLog(re.Line == null ? "At line {0}" : "At line {0}: {1}", re.LineNumber+1, re.Line);
+				for (var x = ex; x != null; x = x.InnerException)
+					Value.DebugLog(x.StackTrace);
+#endif
 				result = new Value(re);
 				throw re;
 			}

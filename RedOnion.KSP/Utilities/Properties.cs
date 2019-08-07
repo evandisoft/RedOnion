@@ -15,14 +15,52 @@ namespace RedOnion.KSP.Utilities
 	public abstract class Properties : Properties<object>
 	{
 	}
+	[Description(
+@"String-keyed read-only dictionary that exposes its values as properties.
+The dictionary is filled by the scripting engine.
+Both the properties and indexed values will first try exact case match (even in ROS),
+then (if exact match not found) try insensitive match where UPPER is preferred
+(`SomeThing` will match `Something` if there is `Something` and `something`).
+Can be used as base class for list of celestial bodies,
+discovered assemblies, namespaces, classes etc.")]
 	public abstract class Properties<T> : IEnumerable<T>, ISelfDescribing, IUserDataType, ICompletable
 	{
+		/// <summary>
+		/// Properties with map of native objects to wrapped ones.
+		/// Designed to return `null` for null-key or non-existent key,
+		/// but returns `default` for struct / value types.
+		/// </summary>
+		public class WithMap<R> : Properties<T>
+		{
+			protected readonly Dictionary<R, T> map = new Dictionary<R, T>();
+			[Browsable(false), MoonSharpHidden]
+			public T this[R key]
+				=> key == null ? default : map.TryGetValue(key, out var it) ? it : default;
+			protected bool Add(string name, T value, R native)
+			{
+				if (strict.ContainsKey(name))
+					return false;
+				strict[name] = list.size;
+				map[native] = value;
+				if (dict.TryGetValue(name, out int at))
+				{
+					var prev = list[at].Key;
+					var overwrite = string.CompareOrdinal(name, prev) > 0;
+					Value.DebugLog("Properties conflict: {0} vs. {1}, overwrite: {2}", name, prev, overwrite);
+					if (overwrite)
+						dict[name] = list.size;
+				}
+				list.Add(new KeyValuePair<string, T>(name, value));
+				return true;
+			}
+		}
+
+		// ROS requires every property to have some integer index
+		// therefore every property (or string-keyed value) gets added to this list
 		protected readonly ListCore<KeyValuePair<string, T>> list;
 		protected readonly Dictionary<string, int> dict = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 		protected readonly Dictionary<string, int> strict = new Dictionary<string, int>();
 
-		protected bool Add(KeyValuePair<string, T> pair)
-			=> Add(pair.Key, pair.Value);
 		protected bool Add(string name, T value)
 		{
 			if (strict.ContainsKey(name))
@@ -31,7 +69,9 @@ namespace RedOnion.KSP.Utilities
 			if (dict.TryGetValue(name, out int at))
 			{
 				var prev = list[at].Key;
-				if (string.CompareOrdinal(name, prev) > 0)
+				var overwrite = string.CompareOrdinal(name, prev) > 0;
+				Value.DebugLog("Properties conflict: {0} vs. {1}, overwrite: {2}", name, prev, overwrite);
+				if (overwrite)
 					dict[name] = list.size;
 			}
 			list.Add(new KeyValuePair<string, T>(name, value));

@@ -185,6 +185,28 @@ namespace RedOnion.ROS.Tests
 				"    return h",
 				"  return g()",
 				"(f 1)(3)");
+
+			Reset();
+			Lines(1,
+				"var x = 0",
+				"def set v",
+				"  x = v",              // function without return (see Core.Execute(int) .. while (at == blockEnd) .. case OpCode.Function)
+				"def test",
+				"  if x == 0; set 1",	// captured function
+				"  else set x+1",
+				"test",
+				"return x");
+			var test = Value.Void;
+			Assert.IsTrue(ctx.Get(ref test, ctx.Find("test")));
+			Execute(test.obj as Function);
+			var xval = Value.Void;
+			Assert.IsTrue(ctx.Get(ref xval, ctx.Find("x")));
+			Assert.IsTrue(xval.IsInt);
+			Assert.AreEqual(2, xval.ToInt());
+			Execute(test.obj as Function);
+			Assert.IsTrue(ctx.Get(ref xval, ctx.Find("x")));
+			Assert.IsTrue(xval.IsInt);
+			Assert.AreEqual(3, xval.ToInt());
 		}
 
 		[Test]
@@ -271,6 +293,28 @@ obj.getTotal    // returns 1
 			Test(3.14, "x");
 			Globals.Add("test2", "var x = 1.41");
 			Test(ExitCode.Return, 1.41, "run.library.source test2; return x");
+		}
+
+		[Test]
+		public void ROS_Scope11_Events()
+		{
+			YieldLines(ExitCode.Return, 3,
+				"var x = 0",
+				"def update => x++",
+				"system.update.add update",
+				"wait; wait; wait",
+				"system.update.remove update",
+				"return x");
+
+			Reset();
+			YieldLines(ExitCode.Return, 7,
+				"var x = 0",
+				"def add y => x += y",
+				"def update => add x+1",
+				"system.update.add update",
+				"wait; wait; wait",
+				"system.update.remove update",
+				"return x");
 		}
 	}
 }
