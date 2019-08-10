@@ -111,7 +111,7 @@ namespace RedOnion
 
 		private void FixedUpdate()
 		{
-			core?.FixedUpdate();
+			core?.UpdatePhysics();
 		}
 
 		private static void Log(string msg)

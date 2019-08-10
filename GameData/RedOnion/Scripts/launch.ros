@@ -1,18 +1,66 @@
-ship.throttle = 0
-user.throttle = 1
-
 var targetAltitude = 80000
 var safeAltitude   = 72000
 var ascentHeading  = 90
+var firstAngle     = 10
 var firstAltitude  = 1000
 var narrowAltitude = 100
-var firstAngle     = 5
+
+def gui
+  var lblWidth = 120
+  var boxWidth = 40
+  var wnd = new ui.window
+  def row label, value
+    var row = wnd.add new ui.panel
+    row.layout = ui.layout.horizontal
+    var lbl = row.add new ui.label
+    lbl.text = label
+    lbl.minWidth = lblWidth
+    var box = row.add new ui.textBox
+    box.text = string value
+    box.minWidth = boxWidth
+    return box
+  var ta = row "Target altitude: ", targetAltitude
+  var sa = row "Safe altitude: ",   safeAltitude
+  var ah = row "Ascent heading: ",  ascentHeading
+  var fa = row "First angle: ",     firstAngle
+  var a1 = row "First altitude: ",  firstAltitude
+  var na = row "Narrow altitude: ", narrowAltitude
+  var brow = wnd.add new ui.panel
+  brow.layout = ui.layout.horizontal
+  var cancel = brow.add new ui.button
+  cancel.text = "Cancel"
+  cancel.flexWidth = 1
+  var launch = brow.add new ui.button
+  launch.text = "Launch"
+  launch.flexWidth = 1
+  var selected = null
+  cancel.click.add def => selected = false
+  launch.click.add def => selected = true
+  wnd.closed.add def => selected = false
+  while selected == null
+    wait
+  if selected
+    targetAltitude = double ta.text
+    safeAltitude   = double sa.text
+    ascentHeading  = double ah.text
+    firstAngle     = double fa.text
+    firstAltitude  = double a1.text
+    narrowAltitude = double na.text
+  wnd.dispose
+  return selected
+if !gui()
+  return
+
+ship.throttle = 0
+user.throttle = 1
 
 var lastPitchReport = 0.0
+var prevPitchValue = 0
 def setPitch pitch
   ksp.flightControl.setRel ascentHeading, pitch
-  if time() - lastPitchReport > 10
+  if time() - lastPitchReport > 1 and pitch != prevPitchValue
     lastPitchReport = time()
+    prevPitchValue = pitch
     print "Pitch: " + pitch
 
 def steer
@@ -20,8 +68,9 @@ def steer
     setPitch 90
   else if altitude <= firstAltitude
     setPitch 90 - firstAngle * altitude/firstAltitude
-  else setPitch (90 - firstAngle) * math.deg.acos(
-    math.clamp (apoapsis / safeAltitude)^1.4, 0, 1) / 90
+  else setPitch (90 - firstAngle) * math.deg.acos(math.clamp
+    ((apoapsis - firstAltitude) / (safeAltitude - firstAltitude)),
+    0, 1) / 90
     
 var lastApoAbove = 0.0
 def throttle
@@ -59,33 +108,35 @@ def staging
     stage
     return
 
-var vd1 = new vector.draw
-var vd2 = new vector.draw
-vd1.scale = 10
-vd2.scale = 10
-vd2.color = color.blue
+var vd = [
+    new vector.draw,
+    new vector.draw
+]
+vd[0].scale = 10
+vd[1].scale = 10
+vd[1].color = color.blue
 def vectors
-  vd1.vector = new vector ship.forward
-  vd2.vector = new vector ship.srfVelocity.normalized
-  vd1.show
-  vd2.show
+  vd[0].vector = new vector ship.forward
+  vd[1].vector = new vector ship.srfvel.normalized
+  vd[0].show
+  vd[1].show
 
-system.update.add steer
-system.update.add throttle
-system.update.add vectors
-system.idle.add staging
+var subs = [
+  system.update(steer),
+  system.update(throttle),
+  system.update(vectors),
+  system.idle(staging)
+]
 
 print "Target apoapsis: " + targetAltitude
 print "Safe altitude:   " + safeAltitude
 until altitude >= safeAltitude and apoapsis >= targetAltitude*.99
   wait
 
-system.update.rem steer
-system.update.rem throttle
-system.update.rem vectors
-system.idle.rem staging
-vd1.hide
-vd2.hide
+for var e in subs
+  e.remove
+for var d in vd
+  d.hide
 
 user.throttle = 0
 ship.throttle = math.nan

@@ -39,23 +39,45 @@ namespace Kerbalua.Other
 				return;
 			try
 			{
-				processor.FixedUpdate();
+				processor.UpdatePhysics();
 			}
 			catch (Exception e)
 			{
+				Debug.Log(e);
 				PrintErrorAction?.Invoke(e.Message);
 
-				string FormatLine(int lineNumber, string line)
-					=> string.Format(Value.Culture,
-					line == null ? "At line {0}." : "At line {0}: {1}",
-					lineNumber+1, line);
+				if (e is Error err)
+				{
+					var atLine = string.Format(Value.Culture,
+					err.Line == null ? "At line {0}." : "At line {0}: {1}",
+					err.LineNumber+1, err.Line);
+					Debug.Log(atLine);
+					PrintErrorAction?.Invoke(atLine);
+				}
 
-				if (e is RuntimeError runError)
-					PrintErrorAction?.Invoke(FormatLine(runError.LineNumber, runError.Line));
-				else if (e is ParseError parseError)
-					PrintErrorAction?.Invoke(FormatLine(parseError.LineNumber, parseError.Line));
-
+				Terminate();
+			}
+		}
+		public override void Update()
+		{
+			try
+			{
+				processor.UpdateGraphic();
+			}
+			catch (Exception e)
+			{
 				Debug.Log(e);
+				PrintErrorAction?.Invoke(e.Message);
+
+				if (e is Error err)
+				{
+					var atLine = string.Format(Value.Culture,
+					err.Line == null ? "At line {0}." : "At line {0}: {1}",
+					err.LineNumber+1, err.Line);
+					Debug.Log(atLine);
+					PrintErrorAction?.Invoke(atLine);
+				}
+
 				Terminate();
 			}
 		}

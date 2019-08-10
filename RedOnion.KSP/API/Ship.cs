@@ -4,12 +4,17 @@ using MoonSharp.Interpreter;
 using RedOnion.ROS;
 using RedOnion.ROS.Utilities;
 using RedOnion.KSP.Parts;
+using UnityEngine;
 
 namespace RedOnion.KSP.API
 {
 	[Description("Active vessel")]
 	public class Ship : ISpaceObject, IDisposable
 	{
+		[Browsable(false), MoonSharpHidden]
+		public static void DisableAutopilot()
+			=> active?._autopilot?.Disable();
+
 		static Ship active;
 		[Browsable(false), MoonSharpHidden]
 		public static Ship Active
@@ -80,10 +85,10 @@ namespace RedOnion.KSP.API
 				GameEvents.onGameSceneLoadRequested.Remove(SceneChange);
 				native = null;
 			}
-			if (protectedAutopilot != null)
+			if (_autopilot != null)
 			{
-				protectedAutopilot.Dispose();
-				protectedAutopilot = null;
+				_autopilot.Dispose();
+				_autopilot = null;
 			}
 		}
 		void SceneChange(GameScenes scene)
@@ -93,16 +98,16 @@ namespace RedOnion.KSP.API
 		}
 
 		[Description("Autopilot of this ship (vehicle/wessel).")]
-		public Autopilot autopilot => protectedAutopilot ?? (protectedAutopilot = new Autopilot(this));
-		protected Autopilot protectedAutopilot;
+		public Autopilot autopilot => _autopilot ?? (_autopilot = new Autopilot(this));
+		protected Autopilot _autopilot;
 		[Description("Current throttle (assign redirects to `Autopilot`, reads control state if autopilot disabled)")]
 		public float throttle
 		{
-			get => protectedAutopilot == null || float.IsNaN(protectedAutopilot.throttle)
-				? native.ctrlState.mainThrottle : protectedAutopilot.throttle;
+			get => _autopilot == null || float.IsNaN(_autopilot.throttle)
+				? native.ctrlState.mainThrottle : _autopilot.throttle;
 			set
 			{
-				if (protectedAutopilot == null && float.IsNaN(value))
+				if (_autopilot == null && float.IsNaN(value))
 					return;
 				autopilot.throttle = value;
 			}
@@ -186,12 +191,14 @@ namespace RedOnion.KSP.API
 
 		[Convert(typeof(Vector)), Description("Current position relative to active ship (so `ship.position` always reads zero).")]
 		public Vector3d position => native.transform.position;
-		[Convert(typeof(Vector)), Description("Position relative to orbited body.")]
-		public Vector3d relative => native.transform.position - native.mainBody.transform.position;
 		[Convert(typeof(Vector)), Description("Current orbital velocity.")]
 		public Vector3d velocity => native.obt_velocity;
 		[Convert(typeof(Vector)), Description("Current surface velocity.")]
+		public Vector3d surfaceVelocity => native.srf_velocity;
+		[Convert(typeof(Vector)), Description("Current surface velocity (Alias to `surfaceVelocity`).")]
 		public Vector3d srfVelocity => native.srf_velocity;
+		[Convert(typeof(Vector)), Description("Current surface velocity (Alias to `surfaceVelocity`).")]
+		public Vector3d srfvel => native.srf_velocity;
 		[Description("Predicted position at specified time.")]
 		[return: Convert(typeof(Vector))]
 		public Vector3d positionAt(double time) => native.orbit.getPositionAtUT(time);
@@ -199,16 +206,19 @@ namespace RedOnion.KSP.API
 		[return: Convert(typeof(Vector))]
 		public Vector3d velocityAt(double time) => native.orbit.getOrbitalVelocityAtUT(time);
 
+		// see https://en.wikipedia.org/wiki/Axes_conventions#Ground_reference_frames_for_attitude_description
+		[Convert(typeof(Vector)), Description("Vector pointing north in a plane that is tangent to sphere centered in orbited body.")]
+		public Vector3d north => native.north;
+		[Convert(typeof(Vector)), Description("Vector pointing east (tangent to sphere centered in orbited body).")]
+		public Vector3d east => native.east;
+		[Convert(typeof(Vector)), Description("Vector pointing forward (in the direction of the 'nose').")]
+		public Vector3d forward => native.transform.up;
+		[Description("Rotation relative to orbited body.")]
+		public Quaternion rotation => native.srfRelRotation;
+
 		[Convert(typeof(Vector)), Description("Center of mass.")]
 		public Vector3d centerOfMass => native.CoMD;
 		Vector3d ISpaceObject.position => centerOfMass;
-		[Convert(typeof(Vector)), Description("Vector pointing north.")]
-		public Vector3d north => native.north;
-		[Convert(typeof(Vector)), Description("Vector pointing east.")]
-		public Vector3d east => native.east;
-		[Convert(typeof(Vector)), Description("Vector pointing up/forward.")]
-		public Vector3d forward => native.transform.up;
-
 		[Convert(typeof(Vector)), Description("Angular velocity (ω, rad/s), how fast the ship rotates")]
 		public Vector3d angularVelocity => native.angularVelocityD;
 		[Convert(typeof(Vector)), Description("Moment of inertia (I, kg*m²) aka angular mass or rotational inertia.")]

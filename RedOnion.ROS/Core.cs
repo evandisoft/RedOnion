@@ -101,14 +101,14 @@ namespace RedOnion.ROS
 			{
 				var line = err.Line;
 				Log(line == null ? "Error at line {0}."
-					: "Error at line {0}: {1}", err.LineNumber, line);
+					: "Error at line {0}: {1}", err.LineNumber+1, line);
 			}
 #else
 			if (ex is Error err)
 			{
 				var line = err.Line;
 				Log(line == null ? "Error at line {0}."
-					: "Error at line {0}: {1}", err.LineNumber, line);
+					: "Error at line {0}: {1}", err.LineNumber+1, line);
 				ex = ex.InnerException;
 			}
 			var trace = ex?.StackTrace;

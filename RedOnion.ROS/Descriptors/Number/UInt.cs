@@ -17,6 +17,14 @@ namespace RedOnion.ROS
 			public override string ToString(ref Value self, string format, IFormatProvider provider, bool debug)
 				=> self.num.UInt.ToString(format, provider);
 
+			public override bool Call(ref Value result, object self, Arguments args, bool create = false)
+			{
+				if (args.Length != 1 || (result.obj != null && result.obj != this))
+					return false;
+				result = args[0].ToUInt();
+				return true;
+			}
+
 			public override bool Convert(ref Value self, Descriptor to)
 			{
 				switch (to.Primitive)

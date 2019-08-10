@@ -75,7 +75,6 @@
     <Compile Include="Objects\Namespace.cs" />
     <Compile Include="Utilities\RosMath.cs" />
     <Compile Include="Processor.cs" />
-    <Compile Include="Utilities\Event.cs" />
     <Compile Include="Objects\Function.cs" />
     <Compile Include="Objects\Globals.cs" />
     <Compile Include="Functions\Print.cs" />

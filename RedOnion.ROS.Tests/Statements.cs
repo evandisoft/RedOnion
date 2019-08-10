@@ -27,7 +27,7 @@ namespace RedOnion.ROS.Tests
 				Code = Compile(script);
 				if (Globals == null) Globals = new Globals();
 				Assert.IsFalse(Execute(countdown));
-				do FixedUpdate();
+				do UpdatePhysics();
 				while (Paused);
 			}
 			catch (Exception e)

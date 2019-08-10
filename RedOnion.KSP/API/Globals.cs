@@ -60,6 +60,7 @@ namespace RedOnion.KSP.API
 		[Description("Alias to `ship.periapsis`.")]
 		public static double periapsis => ship.periapsis;
 
+#if API_GLOBAL_ALIASES
 		// TODO: move aliases to startup/setup script/library
 		[Alias, Description("Alias to `Vector.dot` (or `v.dot`).")]
 		public static readonly string vdot = "Vector.dot";
@@ -71,6 +72,7 @@ namespace RedOnion.KSP.API
 		public static readonly string vangle = "Vector.angle";
 		[Alias, Description("Alias to `Vector.angle` (or `v.angle`).")]
 		public static readonly string vang = "Vector.angle";
+#endif
 	}
 
 	public class RosGlobals : RedOnion.ROS.Objects.Globals
@@ -127,6 +129,10 @@ namespace RedOnion.KSP.API
 			ref var member = ref reflected[at];
 			if (member.read == null)
 				return false;
+#if !API_GLOBAL_ALIASES
+			self = member.read(self.obj);
+			return true;
+#else
 			if (member.kind != Reflected.Prop.Kind.Field || member.write != null)
 			{
 				self = member.read(self.obj);
@@ -162,6 +168,7 @@ namespace RedOnion.KSP.API
 			}
 			self = item;
 			return true;
+#endif
 		}
 		public override bool Set(ref Value self, int at, OpCode op, ref Value value)
 		{
@@ -226,6 +233,9 @@ namespace RedOnion.KSP.API
 			var prop = typeof(Globals).GetProperty(name, BindingFlags.Static|BindingFlags.Public);
 			if (prop != null)
 				return DynValue.FromObject(table.OwnerScript, prop.GetValue(null, null));
+#if !API_GLOBAL_ALIASES
+			return null;
+#else
 			var alias = typeof(Globals).GetField(name, BindingFlags.Static|BindingFlags.Public);
 			if (alias == null || alias.FieldType != typeof(string))
 			{
@@ -253,6 +263,7 @@ namespace RedOnion.KSP.API
 				item = data.Descriptor.Index(table.OwnerScript, data.Object, DynValue.NewString(path[i]), false);
 			}
 			return item;
+#endif
 		}
 
 

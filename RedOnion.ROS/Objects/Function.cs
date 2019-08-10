@@ -105,7 +105,7 @@ namespace RedOnion.ROS.Objects
 
 		Action executeLater;
 		public Action ExecuteLater => executeLater
-			?? (executeLater = () => Processor.OneShot.Add(this));
+			?? (executeLater = () => Processor.Once.Add(new Value(this)));
 		public override bool Convert(ref Value self, Descriptor to)
 		{
 			if (to == Descriptor.Actions[0])

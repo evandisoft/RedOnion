@@ -63,10 +63,9 @@ namespace RedOnion.KSP
 				_window = null;
 				
 			}
-			protected bool Shutdown(IProcessor processor)
+			protected void Shutdown()
 			{
 				(_window?.Target as Window)?.Dispose();
-				return false;
 			}
 		}
 	}

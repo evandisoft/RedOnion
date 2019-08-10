@@ -1,3 +1,4 @@
+using RedOnion.KSP.API;
 using RedOnion.KSP.Autopilot;
 using System;
 using System.Collections.Generic;
@@ -58,6 +59,7 @@ namespace Kerbalua.Other {
 		protected abstract void ProtectedSetSource(string source, string path);
 		public abstract bool Evaluate(out string result);
 		public abstract void FixedUpdate();
+		public virtual void Update() { }
 
 		/// <summary>
 		/// Tell the engine to end an incomplete evaluation.
@@ -131,6 +133,7 @@ namespace Kerbalua.Other {
 		public virtual void ResetEngine()
 		{
 			FlightControl.GetInstance().Shutdown();
+			Ship.DisableAutopilot();
 		}
 	}
 }

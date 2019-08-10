@@ -73,7 +73,7 @@ namespace RedOnion.KSP.API
 				{
 					_draw = new WeakReference(draw);
 					_processor = draw._processor;
-					_processor.Update += Update;
+					_processor.PhysicsUpdate += Update;
 				}
 				~Hooks() => Dispose(false);
 				public void Dispose()
@@ -85,7 +85,7 @@ namespace RedOnion.KSP.API
 				{
 					if (_processor == null)
 						return;
-					_processor.Update -= Update;
+					_processor.PhysicsUpdate -= Update;
 					_processor = null;
 					_draw = null;
 				}

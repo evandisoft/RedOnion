@@ -30,15 +30,29 @@ namespace RedOnion.ROS.Objects
 
 			if (Processor is Processor processor)
 			{
-				System.Add("update", new Value(Event.EventDescriptor.Instance, processor.Update));
-				System.Add("idle", new Value(Event.EventDescriptor.Instance, processor.Update));
+				System.Add("update", new Value(processor.Update));
+				System.Add("idle", new Value(processor.Idle));
+				System.Add("onece", new Value(processor.Once));
 			}
 
 			System.Add("null", Value.Null);
 			System.Add("true", Value.True);
 			System.Add("false", Value.False);
-			System.Add("NaN", Value.NaN);
-			System.Add("Inf", double.PositiveInfinity);
+			System.Add("nan", Value.NaN);
+			System.Add("inf", double.PositiveInfinity);
+
+			System.Add("double", new Value(Descriptor.Double));
+			System.Add("float", new Value(Descriptor.Float));
+			System.Add("long", new Value(Descriptor.Long));
+			System.Add("ulong", new Value(Descriptor.ULong));
+			System.Add("int", new Value(Descriptor.Int));
+			System.Add("uint", new Value(Descriptor.UInt));
+			System.Add("short", new Value(Descriptor.Short));
+			System.Add("ushort", new Value(Descriptor.UShort));
+			System.Add("sbyte", new Value(Descriptor.SByte));
+			System.Add("byte", new Value(Descriptor.Byte));
+			System.Add("char", new Value(Descriptor.Char));
+			System.Add("string", new Value(Descriptor.String));
 
 			System.Lock();
 			Lock();

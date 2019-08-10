@@ -7,10 +7,12 @@ using UnityEngine;
 namespace RedOnion.KSP.API
 {
 	[Creator(typeof(VectorCreator))]
-	[Description("3D vector / coordinate. All the usual operators were implemented,"
-		+ " multiplication and division can use both vector (per-axis) and number (all-axes)."
-		+ " Beware that multiplication is scaling, not cross product or dot - use appropriate function for these."
-		+ " See also [ConstVector.md](ConstVector) which represents read-only base class.")]
+	[Description(
+@"3D vector / coordinate. All the usual operators were implemented,
+multiplication and division can use both vector (per-axis) and number (all-axes).
+Beware that multiplication is scaling, not cross product or dot - use appropriate function for these.
+See also [ConstVector.md](ConstVector) which represents read-only base class.
+NOTE: Subject to change - may revert to `Vector3d` with custom descriptor.")]
 	public class Vector : ConstVector
 	{
 		public Vector() { }

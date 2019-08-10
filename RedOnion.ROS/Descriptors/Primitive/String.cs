@@ -11,6 +11,14 @@ namespace RedOnion.ROS
 			public override string ToString(ref Value self, string format, IFormatProvider provider, bool debug)
 				=> self.obj.ToString();
 
+			public override bool Call(ref Value result, object self, Arguments args, bool create = false)
+			{
+				if (args.Length != 1 || (result.obj != null && result.obj != this))
+					return false;
+				result = args[0].ToStr();
+				return true;
+			}
+
 			public override bool Convert(ref Value self, Descriptor to)
 			{
 				var str = self.obj.ToString();

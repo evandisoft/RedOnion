@@ -246,13 +246,18 @@ namespace RedOnion.ROS
 	{
 		/// <summary>
 		/// Event invoked on engine shutdown or reset.
-		/// Return false to auto-remove after invoke.
+		/// (All subscriptions are removed prior to executing the handlers.)
 		/// </summary>
-		event Func<IProcessor, bool> Shutdown;
+		event Action Shutdown;
 		/// <summary>
-		/// Event invoked on every FixedUpdate (if possible).
+		/// Event invoked on every physics update (Unity FixedUpdate).
 		/// </summary>
-		event Action Update;
+		event Action PhysicsUpdate;
+		/// <summary>
+		/// Event invoked on every graphic update (Unity Update).
+		/// </summary>
+		event Action GraphicUpdate;
+
 		/// <summary>
 		/// Invoked by print function
 		/// </summary>

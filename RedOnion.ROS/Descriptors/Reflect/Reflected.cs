@@ -6,6 +6,9 @@ using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Reflection;
 
+// TODO: make it case semi-sensitive = prefer insensitive (present as camelCase),
+// but use the case on collisions (requiring exact match to use the non-default).
+
 namespace RedOnion.ROS
 {
 	partial class Descriptor

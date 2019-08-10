@@ -17,7 +17,7 @@ namespace RedOnion.KSP.API
 		protected Ship _ship;
 		protected Vessel _hooked;
 		protected float _throttle, _elevation, _heading, _bank;
-		// these are manipulate the direction (and do the hard work)
+		// these manipulate the direction (and do the hard work)
 		protected PID pidElevation = new PID();
 		protected PID pidHeading = new PID();
 		protected PID pidBank = new PID();
@@ -33,6 +33,7 @@ namespace RedOnion.KSP.API
 			_elevation = float.NaN;
 			_heading = float.NaN;
 			_bank = float.NaN;
+			Unhook();
 		}
 
 		protected internal Autopilot(Ship ship)
@@ -64,6 +65,20 @@ namespace RedOnion.KSP.API
 		{
 			get => _elevation;
 			set => Check(_elevation = RosMath.ClampS180(value));
+		}
+		[Description("Target heading (aka yaw, -180..+180)."
+			+ "NaN for releasing the control.")]
+		public float heading
+		{
+			get => _heading;
+			set => Check(_heading = RosMath.ClampS180(value));
+		}
+		[Description("Target bank (aka roll, -180..+180)."
+			+ "NaN for releasing the control.")]
+		public float bank
+		{
+			get => _bank;
+			set => Check(_bank = RosMath.ClampS180(value));
 		}
 
 		protected void Hook()

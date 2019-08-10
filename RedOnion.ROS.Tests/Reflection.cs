@@ -192,7 +192,7 @@ namespace RedOnion.ROS.Tests
 			Assert.AreEqual(0, StaticTest.Integer);
 			StaticTest.CallAction();
 			Assert.AreEqual(0, StaticTest.Integer);
-			FixedUpdate();
+			UpdatePhysics();
 			Assert.AreEqual(10, StaticTest.Integer);
 
 			var it = new InstanceTest();
@@ -201,7 +201,7 @@ namespace RedOnion.ROS.Tests
 			Assert.IsNull(it.name);
 			it.CallAction();
 			Assert.IsNull(it.name);
-			FixedUpdate();
+			UpdatePhysics();
 			Assert.AreEqual("done", it.name);
 		}
 
