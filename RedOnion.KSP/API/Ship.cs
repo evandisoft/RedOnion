@@ -206,15 +206,64 @@ namespace RedOnion.KSP.API
 		[return: Convert(typeof(Vector))]
 		public Vector3d velocityAt(double time) => native.orbit.getOrbitalVelocityAtUT(time);
 
+		[Convert(typeof(Vector)), Description("Vector pointing forward (from cockpit - in the direction of the 'nose').")]
+		public Vector3d forward => native.transform.up;
+		[Convert(typeof(Vector)), Description("Vector pointing backward (from cockpit - in the direction of the 'nose').")]
+		public Vector3d back => -native.transform.up;
+		[Convert(typeof(Vector)), Description("Vector pointing up (from cockpit).")]
+		public Vector3d up => -native.transform.forward;
+		[Convert(typeof(Vector)), Description("Vector pointing down (from cockpit).")]
+		public Vector3d down => native.transform.forward;
+		[Convert(typeof(Vector)), Description("Vector pointing left (from cockpit).")]
+		public Vector3d left => -native.transform.right;
+		[Convert(typeof(Vector)), Description("Vector pointing left (from cockpit).")]
+		public Vector3d right => native.transform.right;
+
 		// see https://en.wikipedia.org/wiki/Axes_conventions#Ground_reference_frames_for_attitude_description
-		[Convert(typeof(Vector)), Description("Vector pointing north in a plane that is tangent to sphere centered in orbited body.")]
+		[Convert(typeof(Vector)), Description("Vector pointing north in the plane that is tangent to sphere centered in orbited body.")]
 		public Vector3d north => native.north;
 		[Convert(typeof(Vector)), Description("Vector pointing east (tangent to sphere centered in orbited body).")]
 		public Vector3d east => native.east;
-		[Convert(typeof(Vector)), Description("Vector pointing forward (in the direction of the 'nose').")]
-		public Vector3d forward => native.transform.up;
-		[Description("Rotation relative to orbited body.")]
-		public Quaternion rotation => native.srfRelRotation;
+		[Convert(typeof(Vector)), Description("Vector pointing away from orbited body (aka *up*, but we use `up` for cockpit-up).")]
+		public Vector3d away => native.up;
+
+		[Description("Current pitch / elevation (the angle between forward vector and tangent plane) [-90..+90]")]
+		public double pitch => 90.0 - Vector3d.Angle(forward, away);
+		[Description("Current heading / yaw (the angle between forward and north vectors"
+			+ " in tangent plane) [0..360]. Note that it can change violently around the poles.")]
+		public double heading
+		{
+			get
+			{
+				var forward = this.forward;
+				var north = this.north;
+				var away = this.away;
+				var a = Vector3d.Angle(north,
+					Vector3d.Exclude(away, forward));
+				if (Vector3d.Angle(north,
+					Vector3d.Cross(away, forward)) < 90.0)
+					a = 360.0-a;
+				return a;
+			}
+		}
+		[Description("Current roll / bank (the angle between up and away vectors"
+			+ " in the plane perpendicular to forward vector) [-180..+180]."
+			+ " \nNote that it can change violently when facing up or down.")]
+		public double roll
+		{
+			get
+			{
+				var forward = this.forward;
+				var away = this.away;
+				var up = this.up;
+				var a = Vector3d.Angle(up,
+					Vector3d.Exclude(forward, away));
+				if (Vector3d.Angle(up,
+					Vector3d.Cross(forward, away)) < 90.0)
+					a = -a;
+				return a;
+			}
+		}
 
 		[Convert(typeof(Vector)), Description("Center of mass.")]
 		public Vector3d centerOfMass => native.CoMD;

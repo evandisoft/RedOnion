@@ -188,6 +188,13 @@ namespace RedOnion.ROS.Tests
 
 			Reset();
 			Lines(1,
+				"def test",
+				"  return def",			// return lambda
+				"    return 1",
+				"return test()()");
+
+			Reset();
+			Lines(1,
 				"var x = 0",
 				"def set v",
 				"  x = v",              // function without return (see Core.Execute(int) .. while (at == blockEnd) .. case OpCode.Function)

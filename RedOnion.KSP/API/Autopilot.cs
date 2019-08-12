@@ -16,15 +16,26 @@ namespace RedOnion.KSP.API
 	{
 		protected Ship _ship;
 		protected Vessel _hooked;
+
+		// inputs
 		protected float _throttle, _elevation, _heading, _bank;
+
+		// for change limiting
+		protected float prevPitch;  // for elevation
+		protected float prevYaw;    // for heading
+		protected float prevRoll;   // for bank
+
 		// these manipulate the direction (and do the hard work)
 		protected PID pidElevation = new PID();
 		protected PID pidHeading = new PID();
 		protected PID pidBank = new PID();
-		// these are merely for smooth control (limit rate of change)
-		protected PID pidPitch = new PID();
-		protected PID pidRoll = new PID();
-		protected PID pidYaw = new PID();
+
+		protected internal Autopilot(Ship ship)
+		{
+			_ship = ship;
+			Disable();
+			Reset();
+		}
 
 		[Description("Disable the autopilot, setting all values to NaN.")]
 		public void Disable()
@@ -36,8 +47,12 @@ namespace RedOnion.KSP.API
 			Unhook();
 		}
 
-		protected internal Autopilot(Ship ship)
-			=> this._ship = ship;
+		public void Reset()
+		{
+			prevPitch = 0f;
+			prevYaw = 0f;
+			prevRoll = 0f;
+		}
 
 		~Autopilot() => Dispose(false);
 		[Browsable(false), MoonSharpHidden]
@@ -92,9 +107,6 @@ namespace RedOnion.KSP.API
 			pidElevation.reset();
 			pidHeading.reset();
 			pidBank.reset();
-			pidPitch.reset();
-			pidRoll.reset();
-			pidYaw.reset();
 		}
 		protected void Unhook()
 		{

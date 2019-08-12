@@ -411,6 +411,7 @@ namespace RedOnion.ROS
 						ref var type = ref vals.Top(-n);
 						if (type.desc != Descriptor.Void)
 							throw new NotImplementedException("Typed array");
+						Dereference(n-1);
 						var arr = new Value[n - 1];
 						for (int i = 0; i < arr.Length; i++)
 							arr[i] = vals.Top(i - arr.Length);

@@ -210,6 +210,12 @@ namespace RedOnion.ROS.Tests
 			Test(2, "a.length");
 			Test("hello", "a[0]");
 			Test("world", "a[1]");
+
+			Lines(3,
+				"var x = 1",
+				"var y = 2",
+				"var a = [x, y]",
+				"return a[0] + a[1]");
 		}
 
 		[Test]

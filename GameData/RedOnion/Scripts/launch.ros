@@ -109,23 +109,24 @@ def staging
     return
 
 var vd = [
-    new vector.draw,
-    new vector.draw
+  new vector.draw,
+  new vector.draw,
 ]
 vd[0].scale = 10
 vd[1].scale = 10
 vd[1].color = color.blue
 def vectors
-  vd[0].vector = new vector ship.forward
-  vd[1].vector = new vector ship.srfvel.normalized
-  vd[0].show
-  vd[1].show
+  vd[0].vector = ship.forward
+  vd[1].vector = ship.srfvel.normalized
+vectors
+for var d in vd
+  d.show
 
 var subs = [
   system.update(steer),
   system.update(throttle),
+  system.idle(staging),
   system.update(vectors),
-  system.idle(staging)
 ]
 
 print "Target apoapsis: " + targetAltitude

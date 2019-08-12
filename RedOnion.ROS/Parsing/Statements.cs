@@ -20,6 +20,7 @@ namespace RedOnion.ROS.Parsing
 			|| ExCode.Kind() == OpKind.Unary || ExCode.Kind() == OpKind.PreOrPost
 			|| ExCode == ExCode.Add || ExCode == ExCode.Sub
 			|| ExCode == ExCode.Var || ExCode == ExCode.Create
+			|| ExCode == ExCode.Def || ExCode == ExCode.Function
 			|| Curr == '(' || Curr == '[' || Curr == '{');
 
 		/// <summary>

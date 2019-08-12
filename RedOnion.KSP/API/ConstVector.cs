@@ -115,13 +115,13 @@ NOTE: Subject to change - may revert to `Vector3d` with custom descriptor.")]
 			=> new Vector(Vector3d.Project(native, normal));
 		[Description("Project this vector onto plane specified by normal vector.")]
 		public Vector projectOnPlane(ConstVector normal)
-			=> new Vector(Vector3d.Exclude(native, normal));
+			=> new Vector(Vector3d.Exclude(normal, native));
 		[Description("Project this vector onto another vector (alias to `projectOnVector`).")]
 		public Vector project(ConstVector normal)
 			=> new Vector(Vector3d.Project(native, normal));
 		[Description("Project this vector onto plane specified by normal vector (alias to `projectOnPlane`).")]
 		public Vector exclude(ConstVector normal)
-			=> new Vector(Vector3d.Exclude(native, normal));
+			=> new Vector(Vector3d.Exclude(normal, native));
 
 		[Description("Native UnityEngine.Vector3 (`float x,y,z`).")]
 		public Vector3 Vector3 => _native;
