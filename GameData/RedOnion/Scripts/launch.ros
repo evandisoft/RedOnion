@@ -56,12 +56,46 @@ user.throttle = 1
 
 var lastPitchReport = 0.0
 var prevPitchValue = 0
+ship.heading = ascentHeading
+/*
+var ppid = new pid
+var ypid = new pid
+ppid.scale = 0.3
+ypid.scale = 0.3
+ppid.p = 0.9
+ppid.i = 0.1
+ppid.d = 0.5
+ppid.r = 0.1
+ypid.p = 0.9
+ypid.i = 0.1
+ypid.d = 0.5
+ypid.r = 0.1
+*/
 def setPitch pitch
-  ksp.flightControl.setRel ascentHeading, pitch
-  if time() - lastPitchReport > 1 and pitch != prevPitchValue
+  ship.pitch = pitch
+  var ap = ship.autopilot
+  var dir = new vector ship.native.transform.inverseTransformDirection ap.direction
+  var pd = math.deg.atan2 -dir.z, dir.y
+  var cd = math.deg.atan2 dir.x, dir.y
+  /*
+  ppid.input = pd
+  ypid.input = cd
+  ap.rawPitch = ppid.update()
+  ap.rawYaw   = ypid.update()
+  */
+  if time() - lastPitchReport >= .25 and pitch != prevPitchValue
     lastPitchReport = time()
     prevPitchValue = pitch
-    print "Pitch: " + pitch
+    print "Want: {0,6:F2}:{1,6:F2}", pitch, ascentHeading
+    print "Have: {0,6:F2}:{1,6:F2}", ship.pitch, ship.heading
+    print "Diff: {0,6:F2}:{1,6:F2}", pd, cd
+    /*
+    print "PIDs: {0,6:F2}:{1,6:F2}", ppid.output, ypid.output
+    print "Vect: {0,4:F2}:{1,4:F2}:{2,4:F2}", dir.x, dir.y, dir.z
+    var fwd = ship.forward
+    print "Ship: {0,4:F2}:{1,4:F2}:{2,4:F2}", fwd.x, fwd.y, fwd.z
+    */
+    print
 
 def steer
   if altitude <= narrowAltitude
@@ -110,14 +144,14 @@ def staging
 
 var vd = [
   new vector.draw,
-  new vector.draw,
-]
-vd[0].scale = 10
-vd[1].scale = 10
+  new vector.draw]
+vd[0].scale = 15
+vd[0].width = .5
 vd[1].color = color.blue
+vd[1].scale = 10
 def vectors
   vd[0].vector = ship.forward
-  vd[1].vector = ship.srfvel.normalized
+  vd[1].vector = ship.autopilot.direction
 vectors
 for var d in vd
   d.show
@@ -125,8 +159,8 @@ for var d in vd
 var subs = [
   system.update(steer),
   system.update(throttle),
-  system.idle(staging),
   system.update(vectors),
+  system.idle(staging)
 ]
 
 print "Target apoapsis: " + targetAltitude
@@ -140,7 +174,6 @@ for var d in vd
   d.hide
 
 user.throttle = 0
-ship.throttle = math.nan
-ksp.FlightControl.disable
+ship.autopilot.disable
 
 print "Safe altitude reached"

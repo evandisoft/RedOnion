@@ -7,8 +7,7 @@ var vd = [
   new vector.draw,
   new vector.draw,
   new vector.draw,
-  new vector.draw
-]
+  new vector.draw]
 vd[0].scale = 10
 vd[1].color = color.red
 vd[1].scale = 10

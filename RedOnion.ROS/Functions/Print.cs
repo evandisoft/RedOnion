@@ -24,9 +24,9 @@ namespace RedOnion.ROS.Functions
 				result = msg;
 				return true;
 			}
-			var call = new string[args.Length-1];
-			for (int i = 0; i < args.Length; i++)
-				call[i] = args[i+1].ToStr();
+			var call = new object[args.Length-1];
+			for (int i = 1; i < args.Length; i++)
+				call[i-1] = args[i].Box();
 			msg = string.Format(Value.Culture, msg, call);
 			processor?.Print(msg);
 			result = msg;

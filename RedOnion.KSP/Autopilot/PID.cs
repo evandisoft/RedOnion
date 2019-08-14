@@ -45,6 +45,9 @@ namespace RedOnion.KSP.Autopilot
 			+ " works well against both oscillation and windup)")]
 		public double R = 0.0;
 
+		[Description("Difference scaling factor")]
+		public double scale = 1.0;
+
 		[Description("Maximal abs(Target - previous Target) per second."
 			+ " NaN or +Inf means no limit (which is default)."
 			+ " This can make the output smoother (more human-like control)"
@@ -77,6 +80,9 @@ namespace RedOnion.KSP.Autopilot
 			+ " (dumpening - applied to accumulator used by integral factor,"
 			+ " works well against both oscillation and windup)")]
 		public double R { get => _param.R; set => _param.R = value; }
+
+		[Description("Difference scaling factor")]
+		public double scale { get => _param.scale; set => _param.scale = value; }
 
 		[Description("Maximal abs(Target - previous Target) per second."
 			+ " NaN or +Inf means no limit (which is default)."
@@ -123,6 +129,16 @@ namespace RedOnion.KSP.Autopilot
 		public double minOutput { get; set; } = double.NegativeInfinity;
 
 		public PID() => reset();
+		public PID(double scale) : this() => this.scale = scale;
+		public PID(double p, double i, double d = 0.0, double r = 0.0)
+		{
+			reset();
+			P = p;
+			I = i;
+			D = d;
+			R = r;
+		}
+
 		[Description("Reset internal state of the regulator (won't change PIDR and limits)")]
 		public void reset()
 		{
@@ -142,7 +158,7 @@ namespace RedOnion.KSP.Autopilot
 			var now = Planetarium.GetUniversalTime();
 			if (now != _stamp)
 			{
-				Update(now - _stamp);
+				Update(double.IsNaN(_stamp) ? Time.fixedDeltaTime : now - _stamp);
 				_stamp = now;
 			}
 			return _output;
@@ -196,14 +212,18 @@ namespace RedOnion.KSP.Autopilot
 					{
 						double change = input - _input;
 						if (!double.IsNaN(D))
-							result -= D * change / dt;
+							result += D * change / dt;
 						if (!double.IsNaN(R))
-							_accu -= R * change * dt;
+							_accu += R * change * dt;
 					}
 				}
+				if (double.IsNaN(_accu))
+					_accu = 0.0;
 				if (Math.Abs(_accu) > accumulatorLimit)
 					_accu = _accu < 0 ? -accumulatorLimit : accumulatorLimit;
 				result += _accu;
+				if (!double.IsNaN(scale))
+					result *= scale;
 				var outputLimit = outputChangeLimit * dt;
 				if (Math.Abs(result) > outputLimit)
 					result = result < 0 ? -outputLimit : outputLimit;

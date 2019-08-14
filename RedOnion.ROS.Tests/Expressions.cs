@@ -233,5 +233,11 @@ namespace RedOnion.ROS.Tests
 				Test(1, s);
 			}
 		}
+
+		[Test]
+		public void ROS_Expr10_Print()
+		{
+			Test("3.14", @"print ""{0:F2}"", math.pi");
+		}
 	}
 }

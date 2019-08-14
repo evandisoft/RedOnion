@@ -228,7 +228,16 @@ namespace RedOnion.KSP.API
 		public Vector3d away => native.up;
 
 		[Description("Current pitch / elevation (the angle between forward vector and tangent plane) [-90..+90]")]
-		public double pitch => 90.0 - Vector3d.Angle(forward, away);
+		public double pitch
+		{
+			get => 90.0 - Vector3d.Angle(forward, away);
+			set
+			{
+				if (_autopilot == null && double.IsNaN(value))
+					return;
+				autopilot.pitch = value;
+			}
+		}
 		[Description("Current heading / yaw (the angle between forward and north vectors"
 			+ " in tangent plane) [0..360]. Note that it can change violently around the poles.")]
 		public double heading
@@ -244,6 +253,12 @@ namespace RedOnion.KSP.API
 					Vector3d.Cross(away, forward)) < 90.0)
 					a = 360.0-a;
 				return a;
+			}
+			set
+			{
+				if (_autopilot == null && double.IsNaN(value))
+					return;
+				autopilot.heading = value;
 			}
 		}
 		[Description("Current roll / bank (the angle between up and away vectors"
@@ -263,6 +278,12 @@ namespace RedOnion.KSP.API
 					a = -a;
 				return a;
 			}
+			set
+			{
+				if (_autopilot == null && double.IsNaN(value))
+					return;
+				autopilot.roll = value;
+			}
 		}
 
 		[Convert(typeof(Vector)), Description("Center of mass.")]
@@ -276,11 +297,14 @@ namespace RedOnion.KSP.API
 		public Vector3d angularMomentum => native.angularMomentum;
 
 		protected double _torqueStamp;
-		protected Vector3d _maxTorque, _maxAngular;
+		protected Vector3d _maxTorque, _maxVacuumTorque;
+		protected Vector3d _maxAngular, _maxVacuumAngular;
 		protected void UpdateTorque()
 		{
 			var positiveTorque = Vector3d.zero;
 			var negativeTorque = Vector3d.zero;
+			var positiveVacuum = Vector3d.zero;
+			var negativeVacuum = Vector3d.zero;
 			foreach (var part in native.parts)
 			{
 				foreach (var module in part.Modules)
@@ -290,13 +314,22 @@ namespace RedOnion.KSP.API
 					provider.GetPotentialTorque(out var pos, out var neg);
 					positiveTorque += pos;
 					negativeTorque += neg;
+					if (!(provider is ModuleControlSurface))
+					{
+						positiveVacuum += pos;
+						negativeVacuum += neg;
+					}
 				}
 			}
 			_torqueStamp = Time.now;
 			_maxTorque.x = Math.Max(positiveTorque.x, negativeTorque.x);
 			_maxTorque.y = Math.Max(positiveTorque.y, negativeTorque.y);
 			_maxTorque.z = Math.Max(positiveTorque.z, negativeTorque.z);
+			_maxVacuumTorque.x = Math.Max(positiveVacuum.x, negativeVacuum.x);
+			_maxVacuumTorque.y = Math.Max(positiveVacuum.y, negativeVacuum.y);
+			_maxVacuumTorque.z = Math.Max(positiveVacuum.z, negativeVacuum.z);
 			_maxAngular = VectorCreator.shrink(_maxTorque, momentOfInertia);
+			_maxVacuumAngular = VectorCreator.shrink(_maxVacuumTorque, momentOfInertia);
 		}
 
 		[Convert(typeof(Vector)), Description("Maximal ship torque (aka moment of force or turning effect, maximum of positive and negative).")]
@@ -309,6 +342,16 @@ namespace RedOnion.KSP.API
 				return _maxTorque;
 			}
 		}
+		[Convert(typeof(Vector)), Description("Maximal ship torque in vacuum (ignoring control surfaces).")]
+		public Vector3d maxVacuumTorque
+		{
+			get
+			{
+				if (Time.since(_torqueStamp) > 0)
+					UpdateTorque();
+				return _maxVacuumTorque;
+			}
+		}
 		[Convert(typeof(Vector)), Description("Maximal angular acceleration (rad/s²)")]
 		public Vector3d maxAngular
 		{
@@ -317,6 +360,16 @@ namespace RedOnion.KSP.API
 				if (Time.since(_torqueStamp) > 0)
 					UpdateTorque();
 				return _maxAngular;
+			}
+		}
+		[Convert(typeof(Vector)), Description("Maximal angular acceleration in vacuum (ignoring control surfaces).")]
+		public Vector3d maxVacuumAngular
+		{
+			get
+			{
+				if (Time.since(_torqueStamp) > 0)
+					UpdateTorque();
+				return _maxVacuumAngular;
 			}
 		}
 	}

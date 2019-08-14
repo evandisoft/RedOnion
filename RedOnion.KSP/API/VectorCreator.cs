@@ -39,6 +39,8 @@ namespace RedOnion.KSP.API
 		public static readonly ConstVector left = new ConstVector(Vector3d.left);
 		[Description("Vector(1, 0, 0).")]
 		public static readonly ConstVector right = new ConstVector(Vector3d.right);
+		[Description("Vector(nan, nan, nan).")]
+		public static readonly ConstVector none = new ConstVector(new Vector3d(double.NaN, double.NaN, double.NaN));
 
 		[Description("Cross product.")]
 		public static Vector cross(ConstVector a, ConstVector b)

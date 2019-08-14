@@ -122,6 +122,9 @@ NOTE: Subject to change - may revert to `Vector3d` with custom descriptor.")]
 		[Description("Project this vector onto plane specified by normal vector (alias to `projectOnPlane`).")]
 		public Vector exclude(ConstVector normal)
 			=> new Vector(Vector3d.Exclude(normal, native));
+		[Description("Rotate vector by an angle around axis.")]
+		public Vector rotate(double angle, Vector axis)
+			=> new Vector(QuaternionD.AngleAxis(angle, axis) * native);
 
 		[Description("Native UnityEngine.Vector3 (`float x,y,z`).")]
 		public Vector3 Vector3 => _native;
