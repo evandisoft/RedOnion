@@ -176,7 +176,20 @@ namespace RedOnion.ROS
 			ctx.RootEnd = at + fn.CodeSize;
 			ctx.PopAll();
 			ctx.Push(at, at + fn.CodeSize, OpCode.Function);
-			ctx.Add("arguments", new Value[0]);
+			if (fn.BoundArguments == null)
+				ctx.Add("arguments", new Value[0]);
+			else
+			{
+				var args = new Value[fn.BoundArguments.Length];
+				fn.BoundArguments.CopyTo(args, 0);
+				ctx.Add("arguments", args);
+				for (int i = 0; i < fn.ArgumentCount; i++)
+				{
+					if (i < args.Length)
+						ctx.Add(fn.ArgumentName(i), ref args[i]);
+					else ctx.Add(fn.ArgumentName(i), Value.Null);
+				}
+			}
 			result = Value.Void;
 			return Execute(countdown);
 		}
@@ -330,13 +343,18 @@ namespace RedOnion.ROS
 				var args = new Value[argc];
 				for (int i = 0; i < argc; i++)
 					args[i] = vals.Top(i - argc);
+				if (fn.BoundArguments != null)
+				{
+					var combined = new Value[fn.BoundArguments.Length + args.Length];
+					fn.BoundArguments.CopyTo(combined, 0);
+					args.CopyTo(combined, fn.BoundArguments.Length);
+					args = combined;
+				}
 				ctx.Add("arguments", args);
 				for (int i = 0; i < fn.ArgumentCount; i++)
 				{
 					if (i < argc)
 						ctx.Add(fn.ArgumentName(i), ref args[i]);
-					// we go with null for now, but will need some extra code
-					// for assigning default values to arguments
 					else ctx.Add(fn.ArgumentName(i), Value.Null);
 				}
 				result = Value.Void;

@@ -21,7 +21,7 @@ namespace RedOnion.KSP.API
 		public static double since(double time) => now - time;
 
 		[Description("Seconds in one tick. (Script engine always runs in physics ticks.)")]
-		public static double deltaTime => UnityEngine.Time.deltaTime;
+		public static double tick => TimeWarp.fixedDeltaTime;
 
 		bool ICallable.Call(ref Value result, object self, Arguments args, bool create)
 		{

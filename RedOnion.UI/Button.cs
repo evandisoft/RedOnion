@@ -1,7 +1,6 @@
 using RedOnion.UI.Components;
 using System;
 using UnityEngine;
-using UnityEngine.Events;
 using UUI = UnityEngine.UI;
 
 namespace RedOnion.UI
@@ -20,14 +19,19 @@ namespace RedOnion.UI
 				{
 					if (GameObject == null)
 						throw new ObjectDisposedException(Name);
-					label = Add(new Label("Label") { Text = "Button" });
+					label = Add(new Label("Label")
+					{
+						Text = "Button",
+						TextColor = Skin.button.normal.textColor,
+						FontStyle = Skin.button.fontStyle
+					});
 				}
 				return label;
 			}
 		}
 
-		protected Icon icon;
-		protected Icon IconCore
+		protected Image icon;
+		protected Image IconCore
 		{
 			get
 			{
@@ -35,7 +39,7 @@ namespace RedOnion.UI
 				{
 					if (GameObject == null)
 						throw new ObjectDisposedException(Name);
-					icon = Add(new Icon("Icon"));
+					icon = Add(new Image("Icon"));
 				}
 				return icon;
 			}

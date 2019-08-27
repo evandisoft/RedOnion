@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UUI = UnityEngine.UI;
 
@@ -6,19 +7,26 @@ namespace RedOnion.UI.Components
 {
 	public class InputField : UUI.InputField, UUI.ILayoutGroup
 	{
-		readonly string lockID = "RedOnion.InputField";
+		static readonly string lockID = "RedOnion.InputField";
 		bool locked = false;
+		public TextBox TextBox { get; set; }
+		public class TextBoxEvent : UnityEvent<TextBox> { };
+		public TextBoxEvent onSelected { get; } = new TextBoxEvent();
+		public TextBoxEvent onDeselected { get; } = new TextBoxEvent();
 		public override void OnSelect(BaseEventData eventData)
 		{
-			InputLockManager.SetControlLock(ControlTypes.KEYBOARDINPUT, lockID);
+			// UI_DIALOGS disable NavBall toggle
+			InputLockManager.SetControlLock(ControlTypes.KEYBOARDINPUT|ControlTypes.UI_DIALOGS, lockID);
 			locked = true;
 			base.OnSelect(eventData);
+			onSelected.Invoke(TextBox);
 		}
 		public override void OnDeselect(BaseEventData eventData)
 		{
 			InputLockManager.RemoveControlLock(lockID);
 			locked = false;
 			base.OnDeselect(eventData);
+			onDeselected.Invoke(TextBox);
 		}
 		protected override void OnDestroy()
 		{

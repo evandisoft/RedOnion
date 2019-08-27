@@ -20,6 +20,7 @@ namespace RedOnion.UI
 			get => GameObject.name ?? GetType().FullName;
 			set => GameObject.name = value;
 		}
+		public object Tag { get; set; }
 		public Element Parent { get; internal set; }
 
 		protected Element(string name = null)
@@ -152,6 +153,16 @@ namespace RedOnion.UI
 		{
 			get => ConvertLayoutElementValue(layoutElement?.flexibleHeight);
 			set => LayoutElement.flexibleHeight = value >= 0f ? value : -1f;
+		}
+		public float Width
+		{
+			get => RectTransform.rect.width;
+			set => PreferWidth = value;
+		}
+		public float Height
+		{
+			get => RectTransform.rect.height;
+			set => PreferHeight = value;
 		}
 
 		// TODO: Use our LayoutComponent

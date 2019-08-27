@@ -9,6 +9,7 @@ namespace RedOnion.ROS.Tests
 	public class ROS_Reflection : CoreTests
 	{
 		public delegate void MyAction();
+		public delegate void MyAction2(string v);
 		public static class StaticTest
 		{
 			public static string name;
@@ -21,6 +22,9 @@ namespace RedOnion.ROS.Tests
 			public static MyAction action;
 			public static void AddAction(MyAction add) => action += add;
 			public static void CallAction() => action?.Invoke();
+			public static MyAction2 action2;
+			public static void AddAction2(MyAction2 add) => action2 += add;
+			public static void CallAction2(string v) => action2?.Invoke(v);
 		}
 		public class InstanceTest
 		{
@@ -34,6 +38,9 @@ namespace RedOnion.ROS.Tests
 			public MyAction action;
 			public void AddAction(MyAction add) => action += add;
 			public void CallAction() => action?.Invoke();
+			public MyAction2 action2;
+			public void AddAction2(MyAction2 add) => action2 += add;
+			public void CallAction2(string v) => action2?.Invoke(v);
 		}
 		public class MixedTest
 		{
@@ -182,7 +189,17 @@ namespace RedOnion.ROS.Tests
 		}
 
 		[Test]
-		public void ROS_Refl06_Action()
+		public void ROS_Refl06_Math()
+		{
+			Globals = new Globals();
+			Test(3.14, "math.abs -3.14");
+			Test(2.7f, "math.abs -2.7f");
+			Test(1.41, "math.max 1.0, 1.41");
+			Test(30.0, "math.deg.asin 0.5");
+		}
+
+		[Test]
+		public void ROS_Refl07_Action()
 		{
 			Globals = new Globals();
 			Globals.Add(typeof(StaticTest));
@@ -206,13 +223,16 @@ namespace RedOnion.ROS.Tests
 		}
 
 		[Test]
-		public void ROS_Refl07_Math()
+		public void ROS_Refl08_ActionArgs()
 		{
 			Globals = new Globals();
-			Test(3.14, "math.abs -3.14");
-			Test(2.7f, "math.abs -2.7f");
-			Test(1.41, "math.max 1.0, 1.41");
-			Test(30.0, "math.deg.asin 0.5");
+			Globals.Add(typeof(StaticTest));
+			StaticTest.name = null;
+			Test("def setName name => staticTest.name = name");
+			Test("staticTest.addAction2 setName");
+			StaticTest.CallAction2("test");
+			UpdatePhysics();
+			Assert.AreEqual("test", StaticTest.name);
 		}
 	}
 }

@@ -74,6 +74,33 @@ namespace RedOnion.KSP.Parts
 				return true;
 			}
 		}
+		[Description("Current thrust (at current pressure, with current `thrustPercentage` and current throttle).")]
+		public double thrust
+		{
+			get
+			{
+				var thrust = 0.0;
+				foreach (var e in this)
+				{
+					if (e.operational)
+						thrust += (double)e.thrust * e.thrustPercentage * 0.01;
+				}
+				return thrust;
+			}
+		}
+		[Description("Get thrust of all operational engines at atmospheric pressure"
+			+ " (0 = vacuum, 1 = Kerbin sea-level pressure, NaN = current pressure)"
+			+ " and throttle (default 1 = full throttle).")]
+		public double getThrust(float atm = float.NaN, float throttle = 1f)
+		{
+			var thrust = 0.0;
+			foreach (var e in this)
+			{
+				if (e.operational)
+					thrust += (double)e.getThrust(atm, throttle) * e.thrustPercentage;
+			}
+			return thrust;
+		}
 	}
 
 	[Description("Engine of a ship (vehicle/vessel).")]
@@ -163,8 +190,7 @@ namespace RedOnion.KSP.Parts
 		[DisplayName("Sea-level ISP.")]
 		public float seaLevelIsp => activeModule.atmosphereCurve.Evaluate(1f);
 
-		[Description("Avalable thrust at current pressure, ignoring the limiter"
-			+ " (`thrustPercentage` and current throttle).")]
+		[Description("Current thrust (at current pressure, with current `thrustPercentage` and current throttle).")]
 		public float thrust => activeModule.finalThrust;
 		[Description("Thrust limiter in percents.")]
 		public float thrustPercentage

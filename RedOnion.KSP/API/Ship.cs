@@ -13,7 +13,7 @@ namespace RedOnion.KSP.API
 	{
 		[Browsable(false), MoonSharpHidden]
 		public static void DisableAutopilot()
-			=> active?._autopilot?.Disable();
+			=> active?._autopilot?.disable();
 
 		static Ship active;
 		[Browsable(false), MoonSharpHidden]
@@ -157,6 +157,10 @@ namespace RedOnion.KSP.API
 		public double altitude => native.altitude;
 		[Description("True height above ground in meters.")]
 		public double radarAltitude => native.radarAltitude;
+		[Description("Dynamic pressure [atm = 101.325kPa]")]
+		public double dynamicPressure => native.dynamicPressurekPa * (1.0/101.325);
+		[Description("Dynamic pressure [atm = 101.325kPa]")]
+		public double q => native.dynamicPressurekPa * (1.0/101.325);
 
 
 		[Description("KSP API. Orbited body.")]
@@ -289,22 +293,20 @@ namespace RedOnion.KSP.API
 		[Convert(typeof(Vector)), Description("Center of mass.")]
 		public Vector3d centerOfMass => native.CoMD;
 		Vector3d ISpaceObject.position => centerOfMass;
-		[Convert(typeof(Vector)), Description("Angular velocity (ω, rad/s), how fast the ship rotates")]
-		public Vector3d angularVelocity => native.angularVelocityD;
-		[Convert(typeof(Vector)), Description("Moment of inertia (I, kg*m²) aka angular mass or rotational inertia.")]
+		[Convert(typeof(Vector)), Description("Angular velocity (ω, deg/s), how fast the ship rotates")]
+		public Vector3d angularVelocity => native.angularVelocityD * RosMath.Rad2Deg;
+		[Convert(typeof(Vector)), Description("Angular momentum (L = Iω, kg⋅m²⋅deg/s) aka moment of momentum or rotational momentum.")]
+		public Vector3d angularMomentum => (Vector3d)native.angularMomentum * RosMath.Rad2Deg;
+		[Convert(typeof(Vector)), Description("Moment of inertia (I, kg⋅m²) aka angular mass or rotational inertia.")]
 		public Vector3d momentOfInertia => native.MOI;
-		[Convert(typeof(Vector)), Description("Angular momentum (L = Iω, kg*m²/s) aka moment of momentum or rotational momentum.")]
-		public Vector3d angularMomentum => native.angularMomentum;
 
 		protected double _torqueStamp;
 		protected Vector3d _maxTorque, _maxVacuumTorque;
 		protected Vector3d _maxAngular, _maxVacuumAngular;
 		protected void UpdateTorque()
 		{
-			var positiveTorque = Vector3d.zero;
-			var negativeTorque = Vector3d.zero;
-			var positiveVacuum = Vector3d.zero;
-			var negativeVacuum = Vector3d.zero;
+			var torque = Vector3d.zero;
+			var vacuum = Vector3d.zero;
 			foreach (var part in native.parts)
 			{
 				foreach (var module in part.Modules)
@@ -312,27 +314,25 @@ namespace RedOnion.KSP.API
 					if (!(module is ITorqueProvider provider))
 						continue;
 					provider.GetPotentialTorque(out var pos, out var neg);
-					positiveTorque += pos;
-					negativeTorque += neg;
+					torque.x += 0.5 * (Math.Abs(pos.x) + Math.Abs(neg.x));
+					torque.y += 0.5 * (Math.Abs(pos.y) + Math.Abs(neg.y));
+					torque.z += 0.5 * (Math.Abs(pos.z) + Math.Abs(neg.z));
 					if (!(provider is ModuleControlSurface))
 					{
-						positiveVacuum += pos;
-						negativeVacuum += neg;
+						vacuum.x += 0.5 * (Math.Abs(pos.x) + Math.Abs(neg.x));
+						vacuum.y += 0.5 * (Math.Abs(pos.y) + Math.Abs(neg.y));
+						vacuum.z += 0.5 * (Math.Abs(pos.z) + Math.Abs(neg.z));
 					}
 				}
 			}
 			_torqueStamp = Time.now;
-			_maxTorque.x = Math.Max(positiveTorque.x, negativeTorque.x);
-			_maxTorque.y = Math.Max(positiveTorque.y, negativeTorque.y);
-			_maxTorque.z = Math.Max(positiveTorque.z, negativeTorque.z);
-			_maxVacuumTorque.x = Math.Max(positiveVacuum.x, negativeVacuum.x);
-			_maxVacuumTorque.y = Math.Max(positiveVacuum.y, negativeVacuum.y);
-			_maxVacuumTorque.z = Math.Max(positiveVacuum.z, negativeVacuum.z);
+			_maxTorque = torque * RosMath.Rad2Deg;
+			_maxVacuumTorque = vacuum * RosMath.Rad2Deg;
 			_maxAngular = VectorCreator.shrink(_maxTorque, momentOfInertia);
 			_maxVacuumAngular = VectorCreator.shrink(_maxVacuumTorque, momentOfInertia);
 		}
 
-		[Convert(typeof(Vector)), Description("Maximal ship torque (aka moment of force or turning effect, maximum of positive and negative).")]
+		[Convert(typeof(Vector)), Description("Maximal ship torque [N⋅m⋅deg=deg⋅kg⋅m²/s²] (aka moment of force or turning effect, maximum of positive and negative).")]
 		public Vector3d maxTorque
 		{
 			get
@@ -342,7 +342,7 @@ namespace RedOnion.KSP.API
 				return _maxTorque;
 			}
 		}
-		[Convert(typeof(Vector)), Description("Maximal ship torque in vacuum (ignoring control surfaces).")]
+		[Convert(typeof(Vector)), Description("Maximal ship torque in vacuum [N⋅m⋅deg=deg⋅kg⋅m²/s²] (ignoring control surfaces).")]
 		public Vector3d maxVacuumTorque
 		{
 			get
@@ -352,7 +352,7 @@ namespace RedOnion.KSP.API
 				return _maxVacuumTorque;
 			}
 		}
-		[Convert(typeof(Vector)), Description("Maximal angular acceleration (rad/s²)")]
+		[Convert(typeof(Vector)), Description("Maximal angular acceleration (deg/s²)")]
 		public Vector3d maxAngular
 		{
 			get
@@ -372,5 +372,13 @@ namespace RedOnion.KSP.API
 				return _maxVacuumAngular;
 			}
 		}
+
+		[Description("Translate vector/direction into local coordinates.")]
+		public Vector local(ConstVector v)
+			=> new Vector(native.transform.InverseTransformDirection(v));
+		public Vector3d local(Vector3d v)
+			=> native.transform.InverseTransformDirection(v);
+		public Vector3 local(Vector3 v)
+			=> native.transform.InverseTransformDirection(v);
 	}
 }

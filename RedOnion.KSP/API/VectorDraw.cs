@@ -173,6 +173,12 @@ namespace RedOnion.KSP.API
 				}
 				if (reference != null)
 					origin += reference.position;
+				else
+				{
+					var vessel = FlightGlobals.ActiveVessel;
+					if (vessel != null)
+						origin += vessel.transform.position;
+				}
 				var head = origin + 0.9 * scale * direction;
 				var end = origin + scale * direction;
 

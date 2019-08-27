@@ -87,7 +87,7 @@
     <Compile Include="API\Stage.cs" />
     <Compile Include="API\Vector.cs" />
     <Compile Include="API\VectorCreator.cs" />
-    <Compile Include="Autopilot\PID.cs" />
+    <Compile Include="API\PID.cs" />
     <Compile Include="Parts\Propellant.cs" />
     <Compile Include="Parts\Resource.cs" />
     <Compile Include="Parts\Sensor.cs" />

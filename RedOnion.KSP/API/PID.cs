@@ -4,9 +4,8 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using UnityEngine;
 
-namespace RedOnion.KSP.Autopilot
+namespace RedOnion.KSP.API
 {
 	[Description("PID(R) regulator parameters.")]
 	public class PidParams
@@ -65,10 +64,26 @@ namespace RedOnion.KSP.Autopilot
 		public double accumulatorLimit = double.PositiveInfinity;
 	}
 	[Description("PID(R) regulator.")]
-	public class PID
+	public class PID : PID<PidParams>
 	{
-		protected PidParams _param = new PidParams();
+		public PID() : base(new PidParams()) { }
+		public PID(double scale) : this() => this.scale = scale;
+		public PID(double p, double i, double d = 0.0, double r = 0.0) : this()
+		{
+			P = p;
+			I = i;
+			D = d;
+			R = r;
+		}
+	}
+	[Description("PID(R) regulator (with extra parameters).")]
+	public class PID<Params> where Params : PidParams
+	{
+		protected Params _param;
 		protected double _stamp, _input, _target, _output, _accu;
+
+		[Description("All the parameters.")]
+		public Params param => _param;
 
 		[Description("Proportional factor (strength of direct control)")]
 		public double P { get => _param.P; set => _param.P = value; }
@@ -128,15 +143,10 @@ namespace RedOnion.KSP.Autopilot
 		[Description("Lowest output allowed")]
 		public double minOutput { get; set; } = double.NegativeInfinity;
 
-		public PID() => reset();
-		public PID(double scale) : this() => this.scale = scale;
-		public PID(double p, double i, double d = 0.0, double r = 0.0)
+		public PID(Params param)
 		{
+			_param = param;
 			reset();
-			P = p;
-			I = i;
-			D = d;
-			R = r;
 		}
 
 		[Description("Reset internal state of the regulator (won't change PIDR and limits)")]
@@ -158,7 +168,7 @@ namespace RedOnion.KSP.Autopilot
 			var now = Planetarium.GetUniversalTime();
 			if (now != _stamp)
 			{
-				Update(double.IsNaN(_stamp) ? Time.fixedDeltaTime : now - _stamp);
+				Update(double.IsNaN(_stamp) ? Time.tick : now - _stamp);
 				_stamp = now;
 			}
 			return _output;
@@ -187,7 +197,7 @@ namespace RedOnion.KSP.Autopilot
 			return Update(dt);
 		}
 		[Description("Update output according to time elapsed (provided as dt, using current Input and Target)")]
-		public double Update(
+		public virtual double Update(
 			[Description("Time elapsed since last update (in seconds)")]
 			double dt)
 		{
@@ -211,10 +221,12 @@ namespace RedOnion.KSP.Autopilot
 					if (!double.IsNaN(_input))
 					{
 						double change = input - _input;
+						if (double.IsNaN(_target))
+							change = -change;
 						if (!double.IsNaN(D))
-							result += D * change / dt;
+							result -= D * change / dt;
 						if (!double.IsNaN(R))
-							_accu += R * change * dt;
+							_accu -= R * change * dt;
 					}
 				}
 				if (double.IsNaN(_accu))

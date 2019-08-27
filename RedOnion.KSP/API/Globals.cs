@@ -34,6 +34,10 @@ namespace RedOnion.KSP.API
 		[Unsafe, Description("Alias to `reflect` because of the namespaces.")]
 		public static Reflect native => Reflect.Instance;
 
+		[Description("Function for creating 3D vector / coordinate.")]
+		public static VectorCreator vector => VectorCreator.Instance;
+		[DisplayName("V"), Description("Alias to Vector Function for creating 3D vector / coordinate.")]
+		public static VectorCreator V => VectorCreator.Instance;
 		[Description("Current time")]
 		public static Time time => Time.Instance;
 
@@ -48,17 +52,16 @@ namespace RedOnion.KSP.API
 		[Description("User/player controls.")]
 		public static Player user => Player.Instance;
 
-		[Description("Function for creating 3D vector / coordinate.")]
-		public static VectorCreator vector => VectorCreator.Instance;
-		[DisplayName("V"), Description("Alias to Vector Function for creating 3D vector / coordinate.")]
-		public static VectorCreator V => VectorCreator.Instance;
-
 		[Description("Alias to `ship.altitude`")]
 		public static double altitude => ship.altitude;
 		[Description("Alias to `ship.apoapsis`.")]
 		public static double apoapsis => ship.apoapsis;
 		[Description("Alias to `ship.periapsis`.")]
 		public static double periapsis => ship.periapsis;
+		[Description("Orbited body (redirects to `ship.body`).")]
+		public static SpaceBody body => ship.body;
+		[Description("Atmosphere parameters of orbited body (redirects to `ship.body.atmosphere`).")]
+		public static SpaceBody.Atmosphere atmosphere => ship.body.atmosphere;
 
 #if API_GLOBAL_ALIASES
 		// TODO: move aliases to startup/setup script/library

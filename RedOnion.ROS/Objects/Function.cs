@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace RedOnion.ROS.Objects
@@ -58,7 +59,8 @@ namespace RedOnion.ROS.Objects
 			{
 				if (prototype == null)
 				{
-					prototype = new UserObject();
+					prototype = OriginalFunction == null
+						? new UserObject() : OriginalFunction.Prototype;
 					prop.items[0].value = new Value(prototype);
 				}
 				return prototype;
@@ -94,7 +96,8 @@ namespace RedOnion.ROS.Objects
 		{
 			if (at == 0 && prototype == null)
 			{
-				prototype = new UserObject();
+				prototype = OriginalFunction == null
+					? new UserObject() : OriginalFunction.Prototype;
 				prop.items[0].value = new Value(prototype);
 			}
 			return base.Get(ref self, at);
@@ -106,14 +109,62 @@ namespace RedOnion.ROS.Objects
 		Action executeLater;
 		public Action ExecuteLater => executeLater
 			?? (executeLater = () => Processor.Once.Add(new Value(this)));
+		public void ExecuteLater1(Value arg)
+			=> Processor.Once.Add(new Value(this.Bind(arg)));
+		public void ExecuteLater1Gen<Arg>(Arg arg)
+			=> Processor.Once.Add(new Value(this.Bind(new Value(arg))));
+		static MethodInfo executeLater1 = typeof(Function).GetMethod("ExecuteLater1");
+		static MethodInfo executeLater1Gen = typeof(Function).GetMethod("ExecuteLater1Gen");
 		public override bool Convert(ref Value self, Descriptor to)
 		{
-			if (to == Descriptor.Actions[0])
+			if (to.Type.IsSubclassOf(typeof(Delegate)))
 			{
-				self = new Value(ExecuteLater);
-				return true;
+				if (to == Descriptor.Actions[0])
+				{
+					self = new Value(to, ExecuteLater);
+					return true;
+				}
+				var info = to.Type.GetMethod("Invoke");
+				var pars = info.GetParameters();
+				if (pars.Length == 1)
+				{
+					if (pars[0].ParameterType == typeof(Value))
+					{
+						self = new Value(to, Delegate.CreateDelegate(to.Type, this, executeLater1));
+						return true;
+					}
+					self = new Value(to, Delegate.CreateDelegate(to.Type, this,
+						executeLater1Gen.MakeGenericMethod(pars[0].ParameterType)));
+					return true;
+				}
 			}
 			return base.Convert(ref self, to);
+		}
+
+		public Value[] BoundArguments { get; set; }
+		public Function OriginalFunction { get; }
+		public Function Bind(params Value[] args)
+			=> new Function(this, args);
+		public Function(Function src, params Value[] args)
+			: base(src.Name, typeof(Function), ExCode.Function, TypeCode.Object, src.parent)
+		{
+			OriginalFunction = src.OriginalFunction ?? src;
+			BoundArguments = args;
+			if (src.BoundArguments != null)
+			{
+				BoundArguments = new Value[src.BoundArguments.Length + args.Length];
+				src.BoundArguments.CopyTo(BoundArguments, 0);
+				args.CopyTo(BoundArguments, src.BoundArguments.Length);
+			}
+			Code = src.Code;
+			CodeAt = src.CodeAt;
+			CodeSize = src.CodeSize;
+			TypeAt = src.TypeAt;
+			Arguments = src.Arguments;
+			ArgsString = src.ArgsString; //TODO: remove bound args
+			Context = src.Context;
+			Processor = src.Processor;
+			Add("prototype", Value.Null);
 		}
 	}
 }

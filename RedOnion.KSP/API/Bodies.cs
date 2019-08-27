@@ -57,7 +57,7 @@ namespace RedOnion.KSP.API
 		protected internal SpaceBody(CelestialBody body)
 		{
 			native = body;
-			orbiting = new ReadOnlyList<SpaceBody>(FillOrbiting);
+			bodies = new ReadOnlyList<SpaceBody>(FillBodies);
 		}
 
 		[Description("Name of the body.")]
@@ -65,15 +65,46 @@ namespace RedOnion.KSP.API
 		[Convert(typeof(Vector)), Description("Position of the body (relative to active ship).")]
 		public Vector3d position => native.position;
 		[Description("Celestial body this body is orbiting.")]
-		public ISpaceObject body => Bodies.Instance[native.referenceBody];
+		public SpaceBody body => Bodies.Instance[native.referenceBody];
+		ISpaceObject ISpaceObject.body => body;
 
 		[Description("Orbiting celestial bodies.")]
-		public ReadOnlyList<SpaceBody> orbiting { get; }
-		void FillOrbiting()
+		public ReadOnlyList<SpaceBody> bodies { get; }
+		void FillBodies()
 		{
-			orbiting.Clear();
+			bodies.Clear();
 			foreach (var child in native.orbitingBodies)
-				orbiting.Add(Bodies.Instance[child]);
+				bodies.Add(Bodies.Instance[child]);
+		}
+
+		[Description("Radius of the body [m].")]
+		public double radius => native.Radius;
+		[Description("Mass of the body [kg].")]
+		public double mass => native.Mass;
+		[Description("Standard gravitational parameter (μ = GM) [m³/s²]")]
+		public double gravParameter => native.gravParameter;
+		[Description("Standard gravitational parameter (μ = GM) [m³/s²]")]
+		public double mu => native.gravParameter;
+
+		[Description("Atmosphere parameters of the body.")]
+		public Atmosphere atmosphere => new Atmosphere(native);
+		[Description("Atmosphere parameters of the body. (Alias to `atmosphere`)")]
+		public Atmosphere atm => new Atmosphere(native);
+
+		public struct Atmosphere
+		{
+			readonly CelestialBody native;
+			internal Atmosphere(CelestialBody native)
+				=> this.native = native;
+
+			[Description("Is there any atmosphere (true on Kerbin, false on Moon).")]
+			public bool exists => native.atmosphere;
+			[Description("Is there oxygen in the atmosphere.")]
+			public bool oxygen => native.atmosphereContainsOxygen;
+			[Description("Depth/height of the atmosphere.")]
+			public double depth => native.atmosphereDepth;
+			[Description("Depth/height of the atmosphere.")]
+			public double height => native.atmosphereDepth;
 		}
 	}
 }

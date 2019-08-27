@@ -32,7 +32,7 @@ namespace RedOnion.ROS.Objects
 			{
 				System.Add("update", new Value(processor.Update));
 				System.Add("idle", new Value(processor.Idle));
-				System.Add("onece", new Value(processor.Once));
+				System.Add("once", new Value(processor.Once));
 			}
 
 			System.Add("null", Value.Null);
