@@ -27,7 +27,8 @@ namespace RedOnion.ROS.Tests
 				Code = Compile(script);
 				if (Globals == null) Globals = new Globals();
 				Assert.IsFalse(Execute(countdown));
-				while (!Execute(countdown)) ;
+				do UpdatePhysics();
+				while (Paused);
 			}
 			catch (Exception e)
 			{
@@ -69,6 +70,19 @@ namespace RedOnion.ROS.Tests
 			Test(ExitCode.Return, false, "if false: return true else: return false");
 			Test(ExitCode.Return, 1, "if true; return 1; else return 2");
 			Test(ExitCode.Return, 2, "unless true: return 1; else return 2");
+
+			Lines(ExitCode.Return, 1,
+				"if true; return 1",
+				"else if true; return 2",
+				"else return 3");
+			Lines(ExitCode.Return, 2,
+				"if false; return 1",
+				"else if true; return 2",
+				"else return 3");
+			Lines(ExitCode.Return, 3,
+				"if false; return 1",
+				"else if false; return 2",
+				"else return 3");
 		}
 
 		[Test]

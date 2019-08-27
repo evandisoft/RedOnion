@@ -15,7 +15,7 @@ namespace RedOnion.ROS
 				public Values(Value[] items)
 				{
 					this.items = items;
-					index = new Dictionary<string, int>();
+					index = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 					for (int i = 0; i < items.Length; i++)
 						index.Add(items[i].Name, i);
 				}
@@ -28,6 +28,12 @@ namespace RedOnion.ROS
 					it = items[at];
 					return true;
 				}
+				public IEnumerable<string> EnumerateProperties()
+				{
+					foreach (var value in items)
+						yield return value.Name;
+				}
+
 			}
 			public Simple(string name, Values values)
 				: this(name, typeof(Simple), values) {}
@@ -39,6 +45,9 @@ namespace RedOnion.ROS
 				=> values.Find(name);
 			public override bool Get(ref Value self, int at)
 				=> values.Get(ref self, at);
+
+			public override IEnumerable<string> EnumerateProperties(object self)
+				=> values.EnumerateProperties();
 		}
 	}
 }

@@ -18,6 +18,8 @@ namespace RedOnion.KSP.ReflectionUtil
 				=> ((NamespaceInstance)self).RosFind(name);
 			public override bool Get(ref Value self, int at)
 				=> ((NamespaceInstance)self.obj).RosGet(ref self, at);
+			public override IEnumerable<string> EnumerateProperties(object self)
+				=> ((NamespaceInstance)self).PossibleCompletions;
 		}
 		RosProps ros;
 		internal int RosFind(string name)

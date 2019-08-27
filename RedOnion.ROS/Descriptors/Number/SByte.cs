@@ -17,6 +17,17 @@ namespace RedOnion.ROS
 			public override string ToString(ref Value self, string format, IFormatProvider provider, bool debug)
 				=> self.num.SByte.ToString(format, provider);
 
+			public override bool Call(ref Value result, object self, Arguments args, bool create = false)
+			{
+				if (args.Length != 1 || (result.obj != null && result.obj != this))
+					return false;
+				var it = args[0];
+				if (!it.desc.Convert(ref it, this))
+					return false;
+				result = it;
+				return true;
+			}
+
 			public override bool Convert(ref Value self, Descriptor to)
 			{
 				switch (to.Primitive)

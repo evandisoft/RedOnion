@@ -19,6 +19,7 @@ namespace RedOnion.UI
 			Image.sprite = Skin.textField.normal.background;
 			Image.type = UUI.Image.Type.Sliced;
 			Core = GameObject.AddComponent<InputField>();
+			Core.TextBox = this;
 			Label = Add(new Label()
 			{
 				Anchors = Anchors.Fill,
@@ -82,6 +83,16 @@ namespace RedOnion.UI
 		public Event<string> Changed
 		{
 			get => new Event<string>(Core.onValueChanged);
+			set { }
+		}
+		public Event<TextBox> Enter
+		{
+			get => new Event<TextBox>(Core.onSelected);
+			set { }
+		}
+		public Event<TextBox> Exit
+		{
+			get => new Event<TextBox>(Core.onDeselected);
 			set { }
 		}
 

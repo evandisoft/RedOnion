@@ -1,18 +1,176 @@
-var targetAltitude = 80000000
-var safeAltitude   = 72000
-var ascentHeading  = 90
+var targetAltitude = 80   // target orbit's altitude in km
+var ascentHeading  = 90   // ascent heading (0 = north, 90 = equitorial)
+var ascentProfile  = 5    // profile (1-9, less means less aggresive turn)
+var speedRatio     = 5    // speed/altitude ratio to base the curve on (higher is for speed, more than 10 means switch earlier to full speed-based)
+var maxSpeed       = .9   // target escape speed (fraction of minimal or in m/s if above 2)
+var safeAltitude   = 2 + math.max atmosphere.depth/1000, 8 // safe altitude above atmosphere and mountains
+var firstAngle     = 30   // angle from up (90) to use simple ratio
+var firstAltitude  = math.max safeAltitude/10, 3 // altitude (in km) of first phase (to reach pitch=90-firstAngle)
+var narrowAltitude = 100  // altitude (in m) upto which to go straight up
 
-ship.throttle = 0
-user.throttle = 1
+
+//: PARAM GUI
+
+def gui
+  var lblWidth = 120
+  var boxWidth = 60
+  var uniWidth = 40
+  var wnd = new ui.window
+  var hintLabel = new ui.label
+  def boxEnter box
+    hintLabel.text = box.tag
+  def row label, value, units, hint
+    var row = wnd.add new ui.panel
+    row.layout = ui.layout.horizontal
+    var lbl = row.add new ui.label
+    lbl.text = label
+    lbl.minWidth = lblWidth
+    var box = row.add new ui.textBox
+    box.text = string value
+    box.tag = hint
+    box.enter.add boxEnter
+    if units == null
+      box.preferWidth = boxWidth + 3 + uniWidth
+    else
+      box.preferWidth = boxWidth
+      var uni = row.add new ui.label
+      uni.text = units
+      uni.minWidth = uniWidth
+    return box
+  var ta = row "Target altitude: ", targetAltitude, "km",    "Final Apoapsis"
+  var ah = row "Ascent heading: ",  ascentHeading,  "°",     "Course during ascent (not inclination)"
+  var pf = row "Ascent profile: ",  ascentProfile,  "1-9",   "Lower means less agressive turn"
+  var pr = row "Speed/Alt ratio: ", speedRatio,     "*10%",  "Higher for speed, above 10 means earlier"
+  var ms = row "Max. Speed: ",      maxSpeed,       "*|m/s", "<= 2 for fraction of minimal, or m/s"
+  var sa = row "Safe altitude: ",   safeAltitude,   "km",    "Above atmposhepre and mountains"
+  var fa = row "First angle: ",     firstAngle,     "°",     "Degrees of pitch for first phase"
+  var a1 = row "First altitude: ",  firstAltitude,  "km",    "Altitude for first phase"
+  var na = row "Narrow altitude: ", narrowAltitude,  "m",    "Minimal altitude to go straight"
+  wnd.add hintLabel
+  var brow = wnd.add new ui.panel
+  brow.layout = ui.layout.horizontal
+  var cancel = brow.add new ui.button
+  cancel.text = "Cancel"
+  cancel.flexWidth = 1
+  var launch = brow.add new ui.button
+  launch.text = "Launch"
+  launch.flexWidth = 1
+  var selected = null
+  cancel.click.add def => selected = false
+  launch.click.add def => selected = true
+  wnd.closed.add def => selected = false
+  while selected == null
+    wait
+  if selected
+    targetAltitude = double ta.text
+    ascentHeading  = double ah.text
+    ascentProfile  = double pf.text
+    speedRatio     = double pr.text
+    maxSpeed       = double ms.text
+    safeAltitude   = double sa.text
+    firstAngle     = double fa.text
+    firstAltitude  = double a1.text
+    narrowAltitude = double na.text
+  wnd.dispose
+  return selected
+if !gui()
+  return
+
+targetAltitude *= 1000
+safeAltitude   *= 1000
+firstAltitude  *= 1000
+ascentProfile  = 1-math.clamp(ascentProfile, 1, 9)*0.1
+speedRatio     = speedRatio*0.1
+if maxSpeed <= 2
+  maxSpeed *= math.sqrt body.mu/(body.radius+safeAltitude)
+
+
+//: STEERING
 
 var lastPitchReport = 0.0
+var prevPitchValue = 0
+ship.heading = ascentHeading
+def actrl angle, speed, accel
+  var stop = speed * (math.abs(speed) / accel + 0.5)
+  return 10 * (angle + stop) / accel
 def setPitch pitch
-  ksp.flightControl.setRel ascentHeading, pitch
-  if time() - lastPitchReport > 10
+  ship.pitch = pitch
+  var di = ship.local autopilot.direction
+  var pd = math.deg.atan2 -di.z, di.y
+  var cd = math.deg.atan2  di.x, di.y
+  var av = ship.angularVelocity
+  var ma = ship.maxAngular
+  var cp = actrl pd, av.x, ma.x
+  var cy = actrl cd, av.z, ma.z
+//autopilot.rawPitch = cp
+//autopilot.rawYaw = cy
+  if time() - lastPitchReport >= .1 and (pitch != prevPitchValue or pd > 0.1)
     lastPitchReport = time()
-    print "Pitch: " + pitch
+    prevPitchValue = pitch
+    print "Want: {0,6:F2}:{1,6:F2}", pitch, ascentHeading
+    print "Have: {0,6:F2}:{1,6:F2}", ship.pitch, ship.heading
+    print "Diff: {0,6:F2}:{1,6:F2}", pd, cd
+    print "Ctrl: {0,6:F1}:{1,6:F1}", cp * 100, cy * 100
+    print "Stop: {0,6:F2}:{1,6:F2}", av.x * math.abs(av.x) / ma.x, av.z * math.abs(av.z) / ma.z
+    print "Accl: {0,6:F1}:{1,6:F1}", ma.x, ma.z
+    print
 
-def checkStaging
+var minSpeed = null
+def steer
+  if altitude <= narrowAltitude
+    setPitch 90
+    return
+  if altitude <= firstAltitude
+    setPitch 90 - firstAngle * altitude/firstAltitude
+    return
+  if ship.periapsis >= safeAltitude
+    setPitch 0
+    return
+//smooth transition from surface to orbital speed by ratio of altitude to safe altitude
+  var factor = math.clamp (altitude/safeAltitude)^2, 0, 1
+  var speed = factor * ship.velocity.size + ship.surfaceVelocity.size * (1-factor)
+  if minSpeed == null then minSpeed = speed
+//mix of speed-based and altitude-based curve
+  var altRatio = math.clamp (altitude-firstAltitude)/(safeAltitude-firstAltitude), 0, 1
+  var ratio = math.min 1, speedRatio * altRatio
+  var fract = ((1-ratio)*altRatio + ratio *
+    math.min(1,(speed-minSpeed)/(maxSpeed-minSpeed)))^ascentProfile
+  var want = (90 - firstAngle) * (1 - fract)
+//compensate for differences from desired prograde pitch
+  var srfA = 90 - ship.away.angle ship.surfaceVelocity
+  var curr = factor * (90 - ship.away.angle ship.velocity) + (1-factor) * srfA
+  if want < curr and altitude < safeAltitude/3
+    want = want + 3*altitude/safeAltitude*(want-curr)
+  else want = 2*want-curr
+  want = math.clamp want, 0, 90
+//limit AoA when Q is high
+  var maxA = 1/math.max 0.1, ship.q^2
+  setPitch math.clamp want, srfA-maxA, srfA+maxA
+
+
+//: THROTTLE
+
+var lastApoAbove = 0.0
+def throttle
+  if apoapsis >= targetAltitude
+    ship.throttle = 0
+    if lastApoAbove == 0.0
+      print "Apoapsis reached"
+    lastApoAbove = time()
+  else if lastApoAbove != 0 and time() - lastApoAbove < 10
+    ship.throttle = 0
+  else
+    var power = 1
+    if apoapsis > safeAltitude*0.9 and altitude < safeAltitude
+      power = math.max 0.1, (targetAltitude-apoapsis) / math.max 1.0, targetAltitude-safeAltitude*0.9
+    if apoapsis > targetAltitude * 0.95
+      power = math.min power, 0.01+20*(1-apoapsis/targetAltitude)
+    ship.throttle = math.min power, user.throttle
+
+
+//: STAGING
+
+def staging
   if !stage.ready
     return
   var nextDecoupler = ship.parts.nextDecoupler
@@ -31,33 +189,121 @@ def checkStaging
     stage
     return
 
+
+//: VECTORS
+
+var vd = [
+  new vector.draw,
+  new vector.draw]
+vd[0].scale = 15
+vd[0].width = .5
+vd[1].color = color.blue
+vd[1].scale = 10
+def vectors
+  vd[0].vector = ship.forward
+  vd[1].vector = ship.autopilot.direction
+vectors
+for var d in vd
+  d.show
+
+
+//: ASCENT
+
+ship.throttle = 0
+user.throttle = 1
+var subs = [
+  system.update(steer),
+  system.update(throttle),
+  system.update(vectors)
+]
+var stgsub = system.idle(staging)
+
 print "Target apoapsis: " + targetAltitude
 print "Safe altitude:   " + safeAltitude
-var lastApoAbove = 0.0
-wait
-until altitude >= safeAltitude and apoapsis >= targetAltitude 
-  checkStaging()
-
-  setPitch math.deg.acos math.clamp apoapsis / safeAltitude, 0, 1
-
-  if apoapsis >= targetAltitude
-    ship.throttle = 0
-    if lastApoAbove == 0.0
-      print "Apoapsis reached"
-    lastApoAbove = time()
-  else if lastApoAbove != 0 and time() - lastApoAbove < 10
-    ship.throttle = 0
-  else
-    var power = 1
-    if apoapsis > safeAltitude and altitude < safeAltitude
-      power = math.max 0.3, (targetAltitude-apoapsis) / math.max(1.0, targetAltitude-safeAltitude)
-    if apoapsis > targetAltitude * 0.95
-      power = math.min power, 0.01+20*(1-apoapsis/targetAltitude)
-    ship.throttle = math.min power, user.throttle
-
+var rollSet = false
+do
   wait
+  if !rollSet and ship.pitch < 89 and math.abs(ship.heading - ascentHeading) < 5
+    rollSet = true
+    ship.roll = math.round(ship.roll / 45)*45
+until altitude >= safeAltitude and apoapsis >= targetAltitude*.99
 
-print "Safe altitude reached"
+for var e in subs
+  e.remove
+for var d in vd
+  d.hide
+
 user.throttle = 0
-ship.throttle = math.nan
-ksp.FlightControl.disable
+ship.autopilot.disable
+print "Safe altitude reached"
+
+
+//: CIRCULARIZE
+
+def dt => ship.eccentricity < 0.001 or
+  periapsis < safeAltitude and ship.timeToAp > ship.timeToPe ?
+  0 : ship.timeToAp
+var minE = ship.eccentricity
+def dv
+  minE = math.min minE, ship.eccentricity
+  if minE < 0.001 and (minE < 0.00001 or ship.eccentricity > 1.1*minE)
+    return vector.zero
+  var p = ship.position-body.position
+  var v1 = ship.velocity
+  var v2 = math.sqrt(body.mu/p.size) * (p.cross v1.cross p).normalized
+  return v2-v1
+def bt dv //TODO: burn time for deltaV
+  return 120
+subs = system.update def
+  autopilot.direction = ship.velocity
+print "ETA: {0:F1}s", dt()-0.5*bt(dv()) + 1
+while dt() > 0.5*bt(dv()) + 1
+  wait
+print "Burn!"
+var dv0 = dv()
+var dv1 = dv0
+var dvLast = dv0
+var dvMin = dvLast.size
+var maxThrottle = 1
+subs.remove
+subs = system.update def
+  dv1 = dv()
+  dvMin = math.min dvMin, dv1.size
+  if dvMin >= 0.01; dvLast = dv1
+  autopilot.direction = ship.timeToAp < ship.timeToAp ? ship.timeToAp >= 1 ?
+    dv1 : ship.velocity : ship.velocity.rotate math.clamp(ship.period - ship.timeToAp, 0, 30), ship.right
+  var e = dvLast.angle ship.forward
+  e = e <= 1 ? 1 : math.cos math.min 89.4, e^2 // min 0.0105
+  autopilot.throttle = e*math.min maxThrottle, dvMin * ship.mass / math.max 1, ship.engines.getThrust(nan,1)
+//TODO: default arguments for function calls!
+var choked = null
+var warned = false
+var almost = null
+var maxHeight = apoapsis*1.01+1000
+until dvMin < 0.05 or ship.eccentricity < 0.0001 or
+  ship.timeToAp > ship.period/3 and ship.timeToAp < ship.period*2/3 or // happens with good accuracy
+  apoapsis > maxHeight and periapsis > max(atmosphere.depth,1000)+1000 or // something went wrong?
+	apoapsis > maxHeight*1.5+5000 // something went really really wrong
+  if ship.engines.getThrust(nan,1) == 0
+    if choked == null
+      choked = time()
+    if time()-choked > 3
+      warned = true
+      print "No acceleration!"
+    if time()-choked > 30
+      print "No acceleration!!"
+      break
+    continue
+  choked = null
+  if dv0.dot(dv1) < 0
+    print "Overshot"
+    break
+  var sz = dv1.size
+  if sz < math.max(1, dv0.size*0.1) and sz > dvMin + math.max(1,dv0.size*0.01)
+    print "DeltaV increase: {0} > {1}; dv0={2}", math.round(sz,2), math.round(dvMin,2), math.round(dv0.size,2)
+    break
+subs.remove
+stgsub.remove
+user.throttle = 0
+ship.autopilot.disable
+print "DONE!"

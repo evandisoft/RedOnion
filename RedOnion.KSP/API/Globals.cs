@@ -34,6 +34,10 @@ namespace RedOnion.KSP.API
 		[Unsafe, Description("Alias to `reflect` because of the namespaces.")]
 		public static Reflect native => Reflect.Instance;
 
+		[Description("Function for creating 3D vector / coordinate.")]
+		public static VectorCreator vector => VectorCreator.Instance;
+		[DisplayName("V"), Description("Alias to Vector Function for creating 3D vector / coordinate.")]
+		public static VectorCreator V => VectorCreator.Instance;
 		[Description("Current time")]
 		public static Time time => Time.Instance;
 
@@ -48,18 +52,18 @@ namespace RedOnion.KSP.API
 		[Description("User/player controls.")]
 		public static Player user => Player.Instance;
 
-		[Description("Function for creating 3D vector / coordinate.")]
-		public static VectorCreator vector => VectorCreator.Instance;
-		[DisplayName("V"), Description("Alias to Vector Function for creating 3D vector / coordinate.")]
-		public static VectorCreator V => VectorCreator.Instance;
-
 		[Description("Alias to `ship.altitude`")]
 		public static double altitude => ship.altitude;
 		[Description("Alias to `ship.apoapsis`.")]
 		public static double apoapsis => ship.apoapsis;
 		[Description("Alias to `ship.periapsis`.")]
 		public static double periapsis => ship.periapsis;
+		[Description("Orbited body (redirects to `ship.body`).")]
+		public static SpaceBody body => ship.body;
+		[Description("Atmosphere parameters of orbited body (redirects to `ship.body.atmosphere`).")]
+		public static SpaceBody.Atmosphere atmosphere => ship.body.atmosphere;
 
+#if API_GLOBAL_ALIASES
 		// TODO: move aliases to startup/setup script/library
 		[Alias, Description("Alias to `Vector.dot` (or `v.dot`).")]
 		public static readonly string vdot = "Vector.dot";
@@ -71,6 +75,7 @@ namespace RedOnion.KSP.API
 		public static readonly string vangle = "Vector.angle";
 		[Alias, Description("Alias to `Vector.angle` (or `v.angle`).")]
 		public static readonly string vang = "Vector.angle";
+#endif
 	}
 
 	public class RosGlobals : RedOnion.ROS.Objects.Globals
@@ -127,6 +132,10 @@ namespace RedOnion.KSP.API
 			ref var member = ref reflected[at];
 			if (member.read == null)
 				return false;
+#if !API_GLOBAL_ALIASES
+			self = member.read(self.obj);
+			return true;
+#else
 			if (member.kind != Reflected.Prop.Kind.Field || member.write != null)
 			{
 				self = member.read(self.obj);
@@ -162,6 +171,7 @@ namespace RedOnion.KSP.API
 			}
 			self = item;
 			return true;
+#endif
 		}
 		public override bool Set(ref Value self, int at, OpCode op, ref Value value)
 		{
@@ -226,6 +236,9 @@ namespace RedOnion.KSP.API
 			var prop = typeof(Globals).GetProperty(name, BindingFlags.Static|BindingFlags.Public);
 			if (prop != null)
 				return DynValue.FromObject(table.OwnerScript, prop.GetValue(null, null));
+#if !API_GLOBAL_ALIASES
+			return null;
+#else
 			var alias = typeof(Globals).GetField(name, BindingFlags.Static|BindingFlags.Public);
 			if (alias == null || alias.FieldType != typeof(string))
 			{
@@ -253,6 +266,7 @@ namespace RedOnion.KSP.API
 				item = data.Descriptor.Index(table.OwnerScript, data.Object, DynValue.NewString(path[i]), false);
 			}
 			return item;
+#endif
 		}
 
 

@@ -7,8 +7,10 @@ using UnityEngine;
 
 namespace RedOnion.KSP.API
 {
-	[Description("Read-only 3D vector / coordinate, base class for `Vector`,"
-		+ " used for Vector.zero and other constants. Can also be used for properties.")]
+	[Description(
+@"Read-only 3D vector / coordinate, base class for `Vector`,
+ used for Vector.zero and other constants. Can also be used for properties.
+NOTE: Subject to change - may revert to `Vector3d` with custom descriptor.")]
 	public class ConstVector : IEquatable<ConstVector>, IEquatable<Vector>, IOperators, IConvert
 	{
 		protected Vector3d _native;
@@ -97,6 +99,42 @@ namespace RedOnion.KSP.API
 		public double squareSize => _native.sqrMagnitude;
 		[Description("Get normalized vector (size 1).")]
 		public Vector normalized => new Vector(_native.normalized);
+
+
+		[Description("Dot product of this vector and another vector.")]
+		public double dot(ConstVector rhs)
+			=> Vector3d.Dot(native, rhs.native);
+		[Description("Angle between this vector and another vector (0..180).")]
+		public double angle(ConstVector rhs)
+			=> Vector3d.Angle(native, rhs.native);
+		[Description("Angle between this vector and another vector given point above the plane (-180..180)."
+			+ " Note that the vectors are not projected onto the plane,"
+			+ " the angle of cross product of the two and the third vector being above 90 makes the result negative.")]
+		public double angle(ConstVector rhs, ConstVector axis)
+		{
+			var a = angle(rhs);
+			if (Vector3d.Angle(axis.native, Vector3d.Cross(native, rhs.native)) > 90)
+				a = -a;
+			return a;
+		}
+		[Description("Cross product of this vector with another vector.")]
+		public Vector cross(ConstVector rhs)
+			=> new Vector(Vector3d.Cross(native, rhs));
+		[Description("Project this vector onto another vector.")]
+		public Vector projectOnVector(ConstVector normal)
+			=> new Vector(Vector3d.Project(native, normal));
+		[Description("Project this vector onto plane specified by normal vector.")]
+		public Vector projectOnPlane(ConstVector normal)
+			=> new Vector(Vector3d.Exclude(normal, native));
+		[Description("Project this vector onto another vector (alias to `projectOnVector`).")]
+		public Vector project(ConstVector normal)
+			=> new Vector(Vector3d.Project(native, normal));
+		[Description("Project this vector onto plane specified by normal vector (alias to `projectOnPlane`).")]
+		public Vector exclude(ConstVector normal)
+			=> new Vector(Vector3d.Exclude(normal, native));
+		[Description("Rotate vector by an angle around axis.")]
+		public Vector rotate(double angle, Vector axis)
+			=> new Vector(QuaternionD.AngleAxis(angle, axis) * native);
 
 		[Description("Native UnityEngine.Vector3 (`float x,y,z`).")]
 		public Vector3 Vector3 => _native;

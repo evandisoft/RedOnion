@@ -246,14 +246,23 @@ namespace RedOnion.ROS.Utilities
 		public static float Atan2(float y, float x) => (float)Atan2(y, x);
 
 		public static double Sqrt(double d) => Math.Sqrt(d);
-		public static long BigMul(int a, int b) => Math.BigMul(a, b);
-		public static int DivRem(int a, int b, out int result) => Math.DivRem(a, b, out result);
-		public static long DivRem(long a, long b, out long result) => Math.DivRem(a, b, out result);
 		public static double Exp(double d) => Math.Exp(d);
 		public static double IEEERemainder(double x, double y) => Math.IEEERemainder(x, y);
 		public static double Log(double a, double newBase) => Math.Log(a, newBase);
 		public static double Log(double d) => Math.Log(d);
 		public static double Log10(double d) => Math.Log10(d);
 		public static double Pow(double x, double y) => Math.Pow(x, y);
+
+		public static float Sqrt(float d) => (float)Math.Sqrt(d);
+		public static float Exp(float d) => (float)Math.Exp(d);
+		public static float IEEERemainder(float x, float y) => (float)Math.IEEERemainder(x, y);
+		public static float Log(float a, float newBase) => (float)Math.Log(a, newBase);
+		public static float Log(float d) => (float)Math.Log(d);
+		public static float Log10(float d) => (float)Math.Log10(d);
+		public static float Pow(float x, float y) => (float)Math.Pow(x, y);
+
+		public static long BigMul(int a, int b) => Math.BigMul(a, b);
+		public static int DivRem(int a, int b, out int result) => Math.DivRem(a, b, out result);
+		public static long DivRem(long a, long b, out long result) => Math.DivRem(a, b, out result);
 	}
 }

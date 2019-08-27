@@ -122,6 +122,8 @@ namespace RedOnion.ROS.Tests
 			Test(10,        "--x");         // pre-decrement
 			Test(-10,        "-x");         // unary minus
 			Test(10,         "+x");         // unary plus
+			Test(11,        "x+=1");        // compound assignment - add
+			Test(22,		"x*=2");		// compound assignment - mul
 		}
 
 		[Test]
@@ -208,6 +210,12 @@ namespace RedOnion.ROS.Tests
 			Test(2, "a.length");
 			Test("hello", "a[0]");
 			Test("world", "a[1]");
+
+			Lines(3,
+				"var x = 1",
+				"var y = 2",
+				"var a = [x, y]",
+				"return a[0] + a[1]");
 		}
 
 		[Test]
@@ -216,6 +224,7 @@ namespace RedOnion.ROS.Tests
 			foreach (var s in new[]
 			{
 				"(\n+1\n)",
+				"-1\\\n+ 2",
 				"def pass x => x\npass(\n1\n)",
 				"def sum2 x,y => x+y"
 				+ "\nsum2 pass(2),\npass(-1)"
@@ -223,6 +232,12 @@ namespace RedOnion.ROS.Tests
 			{
 				Test(1, s);
 			}
+		}
+
+		[Test]
+		public void ROS_Expr10_Print()
+		{
+			Test("3.14", @"print ""{0:F2}"", math.pi");
 		}
 	}
 }

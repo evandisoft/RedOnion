@@ -7,35 +7,66 @@ namespace RedOnion.KSP
 {
 	public class Window : UI.Window
 	{
-		WeakReference core;
-		public Window(IProcessor core)
-			: this(core, null, UI.Layout.Vertical) {}
-		public Window(IProcessor core, UI.Layout layout)
-			: this(core, null, layout) { }
-		public Window(IProcessor core, string name = null, UI.Layout layout = UI.Layout.Vertical)
+		protected IProcessor _processor;
+		public Window(IProcessor processor)
+			: this(processor, null, UI.Layout.Vertical) {}
+		public Window(IProcessor processor, UI.Layout layout)
+			: this(processor, null, layout) { }
+		public Window(IProcessor processor, string name = null, UI.Layout layout = UI.Layout.Vertical)
 			: base(name, layout)
 		{
 			Value.DebugLog("Creating new window");
-			if (core != null)
+			if (processor != null)
 			{
-				core.Shutdown += CoreShutdown;
-				this.core = new WeakReference(core);
+				_processor = processor;
+				_hooks = new Hooks(this);
 			}
-		}
-		bool CoreShutdown(IProcessor core)
-		{
-			Dispose();
-			return false;
 		}
 		protected override void Dispose(bool disposing)
 		{
-			var core = this.core?.Target as IProcessor;
-			Value.DebugLog("Disposing window (dispose: {0}, core: {1})", disposing, core != null);
-			if (core != null)
-				core.Shutdown -= CoreShutdown;
+			Value.DebugLog("Disposing window (dispose: {0}, processor: {1})", disposing, _processor != null);
+			if (_hooks != null)
+			{
+				_hooks.Dispose();
+				_hooks = null;
+			}
 			if (disposing)
-				this.core = null;
+				_processor = null;
 			base.Dispose(disposing);
+		}
+
+		// this is to avoid direct hard-link from processor to window,
+		// so that it can be garbage-collected when no direct link exists
+		protected Hooks _hooks;
+		protected class Hooks : IDisposable
+		{
+			protected WeakReference _window;
+			protected IProcessor _processor;
+			public Hooks(Window window)
+			{
+				_window = new WeakReference(window);
+				_processor = window._processor;
+				_processor.Shutdown += Shutdown;
+			}
+			~Hooks() => Dispose(false);
+			public void Dispose()
+			{
+				GC.SuppressFinalize(this);
+				Dispose(true);
+			}
+			protected virtual void Dispose(bool disposing)
+			{
+				if (_processor == null)
+					return;
+				_processor.Shutdown -= Shutdown;
+				_processor = null;
+				_window = null;
+				
+			}
+			protected void Shutdown()
+			{
+				(_window?.Target as Window)?.Dispose();
+			}
 		}
 	}
 }

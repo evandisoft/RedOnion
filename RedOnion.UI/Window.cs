@@ -35,7 +35,7 @@ namespace RedOnion.UI
 				Fitter.verticalFit = UUI.ContentSizeFitter.FitMode.PreferredSize;
 				Color = new Color(.2f, .2f, .2f, .8f);
 				Layout = Layout.Vertical;
-				LayoutPadding = new LayoutPadding(4);
+				LayoutPadding = new LayoutPadding(0f);
 				Header = Add(new Panel("Window Title Row")
 				{
 					Layout = Layout.Horizontal,
@@ -56,6 +56,7 @@ namespace RedOnion.UI
 				Content = Add(new Panel("Window Content Panel")
 				{
 					Color = new Color(.5f, .5f, .5f, .5f),
+					//Sprite = Skin.window.normal.background,
 					FlexWidth = 1f, FlexHeight = 1f,
 				});
 

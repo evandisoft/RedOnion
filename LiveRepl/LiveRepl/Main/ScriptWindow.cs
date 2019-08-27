@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using Kerbalua.Other;
 using System.Collections.Generic;
 using System;
@@ -476,6 +476,21 @@ Any other key gives focus to input box.
 			mainWindowRect.x += modifiedEffectiveRect.x - effectiveWindowRect.x;
 			mainWindowRect.y += modifiedEffectiveRect.y - effectiveWindowRect.y;
 			//GlobalKeyBindings.ExecuteAndConsumeIfMatched(Event.current)
+
+			foreach (var engineName in replEvaluators.Keys)
+			{
+				var repl = replEvaluators[engineName];
+				try
+				{
+					repl.Update();
+				}
+				catch (Exception ex)
+				{
+					Debug.Log("Exception in REPL.Update: " + ex.Message);
+					repl.ResetEngine();
+					RunStartupScripts(engineName);
+				}
+			}
 		}
 
 

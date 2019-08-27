@@ -17,6 +17,14 @@ namespace RedOnion.ROS
 			public override string ToString(ref Value self, string format, IFormatProvider provider, bool debug)
 				=> self.num.Float.ToString(format, provider);
 
+			public override bool Call(ref Value result, object self, Arguments args, bool create = false)
+			{
+				if (args.Length != 1 || (result.obj != null && result.obj != this))
+					return false;
+				result = (float)args[0].ToDouble();
+				return true;
+			}
+
 			public override bool Convert(ref Value self, Descriptor to)
 			{
 				switch (to.Primitive)
@@ -107,6 +115,9 @@ namespace RedOnion.ROS
 					return true;
 				case OpCode.Div:
 					lhs.num.Float /= rhs.num.Float;
+					return true;
+				case OpCode.BitXor:
+					lhs.num.Float = (float)Math.Pow(lhs.num.Float, rhs.num.Float);
 					return true;
 
 				case OpCode.Equals:

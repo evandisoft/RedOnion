@@ -15,8 +15,8 @@ namespace RedOnion.UI
 			Core.alignment = TextAnchor.MiddleLeft;
 			Core.font = Skin.font;
 			Core.fontSize = 14;
-			Core.fontStyle = FontStyle.Normal;
-			Core.color = Color.black;
+			Core.fontStyle = Skin.label.fontStyle;
+			Core.color = Skin.label.normal.textColor;
 		}
 
 		protected override void Dispose(bool disposing)

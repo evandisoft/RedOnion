@@ -269,6 +269,9 @@ namespace RedOnion.ROS.Parsing
 				Debug.Assert(op == ExCode.Unknown);
 				switch (Curr)
 				{
+				case '\\':
+					Next(true);
+					goto next;
 				case '(':			//------------------------------------------------------------ (
 					if (unary || (HasOption(Option.AutocallWhenArgs) && White))
 					{

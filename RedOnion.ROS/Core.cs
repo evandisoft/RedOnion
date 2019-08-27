@@ -48,6 +48,7 @@ namespace RedOnion.ROS
 		public Processor Processor => processor;
 		public Context Context => ctx;
 		public ExitCode Exit { get; protected set; }
+		public bool Paused => Exit == ExitCode.Yield || Exit == ExitCode.Countdown;
 		public Value Result => result;
 		public int Countdown { get; set; }
 		public ArgumentList Arguments => vals;
@@ -92,6 +93,29 @@ namespace RedOnion.ROS
 		[Conditional("DEBUG")]
 		public void DebugLog(string msg, params object[] args)
 			=> Log(string.Format(Value.Culture, msg, args));
+
+		public void Log(Exception ex)
+		{
+#if !DEBUG
+			if (ex is Error err)
+			{
+				var line = err.Line;
+				Log(line == null ? "Error at line {0}."
+					: "Error at line {0}: {1}", err.LineNumber+1, line);
+			}
+#else
+			if (ex is Error err)
+			{
+				var line = err.Line;
+				Log(line == null ? "Error at line {0}."
+					: "Error at line {0}: {1}", err.LineNumber+1, line);
+				ex = ex.InnerException;
+			}
+			var trace = ex?.StackTrace;
+			if (trace != null && trace.Length > 0)
+				Log(ex.StackTrace);
+#endif
+		}
 
 		~Core() => Dispose(false);
 		public void Dispose() => Dispose(true);
@@ -148,11 +172,25 @@ namespace RedOnion.ROS
 			ctxIsPrivate = false;
 			Code = fn.Code;
 			ctxIsPrivate = true;
-			ctx.Push(at, at + fn.CodeSize, OpCode.Function);
-			ctx.Add("arguments", new Value[0]);
-			result = Value.Void;
 			ctx.RootStart = at = fn.CodeAt;
 			ctx.RootEnd = at + fn.CodeSize;
+			ctx.PopAll();
+			ctx.Push(at, at + fn.CodeSize, OpCode.Function);
+			if (fn.BoundArguments == null)
+				ctx.Add("arguments", new Value[0]);
+			else
+			{
+				var args = new Value[fn.BoundArguments.Length];
+				fn.BoundArguments.CopyTo(args, 0);
+				ctx.Add("arguments", args);
+				for (int i = 0; i < fn.ArgumentCount; i++)
+				{
+					if (i < args.Length)
+						ctx.Add(fn.ArgumentName(i), ref args[i]);
+					else ctx.Add(fn.ArgumentName(i), Value.Null);
+				}
+			}
+			result = Value.Void;
 			return Execute(countdown);
 		}
 
@@ -297,6 +335,7 @@ namespace RedOnion.ROS
 				str = compiled.Strings;
 				at = fn.CodeAt;
 				ctx = fn.Context;
+				ctx.PopAll();
 				ctx.Push(at, at + fn.CodeSize, OpCode.Function);
 				if (create)
 					this.self = new Value(new UserObject(fn.Prototype));
@@ -304,13 +343,18 @@ namespace RedOnion.ROS
 				var args = new Value[argc];
 				for (int i = 0; i < argc; i++)
 					args[i] = vals.Top(i - argc);
+				if (fn.BoundArguments != null)
+				{
+					var combined = new Value[fn.BoundArguments.Length + args.Length];
+					fn.BoundArguments.CopyTo(combined, 0);
+					args.CopyTo(combined, fn.BoundArguments.Length);
+					args = combined;
+				}
 				ctx.Add("arguments", args);
 				for (int i = 0; i < fn.ArgumentCount; i++)
 				{
 					if (i < argc)
 						ctx.Add(fn.ArgumentName(i), ref args[i]);
-					// we go with null for now, but will need some extra code
-					// for assigning default values to arguments
 					else ctx.Add(fn.ArgumentName(i), Value.Null);
 				}
 				result = Value.Void;
@@ -318,6 +362,7 @@ namespace RedOnion.ROS
 			}
 			if (!it.desc.Call(ref it, self, new Arguments(Arguments, argc), create)
 				&& op != OpCode.Autocall)
+			{
 				throw InvalidOperation(create ? op == OpCode.Identifier
 					? "Could not create new {0}" : argc == 0
 					? "{0} cannot create object given zero arguments" : argc == 1
@@ -327,6 +372,7 @@ namespace RedOnion.ROS
 					? "{0} cannot be called with that argument"
 					: "{0} cannot be called with these two arguments",
 					self != null ? selfDesc.NameOf(self, idx) : it.Name);
+			}
 			vals.Pop(argc);
 		}
 		// see Functions.Run

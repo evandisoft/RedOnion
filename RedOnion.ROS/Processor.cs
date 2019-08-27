@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -13,7 +14,14 @@ namespace RedOnion.ROS
 {
 	public class Processor : Core, IProcessor
 	{
-		public Processor() : base(null) => ctx = new Context();
+		public Processor() : base(null)
+		{
+			ctx = new Context();
+			eventsToRemove = new List<Event.Subscription>();
+			Update = new Event(eventsToRemove);
+			Once = new Event(eventsToRemove);
+			Idle = new Event(eventsToRemove);
+		}
 		protected override void SetGlobals(Globals value)
 		{
 			if ((globals = value) == null)
@@ -21,6 +29,12 @@ namespace RedOnion.ROS
 			value.Processor = this;
 			value.Fill();
 		}
+
+		public event Action Shutdown;
+		public event Action PhysicsUpdate;
+		public event Action GraphicUpdate;
+		public Action<string> Print;
+		void IProcessor.Print(string msg) => Print?.Invoke(msg);
 
 		/// <summary>
 		/// Total time-limit for all handlers (one of each type can still be executed).
@@ -52,7 +66,7 @@ namespace RedOnion.ROS
 		/// At least one handler is always executed every (MaxOneShotSkips+1) updates
 		/// (every other fixed update by default).
 		/// </summary>
-		public int OneShotPercent { get; set; } = 40;
+		public int OncePercent { get; set; } = 40;
 		/// <summary>
 		/// The percentage of the limit (going down from 100% to zero)
 		/// when to stop executing idle handlers.
@@ -70,15 +84,6 @@ namespace RedOnion.ROS
 		/// Maximum number of updates when no idle handler was executed (if there was any).
 		/// </summary>
 		public int MaxIdleSkips { get; set; } = 9;
-
-		public event Func<IProcessor, bool> Shutdown;
-		public Action<string> Print;
-		void IProcessor.Print(string msg) => Print?.Invoke(msg);
-		event Action IProcessor.Update
-		{
-			add => updateList.Add(value);
-			remove => updateList.Remove(value);
-		}
 
 		//TODO: cache scripts - both compiled and the source (watch file modification time)
 		protected Parser Parser { get; } = new Parser();
@@ -100,25 +105,19 @@ namespace RedOnion.ROS
 		public virtual void Reset()
 		{
 			var shutdown = Shutdown;
+			Shutdown = null;
 			if (shutdown != null)
 			{
-				foreach (Func<IProcessor, bool> handler in shutdown.GetInvocationList())
+				foreach (Action handler in shutdown.GetInvocationList())
 				{
 					try
 					{
-						if (!handler(this))
-							Shutdown -= handler;
+						handler();
 					}
 					catch (Exception ex)
 					{
 						Log("Exception in Shutdown: " + ex.Message);
-						if (ex is Error err)
-						{
-							var line = err.Line;
-							Log(line == null ? "Error at line {0}."
-								: "Error at line {0}: {1}", err.LineNumber, line);
-						}
-						Shutdown -= handler;
+						Log(ex);
 					}
 				}
 			}
@@ -133,85 +132,101 @@ namespace RedOnion.ROS
 			Exit = ExitCode.None;
 		}
 
-		protected EventList updateList = new EventList();
-		protected EventList oneShotList = new EventList();
-		protected EventList idleList = new EventList();
-
-		public Event Update
-		{
-			get => new Event(updateList);
-			set { }
-		}
-		public Event OneShot
-		{
-			get => new Event(oneShotList);
-			set { }
-		}
-		public Event Idle
-		{
-			get => new Event(idleList);
-			set { }
-		}
+		protected readonly List<Event.Subscription> eventsToRemove;
+		public Event Update { get; }
+		public Event Once { get; }
+		public Event Idle { get; }
 
 		public bool HasEvents
-			=> updateList.Count > 0
-			|| oneShotList.Count > 0
-			|| idleList.Count > 0;
+			=> Update.Count > 0
+			|| Once.Count > 0
+			|| Idle.Count > 0;
 		public void ClearEvents()
 		{
-			updateList.Clear();
-			oneShotList.Clear();
-			idleList.Clear();
-			oneShotSkipped = 0;
+			Update.Clear();
+			Once.Clear();
+			Idle.Clear();
+			onceSkipped = 0;
 			idleSkipped = 0;
 			PeakMillis = AverageMillis;
 		}
 
 		public int TotalCountdown { get; protected set; }
 		public int CountdownPercent => 100 * TotalCountdown / UpdateCountdown;
+		public int TimeoutPercent => (int)(100 * (1 - watch.Elapsed.TotalMilliseconds / UpdateTimeout.TotalMilliseconds));
 		public double AverageMillis { get; set; }
 		public double PeakMillis { get; set; }
-		Stopwatch watch = new Stopwatch();
-		int oneShotSkipped, idleSkipped;
-		public void FixedUpdate()
+
+		readonly Stopwatch watch = new Stopwatch();
+		int onceSkipped, idleSkipped;
+
+		public void UpdateGraphic()
+		{
+			var graphic = GraphicUpdate;
+			if (graphic != null)
+			{
+				foreach (Action handler in graphic.GetInvocationList())
+				{
+					try
+					{
+						handler();
+					}
+					catch (Exception ex)
+					{
+						Log("Exception in GraphicUpdate: " + ex.Message);
+						Log(ex);
+						PhysicsUpdate -= handler;
+					}
+				}
+			}
+		}
+		public void UpdatePhysics()
 		{
 			TotalCountdown = UpdateCountdown;
 			watch.Reset();
 			watch.Start();
 
+			// see Event.AutoRemove
+			lock (eventsToRemove)
+			{
+				foreach (var e in eventsToRemove)
+					e.Remove();
+				eventsToRemove.Clear();
+			}
+
 			// update
-			if (updateList.Count > 0)
+			if (!Update.IsEmpty)
 			{
 				do
 				{
-					ref var call = ref updateList.GetNext();
-					if (!Call(ref call))
-						updateList.Remove(call.Value);
-				} while (!updateList.AtEnd
+					var call = Update.GetNext();
+					if (!Call(call, "Update", UpdatePercent))
+						call.Remove();
+				} while (!Update.AtFirst //TODO: reconsider this condition
 				&& CountdownPercent > UpdatePercent
-				&& watch.Elapsed < UpdateTimeout);
+				&& TimeoutPercent > UpdatePercent);
 			}
 
 			// one shot
-			if (oneShotList.IsEmpty)
-				oneShotSkipped = 0;
-			else if (CountdownPercent <= OneShotPercent && oneShotSkipped < MaxOneShotSkips)
-				oneShotSkipped++;
+			if (Once.IsEmpty)
+				onceSkipped = 0;
+			else if (CountdownPercent <= OncePercent && onceSkipped < MaxOneShotSkips)
+				onceSkipped++;
 			else
 			{
-				oneShotSkipped = 0;
+				onceSkipped = 0;
 				do
 				{
-					ref var call = ref oneShotList.GetNext();
-					Call(ref call);
-					oneShotList.Remove(call.Value);
-				} while (!oneShotList.AtEnd
-				&& CountdownPercent > OneShotPercent
-				&& watch.Elapsed < UpdateTimeout);
+					var call = Once.GetNext();
+					Call(call, "Once", OncePercent);
+					call.Remove();
+				} while (!Once.IsEmpty
+				&& CountdownPercent > OncePercent
+				&& TimeoutPercent > OncePercent);
 			}
 
 			// idle
-			if (idleList.IsEmpty)
+			if (Idle.IsEmpty)
 				idleSkipped = 0;
 			else if (CountdownPercent <= IdlePercent && idleSkipped < MaxIdleSkips)
 				idleSkipped++;
@@ -220,23 +235,43 @@ namespace RedOnion.ROS
 				idleSkipped = 0;
 				do
 				{
-					ref var call = ref idleList.GetNext();
-					if (!Call(ref call))
-						idleList.Remove(call.Value);
-				} while (!idleList.AtEnd
+					var call = Idle.GetNext();
+					if (!Call(call, "Idle", IdlePercent))
+						call.Remove();
+				} while (!Idle.AtFirst //TODO: reconsider this condition
 				&& CountdownPercent > IdlePercent
-				&& watch.Elapsed < UpdateTimeout);
+				&& TimeoutPercent > IdlePercent);
 			}
 
 			// main
 			do
 			{
-				if (Exit != ExitCode.Countdown && Exit != ExitCode.Yield)
+				if (!Paused)
 					break;
 				var countdown = Math.Min(StepCountdown, TotalCountdown);
 				Execute(countdown);
 				TotalCountdown -= (countdown - Countdown);
-			} while (TotalCountdown > 0 && watch.Elapsed < UpdateTimeout);
+			} while (Exit == ExitCode.Countdown
+			&& TotalCountdown > 0 && watch.Elapsed < UpdateTimeout);
+
+			// other updates
+			var physics = PhysicsUpdate;
+			if (physics != null)
+			{
+				foreach (Action handler in physics.GetInvocationList())
+				{
+					try
+					{
+						handler();
+					}
+					catch (Exception ex)
+					{
+						Log("Exception in PhysicsUpdate: " + ex.Message);
+						Log(ex);
+						PhysicsUpdate -= handler;
+					}
+				}
+			}
 
 			// watch
 			watch.Stop();
@@ -248,162 +283,278 @@ namespace RedOnion.ROS
 			if (milli > PeakMillis)
 				PeakMillis = milli;
 		}
-		private bool Call(ref EventList.Element e)
+		private bool Call(Event.Subscription e, string name, int downtoPercent)
 		{
 			try
 			{
-				if (!e.Value.IsFunction)
+				if (!e.Action.IsFunction)
 				{
-					var result = Value.Void;
-					e.Value.desc.Call(ref result, null, new Arguments(Arguments, 0));
+					var result = e.Action;
+					e.Action.desc.Call(ref result, null, new Arguments(Arguments, 0));
 				}
-				else if (e.Core != null)
+				else
 				{
 					do
 					{
-						if (Exit != ExitCode.Countdown && Exit != ExitCode.Yield)
-							break;
 						var countdown = Math.Min(StepCountdown, TotalCountdown);
-						e.Core.Execute(countdown);
+						if (e.Core == null)
+						{
+							e.Core = new Core(this);
+							e.Core.Globals = Globals;
+							var fn = e.Action.obj as Function;
+							e.Core.Execute(fn, countdown);
+						}
+						else e.Core.Execute(countdown);
 						TotalCountdown -= (countdown - Countdown);
-					} while (TotalCountdown > 0 && watch.Elapsed < UpdateTimeout);
-					if (Exit != ExitCode.Countdown && Exit != ExitCode.Yield)
+					} while (e.Core.Exit == ExitCode.Countdown
+					&& CountdownPercent > downtoPercent && UpdatePercent > downtoPercent);
+					if (!e.Core.Paused)
 					{
 						// TODO: pool
 						e.Core = null;
 					}
 				}
-				else
-				{
-					e.Core = new Core(this);
-					e.Core.Globals = Globals;
-					var countdown = Math.Min(StepCountdown, TotalCountdown);
-					var fn = e.Value.obj as RedOnion.ROS.Objects.Function;
-					e.Core.Execute(fn, countdown);
-				}
 			}
 			catch (Exception ex)
 			{
-				Log("Exception in FixedUpdate: " + ex.Message);
-				if (ex is Error err)
-				{
-					var line = err.Line;
-					Log(line == null ? "Error at line {0}."
-						: "Error at line {0}: {1}", err.LineNumber, line);
-				}
+				Log("Exception in FixedUpdate.{0}: {1}", name, ex.Message);
+				Log(ex);
 				return false;
 			}
 			return true;
 		}
 
-		/// <summary>
-		/// List of callable objects that tracks removals during enumeration
-		/// </summary>
-		public class EventList : IList<Value>
-		{
-			//TODO: doubly-linked list (for fast remove) with free-list (pool to save GC)
-			public struct Element : IEquatable<Element>
-			{
-				/// <summary>
-				/// Function or Action
-				/// </summary>
-				public readonly Value Value;
-				/// <summary>
-				/// Core it is currently running on (if yielding)
-				/// </summary>
-				public Core Core;
+		[Description(
+@"List of subscriptions - actions to be called.
+(Periodically for `update` and `idle`, once for `oneShot`.).
+Either use `add/remove` pair, or call the list and store the auto-remove subscription object.
+The subscription will be automatically removed if there is no reference to the subscription object.
 
-				public Element(Value value)
+Example:
+```
+def action
+  print ""executed""
+system.update.add action
+wait // will get executed once
+system.update.remove action
+wait // will not get executed
+var sub = system.update action
+wait // will get executed once
+sub.remove
+wait // will not get executed
+sub = system.update action
+wait // will get executed once
+sub = null
+wait // may still get executed, but will get removed eventually
+```
+
+Future plan:
+```
+using system.update action
+  wait // will get executed once
+wait // will not get executed
+
+def test
+  using system.update action
+  wait
+test // will get executed once
+wait // will not get executed
+```
+")]
+		public sealed class Event : ICallable
+		{
+			internal Event(List<Event.Subscription> eventsToRemove)
+				=> this.eventsToRemove = eventsToRemove;
+			internal readonly List<Event.Subscription> eventsToRemove;
+			internal Subscription first, next;
+			internal bool AtFirst => next == first;
+			internal bool IsEmpty => first == null;
+			internal Subscription GetNext()
+			{
+				var it = next;
+				next = next.next;
+				return it;
+			}
+
+			[Description("Number of subscribers")]
+			public int Count { get; private set; }
+
+			bool ICallable.Call(ref Value result, object self, Arguments args, bool create)
+			{
+				if (args.Length != 1)
+					return false;
+				var it = args[0];
+				if (!it.IsFunction)
+					return false;
+				result = new Value(new AutoRemove(Add(it)));
+				return true;
+			}
+
+			[Description("The auto-remove subscription object returned by call to `system.update` or `idle` (or `oneShot`).")]
+			public sealed class AutoRemove : IDisposable, IEquatable<AutoRemove>, IEquatable<Subscription>, IEquatable<Value>
+			{
+				internal AutoRemove(Subscription subscription)
+					=> Subscription = subscription;
+				[Description("The subscription.")]
+				public Subscription Subscription { get; }
+
+				[Description("The subscribed action (ROS function or .NET action delegate).")]
+				public Value Action => Subscription.Action;
+				[Description("The event the action is subscribed to (null when removed).")]
+				public Event Event => Subscription.Event;
+				[Browsable(false), Description("Core it is currently running on (if yielding).")]
+				public Core Core => Subscription.Core;
+
+				[Browsable(false)]
+				public bool Equals(AutoRemove it)
+					=> ReferenceEquals(this, it);
+				[Browsable(false)]
+				public bool Equals(Subscription subscription)
+					=> ReferenceEquals(Subscription, subscription);
+				[Browsable(false)]
+				public bool Equals(Value value)
+					=> value.obj is Subscription s ? ReferenceEquals(this, s) : Action.Equals(value);
+				[Browsable(false)]
+				public override bool Equals(object o)
+					=> o is Value v ? Equals(v) : ReferenceEquals(this, o);
+				[Browsable(false)]
+				public override int GetHashCode()
+					=> Subscription.GetHashCode();
+
+				[Description("Remove this subscription from its list. (Ignored if already removed.)")]
+				public void Remove() => Subscription.Remove();
+
+				void IDisposable.Dispose() => Subscription.Remove();
+
+				// destructors could be called from different thread
+				// this is a way to delegate the removal to main thread
+				internal readonly static List<Subscription> toRemove = new List<Subscription>();
+				~AutoRemove()
 				{
-					Value = value;
+					var e = Subscription.Event;
+					if (e != null)
+					{
+						lock (e.eventsToRemove)
+							e.eventsToRemove.Add(Subscription);
+					}
+				}
+			}
+
+			[Description("The subscription to `system.update` or `idle` (or `oneShot`).")]
+			public sealed class Subscription : IDisposable, IEquatable<Subscription>, IEquatable<Value>
+			{
+				internal Subscription(Value action) => Action = action;
+				internal Subscription next, prev; // cyclic (when subscribed, null if removed)
+
+				[Description("The subscribed action (ROS function or .NET action delegate).")]
+				public Value Action { get; }
+				[Description("The event the action is subscribed to (null when removed).")]
+				public Event Event { get; internal set; }
+				[Browsable(false), Description("Core it is currently running on (if yielding).")]
+				public Core Core { get; internal set; }
+
+				[Browsable(false)]
+				public bool Equals(Subscription subscription)
+					=> ReferenceEquals(this, subscription);
+				[Browsable(false)]
+				public bool Equals(Value value)
+					=> value.obj is Subscription s ? ReferenceEquals(this, s) : Action.Equals(value);
+				[Browsable(false)]
+				public override bool Equals(object o)
+					=> o is Subscription s ? Equals(s) : o is Value v && Equals(v);
+				[Browsable(false)]
+				public override int GetHashCode()
+					=> base.GetHashCode();
+
+				[Description("Remove this subscription from its list. (Ignored if already removed.)")]
+				public void Remove()
+				{
+					if (Event == null)
+						return;
+					if (--Event.Count == 0)
+					{
+						Event.first = null;
+						Event.next = null;
+					}
+					else
+					{
+						if (Event.first == this)
+							Event.first = next;
+						if (Event.next == this)
+							Event.next = next;
+					}
+					next.prev = prev;
+					prev.next = next;
+					next = null;
+					prev = null;
+					Event = null;
 					Core = null;
 				}
-
-				public bool Equals(Element e)
-					=> Value.Equals(e.Value);
-				public override bool Equals(Object o)
-					=> o is Element e && Equals(e);
-				public override int GetHashCode()
-					=> Value.GetHashCode();
-			}
-			protected ListCore<Element> list;
-			protected internal int index;
-
-			public int Count => list.size;
-			public bool IsEmpty => list.size == 0;
-			public bool AtEnd => index >= list.size;
-
-			public ref Element GetNext()
-			{
-				if (index >= list.size)
-					index = 0;
-				return ref list.items[index++];
+				void IDisposable.Dispose() => Remove();
 			}
 
-			public void Add(Value value)
-				=> list.Add(new Element(value));
-			public void Add(Action action)
-				=> list.Add(new Element(new Value(action)));
-			public void Insert(int index, Value value)
+			public Subscription Add(Value value)
 			{
-				if (index <= this.index && index >= 0)
-					this.index++;
-				list.Insert(index, new Element(value));
-			}
-			public void RemoveAt(int index)
-			{
-				if (index < this.index && index >= 0)
-					this.index--;
-				list.RemoveAt(index);
+				if (value.obj is Subscription s)
+					s.Remove();
+				else s = new Subscription(value);
+				Count++;
+				s.Event = this;
+				if (first == null)
+				{
+					s.next = s;
+					s.prev = s;
+					first = s;
+					next = s;
+				}
+				else
+				{
+					s.next = first;
+					s.prev = first.prev;
+					s.prev.next = s;
+					first.prev = s;
+				}
+				return s;
 			}
 			public bool Remove(Value value)
 			{
-				int index = IndexOf(value);
-				if (index < 0)
+				if (first == null)
 					return false;
-				RemoveAt(index);
-				return true;
-			}
-			public bool Remove(Action action)
-				=> Remove(new Value(action));
-
-			public Value this[int index]
-			{
-				get => list[index].Value;
-				set => list[index] = new Element(value);
+				if (value.obj is Subscription s)
+				{
+					if (s.Event != this)
+						return false;
+					s.Remove();
+					return true;
+				}
+				bool found = false;
+				var next = first;
+				do
+				{
+					var it = next;
+					next = next.next;
+					if (it.Action.Equals(value))
+					{
+						found = true;
+						it.Remove();
+					}
+				}
+				while (next != first);
+				return found;
 			}
 			public void Clear()
 			{
-				list.Clear();
-				index = 0;
+				var next = first;
+				if (next == null)
+					return;
+				do
+				{
+					var it = next;
+					next = next.next;
+					it.Remove();
+				}
+				while (next != first);
 			}
-
-			public bool Contains(Value value)
-			{
-				foreach (var e in list)
-					if (e.Value.Equals(value))
-						return true;
-				return false;
-			}
-			public void CopyTo(Value[] array, int index)
-			{
-				foreach (var e in list)
-					array[index++] = e.Value;
-			}
-			public int IndexOf(Value value)
-			{
-				for (int i = 0; i < list.size; i++)
-					if (list.items[i].Value.Equals(value))
-						return i;
-				return -1;
-			}
-			public IEnumerator<Value> GetEnumerator()
-			{
-				foreach (var e in list)
-					yield return e.Value;
-			}
-			IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-			bool ICollection<Value>.IsReadOnly => false;
 		}
 	}
 }
