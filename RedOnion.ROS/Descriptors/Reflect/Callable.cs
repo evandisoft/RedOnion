@@ -9,10 +9,6 @@ namespace RedOnion.ROS
 		public abstract class Callable : Descriptor
 		{
 			/// <summary>
-			/// Instance method vs. static function
-			/// </summary>
-			public bool IsMethod { get; protected set; }
-			/// <summary>
 			/// Minimal number of arguments (number of required arguments)
 			/// </summary>
 			public int MinArgs { get; protected set; }
@@ -28,6 +24,14 @@ namespace RedOnion.ROS
 			/// Parameter list (optional - may be null)
 			/// </summary>
 			public ParameterInfo[] Params { get; protected set; }
+			/// <summary>
+			/// Instance method vs. static function
+			/// </summary>
+			public bool IsMethod { get; protected set; }
+			/// <summary>
+			/// The `Info` refers to Delegate.Invoke (otherwise to real method)
+			/// </summary>
+			public bool IsDelegate { get; protected set; }
 
 			protected Callable(string name, Type type, bool method, MethodInfo invoke = null)
 				: base(name, type)
@@ -45,6 +49,7 @@ namespace RedOnion.ROS
 					if (IsMethod = method)
 						MaxArgs--;
 					MinArgs = MaxArgs;
+					IsDelegate = true;
 					return;
 				}
 				Info = invoke;
@@ -53,12 +58,6 @@ namespace RedOnion.ROS
 				MaxArgs = Params.Length;
 				while (MinArgs < MaxArgs && Params[MinArgs].RawDefaultValue == DBNull.Value)
 					MinArgs++;
-				if (method)
-				{
-					MaxArgs--;
-					if (MinArgs > 0)
-						MinArgs--;
-				}
 			}
 
 			public static Descriptor FromType(Type type)

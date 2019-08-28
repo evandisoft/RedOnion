@@ -27,9 +27,20 @@ namespace RedOnion.ROS
 
 			public override bool Call(ref Value result, object self, Arguments args, bool create)
 			{
-				if (create || args.Length != 3)
+				if (create)
 					return false;
-				((Action<Value, Value, Value>)result.obj)(args[0], args[1], args[2]);
+				if (args.Length == 3)
+				{
+					((Action<Value, Value, Value>)result.obj)(args[0], args[1], args[2]);
+					result = Value.Void;
+					return true;
+				}
+				if (MinArgs > args.Length || Params?.Length != 3 || args.Length > 3)
+					return false;
+				((Action<Value, Value, Value>)result.obj)(
+					args.Length == 0 ? new Value(Params[0].DefaultValue) : args[0],
+					args.Length <= 1 ? new Value(Params[1].DefaultValue) : args[1],
+					new Value(Params[2].DefaultValue));
 				result = Value.Void;
 				return true;
 			}
@@ -63,9 +74,19 @@ namespace RedOnion.ROS
 
 			public override bool Call(ref Value result, object self, Arguments args, bool create)
 			{
-				if (create || args.Length != 3)
+				if (create)
 					return false;
-				result = ((Func<Value, Value, Value, Value>)result.obj)(args[0], args[1], args[2]);
+				if (args.Length == 3)
+				{
+					result = ((Func<Value, Value, Value, Value>)result.obj)(args[0], args[1], args[2]);
+					return true;
+				}
+				if (MinArgs > args.Length || Params?.Length != 3 || args.Length > 3)
+					return false;
+				result = ((Func<Value, Value, Value, Value>)result.obj)(
+					args.Length == 0 ? new Value(Params[0].DefaultValue) : args[0],
+					args.Length <= 1 ? new Value(Params[1].DefaultValue) : args[1],
+					new Value(Params[2].DefaultValue));
 				return true;
 			}
 		}
@@ -74,14 +95,27 @@ namespace RedOnion.ROS
 		/// </summary>
 		public class Procedure3<T> : Callable
 		{
-			public Procedure3(string name)
-				: base(name, typeof(Action<T, Value, Value, Value>), true) { }
+			public Procedure3(MethodInfo m)
+				: this(m.Name, m) { }
+			public Procedure3(string name, MethodInfo m = null)
+				: base(name, typeof(Action<T, Value, Value, Value>), true, m) { }
 
 			public override bool Call(ref Value result, object self, Arguments args, bool create)
 			{
-				if (create || args.Length != 3)
+				if (create)
 					return false;
-				((Action<T, Value, Value, Value>)result.obj)((T)self, args[0], args[1], args[2]);
+				if (args.Length == 3)
+				{
+					((Action<T, Value, Value, Value>)result.obj)((T)self, args[0], args[1], args[2]);
+					result = Value.Void;
+					return true;
+				}
+				if (MinArgs > args.Length || IsDelegate || Params?.Length != 3 || args.Length > 3)
+					return false;
+				((Action<T, Value, Value, Value>)result.obj)((T)self,
+					args.Length == 0 ? new Value(Params[0].DefaultValue) : args[0],
+					args.Length <= 1 ? new Value(Params[1].DefaultValue) : args[1],
+					new Value(Params[2].DefaultValue));
 				result = Value.Void;
 				return true;
 			}
@@ -91,14 +125,26 @@ namespace RedOnion.ROS
 		/// </summary>
 		public class Method3<T> : Callable
 		{
-			public Method3(string name)
-				: base(name, typeof(Func<T, Value, Value, Value, Value>), true) { }
+			public Method3(MethodInfo m)
+				: this(m.Name, m) { }
+			public Method3(string name, MethodInfo m = null)
+				: base(name, typeof(Func<T, Value, Value, Value, Value>), true, m) { }
 
 			public override bool Call(ref Value result, object self, Arguments args, bool create)
 			{
-				if (create || args.Length != 3)
+				if (create)
 					return false;
-				result = ((Func<T, Value, Value, Value, Value>)result.obj)((T)self, args[0], args[1], args[2]);
+				if (args.Length == 3)
+				{
+					result = ((Func<T, Value, Value, Value, Value>)result.obj)((T)self, args[0], args[1], args[2]);
+					return true;
+				}
+				if (MinArgs > args.Length || IsDelegate || Params?.Length != 3 || args.Length > 3)
+					return false;
+				result = ((Func<T, Value, Value, Value, Value>)result.obj)((T)self,
+					args.Length == 0 ? new Value(Params[0].DefaultValue) : args[0],
+					args.Length <= 1 ? new Value(Params[1].DefaultValue) : args[1],
+					new Value(Params[2].DefaultValue));
 				return true;
 			}
 		}

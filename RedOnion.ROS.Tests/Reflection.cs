@@ -25,6 +25,12 @@ namespace RedOnion.ROS.Tests
 			public static MyAction2 action2;
 			public static void AddAction2(MyAction2 add) => action2 += add;
 			public static void CallAction2(string v) => action2?.Invoke(v);
+			public static void DefaultArg(string v = "default") => name = v;
+			public static void DefaultArg2(string v = "test", int i = 333)
+			{
+				name = v;
+				Integer = i;
+			}
 		}
 		public class InstanceTest
 		{
@@ -41,6 +47,12 @@ namespace RedOnion.ROS.Tests
 			public MyAction2 action2;
 			public void AddAction2(MyAction2 add) => action2 += add;
 			public void CallAction2(string v) => action2?.Invoke(v);
+			public void DefaultArg(string v = "default") => name = v;
+			public void DefaultArg2(string v = "test", int i = 333)
+			{
+				name = v;
+				Integer = i;
+			}
 		}
 		public class MixedTest
 		{
@@ -138,6 +150,16 @@ namespace RedOnion.ROS.Tests
 
 			Test(1.0+2f+3, "test.sum3 1.0, 2f, 3");
 			Test(1.0+2f+3, "it.sum3 1.0, 2f, 3");
+
+			Test("default", "test.defaultArg; test.name");
+			Test("default", "it.defaultArg; it.name");
+
+			Test("test", "test.defaultArg2; test.name");
+			Test(333, "test.integer");
+			Test("test", "it.defaultArg2; it.name");
+			Test(333, "it.integer");
+			Test("hello", "test.defaultArg2 \"hello\"; test.name");
+			Test("hello", "it.defaultArg2 \"hello\"; it.name");
 		}
 
 		public struct Point
