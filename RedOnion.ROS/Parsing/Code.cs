@@ -243,28 +243,36 @@ namespace RedOnion.ROS.Parsing
 					return op;
 				}
 				Debug.Assert(op > OpCode.Identifier || op == OpCode.Void || op == OpCode.This || op == OpCode.Null);
+				if (!HasOption(Option.Prefix) && op != OpCode.Void)
+					Write(OpCode.Type);
 				Write(op);
 				return op;
 			}
-			if (HasOption(Option.Prefix))
+			if (HasOption(Option.Prefix) && op != OpCode.Var)
 				Write(op);
 			var ex = op.Extend();
 			if (ex.Unary())
 			{
-				if (create && !HasOption(Option.Prefix))
-					Write(OpCode.Create);
+				Debug.Assert(!create || op != OpCode.Create);
 				create |= op == OpCode.Create;
 				if (HasOption(Option.Prefix))
 					goto next;
-				Rewrite(top, type || create, start, create);
+				Rewrite(top, type, start, op == OpCode.Create);
 				if (op != OpCode.Create)
+				{
+					if (create)
+					{
+						Debug.Assert(op == OpCode.Call0);
+						Write(OpCode.Create);
+					}
 					Write(op);
+				}
 				return op;
 			}
 			if (ex.Binary())
 			{
 				// first/left argument
-				Rewrite(TopInt(top), type || create);
+				Rewrite(TopInt(top), type);
 				// second/right argument
 				if (op == OpCode.Dot)
 				{
@@ -286,7 +294,7 @@ namespace RedOnion.ROS.Parsing
 				{
 					if (HasOption(Option.Prefix))
 						goto full;
-					Rewrite(top, type || create);
+					Rewrite(top, type);
 					if (create && !HasOption(Option.Prefix))
 						Write(OpCode.Create);
 					Write(op);
@@ -309,10 +317,10 @@ namespace RedOnion.ROS.Parsing
 
 				if (op == OpCode.Var)
 				{
-					Debug.Assert(!create);
+					Debug.Assert(!create && !type);
 					if (HasOption(Option.Prefix))
 					{
-						var varat = --code.size; // remove our OpCode.Var
+						var varat = code.size;
 						Rewrite(TopInt(mtop));
 						Debug.Assert(code[varat] == OpCode.Identifier.Code());
 						code[varat] = OpCode.Var.Code(); // rewrite OpCode.Identifier with OpCode.Var
@@ -320,13 +328,10 @@ namespace RedOnion.ROS.Parsing
 						goto full;
 					}
 					// type
-					var peek = (OpCode)values.items[mtop-5];
-					if (peek >= OpCode.String && peek < OpCode.Create || peek == OpCode.Array)
-						Write(OpCode.Type);
 					Rewrite(mtop, true);
 					// value
 					Rewrite(top);
-					// name - like `Rewrite(TopInt(mtop), type || create);`
+					// name - like `Rewrite(TopInt(mtop));`
 					// ... but we need to avoid adding the variable to captured
 					// ... and also change the code to OpCode.Var
 					top = TopInt(mtop);
@@ -399,12 +404,12 @@ namespace RedOnion.ROS.Parsing
 			if (n > 1)
 			{
 				var next = TopInt(top);
-				if (type && !HasOption(Option.Prefix))
+				/*if (type && !HasOption(Option.Prefix))
 				{
 					var peek = (OpCode)values.items[next-5];
 					if (peek >= OpCode.String && peek < OpCode.Create || peek == OpCode.Array)
 						Write(OpCode.Type);
-				}
+				}*/
 				Rewrite(next, n - 1, type, create);
 				create = false;
 			}

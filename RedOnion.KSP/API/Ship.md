@@ -24,6 +24,8 @@ Active vessel
 - `latitude`: Double - Latitude of current position in degrees.
 - `altitude`: Double - Altitude of current position (above sea level) in meters.
 - `radarAltitude`: Double - True height above ground in meters.
+- `dynamicPressure`: Double - Dynamic pressure [atm = 101.325kPa]
+- `q`: Double - Dynamic pressure [atm = 101.325kPa]
 - `body`: SpaceBody - KSP API. Orbited body.
 - `orbit`: Orbit - KSP API. Orbit parameters.
 - `eccentricity`: Double - Eccentricity of current orbit.
@@ -39,15 +41,34 @@ Active vessel
 - `trueAnomaly`: Double - Angle in degrees between the direction of periapsis and the current position.
 - `meanAnomaly`: Double - Angle in degrees between the direction of periapsis and the current position extrapolated on circular orbit.
 - `position`: Vector3d - Current position relative to active ship (so `ship.position` always reads zero).
-- `relative`: Vector3d - Position relative to orbited body.
-- `velocity`: Vector3d - Current velocity.
-- `centerOfMass`: Vector3d - Center of mass
-- `angularVelocity`: Vector3d - Angular velocity (ω, rad/s), how fast the ship rotates
-- `momentOfInertia`: Vector3d - Moment of inertia (I, kg*m²) aka angular mass or rotational inertia.
-- `angularMomentum`: Vector3d - Angular momentum (L = Iω, kg*m²/s) aka moment of momentum or rotational momentum.
-- `maxTorque`: Vector3d - Maximal ship torque (aka moment of force or turning effect, maximum of positive and negative).
-- `maxAngular`: Vector3d - Maximal angular acceleration (rad/s²)
+- `velocity`: Vector3d - Current orbital velocity.
+- `surfaceVelocity`: Vector3d - Current surface velocity.
+- `srfVelocity`: Vector3d - Current surface velocity (Alias to `surfaceVelocity`).
+- `srfvel`: Vector3d - Current surface velocity (Alias to `surfaceVelocity`).
+- `forward`: Vector3d - Vector pointing forward (from cockpit - in the direction of the 'nose').
+- `back`: Vector3d - Vector pointing backward (from cockpit - in the direction of the 'nose').
+- `up`: Vector3d - Vector pointing up (from cockpit).
+- `down`: Vector3d - Vector pointing down (from cockpit).
+- `left`: Vector3d - Vector pointing left (from cockpit).
+- `right`: Vector3d - Vector pointing left (from cockpit).
+- `north`: Vector3d - Vector pointing north in the plane that is tangent to sphere centered in orbited body.
+- `east`: Vector3d - Vector pointing east (tangent to sphere centered in orbited body).
+- `away`: Vector3d - Vector pointing away from orbited body (aka *up*, but we use `up` for cockpit-up).
+- `pitch`: Double - Current pitch / elevation (the angle between forward vector and tangent plane) [-90..+90]
+- `heading`: Double - Current heading / yaw (the angle between forward and north vectors in tangent plane) [0..360]. Note that it can change violently around the poles.
+- `roll`: Double - Current roll / bank (the angle between up and away vectors in the plane perpendicular to forward vector) [-180..+180]. 
+Note that it can change violently when facing up or down.
+- `centerOfMass`: Vector3d - Center of mass.
+- `angularVelocity`: Vector3d - Angular velocity (ω, deg/s), how fast the ship rotates
+- `angularMomentum`: Vector3d - Angular momentum (L = Iω, kg⋅m²⋅deg/s) aka moment of momentum or rotational momentum.
+- `momentOfInertia`: Vector3d - Moment of inertia (I, kg⋅m²) aka angular mass or rotational inertia.
+- `maxTorque`: Vector3d - Maximal ship torque [N⋅m⋅deg=deg⋅kg⋅m²/s²] (aka moment of force or turning effect, maximum of positive and negative).
+- `maxVacuumTorque`: Vector3d - Maximal ship torque in vacuum [N⋅m⋅deg=deg⋅kg⋅m²/s²] (ignoring control surfaces).
+- `maxAngular`: Vector3d - Maximal angular acceleration (deg/s²)
+- `maxVacuumAngular`: Vector3d - Maximal angular acceleration in vacuum (ignoring control surfaces).
 - `positionAt()`: Vector3d, time Double
   - Predicted position at specified time.
 - `velocityAt()`: Vector3d, time Double
   - Predicted velocity at specified time.
+- `local()`: [Vector](Vector.md), v [ConstVector](ConstVector.md)
+  - Translate vector/direction into local coordinates.

@@ -402,7 +402,8 @@ namespace RedOnion.ROS.Objects
 				return true;
 			}
 			if (op.Kind() == OpKind.Assign)
-				return it.desc.Binary(ref it, op + 0x10, ref value);
+				return it.desc.Binary(ref it, op + 0x10, ref value)
+					|| value.desc.Binary(ref it, op + 0x10, ref value);
 			if (op.Kind() != OpKind.PreOrPost)
 				return false;
 			if (op >= OpCode.Inc)

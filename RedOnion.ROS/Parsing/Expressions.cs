@@ -230,7 +230,8 @@ namespace RedOnion.ROS.Parsing
 				case ExCode.NullCol:
 					goto binary_check;
 				case ExCode.Ternary://--------------------------------------------------- ternary ?:
-					while (operators.size > bottom)
+					while (operators.size > bottom
+						&& operators.Top().Kind() != OpKind.Assign)
 						PrepareOperator(PopOperator());
 					Next().ParseExpression(flags &~Flag.Limited);
 					if (Eol)

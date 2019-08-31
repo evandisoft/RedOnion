@@ -123,7 +123,10 @@ namespace RedOnion.ROS.Tests
 			Test(-10,        "-x");         // unary minus
 			Test(10,         "+x");         // unary plus
 			Test(11,        "x+=1");        // compound assignment - add
-			Test(22,		"x*=2");		// compound assignment - mul
+			Test(22,		"x*=2");        // compound assignment - mul
+
+			Test(1, "var v = 1");  // integer
+			Test(2.0, "v += 1.0"); // double
 		}
 
 		[Test]

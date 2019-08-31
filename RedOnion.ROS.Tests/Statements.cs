@@ -44,6 +44,8 @@ namespace RedOnion.ROS.Tests
 			Assert.AreEqual(value, result, "Different result: <{0}>", script);
 			Assert.AreEqual(value?.GetType(), result?.GetType(), "Different type: <{0}>", script);
 		}
+		public void YieldLines(params string[] lines)
+			=> Yield(string.Join(Environment.NewLine, lines));
 		public void YieldLines(ExitCode exit, object value, params string[] lines)
 			=> Yield(exit, value, string.Join(Environment.NewLine, lines));
 		public void YieldLines(ExitCode exit, object value, int countdown, params string[] lines)

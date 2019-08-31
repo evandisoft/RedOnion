@@ -219,26 +219,29 @@ namespace RedOnion.ROS.Tests
 		[Test]
 		public void ROS_Scope08_ClosureModify()
 		{
-			Lines(3,
+			Lines(3, // modify captured x
 				"var x = 0",
 				"def inc => ++x",
 				"def add y => x += y",
 				"inc",
 				"add 2");
 
-			/* TODO: create new OpCode.Local and make parser decide the index
-			 * TODO: multiple cousins for closures in loop
+			Lines(6, // modify in nested call
+				"def doit",
+				"  inc",
+				"  add 2",
+				"doit; x");
+
+
+			/* TODO: multiple cousins for closures in loop
 			
-			! Although the following appears to work, I am not sure why, it should not
-			! because all the closures should now share single context `var j=i` does not matter
 			Reset();
 			Lines("123",
 				"var s = \"\"",
 				"var a = new list",
 				"for var i = 0; i < 3; i++",
 				"  a.add def f",
-				"    var j = i",
-				"    s += j + 1",
+				"    s += i + 1",
 				"for var f in a; f",
 				"return s");
 
@@ -322,6 +325,19 @@ obj.getTotal    // returns 1
 				"wait; wait; wait",
 				"system.update.remove update",
 				"return x");
+
+			Reset();
+			YieldLines(ExitCode.Return, 5,
+				"var x = 0",
+				"var s1 = system.update def; x++",
+				"var s2 = system.update def; x+=2",
+				"yield",
+				"s1.remove",
+				"wait",
+				"s2.remove",
+				"wait; wait",
+				"return x");
+			Assert.AreEqual(0, Update.Count);
 		}
 	}
 }

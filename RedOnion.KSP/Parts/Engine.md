@@ -11,7 +11,7 @@ Engine of a ship (vehicle/vessel).
 - `gimbalModule`: ModuleGimbal - KSP API. Gimbal module, if present (null otherwise).
 - `multiMode`: Boolean - Is multi-mode engine (or not).
 - `hasGimbal`: Boolean - Has gimbal module.
-- `thrust`: Single - Avalable thrust at current pressure, ignoring the limiter (`thrustPercentage` and current throttle).
+- `thrust`: Single - Current thrust (at current pressure, with current `thrustPercentage` and current throttle).
 - `thrustPercentage`: Single - Thrust limiter in percents.
 - `ship`: [Ship](../API/Ship.md) - Ship (vehicle/vessel) this part belongs to.
 - `native`: Part - Native `Part` - KSP API.

@@ -239,15 +239,39 @@ namespace RedOnion.ROS
 				}
 				if (at < 0 || at >= prop.size)
 					return false;
+				var write = prop.items[at].write;
+				if (write == null) return false;
 				if (op == OpCode.Assign)
 				{
-					var write = prop.items[at].write;
-					if (write == null) return false;
 					write(self.obj, value);
 					return true;
 				}
-				//TODO: other operations
-				return false;
+				var read = prop.items[at].read;
+				if (read == null) return false;
+				var it = read(self.obj);
+				if (op.Kind() == OpKind.Assign)
+				{
+					if (!it.desc.Binary(ref it, op + 0x10, ref value)
+						&& !value.desc.Binary(ref it, op + 0x10, ref value))
+						return false;
+					write(self.obj, it);
+					return true;
+				}
+				if (op.Kind() != OpKind.PreOrPost)
+					return false;
+				if (op >= OpCode.Inc)
+				{
+					if (!it.desc.Unary(ref it, op))
+						return false;
+					write(self.obj, it);
+					return true;
+				}
+				var tmp = it;
+				if (!it.desc.Unary(ref it, op + 0x08))
+					return false;
+				write(self.obj, it);
+				self = tmp;
+				return true;
 			}
 			public override IEnumerable<Value> Enumerate(object self)
 			{

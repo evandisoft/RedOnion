@@ -31,6 +31,8 @@ namespace RedOnion.ROS.Tests
 				name = v;
 				Integer = i;
 			}
+			[Convert(typeof(Double))]
+			public static int number { get; set; }
 		}
 		public class InstanceTest
 		{
@@ -53,6 +55,8 @@ namespace RedOnion.ROS.Tests
 				name = v;
 				Integer = i;
 			}
+			[Convert(typeof(Double))]
+			public int number { get; set; }
 		}
 		public class MixedTest
 		{
@@ -101,6 +105,8 @@ namespace RedOnion.ROS.Tests
 			Test("var m = new mix");
 			Test("mix", "m.name");
 			Test(1.414f, "m.value");
+
+			Test(3, "it.integer += 1");
 		}
 
 		[Test]
@@ -255,6 +261,59 @@ namespace RedOnion.ROS.Tests
 			StaticTest.CallAction2("test");
 			UpdatePhysics();
 			Assert.AreEqual("test", StaticTest.name);
+
+			var it = new InstanceTest();
+			Globals.Add("it", it);
+			Test("def setName2 name => it.name = name");
+			Test("it.addAction2 setName2");
+			it.CallAction2("test");
+			UpdatePhysics();
+			Assert.AreEqual("test", it.name);
+		}
+
+		public struct SVect
+		{
+			public double x, y, z;
+			public SVect(double x, double y, double z)
+			{
+				this.x = x;
+				this.y = y;
+				this.z = z;
+			}
+		}
+		public class CVect
+		{
+			protected SVect native;
+			public CVect() { }
+			public CVect(double x, double y, double z)
+				=> native = new SVect(x, y, z);
+			public static implicit operator SVect(CVect v) => v.native;
+			public static explicit operator CVect(SVect v) => new CVect(v.x, v.y, v.z);
+			public double X => native.x;
+			public double Y => native.y;
+			public double Z => native.z;
+
+			[Convert(typeof(CVect))]
+			public static SVect Test { get; set; }
+		}
+		[Test]
+		public void ROS_Refl09_Convert()
+		{
+			Globals = new Globals();
+			Globals.Add(typeof(StaticTest));
+			Test(0.0, "staticTest.number");
+			Test(1.1, "staticTest.number = 1.1");
+			Test(1.0, "staticTest.number");
+
+			var it = new InstanceTest();
+			Globals.Add("it", it);
+			Test(0.0, "it.number");
+			Test(1.1, "it.number = 1.1");
+			Test(1.0, "it.number");
+
+			Globals.Add(typeof(CVect));
+			Test("cvect.test = cvect 1,2,3");
+			Test(1.0, "cvect.test.x");
 		}
 	}
 }

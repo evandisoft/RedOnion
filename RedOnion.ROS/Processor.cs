@@ -34,7 +34,62 @@ namespace RedOnion.ROS
 		public event Action PhysicsUpdate;
 		public event Action GraphicUpdate;
 		public Action<string> Print;
+		public Action<string> PrintError;
 		void IProcessor.Print(string msg) => Print?.Invoke(msg);
+		public void PrintException(string where, Exception ex)
+		{
+			var hdr = Value.Format("Exception in {0}: {1}", where, ex.Message);
+			Log(hdr);
+			PrintError?.Invoke(hdr);
+#if !DEBUG
+			if (ex is Error err)
+			{
+				var line = err.Line;
+				var str = Value.Format(line == null ? "Error at line {0}."
+					: "Error at line {0}: {1}", err.LineNumber+1, line);
+				Log(str);
+				PrintError?.Invoke(str);
+			}
+#else
+			var err = ex as Error;
+			if (err != null)
+			{
+				var line = err.Line;
+				var str = Value.Format(line == null ? "Error at line {0}."
+					: "Error at line {0}: {1}", err.LineNumber + 1, line);
+				Log(str);
+				PrintError?.Invoke(str);
+				ex = ex.InnerException;
+			}
+			var trace = ex?.StackTrace;
+			if (trace != null && trace.Length > 0)
+			{
+				Log(trace);
+				PrintError?.Invoke(trace);
+			}
+			if (err is RuntimeError re)
+			{
+				var code = re.Code?.Code;
+				if (code == null)
+					return;
+				var sb = new StringBuilder();
+				var at = re.CodeAt;
+				if (at > 0)
+				{
+					for (int i = Math.Max(0, at - 64); i < at; i++)
+						sb.AppendFormat("{0:X2}", code[i]);
+					Log(sb.ToString());
+				}
+				if (at < code.Length)
+				{
+					sb.Length = 0;
+					for (int i = at, n = Math.Min(at + 64, code.Length); i < n; i++)
+						sb.AppendFormat("{0:X2}", code[i]);
+					Log(sb.ToString());
+				}
+			}
+#endif
+		}
 
 		/// <summary>
 		/// Total time-limit for all handlers (one of each type can still be executed).
@@ -91,7 +146,7 @@ namespace RedOnion.ROS
 			=> Parser.Compile(source, path);
 		public virtual string ReadScript(string path)
 		{
-			if (!Path.IsPathRooted(path))
+			if (!Path.IsPathRooted(path) && !File.Exists(path))
 				path = Path.Combine(Path.GetDirectoryName(typeof(Processor).Assembly.Location), path);
 			if (File.Exists(path))
 				return File.ReadAllText(path, Encoding.UTF8);
@@ -116,8 +171,7 @@ namespace RedOnion.ROS
 					}
 					catch (Exception ex)
 					{
-						Log("Exception in Shutdown: " + ex.Message);
-						Log(ex);
+						PrintException("Shutdown", ex);
 					}
 				}
 			}
@@ -173,9 +227,8 @@ namespace RedOnion.ROS
 					}
 					catch (Exception ex)
 					{
-						Log("Exception in GraphicUpdate: " + ex.Message);
-						Log(ex);
 						PhysicsUpdate -= handler;
+						PrintException("GraphicUpdate", ex);
 					}
 				}
 			}
@@ -186,7 +239,7 @@ namespace RedOnion.ROS
 			watch.Reset();
 			watch.Start();
 
-			// see Event.AutoRemove
+			// see Event.AutoRemove (the list is filled from destructors)
 			lock (eventsToRemove)
 			{
 				foreach (var e in eventsToRemove)
@@ -194,7 +247,7 @@ namespace RedOnion.ROS
 				eventsToRemove.Clear();
 			}
 
-			// update
+			// update (periodic, every physics/fixed update if possible)
 			if (!Update.IsEmpty)
 			{
 				do
@@ -207,7 +260,7 @@ namespace RedOnion.ROS
 				&& TimeoutPercent > UpdatePercent);
 			}
 
-			// one shot
+			// one shot (usually from UI like button click)
 			if (Once.IsEmpty)
 				onceSkipped = 0;
 			else if (CountdownPercent <= OncePercent && onceSkipped < MaxOneShotSkips)
@@ -225,7 +278,7 @@ namespace RedOnion.ROS
 				&& TimeoutPercent > OncePercent);
 			}
 
-			// idle
+			// idle (less important like staging logic)
 			if (Idle.IsEmpty)
 				idleSkipped = 0;
 			else if (CountdownPercent <= IdlePercent && idleSkipped < MaxIdleSkips)
@@ -243,7 +296,7 @@ namespace RedOnion.ROS
 				&& TimeoutPercent > IdlePercent);
 			}
 
-			// main
+			// main (note: exceptions are propagated, terminating execution)
 			do
 			{
 				if (!Paused)
@@ -254,7 +307,7 @@ namespace RedOnion.ROS
 			} while (Exit == ExitCode.Countdown
 			&& TotalCountdown > 0 && watch.Elapsed < UpdateTimeout);
 
-			// other updates
+			// other updates (e.g. vector drawing)
 			var physics = PhysicsUpdate;
 			if (physics != null)
 			{
@@ -266,9 +319,8 @@ namespace RedOnion.ROS
 					}
 					catch (Exception ex)
 					{
-						Log("Exception in PhysicsUpdate: " + ex.Message);
-						Log(ex);
 						PhysicsUpdate -= handler;
+						PrintException("PhysicsUpdate", ex);
 					}
 				}
 			}
@@ -317,8 +369,7 @@ namespace RedOnion.ROS
 			}
 			catch (Exception ex)
 			{
-				Log("Exception in FixedUpdate.{0}: {1}", name, ex.Message);
-				Log(ex);
+				PrintException("FixedUpdate." + name, ex);
 				return false;
 			}
 			return true;
@@ -326,7 +377,7 @@ namespace RedOnion.ROS
 
 		[Description(
 @"List of subscriptions - actions to be called.
-(Periodically for `update` and `idle`, once for `oneShot`.).
+(Periodically for `update` and `idle`, once for `once`.).
 Either use `add/remove` pair, or call the list and store the auto-remove subscription object.
 The subscription will be automatically removed if there is no reference to the subscription object.
 
@@ -363,9 +414,9 @@ wait // will not get executed
 ")]
 		public sealed class Event : ICallable
 		{
-			internal Event(List<Event.Subscription> eventsToRemove)
+			internal Event(List<Subscription> eventsToRemove)
 				=> this.eventsToRemove = eventsToRemove;
-			internal readonly List<Event.Subscription> eventsToRemove;
+			internal readonly List<Subscription> eventsToRemove;
 			internal Subscription first, next;
 			internal bool AtFirst => next == first;
 			internal bool IsEmpty => first == null;
@@ -428,7 +479,6 @@ wait // will not get executed
 
 				// destructors could be called from different thread
 				// this is a way to delegate the removal to main thread
-				internal readonly static List<Subscription> toRemove = new List<Subscription>();
 				~AutoRemove()
 				{
 					var e = Subscription.Event;

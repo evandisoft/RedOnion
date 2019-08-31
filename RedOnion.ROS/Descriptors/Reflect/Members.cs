@@ -311,7 +311,7 @@ namespace RedOnion.ROS
 								write,
 								GetConvertExpression(GetValueConvertExpression(
 									convert ?? type, ValueParameter),
-									convert == null ? null : p.PropertyType)),
+									convert == null ? null : type)),
 							SelfParameter, ValueParameter
 						).Compile();
 				}

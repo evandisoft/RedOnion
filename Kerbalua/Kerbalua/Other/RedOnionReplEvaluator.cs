@@ -22,16 +22,20 @@ namespace Kerbalua.Other
 		{
 			suggest = new RosSuggest(processor = new RosProcessor());
 			processor.Print += PrintRedirect;
+			processor.PrintError += ErrorRedirect;
 		}
 		protected override void Dispose(bool disposing)
 		{
 			processor.Print -= PrintRedirect;
+			processor.PrintError -= ErrorRedirect;
 			if (disposing)
 				processor.Dispose();
 			base.Dispose(disposing);
 		}
 		protected void PrintRedirect(string msg)
 			=> PrintAction?.Invoke(msg);
+		protected void ErrorRedirect(string msg)
+			=> PrintErrorAction?.Invoke(msg);
 
 		public override void FixedUpdate()
 		{

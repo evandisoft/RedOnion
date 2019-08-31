@@ -121,9 +121,9 @@ namespace RedOnion.KSP.Parts
 		[Unsafe, Description("KSP API. Gimbal module, if present (null otherwise).")]
 		public ModuleGimbal gimbalModule { get; private set; }
 		[Description("Is multi-mode engine (or not).")]
-		public bool multiMode { get { return secondModule != null; } }
+		public bool multiMode => secondModule != null;
 		[Description("Has gimbal module.")]
-		public bool hasGimbal { get { return gimbalModule != null; } }
+		public bool hasGimbal => gimbalModule != null;
 
 		[Description("Accepts `sensor`. (Case insensitive)")]
 		public override bool istype(string name)

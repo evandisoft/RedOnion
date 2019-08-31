@@ -1,7 +1,7 @@
 using System;
 using UE = UnityEngine;
 using UUI = UnityEngine.UI;
-using ROC = RedOnion.UI.Components;
+using UIC = RedOnion.UI.Components;
 using KSP.UI;
 using System.ComponentModel;
 
@@ -42,9 +42,9 @@ namespace RedOnion.KSP.Namespaces
 		public static Type Button = typeof(UUI.Button);
 		public static Type Image = typeof(UUI.Image);
 		public static Type RawImage = typeof(UUI.RawImage);
-		public static Type BackgroundImage = typeof(ROC.BackgroundImage);
-		public static Type DragHandler = typeof(ROC.DragHandler);
-		public static Type LayoutComponent = typeof(ROC.LayoutComponent);
+		public static Type BackgroundImage = typeof(UIC.BackgroundImage);
+		public static Type DragHandler = typeof(UIC.DragHandler);
+		public static Type LayoutComponent = typeof(UIC.LayoutComponent);
 
 		public static Type Screen = typeof(UE.Screen);
 		public static Type Sprite = typeof(UE.Sprite);

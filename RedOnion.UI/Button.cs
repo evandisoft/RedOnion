@@ -7,7 +7,7 @@ namespace RedOnion.UI
 {
 	public class Button : Element
 	{
-		protected UUI.Button Core { get; private set; }
+		protected ToggleableButton Core { get; private set; }
 		protected BackgroundImage Image { get; private set; }
 
 		protected Label label;
@@ -48,11 +48,12 @@ namespace RedOnion.UI
 		public Button(string name = null)
 			: base(name)
 		{
-			Core = GameObject.AddComponent<UUI.Button>();
+			Core = GameObject.AddComponent<ToggleableButton>();
 			Image = GameObject.AddComponent<BackgroundImage>();
 			Image.sprite = Skin.button.normal.background;
 			Image.type = UUI.Image.Type.Sliced;
 			Core.image = Image;
+			//Core.targetGraphic = Image;
 			Core.spriteState = new UUI.SpriteState()
 			{
 				pressedSprite = Skin.button.active.background,
@@ -80,6 +81,18 @@ namespace RedOnion.UI
 			get => new Event(Core.onClick);
 			set { }
 		}
+		public bool Toggleable
+		{
+			get => Core.Toggleable;
+			set => Core.Toggleable = value;
+		}
+		public bool Pressed
+		{
+			get => Core.Pressed;
+			set => Core.Pressed = value;
+		}
+		public void Press() => Core.Press();
+		public void Toggle() => Core.Toggle();
 
 		public string Text
 		{
@@ -109,8 +122,25 @@ namespace RedOnion.UI
 						return;
 					icon.Dispose();
 					icon = null;
+					return;
 				}
 				IconCore.Texture = value;
+			}
+		}
+		public Sprite IconSprite
+		{
+			get => icon?.Sprite;
+			set
+			{
+				if (value == null)
+				{
+					if (icon == null)
+						return;
+					icon.Dispose();
+					icon = null;
+					return;
+				}
+				IconCore.Sprite = value;
 			}
 		}
 

@@ -60,12 +60,16 @@ namespace RedOnion.UI
 		{
 		}
 
+		public bool AutoSize { get; set; } = true;
+		public bool HasRaw => raw != null;
+		public bool HasImage => image != null;
 		public Texture Texture
 		{
 			get => raw?.texture ?? image?.sprite?.texture;
 			set
 			{
 				Raw.texture = value;
+				if (!AutoSize) return;
 				Raw.SetNativeSize();
 				MinWidth = value.width;
 				MinHeight = value.height;
@@ -79,7 +83,7 @@ namespace RedOnion.UI
 
 		public Sprite Sprite
 		{
-			get => Core.sprite;
+			get => image?.sprite;
 			set
 			{
 				Core.sprite = value;
