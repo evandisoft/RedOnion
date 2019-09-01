@@ -204,6 +204,12 @@ namespace RedOnion.ROS.Tests
 			public static TestEnum Or(TestEnum a, TestEnum b)
 				=> (TestEnum)((int)a | (int)b);
 		}
+		public class EnumClass
+		{
+			public TestEnum Value { get; set; }
+			public EnumClass() { }
+			public EnumClass(TestEnum value) => Value = value;
+		}
 		[Test]
 		public void ROS_Refl05_Enum()
 		{
@@ -214,6 +220,8 @@ namespace RedOnion.ROS.Tests
 			Test(TestEnum.Zero, "zero");
 			Test(1, "enumUtils.enum2int testEnum.one");
 			Test(TestEnum.Three, "enumUtils.or testEnum.one, testEnum.two");
+			Globals.Add(typeof(EnumClass));
+			Test(TestEnum.One, "(new enumClass testEnum.one).value");
 		}
 
 		[Test]
@@ -224,6 +232,7 @@ namespace RedOnion.ROS.Tests
 			Test(2.7f, "math.abs -2.7f");
 			Test(1.41, "math.max 1.0, 1.41");
 			Test(30.0, "math.deg.asin 0.5");
+			Test(0.5, "math.min 1, 0.5"); // mixing integer with double
 		}
 
 		[Test]

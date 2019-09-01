@@ -22,8 +22,7 @@ namespace RedOnion.UI
 			public Button Close { get; }
 			public Panel Content { get; }
 
-			public FramePanel(string name = null)
-				: base("Window Frame")
+			public FramePanel()
 			{
 				GameObject.transform.SetParent(UIMasterController.Instance.dialogCanvas.transform, false);
 				Group = GameObject.AddComponent<CanvasGroup>();
@@ -36,24 +35,24 @@ namespace RedOnion.UI
 				Color = new Color(.2f, .2f, .2f, .8f);
 				Layout = Layout.Vertical;
 				LayoutPadding = new LayoutPadding(0f);
-				Header = Add(new Panel("Window Title Row")
+				Header = Add(new Panel
 				{
 					Layout = Layout.Horizontal,
 					FlexWidth = 1f,
 				});
-				Title = Header.Add(new Label("Window Title")
+				Title = Header.Add(new Label
 				{
 					Text = "Window",
 					TextColor = Color.white,
 					TextAlign = TextAnchor.MiddleLeft,
 					FlexWidth = 1f,
 				});
-				Close = Header.Add(new Button("Window Close Button")
+				Close = Header.Add(new Button
 				{
 					IconTexture = DefaultCloseButtonIcon,
 					Padding = 3f, Spacing = 3f,
 				});
-				Content = Add(new Panel("Window Content Panel")
+				Content = Add(new Panel
 				{
 					Color = new Color(.5f, .5f, .5f, .5f),
 					//Sprite = Skin.window.normal.background,
@@ -89,7 +88,7 @@ namespace RedOnion.UI
 		public Window(string name = null, Layout layout = Layout.Vertical)
 		{
 			Scenes = (SceneFlags)(1 << (int)HighLogic.LoadedScene);
-			Frame = new FramePanel(name);
+			Frame = new FramePanel();
 			Content = Frame.Content;
 			Content.Layout = layout;
 			Frame.Close.Click += Close;

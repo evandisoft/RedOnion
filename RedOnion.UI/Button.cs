@@ -39,14 +39,13 @@ namespace RedOnion.UI
 				{
 					if (GameObject == null)
 						throw new ObjectDisposedException(Name);
-					icon = Add(new Image("Icon"));
+					icon = Add(new Image());
 				}
 				return icon;
 			}
 		}
 
-		public Button(string name = null)
-			: base(name)
+		public Button()
 		{
 			Core = GameObject.AddComponent<ToggleableButton>();
 			Image = GameObject.AddComponent<BackgroundImage>();
@@ -64,6 +63,7 @@ namespace RedOnion.UI
 			Spacing = 6f;
 			Layout = Layout.Horizontal;
 		}
+		public Button(string text) : this() => Text = text;
 
 		protected override void Dispose(bool disposing)
 		{

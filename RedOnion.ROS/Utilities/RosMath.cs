@@ -6,7 +6,7 @@ namespace RedOnion.ROS.Utilities
 	public static class RosMath
 	{
 		public const double PI = Math.PI;
-		public const double E = Math.PI;
+		public const double E = Math.E;
 		public const double NaN = double.NaN;
 		public const double Inf = double.PositiveInfinity;
 		public const double Deg2Rad = PI / 180.0;

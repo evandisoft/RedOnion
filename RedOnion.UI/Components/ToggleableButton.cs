@@ -37,9 +37,15 @@ namespace RedOnion.UI.Components
 				base.OnPointerClick(eventData);
 			else Toggle();
 		}
+		public override void OnPointerEnter(PointerEventData eventData)
+		{
+			if (Pressed) disableTransition = true;
+			base.OnPointerEnter(eventData);
+			disableTransition = false;
+		}
 		public override void OnPointerExit(PointerEventData eventData)
 		{
-			if (Toggleable) disableTransition = true;
+			if (Pressed) disableTransition = true;
 			base.OnPointerExit(eventData);
 			disableTransition = false;
 		}

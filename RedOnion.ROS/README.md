@@ -119,12 +119,29 @@ z = x \
   + y
 ```
 
+## Number types
+
+Beware that ROS distinguishes between various types of numbers,
+especially integers (`int`, `uint`, `byte`, ...) vs. floating-point number (`double` or `float`).
+This could sometimes surprise you: `1/3` is `0` but `1.0/3` is `0.333...`
+because `1/3` uses integer arithmetic, but `1.0/3` uses floating-point arithmetic.
+Integer types get promoted to floating-point (`double`)
+if used in any operation involving floating-point number (the `3` gets converted to `3.0`
+making the expression `1.0/3.0`). Smaller integer types always get promoted to `int` or `double`.
+
+Operator `^` could also surprise you, because it means bitwise-xor in C#/C++.
+ROS translates the operator to `math.pow` if used with floating-point number,
+but again, remember that you first have to enforce floating-point arithmetic,
+or just use `**` operator (which works like `math.pow` even for integers).
+Also note that bitwise operators (`&`, `|`, `^`, `<<` and `>>`)
+have much higher priority/precedence in ROS than in C#/C++.
+
 ## Functions and lambdas
 
 Functions are created by `function` or `def` keyword
 followed by name of the function and list of arguments.
 The body has to be indented at least one space more
-than the `function`/`def` keyword.
+than the `function`/`def` keyword (or rather the line with that keyword).
 
 Lambdas have similar syntax but are anonymous,
 therefore there is no name after the keyword.
@@ -139,7 +156,7 @@ via `arguments` variable, as seen in previous example
 
 Every named argument actually passed is also accessible
 as a variable under the name specified in the definition.
-Arguments not provided will have the value of `null`.
+Arguments not provided will have the value `null`.
 
 ```
 def sum
@@ -166,7 +183,7 @@ Most of them come from C#, some from other languages.
 
 `if/unless` is followed by a condition,
 optional `then`, colon (`:`) or semicolon (`;`).
-Statement may follow, more statements must be indentet.
+Statement may follow, more statements must be indented.
 `else` with another block of statements may follow last.
 
 ```

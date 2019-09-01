@@ -23,10 +23,9 @@ namespace RedOnion.UI
 		public object Tag { get; set; }
 		public Element Parent { get; internal set; }
 
-		protected Element(string name = null)
+		protected Element()
 		{
-			GameObject = new GameObject(name);
-			GameObject.layer = UILayer;
+			GameObject = new GameObject() { layer = UILayer };
 			RectTransform = GameObject.AddComponent<RectTransform>();
 			RectTransform.pivot = new Vector2(.5f, .5f);
 			RectTransform.anchorMin = new Vector2(.5f, .5f);

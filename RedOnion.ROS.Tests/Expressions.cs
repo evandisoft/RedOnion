@@ -127,6 +127,8 @@ namespace RedOnion.ROS.Tests
 
 			Test(1, "var v = 1");  // integer
 			Test(2.0, "v += 1.0"); // double
+			Test(1.5, "v = math.clamp v, math.max(0, 1.0), math.min(1.5, 2)");
+			//Test("var i, j");//TODO: maybe only as statement, because `if var x = true, y = false` could be a problem (return last?)
 		}
 
 		[Test]

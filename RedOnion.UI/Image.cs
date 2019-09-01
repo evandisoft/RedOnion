@@ -55,11 +55,6 @@ namespace RedOnion.UI
 			}
 		}
 
-		public Image(string name = null)
-			: base(name)
-		{
-		}
-
 		public bool AutoSize { get; set; } = true;
 		public bool HasRaw => raw != null;
 		public bool HasImage => image != null;

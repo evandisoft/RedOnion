@@ -141,7 +141,7 @@ namespace RedOnion.KSP.API
 		public uint PersistentID => native.persistentId;
 		[Description("KSP API. Vessel type as selected by user (or automatically).")]
 		public VesselType vesseltype => native.vesselType;
-		[Description("Total mass of the ship (vehicle/vessel).")]
+		[Description("Total mass of the ship (vehicle/vessel). [tons = 1000 kg]")]
 		public float mass => native.GetTotalMass();
 		[Description("Wheter the ship is still packed (reduced physics).")]
 		public bool packed => native.packed;
@@ -295,9 +295,9 @@ namespace RedOnion.KSP.API
 		Vector3d ISpaceObject.position => centerOfMass;
 		[Convert(typeof(Vector)), Description("Angular velocity (ω, deg/s), how fast the ship rotates")]
 		public Vector3d angularVelocity => native.angularVelocityD * RosMath.Rad2Deg;
-		[Convert(typeof(Vector)), Description("Angular momentum (L = Iω, kg⋅m²⋅deg/s) aka moment of momentum or rotational momentum.")]
+		[Convert(typeof(Vector)), Description("Angular momentum (L = Iω, kg⋅m²⋅deg/s=N⋅m⋅s⋅deg) aka moment of momentum or rotational momentum.")]
 		public Vector3d angularMomentum => (Vector3d)native.angularMomentum * RosMath.Rad2Deg;
-		[Convert(typeof(Vector)), Description("Moment of inertia (I, kg⋅m²) aka angular mass or rotational inertia.")]
+		[Convert(typeof(Vector)), Description("Moment of inertia (I, kg⋅m²=N⋅m⋅s²) aka angular mass or rotational inertia.")]
 		public Vector3d momentOfInertia => native.MOI;
 
 		protected double _torqueStamp;

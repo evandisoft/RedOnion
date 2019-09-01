@@ -31,8 +31,20 @@ namespace RedOnion.KSP.Parts
 				protectedResources.SetDirty();
 		}
 
-		protected internal PartSet() { }
-		protected internal PartSet(Action refresh) : base(refresh) { }
+		[Description("Ship (vessel/vehicle) this list of parts belongs to.")]
+		public Ship ship
+		{
+			get
+			{
+				if (Dirty) DoRefresh();
+				return _ship;
+			}
+			protected internal set => _ship = value;
+		}
+		protected Ship _ship;
+
+		protected internal PartSet(Ship ship) => this.ship = ship;
+		protected internal PartSet(Ship ship, Action refresh) : base(refresh) => this.ship = ship;
 
 		bool IPartSet.Dirty => Dirty;
 		bool ICollection<PartBase>.IsReadOnly => true;
@@ -92,9 +104,6 @@ namespace RedOnion.KSP.Parts
 	}
 	public class ShipPartSet : PartSet<PartBase>, IDisposable
 	{
-		[Description("Ship (vessel/vehicle) this list of parts belongs to.")]
-		public Ship ship { get; protected set; }
-
 		protected PartBase protectedRoot;
 		[Description("Root part.")]
 		public PartBase root
@@ -129,12 +138,11 @@ namespace RedOnion.KSP.Parts
 		[Description("All sensors.")]
 		public ReadOnlyList<Sensor> sensors { get; protected set; }
 
-		protected internal ShipPartSet(Ship ship)
+		protected internal ShipPartSet(Ship ship) : base(ship)
 		{
-			this.ship = ship;
 			decouplers = new ReadOnlyList<Decoupler>(DoRefresh);
 			dockingports = new ReadOnlyList<DockingPort>(DoRefresh);
-			engines = new EngineSet(DoRefresh);
+			engines = new EngineSet(ship, DoRefresh);
 			sensors = new ReadOnlyList<Sensor>(DoRefresh);
 		}
 		protected internal override void SetDirty()
@@ -147,12 +155,12 @@ namespace RedOnion.KSP.Parts
 			dockingports.SetDirty();
 			engines.SetDirty();
 			sensors.SetDirty();
-			if (ship == Ship.Active)
+			if (_ship == Ship.Active)
 				Stage.SetDirty();
 		}
 		void VesselModified(Vessel vessel)
 		{
-			if (vessel == ship.native)
+			if (vessel == _ship.native)
 				SetDirty();
 		}
 
@@ -169,7 +177,7 @@ namespace RedOnion.KSP.Parts
 				return;
 			GameEvents.onVesselWasModified.Remove(VesselModified);
 			cache = null;
-			ship = null;
+			_ship = null;
 			protectedRoot = null;
 			protectedNextDecoupler = null;
 			if (disposing)
@@ -195,7 +203,7 @@ namespace RedOnion.KSP.Parts
 			dockingports.Clear();
 			engines.Clear();
 			sensors.Clear();
-			Construct(ship.native.rootPart, null, null);
+			Construct(_ship.native.rootPart, null, null);
 			base.DoRefresh();
 			decouplers.Dirty = false;
 			dockingports.Dirty = false;
@@ -213,7 +221,7 @@ namespace RedOnion.KSP.Parts
 			{
 				if (module is IEngineStatus)
 				{
-					var engine = new Engine(ship, part, parent, decoupler);
+					var engine = new Engine(_ship, part, parent, decoupler);
 					engines.Add(engine);
 					self = engine;
 					break;
@@ -223,7 +231,7 @@ namespace RedOnion.KSP.Parts
 					var dock = module as ModuleDockingNode;
 					if (dock != null)
 					{
-						var port = new DockingPort(ship, part, parent, decoupler, dock);
+						var port = new DockingPort(_ship, part, parent, decoupler, dock);
 						dockingports.Add(port);
 						self = port;
 						if (!module.StagingEnabled())
@@ -238,13 +246,13 @@ namespace RedOnion.KSP.Parts
 							continue;
 						if (module is global::LaunchClamp)
 						{
-							var clamp = new LaunchClamp(ship, part, parent, decoupler);
+							var clamp = new LaunchClamp(_ship, part, parent, decoupler);
 							self = clamp;
 							decoupler = clamp;
 						}
 						else if (module is ModuleDecouple || module is ModuleAnchoredDecoupler)
 						{
-							var separator = new Decoupler(ship, part, parent, decoupler);
+							var separator = new Decoupler(_ship, part, parent, decoupler);
 							self = separator;
 							decoupler = separator;
 						}
@@ -263,14 +271,14 @@ namespace RedOnion.KSP.Parts
 				var sensor = module as ModuleEnviroSensor;
 				if (sensor != null)
 				{
-					var sense = new Sensor(ship, part, parent, decoupler, sensor);
+					var sense = new Sensor(_ship, part, parent, decoupler, sensor);
 					sensors.Add(sense);
 					self = sense;
 					break;
 				}
 			}
 			if (self == null)
-				self = new PartBase(ship, part, parent, decoupler);
+				self = new PartBase(_ship, part, parent, decoupler);
 			if (protectedRoot == null)
 				protectedRoot = self;
 			if (cache == null)

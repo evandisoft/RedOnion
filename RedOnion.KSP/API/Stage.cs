@@ -43,31 +43,36 @@ namespace RedOnion.KSP.API
 
 		[Description("Parts that will be separated by next decoupler")]
 		public static PartSet<PartBase> parts { get; }
-			= new PartSet<PartBase>(Refresh);
+			= new PartSet<PartBase>(null, Refresh);
 		[Description("Active engines (regardless of decouplers)."
 			+ " `Engines.Resources` reflect total amounts of fuels"
 			+ " inside boosters with fuel that cannot flow (like solid fuel).")]
 		public static EngineSet engines { get; }
-			= new EngineSet(Refresh);
+			= new EngineSet(null, Refresh);
 		[Description("Active engines and all accessible tanks upto next decoupler."
-			+ " `CrossParts.Resources` reflect total amounts of fuels accessible to active engines,"
+			+ " `xparts.resources` reflect total amounts of fuels accessible to active engines,"
 			+ " but only in parts that will be separated by next decoupler."
 			+ " This includes liquid fuel and oxidizer and can be used for automated staging,"
 			+ " Especially so called Asparagus and any design throwing off tanks (with or without engiens).")]
-		public static PartSet<PartBase> crossparts { get; }
-			= new PartSet<PartBase>(Refresh);
+		public static PartSet<PartBase> xparts { get; }
+			= new PartSet<PartBase>(null, Refresh);
 
 		[Description("Amount of solid fuel available in active engines."
-			+ " Shortcut to `Engines.Resources.GetAmountOf(\"SolidFuel\")`.")]
+			+ " Shortcut to `engines.resources.getAmountOf(\"SolidFuel\")`.")]
 		public static double solidfuel
 			=> engines.resources.getAmountOf("SolidFuel");
 		[Description("Amount of liquid fuel available in tanks of current stage to active engines."
-			+ " Shortcut to `CrossParts.Resources.GetAmountOf(\"LiquidFuel\")`.")]
+			+ " Shortcut to `xparts.resources.getAmountOf(\"LiquidFuel\")`.")]
 		public static double liquidfuel
-			=> crossparts.resources.getAmountOf("LiquidFuel");
+			=> xparts.resources.getAmountOf("LiquidFuel");
 
 		[Description("Total amount of fuel avialable in active engines.")]
 		public static double fuel => solidfuel + liquidfuel;
+
+		[Description("Estimate burn time for given delta-v.")]
+		public static double burnTime(double deltaV) => engines.burnTime(deltaV);
+		// TODO: burnTime even if current stage cannot handle it
+
 
 		static protected internal bool Dirty { get; private set; } = true;
 		static protected internal void SetDirty(string reason = null)
@@ -83,10 +88,10 @@ namespace RedOnion.KSP.API
 			GameEvents.StageManager.OnGUIStageRemoved.Remove(Instance.StagesChanged);
 			Dirty = true;
 			parts.SetDirty();
-			crossparts.SetDirty();
+			xparts.SetDirty();
 			engines.SetDirty();
 			parts.Clear();
-			crossparts.Clear();
+			xparts.Clear();
 			engines.Clear();
 
 		}
@@ -106,17 +111,23 @@ namespace RedOnion.KSP.API
 		static protected void Refresh()
 		{
 			parts.Clear();
-			crossparts.Clear();
+			xparts.Clear();
 			engines.Clear();
 			var ship = Ship.Active;
 			if (ship == null)
 			{
 				Dirty = false;
 				parts.Dirty = false;
-				crossparts.Dirty = false;
+				xparts.Dirty = false;
 				engines.Dirty = false;
+				parts.ship = null;
+				xparts.ship = null;
+				engines.ship = null;
 				return;
 			}
+			parts.ship = ship;
+			xparts.ship = ship;
+			engines.ship = ship;
 			var shipParts = ship.parts;
 			var nextDecoupler = shipParts.nextDecouplerStage;
 			foreach (var p in shipParts)
@@ -129,17 +140,17 @@ namespace RedOnion.KSP.API
 				if (e.state != PartStates.ACTIVE)
 					continue;
 				engines.Add(e);
-				crossparts.Add(e);
+				xparts.Add(e);
 				foreach (var crossPart in e.native.crossfeedPartSet.GetParts())
 				{
 					var part = shipParts[crossPart];
 					if (part.decoupledin >= nextDecoupler)
-						crossparts.Add(part);
+						xparts.Add(part);
 				}
 			}
 			Dirty = false;
 			parts.Dirty = false;
-			crossparts.Dirty = false;
+			xparts.Dirty = false;
 			engines.Dirty = false;
 			GameEvents.onEngineActiveChange.Add(Instance.EngineChange);
 			GameEvents.onStageActivate.Add(Instance.StageActivated);

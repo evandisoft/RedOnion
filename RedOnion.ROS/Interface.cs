@@ -381,11 +381,14 @@ namespace RedOnion.ROS
 		public int Length => argc;
 		public int Count => argc;
 		public int Size => argc;
+
+		[DebuggerStepThrough]
 		public Arguments(ArgumentList list, int argc)
 		{
 			this.list = list;
 			this.argc = argc;
 		}
+		[DebuggerStepThrough]
 		public Arguments(Arguments args, int argc)
 		{
 			this.list = args.list;

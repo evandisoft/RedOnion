@@ -118,9 +118,15 @@ namespace RedOnion.ROS
 								continue;
 							return false;
 						}
-						if (type.IsPrimitive || type.IsEnum)
+						if (type.IsPrimitive)
 						{
 							if (arg.IsNumber)
+								continue;
+							return false;
+						}
+						if (type.IsEnum)
+						{
+							if (arg.desc.Primitive == ExCode.Enum)
 								continue;
 							return false;
 						}
@@ -178,7 +184,7 @@ namespace RedOnion.ROS
 							var type = param.ParameterType;
 							if (type == typeof(string))
 								call[i] = arg.ToStr();
-							else if (type.IsPrimitive || type.IsEnum)
+							else if (type.IsPrimitive)
 								call[i] = System.Convert.ChangeType(arg.Box(), type);
 							//else if (typeof(Delegate).IsAssignableFrom(type))
 							//	call[i] = ((BasicObjects.FunctionObj)arg.Object).GetDelegate(type);

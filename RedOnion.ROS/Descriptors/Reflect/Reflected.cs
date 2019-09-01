@@ -105,6 +105,8 @@ namespace RedOnion.ROS
 			{
 				if (result.obj is ICallable call)
 					return call.Call(ref result, self, args, create);
+				if (!create && result.obj != null && !(result.obj is Type))
+					return false;
 				if (args.Count == 0)
 				{
 					if (processorCtor != null

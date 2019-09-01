@@ -43,6 +43,30 @@ namespace RedOnion.ROS
 					}
 					if (args.Length > 0 && args[0].IsNumber)
 					{
+						//TODO: take inspiration from MoonSharp and its scoring logic
+						if (args.Length > 1 && argc >= 1 && args[1].IsNumber
+							&& args[0].desc != args[1].desc
+							&& (args[0].IsFpNumber || args[1].IsFpNumber))
+						{// for max(1, 0.5) and similar
+							foreach (var m in list)
+							{
+								var desc = (Callable)m.desc;
+								var ptype0 = desc.Params[0].ParameterType;
+								var ptype1 = desc.Params[1].ParameterType;
+								if ((ptype0 == typeof(double) && ptype1 == typeof(double))
+								|| (ptype0 == typeof(float) && ptype1 == typeof(float)
+								&& args[0].desc.Primitive != ExCode.Double
+								&& args[1].desc.Primitive != ExCode.Double))
+								{
+									var it = m;
+									if (it.desc.Call(ref it, self, args, create))
+									{
+										result = it;
+										return true;
+									}
+								}
+							}
+						}
 						// exact type
 						var type = args[0].desc.Type;
 						foreach (var m in list)

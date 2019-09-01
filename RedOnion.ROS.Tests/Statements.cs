@@ -85,6 +85,12 @@ namespace RedOnion.ROS.Tests
 				"if false; return 1",
 				"else if false; return 2",
 				"else return 3");
+
+			Lines(ExitCode.Return, 3,
+				"if true",
+				"  if false; return 1",
+				"else return 2",
+				"return 3");
 		}
 
 		[Test]
@@ -114,6 +120,14 @@ namespace RedOnion.ROS.Tests
 				"  counter = 10",
 				"until counter > 10",
 				"return counter");
+
+			Lines(ExitCode.Return, 1,
+				"var it = 0",
+				"until (",
+				"  false)",
+				"  it = 1",
+				"  return it",
+				"return it+2");
 		}
 
 		[Test]

@@ -25,7 +25,7 @@ namespace RedOnion.ROS.Parsing
 		{
 			Debug.Assert(op.Priority() > ExCode.Assign.Priority());
 			while (operators.size > bottom && TopOperator().Priority() >= op.Priority())
-				PrepareOperator(PopOperator());
+				PrepareOperator(PopOperator(), bottom);
 			operators.Push(op);
 		}
 
@@ -50,7 +50,7 @@ namespace RedOnion.ROS.Parsing
 		/// <summary>
 		/// Prepare top operator (prepare postfix record or expression tree node)
 		/// </summary>
-		protected void PrepareOperator(ExCode op)
+		protected void PrepareOperator(ExCode op, int bottom)
 		{
 			Debug.Assert(op.Kind() <= OpKind.PreOrPost && op.Kind() >= OpKind.Special);
 
@@ -101,7 +101,7 @@ namespace RedOnion.ROS.Parsing
 				n++;
 				mstart = TopInt(mstart);
 			}
-			while (operators.size > 0 && TopOperator() == ExCode.Comma)
+			while (operators.size > bottom && TopOperator() == ExCode.Comma)
 			{
 				PopOperator();
 				n++;

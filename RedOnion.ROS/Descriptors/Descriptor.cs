@@ -29,7 +29,7 @@ namespace RedOnion.ROS
 		{
 			Name = name ?? type.Name;
 			Type = type;
-			Primitive = ExCode.Class;
+			Primitive = type.IsEnum ? ExCode.Enum : type.IsValueType ? ExCode.Struct : ExCode.Class;
 			TypeCode = TypeCode.Object;
 		}
 		protected Descriptor(string name)

@@ -217,7 +217,7 @@ namespace RedOnion.ROS.Parsing
 			}
 			while (ParseClasses(Flag.None));
 
-			ParseBlock(Flag.NoSize);
+			ParseBlock(Flag.NoSize, 0);
 		}
 
 		/// <summary>

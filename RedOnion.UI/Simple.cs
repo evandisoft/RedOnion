@@ -7,10 +7,8 @@ namespace RedOnion.UI
 {
 	public class Simple : Element
 	{
-		public Simple(string name = null)
-			: base(name)
-		{
-		}
+		public Simple() : base() { }
+		public Simple(Layout layout) : base() => Layout = layout;
 
 		protected UUI.RawImage rawImage;
 		public UUI.RawImage RawImage

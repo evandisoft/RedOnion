@@ -209,6 +209,8 @@ namespace RedOnion.ROS.Parsing
 		/// </code></remarks>
 		protected virtual void ParseFunction(string name, Flag flags)
 		{
+			var ind = Indent;
+
 			// swap context
 			var prevCtx = ctx;
 			ctx = ctxPool.size > 0 ? ctxPool.Pop() : new Context();
@@ -286,7 +288,7 @@ namespace RedOnion.ROS.Parsing
 			// body
 			var labels = StoreLabels();
 			var blockAt = code.size;
-			var count = ParseBlock(flags);
+			var count = ParseBlock(flags, ind);
 			if (lambda && count == 1)
 			{
 				if (HasOption(Option.Prefix))

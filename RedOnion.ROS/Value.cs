@@ -52,10 +52,12 @@ namespace RedOnion.ROS
 
 		/// <summary>
 		/// The descriptor - how the core interacts with the value
+		/// or what type it represents if obj == null
+		/// (except for null and void - these are type-less values)
 		/// </summary>
 		public Descriptor desc;
 		/// <summary>
-		/// The object unless primitive value (number, null, void).
+		/// The object unless primitive value (number, null, void or type).
 		/// </summary>
 		public object obj;
 		/// <summary>

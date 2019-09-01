@@ -12,8 +12,7 @@ namespace RedOnion.UI
 		public Label Label { get; private set; }
 		protected BackgroundImage Image { get; private set; }
 
-		public TextBox(string name = null)
-			: base(name)
+		public TextBox()
 		{
 			Image = GameObject.AddComponent<BackgroundImage>();
 			Image.sprite = Skin.textField.normal.background;
@@ -28,6 +27,7 @@ namespace RedOnion.UI
 			});
 			Core.textComponent = Label.Core;
 		}
+		public TextBox(string text) : this() => Text = text;
 
 		protected override void Dispose(bool disposing)
 		{

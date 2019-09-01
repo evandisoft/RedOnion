@@ -9,10 +9,8 @@ namespace RedOnion.UI
 {
 	public class Panel : Simple, IEnumerable<Element>
 	{
-		public Panel(string name = null)
-			: base(name)
-		{
-		}
+		public Panel() : base() { }
+		public Panel(Layout layout) : base(layout) { }
 
 		protected List<Element> children;
 		protected override void AddElement(Element element)

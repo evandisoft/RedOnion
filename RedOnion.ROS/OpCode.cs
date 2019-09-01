@@ -129,29 +129,30 @@ namespace RedOnion.ROS
 
 	//	assign
 		Assign			= 0x30, // =
-		OrAssign		= 0x31, // |=
-		XorAssign		= 0x32, // ^=
-		AndAssign		= 0x33, // &=
-		LshAssign		= 0x34, // <<=
-		RshAssign		= 0x35, // >>=
-		AddAssign		= 0x36, // +=
-		SubAssign		= 0x37, // -=
-		MulAssign		= 0x38, // *=
-		DivAssign		= 0x39, // /=
-		ModAssign		= 0x3A, // %=
+		AddAssign		= 0x31, // +=
+		SubAssign		= 0x32, // -=
+		MulAssign		= 0x33, // *=
+		DivAssign		= 0x34, // /=
+		ModAssign		= 0x35, // %=
+		PwrAssign		= 0x36, // **=
+		OrAssign		= 0x37, // |=
+		XorAssign		= 0x38, // ^=
+		AndAssign		= 0x39, // &=
+		LshAssign		= 0x3A, // <<=
+		RshAssign		= 0x3B, // >>=
 
 	//	binary
-		BitOr			= 0x41, // |
-		BitXor			= 0x42, // ^
-		BitAnd			= 0x43, // &
-		ShiftLeft		= 0x44, // <<
-		ShiftRight		= 0x45, // >>
-		Add				= 0x46, // +
-		Sub				= 0x47, // -
-		Mul				= 0x48, // *
-		Div				= 0x49, // /
-		Mod				= 0x4A, // %
-		Power			= 0x4B, // **		(reserved)
+		Add				= 0x41, // +
+		Sub				= 0x42, // -
+		Mul				= 0x43, // *
+		Div				= 0x44, // /
+		Mod				= 0x45, // %
+		Power			= 0x46, // **
+		BitOr			= 0x47, // |		!! changed priority from C#/C++ !!
+		BitXor			= 0x48, // ^		!! changed priority from C#/C++ !!
+		BitAnd			= 0x49, // &		!! changed priority from C#/C++ !!
+		ShiftLeft		= 0x4A, // <<		!! changed priority from C#/C++ !!
+		ShiftRight		= 0x4B, // >>		!! changed priority from C#/C++ !!
 
 	//	logic + casts
 		LogicOr			= 0x50, // ||
@@ -325,69 +326,70 @@ namespace RedOnion.ROS
 
 	//	assign
 		Assign			= 0x0130, // =
-		OrAssign		= 0x0131, // |=
-		XorAssign		= 0x0132, // ^=
-		AndAssign		= 0x0133, // &=
-		LshAssign		= 0x0134, // <<=
-		RshAssign		= 0x0135, // >>=
-		AddAssign		= 0x0136, // +=
-		SubAssign		= 0x0137, // -=
-		MulAssign		= 0x0138, // *=
-		DivAssign		= 0x0139, // /=
-		ModAssign		= 0x013A, // %=
+		AddAssign		= 0x0131, // +=
+		SubAssign		= 0x0132, // -=
+		MulAssign		= 0x0133, // *=
+		DivAssign		= 0x0134, // /=
+		ModAssign		= 0x0135, // %=
+		PwrAssign		= 0x0136, // **=
+		OrAssign		= 0x0137, // |=
+		XorAssign		= 0x0138, // ^=
+		AndAssign		= 0x0139, // &=
+		LshAssign		= 0x013A, // <<=
+		RshAssign		= 0x013B, // >>=
 
 	//	binary
-		BitOr			= 0x0A41, // |		!! changed priority !! 5 in C#
-		BitXor			= 0x0B42, // ^		!! changed priority !! 6 in C#
-		BitAnd			= 0x0C43, // &		!! changed priority !! 7 in C#
-		ShiftLeft		= 0x0D44, // <<
-		ShiftRight		= 0x0D45, // >>
-		Add				= 0x0E46, // +
-		Sub				= 0x0E47, // -
-		Mul				= 0x0F48, // *
-		Div				= 0x0F49, // /
-		Mod				= 0x0F4A, // %
-		Power			= 0x904B, // **		(reserved)
+		Add				= 0x0B41, // +
+		Sub				= 0x0B42, // -
+		Mul				= 0x0C43, // *
+		Div				= 0x0C44, // /
+		Mod				= 0x0C45, // %
+		Power			= 0x0D46, // **
+		BitOr			= 0x0E47, // |		!! changed priority from C#/C++ !!
+		BitXor			= 0x0F48, // ^		!! changed priority from C#/C++ !!
+		BitAnd			= 0x1049, // &		!! changed priority from C#/C++ !!
+		ShiftLeft		= 0x114A, // <<		!! changed priority from C#/C++ !!
+		ShiftRight		= 0x114B, // >>		!! changed priority from C#/C++ !!
 
 	//	logic + casts
 		LogicOr			= 0x0350, // ||
 		LogicAnd		= 0x0451, // &&
-	//	priority 5..7 reserved for C# binary or, xor, and
-		Equals			= 0x0852, // ==
-		Differ			= 0x0853, // !=
-		Less			= 0x0954, // <
-		More			= 0x0955, // >
-		LessEq			= 0x0956, // <=
-		MoreEq			= 0x0957, // >=
-		Identity		= 0x0958, // ===
-		NotIdentity		= 0x0959, // !==
+	//	priority 5..8 reserved for C# binary or, xor, and, <<, >>
+		Equals			= 0x0952, // ==
+		Differ			= 0x0953, // !=
+		Less			= 0x0A54, // <
+		More			= 0x0A55, // >
+		LessEq			= 0x0A56, // <=
+		MoreEq			= 0x0A57, // >=
+		Identity		= 0x0A58, // ===
+		NotIdentity		= 0x0A59, // !==
 
-		As				= 0x095A, // as
-		AsCast			= 0x095B, // as!
-		Cast			= 0x095C, // !		(type! value)
-		Is				= 0x095D, // is
-		IsNot			= 0x095E, // is!
+		As				= 0x0A5A, // as
+		AsCast			= 0x0A5B, // as!
+		Cast			= 0x0A5C, // !		(type! value)
+		Is				= 0x0A5D, // is
+		IsNot			= 0x0A5E, // is!
 	
 	//	unary
-		Plus			= 0x4F60, // +x
-		Neg				= 0x4F61, // -x
-		Flip			= 0x4F62, // ~x
-		Not				= 0x4F63, // !x
-		AddrOf			= 0xCF64, // &x		(reserved)
-		Deref			= 0xCF65, // *x		(reserved)
+		Plus			= 0x5260, // +x
+		Neg				= 0x5261, // -x
+		Flip			= 0x5262, // ~x
+		Not				= 0x5263, // !x
+		AddrOf			= 0xD264, // &x		(reserved)
+		Deref			= 0xD265, // *x		(reserved)
 
-		TypeOf			= 0xCF68, // typeof x
-		NameOf			= 0xCF69, // nameof x
-		Await			= 0x406A, // await task
-		Delete			= 0x406D, // delete
-		Ref				= 0x406E, // ref
-		Out				= 0x406F, // out
+		TypeOf			= 0xD268, // typeof x
+		NameOf			= 0xD269, // nameof x
+		Await			= 0x526A, // await task
+		Delete			= 0x526D, // delete
+		Ref				= 0x526E, // ref
+		Out				= 0x526F, // out
 
 	//	unary post/pre
-		PostInc			= 0x5170, // x++
-		PostDec			= 0x5171, // x--
-		Inc				= 0x5278, // ++x
-		Dec				= 0x5279, // --x
+		PostInc			= 0x5370, // x++
+		PostDec			= 0x5371, // x--
+		Inc				= 0x5478, // ++x
+		Dec				= 0x5479, // --x
 
 	//	statements
 		Block			= 0x0080, // block with its own scope
@@ -527,8 +529,8 @@ namespace RedOnion.ROS
 		/// </summary>
 		public static ExCode StdPriority(this ExCode self)
 			=> self.Code() >= ExCode.BitOr.Code()
-			&& self.Code() <= ExCode.BitAnd.Code()
-			? self.Priority() - 0x0500
+			&& self.Code() <= ExCode.ShiftRight.Code()
+			? self.Priority() - 0x0900
 			: self.Code() == ExCode.Cast.Code()
 			? 0 : self.Priority();
 
@@ -577,11 +579,11 @@ namespace RedOnion.ROS
 			0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00, 0x00,0x00,0x00,0x00,0x01,0x02,0x04,0x00, //0 constants
 			0x01,0x02,0x04,0x08,0x10,0x41,0x42,0x44, 0x48,0x50,0x01,0x10,0xC4,0xC8,0xCA,0x90, //1 numbers
 			0x40,0x40,0x00,0x20,0x60,0x00,0x60,0x00, 0x20,0x60,0x60,0x60,0x02,0x00,0x00,0x20, //2 special
-			0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01, 0x01,0x01,0x01,0x81,0x81,0x81,0x81,0x81, //3 assign
-			0x81,0x0A,0x0B,0x0C,0x0D,0x0D,0x0E,0x0E, 0x0F,0x0F,0x0F,0x90,0x90,0x90,0x90,0x90, //4 binary
-			0x03,0x04,0x08,0x08,0x09,0x09,0x09,0x09, 0x09,0x09,0x09,0x09,0x09,0x09,0x09,0x89, //5 logic + casts
-			0x4F,0x4F,0x4F,0x4F,0xCF,0xCF,0xCF,0xCF, 0xCF,0xCF,0x40,0xC0,0xC0,0x40,0x40,0x40, //6 unary
-			0x51,0x51,0xD1,0xD1,0xD1,0xD1,0xD1,0xD1, 0x52,0x52,0xD2,0xD2,0xD2,0xD2,0xD2,0xD2, //7 post/pre
+			0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01, 0x01,0x01,0x01,0x01,0x81,0x81,0x81,0x81, //3 assign
+			0x81,0x0B,0x0B,0x0C,0x0C,0x0C,0x0D,0x0E, 0x0F,0x10,0x11,0x11,0x91,0x91,0x91,0x91, //4 binary
+			0x03,0x04,0x09,0x09,0x0A,0x0A,0x0A,0x0A, 0x0A,0x0A,0x0A,0x0A,0x0A,0x0A,0x0A,0x8A, //5 logic + casts
+			0x52,0x52,0x52,0x52,0xD2,0xD2,0xD2,0xD2, 0xD2,0xD2,0x52,0x52,0x52,0x52,0x52,0x52, //6 unary
+			0x53,0x53,0xD3,0xD3,0xD3,0xD3,0xD3,0xD3, 0x54,0x54,0xD4,0xD4,0xD4,0xD4,0xD4,0xD4, //7 post/pre
 			// the rest of this table must be zeros
 			0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00, 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00, //8 statements
 			0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00, 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00, //9 statements
@@ -603,11 +605,11 @@ namespace RedOnion.ROS
 			"new",  "()",   "()",   "()",   "()",   "[]",   "[]",   ".",
 			"var",  ".[]",  "[]",   "??",   "?.",   "?.()", "?:",   "=>",
 		//	assign
-			"=",    "|=",   "^=",   "&=",   "<<=",  ">>=",  "+=",   "-=",
-			"*=",   "/=",   "%=",   null,   null,   null,   null,   "var",
+			"=",    "+=",   "-=",   "*=",   "/=",   "%=",   "**=",  "|=",
+			"^=",   "&=",   "<<=",  ">>=",  null,   null,   null,   null,
 		//	binary
-			null,   "|",    "^",    "&",    "<<",   ">>",   "+",    "-",
-			"*",    "/",    "%",    "**",   null,   null,   "as",   "as!",
+			null,   "+",    "-",    "*",    "/",    "%",    "**",   "|",
+			"^",	"&",    "<<",   ">>",   null,   null,   null,   null,
 		//	logic + casts
 			"||",   "&&",   "==",   "!=",   "<",    ">",    "<=",   ">=",
 			"===",  "!==",  "as",   "as!",  "!",    "is",   "is!",  null,

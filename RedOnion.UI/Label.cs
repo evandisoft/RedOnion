@@ -8,8 +8,7 @@ namespace RedOnion.UI
 	{
 		public UUI.Text Core { get; private set; }
 
-		public Label(string name = null)
-			: base(name)
+		public Label()
 		{
 			Core = GameObject.AddComponent<UUI.Text>();
 			Core.alignment = TextAnchor.MiddleLeft;
@@ -18,6 +17,7 @@ namespace RedOnion.UI
 			Core.fontStyle = Skin.label.fontStyle;
 			Core.color = Skin.label.normal.textColor;
 		}
+		public Label(string text) : this() => Text = text;
 
 		protected override void Dispose(bool disposing)
 		{

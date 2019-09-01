@@ -31,14 +31,14 @@ namespace RedOnion.UI
 			}
 		}
 
-		public Toggle(string name = null)
+		public Toggle()
 		{
 			Core = GameObject.AddComponent<UUI.Toggle>();
 			// TODO: width by height (aspect-ratio fitter)
-			ToggleFrame = Add(new Simple("ToggleFrame") {
+			ToggleFrame = Add(new Simple {
 				Sprite = Skin.toggle.normal.background
 			});
-			ImageCore = ToggleFrame.Add(new Image("ToggleImage") {
+			ImageCore = ToggleFrame.Add(new Image {
 				Sprite = Skin.toggle.active.background
 			});
 			InnerPadding = new Padding(8f, 4f);
@@ -53,6 +53,7 @@ namespace RedOnion.UI
 			Core.graphic = ImageCore.Core;
 			//Core.targetGraphic = ImageCore.Core;
 		}
+		public Toggle(string text) : this() => Text = text;
 
 		protected override void Dispose(bool disposing)
 		{
