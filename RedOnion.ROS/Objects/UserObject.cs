@@ -161,7 +161,7 @@ namespace RedOnion.ROS.Objects
 			return at < 0 && add ? Add(name, Value.Void) : at;
 		}
 		public override string NameOf(object self, int at)
-			=> prop[at].name ?? "#" + at;
+			=> prop.GetOrDefault(at).name ?? "#" + at;
 		public override bool Get(ref Value self, int at)
 		{
 			if (at < 0 || at >= prop.size)

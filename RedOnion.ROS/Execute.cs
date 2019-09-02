@@ -31,7 +31,9 @@ namespace RedOnion.ROS
 
 					while (at == blockEnd)
 					{
-						if (ctx.BlockCount == 0 && ctx.BlockCode != OpCode.Return)
+						if (ctx.BlockCount == 0
+							&& ctx.BlockCode != OpCode.Return
+							&& ctx.BlockCode != OpCode.Function)
 							goto finishNoReturn;
 
 						if (countdown <= 0)
@@ -931,16 +933,17 @@ namespace RedOnion.ROS
 					throw;
 				}
 				re = new RuntimeError(compiled, at, ex);
-#if DEBUG
-				Value.DebugLog("ROS.Core.Execute: Exception " + ex.Message);
-				if (compiled.Path != null)
-					Value.DebugLog("Script path: " + compiled.Path);
-				if (re.LineNumber >= 0 || re.Line != null)
-					Value.DebugLog(re.Line == null ? "At line {0}" : "At line {0}: {1}", re.LineNumber+1, re.Line);
-				for (var x = ex; x != null; x = x.InnerException)
-					Value.DebugLog(x.StackTrace);
-#endif
 				result = new Value(re);
+				processor?.PrintException("Core.Execute", re, logOnly: true);
+				Log("{0,2}: {1} (private: {2})", stack.size, ctx, ctxIsPrivate);
+				for (int i = stack.size; i > 0;)
+				{
+					ref var ss = ref stack.items[--i];
+					var lnum = ss.code.FindLine(ss.at-1);
+					var line = lnum >= 0 && lnum < ss.code.Lines.Count
+						? ss.code.Lines[lnum].Text : null;
+					Log("{0,2}: {1}, at:{2}, line:{3}:{4}", i, ss.context, ss.at, lnum+1, line ?? "<no source>");
+				}
 				throw re;
 			}
 		}

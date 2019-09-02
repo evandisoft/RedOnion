@@ -36,38 +36,37 @@ namespace RedOnion.ROS
 		public Action<string> Print;
 		public Action<string> PrintError;
 		void IProcessor.Print(string msg) => Print?.Invoke(msg);
-		public void PrintException(string where, Exception ex)
+		public void PrintException(string where, Exception ex, bool logOnly = false)
 		{
+			var print = logOnly ? null : PrintError;
 			var hdr = Value.Format("Exception in {0}: {1}", where, ex.Message);
 			Log(hdr);
-			PrintError?.Invoke(hdr);
-#if !DEBUG
-			if (ex is Error err)
-			{
-				var line = err.Line;
-				var str = Value.Format(line == null ? "Error at line {0}."
-					: "Error at line {0}: {1}", err.LineNumber+1, line);
-				Log(str);
-				PrintError?.Invoke(str);
-			}
-#else
+			print?.Invoke(hdr);
 			var err = ex as Error;
+			var re = err as RuntimeError;
 			if (err != null)
 			{
+				var path = re?.Code?.Path;
+				if (path != null)
+				{
+					var pathstr = "Script path: " + path;
+					Log(pathstr);
+					print?.Invoke(pathstr);
+				}
 				var line = err.Line;
 				var str = Value.Format(line == null ? "Error at line {0}."
 					: "Error at line {0}: {1}", err.LineNumber + 1, line);
 				Log(str);
-				PrintError?.Invoke(str);
+				print?.Invoke(str);
 				ex = ex.InnerException;
 			}
 			var trace = ex?.StackTrace;
 			if (trace != null && trace.Length > 0)
 			{
 				Log(trace);
-				PrintError?.Invoke(trace);
+				print?.Invoke(trace);
 			}
-			if (err is RuntimeError re)
+			if (re != null)
 			{
 				var code = re.Code?.Code;
 				if (code == null)
@@ -88,7 +87,6 @@ namespace RedOnion.ROS
 					Log(sb.ToString());
 				}
 			}
-#endif
 		}
 
 		/// <summary>

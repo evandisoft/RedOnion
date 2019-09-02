@@ -42,7 +42,7 @@ namespace RedOnion.ROS.Objects
 		public string ArgumentName(int i)
 			=> i >= ArgumentCount ? null : Arguments[i].Name;
 		/// <summary>
-		/// Private variables/fields
+		/// Context with captured variables
 		/// </summary>
 		public Context Context { get; protected set; }
 		/// <summary>
@@ -87,7 +87,7 @@ namespace RedOnion.ROS.Objects
 			TypeAt = typeAt;
 			Arguments = args;
 			ArgsString = args == null ? "" : string.Join(", ", args.Select(x => x.Name).ToArray());
-			Context = new Context(context, this, cvars);
+			Context = new Context(this, context, cvars);
 			Processor = processor;
 			Add("prototype", Value.Null);
 		}

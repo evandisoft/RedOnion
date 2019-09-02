@@ -94,29 +94,6 @@ namespace RedOnion.ROS
 		public void DebugLog(string msg, params object[] args)
 			=> Log(string.Format(Value.Culture, msg, args));
 
-		public void Log(Exception ex)
-		{
-#if !DEBUG
-			if (ex is Error err)
-			{
-				var line = err.Line;
-				Log(line == null ? "Error at line {0}."
-					: "Error at line {0}: {1}", err.LineNumber+1, line);
-			}
-#else
-			if (ex is Error err)
-			{
-				var line = err.Line;
-				Log(line == null ? "Error at line {0}."
-					: "Error at line {0}: {1}", err.LineNumber+1, line);
-				ex = ex.InnerException;
-			}
-			var trace = ex?.StackTrace;
-			if (trace != null && trace.Length > 0)
-				Log(ex.StackTrace);
-#endif
-		}
-
 		~Core() => Dispose(false);
 		public void Dispose() => Dispose(true);
 		protected virtual void Dispose(bool disposing) { }
@@ -168,7 +145,7 @@ namespace RedOnion.ROS
 		/// <param name="countdown">Countdown until auto-yield</param>
 		public bool Execute(Function fn, int countdown = 1000)
 		{
-			ctx = fn.Context;
+			ctx = new Context(fn, fn.Context, null);
 			ctxIsPrivate = false;
 			Code = fn.Code;
 			ctxIsPrivate = true;
@@ -334,9 +311,7 @@ namespace RedOnion.ROS
 				code = compiled.Code;
 				str = compiled.Strings;
 				at = fn.CodeAt;
-				ctx = fn.Context;
-				ctx.PopAll();
-				ctx.Push(at, at + fn.CodeSize, OpCode.Function);
+				ctx = new Context(fn, fn.Context, null);
 				if (create)
 					this.self = new Value(new UserObject(fn.Prototype));
 				else this.self = new Value(selfDesc, self);

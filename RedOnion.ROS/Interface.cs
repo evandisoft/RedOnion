@@ -107,18 +107,9 @@ namespace RedOnion.ROS
 			{
 				if (lineNumber < 0)
 				{
-					lineNumber = 0;
-					if (Code?.LineMap != null && Code.LineMap.Length > 0)
-					{
-						int it = Array.BinarySearch(Code.LineMap, CodeAt-1);
-						if (it < 0)
-						{
-							it = ~it;
-							if (it > 0)
-								it--;
-						}
-						lineNumber = it;
-					}
+					lineNumber = Code?.FindLine(CodeAt-1) ?? -1;
+					if (lineNumber < 0)
+						lineNumber = 0;
 				}
 				return lineNumber;
 			}
@@ -196,6 +187,19 @@ namespace RedOnion.ROS
 		/// Index to Code for each line
 		/// </summary>
 		public int[] LineMap { get; }
+		public int FindLine(int at)
+		{
+			if (LineMap == null || LineMap.Length == 0)
+				return -1;
+			int it = Array.BinarySearch(LineMap, at);
+			if (it < 0)
+			{
+				it = ~it;
+				if (it > 0)
+					it--;
+			}
+			return it;
+		}
 
 		/// <summary>
 		/// Prefix notation of the code is good for analyzers,

@@ -334,7 +334,7 @@ ctlsub = system.update def
   var tta = ship.timeToAp
   var dir
   if tta < ship.timeToPe
-  //tangent when before apoapsis
+  //minimize velocity vector difference when before apoapsis
     dir = dv()
     pwr = 1 / math.clamp (tta - 0.5 * stage.burnTime dir.size), 1.0, 100.0
     if pwr <= 0.01; pwr = 0.0
@@ -358,15 +358,23 @@ var almost = null
 var maxHeight = apoapsis*1.01+1000
 var prevReport = 0
 print "Burn!"
-until (ship.eccentricity < 0.0001 // perfect
+until (ship.eccentricity < 0.00001 // perfect
   or ship.timeToPe < ship.period*0.3 // happens with good accuracy
   or apoapsis > maxHeight and periapsis > math.max(atmosphere.depth,1000)+1000 // something went wrong?
   or apoapsis > maxHeight*1.5+5000) // something went really really wrong
 
+  if ship.eccentricity < 0.01
+    if almost == null; almost = time()
+    else if time.since(almost) > 10; break
+  
   if time.since(prevReport) >= 1
     prevReport = time()
     var delta = dv().size
-    print "TTA: {0,6:F1} DV: {1,6:F1} BT: {2,6:F1}", ship.timeToAp, delta, stage.burnTime delta
+    var tta = ship.timeToAp
+    if tta > ship.timeToPe
+      tta -= ship.period
+    print "TTA: {0,6:F1} DV: {1,6:F1} BT: {2,6:F1}", tta, delta, stage.burnTime delta
+    
   if ship.engines.getThrust() == 0
     if choked == null
       choked = time()
@@ -378,9 +386,7 @@ until (ship.eccentricity < 0.0001 // perfect
       break
     continue
   choked = null
-  if ship.eccentricity < 0.01
-    if almost == null; almost = time()
-    else if time.since(almost) > 10; break
+
 ctlsub.remove
 stgsub.remove
 vdraws.remove
@@ -388,6 +394,8 @@ if steers != null
   steers.remove
 for var d in vd
   d.hide
+vd = null
 user.throttle = 0
 ship.autopilot.disable
-print "DONE!"
+print "DONE! e={0:F5} Ap:{1:F3} Pe:{2:F3}", ship.eccentricity, apoapsis*0.001, periapsis*0.001
+return ship.eccentricity

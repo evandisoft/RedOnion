@@ -260,7 +260,15 @@ namespace RedOnion.ROS.Tests
 		}
 
 		[Test]
-		public void ROS_Scope09_DocExample()
+		public void ROS_Scope09_Recursion()
+		{
+			Lines(13,
+				"def fib n => n < 2 ? n : fib(n-1) + fib(n-2)",
+				"return fib 7");
+		}
+
+		[Test]
+		public void ROS_Scope10_DocExample()
 		{
 			Test(1, @"
 def MyClass
@@ -292,7 +300,7 @@ obj.getTotal    // returns 1
 		}
 
 		[Test]
-		public void ROS_Scope10_Run()
+		public void ROS_Scope11_Run()
 		{
 			if (Globals == null)
 				Globals = new Globals();
@@ -306,7 +314,7 @@ obj.getTotal    // returns 1
 		}
 
 		[Test]
-		public void ROS_Scope11_Events()
+		public void ROS_Scope12_Events()
 		{
 			YieldLines(ExitCode.Return, 3,
 				"var x = 0",
