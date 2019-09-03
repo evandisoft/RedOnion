@@ -232,31 +232,26 @@ namespace RedOnion.ROS.Tests
 				"  add 2",
 				"doit; x");
 
-
-			/* TODO: multiple cousins for closures in loop
-			
+			// This is some advanced stuff. `a.add def => s += i + 1` will not currently work the way you might expect,
+			// because `i` is not captured by creating the lambda, but by calling it!
+			// That means that `i` is already `4` when such lambdas would first be called, producing `s = "444"`.
+			// But that `(def; var n = ...)()` is a call in the moment where `i` is `0`, `1` or `2` in each call,
+			// therefore the inner lambda (`def => s += n`) is referencing `n` which was already set to `1`, `2` or `3`,
+			// producing the final result of "123". The difference is that calling the outer lambda creates new context,
+			// where the 'n' lives and the inner lambda is referencing that particular `n`
+			// (each inner lambda referencing different context). All the simple `a.add def => s += i + 1`
+			// would reference same context where `i` ceased to exist with last value being `4`.
 			Reset();
-			Lines("123",
+			Lines((object)"123",
 				"var s = \"\"",
 				"var a = new list",
 				"for var i = 0; i < 3; i++",
-				"  a.add def f",
-				"    s += i + 1",
+				"  a.add (def",
+				"    var n = i + 1",
+				"    return def => s += n",
+				"  )()",
 				"for var f in a; f",
 				"return s");
-
-			Reset();
-			Lines(6,
-				"var sum = 0",
-				"var vals = [1, 2, 3]",
-				"var fns = new list",
-				"var index = 0",
-				"while index < vals.length",
-				"  var value = vals[index++]",
-				"  fns.add def => sum += value",
-				"do fns[--index]() while index > 0",
-				"return sum");
-			*/
 		}
 
 		[Test]
