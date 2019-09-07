@@ -137,7 +137,7 @@ if !evan
   autopilot.killRot = true
   if cust
     def steerPID
-      var pid = PID 1.0, 0.5, 0.0, 0.3
+      var pid = PID 1.0, 0.5, 0.01, 0.4
       pid.maxInput = 1
       pid.minInput = -1
       pid.maxOutput = 1
@@ -149,14 +149,10 @@ if !evan
     var ppid = steerPID()
     var ypid = steerPID()
     var rpid = steerPID()
-    rpid.P = 1
-    rpid.I = 0
-    rpid.D = 0
-    rpid.R = 0
     customSteering = def
       var av = ship.angularVelocity
       var ma = ship.maxAngular
-
+      
       var di = ship.local autopilot.direction
       var pd = math.deg.atan2 -di.z, di.y
       var yd = math.deg.atan2  di.x, di.y
@@ -171,7 +167,7 @@ if !evan
       print "Stop {0,6:F2}:{1,6:F2} Pure {2,6:F1}:{3,6:F1} T:{4:F2}",
         ps, ys, ppid.input  * 100, ypid.input  * 100,
         (ppid.lastDt + ypid.lastDt + rpid.lastDt)/3
-
+      
       var rd = math.clampS180 autopilot.roll - (ship.pitch <= 89 ? ship.roll :
         180.0 + ship.up.angle ship.north.rotate(ascentHeading, ship.away), ship.away)
       var rs = av.y * (math.abs(av.y) / ma.y + 0.5)

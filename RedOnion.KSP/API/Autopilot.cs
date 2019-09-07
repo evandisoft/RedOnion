@@ -156,8 +156,8 @@ namespace RedOnion.KSP.API
 			{
 				P = 1.0;    // direct control
 				I = 0.5;    // error-correcting, *dt
-				R = 0.3;    // cumulated change, *dt
-				D = 0.0;    // change-resisting, /dt
+				R = 0.4;    // cumulated change, *dt
+				D = 0.01;   // change-resisting, /dt
 				outputChangeLimit = 5; //*dt => 10% per std. tick
 				targetChangeLimit = 5; //*dt => 10% per std. tick
 				accumulatorLimit = 0.5; // abs(accu) <= 50%
@@ -165,17 +165,16 @@ namespace RedOnion.KSP.API
 				time = 3.0;
 				angular = 10.0;
 			}
+			/*
 			internal class Roll : PidParams
 			{
 				public override void reset()
 				{
 					base.reset();
-					P = 1.0;
-					I = 0.0;
-					R = 0.0;
-					D = 0.0;
+					scale = 0.5;
 				}
 			}
+			*/
 		}
 		public class PID : API.PID<PidParams>
 		{
@@ -207,7 +206,7 @@ namespace RedOnion.KSP.API
 
 			protected internal PID _pitch = new PID();
 			protected internal PID _yaw = new PID();
-			protected internal PID _roll = new PID(new PidParams.Roll());
+			protected internal PID _roll = new PID(/*new PidParams.Roll()*/);
 
 			public PidParams pitch => _pitch.param;
 			public PidParams yaw => _yaw.param;

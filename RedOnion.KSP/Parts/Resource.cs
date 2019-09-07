@@ -26,7 +26,7 @@ namespace RedOnion.KSP.Parts
 			// TODO: reuse
 			list.Clear();
 			cache.Clear();
-			Update(Planetarium.GetUniversalTime());
+			Update(Time.now);
 			base.DoRefresh();
 		}
 		protected internal void Update(double now)
@@ -53,7 +53,7 @@ namespace RedOnion.KSP.Parts
 				var name = native.resourceName;
 				if (!cache.TryGetValue(name, out var res))
 				{
-					res = new Resource(this, name, part == null ? null : native);
+					res = new Resource(this, name, this.part == null ? null : native);
 					Add(res);
 					cache[name] = res;
 				}
@@ -107,7 +107,7 @@ namespace RedOnion.KSP.Parts
 			{
 				if (native != null)
 					return native.amount;
-				double now = Planetarium.GetUniversalTime();
+				double now = Time.now;
 				if (now != List.stamp) List.Update(now);
 				return _amount;
 			}
@@ -119,7 +119,7 @@ namespace RedOnion.KSP.Parts
 			{
 				if (native != null)
 					return native.maxAmount;
-				double now = Planetarium.GetUniversalTime();
+				double now = Time.now;
 				if (now != List.stamp) List.Update(now);
 				return _maxAmount;
 			}
