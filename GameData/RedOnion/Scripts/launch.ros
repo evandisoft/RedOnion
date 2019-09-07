@@ -1,12 +1,19 @@
 var targetAltitude = 80   // target orbit's altitude in km
 var ascentHeading  = 90   // ascent heading (0 = north, 90 = equitorial)
+var ascentRoll = math.round((ship.pitch < 80 ? ship.roll :
+  180 - ship.up.angle(ship.north.rotate ascentHeading, ship.away)) / 45)*45
+var circleRoll = ascentRoll
 var ascentProfile  = 5    // profile (1-9, less means less aggresive turn)
 var speedRatio     = 5    // speed/altitude ratio to base the curve on (higher is for speed, more than 10 means switch earlier to full speed-based)
 var maxSpeed       = .9   // target escape speed (fraction of minimal or in m/s if above 2)
 var safeAltitude   = 2 + math.max atmosphere.depth/1000, 8 // safe altitude above atmosphere and mountains
-var firstAngle     = 30   // angle from up (90) to use simple ratio
+var startAngle     = math.round(ship.pitch,1) // usually 90 but e.g. DynaWing starts with 81.2
+var firstAngle     = 60   // angle from up (90) to use simple ratio
 var firstAltitude  = math.max safeAltitude/10, 3 // altitude (in km) of first phase (to reach pitch=90-firstAngle)
 var narrowAltitude = 100  // altitude (in m) upto which to go straight up
+
+if startAngle > 89
+  startAngle = 90
 
 
 //: PARAM GUI
@@ -40,15 +47,18 @@ def gui
       uni.text = units
       uni.minWidth = uniWidth
     return box
-  var ta = row "Target altitude: ", targetAltitude, "km",    "Final Apoapsis"
-  var ah = row "Ascent heading: ",  ascentHeading,  "°",     "Course during ascent (not inclination)"
-  var pf = row "Ascent profile: ",  ascentProfile,  "1-9",   "Lower means less agressive turn"
-  var pr = row "Speed/Alt ratio: ", speedRatio,     "*10%",  "Higher for speed, above 10 means earlier"
-  var ms = row "Max. Speed: ",      maxSpeed,       "*|m/s", "<= 2 for fraction of minimal, or m/s"
-  var sa = row "Safe altitude: ",   safeAltitude,   "km",    "Above atmposhepre and mountains"
-  var fa = row "First angle: ",     firstAngle,     "°",     "Degrees of pitch for first phase"
-  var a1 = row "First altitude: ",  firstAltitude,  "km",    "Altitude for first phase"
-  var na = row "Narrow altitude: ", narrowAltitude,  "m",    "Minimal altitude to go straight"
+  var ta = row "Target altitude: ",  targetAltitude, "km",    "Final Apoapsis"
+  var ah = row "Ascent heading: ",   ascentHeading,  "°",     "Course during ascent (not inclination)"
+  var ar = row "Ascent roll: ",      ascentRoll,     "°",     "Roll/bank during ascent"
+  var cr = row "Circularize roll: ", circleRoll,     "°",     "Roll/bank during circularization"
+  var pf = row "Ascent profile: ",  ascentProfile,   "1-9",   "Lower means less agressive turn"
+  var pr = row "Speed/Alt ratio: ", speedRatio,      "*10%",  "Higher for speed, above 10 means earlier"
+  var ms = row "Max. Speed: ",      maxSpeed,        "*|m/s", "<= 2 for fraction of minimal, or m/s"
+  var sa = row "Safe altitude: ",   safeAltitude,    "km",    "Above atmposhepre and mountains"
+  var sd = row "Start angle: ",     startAngle,      "°",     "Degrees of pitch for first phase"
+  var fa = row "First angle: ",     firstAngle,      "°",     "Degrees of pitch for first phase"
+  var a1 = row "First altitude: ",  firstAltitude,   "km",    "Altitude for first phase"
+  var na = row "Narrow altitude: ", narrowAltitude,   "m",    "Minimal altitude to go straight"
   var apsel = wnd.add new panel layout.horizontal
   apsel.add new label "Pilot: "
   var xfirda = apsel.add new button "Firda"
@@ -87,10 +97,13 @@ def gui
   if selected
     targetAltitude = double ta.text
     ascentHeading  = double ah.text
+    ascentRoll     = double ar.text
+    circleRoll     = double cr.text
     ascentProfile  = double pf.text
     speedRatio     = double pr.text
     maxSpeed       = double ms.text
     safeAltitude   = double sa.text
+    startAngle     = double sd.text
     firstAngle     = double fa.text
     firstAltitude  = double a1.text
     narrowAltitude = double na.text
@@ -124,44 +137,54 @@ if !evan
   autopilot.killRot = true
   if cust
     def steerPID
-      var pid = PID 1.0, 1.0, 0.0, 0.5
+      var pid = PID 1.0, 0.5, 0.0, 0.3
       pid.maxInput = 1
       pid.minInput = -1
       pid.maxOutput = 1
       pid.minOutput = -1
       pid.outputChangeLimit = 5
-      pid.accumulatorLimit = 1
+      pid.accumulatorLimit = 0.5
       pid.errorLimit = 1
       return pid
     var ppid = steerPID()
     var ypid = steerPID()
-    var dtSum = 0
-    var dtCnt = 0
+    var rpid = steerPID()
+    rpid.P = 1
+    rpid.I = 0
+    rpid.D = 0
+    rpid.R = 0
     customSteering = def
+      var av = ship.angularVelocity
+      var ma = ship.maxAngular
+
       var di = ship.local autopilot.direction
       var pd = math.deg.atan2 -di.z, di.y
       var yd = math.deg.atan2  di.x, di.y
-      var av = ship.angularVelocity
-      var ma = ship.maxAngular
-      var ps = av.x * (math.abs(av.x) / ma.x + 0.3 + 10 * ppid.dt)
-      var ys = av.z * (math.abs(av.z) / ma.z + 0.3 + 10 * ypid.dt)
+      var ps = av.x * (math.abs(av.x) / ma.x + 0.5)
+      var ys = av.z * (math.abs(av.z) / ma.z + 0.5)
       ppid.input = 10 * (pd + ps) / ma.x
       ypid.input = 10 * (yd + ys) / ma.z
       autopilot.rawPitch = ppid.update()
       autopilot.rawYaw   = ypid.update()
-      dtSum += ppid.lastDt + ypid.lastDt
-      dtCnt += 2
-      print "Diff: {0,6:F2}:{1,6:F2} Ctrl: {2,6:F1}:{3,6:F1} T:{4:F2}",
-        pd, yd, ppid.output * 100, ypid.output * 100, dtSum/dtCnt
-      print "Stop: {0,6:F2}:{1,6:F2} Pure: {2,6:F1}:{3,6:F1} Q:{4:F2}",
-        ps, ys, ppid.input  * 100, ypid.input  * 100, ship.q
-        dtSum = 0; dtCnt = 0
+      print "Diff {0,6:F2}:{1,6:F2} Ctrl {2,6:F1}:{3,6:F1} Q:{4:F2}",
+        pd, yd, ppid.output * 100, ypid.output * 100, ship.q
+      print "Stop {0,6:F2}:{1,6:F2} Pure {2,6:F1}:{3,6:F1} T:{4:F2}",
+        ps, ys, ppid.input  * 100, ypid.input  * 100,
+        (ppid.lastDt + ypid.lastDt + rpid.lastDt)/3
+
+      var rd = math.clampS180 autopilot.roll - (ship.pitch <= 89 ? ship.roll :
+        180.0 + ship.up.angle ship.north.rotate(ascentHeading, ship.away), ship.away)
+      var rs = av.y * (math.abs(av.y) / ma.y + 0.5)
+      rpid.input = 10 * (rd + rs) / ma.y
+      autopilot.rawRoll  = rpid.update()
+      print "Roll {0,6:F2}/{1,6:F2} Ctrl {2,6:F1}/{3,6:F1} T:{4:F2}",
+        rd, rs, rpid.output * 100, rpid.input  * 100, rpid.lastDt
 
 var minSpeed = null
 var prevSteerReport = -inf
 def steer
   if altitude <= narrowAltitude
-    setPitch 90
+    setPitch startAngle
     return
   if ship.periapsis >= safeAltitude
     setPitch 0
@@ -170,26 +193,26 @@ def steer
   var srfA = 90 - ship.away.angle ship.surfaceVelocity
   var curr = srfA
   var maxA = 3.0/math.clamp ship.q, 0.1, 1.0
+//smooth transition from surface to orbital speed by ratio of altitude to safe altitude
+  var factor = math.clamp (altitude/safeAltitude)^2, 0, 1
+  var speed = factor * ship.velocity.size + ship.surfaceVelocity.size * (1-factor)
+  if minSpeed == null then minSpeed = speed
   var want
-  var pitch
   if altitude <= firstAltitude
-    pitch = want = 90 - firstAngle * altitude/firstAltitude
+    want = startAngle - (startAngle - firstAngle) * altitude/firstAltitude
   else
-  //smooth transition from surface to orbital speed by ratio of altitude to safe altitude
-    var factor = math.clamp (altitude/safeAltitude)^2, 0, 1
-    var speed = factor * ship.velocity.size + ship.surfaceVelocity.size * (1-factor)
-    if minSpeed == null then minSpeed = speed
   //mix of speed-based and altitude-based curve
     var altRatio = math.clamp (altitude-firstAltitude)/(safeAltitude-firstAltitude), 0, 1
     var ratio = math.min 1, speedRatio * altRatio
     var fract = ((1-ratio)*altRatio + ratio *
       math.min(1,(speed-minSpeed)/(maxSpeed-minSpeed)))^ascentProfile
-    want = (90 - firstAngle) * (1 - fract)
-  //compensate for differences from desired prograde pitch
-    curr = factor * (90 - ship.away.angle ship.velocity) + (1-factor) * srfA
-    if want < curr and altitude < safeAltitude/3
-      pitch = want + 3*altitude/safeAltitude*(want-curr)
-    else pitch = 2*want-curr
+    want = firstAngle * (1 - fract)
+//compensate for differences from desired prograde pitch
+  var pitch
+  curr = factor * (90 - ship.away.angle ship.velocity) + (1-factor) * srfA
+  if want < curr and altitude < safeAltitude/3
+    pitch = want + 3*altitude/safeAltitude*(want-curr)
+  else pitch = 2*want-curr
 //final adjustment
   var ctrl = math.clamp pitch, math.max(0, srfA-maxA), math.min(srfA+maxA, 90)
   setPitch ctrl
@@ -280,10 +303,8 @@ var ctlsub = system.update def
 var stgsub = system.idle(staging)
 var vdraws = system.update(vectors)
 var steers = customSteering == null ? null : system.update(customSteering)
-var roll = math.round((ship.pitch < 80 ? ship.roll :
-  180 - ship.up.angle(ship.north.rotate ascentHeading, ship.away)) / 45)*45
 if !evan
-  ship.roll = roll
+  ship.roll = ascentRoll
 
 print "Target apoapsis: " + targetAltitude
 print "Safe altitude:   " + safeAltitude
@@ -312,7 +333,8 @@ def dv
   var v2 = math.sqrt(body.mu/p.size) * (p.cross v1.cross p).normalized
   return v2-v1
 
-autopilot.roll = roll
+if !evan
+  autopilot.roll = circleRoll
 ctlsub = system.update def
   autopilot.direction = ship.away.cross ship.velocity.cross ship.away
 

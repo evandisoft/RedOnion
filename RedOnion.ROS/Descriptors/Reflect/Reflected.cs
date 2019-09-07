@@ -286,7 +286,7 @@ namespace RedOnion.ROS
 			private IEnumerable<Value> EnumerateNative(IEnumerable e)
 			{
 				foreach (var v in e)
-					yield return new Value(e);
+					yield return new Value(v);
 			}
 			public override IEnumerable<string> EnumerateProperties(object self)
 			{
