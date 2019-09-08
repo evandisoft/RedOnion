@@ -52,13 +52,14 @@ namespace RedOnion.UI
 			Image.sprite = Skin.button.normal.background;
 			Image.type = UUI.Image.Type.Sliced;
 			Core.image = Image;
-			//Core.targetGraphic = Image;
+			Core.normalSprite = Skin.button.normal.background;
 			Core.spriteState = new UUI.SpriteState()
 			{
 				pressedSprite = Skin.button.active.background,
 				highlightedSprite = Skin.button.highlight.background,
 				disabledSprite = Skin.button.disabled.background
 			};
+			Core.transition = UUI.Selectable.Transition.SpriteSwap;
 			InnerPadding = new Padding(8f, 4f);
 			Spacing = 6f;
 			Layout = Layout.Horizontal;

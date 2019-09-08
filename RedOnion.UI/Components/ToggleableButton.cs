@@ -14,8 +14,10 @@ namespace RedOnion.UI.Components
 			get => _toggleable;
 			set
 			{
-				if ((_toggleable = value) == false)
-					_pressed = false;
+				if (_toggleable = value)
+					return;
+				_pressed = false;
+				image.sprite = normalSprite;
 			}
 		}
 		public bool Pressed
@@ -28,26 +30,12 @@ namespace RedOnion.UI.Components
 				Toggle();
 			}
 		}
-		protected bool disableTransition;
-		public override bool IsInteractable()
-			=> !disableTransition && base.IsInteractable();
+		public Sprite normalSprite;
 		public override void OnPointerClick(PointerEventData eventData)
 		{
 			if (!Toggleable)
 				base.OnPointerClick(eventData);
 			else Toggle();
-		}
-		public override void OnPointerEnter(PointerEventData eventData)
-		{
-			if (Pressed) disableTransition = true;
-			base.OnPointerEnter(eventData);
-			disableTransition = false;
-		}
-		public override void OnPointerExit(PointerEventData eventData)
-		{
-			if (Pressed) disableTransition = true;
-			base.OnPointerExit(eventData);
-			disableTransition = false;
 		}
 
 		public void Toggle()
@@ -58,9 +46,9 @@ namespace RedOnion.UI.Components
 				return;
 			}
 			_pressed = !_pressed;
+			image.sprite = _pressed ? spriteState.pressedSprite : normalSprite;
 			if (!IsActive() || !IsInteractable())
 				return;
-			DoStateTransition(_pressed ? SelectionState.Pressed : currentSelectionState, false);
 			onClick.Invoke();
 		}
 		public void Press()
