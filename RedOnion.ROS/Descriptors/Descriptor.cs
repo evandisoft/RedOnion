@@ -18,6 +18,8 @@ namespace RedOnion.ROS
 
 		public virtual object Box(ref Value self)
 			=> self.obj;
+		public virtual bool IsInstanceOf(ref Value it)
+			=> Type.IsInstanceOfType(it.Box());
 		public virtual bool Equals(ref Value self, object obj)
 			=> obj is Value val ? val.desc == this && self.obj.Equals(val.obj) : self.obj.Equals(obj);
 		public virtual int GetHashCode(ref Value self)

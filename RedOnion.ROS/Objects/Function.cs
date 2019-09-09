@@ -109,12 +109,35 @@ namespace RedOnion.ROS.Objects
 		Action executeLater;
 		public Action ExecuteLater => executeLater
 			?? (executeLater = () => Processor.Once.Add(new Value(this)));
+
 		public void ExecuteLater1(Value arg)
 			=> Processor.Once.Add(new Value(this.Bind(arg)));
 		public void ExecuteLater1Gen<Arg>(Arg arg)
 			=> Processor.Once.Add(new Value(this.Bind(new Value(arg))));
 		static MethodInfo executeLater1 = typeof(Function).GetMethod("ExecuteLater1");
 		static MethodInfo executeLater1Gen = typeof(Function).GetMethod("ExecuteLater1Gen");
+
+		public void ExecuteLater2(Value a, Value b)
+			=> Processor.Once.Add(new Value(this.Bind(a, b)));
+		public void ExecuteLater2Gen<A, B>(A a, B b)
+			=> Processor.Once.Add(new Value(this.Bind(new Value(a), new Value(b))));
+		static MethodInfo executeLater2 = typeof(Function).GetMethod("ExecuteLater2");
+		static MethodInfo executeLater2Gen = typeof(Function).GetMethod("ExecuteLater2Gen");
+
+		public void ExecuteLater3(Value a, Value b, Value c)
+			=> Processor.Once.Add(new Value(this.Bind(a, b, c)));
+		public void ExecuteLater3Gen<A, B, C>(A a, B b, C c)
+			=> Processor.Once.Add(new Value(this.Bind(new Value(a), new Value(b), new Value(c))));
+		static MethodInfo executeLater3 = typeof(Function).GetMethod("ExecuteLater3");
+		static MethodInfo executeLater3Gen = typeof(Function).GetMethod("ExecuteLater3Gen");
+
+		public void ExecuteLater4(Value a, Value b, Value c, Value d)
+			=> Processor.Once.Add(new Value(this.Bind(a, b, c, d)));
+		public void ExecuteLater4Gen<A, B, C, D>(A a, B b, C c, D d)
+			=> Processor.Once.Add(new Value(this.Bind(new Value(a), new Value(b), new Value(c), new Value(d))));
+		static MethodInfo executeLater4 = typeof(Function).GetMethod("ExecuteLater4");
+		static MethodInfo executeLater4Gen = typeof(Function).GetMethod("ExecuteLater4Gen");
+
 		public override bool Convert(ref Value self, Descriptor to)
 		{
 			if (to.Type.IsSubclassOf(typeof(Delegate)))
@@ -126,6 +149,11 @@ namespace RedOnion.ROS.Objects
 				}
 				var info = to.Type.GetMethod("Invoke");
 				var pars = info.GetParameters();
+				if (pars.Length == 0)
+				{
+					self = new Value(to, ExecuteLater);
+					return true;
+				}
 				if (pars.Length == 1)
 				{
 					if (pars[0].ParameterType == typeof(Value))
@@ -135,6 +163,45 @@ namespace RedOnion.ROS.Objects
 					}
 					self = new Value(to, Delegate.CreateDelegate(to.Type, this,
 						executeLater1Gen.MakeGenericMethod(pars[0].ParameterType)));
+					return true;
+				}
+				if (pars.Length == 2)
+				{
+					if (pars[0].ParameterType == typeof(Value)
+						&& pars[1].ParameterType == typeof(Value))
+					{
+						self = new Value(to, Delegate.CreateDelegate(to.Type, this, executeLater2));
+						return true;
+					}
+					self = new Value(to, Delegate.CreateDelegate(to.Type, this,
+						executeLater2Gen.MakeGenericMethod(pars[0].ParameterType, pars[1].ParameterType)));
+					return true;
+				}
+				if (pars.Length == 3)
+				{
+					if (pars[0].ParameterType == typeof(Value)
+						&& pars[1].ParameterType == typeof(Value)
+						&& pars[2].ParameterType == typeof(Value))
+					{
+						self = new Value(to, Delegate.CreateDelegate(to.Type, this, executeLater3));
+						return true;
+					}
+					self = new Value(to, Delegate.CreateDelegate(to.Type, this,
+						executeLater3Gen.MakeGenericMethod(pars[0].ParameterType, pars[1].ParameterType, pars[2].ParameterType)));
+					return true;
+				}
+				if (pars.Length == 4)
+				{
+					if (pars[0].ParameterType == typeof(Value)
+						&& pars[1].ParameterType == typeof(Value)
+						&& pars[2].ParameterType == typeof(Value)
+						&& pars[3].ParameterType == typeof(Value))
+					{
+						self = new Value(to, Delegate.CreateDelegate(to.Type, this, executeLater4));
+						return true;
+					}
+					self = new Value(to, Delegate.CreateDelegate(to.Type, this,
+						executeLater4Gen.MakeGenericMethod(pars[0].ParameterType, pars[1].ParameterType, pars[2].ParameterType, pars[3].ParameterType)));
 					return true;
 				}
 			}
@@ -165,6 +232,38 @@ namespace RedOnion.ROS.Objects
 			Context = src.Context;
 			Processor = src.Processor;
 			Add("prototype", Value.Null);
+		}
+
+		public class Creator : UserObject
+		{
+			public UserObject Prototype { get; protected set; }
+			public Creator(UserObject baseClass) : base("Function", baseClass)
+			{
+				Add("prototype", Prototype = new UserObject(baseClass));
+				Prototype.Add("bind", new Bind(baseClass));
+				Prototype.Lock();
+			}
+
+			/* TODO: compile function from a string (like in JavaScript)
+			public override bool Call(ref Value result, object self, Arguments args, bool create)
+			{
+				return base.Call(ref result, self, args, create);
+			}
+			*/
+
+			public class Bind : UserObject
+			{
+				public Bind(UserObject baseClass) : base("Function.bind", baseClass) { }
+				public override bool Call(ref Value result, object self, Arguments args, bool create)
+				{
+					if (!create && self is Function fn)
+					{
+						result = new Value(fn.Bind(args.ToArray()));
+						return true;
+					}
+					return false;
+				}
+			}
 		}
 	}
 }

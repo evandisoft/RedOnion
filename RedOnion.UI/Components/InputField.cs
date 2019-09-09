@@ -11,22 +11,32 @@ namespace RedOnion.UI.Components
 		bool locked = false;
 		public TextBox TextBox { get; set; }
 		public class TextBoxEvent : UnityEvent<TextBox> { };
-		public TextBoxEvent onSelected { get; } = new TextBoxEvent();
-		public TextBoxEvent onDeselected { get; } = new TextBoxEvent();
+		public TextBoxEvent Selected { get; } = new TextBoxEvent();
+		public TextBoxEvent Deselected { get; } = new TextBoxEvent();
+		public class TextBoxEvent<T> : UnityEvent<TextBox, T> { };
+		public TextBoxEvent<string> Changed { get; } = new TextBoxEvent<string>();
+		public TextBoxEvent<string> Submitted { get; } = new TextBoxEvent<string>();
+
+		public InputField()
+		{
+			onValueChanged.AddListener(text => Changed.Invoke(TextBox, text));
+			onEndEdit.AddListener(text => Submitted.Invoke(TextBox, text));
+		}
+
 		public override void OnSelect(BaseEventData eventData)
 		{
 			// UI_DIALOGS disable NavBall toggle
 			InputLockManager.SetControlLock(ControlTypes.KEYBOARDINPUT|ControlTypes.UI_DIALOGS, lockID);
 			locked = true;
 			base.OnSelect(eventData);
-			onSelected.Invoke(TextBox);
+			Selected.Invoke(TextBox);
 		}
 		public override void OnDeselect(BaseEventData eventData)
 		{
 			InputLockManager.RemoveControlLock(lockID);
 			locked = false;
 			base.OnDeselect(eventData);
-			onDeselected.Invoke(TextBox);
+			Deselected.Invoke(TextBox);
 		}
 		protected override void OnDestroy()
 		{

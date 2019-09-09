@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -6,16 +7,24 @@ using UUI = UnityEngine.UI;
 
 namespace RedOnion.UI.Components
 {
-	public class ToggleableButton : UUI.Button
+	public class ToggleableButton : UUI.Selectable, IPointerClickHandler, ISubmitHandler
 	{
+
+		public Button Button { get; set; }
+		public class ButtonClickedEvent : UnityEvent<Button> { }
+		public ButtonClickedEvent Click { get; set; } = new ButtonClickedEvent();
+
+		public Sprite normalSprite;
 		bool _toggleable, _pressed;
+		int _exclusive;
+
 		public bool Toggleable
 		{
 			get => _toggleable;
 			set
 			{
-				if (_toggleable = value)
-					return;
+				_toggleable = value;
+				if (value) return;
 				_pressed = false;
 				image.sprite = normalSprite;
 			}
@@ -30,36 +39,154 @@ namespace RedOnion.UI.Components
 				Toggle();
 			}
 		}
-		public Sprite normalSprite;
-		public override void OnPointerClick(PointerEventData eventData)
+		public bool Exclusive
 		{
-			if (!Toggleable)
-				base.OnPointerClick(eventData);
-			else Toggle();
+			get => _exclusive > 0;
+			set
+			{
+				if (Exclusive == value)
+					return;
+				_exclusive = value ? 1 : 0;
+				if (!value)
+					return;
+				_toggleable = true;
+				if (_pressed)
+					EnsureExclusive();
+			}
+		}
+		public int ExclusiveLevel
+		{
+			get => _exclusive;
+			set
+			{
+				if (_exclusive == value)
+					return;
+				if (value <= 0)
+				{
+					_exclusive = 0;
+					return;
+				}
+				_exclusive = value;
+				_toggleable = true;
+				if (_pressed)
+					EnsureExclusive();
+			}
 		}
 
+		public void Press()
+			=> Press(true, true);
+		public void Press(bool action = true, bool transition = true)
+		{
+			if (Toggleable)
+			{
+				if (!_pressed)
+					Toggle(action);
+				return;
+			}
+			if (action)
+				Click.Invoke(Button);
+			if (transition && IsActive() && IsInteractable() && colors.fadeDuration > 0f)
+			{
+				DoStateTransition(SelectionState.Pressed, instant: false);
+				StartCoroutine(Unpress());
+			}
+		}
+		IEnumerator Unpress()
+		{
+			float elapsed = 0f;
+			while (elapsed < colors.fadeDuration)
+			{
+				elapsed += Time.unscaledDeltaTime;
+				yield return null;
+			}
+			DoStateTransition(currentSelectionState, instant: false);
+		}
 		public void Toggle()
+			=> Toggle(true);
+		public void Toggle(bool action)
 		{
 			if (!Toggleable)
 			{
-				Press();
+				Press(action);
 				return;
 			}
 			_pressed = !_pressed;
-			image.sprite = _pressed ? spriteState.pressedSprite : normalSprite;
-			if (!IsActive() || !IsInteractable())
-				return;
-			onClick.Invoke();
+			image.sprite = Pressed ? spriteState.pressedSprite : normalSprite;
+			DoStateTransition(SelectionState.Normal, instant: false);
+			if (Exclusive && Pressed)
+				EnsureExclusive();
+			if (action)
+				Click.Invoke(Button);
 		}
-		public void Press()
+		protected void EnsureExclusive()
 		{
-			if (!Toggleable)
-			{
-				base.OnSubmit(null);
+			if (!Exclusive || !Pressed)
 				return;
+			var parent = Button?.Parent as Panel;
+			if (parent == null)
+				return;
+			if (_exclusive == 1)
+				EnsureExclusive(parent, _exclusive);
+			else
+			{
+				int levels = 1;
+				do
+				{
+					var p2 = parent.Parent as Panel;
+					if (p2 == null)
+						break;
+					parent = p2;
+				} while (++levels < _exclusive);
+				EnsureExclusive(parent, levels);
 			}
-			if (!_pressed)
-				Toggle();
+		}
+		void EnsureExclusive(Panel parent, int levels)
+		{
+			if (parent == null)
+				return;
+			if (levels <= 1)
+			{
+				foreach (var e in parent)
+				{
+					var other = e as Button;
+					if (other == null || other == Button)
+						continue;
+					if (other.Exclusive && other.Pressed)
+						other.Toggle(false);
+				}
+			}
+			else
+			{
+				levels--;
+				foreach (var e in parent)
+					EnsureExclusive(e as Panel, levels);
+			}
+		}
+
+		public virtual void OnPointerClick(PointerEventData eventData)
+		{
+			if (eventData.button == PointerEventData.InputButton.Left
+				&& IsActive() && IsInteractable())
+			{
+				if (!Toggleable)
+					Press(transition: false);
+				else if (!Exclusive || !Pressed)
+					Toggle();
+				else
+					Click.Invoke(Button);
+			}
+		}
+		public virtual void OnSubmit(BaseEventData eventData)
+		{
+			if (IsActive() && IsInteractable())
+			{
+				if (!Toggleable)
+					Press();
+				else if (!Exclusive || !Pressed)
+					Toggle();
+				else
+					Click.Invoke(Button);
+			}
 		}
 	}
 }

@@ -25,18 +25,16 @@ def gui
   var lblWidth = 120
   var boxWidth = 60
   var uniWidth = 40
-  var wnd = new window
+  var wnd = new window "Launch " + ship.name
   wnd.x -= (unity.screen.width - 200) / 3
   var hintLabel = new label
   def boxEnter box
     hintLabel.text = box.tag
   def row text, value, units, hint
     var row = wnd.add new panel layout.horizontal
-    var lbl = row.add new label
-    lbl.text = text
+    var lbl = row.addLabel text
     lbl.minWidth = lblWidth
-    var box = row.add new textBox
-    box.text = string value
+    var box = row.addTextBox string value
     box.tag = hint
     box.enter.add boxEnter
     if units == null
@@ -59,32 +57,22 @@ def gui
   var fa = row "First angle: ",     firstAngle,      "°",     "Degrees of pitch for first phase"
   var a1 = row "First altitude: ",  firstAltitude,   "km",    "Altitude for first phase"
   var na = row "Narrow altitude: ", narrowAltitude,   "m",    "Minimal altitude to go straight"
-  var apsel = wnd.add new panel layout.horizontal
-  apsel.add new label "Pilot: "
-  var xfirda = apsel.add new button "Firda"
-  xfirda.toggleable = true
+
+  var apsel = wnd.addHorizontal()
+  apsel.addLabel "Pilot: "
+  var xfirda = apsel.addExclusive "Firda"
+  var xevan = apsel.addExclusive "Evan"
+  var xcust = apsel.addExclusive "Custom"
   xfirda.pressed = true
-  var xevan = apsel.add new button "Evan"
-  xevan.toggleable = true
-  var xcust = apsel.add new button "Custom"
-  xcust.toggleable = true
-  xfirda.click.add def
-    if xfirda.pressed
-      xevan.pressed = false
-      xcust.pressed = false
-  xevan.click.add def
-    if xevan.pressed
-      xfirda.pressed = false
-      xcust.pressed = false
-  xcust.click.add def
-    if xcust.pressed
-      xfirda.pressed = false
-      xevan.pressed = false
+
   wnd.add hintLabel
-  var brow = wnd.add new panel layout.horizontal
+  var brow = wnd.addHorizontal()
   var cancel = brow.add new button
   cancel.text = "Cancel"
   cancel.flexWidth = 1
+  (brow.addButton "Control", def
+    run.replace "control.ros"
+  ).flexWidth = 1
   var launch = brow.add new button
   launch.text = "Launch"
   launch.flexWidth = 1
@@ -188,7 +176,7 @@ def steer
 //limit AoA when Q is high
   var srfA = 90 - ship.away.angle ship.surfaceVelocity
   var curr = srfA
-  var maxA = 3.0/math.clamp ship.q, 0.1, 1.0
+  var maxA = 3.0/math.clamp(ship.q, 0.1, 0.75) - 3.0
 //smooth transition from surface to orbital speed by ratio of altitude to safe altitude
   var factor = math.clamp (altitude/safeAltitude)^2, 0, 1
   var speed = factor * ship.velocity.size + ship.surfaceVelocity.size * (1-factor)
@@ -334,20 +322,8 @@ if !evan
 ctlsub = system.update def
   autopilot.direction = ship.away.cross ship.velocity.cross ship.away
 
-var prevEtaReport = -10
-for
-  var bt = stage.burnTime dv().size
-  if bt != bt; bt = 120 // bt != bt is test for nan
-  var eta = dt()-0.5*bt
-  if time.since(prevEtaReport) >= (eta > 10 ? 10 : eta > 5 ? 2 : 1)
-    prevEtaReport = time.now
-    print "ETA: {0:F1}s", eta
-  if eta <= 1; break
-  wait
-
-var maxThrottle = 1.0
-ctlsub.remove
-ctlsub = system.update def
+var maxThrottle = 0.0
+def circle
   var pwr = 1
   var tta = ship.timeToAp
   var dir
@@ -369,6 +345,23 @@ ctlsub = system.update def
   var haveSpeed = ship.velocity.size
   var need = (needSpeed-haveSpeed) * ship.mass / math.max 1, ship.engines.getThrust()
   autopilot.throttle = pwr * e * math.min(maxThrottle, need)
+
+var prevEtaReport = -10
+var switched = false
+for
+  var bt = stage.burnTime dv().size
+  if bt != bt; bt = 120 // bt != bt is test for nan
+  var eta = dt()-0.5*bt
+  if time.since(prevEtaReport) >= (eta > 10 ? 10 : eta > 5 ? 2 : 1)
+    prevEtaReport = time.now
+    print "ETA: {0:F1}s", eta
+  if eta <= 5 and !switched
+    switched = true
+    ctlsub.remove
+    ctlsub = system.update circle
+  if eta <= 1; break
+  wait
+maxThrottle = 1.0
 
 var choked = null
 var warned = false
@@ -416,4 +409,4 @@ vd = null
 user.throttle = 0
 ship.autopilot.disable
 print "DONE! e={0:F5} Ap:{1:F3} Pe:{2:F3}", ship.eccentricity, apoapsis*0.001, periapsis*0.001
-return ship.eccentricity
+run.replace "control.ros"

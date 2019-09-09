@@ -22,7 +22,6 @@ namespace RedOnion.ROS
 		protected Globals globals;
 		protected ArgumentList vals;
 		protected Context ctx;
-		protected bool ctxIsPrivate;
 		protected Value self; // `this` for current code
 		protected Value result;
 		protected struct SavedContext
@@ -57,30 +56,29 @@ namespace RedOnion.ROS
 		public CompiledCode Code
 		{
 			get => compiled;
-			protected set
+			protected set => SetCode(value);
+		}
+		protected internal void SetCode(CompiledCode value, bool reset = false)
+		{
+			if (stack.size > 0)
 			{
-				if (stack.size > 0)
-				{
+				if (!reset)
 					ctx = stack[0].context;
-					stack.Clear();
-				}
-				at = 0;
-				code = value?.Code;
-				str = value?.Strings;
-				vals.Clear();
-				self = Value.Null;
-				Exit = ExitCode.None;
-				result = Value.Void;
-				compiled = value;
-				if (ctx == null || ctxIsPrivate)
-				{
-					ctx = new Context();
-					ctxIsPrivate = false;
-				}
-				ctx.RootStart = 0;
-				ctx.RootEnd = code.Length;
-				ctx.PopAll();
+				stack.Clear();
 			}
+			at = 0;
+			code = value?.Code;
+			str = value?.Strings;
+			vals.Clear();
+			self = Value.Null;
+			Exit = ExitCode.None;
+			result = Value.Void;
+			compiled = value;
+			if (ctx == null || reset)
+				ctx = new Context();
+			ctx.RootStart = 0;
+			ctx.RootEnd = code.Length;
+			ctx.PopAll();
 		}
 
 		public virtual void Log(string msg)
@@ -146,9 +144,7 @@ namespace RedOnion.ROS
 		public bool Execute(Function fn, int countdown = 1000)
 		{
 			ctx = new Context(fn, fn.Context, null);
-			ctxIsPrivate = false;
 			Code = fn.Code;
-			ctxIsPrivate = true;
 			ctx.RootStart = at = fn.CodeAt;
 			ctx.RootEnd = at + fn.CodeSize;
 			ctx.PopAll();
@@ -324,6 +320,7 @@ namespace RedOnion.ROS
 					fn.BoundArguments.CopyTo(combined, 0);
 					args.CopyTo(combined, fn.BoundArguments.Length);
 					args = combined;
+					argc += fn.BoundArguments.Length;
 				}
 				ctx.Add("arguments", args);
 				for (int i = 0; i < fn.ArgumentCount; i++)
@@ -335,6 +332,9 @@ namespace RedOnion.ROS
 				result = Value.Void;
 				return;
 			}
+#if DEBUG
+			bool wasReplace = it.desc is Functions.Run.RunReplace || it.desc is Functions.Run.RunReplaceSource;
+#endif
 			if (!it.desc.Call(ref it, self, new Arguments(Arguments, argc), create)
 				&& op != OpCode.Autocall)
 			{
@@ -348,7 +348,10 @@ namespace RedOnion.ROS
 					: "{0} cannot be called with these two arguments",
 					self != null ? selfDesc.NameOf(self, idx) : it.Name);
 			}
-			vals.Pop(argc);
+#if DEBUG
+			Debug.Assert(argc <= vals.Count || wasReplace);
+#endif
+			vals.Pop(Math.Min(argc, vals.Count));
 		}
 		// see Functions.Run
 		internal void CallScript(CompiledCode script, bool include = false)
@@ -369,7 +372,8 @@ namespace RedOnion.ROS
 				ret.blockCode = ctx.BlockCode;
 				ret.blockEnd = ctx.BlockEnd;
 				ctx.BlockEnd = code.Length;
-				ctx.BlockCode = OpCode.Return;
+				// see Execute(int): `while (at == blockEnd)` at the top
+				ctx.BlockCode = OpCode.Import;
 			}
 			else ctx = new Context() { RootEnd = code.Length };
 			result = Value.Void;

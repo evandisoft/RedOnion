@@ -1,0 +1,76 @@
+var wnd = new window "Control " + ship.name
+wnd.x -= (unity.screen.width - 200) / 3
+
+// mode vs. the rest
+var split = wnd.addHorizontal()
+split.padding = 0
+
+// mode
+var mode = split.addVertical()
+def mbtn text
+  var btn = mode.addExclusive text
+  btn.width = 60
+  return btn
+var mObt = mbtn "OBT" // orbital steering
+var mSrf = mbtn "SRF" // surface steering
+var mTgt = mbtn "TGT" // target steering and utils
+var mMan = mbtn "MAN" // maneuver execution
+var mNde = mbtn "NDE" // nodes only (+ "EXEC" button)
+mObt.pressed = true
+
+// main content (buttons and footer)
+var main = split.addVertical()
+main.padding = 0
+var btns = main.addHorizontal() //TODO: stack
+btns.padding = 0
+
+var dirsubs = null
+def lockdir fn
+  if dirsubs != null
+    dirsubs.remove
+    dirsubs = null
+  autopilot.disable
+  if fn != null
+    dirsubs = system.update def
+      autopilot.direction = fn()
+def xbtn parent, text, steer
+  var btn = parent.addExclusive2 text, lockdir.bind steer
+  btn.width = 80
+  return btn
+
+// orbital/surfece buttons
+var blk1 = btns.addVertical()
+var row = blk1.addHorizontal()
+xbtn row, "Progr.", def => mSrf.pressed ? ship.srfvel : ship.velocity
+xbtn row, "Retro.", def => mSrf.pressed ? -ship.srfvel : -ship.velocity
+row = blk1.addHorizontal()
+xbtn row, "Normal", def => ship.velocity.cross ship.away
+xbtn row, "Anti-N", def => -ship.velocity.cross ship.away
+row = blk1.addHorizontal()
+xbtn row, "Rad-OUT", def => ship.velocity.cross ship.away.cross ship.velocity
+xbtn row, "Rad-IN", def => -ship.velocity.cross ship.away.cross ship.velocity
+row = blk1.addHorizontal()
+var unlock = row.addExclusive2 "UNLOCK"
+unlock.flexWidth = 1
+
+// main loop
+var done = false
+wnd.closed.add def
+  done = true
+until done
+  if mObt.pressed and altitude < math.max atmosphere.height/4, 1000
+    mSrf.pressed = true
+  wait
+  if stage.ready
+    var nextDecoupler = ship.parts.nextDecoupler
+    if nextDecoupler != null
+      if nextDecoupler.isType("LaunchClamp")
+        print "Releasing launch clamps"
+        stage
+      else if !stage.engines.anyOperational
+        print "No operational engine"
+        stage
+      else if stage.solidFuel + stage.liquidFuel <= 0.1
+        print "Stage out of fuel"
+        stage
+        return

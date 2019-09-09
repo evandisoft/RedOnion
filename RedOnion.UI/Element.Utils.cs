@@ -5,6 +5,7 @@ using UnityEngine;
 using Ionic.Zip;
 using System.Globalization;
 using System.Diagnostics;
+using Debug = UnityEngine.Debug;
 
 [assembly: InternalsVisibleTo("RedOnion.KSP")]
 

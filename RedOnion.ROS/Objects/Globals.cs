@@ -12,21 +12,33 @@ namespace RedOnion.ROS.Objects
 
 		public Globals() : base("Globals", typeof(Globals)) { }
 
-		protected Print print;
-		protected Run run;
-		protected UserObject obj;
+		public UserObject Prototype { get; protected set; }
+		public UserObject Object { get; protected set; }
+		public Function.Creator Function { get; protected set; }
+
+		public Print Print { get; protected set; }
+		public Run Run { get; protected set; }
 
 		public virtual void Fill()
 		{
 			if (readOnlyTop > 0)
 				return;
-			Add("System", parent = new UserObject());
+			Prototype = new UserObject("Object.prototype");
+			Add("System", parent = new UserObject(Prototype));
+
+			System.Add("object", new Value(Object = new UserObject(Prototype)));
+			Object.Add("prototype", Prototype);
+			Object.Lock();
+			System.Add("function", new Value(Function = new Function.Creator(Prototype)));
+
 			System.Add("global", this);
+			System.Add("globals", this);
 			System.Add("math", typeof(RosMath));
-			System.Add("print", new Value(print = new Print()));
-			System.Add("run", new Value(run = new Run()));
-			System.Add("object", new Value(obj = new UserObject()));
+			System.Add("print", new Value(Print = new Print(Prototype)));
+			System.Add("run", new Value(Run = new Run(Prototype)));
 			System.Add("list", new Value(typeof(List<Value>)));
+			System.Add("queue", new Value(typeof(Queue<Value>)));
+			System.Add("stack", new Value(typeof(Stack<Value>)));
 
 			if (Processor is Processor processor)
 			{
@@ -52,7 +64,7 @@ namespace RedOnion.ROS.Objects
 			System.Add("sbyte", new Value(Descriptor.SByte));
 			System.Add("byte", new Value(Descriptor.Byte));
 			System.Add("char", new Value(Descriptor.Char));
-			System.Add("string", new Value(Descriptor.String));
+			System.Add("string", new Value(Descriptor.String, null));
 
 			System.Lock();
 			Lock();
@@ -61,9 +73,9 @@ namespace RedOnion.ROS.Objects
 		{
 			base.Reset();
 			System.Reset();
-			print?.Reset();
-			run?.Reset();
-			obj?.Reset();
+			Print?.Reset();
+			Run?.Reset();
+			Object?.Reset();
 		}
 	}
 }

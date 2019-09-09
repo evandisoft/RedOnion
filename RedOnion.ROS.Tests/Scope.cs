@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Linq;
 using NUnit.Framework;
 using RedOnion.ROS.Objects;
 
@@ -232,8 +233,7 @@ namespace RedOnion.ROS.Tests
 				"  add 2",
 				"doit; x");
 
-			// This is some advanced stuff. `a.add def => s += i + 1` will not currently work the way you might expect,
-			// because `i` is not captured by creating the lambda, but by calling it!
+			// `a.add def => s += i + 1` will not work the way you might expect, because `i` is captured by reference.
 			// That means that `i` is already `4` when such lambdas would first be called, producing `s = "444"`.
 			// But that `(def; var n = ...)()` is a call in the moment where `i` is `0`, `1` or `2` in each call,
 			// therefore the inner lambda (`def => s += n`) is referencing `n` which was already set to `1`, `2` or `3`,
@@ -241,6 +241,7 @@ namespace RedOnion.ROS.Tests
 			// where the 'n' lives and the inner lambda is referencing that particular `n`
 			// (each inner lambda referencing different context). All the simple `a.add def => s += i + 1`
 			// would reference same context where `i` ceased to exist with last value being `4`.
+			// The context where `i` lives was named *cousin context* - see Context.SeparateVars().
 			Reset();
 			Lines((object)"123",
 				"var s = \"\"",
@@ -306,6 +307,9 @@ obj.getTotal    // returns 1
 			Test(3.14, "x");
 			Globals.Add("test2", "var x = 1.41");
 			Test(ExitCode.Return, 1.41, "run.library.source test2; return x");
+
+			Test(ExitCode.Return, 0, "run.replace.source \"return 0\"");
+			Assert.AreEqual(0, ctx.EnumerateProperties(ctx).Count());
 		}
 
 		[Test]

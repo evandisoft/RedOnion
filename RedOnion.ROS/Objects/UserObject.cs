@@ -166,7 +166,10 @@ namespace RedOnion.ROS.Objects
 		{
 			if (at < 0 || at >= prop.size)
 				return false;
-			self = prop.items[at].value;
+			ref var it = ref prop.items[at].value;
+			if (it.IsVoid)
+				return false;
+			self = it;
 			return true;
 		}
 		public override bool Set(ref Value self, int at, OpCode op, ref Value value)
@@ -194,16 +197,11 @@ namespace RedOnion.ROS.Objects
 				return -1;
 			var index = args[0];
 			int at;
-			if (index.IsNumerOrChar)
+			if (index.IsNumber)
 			{
 				at = index.ToInt();
 				if (at < 0 || at >= prop.size)
-				{
-					if (at >= prop.size || args.Length > 1)
-						return -1;
-					at = prop.size;
-					prop.Add(new Prop());
-				}
+					return -1;
 			}
 			else
 			{
@@ -211,12 +209,8 @@ namespace RedOnion.ROS.Objects
 					return -1;
 				var name = index.obj.ToString();
 				at = Find(name);
-				if (at < 0 || at >= prop.size)
-				{
-					if (at > prop.size || args.Length > 1)
-						return -1;
-					at = Add(name, Value.Void);
-				}
+				if (at < 0)
+					return -1;
 			}
 			if (args.Length == 1)
 				return at;

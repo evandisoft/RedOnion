@@ -276,8 +276,8 @@ for var f in a; f
 return s;
 ```
 
-The first `a.add def => s += i + 1` will capture `i` when the lambda is called, not when it is created!
-That means that `i` is already `4` when such lambdas would first be called, producing `s = "444"`.
+The first `a.add def => s += i + 1` will capture `i` by reference
+and when those lambdas are first called, the `i` is already `4`, producing `s = "444"`.
 But that `(def; var n = ...)()` is a call in the moment where `i` is `0`, `1` or `2` in each call,
 therefore the inner lambda (`def => s += n`) is referencing `n` which was already set to `1`, `2` or `3`,
 producing the final result of `"123"`. The difference is that calling the outer lambda creates new context,

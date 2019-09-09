@@ -5,6 +5,7 @@ using RedOnion.ROS;
 using RedOnion.ROS.Utilities;
 using RedOnion.KSP.Parts;
 using UnityEngine;
+using KSP.Localization;
 
 namespace RedOnion.KSP.API
 {
@@ -97,7 +98,7 @@ namespace RedOnion.KSP.API
 				Dispose();
 		}
 
-		[Description("Autopilot of this ship (vehicle/wessel).")]
+		[Description("Autopilot of this ship (vehicle/vessel).")]
 		public Autopilot autopilot => _autopilot ?? (_autopilot = new Autopilot(this));
 		protected Autopilot _autopilot;
 		[Description("Current throttle (assign redirects to `Autopilot`, reads control state if autopilot disabled)")]
@@ -116,6 +117,18 @@ namespace RedOnion.KSP.API
 		[Unsafe, Description("Native `Vessel` for unrestricted access to KSP API."
 			+ " Same as `FlightGlobals.ActiveVessel` if accessed through global `ship`.")]
 		public Vessel native { get; private set; }
+
+		[Description("Name of the ship (vehicle/vessel).")]
+		public string name
+		{
+			get
+			{
+				var name = native.vesselName;
+				return name.StartsWith(autoLocMarker) ? Localizer.Format(name) : name;
+			}
+		}
+		internal readonly static string autoLocMarker = "#autoLOC_";
+
 		[Description("All parts of this ship/vessel/vehicle.")]
 		public ShipPartSet parts { get; private set; }
 		[Description("Root part (same as `parts.root`).")]

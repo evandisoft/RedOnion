@@ -36,6 +36,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Button.cs" />
+    <Compile Include="Collector.cs" />
     <Compile Include="Components\BackgroundImage.cs" />
     <Compile Include="Components\DragHandler.cs" />
     <Compile Include="Components\InputField.cs" />
@@ -60,6 +61,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="System">
+      <HintPath>$(KerbalLibs)\System.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="UnityEngine">
       <HintPath>$(KerbalLibs)\UnityEngine.dll</HintPath>
       <Private>False</Private>

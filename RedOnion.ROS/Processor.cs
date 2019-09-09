@@ -73,7 +73,7 @@ namespace RedOnion.ROS
 					return;
 				var sb = new StringBuilder();
 				var at = re.CodeAt;
-				if (at > 0)
+				if (at > 0 && at <= code.Length)
 				{
 					for (int i = Math.Max(0, at - 64); i < at; i++)
 						sb.AppendFormat("{0:X2}", code[i]);

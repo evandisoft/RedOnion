@@ -349,7 +349,8 @@ namespace RedOnion.ROS
 				{
 					Value.DebugLog("Found default {0}#ctor [args: {1}]",
 						Type.Name, args.Length);
-					defaultCtor = c;
+					if (defaultCtor == null || c.GetParameters().Length < defaultCtor.GetParameters().Length)
+						defaultCtor = c;
 					return;
 				}
 				if (args[0].ParameterType == typeof(IProcessor)
@@ -358,7 +359,8 @@ namespace RedOnion.ROS
 				{
 					Value.DebugLog("Found default {0}#ctor accepting processor [args: {1}]",
 						Type.Name, args.Length);
-					processorCtor = c;
+					if (processorCtor == null || c.GetParameters().Length < processorCtor.GetParameters().Length)
+						processorCtor = c;
 					return;
 				}
 			}

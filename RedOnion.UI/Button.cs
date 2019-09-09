@@ -1,6 +1,7 @@
 using RedOnion.UI.Components;
 using System;
 using UnityEngine;
+using UnityEngine.Events;
 using UUI = UnityEngine.UI;
 
 namespace RedOnion.UI
@@ -47,10 +48,12 @@ namespace RedOnion.UI
 
 		public Button()
 		{
-			Core = GameObject.AddComponent<ToggleableButton>();
 			Image = GameObject.AddComponent<BackgroundImage>();
-			Image.sprite = Skin.button.normal.background;
 			Image.type = UUI.Image.Type.Sliced;
+			Image.sprite = Skin.button.normal.background;
+			Core = GameObject.AddComponent<ToggleableButton>();
+			Core.Button = this;
+			Core.colors = UUI.ColorBlock.defaultColorBlock;
 			Core.image = Image;
 			Core.normalSprite = Skin.button.normal.background;
 			Core.spriteState = new UUI.SpriteState()
@@ -65,6 +68,7 @@ namespace RedOnion.UI
 			Layout = Layout.Horizontal;
 		}
 		public Button(string text) : this() => Text = text;
+		public Button(string text, UnityAction<Button> click) : this(text) => Core.Click.AddListener(click);
 
 		protected override void Dispose(bool disposing)
 		{
@@ -77,11 +81,9 @@ namespace RedOnion.UI
 			base.Dispose(true);
 		}
 
-		public Event Click
-		{
-			get => new Event(Core.onClick);
-			set { }
-		}
+		public Event<Button> Click
+			=> new Event<Button>(Core.Click);
+
 		public bool Toggleable
 		{
 			get => Core.Toggleable;
@@ -92,8 +94,20 @@ namespace RedOnion.UI
 			get => Core.Pressed;
 			set => Core.Pressed = value;
 		}
+		public bool Exclusive
+		{
+			get => Core.Exclusive;
+			set => Core.Exclusive = value;
+		}
+		public int ExclusiveLevel
+		{
+			get => Core.ExclusiveLevel;
+			set => Core.ExclusiveLevel = value;
+		}
 		public void Press() => Core.Press();
 		public void Toggle() => Core.Toggle();
+		public void Press(bool action) => Core.Press(action);
+		public void Toggle(bool action) => Core.Toggle(action);
 
 		public string Text
 		{

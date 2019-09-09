@@ -270,7 +270,7 @@ namespace RedOnion.ROS.Parsing
 
 					// init expression
 					var iniAt = code.size;
-					Next().FullExpression(flags | Flag.Limited | Flag.NoExpression);
+					Next().FullExpression(flags | Flag.Limited | Flag.NoExpression | Flag.WasFor);
 					if (Curr == ':' || ExCode == ExCode.In)
 					{
 						Write(code.size - iniAt, mark + 1);
@@ -321,7 +321,7 @@ namespace RedOnion.ROS.Parsing
 					Write(0); // size of list expression
 
 					var varAt = code.size;
-					Next().FullExpression(flags | Flag.Limited | Flag.NoExpression);
+					Next().FullExpression(flags | Flag.Limited | Flag.NoExpression | Flag.WasFor);
 					if (Curr == ':' || ExCode == ExCode.In)
 						Next();
 					Write(code.size - varAt, mark + 1);

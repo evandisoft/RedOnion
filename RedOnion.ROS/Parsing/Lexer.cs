@@ -16,9 +16,9 @@ namespace RedOnion.ROS.Parsing
 		protected virtual void SetWordCode()
 		{
 			var code = WordCode(Word);
-			if (code == ExCode.As && Peek == '!')
+			if (Peek == '!' && (code == ExCode.As || code == ExCode.Is))
 			{
-				code = ExCode.AsCast;
+				code++;
 				End++;
 				Word += '!';
 			}

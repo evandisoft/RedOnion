@@ -152,6 +152,8 @@ namespace RedOnion.ROS.Parsing
 					goto autocall;
 				goto binary;
 			case OpKind.Logic:
+				if (op == ExCode.In && (flags & Flag.WasFor) != 0)
+					goto done;
 			binary_check:
 				CheckUnary(unary, false);
 			binary:

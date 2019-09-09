@@ -153,7 +153,7 @@ namespace RedOnion.ROS
 					return -1;
 				ref var index = ref args.GetRef(0);
 				int at;
-				if (index.IsNumerOrChar)
+				if (index.IsNumberOrChar)
 				{
 					if (intIndexGet == null && intIndexSet == null)
 						return -1;
@@ -192,7 +192,7 @@ namespace RedOnion.ROS
 				{
 					var proxy = (Value[])self.obj;
 					ref var index = ref proxy[1];
-					if (index.IsNumerOrChar)
+					if (index.IsNumberOrChar)
 					{
 						if (intIndexGet == null)
 							throw InvalidOperation("{0}[{1}] is write only", Name, proxy[1]);
@@ -223,7 +223,7 @@ namespace RedOnion.ROS
 						return false;
 					var proxy = (Value[])self.obj;
 					ref var index = ref proxy[1];
-					if (index.IsNumerOrChar)
+					if (index.IsNumberOrChar)
 					{
 						if (intIndexSet == null)
 							throw InvalidOperation("{0}[{1}] is read only", Name, proxy[1]);

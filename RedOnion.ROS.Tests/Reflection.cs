@@ -210,6 +210,22 @@ namespace RedOnion.ROS.Tests
 			public EnumClass() { }
 			public EnumClass(TestEnum value) => Value = value;
 		}
+		public class EnumTest
+		{
+			public IProcessor Processor { get; set; }
+			public string Name { get; set; }
+			public TestEnum Value { get; set; }
+			public EnumTest(IProcessor processor)
+				: this(processor, null, TestEnum.One) { }
+			public EnumTest(IProcessor processor, TestEnum value, string name = null)
+				: this(processor, name, value) { }
+			public EnumTest(IProcessor processor, string name, TestEnum value = TestEnum.Three)
+			{
+				Processor = processor;
+				Name = name;
+				Value = value;
+			}
+		}
 		[Test]
 		public void ROS_Refl05_Enum()
 		{
@@ -222,6 +238,10 @@ namespace RedOnion.ROS.Tests
 			Test(TestEnum.Three, "enumUtils.or testEnum.one, testEnum.two");
 			Globals.Add(typeof(EnumClass));
 			Test(TestEnum.One, "(new enumClass testEnum.one).value");
+			Globals.Add(typeof(EnumTest));
+			Test(TestEnum.One, "(new enumTest).value");
+			Test(TestEnum.Two, "(new enumTest testEnum.two).value");
+			Test("hello", "(new enumTest \"hello\").name");
 		}
 
 		[Test]

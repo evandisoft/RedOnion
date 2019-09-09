@@ -12,14 +12,13 @@ namespace RedOnion.UI
 	/// </summary>
 	public abstract partial class Element : IDisposable
 	{
+#if DEBUG
 		public GameObject GameObject { get; private set; }
+#else
+		protected internal GameObject GameObject { get; private set; }
+#endif
 		protected internal RectTransform RectTransform { get; private set; }
 
-		public string Name
-		{
-			get => GameObject.name ?? GetType().FullName;
-			set => GameObject.name = value;
-		}
 		public object Tag { get; set; }
 		public Element Parent { get; internal set; }
 
@@ -30,6 +29,22 @@ namespace RedOnion.UI
 			RectTransform.pivot = new Vector2(.5f, .5f);
 			RectTransform.anchorMin = new Vector2(.5f, .5f);
 			RectTransform.anchorMax = new Vector2(.5f, .5f);
+		}
+
+		public string Name
+		{
+			get => GameObject.name ?? GetType().FullName;
+			set => GameObject.name = value;
+		}
+		public bool Active
+		{
+			get => GameObject.activeSelf;
+			set => GameObject.SetActive(value);
+		}
+		public bool Visible
+		{
+			get => GameObject.activeInHierarchy;
+			set => GameObject.SetActive(value);
 		}
 
 		// virtual so that we can later redirect it in Window (to content panel)
@@ -82,7 +97,11 @@ namespace RedOnion.UI
 		}
 
 		~Element() => Dispose(false);
-		public void Dispose() => Dispose(true);
+		public void Dispose()
+		{
+			GC.SuppressFinalize(this);
+			Dispose(true);
+		}
 		protected virtual void Dispose(bool disposing)
 		{
 			if (!disposing || GameObject == null)

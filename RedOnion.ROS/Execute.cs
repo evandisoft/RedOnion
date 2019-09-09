@@ -32,7 +32,7 @@ namespace RedOnion.ROS
 					while (at == blockEnd)
 					{
 						if (ctx.BlockCount == 0
-							&& ctx.BlockCode != OpCode.Return
+							&& ctx.BlockCode != OpCode.Import
 							&& ctx.BlockCode != OpCode.Function)
 							goto finishNoReturn;
 
@@ -116,8 +116,8 @@ namespace RedOnion.ROS
 							stack.Pop();
 							continue;
 						}
-						// library end
-						case OpCode.Return:
+						// library end (see CallScript)
+						case OpCode.Import:
 						{
 							Debug.Assert(stack.Count > 0);
 							ref var top = ref stack.Top();
@@ -262,7 +262,7 @@ namespace RedOnion.ROS
 							ref var it = ref vals.Top();
 							if (it.IsReference && !it.desc.Get(ref it, it.num.Int))
 								throw CouldNotGet(ref it);
-							if (it.IsNumerOrChar)
+							if (it.IsNumberOrChar)
 								throw InvalidOperation("Numbers do not have properties");
 							var idx = it.desc.Find(it.obj, name, true);
 							if (idx < 0)
@@ -385,7 +385,7 @@ namespace RedOnion.ROS
 						ref var it = ref vals.Top();
 						if (it.IsReference && !it.desc.Get(ref it, it.num.Int))
 							throw CouldNotGet(ref it);
-						if (it.IsNumerOrChar)
+						if (it.IsNumberOrChar)
 							throw InvalidOperation("Numbers do not have properties");
 						var idx = it.desc.Find(it.obj, name, true);
 						if (idx < 0)
@@ -553,6 +553,33 @@ namespace RedOnion.ROS
 							throw CouldNotGet(ref rhs);
 						lhs = (lhs.desc == rhs.desc && lhs.obj == rhs.obj
 							&& lhs.num.Long == rhs.num.Long) == (op == OpCode.Identity);
+						vals.Pop(1);
+						continue;
+					}
+					case OpCode.Is:
+					case OpCode.IsNot:
+					{
+						ref var lhs = ref vals.Top(-2);
+						if (lhs.IsReference && !lhs.desc.Get(ref lhs, lhs.num.Int))
+							throw CouldNotGet(ref lhs);
+						ref var rhs = ref vals.Top(-1);
+						if (rhs.IsReference && !rhs.desc.Get(ref rhs, rhs.num.Int))
+							throw CouldNotGet(ref rhs);
+						lhs = rhs.desc.IsInstanceOf(ref lhs) == (op == OpCode.Is);
+						vals.Pop(1);
+						continue;
+					}
+					case OpCode.In:
+					{
+						ref var lhs = ref vals.Top(-2);
+						if (lhs.IsReference && !lhs.desc.Get(ref lhs, lhs.num.Int))
+							throw CouldNotGet(ref lhs);
+						ref var rhs = ref vals.Top(-1);
+						if (rhs.IsReference && !rhs.desc.Get(ref rhs, rhs.num.Int))
+							throw CouldNotGet(ref rhs);
+						if (!lhs.IsStringOrChar)
+							throw InvalidOperation("Operator 'in' can only be used with strings (or char)");
+						lhs = rhs.desc.Find(rhs.obj, lhs.ToStr()) >= 0;
 						vals.Pop(1);
 						continue;
 					}
@@ -898,7 +925,7 @@ namespace RedOnion.ROS
 						}
 						at += size;
 
-						var it = new Function(fname, null,
+						var it = new Function(fname, globals.Function.Prototype,
 							compiled, bodyAt, bodySz, ftat, args, ctx, cvars, processor);
 						if (fname?.Length > 0)
 							ctx.Add(fname, it);
@@ -917,7 +944,11 @@ namespace RedOnion.ROS
 				if (vals.Count > 0)
 					result = vals.Pop();
 				if (result.IsReference && !result.desc.Get(ref result, result.num.Int))
-					throw CouldNotGet(ref result);
+				{
+					if (Exit != ExitCode.None)
+						throw CouldNotGet(ref result);
+					result = Value.Void;
+				}
 				vals.Clear();
 				ctx.PopAll();
 				Countdown = countdown;
@@ -935,7 +966,7 @@ namespace RedOnion.ROS
 				re = new RuntimeError(compiled, at, ex);
 				result = new Value(re);
 				processor?.PrintException("Core.Execute", re, logOnly: true);
-				Log("{0,2}: {1} (private: {2})", stack.size, ctx, ctxIsPrivate);
+				Log("{0,2}: {1}", stack.size, ctx);
 				for (int i = stack.size; i > 0;)
 				{
 					ref var ss = ref stack.items[--i];

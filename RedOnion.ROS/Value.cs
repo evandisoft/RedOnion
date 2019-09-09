@@ -106,7 +106,7 @@ namespace RedOnion.ROS
 				return;
 			}
 			desc = Descriptor.Of(it.GetType());
-			if (!IsNumerOrChar)
+			if (!IsNumberOrChar)
 			{
 				obj = it;
 				return;
@@ -232,7 +232,7 @@ namespace RedOnion.ROS
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		public bool IsNumber => desc.IsNumber;
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		public bool IsNumerOrChar => desc.IsNumberOrChar;
+		public bool IsNumberOrChar => desc.IsNumberOrChar;
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		public bool IsFpNumber => desc.IsFpNumber;
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -240,7 +240,7 @@ namespace RedOnion.ROS
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		public bool IsInt => desc.Primitive == ExCode.Int;
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		internal bool IsReference => num.HighInt != 0 && !IsNumerOrChar;
+		internal bool IsReference => num.HighInt != 0 && !IsNumberOrChar;
 		// note: the higher part may get changed (but must be non-zero)
 		internal void SetRef(int idx)
 			=> num.Long = (uint)idx | ((long)~idx << 32);
