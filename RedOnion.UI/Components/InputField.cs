@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -10,17 +11,15 @@ namespace RedOnion.UI.Components
 		static readonly string lockID = "RedOnion.InputField";
 		bool locked = false;
 		public TextBox TextBox { get; set; }
-		public class TextBoxEvent : UnityEvent<TextBox> { };
-		public TextBoxEvent Selected { get; } = new TextBoxEvent();
-		public TextBoxEvent Deselected { get; } = new TextBoxEvent();
-		public class TextBoxEvent<T> : UnityEvent<TextBox, T> { };
-		public TextBoxEvent<string> Changed { get; } = new TextBoxEvent<string>();
-		public TextBoxEvent<string> Submitted { get; } = new TextBoxEvent<string>();
+		public event Action<TextBox> Selected;
+		public event Action<TextBox> Deselected;
+		public event Action<TextBox, string> Changed;
+		public event Action<TextBox, string> Submitted;
 
 		public InputField()
 		{
-			onValueChanged.AddListener(text => Changed.Invoke(TextBox, text));
-			onEndEdit.AddListener(text => Submitted.Invoke(TextBox, text));
+			onValueChanged.AddListener(text => Changed?.Invoke(TextBox, text));
+			onEndEdit.AddListener(text => Submitted?.Invoke(TextBox, text));
 		}
 
 		public override void OnSelect(BaseEventData eventData)
@@ -29,14 +28,14 @@ namespace RedOnion.UI.Components
 			InputLockManager.SetControlLock(ControlTypes.KEYBOARDINPUT|ControlTypes.UI_DIALOGS, lockID);
 			locked = true;
 			base.OnSelect(eventData);
-			Selected.Invoke(TextBox);
+			Selected?.Invoke(TextBox);
 		}
 		public override void OnDeselect(BaseEventData eventData)
 		{
 			InputLockManager.RemoveControlLock(lockID);
 			locked = false;
 			base.OnDeselect(eventData);
-			Deselected.Invoke(TextBox);
+			Deselected?.Invoke(TextBox);
 		}
 		protected override void OnDestroy()
 		{

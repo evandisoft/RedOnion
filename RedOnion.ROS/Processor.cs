@@ -269,8 +269,8 @@ namespace RedOnion.ROS
 				do
 				{
 					var call = Once.GetNext();
-					Call(call, "Once", OncePercent);
-					call.Remove();
+					if (!Call(call, "Once", OncePercent) || call.Core == null)
+						call.Remove();
 				} while (!Once.IsEmpty
 				&& CountdownPercent > OncePercent
 				&& TimeoutPercent > OncePercent);

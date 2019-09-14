@@ -67,22 +67,17 @@ def gui
 
   wnd.add hintLabel
   var brow = wnd.addHorizontal()
-  var cancel = brow.add new button
-  cancel.text = "Cancel"
-  cancel.flexWidth = 1
-  (brow.addButton "Control", def
-    run.replace "control.ros"
-  ).flexWidth = 1
-  var launch = brow.add new button
-  launch.text = "Launch"
-  launch.flexWidth = 1
-  var selected = null
-  cancel.click.add def => selected = false
-  launch.click.add def => selected = true
-  wnd.closed.add def => selected = false
-  while selected == null
+  var selected = 0
+  wnd.closed += def => selected = 1
+  (brow.addButton "Cancel",  def => selected = 1).flexWidth = 1
+  (brow.addButton "Control", def => selected = 2).flexWidth = 1
+  (brow.addButton "Launch",  def => selected = 3).flexWidth = 1
+  while selected == 0
     wait
-  if selected
+  if selected == 2
+    wnd.dispose()
+    run.replace "control.ros"
+  if selected == 3
     targetAltitude = double ta.text
     ascentHeading  = double ah.text
     ascentRoll     = double ar.text

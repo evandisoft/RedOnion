@@ -70,7 +70,7 @@ namespace RedOnion.UI
 			Layout = Layout.Horizontal;
 		}
 		public Button(string text) : this() => Text = text;
-		public Button(string text, UnityAction<Button> click) : this(text) => Core.Click.AddListener(click);
+		public Button(string text, Action<Button> click) : this(text) => Core.Click += click;
 
 		protected override void Dispose(bool disposing)
 		{
@@ -83,8 +83,11 @@ namespace RedOnion.UI
 			base.Dispose(true);
 		}
 
-		public Event<Button> Click
-			=> new Event<Button>(Core.Click);
+		public event Action<Button> Click
+		{
+			add => Core.Click += value;
+			remove => Core.Click -= value;
+		}
 
 		public bool Toggleable
 		{

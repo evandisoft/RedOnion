@@ -75,14 +75,26 @@ namespace RedOnion.UI
 			set => Label.FontStyle = value;
 		}
 
-		public Event<TextBox> Enter
-			=> new Event<TextBox>(Core.Selected);
-		public Event<TextBox> Exit
-			=> new Event<TextBox>(Core.Deselected);
-		public Event<TextBox, string> Changed
-			=> new Event<TextBox, string>(Core.Changed);
-		public Event<TextBox, string> Submitted
-			=> new Event<TextBox, string>(Core.Submitted);
+		public event Action<TextBox> Enter
+		{
+			add => Core.Selected += value;
+			remove => Core.Selected -= value;
+		}
+		public event Action<TextBox> Exit
+		{
+			add => Core.Deselected += value;
+			remove => Core.Deselected -= value;
+		}
+		public event Action<TextBox, string> Changed
+		{
+			add => Core.Changed += value;
+			remove => Core.Changed -= value;
+		}
+		public event Action<TextBox, string> Submitted
+		{
+			add => Core.Submitted += value;
+			remove => Core.Submitted += value;
+		}
 
 		public int CaretPosition
 		{

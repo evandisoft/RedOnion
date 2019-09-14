@@ -11,8 +11,7 @@ namespace RedOnion.UI.Components
 	{
 
 		public Button Button { get; set; }
-		public class ButtonClickedEvent : UnityEvent<Button> { }
-		public ButtonClickedEvent Click { get; set; } = new ButtonClickedEvent();
+		public event Action<Button> Click;
 
 		public Sprite normalSprite;
 		public Sprite normalHighlight;
@@ -86,7 +85,7 @@ namespace RedOnion.UI.Components
 				return;
 			}
 			if (action)
-				Click.Invoke(Button);
+				Click?.Invoke(Button);
 			if (transition && IsActive() && IsInteractable() && colors.fadeDuration > 0f)
 			{
 				DoStateTransition(SelectionState.Pressed, instant: false);
@@ -130,7 +129,7 @@ namespace RedOnion.UI.Components
 			if (Exclusive && Pressed)
 				EnsureExclusive();
 			if (action)
-				Click.Invoke(Button);
+				Click?.Invoke(Button);
 		}
 		protected void EnsureExclusive()
 		{
@@ -187,7 +186,7 @@ namespace RedOnion.UI.Components
 				else if (!Exclusive || !Pressed)
 					Toggle();
 				else
-					Click.Invoke(Button);
+					Click?.Invoke(Button);
 			}
 		}
 		public virtual void OnSubmit(BaseEventData eventData)
@@ -199,7 +198,7 @@ namespace RedOnion.UI.Components
 				else if (!Exclusive || !Pressed)
 					Toggle();
 				else
-					Click.Invoke(Button);
+					Click?.Invoke(Button);
 			}
 		}
 	}

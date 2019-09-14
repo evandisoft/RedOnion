@@ -70,7 +70,7 @@ It may get garbage-collected otherwise, but that can take time and is rather bac
 
 				GameObject.AddComponent<Components.DragHandler>();
 				GameEvents.onGameSceneLoadRequested.Add(SceneChange);
-				Close.Click.Add(CloseWindow);
+				Close.Click += CloseWindow;
 			}
 			protected override void Dispose(bool disposing)
 			{
@@ -155,15 +155,22 @@ It may get garbage-collected otherwise, but that can take time and is rather bac
 				throw new ObjectDisposedException(Name);
 			Frame.Visible = false;
 		}
+		public bool Active
+		{
+			get => Frame.Active;
+			set => Frame.Active = value;
+		}
+		public bool Visible
+		{
+			get => Frame.Visible;
+			set => Frame.Visible = value;
+		}
 
-		class WindowClosedEvent : UnityEvent<Window> { }
-		readonly WindowClosedEvent closed = new WindowClosedEvent();
-		public Event<Window> Closed
-			=> new Event<Window>(closed);
+		public event Action<Window> Closed;
 		public virtual void Close()
 		{
 			Hide();
-			closed.Invoke(this);
+			Closed?.Invoke(this);
 		}
 
 		public string Title
@@ -216,15 +223,15 @@ It may get garbage-collected otherwise, but that can take time and is rather bac
 			=> Content.AddTextBox(text);
 		public Button AddButton(string text)
 			=> Content.AddButton(text);
-		public Button AddButton(string text, UnityAction<Button> click)
+		public Button AddButton(string text, Action<Button> click)
 			=> Content.AddButton(text, click);
 		public Button AddToggle(string text)
 			=> Content.AddToggle(text);
-		public Button AddToggle(string text, UnityAction<Button> click)
+		public Button AddToggle(string text, Action<Button> click)
 			=> Content.AddToggle(text, click);
 		public Button AddExclusive(string text)
 			=> Content.AddExclusive(text);
-		public Button AddExclusive(string text, UnityAction<Button> click)
+		public Button AddExclusive(string text, Action<Button> click)
 			=> Content.AddExclusive(text, click);
 
 		public Vector2 Position

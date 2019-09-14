@@ -41,7 +41,6 @@
     <Compile Include="Components\DragHandler.cs" />
     <Compile Include="Components\InputField.cs" />
     <Compile Include="Components\ToggleableButton.cs" />
-    <Compile Include="Event.cs" />
     <Compile Include="Image.cs" />
     <Compile Include="Label.cs" />
     <Compile Include="Element.cs" />

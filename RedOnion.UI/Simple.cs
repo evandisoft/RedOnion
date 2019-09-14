@@ -95,19 +95,19 @@ namespace RedOnion.UI
 			=> Add(new TextBox(text));
 		public Button AddButton(string text)
 			=> Add(new Button(text));
-		public Button AddButton(string text, UnityAction<Button> click)
+		public Button AddButton(string text, Action<Button> click)
 			=> Add(new Button(text, click));
 		public Button AddToggle(string text)
 			=> Add(new Button(text) { Toggleable = true });
-		public Button AddToggle(string text, UnityAction<Button> click)
+		public Button AddToggle(string text, Action<Button> click)
 			=> Add(new Button(text, click) { Toggleable = true });
 		public Button AddExclusive(string text)
 			=> Add(new Button(text) { Exclusive = true });
-		public Button AddExclusive(string text, UnityAction<Button> click)
+		public Button AddExclusive(string text, Action<Button> click)
 			=> Add(new Button(text, click) { Exclusive = true });
 		public Button AddExclusive2(string text)
 			=> Add(new Button(text) { ExclusiveLevel = 2 });
-		public Button AddExclusive2(string text, UnityAction<Button> click)
+		public Button AddExclusive2(string text, Action<Button> click)
 			=> Add(new Button(text, click) { ExclusiveLevel = 2 });
 
 		public Color Color

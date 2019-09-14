@@ -68,3 +68,8 @@ until done
     else if stage.fuel <= 0.1
       print "Stage out of fuel"
       stage
+wnd.dispose
+if dirsubs != null
+  dirsubs.remove
+  dirsubs = null
+autopilot.disable
