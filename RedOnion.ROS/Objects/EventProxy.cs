@@ -7,13 +7,20 @@ using System.Text;
 
 namespace RedOnion.ROS.Objects
 {
+	public interface IEventProxy
+	{
+		Descriptor DelegateDescriptor { get; }
+		void Add(ref Value value);
+		void Remove(ref Value value);
+	}
+
 	/// <summary>
 	/// Event proxy object for instance events.
 	/// </summary>
 	/// <typeparam name="Obj">Type of the object the event is declared on.</typeparam>
 	/// <typeparam name="Fn">Type of the event (delegate).</typeparam>
 	public class EventProxy<Obj,Fn> :
-		Descriptor, ISelfDescribing
+		Descriptor, ISelfDescribing, IEventProxy
 		where Fn : Delegate
 	{
 		Descriptor ISelfDescribing.Descriptor => this;
@@ -38,6 +45,10 @@ namespace RedOnion.ROS.Objects
 
 		public void Add(Fn value) => _add(Owner, value);
 		public void Remove(Fn value) => _remove(Owner, value);
+
+		Descriptor IEventProxy.DelegateDescriptor => DelegateDescriptor;
+		void IEventProxy.Add(ref Value value) => Add((Fn)value.obj);
+		void IEventProxy.Remove(ref Value value) => Remove((Fn)value.obj);
 
 		public override int Find(object self, string name, bool add = false)
 		{
@@ -107,7 +118,7 @@ namespace RedOnion.ROS.Objects
 	/// </summary>
 	/// <typeparam name="Fn">Type of the event (delegate).</typeparam>
 	public class EventProxy<Fn> :
-		Descriptor, ISelfDescribing
+		Descriptor, ISelfDescribing, IEventProxy
 		where Fn : Delegate
 	{
 		Descriptor ISelfDescribing.Descriptor => this;
@@ -129,6 +140,10 @@ namespace RedOnion.ROS.Objects
 
 		public void Add(Fn value) => _add(value);
 		public void Remove(Fn value) => _remove(value);
+
+		Descriptor IEventProxy.DelegateDescriptor => DelegateDescriptor;
+		void IEventProxy.Add(ref Value value) => Add((Fn)value.obj);
+		void IEventProxy.Remove(ref Value value) => Remove((Fn)value.obj);
 
 		public override int Find(object self, string name, bool add = false)
 		{

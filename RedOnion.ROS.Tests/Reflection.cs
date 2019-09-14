@@ -43,6 +43,8 @@ namespace RedOnion.ROS.Tests
 				Action = null;
 				Action2 = null;
 			}
+			public static MyAction GetAction() => Action;
+			public static MyAction2 GetAction2() => Action2;
 		}
 		public class InstanceTest
 		{
@@ -69,6 +71,8 @@ namespace RedOnion.ROS.Tests
 			}
 			[Convert(typeof(Double))]
 			public int number { get; set; }
+			public MyAction GetAction() => Action;
+			public MyAction2 GetAction2() => Action2;
 		}
 		public class MixedTest
 		{
@@ -322,7 +326,9 @@ namespace RedOnion.ROS.Tests
 			Globals = new Globals();
 			Globals.Add(typeof(StaticTest));
 			Test("def action => staticTest.integer = 10");
+			Assert.IsNull(StaticTest.GetAction());
 			Test("staticTest.event.add action");
+			Assert.NotNull(StaticTest.GetAction());
 			Assert.AreEqual(0, StaticTest.Integer);
 			StaticTest.CallAction();
 			Assert.AreEqual(0, StaticTest.Integer);
@@ -331,7 +337,9 @@ namespace RedOnion.ROS.Tests
 
 			var it = new InstanceTest();
 			Globals.Add("it", it);
+			Assert.IsNull(it.GetAction());
 			Test("it.event.add def => it.name = \"done\"");
+			Assert.NotNull(it.GetAction());
 			Assert.IsNull(it.name);
 			it.CallAction();
 			Assert.IsNull(it.name);
@@ -340,17 +348,28 @@ namespace RedOnion.ROS.Tests
 
 			StaticTest.Reset();
 			Test("def setName name => staticTest.name = name");
+			Assert.IsNull(StaticTest.GetAction2());
 			Test("staticTest.event2.add setName");
+			Assert.NotNull(StaticTest.GetAction2());
 			StaticTest.CallAction2("test");
 			UpdatePhysics();
 			Assert.AreEqual("test", StaticTest.name);
 
 			it.name = null;
 			Test("def setName2 name => it.name = name");
+			Assert.IsNull(it.GetAction2());
 			Test("it.event2.add setName2");
+			Assert.NotNull(it.GetAction2());
 			it.CallAction2("test");
 			UpdatePhysics();
 			Assert.AreEqual("test", it.name);
+
+			Test("staticTest.event -= action");
+			Assert.IsNull(StaticTest.GetAction());
+			Test("staticTest.event2 -= setName");
+			Assert.IsNull(StaticTest.GetAction2());
+			Test("it.event2 -= setName2");
+			Assert.IsNull(it.GetAction2());
 		}
 
 		public struct SVect

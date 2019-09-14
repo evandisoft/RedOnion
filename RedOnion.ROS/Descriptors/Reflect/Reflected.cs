@@ -1,3 +1,4 @@
+using RedOnion.ROS.Objects;
 using RedOnion.ROS.Utilities;
 using System;
 using System.Collections;
@@ -242,14 +243,28 @@ namespace RedOnion.ROS
 				}
 				if (at < 0 || at >= prop.size)
 					return false;
-				var write = prop.items[at].write;
-				if (write == null) return false;
+				ref Prop p = ref prop.items[at];
+				var write = p.write;
+				if (write == null)
+				{
+					if (p.kind != Prop.Kind.Event)
+						return false;
+					if (op != OpCode.AddAssign && op != OpCode.SubAssign)
+						return false;
+					var evt = (IEventProxy)p.read(self.obj).obj;
+					if (!value.desc.Convert(ref value, evt.DelegateDescriptor))
+						return false;
+					if (op == OpCode.AddAssign)
+						evt.Add(ref value);
+					else evt.Remove(ref value);
+					return true;
+				}
 				if (op == OpCode.Assign)
 				{
 					write(self.obj, value);
 					return true;
 				}
-				var read = prop.items[at].read;
+				var read = p.read;
 				if (read == null) return false;
 				var it = read(self.obj);
 				if (op.Kind() == OpKind.Assign)
