@@ -66,7 +66,7 @@ namespace RedOnion.KSP.API
 		public static double liquidfuel
 			=> xparts.resources.getAmountOf("LiquidFuel");
 
-		[Description("Total amount of fuel avialable in active engines.")]
+		[Description("Total amount of fuel avialable for active engines in current stage.")]
 		public static double fuel => solidfuel + liquidfuel;
 
 		[Description("Estimate burn time for given delta-v.")]

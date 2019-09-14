@@ -110,6 +110,10 @@ namespace RedOnion.ROS.Objects
 		public Action ExecuteLater => executeLater
 			?? (executeLater = () => Processor.Once.Add(new Value(this)));
 
+		public void ExecuteLater0()
+			=> Processor.Once.Add(new Value(this));
+		static MethodInfo executeLater0 = typeof(Function).GetMethod("ExecuteLater0");
+
 		public void ExecuteLater1(Value arg)
 			=> Processor.Once.Add(new Value(this.Bind(arg)));
 		public void ExecuteLater1Gen<Arg>(Arg arg)
@@ -151,7 +155,7 @@ namespace RedOnion.ROS.Objects
 				var pars = info.GetParameters();
 				if (pars.Length == 0)
 				{
-					self = new Value(to, ExecuteLater);
+					self = new Value(to, Delegate.CreateDelegate(to.Type, this, executeLater0));
 					return true;
 				}
 				if (pars.Length == 1)

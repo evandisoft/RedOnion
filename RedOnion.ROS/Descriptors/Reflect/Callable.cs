@@ -6,7 +6,7 @@ namespace RedOnion.ROS
 {
 	public partial class Descriptor
 	{
-		public abstract class Callable : Descriptor
+		public class Callable : Descriptor
 		{
 			/// <summary>
 			/// Minimal number of arguments (number of required arguments)
@@ -33,7 +33,9 @@ namespace RedOnion.ROS
 			/// </summary>
 			public bool IsDelegate { get; protected set; }
 
-			protected Callable(string name, Type type, bool method, MethodInfo invoke = null)
+			public Callable(Type type, bool method, MethodInfo invoke = null)
+				: this(type.Name, type, method, invoke) { }
+			public Callable(string name, Type type, bool method, MethodInfo invoke = null)
 				: base(name, type)
 			{
 				if (invoke == null)
@@ -79,15 +81,27 @@ namespace RedOnion.ROS
 						}
 						if (valueArgs)
 						{
+							Descriptor maybe = null;
 							if (info.ReturnType == typeof(void))
-								return Actions[pars.Length];
-							if (info.ReturnType == typeof(Value))
-								return Functions[pars.Length];
+								maybe = Actions[pars.Length];
+							else if (info.ReturnType == typeof(Value))
+								maybe = Functions[pars.Length];
+							if (maybe?.Type == type)
+								return maybe;
 						}
 					}
+					return new Callable(type, false);
 				}
 				return new Reflected(type);
 			}
+
+			public override bool Call(ref Value result, object self, Arguments args, bool create = false)
+			{
+				if (create || args.Length < MinArgs || args.Length > MaxArgs)
+					return false;
+				return TryCall(Info, ref result, self, args);
+			}
+
 
 			public static bool TryCall(
 				MethodBase method,

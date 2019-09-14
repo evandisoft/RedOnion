@@ -242,7 +242,7 @@ def staging
     print "No operational engine"
     stage
     return
-  if stage.solidFuel + stage.liquidFuel <= 0.1
+  if stage.fuel <= 0.1
     print "Stage out of fuel"
     stage
     return

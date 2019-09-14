@@ -72,6 +72,7 @@
     <Compile Include="Functions\Run.cs" />
     <Compile Include="Interface.cs" />
     <Compile Include="Objects\Context.cs" />
+    <Compile Include="Objects\EventProxy.cs" />
     <Compile Include="Objects\Namespace.cs" />
     <Compile Include="Utilities\RosMath.cs" />
     <Compile Include="Processor.cs" />

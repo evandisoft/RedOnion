@@ -15,6 +15,8 @@ namespace RedOnion.UI.Components
 		public ButtonClickedEvent Click { get; set; } = new ButtonClickedEvent();
 
 		public Sprite normalSprite;
+		public Sprite normalHighlight;
+		public Sprite pressedHighlight;
 		bool _toggleable, _pressed;
 		int _exclusive;
 
@@ -110,9 +112,21 @@ namespace RedOnion.UI.Components
 				Press(action);
 				return;
 			}
+			if (normalSprite == null)
+				normalSprite = image.sprite;
+			if (normalHighlight == null && !Pressed)
+				normalHighlight = spriteState.highlightedSprite;
+			if (pressedHighlight == null)
+				pressedHighlight = Pressed ? spriteState.highlightedSprite : normalSprite;
 			_pressed = !_pressed;
 			image.sprite = Pressed ? spriteState.pressedSprite : normalSprite;
-			DoStateTransition(SelectionState.Normal, instant: false);
+			spriteState = new UUI.SpriteState
+			{
+				highlightedSprite = (Pressed ? pressedHighlight : normalHighlight)
+				?? spriteState.highlightedSprite,
+				pressedSprite = spriteState.pressedSprite,
+				disabledSprite = spriteState.disabledSprite
+			};
 			if (Exclusive && Pressed)
 				EnsureExclusive();
 			if (action)

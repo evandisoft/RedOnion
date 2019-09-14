@@ -56,6 +56,8 @@ namespace RedOnion.UI
 			Core.colors = UUI.ColorBlock.defaultColorBlock;
 			Core.image = Image;
 			Core.normalSprite = Skin.button.normal.background;
+			Core.normalHighlight = Skin.button.highlight.background;
+			Core.pressedHighlight = Skin.button.active.background;
 			Core.spriteState = new UUI.SpriteState()
 			{
 				pressedSprite = Skin.button.active.background,

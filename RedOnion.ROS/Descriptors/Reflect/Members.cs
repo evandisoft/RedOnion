@@ -1,3 +1,4 @@
+using RedOnion.ROS.Objects;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -89,6 +90,12 @@ namespace RedOnion.ROS
 					if (idx >= 0)
 						Value.DebugLog("Conflicting name: {0}.{1} [instace: {2}; property]", Type.Name, member.Name, instance);
 					else ProcessProperty(p, instance, ref dict);
+				}
+				else if (member is EventInfo e)
+				{
+					if (idx >= 0)
+						Value.DebugLog("Conflicting name: {0}.{1} [instace: {2}; event]", Type.Name, member.Name, instance);
+					else ProcessEvent(e, instance, ref dict);
 				}
 				else if (member is MethodInfo m)
 				{
@@ -316,6 +323,36 @@ namespace RedOnion.ROS
 						).Compile();
 				}
 			}
+
+			protected virtual void ProcessEvent(
+				EventInfo e, bool instance, ref Dictionary<string, int> dict)
+			{
+				if (dict == null)
+					dict = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+				dict[e.Name] = prop.size;
+				ref var it = ref prop.Add();
+				it.name = e.Name;
+				it.kind = Prop.Kind.Event;
+				it.read = instance
+					// self => new Value(new EventProxy<T,E>(self, e))
+					? Expression.Lambda<Func<object, Value>>(
+						GetNewValueExpression(typeof(Descriptor),
+						Expression.New(typeof(EventProxy<,>)
+							.MakeGenericType(e.DeclaringType, e.EventHandlerType)
+							.GetConstructor(new Type[] { e.DeclaringType, typeof(EventInfo) }),
+							GetConvertExpression(SelfParameter, e.DeclaringType),
+							Expression.Constant(e, typeof(EventInfo)))),
+					SelfParameter).Compile()
+					// self => new Value(new EventProxy<E>(e))
+					: Expression.Lambda<Func<object, Value>>(
+						GetNewValueExpression(typeof(Descriptor),
+						Expression.New(typeof(EventProxy<>)
+							.MakeGenericType(e.EventHandlerType)
+							.GetConstructor(new Type[] { typeof(EventInfo) }),
+							Expression.Constant(e, typeof(EventInfo)))),
+					SelfParameter).Compile();
+			}
+
 
 			protected virtual void ProcessMethod(
 				MethodInfo m, bool instance, ref Dictionary<string, int> dict, int idx)

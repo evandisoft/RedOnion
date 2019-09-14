@@ -26,6 +26,7 @@ namespace RedOnion.ROS
 					Type,
 					Field,
 					Property,
+					Event,
 					Method,
 					MethodGroup
 				}
