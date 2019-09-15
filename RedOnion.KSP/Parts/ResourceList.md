@@ -3,14 +3,14 @@
 List of resources (read-only). Can either belong to single part or to list/set of parts.
 
 - `[index]`: [Resource](Resource.md) - Get resource by name. Returns null for non-existent resource.
-- `count`: Int32 - Number of elements in the list (or set).
-- `getAmountOf()`: Double, name String
+- `count`: int - Number of elements in the list (or set).
+- `getAmountOf()`: double, name string
   - Get amount of resource (in part or set/list) by name. Returns zero for non-existent resources.
-- `getMaxAmountOf()`: Double, name String
+- `getMaxAmountOf()`: double, name string
   - Get maximum storable amount of resource by name. Returs zero for non-existent resources.
-- `getPartCountOf()`: Int32, name String
+- `getPartCountOf()`: int, name string
   - Get number of parts that can store the named resource. Returns zero for non-existent resources.
-- `indexOf()`: Int32, item [Resource](Resource.md)
+- `indexOf()`: int, item [Resource](Resource.md)
   - Get index of element. -1 if not found.
-- `contains()`: Boolean, item [Resource](Resource.md)
+- `contains()`: bool, item [Resource](Resource.md)
   - Test wether the list (or set) contains specified element.

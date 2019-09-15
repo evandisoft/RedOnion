@@ -24,6 +24,22 @@ namespace RedOnion.Build
 		static HashSet<Type> discovered = new HashSet<Type>();
 		static Dictionary<Type, Type> obj2fn = new Dictionary<Type, Type>();
 		static Dictionary<Type, Type> fn2obj = new Dictionary<Type, Type>();
+		static Dictionary<Type, string> typeNames = new Dictionary<Type, string>()
+		{
+			{ typeof(void), "void" },
+			{ typeof(string), "string" },
+			{ typeof(double), "double" },
+			{ typeof(float), "float" },
+			{ typeof(int), "int" },
+			{ typeof(uint), "uint" },
+			{ typeof(long), "long" },
+			{ typeof(ulong), "ulong" },
+			{ typeof(short), "short" },
+			{ typeof(ushort), "ushort" },
+			{ typeof(sbyte), "sbyte" },
+			{ typeof(byte), "byte" },
+			{ typeof(bool), "bool" },
+		};
 
 		static IEnumerable<MemberInfo> GetMembers(Type type)
 		{
@@ -168,7 +184,8 @@ namespace RedOnion.Build
 		static string ResolveType(Document doc, Type type, out string name)
 		{
 			string path = null;
-			name = type.Name;
+			if (!typeNames.TryGetValue(type, out name))
+				name = type.Name;
 			if (types.TryGetValue(type, out var tdoc))
 			{
 				name = tdoc.name;
