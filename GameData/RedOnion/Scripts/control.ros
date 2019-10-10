@@ -13,16 +13,17 @@ def mbtn text
   return btn
 var mObt = mbtn "OBT" // orbital steering
 var mSrf = mbtn "SRF" // surface steering
-//var mTgt = mbtn "TGT" // target steering and utils
+var mTgt = mbtn "TGT" // target steering and utils
 var mMan = mbtn "MAN" // maneuver execution
 var mNde = mbtn "NDE" // nodes only (+ "EXEC" button)
 mObt.pressed = true
 
 // main content (buttons and footer)
 var main = split.addVertical()
-main.padding = 0
+main.width = 163
+main.childAnchors = anchors.fill
 var btns = main.addHorizontal() //TODO: stack
-btns.padding = 0
+btns.childAnchors = anchors.fill
 
 var dirsubs = null
 def lockdir fn
@@ -52,6 +53,8 @@ xbtn row, "Rad-IN", def => -ship.velocity.cross ship.away.cross ship.velocity
 row = blk1.addHorizontal()
 var unlock = row.addExclusive2 "UNLOCK"
 unlock.flexWidth = 1
+unlock.flexHeight = 1
+unlock.pressed = true
 
 // main loop
 var done = false
@@ -60,6 +63,7 @@ wnd.closed.add def
 until done
   if mObt.pressed and altitude < math.max atmosphere.height/4, 1000
     mSrf.pressed = true
+  blk1.visible = mObt.pressed or mSrf.pressed
   wait
   if stage.ready && ship.parts.nextDecoupler != null
     if !stage.engines.anyOperational

@@ -213,7 +213,7 @@ namespace RedOnion.UI
 			}
 		}
 
-		private LayoutPadding layoutPadding = new LayoutPadding(3);
+		private LayoutPadding layoutPadding = new LayoutPadding(0f, 3f, 0f, 0f, 3f, 0f);
 		/// <summary>
 		/// Padding and spacing
 		/// </summary>
@@ -258,8 +258,8 @@ namespace RedOnion.UI
 			if (layoutGroup == null)
 				return;
 			layoutGroup.childAlignment = childAnchors.ToTextAnchor();
-			layoutGroup.childForceExpandWidth = childAnchors.right + 1f/3f > childAnchors.left;
-			layoutGroup.childForceExpandHeight = childAnchors.bottom + 1f/3f > childAnchors.top;
+			layoutGroup.childForceExpandWidth = childAnchors.right - 1f/3f > childAnchors.left;
+			layoutGroup.childForceExpandHeight = childAnchors.bottom - 1f/3f > childAnchors.top;
 		}
 
 		protected Padding InnerPadding

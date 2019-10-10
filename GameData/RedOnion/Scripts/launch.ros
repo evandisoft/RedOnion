@@ -69,9 +69,9 @@ def gui
   var brow = wnd.addHorizontal()
   var selected = 0
   wnd.closed += def => selected = 1
-  (brow.addButton "Cancel",  def => selected = 1).flexWidth = 1
-  (brow.addButton "Control", def => selected = 2).flexWidth = 1
-  (brow.addButton "Launch",  def => selected = 3).flexWidth = 1
+  brow.addButton("Cancel",  def => selected = 1).flexWidth = 1
+  brow.addButton("Control", def => selected = 2).flexWidth = 1
+  brow.addButton("Launch",  def => selected = 3).flexWidth = 1
   while selected == 0
     wait
   if selected == 2
@@ -94,7 +94,7 @@ def gui
   firda = xfirda.pressed
   evan = xevan.pressed
   cust = xcust.pressed
-  return selected
+  return selected == 3
 if !gui()
   return
 

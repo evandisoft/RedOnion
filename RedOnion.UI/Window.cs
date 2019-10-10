@@ -44,11 +44,11 @@ It may get garbage-collected otherwise, but that can take time and is rather bac
 				Fitter.verticalFit = UUI.ContentSizeFitter.FitMode.PreferredSize;
 				Color = new Color(.2f, .2f, .2f, .8f);
 				Layout = Layout.Vertical;
-				LayoutPadding = new LayoutPadding(0f);
+				Spacing = 0f;
 				Header = Add(new Panel
 				{
 					Layout = Layout.Horizontal,
-					FlexWidth = 1f,
+					FlexWidth = 1f, Padding = 3f
 				});
 				Title = Header.Add(new Label
 				{
@@ -66,6 +66,7 @@ It may get garbage-collected otherwise, but that can take time and is rather bac
 				{
 					Color = new Color(.5f, .5f, .5f, .5f),
 					FlexWidth = 1f, FlexHeight = 1f,
+					Padding = 3f
 				});
 
 				GameObject.AddComponent<Components.DragHandler>();
