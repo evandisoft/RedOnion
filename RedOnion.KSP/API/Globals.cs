@@ -38,7 +38,7 @@ namespace RedOnion.KSP.API
 		public static VectorCreator vector => VectorCreator.Instance;
 		[DisplayName("V"), Description("Alias to Vector Function for creating 3D vector / coordinate.")]
 		public static VectorCreator V => VectorCreator.Instance;
-		[Description("Current time")]
+		[Description("Current time and related functions.")]
 		public static Time time => Time.Instance;
 
 		[Description("Active vessel (in flight only, null otherwise).")]
@@ -65,15 +65,15 @@ namespace RedOnion.KSP.API
 
 #if API_GLOBAL_ALIASES
 		// TODO: move aliases to startup/setup script/library
-		[Alias, Description("Alias to `Vector.dot` (or `v.dot`).")]
+		[Alias, Description("Alias to `Vector.dot` (or `V.dot`).")]
 		public static readonly string vdot = "Vector.dot";
-		[Alias, Description("Alias to `Vector.cross` (or `v.cross`).")]
+		[Alias, Description("Alias to `Vector.cross` (or `V.cross`).")]
 		public static readonly string vcrs = "Vector.cross";
-		[Alias, Description("Alias to `Vector.cross` (or `v.cross`).")]
+		[Alias, Description("Alias to `Vector.cross` (or `V.cross`).")]
 		public static readonly string vcross = "Vector.cross";
-		[Alias, Description("Alias to `Vector.angle` (or `v.angle`).")]
+		[Alias, Description("Alias to `Vector.angle` (or `V.angle`).")]
 		public static readonly string vangle = "Vector.angle";
-		[Alias, Description("Alias to `Vector.angle` (or `v.angle`).")]
+		[Alias, Description("Alias to `Vector.angle` (or `V.angle`).")]
 		public static readonly string vang = "Vector.angle";
 #endif
 	}

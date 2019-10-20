@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using UnityEngine;
 
 namespace RedOnion.KSP.API
@@ -57,10 +58,15 @@ namespace RedOnion.KSP.API
 			}
 			protected virtual void Dispose(bool disposing)
 			{
-				if (_processor == null)
+				// this is probably unnecessary (you cannot call Dispose unless you have reference
+				// and the desctructor cannot be called when there is one, but for sure...)
+				var processor = Interlocked.Exchange(ref _processor, null);
+				if (processor == null)
 					return;
-				Hide();
-				_processor = null;
+				if (disposing)
+					Hide();
+				// see UI.Window for another example of this
+				else UI.Collector.Add(this);
 			}
 			// this is to avoid direct hard-link from processor to vector draw,
 			// so that it can be garbage-collected when no direct link exists
@@ -100,6 +106,8 @@ namespace RedOnion.KSP.API
 			[Description("Show the vector. It is created hidden so that you can subscribe to `system.update` first.")]
 			public void Show()
 			{
+				if (_processor == null)
+					throw new ObjectDisposedException("Vector.Draw");
 				if (_hooks == null)
 					_hooks = new Hooks(this);
 			}

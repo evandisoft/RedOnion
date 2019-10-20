@@ -50,13 +50,13 @@ namespace RedOnion.ROS.Tests
 		public void ROS_OpCode03_Priority()
 		{
 			Assert.True(ExCode.Mul.Priority() > ExCode.Add.Priority());
-			Assert.True(ExCode.Sub.Priority() > ExCode.ShiftRight.Priority());
 			Assert.True(ExCode.As.Priority() > ExCode.Equals.Priority());
 			Assert.True(ExCode.LogicAnd.Priority() > ExCode.LogicOr.Priority());
 			Assert.True(ExCode.Less.Priority() > ExCode.Differ.Priority());
 			Assert.True(ExCode.BitOr.Priority() > ExCode.Equals.Priority());
-			Assert.True(ExCode.BitOr.StdPriority() < ExCode.Equals.StdPriority());
 			Assert.True(ExCode.BitOr.Priority() < ExCode.ShiftLeft.Priority());
+			Assert.True(ExCode.Sub.StdPriority() > ExCode.ShiftRight.StdPriority());
+			Assert.True(ExCode.BitOr.StdPriority() < ExCode.Equals.StdPriority());
 			Assert.True(ExCode.BitOr.StdPriority() < ExCode.ShiftLeft.StdPriority());
 		}
 

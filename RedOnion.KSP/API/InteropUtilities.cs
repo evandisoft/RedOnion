@@ -27,7 +27,7 @@ namespace RedOnion.KSP.API
 		}
 		public static DynValue ToLua(this Value value, Script script = null)
 		{
-			if (value.IsNumerOrChar)
+			if (value.IsNumberOrChar)
 				return DynValue.NewNumber(value.ToDouble());
 			if (value.IsString)
 				return DynValue.NewString(value.ToStr());

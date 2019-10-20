@@ -1,3 +1,4 @@
+using RedOnion.ROS.Objects;
 using RedOnion.ROS.Utilities;
 using System;
 using System.Collections;
@@ -26,6 +27,7 @@ namespace RedOnion.ROS
 					Type,
 					Field,
 					Property,
+					Event,
 					Method,
 					MethodGroup
 				}
@@ -105,6 +107,8 @@ namespace RedOnion.ROS
 			{
 				if (result.obj is ICallable call)
 					return call.Call(ref result, self, args, create);
+				if (!create && result.obj != null && !(result.obj is Type))
+					return false;
 				if (args.Count == 0)
 				{
 					if (processorCtor != null
@@ -151,7 +155,7 @@ namespace RedOnion.ROS
 					return -1;
 				ref var index = ref args.GetRef(0);
 				int at;
-				if (index.IsNumerOrChar)
+				if (index.IsNumberOrChar)
 				{
 					if (intIndexGet == null && intIndexSet == null)
 						return -1;
@@ -190,7 +194,7 @@ namespace RedOnion.ROS
 				{
 					var proxy = (Value[])self.obj;
 					ref var index = ref proxy[1];
-					if (index.IsNumerOrChar)
+					if (index.IsNumberOrChar)
 					{
 						if (intIndexGet == null)
 							throw InvalidOperation("{0}[{1}] is write only", Name, proxy[1]);
@@ -221,7 +225,7 @@ namespace RedOnion.ROS
 						return false;
 					var proxy = (Value[])self.obj;
 					ref var index = ref proxy[1];
-					if (index.IsNumerOrChar)
+					if (index.IsNumberOrChar)
 					{
 						if (intIndexSet == null)
 							throw InvalidOperation("{0}[{1}] is read only", Name, proxy[1]);
@@ -239,15 +243,53 @@ namespace RedOnion.ROS
 				}
 				if (at < 0 || at >= prop.size)
 					return false;
+				ref Prop p = ref prop.items[at];
+				var write = p.write;
+				if (write == null)
+				{
+					if (p.kind != Prop.Kind.Event)
+						return false;
+					if (op != OpCode.AddAssign && op != OpCode.SubAssign)
+						return false;
+					var evt = (IEventProxy)p.read(self.obj).obj;
+					if (!value.desc.Convert(ref value, evt.DelegateDescriptor))
+						return false;
+					if (op == OpCode.AddAssign)
+						evt.Add(ref value);
+					else evt.Remove(ref value);
+					return true;
+				}
 				if (op == OpCode.Assign)
 				{
-					var write = prop.items[at].write;
-					if (write == null) return false;
 					write(self.obj, value);
 					return true;
 				}
-				//TODO: other operations
-				return false;
+				var read = p.read;
+				if (read == null) return false;
+				var it = read(self.obj);
+				if (op.Kind() == OpKind.Assign)
+				{
+					if (!it.desc.Binary(ref it, op + 0x10, ref value)
+						&& !value.desc.Binary(ref it, op + 0x10, ref value))
+						return false;
+					write(self.obj, it);
+					return true;
+				}
+				if (op.Kind() != OpKind.PreOrPost)
+					return false;
+				if (op >= OpCode.Inc)
+				{
+					if (!it.desc.Unary(ref it, op))
+						return false;
+					write(self.obj, it);
+					return true;
+				}
+				var tmp = it;
+				if (!it.desc.Unary(ref it, op + 0x08))
+					return false;
+				write(self.obj, it);
+				self = tmp;
+				return true;
 			}
 			public override IEnumerable<Value> Enumerate(object self)
 			{
@@ -260,7 +302,7 @@ namespace RedOnion.ROS
 			private IEnumerable<Value> EnumerateNative(IEnumerable e)
 			{
 				foreach (var v in e)
-					yield return new Value(e);
+					yield return new Value(v);
 			}
 			public override IEnumerable<string> EnumerateProperties(object self)
 			{

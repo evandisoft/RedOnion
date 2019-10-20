@@ -179,6 +179,8 @@ namespace RedOnion.ROS.Utilities
 				items[index] = value;
 			}
 		}
+		public T GetOrDefault(int index)
+			=> index >= 0 && index < size ? items[index] : default;
 
 		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 		public IEnumerator<T> GetEnumerator()

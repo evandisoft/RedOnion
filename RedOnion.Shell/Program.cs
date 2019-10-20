@@ -42,6 +42,18 @@ namespace RedOnion.Shell
 				Environment.Exit(-1);
 				return;
 			}
+			#if DEBUG
+			if (!File.Exists("RedOnion.sln"))
+			{
+				Directory.SetCurrentDirectory("../../..");
+				if (!File.Exists("RedOnion.sln"))
+				{
+					Console.WriteLine("Could not locate RedOnion.sln");
+					Environment.Exit(-1);
+				}
+				Directory.SetCurrentDirectory("GameData/RedOnion/Scripts");
+			}
+			#endif
 
 			if (args.Length == 1)
 			{

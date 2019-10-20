@@ -267,7 +267,7 @@ NOTE: Subject to change - may revert to `Vector3d` with custom descriptor.")]
 					}
 					return false;
 				}
-				if (rhs.IsNumerOrChar)
+				if (rhs.IsNumberOrChar)
 				{
 					double f = rhs.ToDouble();
 					switch (op)
@@ -283,7 +283,7 @@ NOTE: Subject to change - may revert to `Vector3d` with custom descriptor.")]
 				}
 				return false;
 			}
-			if (op == OpCode.Mul && lhs.IsNumerOrChar && VectorCreator.ToVector3d(rhs, out var v))
+			if (op == OpCode.Mul && lhs.IsNumberOrChar && VectorCreator.ToVector3d(rhs, out var v))
 			{
 				double f = lhs.ToDouble();
 				lhs = new Value(new Vector(v.x * f, v.y * f, v.z * f));

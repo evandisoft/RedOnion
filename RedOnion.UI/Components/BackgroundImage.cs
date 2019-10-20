@@ -1,6 +1,3 @@
-using System;
-using UnityEngine;
-using UnityEngine.Events;
 using UUI = UnityEngine.UI;
 
 namespace RedOnion.UI.Components

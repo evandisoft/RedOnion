@@ -178,7 +178,7 @@ namespace RedOnion.KSP.API
 		}
 		public static bool ToVector3d(Value value, out Vector3d result)
 		{
-			if (value.IsNumerOrChar)
+			if (value.IsNumberOrChar)
 			{
 				var d = value.ToDouble();
 				result = new Vector3d(d, d, d);

@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Linq;
 using NUnit.Framework;
 using RedOnion.ROS.Objects;
 
@@ -219,45 +220,51 @@ namespace RedOnion.ROS.Tests
 		[Test]
 		public void ROS_Scope08_ClosureModify()
 		{
-			Lines(3,
+			Lines(3, // modify captured x
 				"var x = 0",
 				"def inc => ++x",
 				"def add y => x += y",
 				"inc",
 				"add 2");
 
-			/* TODO: create new OpCode.Local and make parser decide the index
-			 * TODO: multiple cousins for closures in loop
-			
-			! Although the following appears to work, I am not sure why, it should not
-			! because all the closures should now share single context `var j=i` does not matter
+			Lines(6, // modify in nested call
+				"def doit",
+				"  inc",
+				"  add 2",
+				"doit; x");
+
+			// `a.add def => s += i + 1` will not work the way you might expect, because `i` is captured by reference.
+			// That means that `i` is already `4` when such lambdas would first be called, producing `s = "444"`.
+			// But that `(def; var n = ...)()` is a call in the moment where `i` is `0`, `1` or `2` in each call,
+			// therefore the inner lambda (`def => s += n`) is referencing `n` which was already set to `1`, `2` or `3`,
+			// producing the final result of "123". The difference is that calling the outer lambda creates new context,
+			// where the 'n' lives and the inner lambda is referencing that particular `n`
+			// (each inner lambda referencing different context). All the simple `a.add def => s += i + 1`
+			// would reference same context where `i` ceased to exist with last value being `4`.
+			// The context where `i` lives was named *cousin context* - see Context.SeparateVars().
 			Reset();
-			Lines("123",
+			Lines((object)"123",
 				"var s = \"\"",
 				"var a = new list",
 				"for var i = 0; i < 3; i++",
-				"  a.add def f",
-				"    var j = i",
-				"    s += j + 1",
+				"  a.add (def",
+				"    var n = i + 1",
+				"    return def => s += n",
+				"  )()",
 				"for var f in a; f",
 				"return s");
-
-			Reset();
-			Lines(6,
-				"var sum = 0",
-				"var vals = [1, 2, 3]",
-				"var fns = new list",
-				"var index = 0",
-				"while index < vals.length",
-				"  var value = vals[index++]",
-				"  fns.add def => sum += value",
-				"do fns[--index]() while index > 0",
-				"return sum");
-			*/
 		}
 
 		[Test]
-		public void ROS_Scope09_DocExample()
+		public void ROS_Scope09_Recursion()
+		{
+			Lines(13,
+				"def fib n => n < 2 ? n : fib(n-1) + fib(n-2)",
+				"return fib 7");
+		}
+
+		[Test]
+		public void ROS_Scope10_DocExample()
 		{
 			Test(1, @"
 def MyClass
@@ -289,7 +296,7 @@ obj.getTotal    // returns 1
 		}
 
 		[Test]
-		public void ROS_Scope10_Run()
+		public void ROS_Scope11_Run()
 		{
 			if (Globals == null)
 				Globals = new Globals();
@@ -300,10 +307,13 @@ obj.getTotal    // returns 1
 			Test(3.14, "x");
 			Globals.Add("test2", "var x = 1.41");
 			Test(ExitCode.Return, 1.41, "run.library.source test2; return x");
+
+			Test(ExitCode.Return, 0, "run.replace.source \"return 0\"");
+			Assert.AreEqual(0, ctx.EnumerateProperties(ctx).Count());
 		}
 
 		[Test]
-		public void ROS_Scope11_Events()
+		public void ROS_Scope12_Events()
 		{
 			YieldLines(ExitCode.Return, 3,
 				"var x = 0",
@@ -322,6 +332,19 @@ obj.getTotal    // returns 1
 				"wait; wait; wait",
 				"system.update.remove update",
 				"return x");
+
+			Reset();
+			YieldLines(ExitCode.Return, 5,
+				"var x = 0",
+				"var s1 = system.update def; x++",
+				"var s2 = system.update def; x+=2",
+				"yield",
+				"s1.remove",
+				"wait",
+				"s2.remove",
+				"wait; wait",
+				"return x");
+			Assert.AreEqual(0, Update.Count);
 		}
 	}
 }

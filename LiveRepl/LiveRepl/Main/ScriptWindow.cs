@@ -274,7 +274,10 @@ namespace LiveRepl
 				}));
 			}
 			widgetBar.renderables.Add(replEvaluatorLabel);
-			widgetBar.renderables.Add(new Button("Kill Ctrl", () => { FlightControl.GetInstance().Shutdown(); }));
+			widgetBar.renderables.Add(new Button("Kill Ctrl", () => {
+				FlightControl.GetInstance().Shutdown();
+				Ship.DisableAutopilot();
+			}));
 
 			InitializeKeyBindings();
 		}

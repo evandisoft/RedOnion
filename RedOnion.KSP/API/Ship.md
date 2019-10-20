@@ -2,52 +2,74 @@
 
 Active vessel
 
-- `autopilot`: [Autopilot](Autopilot.md) - Autopilot of this ship (vehicle/wessel).
-- `throttle`: Single - Current throttle (assign redirects to `Autopilot`, reads control state if autopilot disabled)
+- `autopilot`: [Autopilot](Autopilot.md) - Autopilot of this ship (vehicle/vessel).
+- `throttle`: float - Current throttle (assign redirects to `Autopilot`, reads control state if autopilot disabled)
 - `native`: Vessel - Native `Vessel` for unrestricted access to KSP API. Same as `FlightGlobals.ActiveVessel` if accessed through global `ship`.
+- `name`: string - Name of the ship (vehicle/vessel).
 - `parts`: [ShipPartSet](../Parts/ShipPartSet.md) - All parts of this ship/vessel/vehicle.
 - `root`: [Part](../Parts/PartBase.md) - Root part (same as `parts.root`).
 - `nextDecoupler`: [Decoupler](../Parts/Decoupler.md) - One of the decouplers that will get activated by nearest stage. (Same as `Parts.NextDecoupler`.)
-- `nextDecouplerStage`: Int32 - Stage number of the nearest decoupler or -1. (Same as `Parts.NextDecouplerStage`.)
+- `nextDecouplerStage`: int - Stage number of the nearest decoupler or -1. (Same as `Parts.NextDecouplerStage`.)
 - `decouplers`: ReadOnlyList`1 - List of all decouplers, separators, launch clamps and docks with staging. (Docking ports without staging enabled not included.)
 - `dockingports`: ReadOnlyList`1 - List of all docking ports (regardless of staging).
 - `engines`: [EngineSet](../Parts/EngineSet.md) - All engines (regardless of state).
 - `sensors`: ReadOnlyList`1 - All sensors.
 - `ID`: Guid - Unique identifier of the ship (vehicle/vessel). Can change when docking/undocking.
-- `PersistentID`: UInt32 - Unique identifier of the ship (vehicle/vessel). Should be same as it was before docking (after undocking).
+- `PersistentID`: uint - Unique identifier of the ship (vehicle/vessel). Should be same as it was before docking (after undocking).
 - `vesseltype`: VesselType - KSP API. Vessel type as selected by user (or automatically).
-- `mass`: Single - Total mass of the ship (vehicle/vessel).
-- `packed`: Boolean - Wheter the ship is still packed (reduced physics).
-- `landed`: Boolean - Wheter the ship is landed (on the ground or on/in water).
-- `splashed`: Boolean - Wheter the ship is in water.
-- `longitude`: Double - Longitude of current position in degrees.
-- `latitude`: Double - Latitude of current position in degrees.
-- `altitude`: Double - Altitude of current position (above sea level) in meters.
-- `radarAltitude`: Double - True height above ground in meters.
+- `mass`: float - Total mass of the ship (vehicle/vessel). [tons = 1000 kg]
+- `packed`: bool - Wheter the ship is still packed (reduced physics).
+- `landed`: bool - Wheter the ship is landed (on the ground or on/in water).
+- `splashed`: bool - Wheter the ship is in water.
+- `longitude`: double - Longitude of current position in degrees.
+- `latitude`: double - Latitude of current position in degrees.
+- `altitude`: double - Altitude of current position (above sea level) in meters.
+- `radarAltitude`: double - True height above ground in meters.
+- `dynamicPressure`: double - Dynamic pressure [atm = 101.325kPa]
+- `q`: double - Dynamic pressure [atm = 101.325kPa]
 - `body`: SpaceBody - KSP API. Orbited body.
 - `orbit`: Orbit - KSP API. Orbit parameters.
-- `eccentricity`: Double - Eccentricity of current orbit.
-- `semiMajorAxis`: Double - Semi-major axis of current orbit.
-- `semiMinorAxis`: Double - Semi-minor axis of current orbit.
-- `apoapsis`: Double - Height above ground of highest point of current orbit).
-- `periapsis`: Double - Height above ground of lowest point of current orbit).
-- `apocenter`: Double - Highest distance between center of orbited body and any point of current orbit.
-- `pericenter`: Double - Lowest distance between center of orbited body and any point of current orbit.
-- `timeToAp`: Double - Eta to apoapsis in seconds.
-- `timeToPe`: Double - Eta to periapsis in seconds.
-- `period`: Double - Period of current orbit in seconds.
-- `trueAnomaly`: Double - Angle in degrees between the direction of periapsis and the current position.
-- `meanAnomaly`: Double - Angle in degrees between the direction of periapsis and the current position extrapolated on circular orbit.
+- `eccentricity`: double - Eccentricity of current orbit.
+- `semiMajorAxis`: double - Semi-major axis of current orbit.
+- `semiMinorAxis`: double - Semi-minor axis of current orbit.
+- `apoapsis`: double - Height above ground of highest point of current orbit).
+- `periapsis`: double - Height above ground of lowest point of current orbit).
+- `apocenter`: double - Highest distance between center of orbited body and any point of current orbit.
+- `pericenter`: double - Lowest distance between center of orbited body and any point of current orbit.
+- `timeToAp`: double - Eta to apoapsis in seconds.
+- `timeToPe`: double - Eta to periapsis in seconds.
+- `period`: double - Period of current orbit in seconds.
+- `trueAnomaly`: double - Angle in degrees between the direction of periapsis and the current position.
+- `meanAnomaly`: double - Angle in degrees between the direction of periapsis and the current position extrapolated on circular orbit.
 - `position`: Vector3d - Current position relative to active ship (so `ship.position` always reads zero).
-- `relative`: Vector3d - Position relative to orbited body.
-- `velocity`: Vector3d - Current velocity.
-- `centerOfMass`: Vector3d - Center of mass
-- `angularVelocity`: Vector3d - Angular velocity (ω, rad/s), how fast the ship rotates
-- `momentOfInertia`: Vector3d - Moment of inertia (I, kg*m²) aka angular mass or rotational inertia.
-- `angularMomentum`: Vector3d - Angular momentum (L = Iω, kg*m²/s) aka moment of momentum or rotational momentum.
-- `maxTorque`: Vector3d - Maximal ship torque (aka moment of force or turning effect, maximum of positive and negative).
-- `maxAngular`: Vector3d - Maximal angular acceleration (rad/s²)
-- `positionAt()`: Vector3d, time Double
+- `velocity`: Vector3d - Current orbital velocity.
+- `surfaceVelocity`: Vector3d - Current surface velocity.
+- `srfVelocity`: Vector3d - Current surface velocity (Alias to `surfaceVelocity`).
+- `srfvel`: Vector3d - Current surface velocity (Alias to `surfaceVelocity`).
+- `forward`: Vector3d - Vector pointing forward (from cockpit - in the direction of the 'nose').
+- `back`: Vector3d - Vector pointing backward (from cockpit - in the direction of the 'nose').
+- `up`: Vector3d - Vector pointing up (from cockpit).
+- `down`: Vector3d - Vector pointing down (from cockpit).
+- `left`: Vector3d - Vector pointing left (from cockpit).
+- `right`: Vector3d - Vector pointing left (from cockpit).
+- `north`: Vector3d - Vector pointing north in the plane that is tangent to sphere centered in orbited body.
+- `east`: Vector3d - Vector pointing east (tangent to sphere centered in orbited body).
+- `away`: Vector3d - Vector pointing away from orbited body (aka *up*, but we use `up` for cockpit-up).
+- `pitch`: double - Current pitch / elevation (the angle between forward vector and tangent plane) [-90..+90]
+- `heading`: double - Current heading / yaw (the angle between forward and north vectors in tangent plane) [0..360]. Note that it can change violently around the poles.
+- `roll`: double - Current roll / bank (the angle between up and away vectors in the plane perpendicular to forward vector) [-180..+180]. 
+Note that it can change violently when facing up or down.
+- `centerOfMass`: Vector3d - Center of mass.
+- `angularVelocity`: Vector3d - Angular velocity (ω, deg/s), how fast the ship rotates
+- `angularMomentum`: Vector3d - Angular momentum (L = Iω, kg⋅m²⋅deg/s=N⋅m⋅s⋅deg) aka moment of momentum or rotational momentum.
+- `momentOfInertia`: Vector3d - Moment of inertia (I, kg⋅m²=N⋅m⋅s²) aka angular mass or rotational inertia.
+- `maxTorque`: Vector3d - Maximal ship torque [N⋅m⋅deg=deg⋅kg⋅m²/s²] (aka moment of force or turning effect, maximum of positive and negative).
+- `maxVacuumTorque`: Vector3d - Maximal ship torque in vacuum [N⋅m⋅deg=deg⋅kg⋅m²/s²] (ignoring control surfaces).
+- `maxAngular`: Vector3d - Maximal angular acceleration (deg/s²)
+- `maxVacuumAngular`: Vector3d - Maximal angular acceleration in vacuum (ignoring control surfaces).
+- `positionAt()`: Vector3d, time double
   - Predicted position at specified time.
-- `velocityAt()`: Vector3d, time Double
+- `velocityAt()`: Vector3d, time double
   - Predicted velocity at specified time.
+- `local()`: [Vector](Vector.md), v [ConstVector](ConstVector.md)
+  - Translate vector/direction into local coordinates.

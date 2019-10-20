@@ -28,6 +28,9 @@ namespace RedOnion.KSP.Parts
 		[Description("State of the part (IDLE, ACTIVE (e.g. engine), DEACTIVATED, DEAD, FAILED).")]
 		public PartStates state => native.State;
 
+		public string name => native.name;
+		public string title => native.partInfo.title;
+
 		// TODO: make this generic feature of ROS (`typeof` and `is` operators)
 		[Description("Method to test the type of the part (e.g. `.IsType(\"LaunchClamp\")`)")]
 		public virtual bool istype(string name) => false;

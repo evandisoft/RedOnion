@@ -107,12 +107,10 @@ namespace RedOnion.KSP.API
 				}
 				return _direction;
 			}
-			set
-			{
-				_direction = double.IsNaN(value.x) || double.IsNaN(value.y) || double.IsNaN(value.z)
-					? new Vector3d(double.NaN, double.NaN, double.NaN) : value;
-				Check(value.x);
-			}
+			set => Check((_direction = double.IsNaN(value.x)
+				|| double.IsNaN(value.y) || double.IsNaN(value.z)
+				? new Vector3d(double.NaN, double.NaN, double.NaN)
+				: value).x);
 		}
 
 		[Description("Target heading [0..360]."
@@ -150,40 +148,46 @@ namespace RedOnion.KSP.API
 		protected PID rollPID => pids._roll;
 		public class PidParams : API.PidParams
 		{
-			// maximal angle difference to use the PID
-			public double angle { get; set; }
 			// todo: maximal angular velocity and maximal stopping time
 			public double angular { get; set; }
 			public double time { get; set; }
 			protected internal PidParams() => reset();
-			public void reset()
+			public virtual void reset()
 			{
-				P = 0.9;
-				I = 0.1;
-				D = 0.5;
-				R = 0.2;
-				outputChangeLimit = 10;
-				targetChangeLimit = 10;
-				angle = 0.1;
+				P = 1.0;    // direct control
+				I = 0.5;    // error-correcting, *dt
+				R = 0.4;    // cumulated change, *dt
+				D = 0.01;   // change-resisting, /dt
+				outputChangeLimit = 5; //*dt => 10% per std. tick
+				targetChangeLimit = 5; //*dt => 10% per std. tick
+				accumulatorLimit = 0.5; // abs(accu) <= 50%
+				errorLimit = 1; // abs(err) <= 100%
 				time = 3.0;
 				angular = 10.0;
 			}
-
+			/*
+			internal class Roll : PidParams
+			{
+				public override void reset()
+				{
+					base.reset();
+					scale = 0.5;
+				}
+			}
+			*/
 		}
 		public class PID : API.PID<PidParams>
 		{
 			protected internal PID() : base(new PidParams()) => Init();
+			protected internal PID(PidParams param) : base(param) => Init();
 			protected internal void Init()
 			{
 				param.reset();
+				maxInput = +1.0;
+				minInput = -1.0;
 				maxOutput = +1.0;
 				minOutput = -1.0;
 				reset();
-			}
-			public double angle
-			{
-				get => param.angle;
-				set => param.angle = value;
 			}
 			public double angular
 			{
@@ -202,7 +206,7 @@ namespace RedOnion.KSP.API
 
 			protected internal PID _pitch = new PID();
 			protected internal PID _yaw = new PID();
-			protected internal PID _roll = new PID();
+			protected internal PID _roll = new PID(/*new PidParams.Roll()*/);
 
 			public PidParams pitch => _pitch.param;
 			public PidParams yaw => _yaw.param;
@@ -232,11 +236,6 @@ namespace RedOnion.KSP.API
 			{
 				get => combine(pitch.R, yaw.R, roll.R);
 				set => roll.R = yaw.R = pitch.R = value;
-			}
-			public double angle
-			{
-				get => combine(pitch.angle, yaw.angle, roll.angle);
-				set => roll.angle = yaw.angle = pitch.angle = value;
 			}
 			public double time
 			{
@@ -282,14 +281,15 @@ namespace RedOnion.KSP.API
 				Unhook();
 		}
 
-		public double af = 0.5;
-		public double vf = 1.5;
 		protected virtual void Callback(FlightCtrlState st)
 		{
 			if (_hooked == null)
 				return;
 			if (!float.IsNaN(_throttle))
 				st.mainThrottle = RosMath.Clamp(_throttle, 0f, 1f);
+
+			var angvel = _ship.angularVelocity;
+			var maxang = _ship.maxAngular;
 			if (!double.IsNaN(_direction.x)
 				|| !double.IsNaN(_pitch)
 				|| !double.IsNaN(_heading))
@@ -303,10 +303,7 @@ namespace RedOnion.KSP.API
 				// ship.up      => (0,0,-1) <= -transform.forward
 				var pitchDiff = RosMath.Deg.Atan2(-want.z, want.y);
 				var yawDiff = RosMath.Deg.Atan2(want.x, want.y);
-				// X=pitch, Y=roll, Z=yaw (note: the one not used in the atan2 above)
-				var angvel = _ship.angularVelocity;
-				var maxang = _ship.maxAngular;
-				// compute control inputs
+				// compute control inputs (X=pitch, Z=yaw - the one not used in the atan2 above)
 				var pitch = (float)AngularControl(pitchPID, pitchDiff, angvel.x, maxang.x);
 				var yaw = (float)AngularControl(yawPID, yawDiff, angvel.z, maxang.z);
 				// set the controls
@@ -317,8 +314,6 @@ namespace RedOnion.KSP.API
 			}
 			else if (killRot)
 			{
-				var angvel = _ship.angularVelocity;
-				var maxang = _ship.maxAngular;
 				// compute control inputs
 				var pitch = (float)AngularControl(pitchPID, 0, angvel.x, maxang.x);
 				var yaw = (float)AngularControl(yawPID, 0, angvel.z, maxang.z);
@@ -330,12 +325,18 @@ namespace RedOnion.KSP.API
 			}
 			if (!double.IsNaN(_roll) || killRot)
 			{
-				var roll = (float)AngularControl(rollPID,
-					double.IsNaN(_roll) || Math.Abs(_ship.pitch) >= 89.9
-					? 0.0 : _roll - _ship.roll,
-					_ship.angularVelocity.y, _ship.maxAngular.y);
+				var rollDiff = 0.0;
+				if (!double.IsNaN(_roll))
+				{
+					if (Math.Abs(_ship.pitch) <= 89.0)
+						rollDiff = RosMath.ClampS180(_roll - _ship.roll);
+					else if (!double.IsNaN(_heading))
+						rollDiff = RosMath.ClampS180(_roll - 180.0
+							- _ship.up.angle(_ship.north.rotate(_heading, _ship.away), _ship.away));
+				}
+				var roll = (float)AngularControl(rollPID, rollDiff, angvel.y, maxang.y);
 				if (!float.IsNaN(roll))
-					st.roll = RosMath.Clamp(roll, -.1f, +.1f);
+					st.roll = RosMath.Clamp(roll, -1f, +1f);
 			}
 			if (!float.IsNaN(_rawPitch))
 				st.pitch = RosMath.Clamp(_rawPitch, -1f, +1f);
@@ -344,26 +345,23 @@ namespace RedOnion.KSP.API
 			if (!float.IsNaN(_rawRoll))
 				st.roll = RosMath.Clamp(_rawRoll, -1f, +1f);
 		}
+		/// <summary>
+		/// Calculate PYR control input for given parameters. 
+		/// </summary>
+		/// <param name="pid">Associated PID(R) controller.</param>
+		/// <param name="angle">Angle towards target (signed).</param>
+		/// <param name="speed">Angular speed (deg/s, signed).</param>
+		/// <param name="accel">Angular acceleration (deg/s/s, unsigned) at full control.</param>
+		/// <returns>New control fraction (0-100%).</returns>
 		protected virtual double AngularControl(PID pid, double angle, double speed, double accel)
 		{
 			// double the angle we will still travel if we try to stop immediately.
-			// (abs(speed)/accel + 0.5) is the time needed, 0.5*speed would be average speed (we use double)
-			var stop = speed * (Math.Abs(speed)/accel + 0.5);
-
-			// simple logic if speed or angle is significant
-			// (would work on its own, but could jiggle when "idle")
-			if (Math.Abs(stop) > pid.angle || Math.Abs(angle) > pid.angle)
-			{
-				// for decay
-				pid.input = 0;
-				pid.Update();
-				// the fraction of acceleration we want in next tick
-				return 10 * (angle + stop) / accel; // the "10" was selected by testing
-			}
-
-			// final fine-tuning (usually when we are coasting and want to keep the lock with minimal controls)
-			pid.input = RosMath.Clamp(10 * (angle + stop) / accel, -1.0, +1.0);
-			return pid.Update();
+			// abs(speed)/accel is the time needed, 0.5*speed would be average speed,
+			// we use double of that because we always add the angle difference.
+			var stop = speed * (Math.Abs(speed)/accel + 0.3 + 10 * pid.dt);
+			// TODO: recheck the signs and what they mean, should be angle-stop
+			pid.input = 10 * (angle + stop) / accel;
+			return pid.update();
 		}
 	}
 }

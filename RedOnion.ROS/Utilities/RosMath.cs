@@ -6,7 +6,7 @@ namespace RedOnion.ROS.Utilities
 	public static class RosMath
 	{
 		public const double PI = Math.PI;
-		public const double E = Math.PI;
+		public const double E = Math.E;
 		public const double NaN = double.NaN;
 		public const double Inf = double.PositiveInfinity;
 		public const double Deg2Rad = PI / 180.0;
@@ -142,8 +142,12 @@ namespace RedOnion.ROS.Utilities
 		public static int Sign(sbyte value) => Math.Sign(value);
 		public static int Sign(decimal value) => Math.Sign(value);
 
-		public static double Max(double val1, double val2) => Math.Max(val1, val2);
-		public static float Max(float val1, float val2) => Math.Max(val1, val2);
+		// note that Math.Max will return NaN if any of the two is NaN,
+		// we return the other if one is NaN (and NaN only if both are NaN)
+		public static double Max(double val1, double val2)
+			=> val1 >= val2 || double.IsNaN(val2) ? val1 : val2;
+		public static float Max(float val1, float val2)
+			=> val1 >= val2 || float.IsNaN(val2) ? val1 : val2;
 		public static long Max(long val1, long val2) => Math.Max(val1, val2);
 		public static int Max(int val1, int val2) => Math.Max(val1, val2);
 		public static short Max(short val1, short val2) => Math.Max(val1, val2);
@@ -154,8 +158,10 @@ namespace RedOnion.ROS.Utilities
 		public static byte Max(byte val1, byte val2) => Math.Max(val1, val2);
 		public static decimal Max(decimal val1, decimal val2) => Math.Max(val1, val2);
 
-		public static double Min(double val1, double val2) => Math.Min(val1, val2);
-		public static float Min(float val1, float val2) => Math.Min(val1, val2);
+		public static double Min(double val1, double val2)
+			=> val1 <= val2 || double.IsNaN(val2) ? val1 : val2;
+		public static float Min(float val1, float val2)
+			=> val1 <= val2 || float.IsNaN(val2) ? val1 : val2;
 		public static long Min(long val1, long val2) => Math.Min(val1, val2);
 		public static int Min(int val1, int val2) => Math.Min(val1, val2);
 		public static short Min(short val1, short val2) => Math.Min(val1, val2);
@@ -166,8 +172,10 @@ namespace RedOnion.ROS.Utilities
 		public static byte Min(byte val1, byte val2) => Math.Min(val1, val2);
 		public static decimal Min(decimal val1, decimal val2) => Math.Min(val1, val2);
 
-		public static double Clamp(double val, double min, double max) => Math.Min(Math.Max(val, min), max);
-		public static float Clamp(float val, float min, float max) => Math.Min(Math.Max(val, min), max);
+		public static double Clamp(double val, double min, double max)
+			=> double.IsNaN(val) ? val : Min(Max(val, min), max);
+		public static float Clamp(float val, float min, float max)
+			=> double.IsNaN(val) ? val : Min(Max(val, min), max);
 		public static long Clamp(long val, long min, long max) => Math.Min(Math.Max(val, min), max);
 		public static int Clamp(int val, int min, int max) => Math.Min(Math.Max(val, min), max);
 		public static short Clamp(short val, short min, short max) => Math.Min(Math.Max(val, min), max);

@@ -1,3 +1,4 @@
+using RedOnion.ROS.Utilities;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -59,6 +60,10 @@ namespace RedOnion.KSP.API
 			+ " NaN or +Inf means no limit (which is default)")]
 		public double outputChangeLimit = double.PositiveInfinity;
 
+		[Description("Limit of abs(target-input) used by P and I factors."
+			+ " Prevents over-reactions and also reducing windup.")]
+		public double errorLimit = double.PositiveInfinity;
+
 		[Description("Limit of abs(accumulator) used by I and R factors."
 			+ " Another anti-windup measure to prevent overshooting.")]
 		public double accumulatorLimit = double.PositiveInfinity;
@@ -99,7 +104,7 @@ namespace RedOnion.KSP.API
 		[Description("Difference scaling factor")]
 		public double scale { get => _param.scale; set => _param.scale = value; }
 
-		[Description("Maximal abs(Target - previous Target) per second."
+		[Description("Maximal abs(target - previous target) per second."
 			+ " NaN or +Inf means no limit (which is default)."
 			+ " This can make the output smoother (more human-like control)"
 			+ " and help prevent oscillation after target change (windup).")]
@@ -117,23 +122,38 @@ namespace RedOnion.KSP.API
 			get => _param.outputChangeLimit;
 			set => _param.outputChangeLimit = value;
 		}
+		[Description("Limit of abs(target-input) used by P and I factors."
+			+ " Prevents over-reactions and also reducing windup.")]
+		public double errorLimit
+		{
+			get => _param.errorLimit;
+			set => _param.errorLimit = value;
+		}
 		[Description("Limit of abs(accumulator) used by I and R factors."
 			+ " Another anti-windup measure to prevent overshooting.")]
 		public double accumulatorLimit
 		{
 			get => _param.accumulatorLimit;
-			set => _param.outputChangeLimit = value;
+			set => _param.accumulatorLimit = value;
 		}
 
 		[Description("Feedback (true state - e.g. current pitch;"
-			+ " error/difference if Target is NaN)")]
+			+ " error/difference if Target is NaN).")]
 		public double input { get; set; } = double.NaN;
+		[Description("Highest input allowed.")]
+		public double maxInput { get; set; } = double.PositiveInfinity;
+		[Description("Lowest input allowed.")]
+		public double minInput { get; set; } = double.NegativeInfinity;
 
 		[Description("Desired state (set point - e.g. desired/wanted pitch;"
 			+ " NaN for pure error/difference mode, which is the default)."
 			+ " The computed control signal is added to Input if Target is valid,"
 			+ " use error/difference mode if you want to add it to Target.")]
 		public double target { get; set; } = double.NaN;
+		[Description("Highest target allowed.")]
+		public double maxTarget { get; set; } = double.PositiveInfinity;
+		[Description("Lowest target allowed.")]
+		public double minTarget { get; set; } = double.NegativeInfinity;
 
 		[Description("Last computed output value (control signal,"
 			+ " call Update() after changing Input/Target)")]
@@ -157,31 +177,38 @@ namespace RedOnion.KSP.API
 			_target = double.NaN;
 			_output = double.NaN;
 			_accu = 0.0;
+			input = double.NaN;
+			target = double.NaN;
 		}
 		[Description("Reset accumulator to zero.")]
 		public void resetAccu()
 			=> _accu = 0.0;
+		[Description("Time elapsed since last update (in seconds), Time.tick after reset.")]
+		public double dt
+			=> double.IsNaN(_stamp) ? Time.tick : Time.since(_stamp);
+		[Description("Time elapsed between last and previous update.")]
+		public double lastDt { get; protected set; }
 
 		[Description("Update output according to time elapsed (and Input and Target)")]
-		public double Update()
+		public double update()
 		{
-			var now = Planetarium.GetUniversalTime();
+			var now = Time.now;
 			if (now != _stamp)
 			{
-				Update(double.IsNaN(_stamp) ? Time.tick : now - _stamp);
+				update(double.IsNaN(_stamp) ? Time.tick : now - _stamp);
 				_stamp = now;
 			}
 			return _output;
 		}
 		[Description("Set input and update output according to time elapsed (provided as dt)")]
-		public double Update(
-			[Description("Time elapsed since last update (in seconds)")]
+		public double update(
+			[Description("Time elapsed since last update (in seconds).")]
 			double dt,
 			[Description("New input/feedback")]
 			double input)
 		{
 			this.input = input;
-			return Update(dt);
+			return update(dt);
 		}
 		[Description("Set input and target and update output according to time elapsed (provided as dt)")]
 		public double Update(
@@ -194,23 +221,27 @@ namespace RedOnion.KSP.API
 		{
 			this.input = input;
 			this.target = target;
-			return Update(dt);
+			return update(dt);
 		}
 		[Description("Update output according to time elapsed (provided as dt, using current Input and Target)")]
-		public virtual double Update(
+		public virtual double update(
 			[Description("Time elapsed since last update (in seconds)")]
 			double dt)
 		{
+			_stamp = Time.now;
+			lastDt = dt;
+			var input = RosMath.Clamp(this.input, minInput, maxInput);
 			if (double.IsNaN(dt))
 				_output = input;
 			else
 			{
 				var targetLimit = targetChangeLimit * dt;
-				_target = Math.Abs(target - _target) > targetLimit ? target < 0
-					? _target - targetLimit
-					: _target + targetLimit
-					: target; // this accounts for any of Target, this.target or targetLimit being NaN
-				double error = double.IsNaN(_target) ? input : _target - input;
+				_target = RosMath.Clamp(RosMath.Clamp(
+					target, minTarget, maxTarget),
+					_target - targetLimit, _target + targetLimit);
+				double error = RosMath.Clamp(
+					double.IsNaN(_target) ? input : _target - input,
+					-errorLimit, errorLimit);
 				double result = 0;
 				if (!double.IsNaN(error))
 				{
@@ -237,9 +268,15 @@ namespace RedOnion.KSP.API
 				if (!double.IsNaN(scale))
 					result *= scale;
 				var outputLimit = outputChangeLimit * dt;
-				if (Math.Abs(result) > outputLimit)
-					result = result < 0 ? -outputLimit : outputLimit;
-				_output = double.IsNaN(_target) ? result : input + result;
+				if (double.IsNaN(_target))
+					_output = double.IsNaN(_output) ? result : RosMath.Clamp(
+						result, _output - outputLimit, _output + outputLimit);
+				else
+				{
+					if (Math.Abs(result) > outputLimit)
+						result = result < 0 ? -outputLimit : outputLimit;
+					_output = input + result;
+				}
 			}
 			_input = input;
 			if (_output > maxOutput)

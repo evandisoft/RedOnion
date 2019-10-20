@@ -29,47 +29,47 @@ namespace RedOnion.ROS
 			{
 				switch (to.Primitive)
 				{
-				case ExCode.String:
-					self = ToString(ref self, null, Value.Culture, false);
-					return true;
-				case ExCode.Char:
-				case ExCode.WideChar:
-					self = new Value((char)self.num.Double);
-					return true;
-				case ExCode.Byte:
-					self = new Value((byte)self.num.Double);
-					return true;
-				case ExCode.UShort:
-					self = new Value((ushort)self.num.Double);
-					return true;
-				case ExCode.UInt:
-					self = new Value((uint)self.num.Double);
-					return true;
-				case ExCode.ULong:
-					self = new Value((ulong)self.num.Double);
-					return true;
-				case ExCode.SByte:
-					self = new Value((sbyte)self.num.Double);
-					return true;
-				case ExCode.Short:
-					self = new Value((short)self.num.Double);
-					return true;
-				case ExCode.Int:
-					self = new Value((int)self.num.Double);
-					return true;
-				case ExCode.Long:
-					self = new Value((long)self.num.Double);
-					return true;
-				case ExCode.Number:
-				case ExCode.Float:
-					return true;
-				case ExCode.Double:
-					self = new Value(self.num.Double);
-					return true;
-				case ExCode.Bool:
-					var d = self.num.Double;
-					self = new Value(!double.IsNaN(d) && d != 0.0);
-					return true;
+					case ExCode.String:
+						self = ToString(ref self, null, Value.Culture, false);
+						return true;
+					case ExCode.Char:
+					case ExCode.WideChar:
+						self = new Value((char)self.num.Double);
+						return true;
+					case ExCode.Byte:
+						self = new Value((byte)self.num.Double);
+						return true;
+					case ExCode.UShort:
+						self = new Value((ushort)self.num.Double);
+						return true;
+					case ExCode.UInt:
+						self = new Value((uint)self.num.Double);
+						return true;
+					case ExCode.ULong:
+						self = new Value((ulong)self.num.Double);
+						return true;
+					case ExCode.SByte:
+						self = new Value((sbyte)self.num.Double);
+						return true;
+					case ExCode.Short:
+						self = new Value((short)self.num.Double);
+						return true;
+					case ExCode.Int:
+						self = new Value((int)self.num.Double);
+						return true;
+					case ExCode.Long:
+						self = new Value((long)self.num.Double);
+						return true;
+					case ExCode.Number:
+					case ExCode.Float:
+						return true;
+					case ExCode.Double:
+						self = new Value(self.num.Double);
+						return true;
+					case ExCode.Bool:
+						var d = self.num.Double;
+						self = new Value(!double.IsNaN(d) && d != 0.0);
+						return true;
 				}
 				return false;
 			}
@@ -78,15 +78,15 @@ namespace RedOnion.ROS
 			{
 				switch (op)
 				{
-				case OpCode.Plus:
-					return true;
-				case OpCode.Neg:
-					self.num.Float = -self.num.Float;
-					return true;
-				case OpCode.Not:
-					var d = self.num.Double;
-					self = new Value(double.IsNaN(d) || d == 0.0);
-					return true;
+					case OpCode.Plus:
+						return true;
+					case OpCode.Neg:
+						self.num.Float = -self.num.Float;
+						return true;
+					case OpCode.Not:
+						var d = self.num.Double;
+						self = new Value(double.IsNaN(d) || d == 0.0);
+						return true;
 				}
 				return false;
 			}
@@ -104,40 +104,41 @@ namespace RedOnion.ROS
 					return false;
 				switch (op)
 				{
-				case OpCode.Add:
-					lhs.num.Float += rhs.num.Float;
-					return true;
-				case OpCode.Sub:
-					lhs.num.Float -= rhs.num.Float;
-					return true;
-				case OpCode.Mul:
-					lhs.num.Float *= rhs.num.Float;
-					return true;
-				case OpCode.Div:
-					lhs.num.Float /= rhs.num.Float;
-					return true;
-				case OpCode.BitXor:
-					lhs.num.Float = (float)Math.Pow(lhs.num.Float, rhs.num.Float);
-					return true;
+					case OpCode.Add:
+						lhs.num.Float += rhs.num.Float;
+						return true;
+					case OpCode.Sub:
+						lhs.num.Float -= rhs.num.Float;
+						return true;
+					case OpCode.Mul:
+						lhs.num.Float *= rhs.num.Float;
+						return true;
+					case OpCode.Div:
+						lhs.num.Float /= rhs.num.Float;
+						return true;
+					case OpCode.Power:
+					case OpCode.BitXor:
+						lhs.num.Float = (float)Math.Pow(lhs.num.Float, rhs.num.Float);
+						return true;
 
-				case OpCode.Equals:
-					lhs = lhs.num.Float == rhs.num.Float;
-					return true;
-				case OpCode.Differ:
-					lhs = lhs.num.Float != rhs.num.Float;
-					return true;
-				case OpCode.Less:
-					lhs = lhs.num.Float < rhs.num.Float;
-					return true;
-				case OpCode.More:
-					lhs = lhs.num.Float > rhs.num.Float;
-					return true;
-				case OpCode.LessEq:
-					lhs = lhs.num.Float <= rhs.num.Float;
-					return true;
-				case OpCode.MoreEq:
-					lhs = lhs.num.Float >= rhs.num.Float;
-					return true;
+					case OpCode.Equals:
+						lhs = lhs.num.Float == rhs.num.Float;
+						return true;
+					case OpCode.Differ:
+						lhs = lhs.num.Float != rhs.num.Float;
+						return true;
+					case OpCode.Less:
+						lhs = lhs.num.Float < rhs.num.Float;
+						return true;
+					case OpCode.More:
+						lhs = lhs.num.Float > rhs.num.Float;
+						return true;
+					case OpCode.LessEq:
+						lhs = lhs.num.Float <= rhs.num.Float;
+						return true;
+					case OpCode.MoreEq:
+						lhs = lhs.num.Float >= rhs.num.Float;
+						return true;
 				}
 				return false;
 			}

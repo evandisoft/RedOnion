@@ -119,12 +119,29 @@ z = x \
   + y
 ```
 
+## Number types
+
+Beware that ROS distinguishes between various types of numbers,
+especially integers (`int`, `uint`, `byte`, ...) vs. floating-point number (`double` or `float`).
+This could sometimes surprise you: `1/3` is `0` but `1.0/3` is `0.333...`
+because `1/3` uses integer arithmetic, but `1.0/3` uses floating-point arithmetic.
+Integer types get promoted to floating-point (`double`)
+if used in any operation involving floating-point number (the `3` gets converted to `3.0`
+making the expression `1.0/3.0`). Smaller integer types always get promoted to `int` or `double`.
+
+Operator `^` could also surprise you, because it means bitwise-xor in C#/C++.
+ROS translates the operator to `math.pow` if used with floating-point number,
+but again, remember that you first have to enforce floating-point arithmetic,
+or just use `**` operator (which works like `math.pow` even for integers).
+Also note that bitwise operators (`&`, `|`, `^`, `<<` and `>>`)
+have much higher priority/precedence in ROS than in C#/C++.
+
 ## Functions and lambdas
 
 Functions are created by `function` or `def` keyword
 followed by name of the function and list of arguments.
 The body has to be indented at least one space more
-than the `function`/`def` keyword.
+than the `function`/`def` keyword (or rather the line with that keyword).
 
 Lambdas have similar syntax but are anonymous,
 therefore there is no name after the keyword.
@@ -139,7 +156,7 @@ via `arguments` variable, as seen in previous example
 
 Every named argument actually passed is also accessible
 as a variable under the name specified in the definition.
-Arguments not provided will have the value of `null`.
+Arguments not provided will have the value `null`.
 
 ```
 def sum
@@ -166,7 +183,7 @@ Most of them come from C#, some from other languages.
 
 `if/unless` is followed by a condition,
 optional `then`, colon (`:`) or semicolon (`;`).
-Statement may follow, more statements must be indentet.
+Statement may follow, more statements must be indented.
 `else` with another block of statements may follow last.
 
 ```
@@ -214,3 +231,57 @@ for var i = 0; i < arguments.length; i++; print arguments[i]
 
 `break` can break the execution of any loop (jumping after the loop),
 `continue` can continue at the start of the loop (skipping the rest of the block).
+
+## Advanced stuff
+
+```
+var s = ""
+var a = new list
+for var i = 0; i < 3; i++
+  a.add def => s += i + 1",
+for var f in a; f
+return s
+```
+
+What would you expect the result to be? Let me first show you something else:
+
+```
+def MyClass
+  var shared = 0
+  this.add x => shared += x
+  this.value => shared
+var it = new MyClass
+it.add 1
+it.add 2
+return it.value()
+```
+
+What would you expect the result to be? I hope you expect `3`.
+And that would also be a reason why previous example returns `"444"`.
+That is because all the lambdas get reference to the same `i`
+which is `4` at the time they are called in that loop (`for var f in a; f`).
+That is the same reason why all the lambdas can actually modify the same `s`.
+
+But there is a way to alter the first example to produce `"123"`:
+
+```
+var s = ""
+var a = new list
+for var i = 0; i < 3; i++
+  a.add (def
+    var n = i + 1
+    return def => s += n
+  )()
+for var f in a; f
+return s;
+```
+
+The first `a.add def => s += i + 1` will capture `i` by reference
+and when those lambdas are first called, the `i` is already `4`, producing `s = "444"`.
+But that `(def; var n = ...)()` is a call in the moment where `i` is `0`, `1` or `2` in each call,
+therefore the inner lambda (`def => s += n`) is referencing `n` which was already set to `1`, `2` or `3`,
+producing the final result of `"123"`. The difference is that calling the outer lambda creates new context,
+where the `n` lives and the inner lambda is referencing that particular `n`
+(each inner lambda referencing different context). All the simple `a.add def => s += i + 1`
+would reference same context where `i` ceased to exist with last value being `4`
+(and also the one and only `s`).

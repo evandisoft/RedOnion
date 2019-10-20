@@ -1,16 +1,15 @@
 using RedOnion.UI.Components;
 using System;
 using UnityEngine;
+using UnityEngine.Events;
 using UUI = UnityEngine.UI;
 
 namespace RedOnion.UI
 {
 	public class Simple : Element
 	{
-		public Simple(string name = null)
-			: base(name)
-		{
-		}
+		public Simple() : base() { }
+		public Simple(Layout layout) : base() => Layout = layout;
 
 		protected UUI.RawImage rawImage;
 		public UUI.RawImage RawImage
@@ -81,6 +80,35 @@ namespace RedOnion.UI
 			=> base.Add(elements);
 		public new void Remove(params Element[] elements)
 			=> base.Remove(elements);
+
+		public Panel AddPanel(Layout layout)
+			=> Add(new Panel(layout));
+		public Panel AddHorizontal()
+			=> Add(new Panel(Layout.Horizontal));
+		public Panel AddVertical()
+			=> Add(new Panel(Layout.Vertical));
+		public Label AddLabel(string text)
+			=> Add(new Label(text));
+		public TextBox AddText(string text)
+			=> Add(new TextBox(text));
+		public TextBox AddTextBox(string text)
+			=> Add(new TextBox(text));
+		public Button AddButton(string text)
+			=> Add(new Button(text));
+		public Button AddButton(string text, Action<Button> click)
+			=> Add(new Button(text, click));
+		public Button AddToggle(string text)
+			=> Add(new Button(text) { Toggleable = true });
+		public Button AddToggle(string text, Action<Button> click)
+			=> Add(new Button(text, click) { Toggleable = true });
+		public Button AddExclusive(string text)
+			=> Add(new Button(text) { Exclusive = true });
+		public Button AddExclusive(string text, Action<Button> click)
+			=> Add(new Button(text, click) { Exclusive = true });
+		public Button AddExclusive2(string text)
+			=> Add(new Button(text) { ExclusiveLevel = 2 });
+		public Button AddExclusive2(string text, Action<Button> click)
+			=> Add(new Button(text, click) { ExclusiveLevel = 2 });
 
 		public Color Color
 		{

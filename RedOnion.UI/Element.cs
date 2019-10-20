@@ -12,25 +12,39 @@ namespace RedOnion.UI
 	/// </summary>
 	public abstract partial class Element : IDisposable
 	{
+#if DEBUG
 		public GameObject GameObject { get; private set; }
+#else
+		protected internal GameObject GameObject { get; private set; }
+#endif
 		protected internal RectTransform RectTransform { get; private set; }
+
+		public object Tag { get; set; }
+		public Element Parent { get; internal set; }
+
+		protected Element()
+		{
+			GameObject = new GameObject() { layer = UILayer };
+			RectTransform = GameObject.AddComponent<RectTransform>();
+			RectTransform.pivot = new Vector2(.5f, .5f);
+			RectTransform.anchorMin = new Vector2(.5f, .5f);
+			RectTransform.anchorMax = new Vector2(.5f, .5f);
+		}
 
 		public string Name
 		{
 			get => GameObject.name ?? GetType().FullName;
 			set => GameObject.name = value;
 		}
-		public object Tag { get; set; }
-		public Element Parent { get; internal set; }
-
-		protected Element(string name = null)
+		public bool Active
 		{
-			GameObject = new GameObject(name);
-			GameObject.layer = UILayer;
-			RectTransform = GameObject.AddComponent<RectTransform>();
-			RectTransform.pivot = new Vector2(.5f, .5f);
-			RectTransform.anchorMin = new Vector2(.5f, .5f);
-			RectTransform.anchorMax = new Vector2(.5f, .5f);
+			get => GameObject.activeSelf;
+			set => GameObject.SetActive(value);
+		}
+		public bool Visible
+		{
+			get => GameObject.activeInHierarchy;
+			set => GameObject.SetActive(value);
 		}
 
 		// virtual so that we can later redirect it in Window (to content panel)
@@ -83,7 +97,11 @@ namespace RedOnion.UI
 		}
 
 		~Element() => Dispose(false);
-		public void Dispose() => Dispose(true);
+		public void Dispose()
+		{
+			GC.SuppressFinalize(this);
+			Dispose(true);
+		}
 		protected virtual void Dispose(bool disposing)
 		{
 			if (!disposing || GameObject == null)
@@ -195,7 +213,7 @@ namespace RedOnion.UI
 			}
 		}
 
-		private LayoutPadding layoutPadding = new LayoutPadding(3);
+		private LayoutPadding layoutPadding = new LayoutPadding(0f, 3f, 0f, 0f, 3f, 0f);
 		/// <summary>
 		/// Padding and spacing
 		/// </summary>
@@ -240,8 +258,8 @@ namespace RedOnion.UI
 			if (layoutGroup == null)
 				return;
 			layoutGroup.childAlignment = childAnchors.ToTextAnchor();
-			layoutGroup.childForceExpandWidth = childAnchors.right + 1f/3f > childAnchors.left;
-			layoutGroup.childForceExpandHeight = childAnchors.bottom + 1f/3f > childAnchors.top;
+			layoutGroup.childForceExpandWidth = childAnchors.right - 1f/3f > childAnchors.left;
+			layoutGroup.childForceExpandHeight = childAnchors.bottom - 1f/3f > childAnchors.top;
 		}
 
 		protected Padding InnerPadding

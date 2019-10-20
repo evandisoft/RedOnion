@@ -25,9 +25,18 @@ namespace RedOnion.ROS
 
 			public override bool Call(ref Value result, object self, Arguments args, bool create)
 			{
-				if (create || args.Length != 1)
+				if (create)
 					return false;
-				((Action<Value>)result.obj)(args[0]);
+				if (args.Length == 1)
+				{
+					((Action<Value>)result.obj)(args[0]);
+					result = Value.Void;
+					return true;
+				}
+				if (MinArgs > 0 || Params?.Length != 1)
+					return false;
+				// TODO: optimize this by preparing the Value in the constructor (or lazy-create and store)
+				((Action<Value>)result.obj)(new Value(Params[0].DefaultValue));
 				result = Value.Void;
 				return true;
 			}
@@ -59,9 +68,16 @@ namespace RedOnion.ROS
 
 			public override bool Call(ref Value result, object self, Arguments args, bool create)
 			{
-				if (create || args.Length != 1)
+				if (create)
 					return false;
-				result = ((Func<Value, Value>)result.obj)(args[0]);
+				if (args.Length == 1)
+				{
+					result = ((Func<Value, Value>)result.obj)(args[0]);
+					return true;
+				}
+				if (MinArgs > 0 || Params?.Length != 1)
+					return false;
+				result = ((Func<Value, Value>)result.obj)(new Value(Params[0].DefaultValue));
 				return true;
 			}
 		}
@@ -70,14 +86,24 @@ namespace RedOnion.ROS
 		/// </summary>
 		public class Procedure1<T> : Callable
 		{
-			public Procedure1(string name)
-				: base(name, typeof(Action<T, Value>), true) { }
+			public Procedure1(MethodInfo m)
+				: this(m.Name, m) { }
+			public Procedure1(string name, MethodInfo m = null)
+				: base(name, typeof(Action<T, Value>), true, m) { }
 
 			public override bool Call(ref Value result, object self, Arguments args, bool create)
 			{
-				if (create || args.Length != 1)
+				if (create)
 					return false;
-				((Action<T, Value>)result.obj)((T)self, args[0]);
+				if (args.Length == 1)
+				{
+					((Action<T, Value>)result.obj)((T)self, args[0]);
+					result = Value.Void;
+					return true;
+				}
+				if (MinArgs > 0 || IsDelegate || Params?.Length != 1)
+					return false;
+				((Action<T, Value>)result.obj)((T)self, new Value(Params[0].DefaultValue));
 				result = Value.Void;
 				return true;
 			}
@@ -87,14 +113,23 @@ namespace RedOnion.ROS
 		/// </summary>
 		public class Method1<T> : Callable
 		{
-			public Method1(string name)
-				: base(name, typeof(Func<T, Value, Value>), true) { }
+			public Method1(MethodInfo m)
+				: this(m.Name, m) { }
+			public Method1(string name, MethodInfo m = null)
+				: base(name, typeof(Func<T, Value, Value>), true, m) { }
 
 			public override bool Call(ref Value result, object self, Arguments args, bool create)
 			{
-				if (create || args.Length != 1)
+				if (create)
 					return false;
-				result = ((Func<T, Value, Value>)result.obj)((T)self, args[0]);
+				if (args.Length == 1)
+				{
+					result = ((Func<T, Value, Value>)result.obj)((T)self, args[0]);
+					return true;
+				}
+				if (MinArgs > 0 || IsDelegate || Params?.Length != 1)
+					return false;
+				result = ((Func<T, Value, Value>)result.obj)((T)self, new Value(Params[0].DefaultValue));
 				return true;
 			}
 		}

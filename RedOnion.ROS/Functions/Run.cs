@@ -7,16 +7,18 @@ using System.Text;
 namespace RedOnion.ROS.Functions
 {
 	/// <summary>
-	/// Run another script in its own context
+	/// Run another script in its own context (given path to the script).
 	/// </summary>
 	public class Run : UserObject
 	{
-		public RunSource Source { get; } = new RunSource();
-		public RunLibrary Library { get; } = new RunLibrary();
-		public Run() : base("run")
+		public RunSource Source { get; }
+		public RunLibrary Library { get; }
+		public RunReplace Replace { get; }
+		public Run(UserObject baseClass) : base("run", baseClass)
 		{
-			Add("source", Source);
-			Add("library", Library);
+			Add("source", Source = new RunSource(baseClass));
+			Add("library", Library = new RunLibrary(baseClass));
+			Add("replace", Replace = new RunReplace(baseClass));
 			Lock();
 		}
 		public override void Reset()
@@ -38,9 +40,12 @@ namespace RedOnion.ROS.Functions
 			return true;
 		}
 
+		/// <summary>
+		/// Run another script in its own context (given the script as a string).
+		/// </summary>
 		public class RunSource : UserObject
 		{
-			public RunSource() : base("run.source") { }
+			public RunSource(UserObject baseClass) : base("run.source", baseClass) { }
 			public override bool Call(ref Value result, object self, Arguments args, bool create)
 			{
 				if (args.Length != 1)
@@ -52,12 +57,15 @@ namespace RedOnion.ROS.Functions
 				return true;
 			}
 		}
+		/// <summary>
+		/// Run another script in the same context (given path to the script)
+		/// </summary>
 		public class RunLibrary : UserObject
 		{
-			public RunLibrarySource Source { get; } = new RunLibrarySource();
-			public RunLibrary() : base("run.library")
+			public RunLibrarySource Source { get; }
+			public RunLibrary(UserObject baseClass) : base("run.library", baseClass)
 			{
-				Add("source", Source);
+				Add("source", Source = new RunLibrarySource(baseClass));
 				Lock();
 			}
 			public override void Reset()
@@ -78,9 +86,12 @@ namespace RedOnion.ROS.Functions
 				return true;
 			}
 		}
+		/// <summary>
+		/// Run another script in the same context (given the script as string)
+		/// </summary>
 		public class RunLibrarySource : UserObject
 		{
-			public RunLibrarySource() : base("run.library.source") { }
+			public RunLibrarySource(UserObject baseClass) : base("run.library.source", baseClass) { }
 			public override bool Call(ref Value result, object self, Arguments args, bool create)
 			{
 				if (args.Length != 1)
@@ -89,6 +100,53 @@ namespace RedOnion.ROS.Functions
 				var proc = core.Processor;
 				var src = args[0].ToStr();
 				core.CallScript(proc.Compile(src), include: true);
+				return true;
+			}
+		}
+
+		/// <summary>
+		/// Run another script in the same context (given path to the script)
+		/// </summary>
+		public class RunReplace : UserObject
+		{
+			public RunReplaceSource Source { get; }
+			public RunReplace(UserObject baseClass) : base("run.replace", baseClass)
+			{
+				Add("source", Source = new RunReplaceSource(baseClass));
+				Lock();
+			}
+			public override void Reset()
+			{
+				Source.Reset();
+				base.Reset();
+			}
+			public override bool Call(ref Value result, object self, Arguments args, bool create)
+			{
+				if (args.Length != 1)
+					return false;
+				var core = args.Core;
+				var proc = core.Processor;
+				var path = args[0].ToStr();
+				var src = proc.ReadScript(path);
+				if (src == null) throw InvalidOperation("Could not read " + path);
+				core.SetCode(proc.Compile(src), reset: true);
+				return true;
+			}
+		}
+		/// <summary>
+		/// Run another script in the same context (given the script as string)
+		/// </summary>
+		public class RunReplaceSource : UserObject
+		{
+			public RunReplaceSource(UserObject baseClass) : base("run.replace.source", baseClass) { }
+			public override bool Call(ref Value result, object self, Arguments args, bool create)
+			{
+				if (args.Length != 1)
+					return false;
+				var core = args.Core;
+				var proc = core.Processor;
+				var src = args[0].ToStr();
+				core.SetCode(proc.Compile(src), reset: true);
 				return true;
 			}
 		}

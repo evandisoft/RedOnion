@@ -44,6 +44,8 @@ namespace RedOnion.ROS.Tests
 			Assert.AreEqual(value, result, "Different result: <{0}>", script);
 			Assert.AreEqual(value?.GetType(), result?.GetType(), "Different type: <{0}>", script);
 		}
+		public void YieldLines(params string[] lines)
+			=> Yield(string.Join(Environment.NewLine, lines));
 		public void YieldLines(ExitCode exit, object value, params string[] lines)
 			=> Yield(exit, value, string.Join(Environment.NewLine, lines));
 		public void YieldLines(ExitCode exit, object value, int countdown, params string[] lines)
@@ -83,6 +85,12 @@ namespace RedOnion.ROS.Tests
 				"if false; return 1",
 				"else if false; return 2",
 				"else return 3");
+
+			Lines(ExitCode.Return, 3,
+				"if true",
+				"  if false; return 1",
+				"else return 2",
+				"return 3");
 		}
 
 		[Test]
@@ -112,6 +120,14 @@ namespace RedOnion.ROS.Tests
 				"  counter = 10",
 				"until counter > 10",
 				"return counter");
+
+			Lines(ExitCode.Return, 1,
+				"var it = 0",
+				"until (",
+				"  false)",
+				"  it = 1",
+				"  return it",
+				"return it+2");
 		}
 
 		[Test]

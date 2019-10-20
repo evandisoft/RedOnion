@@ -1,3 +1,4 @@
+using RedOnion.ROS.Objects;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -89,6 +90,12 @@ namespace RedOnion.ROS
 					if (idx >= 0)
 						Value.DebugLog("Conflicting name: {0}.{1} [instace: {2}; property]", Type.Name, member.Name, instance);
 					else ProcessProperty(p, instance, ref dict);
+				}
+				else if (member is EventInfo e)
+				{
+					if (idx >= 0)
+						Value.DebugLog("Conflicting name: {0}.{1} [instace: {2}; event]", Type.Name, member.Name, instance);
+					else ProcessEvent(e, instance, ref dict);
 				}
 				else if (member is MethodInfo m)
 				{
@@ -311,11 +318,41 @@ namespace RedOnion.ROS
 								write,
 								GetConvertExpression(GetValueConvertExpression(
 									convert ?? type, ValueParameter),
-									convert == null ? null : p.PropertyType)),
+									convert == null ? null : type)),
 							SelfParameter, ValueParameter
 						).Compile();
 				}
 			}
+
+			protected virtual void ProcessEvent(
+				EventInfo e, bool instance, ref Dictionary<string, int> dict)
+			{
+				if (dict == null)
+					dict = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+				dict[e.Name] = prop.size;
+				ref var it = ref prop.Add();
+				it.name = e.Name;
+				it.kind = Prop.Kind.Event;
+				it.read = instance
+					// self => new Value(new EventProxy<T,E>(self, e))
+					? Expression.Lambda<Func<object, Value>>(
+						GetNewValueExpression(typeof(Descriptor),
+						Expression.New(typeof(EventProxy<,>)
+							.MakeGenericType(e.DeclaringType, e.EventHandlerType)
+							.GetConstructor(new Type[] { e.DeclaringType, typeof(EventInfo) }),
+							GetConvertExpression(SelfParameter, e.DeclaringType),
+							Expression.Constant(e, typeof(EventInfo)))),
+					SelfParameter).Compile()
+					// self => new Value(new EventProxy<E>(e))
+					: Expression.Lambda<Func<object, Value>>(
+						GetNewValueExpression(typeof(Descriptor),
+						Expression.New(typeof(EventProxy<>)
+							.MakeGenericType(e.EventHandlerType)
+							.GetConstructor(new Type[] { typeof(EventInfo) }),
+							Expression.Constant(e, typeof(EventInfo)))),
+					SelfParameter).Compile();
+			}
+
 
 			protected virtual void ProcessMethod(
 				MethodInfo m, bool instance, ref Dictionary<string, int> dict, int idx)
@@ -349,7 +386,8 @@ namespace RedOnion.ROS
 				{
 					Value.DebugLog("Found default {0}#ctor [args: {1}]",
 						Type.Name, args.Length);
-					defaultCtor = c;
+					if (defaultCtor == null || c.GetParameters().Length < defaultCtor.GetParameters().Length)
+						defaultCtor = c;
 					return;
 				}
 				if (args[0].ParameterType == typeof(IProcessor)
@@ -358,7 +396,8 @@ namespace RedOnion.ROS
 				{
 					Value.DebugLog("Found default {0}#ctor accepting processor [args: {1}]",
 						Type.Name, args.Length);
-					processorCtor = c;
+					if (processorCtor == null || c.GetParameters().Length < processorCtor.GetParameters().Length)
+						processorCtor = c;
 					return;
 				}
 			}
@@ -416,7 +455,7 @@ namespace RedOnion.ROS
 						{
 							var self = Expression.Parameter(m.DeclaringType, "self");
 							return new Value((Descriptor)Activator.CreateInstance(
-								typeof(Procedure0<>).MakeGenericType(m.DeclaringType), m.Name),
+								typeof(Procedure0<>).MakeGenericType(m.DeclaringType), m),
 								Expression.Lambda(Expression.Call(self, m),
 								self).Compile());
 						}
@@ -425,7 +464,7 @@ namespace RedOnion.ROS
 							var self = Expression.Parameter(m.DeclaringType, "self");
 							//TODO: cache and reuse the descriptors
 							return new Value((Descriptor)Activator.CreateInstance(
-								typeof(Procedure1<>).MakeGenericType(m.DeclaringType), m.Name),
+								typeof(Procedure1<>).MakeGenericType(m.DeclaringType), m),
 								Expression.Lambda(Expression.Call(self, m,
 								GetValueConvertExpression(args[0].ParameterType, ValueArg0Parameter)),
 								self, ValueArg0Parameter).Compile());
@@ -434,7 +473,7 @@ namespace RedOnion.ROS
 						{
 							var self = Expression.Parameter(m.DeclaringType, "self");
 							return new Value((Descriptor)Activator.CreateInstance(
-								typeof(Procedure2<>).MakeGenericType(m.DeclaringType), m.Name),
+								typeof(Procedure2<>).MakeGenericType(m.DeclaringType), m),
 								Expression.Lambda(Expression.Call(self, m,
 								GetValueConvertExpression(args[0].ParameterType, ValueArg0Parameter),
 								GetValueConvertExpression(args[1].ParameterType, ValueArg1Parameter)),
@@ -444,7 +483,7 @@ namespace RedOnion.ROS
 						{
 							var self = Expression.Parameter(m.DeclaringType, "self");
 							return new Value((Descriptor)Activator.CreateInstance(
-								typeof(Procedure3<>).MakeGenericType(m.DeclaringType), m.Name),
+								typeof(Procedure3<>).MakeGenericType(m.DeclaringType), m),
 								Expression.Lambda(Expression.Call(self, m,
 								GetValueConvertExpression(args[0].ParameterType, ValueArg0Parameter),
 								GetValueConvertExpression(args[1].ParameterType, ValueArg1Parameter),
@@ -466,7 +505,7 @@ namespace RedOnion.ROS
 						{
 							var self = Expression.Parameter(m.DeclaringType, "self");
 							return new Value((Descriptor)Activator.CreateInstance(
-								typeof(Method0<>).MakeGenericType(m.DeclaringType), m.Name),
+								typeof(Method0<>).MakeGenericType(m.DeclaringType), m),
 								Expression.Lambda(GetNewValueExpression(convert ?? m.ReturnType,
 								GetConvertExpression(Expression.Call(self, m),
 								convert)), self).Compile());
@@ -475,7 +514,7 @@ namespace RedOnion.ROS
 						{
 							var self = Expression.Parameter(m.DeclaringType, "self");
 							return new Value((Descriptor)Activator.CreateInstance(
-								typeof(Method1<>).MakeGenericType(m.DeclaringType), m.Name),
+								typeof(Method1<>).MakeGenericType(m.DeclaringType), m),
 								Expression.Lambda(GetNewValueExpression(convert ?? m.ReturnType,
 								GetConvertExpression(Expression.Call(self, m,
 								GetValueConvertExpression(args[0].ParameterType, ValueArg0Parameter)),
@@ -485,7 +524,7 @@ namespace RedOnion.ROS
 						{
 							var self = Expression.Parameter(m.DeclaringType, "self");
 							return new Value((Descriptor)Activator.CreateInstance(
-								typeof(Method2<>).MakeGenericType(m.DeclaringType), m.Name),
+								typeof(Method2<>).MakeGenericType(m.DeclaringType), m),
 								Expression.Lambda(GetNewValueExpression(convert ?? m.ReturnType,
 								GetConvertExpression(Expression.Call(self, m,
 								GetValueConvertExpression(args[0].ParameterType, ValueArg0Parameter),
@@ -496,7 +535,7 @@ namespace RedOnion.ROS
 						{
 							var self = Expression.Parameter(m.DeclaringType, "self");
 							return new Value((Descriptor)Activator.CreateInstance(
-								typeof(Method3<>).MakeGenericType(m.DeclaringType), m.Name),
+								typeof(Method3<>).MakeGenericType(m.DeclaringType), m),
 								Expression.Lambda(GetNewValueExpression(convert ?? m.ReturnType,
 								GetConvertExpression(Expression.Call(self, m,
 								GetValueConvertExpression(args[0].ParameterType, ValueArg0Parameter),

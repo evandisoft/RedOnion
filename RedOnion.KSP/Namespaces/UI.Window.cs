@@ -10,10 +10,10 @@ namespace RedOnion.KSP
 		protected IProcessor _processor;
 		public Window(IProcessor processor)
 			: this(processor, null, UI.Layout.Vertical) {}
-		public Window(IProcessor processor, UI.Layout layout)
-			: this(processor, null, layout) { }
-		public Window(IProcessor processor, string name = null, UI.Layout layout = UI.Layout.Vertical)
-			: base(name, layout)
+		public Window(IProcessor processor, UI.Layout layout, string title = null)
+			: this(processor, title, layout) { }
+		public Window(IProcessor processor, string title, UI.Layout layout = UI.Layout.Vertical)
+			: base(title, layout)
 		{
 			Value.DebugLog("Creating new window");
 			if (processor != null)

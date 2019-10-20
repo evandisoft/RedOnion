@@ -31,7 +31,9 @@ namespace RedOnion.ROS
 
 					while (at == blockEnd)
 					{
-						if (ctx.BlockCount == 0 && ctx.BlockCode != OpCode.Return)
+						if (ctx.BlockCount == 0
+							&& ctx.BlockCode != OpCode.Import
+							&& ctx.BlockCode != OpCode.Function)
 							goto finishNoReturn;
 
 						if (countdown <= 0)
@@ -114,8 +116,8 @@ namespace RedOnion.ROS
 							stack.Pop();
 							continue;
 						}
-						// library end
-						case OpCode.Return:
+						// library end (see CallScript)
+						case OpCode.Import:
 						{
 							Debug.Assert(stack.Count > 0);
 							ref var top = ref stack.Top();
@@ -260,7 +262,7 @@ namespace RedOnion.ROS
 							ref var it = ref vals.Top();
 							if (it.IsReference && !it.desc.Get(ref it, it.num.Int))
 								throw CouldNotGet(ref it);
-							if (it.IsNumerOrChar)
+							if (it.IsNumberOrChar)
 								throw InvalidOperation("Numbers do not have properties");
 							var idx = it.desc.Find(it.obj, name, true);
 							if (idx < 0)
@@ -383,7 +385,7 @@ namespace RedOnion.ROS
 						ref var it = ref vals.Top();
 						if (it.IsReference && !it.desc.Get(ref it, it.num.Int))
 							throw CouldNotGet(ref it);
-						if (it.IsNumerOrChar)
+						if (it.IsNumberOrChar)
 							throw InvalidOperation("Numbers do not have properties");
 						var idx = it.desc.Find(it.obj, name, true);
 						if (idx < 0)
@@ -551,6 +553,33 @@ namespace RedOnion.ROS
 							throw CouldNotGet(ref rhs);
 						lhs = (lhs.desc == rhs.desc && lhs.obj == rhs.obj
 							&& lhs.num.Long == rhs.num.Long) == (op == OpCode.Identity);
+						vals.Pop(1);
+						continue;
+					}
+					case OpCode.Is:
+					case OpCode.IsNot:
+					{
+						ref var lhs = ref vals.Top(-2);
+						if (lhs.IsReference && !lhs.desc.Get(ref lhs, lhs.num.Int))
+							throw CouldNotGet(ref lhs);
+						ref var rhs = ref vals.Top(-1);
+						if (rhs.IsReference && !rhs.desc.Get(ref rhs, rhs.num.Int))
+							throw CouldNotGet(ref rhs);
+						lhs = rhs.desc.IsInstanceOf(ref lhs) == (op == OpCode.Is);
+						vals.Pop(1);
+						continue;
+					}
+					case OpCode.In:
+					{
+						ref var lhs = ref vals.Top(-2);
+						if (lhs.IsReference && !lhs.desc.Get(ref lhs, lhs.num.Int))
+							throw CouldNotGet(ref lhs);
+						ref var rhs = ref vals.Top(-1);
+						if (rhs.IsReference && !rhs.desc.Get(ref rhs, rhs.num.Int))
+							throw CouldNotGet(ref rhs);
+						if (!lhs.IsStringOrChar)
+							throw InvalidOperation("Operator 'in' can only be used with strings (or char)");
+						lhs = rhs.desc.Find(rhs.obj, lhs.ToStr()) >= 0;
 						vals.Pop(1);
 						continue;
 					}
@@ -896,7 +925,7 @@ namespace RedOnion.ROS
 						}
 						at += size;
 
-						var it = new Function(fname, null,
+						var it = new Function(fname, globals.Function.Prototype,
 							compiled, bodyAt, bodySz, ftat, args, ctx, cvars, processor);
 						if (fname?.Length > 0)
 							ctx.Add(fname, it);
@@ -915,7 +944,11 @@ namespace RedOnion.ROS
 				if (vals.Count > 0)
 					result = vals.Pop();
 				if (result.IsReference && !result.desc.Get(ref result, result.num.Int))
-					throw CouldNotGet(ref result);
+				{
+					if (Exit != ExitCode.None)
+						throw CouldNotGet(ref result);
+					result = Value.Void;
+				}
 				vals.Clear();
 				ctx.PopAll();
 				Countdown = countdown;
@@ -931,16 +964,17 @@ namespace RedOnion.ROS
 					throw;
 				}
 				re = new RuntimeError(compiled, at, ex);
-#if DEBUG
-				Value.DebugLog("ROS.Core.Execute: Exception " + ex.Message);
-				if (compiled.Path != null)
-					Value.DebugLog("Script path: " + compiled.Path);
-				if (re.LineNumber >= 0 || re.Line != null)
-					Value.DebugLog(re.Line == null ? "At line {0}" : "At line {0}: {1}", re.LineNumber+1, re.Line);
-				for (var x = ex; x != null; x = x.InnerException)
-					Value.DebugLog(x.StackTrace);
-#endif
 				result = new Value(re);
+				processor?.PrintException("Core.Execute", re, logOnly: true);
+				Log("{0,2}: {1}", stack.size, ctx);
+				for (int i = stack.size; i > 0;)
+				{
+					ref var ss = ref stack.items[--i];
+					var lnum = ss.code.FindLine(ss.at-1);
+					var line = lnum >= 0 && lnum < ss.code.Lines.Count
+						? ss.code.Lines[lnum].Text : null;
+					Log("{0,2}: {1}, at:{2}, line:{3}:{4}", i, ss.context, ss.at, lnum+1, line ?? "<no source>");
+				}
 				throw re;
 			}
 		}

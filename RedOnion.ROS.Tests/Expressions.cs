@@ -123,7 +123,12 @@ namespace RedOnion.ROS.Tests
 			Test(-10,        "-x");         // unary minus
 			Test(10,         "+x");         // unary plus
 			Test(11,        "x+=1");        // compound assignment - add
-			Test(22,		"x*=2");		// compound assignment - mul
+			Test(22,		"x*=2");        // compound assignment - mul
+
+			Test(1, "var v = 1");  // integer
+			Test(2.0, "v += 1.0"); // double
+			Test(1.5, "v = math.clamp v, math.max(0, 1.0), math.min(1.5, 2)");
+			//Test("var i, j");//TODO: maybe only as statement, because `if var x = true, y = false` could be a problem (return last?)
 		}
 
 		[Test]
@@ -167,8 +172,23 @@ namespace RedOnion.ROS.Tests
 			Test(1,			"0 or 1");
 			Test(1,			"1 || 2");
 
+			// this was causing some problems (fixed)
 			Test("var s = \"hello\"");
 			Test(false, "s.length <= 3 || s[3] == '.'");
+
+			// type tests
+			Test(true, "s is string");
+			Test(false, "s is int");
+			Test(true, "1 is int");
+			Test(true, "2.0 is double");
+			Test(true, "3f is! double"); // is! means 'is not' = negated 'is'
+			Test(true, "4f is float");
+
+			// property existence tests (comes from JavaScript)
+			Test(true, "\"length\" in s");
+			Test(true, "\"length\" in string");
+			Test(false, "\"blah\" in s");
+			Test(false, "\"blah\" in string");
 		}
 
 		[Test]

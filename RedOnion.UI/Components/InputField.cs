@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -10,23 +11,31 @@ namespace RedOnion.UI.Components
 		static readonly string lockID = "RedOnion.InputField";
 		bool locked = false;
 		public TextBox TextBox { get; set; }
-		public class TextBoxEvent : UnityEvent<TextBox> { };
-		public TextBoxEvent onSelected { get; } = new TextBoxEvent();
-		public TextBoxEvent onDeselected { get; } = new TextBoxEvent();
+		public event Action<TextBox> Selected;
+		public event Action<TextBox> Deselected;
+		public event Action<TextBox, string> Changed;
+		public event Action<TextBox, string> Submitted;
+
+		public InputField()
+		{
+			onValueChanged.AddListener(text => Changed?.Invoke(TextBox, text));
+			onEndEdit.AddListener(text => Submitted?.Invoke(TextBox, text));
+		}
+
 		public override void OnSelect(BaseEventData eventData)
 		{
 			// UI_DIALOGS disable NavBall toggle
 			InputLockManager.SetControlLock(ControlTypes.KEYBOARDINPUT|ControlTypes.UI_DIALOGS, lockID);
 			locked = true;
 			base.OnSelect(eventData);
-			onSelected.Invoke(TextBox);
+			Selected?.Invoke(TextBox);
 		}
 		public override void OnDeselect(BaseEventData eventData)
 		{
 			InputLockManager.RemoveControlLock(lockID);
 			locked = false;
 			base.OnDeselect(eventData);
-			onDeselected.Invoke(TextBox);
+			Deselected?.Invoke(TextBox);
 		}
 		protected override void OnDestroy()
 		{

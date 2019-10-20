@@ -19,12 +19,32 @@ namespace RedOnion.ROS.Tests
 			public static void SetInteger(int value) => Integer = value;
 			public static string Combine(string a, string b) => a + " " + b;
 			public static double Sum3(double a, float b, int c) => a + b + c;
-			public static MyAction action;
-			public static void AddAction(MyAction add) => action += add;
-			public static void CallAction() => action?.Invoke();
-			public static MyAction2 action2;
-			public static void AddAction2(MyAction2 add) => action2 += add;
-			public static void CallAction2(string v) => action2?.Invoke(v);
+			public static event MyAction Action;
+			public static event MyAction Event { add => Action += value; remove => Action -= value; }
+			public static void AddAction(MyAction add) => Action += add;
+			public static void CallAction() => Action?.Invoke();
+			public static event MyAction2 Action2;
+			public static event MyAction2 Event2 { add => Action2 += value; remove => Action2 -= value; }
+			public static void AddAction2(MyAction2 add) => Action2 += add;
+			public static void CallAction2(string v) => Action2?.Invoke(v);
+			public static void DefaultArg(string v = "default") => name = v;
+			public static void DefaultArg2(string v = "test", int i = 333)
+			{
+				name = v;
+				Integer = i;
+			}
+			[Convert(typeof(Double))]
+			public static int number { get; set; }
+
+			public static void Reset()
+			{
+				name = null;
+				Integer = 0;
+				Action = null;
+				Action2 = null;
+			}
+			public static MyAction GetAction() => Action;
+			public static MyAction2 GetAction2() => Action2;
 		}
 		public class InstanceTest
 		{
@@ -35,12 +55,24 @@ namespace RedOnion.ROS.Tests
 			public void SetInteger(int value) => Integer = value;
 			public string Combine(string a, string b) => a + " " + b;
 			public double Sum3(double a, float b, long c) => a + b + c;
-			public MyAction action;
-			public void AddAction(MyAction add) => action += add;
-			public void CallAction() => action?.Invoke();
-			public MyAction2 action2;
-			public void AddAction2(MyAction2 add) => action2 += add;
-			public void CallAction2(string v) => action2?.Invoke(v);
+			public event MyAction Action;
+			public event MyAction Event { add => Action += value; remove => Action -= value; }
+			public void AddAction(MyAction add) => Action += add;
+			public void CallAction() => Action?.Invoke();
+			public event MyAction2 Action2;
+			public event MyAction2 Event2 { add => Action2 += value; remove => Action2 -= value; }
+			public void AddAction2(MyAction2 add) => Action2 += add;
+			public void CallAction2(string v) => Action2?.Invoke(v);
+			public void DefaultArg(string v = "default") => name = v;
+			public void DefaultArg2(string v = "test", int i = 333)
+			{
+				name = v;
+				Integer = i;
+			}
+			[Convert(typeof(Double))]
+			public int number { get; set; }
+			public MyAction GetAction() => Action;
+			public MyAction2 GetAction2() => Action2;
 		}
 		public class MixedTest
 		{
@@ -64,6 +96,7 @@ namespace RedOnion.ROS.Tests
 		[Test]
 		public void ROS_Refl01_FieldAndProp()
 		{
+			StaticTest.Reset();
 			Globals = new Globals();
 			Globals.Add("test", typeof(StaticTest));
 			Test("me", "test.name = \"me\"");
@@ -89,11 +122,14 @@ namespace RedOnion.ROS.Tests
 			Test("var m = new mix");
 			Test("mix", "m.name");
 			Test(1.414f, "m.value");
+
+			Test(3, "it.integer += 1");
 		}
 
 		[Test]
 		public void ROS_Refl02_SimpleAction()
 		{
+			StaticTest.Reset();
 			Globals = new Globals();
 			Globals.Add("test", typeof(StaticTest));
 			StaticTest.Integer = 1;
@@ -124,6 +160,7 @@ namespace RedOnion.ROS.Tests
 		[Test]
 		public void ROS_Refl03_Methods()
 		{
+			StaticTest.Reset();
 			Globals = new Globals();
 			Globals.Add("test", typeof(StaticTest));
 			Test("test.setInteger(10)");
@@ -138,6 +175,16 @@ namespace RedOnion.ROS.Tests
 
 			Test(1.0+2f+3, "test.sum3 1.0, 2f, 3");
 			Test(1.0+2f+3, "it.sum3 1.0, 2f, 3");
+
+			Test("default", "test.defaultArg; test.name");
+			Test("default", "it.defaultArg; it.name");
+
+			Test("test", "test.defaultArg2; test.name");
+			Test(333, "test.integer");
+			Test("test", "it.defaultArg2; it.name");
+			Test(333, "it.integer");
+			Test("hello", "test.defaultArg2 \"hello\"; test.name");
+			Test("hello", "it.defaultArg2 \"hello\"; it.name");
 		}
 
 		public struct Point
@@ -176,6 +223,28 @@ namespace RedOnion.ROS.Tests
 			public static TestEnum Or(TestEnum a, TestEnum b)
 				=> (TestEnum)((int)a | (int)b);
 		}
+		public class EnumClass
+		{
+			public TestEnum Value { get; set; }
+			public EnumClass() { }
+			public EnumClass(TestEnum value) => Value = value;
+		}
+		public class EnumTest
+		{
+			public IProcessor Processor { get; set; }
+			public string Name { get; set; }
+			public TestEnum Value { get; set; }
+			public EnumTest(IProcessor processor)
+				: this(processor, null, TestEnum.One) { }
+			public EnumTest(IProcessor processor, TestEnum value, string name = null)
+				: this(processor, name, value) { }
+			public EnumTest(IProcessor processor, string name, TestEnum value = TestEnum.Three)
+			{
+				Processor = processor;
+				Name = name;
+				Value = value;
+			}
+		}
 		[Test]
 		public void ROS_Refl05_Enum()
 		{
@@ -186,6 +255,12 @@ namespace RedOnion.ROS.Tests
 			Test(TestEnum.Zero, "zero");
 			Test(1, "enumUtils.enum2int testEnum.one");
 			Test(TestEnum.Three, "enumUtils.or testEnum.one, testEnum.two");
+			Globals.Add(typeof(EnumClass));
+			Test(TestEnum.One, "(new enumClass testEnum.one).value");
+			Globals.Add(typeof(EnumTest));
+			Test(TestEnum.One, "(new enumTest).value");
+			Test(TestEnum.Two, "(new enumTest testEnum.two).value");
+			Test("hello", "(new enumTest \"hello\").name");
 		}
 
 		[Test]
@@ -196,14 +271,15 @@ namespace RedOnion.ROS.Tests
 			Test(2.7f, "math.abs -2.7f");
 			Test(1.41, "math.max 1.0, 1.41");
 			Test(30.0, "math.deg.asin 0.5");
+			Test(0.5, "math.min 1, 0.5"); // mixing integer with double
 		}
 
 		[Test]
 		public void ROS_Refl07_Action()
 		{
+			StaticTest.Reset();
 			Globals = new Globals();
 			Globals.Add(typeof(StaticTest));
-			StaticTest.Integer = 0;
 			Test("def action => staticTest.integer = 10");
 			Test("staticTest.addAction action");
 			Assert.AreEqual(0, StaticTest.Integer);
@@ -225,14 +301,120 @@ namespace RedOnion.ROS.Tests
 		[Test]
 		public void ROS_Refl08_ActionArgs()
 		{
+			StaticTest.Reset();
 			Globals = new Globals();
 			Globals.Add(typeof(StaticTest));
-			StaticTest.name = null;
 			Test("def setName name => staticTest.name = name");
 			Test("staticTest.addAction2 setName");
 			StaticTest.CallAction2("test");
 			UpdatePhysics();
 			Assert.AreEqual("test", StaticTest.name);
+
+			var it = new InstanceTest();
+			Globals.Add("it", it);
+			Test("def setName2 name => it.name = name");
+			Test("it.addAction2 setName2");
+			it.CallAction2("test");
+			UpdatePhysics();
+			Assert.AreEqual("test", it.name);
+		}
+
+		[Test]
+		public void ROS_Refl09_Events()
+		{
+			StaticTest.Reset();
+			Globals = new Globals();
+			Globals.Add(typeof(StaticTest));
+			Test("def action => staticTest.integer = 10");
+			Assert.IsNull(StaticTest.GetAction());
+			Test("staticTest.event.add action");
+			Assert.NotNull(StaticTest.GetAction());
+			Assert.AreEqual(0, StaticTest.Integer);
+			StaticTest.CallAction();
+			Assert.AreEqual(0, StaticTest.Integer);
+			UpdatePhysics();
+			Assert.AreEqual(10, StaticTest.Integer);
+
+			var it = new InstanceTest();
+			Globals.Add("it", it);
+			Assert.IsNull(it.GetAction());
+			Test("it.event.add def => it.name = \"done\"");
+			Assert.NotNull(it.GetAction());
+			Assert.IsNull(it.name);
+			it.CallAction();
+			Assert.IsNull(it.name);
+			UpdatePhysics();
+			Assert.AreEqual("done", it.name);
+
+			StaticTest.Reset();
+			Test("def setName name => staticTest.name = name");
+			Assert.IsNull(StaticTest.GetAction2());
+			Test("staticTest.event2.add setName");
+			Assert.NotNull(StaticTest.GetAction2());
+			StaticTest.CallAction2("test");
+			UpdatePhysics();
+			Assert.AreEqual("test", StaticTest.name);
+
+			it.name = null;
+			Test("def setName2 name => it.name = name");
+			Assert.IsNull(it.GetAction2());
+			Test("it.event2.add setName2");
+			Assert.NotNull(it.GetAction2());
+			it.CallAction2("test");
+			UpdatePhysics();
+			Assert.AreEqual("test", it.name);
+
+			Test("staticTest.event -= action");
+			Assert.IsNull(StaticTest.GetAction());
+			Test("staticTest.event2 -= setName");
+			Assert.IsNull(StaticTest.GetAction2());
+			Test("it.event2 -= setName2");
+			Assert.IsNull(it.GetAction2());
+		}
+
+		public struct SVect
+		{
+			public double x, y, z;
+			public SVect(double x, double y, double z)
+			{
+				this.x = x;
+				this.y = y;
+				this.z = z;
+			}
+		}
+		public class CVect
+		{
+			protected SVect native;
+			public CVect() { }
+			public CVect(double x, double y, double z)
+				=> native = new SVect(x, y, z);
+			public static implicit operator SVect(CVect v) => v.native;
+			public static explicit operator CVect(SVect v) => new CVect(v.x, v.y, v.z);
+			public double X => native.x;
+			public double Y => native.y;
+			public double Z => native.z;
+
+			[Convert(typeof(CVect))]
+			public static SVect Test { get; set; }
+		}
+		[Test]
+		public void ROS_Refl10_Convert()
+		{
+			Globals = new Globals();
+			Globals.Add(typeof(StaticTest));
+			Test(0.0, "staticTest.number");
+			Test(1.1, "staticTest.number = 1.1");
+			Test(1.0, "staticTest.number");
+
+			var it = new InstanceTest();
+			Globals.Add("it", it);
+			Test(0.0, "it.number");
+			Test(1.1, "it.number = 1.1");
+			Test(1.0, "it.number");
+
+			Globals.Add(typeof(CVect));
+			Test("cvect.test = cvect 1,2,3");
+			Test(1.0, "cvect.test.x");
 		}
 	}
 }

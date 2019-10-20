@@ -1,5 +1,7 @@
 using KSP.UI;
 using System;
+using System.ComponentModel;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -7,24 +9,31 @@ using UUI = UnityEngine.UI;
 
 namespace RedOnion.UI
 {
+	[Description(
+@"Window is the root of all UI elements.
+Make sure to keep reference to it and dispose it when you are done with it.
+It may get garbage-collected otherwise, but that can take time and is rather backup measure.")]
 	public class Window : IDisposable
 	{
 		public class FramePanel : Panel
 		{
 			static Texture2D DefaultCloseButtonIcon = LoadIcon(13, 13, "WindowCloseButtonIcon.png");
 
-			public new GameObject GameObject => base.GameObject;
-			public new RectTransform RectTransform => base.RectTransform;
 			public CanvasGroup Group { get; }
 			public UUI.ContentSizeFitter Fitter { get; }
 			public Panel Header { get; }
 			public Label Title { get; }
 			public Button Close { get; }
 			public Panel Content { get; }
+			public SceneFlags Scenes { get; set; }
 
-			public FramePanel(string name = null)
-				: base("Window Frame")
+			// weak reference to main window to allow auto-dispose when there is no hard-reference to it
+			protected readonly WeakReference window;
+
+			public FramePanel(Window window)
 			{
+				this.window = new WeakReference(window);
+				Scenes = (SceneFlags)(1 << (int)HighLogic.LoadedScene);
 				GameObject.transform.SetParent(UIMasterController.Instance.dialogCanvas.transform, false);
 				Group = GameObject.AddComponent<CanvasGroup>();
 				Group.alpha = .9f;
@@ -35,43 +44,55 @@ namespace RedOnion.UI
 				Fitter.verticalFit = UUI.ContentSizeFitter.FitMode.PreferredSize;
 				Color = new Color(.2f, .2f, .2f, .8f);
 				Layout = Layout.Vertical;
-				LayoutPadding = new LayoutPadding(0f);
-				Header = Add(new Panel("Window Title Row")
+				Spacing = 0f;
+				Header = Add(new Panel
 				{
 					Layout = Layout.Horizontal,
-					FlexWidth = 1f,
+					FlexWidth = 1f, Padding = 3f
 				});
-				Title = Header.Add(new Label("Window Title")
+				Title = Header.Add(new Label
 				{
 					Text = "Window",
 					TextColor = Color.white,
 					TextAlign = TextAnchor.MiddleLeft,
 					FlexWidth = 1f,
 				});
-				Close = Header.Add(new Button("Window Close Button")
+				Close = Header.Add(new Button
 				{
 					IconTexture = DefaultCloseButtonIcon,
 					Padding = 3f, Spacing = 3f,
 				});
-				Content = Add(new Panel("Window Content Panel")
+				Content = Add(new Panel
 				{
 					Color = new Color(.5f, .5f, .5f, .5f),
-					//Sprite = Skin.window.normal.background,
 					FlexWidth = 1f, FlexHeight = 1f,
+					Padding = 3f
 				});
 
 				GameObject.AddComponent<Components.DragHandler>();
+				GameEvents.onGameSceneLoadRequested.Add(SceneChange);
+				Close.Click += CloseWindow;
 			}
-
-			public bool Active
+			protected override void Dispose(bool disposing)
 			{
-				get => GameObject.activeSelf;
-				set => GameObject.SetActive(value);
+				if (!disposing || GameObject == null)
+					return;
+				GameEvents.onGameSceneLoadRequested.Remove(SceneChange);
+				base.Dispose(disposing);
+				(window?.Target as Window)?.Dispose();
+				window.Target = null;
 			}
-			public bool Visible
+			// this is here and not in window to not have any reference to the window from game-events
+			void SceneChange(GameScenes scene)
 			{
-				get => GameObject.activeInHierarchy;
-				set => GameObject.SetActive(value);
+				if (((int)Scenes & (1 << (int)scene)) == 0)
+					Dispose();
+			}
+			void CloseWindow(Button button)
+			{
+				var wnd = window?.Target as Window;
+				if (wnd != null) wnd.Close();
+				else Dispose();
 			}
 		}
 
@@ -80,36 +101,47 @@ namespace RedOnion.UI
 			get => Frame.Name;
 			set => Frame.Name = value;
 		}
-		public SceneFlags Scenes { get; set; }
-		public FramePanel Frame { get; private set; }
+		private FramePanel frame;
+#if DEBUG
+		public FramePanel Frame => frame;
+#else
+		protected FramePanel Frame => frame;
+#endif
 		public Panel Content { get; private set; }
 
+		public Window() : this(Layout.Vertical) { }
+		public Window(string title) : this(Layout.Vertical) => Title = title;
+		public Window(string title, Layout layout) : this(layout) => Title = title;
+		public Window(Layout layout, string title) : this(layout) => Title = title;
 		public Window(Layout layout)
-			: this(null, layout) { }
-		public Window(string name = null, Layout layout = Layout.Vertical)
 		{
-			Scenes = (SceneFlags)(1 << (int)HighLogic.LoadedScene);
-			Frame = new FramePanel(name);
-			Content = Frame.Content;
+			frame = new FramePanel(this);
+			Content = frame.Content;
 			Content.Layout = layout;
-			Frame.Close.Click += Close;
-			GameEvents.onGameSceneLoadRequested.Add(SceneChange);
+		}
+		protected Window(FramePanel frame)
+		{
+			this.frame = frame;
+			Content = frame.Content;
 		}
 
 		~Window() => Dispose(false);
-		public void Dispose() => Dispose(true);
+		public void Dispose()
+		{
+			GC.SuppressFinalize(this);
+			Dispose(true);
+		}
 		protected virtual void Dispose(bool disposing)
 		{
-			if (Frame == null)
+			// this is probably unnecessary (you cannot call Dispose unless you have reference
+			// and the desctructor cannot be called when there is one, but for sure...)
+			var frame = Interlocked.Exchange(ref this.frame, null);
+			if (frame == null)
 				return;
-			Frame.Dispose();
-			Frame = null;
-			GameEvents.onGameSceneLoadRequested.Remove(SceneChange);
-		}
-		void SceneChange(GameScenes scene)
-		{
-			if (((int)Scenes & (1 << (int)scene)) == 0)
-				Dispose();
+			if (disposing)
+				frame.Dispose();
+			// use the collector to call frame.Dispose() from main thread (Unity could complain otherwise)
+			else Collector.Add(frame);
 		}
 
 		public void Show()
@@ -124,17 +156,22 @@ namespace RedOnion.UI
 				throw new ObjectDisposedException(Name);
 			Frame.Visible = false;
 		}
-
-		readonly Event closed = new Event(new UnityEvent());
-		public Event Closed
+		public bool Active
 		{
-			get => closed;
-			set { }
+			get => Frame.Active;
+			set => Frame.Active = value;
 		}
+		public bool Visible
+		{
+			get => Frame.Visible;
+			set => Frame.Visible = value;
+		}
+
+		public event Action<Window> Closed;
 		public virtual void Close()
 		{
 			Hide();
-			Closed.Invoke();
+			Closed?.Invoke(this);
 		}
 
 		public string Title
@@ -172,6 +209,31 @@ namespace RedOnion.UI
 			=> Content.Add(elements);
 		public void Remove(params Element[] elements)
 			=> Content.Remove(elements);
+
+		public Panel AddPanel(Layout layout)
+			=> Content.AddPanel(layout);
+		public Panel AddHorizontal()
+			=> Content.AddHorizontal();
+		public Panel AddVertical()
+			=> Content.AddVertical();
+		public Label AddLabel(string text)
+			=> Content.AddLabel(text);
+		public TextBox AddText(string text)
+			=> Content.AddText(text);
+		public TextBox AddTextBox(string text)
+			=> Content.AddTextBox(text);
+		public Button AddButton(string text)
+			=> Content.AddButton(text);
+		public Button AddButton(string text, Action<Button> click)
+			=> Content.AddButton(text, click);
+		public Button AddToggle(string text)
+			=> Content.AddToggle(text);
+		public Button AddToggle(string text, Action<Button> click)
+			=> Content.AddToggle(text, click);
+		public Button AddExclusive(string text)
+			=> Content.AddExclusive(text);
+		public Button AddExclusive(string text, Action<Button> click)
+			=> Content.AddExclusive(text, click);
 
 		public Vector2 Position
 		{

@@ -130,16 +130,16 @@ namespace RedOnion.ROS.Objects
 
 		public Context() : base("context", typeof(Context)) { }
 
-		public Context(Context parent, Function fn, HashSet<string> cvars)
+		public Context(Function fn, Context parent, HashSet<string> cvars)
 			: base("Context of " + fn.Name, typeof(Context))
 		{
-			BlockCode = OpCode.Break;
+			BlockCode = OpCode.Function;
 			RootStart = fn.CodeAt;
 			RootEnd = fn.CodeAt + fn.CodeSize;
-			Captured = cvars;
+			this.parent = parent;
 			if (cvars != null)
 			{
-				this.parent = parent;
+				Captured = cvars;
 				parent.closures.Add(this);
 			}
 		}
@@ -361,12 +361,17 @@ namespace RedOnion.ROS.Objects
 			{
 				for (var obj = parent; ;)
 				{
-					if (obj.dict.TryGetValue(name, out var refIdx))
+					if (obj.dict != null && obj.dict.TryGetValue(name, out var refIdx))
 					{
 						idx = prop.size;
 						ref var link = ref prop.Add();
 						link.name = name;
 						link.value.SetRef(obj, refIdx);
+						if (blockStack.size > 0)
+							blockStack.Top().added.Add(name);
+						if (dict == null)
+							dict = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+						dict[name] = idx;
 						return idx;
 					}
 					obj = obj.parent;
@@ -402,7 +407,8 @@ namespace RedOnion.ROS.Objects
 				return true;
 			}
 			if (op.Kind() == OpKind.Assign)
-				return it.desc.Binary(ref it, op + 0x10, ref value);
+				return it.desc.Binary(ref it, op + 0x10, ref value)
+					|| value.desc.Binary(ref it, op + 0x10, ref value);
 			if (op.Kind() != OpKind.PreOrPost)
 				return false;
 			if (op >= OpCode.Inc)

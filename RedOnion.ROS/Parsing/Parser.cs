@@ -68,7 +68,7 @@ namespace RedOnion.ROS.Parsing
 			Limited = 1 << 0,
 			/// <summary>
 			/// Expression in hungry context which is inside parenthesis or brackets.
-			/// Parse lines until comman or ending parenthesis/bracket is encountered
+			/// Parse lines until comma or ending parenthesis/bracket is encountered
 			/// </summary>
 			Hungry = 1 << 1,
 			/// <summary>
@@ -88,13 +88,17 @@ namespace RedOnion.ROS.Parsing
 			/// </summary>
 			WasIf = 1 << 5,
 			/// <summary>
+			/// After 'for' (used in Expressions not to process 'in')
+			/// </summary>
+			WasFor = 1 << 6,
+			/// <summary>
 			/// Parse only one class (used in Classes when called from Expression)
 			/// </summary>
-			Single = 1 << 6,
+			Single = 1 << 7,
 			/// <summary>
 			/// Top level of member function (can become property)
 			/// </summary>
-			Member = 1 << 7,
+			Member = 1 << 8,
 
 			/// <summary>
 			/// Inside `with` statement (.x => {ivalue}.x, not this.x)
@@ -217,7 +221,7 @@ namespace RedOnion.ROS.Parsing
 			}
 			while (ParseClasses(Flag.None));
 
-			ParseBlock(Flag.NoSize);
+			ParseBlock(Flag.NoSize, 0);
 		}
 
 		/// <summary>

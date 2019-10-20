@@ -83,7 +83,7 @@ namespace RedOnion.ROS.Parsing
 					ValuesPush(start);
 					code.size = fnat;
 					while (operators.size > bottom)
-						PrepareOperator(PopOperator());
+						PrepareOperator(PopOperator(), bottom);
 					return true;
 				}
 				Push(ExCode.Identifier, Word);
@@ -152,6 +152,8 @@ namespace RedOnion.ROS.Parsing
 					goto autocall;
 				goto binary;
 			case OpKind.Logic:
+				if (op == ExCode.In && (flags & Flag.WasFor) != 0)
+					goto done;
 			binary_check:
 				CheckUnary(unary, false);
 			binary:
@@ -217,7 +219,7 @@ namespace RedOnion.ROS.Parsing
 					if (Word.Length > 127)
 						throw new ParseError(this, "Identifier name too long");
 					Push(ExCode.Identifier, Word);
-					PrepareOperator(ExCode.Dot);
+					PrepareOperator(ExCode.Dot, bottom);
 					if (this.Peek == '!')
 					{
 						PushOperator(ExCode.Cast, bottom);
@@ -230,15 +232,16 @@ namespace RedOnion.ROS.Parsing
 				case ExCode.NullCol:
 					goto binary_check;
 				case ExCode.Ternary://--------------------------------------------------- ternary ?:
-					while (operators.size > bottom)
-						PrepareOperator(PopOperator());
+					while (operators.size > bottom
+						&& operators.Top().Kind() != OpKind.Assign)
+						PrepareOperator(PopOperator(), bottom);
 					Next().ParseExpression(flags &~Flag.Limited);
 					if (Eol)
 						NextLine();
 					if (Curr != ':')
 						throw new ParseError(this, "Expected matching ':' for ternary '?'");
 					Next().ParseExpression(flags);
-					PrepareOperator(ExCode.Ternary);
+					PrepareOperator(ExCode.Ternary, bottom);
 					unary = false;
 					goto next;
 				case ExCode.Var:	//----------------------------------------- variable declaration
@@ -257,7 +260,7 @@ namespace RedOnion.ROS.Parsing
 						wasBlock = Next().ParseExpression(flags);
 					else
 						Push(ExCode.Void);
-					PrepareOperator(ExCode.Var);
+					PrepareOperator(ExCode.Var, bottom);
 					if (wasBlock)
 						goto blockend;
 					unary = false;
@@ -286,7 +289,7 @@ namespace RedOnion.ROS.Parsing
 					}
 					if (Next(true).Curr == ')')
 					{
-						PrepareOperator(ExCode.Call0);
+						PrepareOperator(ExCode.Call0, bottom);
 						Next();
 						unary = false;
 						goto next;
@@ -296,7 +299,7 @@ namespace RedOnion.ROS.Parsing
 
 					if (Curr == ')')
 					{
-						PrepareOperator(ExCode.Call1);
+						PrepareOperator(ExCode.Call1, bottom);
 						Next();
 						unary = false;
 						goto next;
@@ -314,7 +317,7 @@ namespace RedOnion.ROS.Parsing
 					if (Curr != ')')
 						throw new ParseError(this, "Expected matching ')'");
 					Next();
-					PrepareOperator(ExCode.CallN);
+					PrepareOperator(ExCode.CallN, bottom);
 					unary = false;
 					goto next;
 				case '[':           //------------------------------------------------------------ [
@@ -336,7 +339,7 @@ namespace RedOnion.ROS.Parsing
 								Next(true);
 							}
 						}
-						PrepareOperator(ExCode.Array);
+						PrepareOperator(ExCode.Array, bottom);
 						Next();
 						unary = false;
 						goto next;
@@ -348,7 +351,7 @@ namespace RedOnion.ROS.Parsing
 
 					if (Curr == ']')
 					{
-						PrepareOperator(ExCode.Index);
+						PrepareOperator(ExCode.Index, bottom);
 						Next();
 						unary = false;
 						goto next;
@@ -364,7 +367,7 @@ namespace RedOnion.ROS.Parsing
 					if (Curr != ']')
 						throw new ParseError(this, "Expected matching ']'");
 					Next();
-					PrepareOperator(ExCode.IndexN);
+					PrepareOperator(ExCode.IndexN, bottom);
 					unary = false;
 					goto next;
 				default:
@@ -395,12 +398,12 @@ namespace RedOnion.ROS.Parsing
 				throw new ExpectedBinary(this);
 			}
 			while (operators.size > bottom)
-				PrepareOperator(PopOperator());
+				PrepareOperator(PopOperator(), bottom);
 			return false;
 
 		blockend:
 			while (operators.size > bottom)
-				PrepareOperator(PopOperator());
+				PrepareOperator(PopOperator(), bottom);
 			return true;
 
 		//################################################################################ auto call
@@ -411,7 +414,7 @@ namespace RedOnion.ROS.Parsing
 			wasBlock = ParseExpression(flags | Flag.Limited);
 			if (Curr != ',')
 			{
-				PrepareOperator(ExCode.Call1);
+				PrepareOperator(ExCode.Call1, bottom);
 				if (wasBlock)
 					goto blockend;
 				unary = false;
@@ -423,7 +426,7 @@ namespace RedOnion.ROS.Parsing
 				wasBlock = Next().ParseExpression(flags | Flag.Limited);
 			}
 			while (Curr == ',');
-			PrepareOperator(ExCode.CallN);
+			PrepareOperator(ExCode.CallN, bottom);
 			if (wasBlock)
 				goto blockend;
 			unary = false;

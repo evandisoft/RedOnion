@@ -9,8 +9,8 @@ namespace RedOnion.KSP.Parts
 	[Description("Read-only set of engines.")]
 	public class EngineSet : PartSet<Engine>
 	{
-		protected internal EngineSet() { }
-		protected internal EngineSet(Action refresh) : base(refresh) { }
+		protected internal EngineSet(Ship ship) : base(ship) { }
+		protected internal EngineSet(Ship ship, Action refresh) : base(ship, refresh) { }
 
 		public PropellantList Propellants => propellants ?? (propellants = new PropellantList(this));
 		protected PropellantList propellants;
@@ -74,7 +74,7 @@ namespace RedOnion.KSP.Parts
 				return true;
 			}
 		}
-		[Description("Current thrust (at current pressure, with current `thrustPercentage` and current throttle).")]
+		[Description("Current thrust [kN] (at current pressure, with current `thrustPercentage` and current throttle).")]
 		public double thrust
 		{
 			get
@@ -88,7 +88,7 @@ namespace RedOnion.KSP.Parts
 				return thrust;
 			}
 		}
-		[Description("Get thrust of all operational engines at atmospheric pressure"
+		[Description("Get thrust [kN] of all operational engines at atmospheric pressure"
 			+ " (0 = vacuum, 1 = Kerbin sea-level pressure, NaN = current pressure)"
 			+ " and throttle (default 1 = full throttle).")]
 		public double getThrust(float atm = float.NaN, float throttle = 1f)
@@ -97,9 +97,51 @@ namespace RedOnion.KSP.Parts
 			foreach (var e in this)
 			{
 				if (e.operational)
-					thrust += (double)e.getThrust(atm, throttle) * e.thrustPercentage;
+					thrust += (double)e.getThrust(atm, throttle) * e.thrustPercentage * 0.01;
 			}
 			return thrust;
+		}
+		[Description("Get average specific impulse [kN] of operational engines at atmospheric pressure"
+			+ " (0 = vacuum, 1 = Kerbin sea-level pressure, NaN = current pressure).")]
+		public double getIsp(double atm = double.NaN)
+		{
+			var thrust = 0.0;
+			var flow = 0.0;
+			foreach (var e in this)
+			{
+				if (!e.operational)
+					continue;
+				var isp = e.isp;
+				if (isp <= 0.001)
+					continue;
+				var eth = e.getThrust(atm) * e.thrustPercentage * 0.01;
+				thrust += eth;
+				flow += eth / isp;
+			}
+			return flow <= 0.001 ? 0.0 : thrust/flow;
+		}
+
+		public static double g0 = 9.81;
+		[Description("Estimate burn time for given delta-v (assuming it can be done without staging).")]
+		public double burnTime(double deltaV)
+		{
+			var thrust = 0.0;
+			var flow = 0.0;
+			foreach (var e in this)
+			{
+				if (!e.operational)
+					continue;
+				var isp = e.isp;
+				if (isp <= 0.001)
+					continue;
+				var eth = e.getThrust() * e.thrustPercentage * 0.01;
+				thrust += eth;
+				flow += eth / isp;
+			}
+			if (flow <= 0.0001)
+				return double.NaN;
+			var stdIsp = g0 * thrust / flow;
+			return stdIsp * _ship.mass * (1.0 - Math.Pow(Math.E, -deltaV / stdIsp)) / thrust;
 		}
 	}
 
@@ -121,9 +163,9 @@ namespace RedOnion.KSP.Parts
 		[Unsafe, Description("KSP API. Gimbal module, if present (null otherwise).")]
 		public ModuleGimbal gimbalModule { get; private set; }
 		[Description("Is multi-mode engine (or not).")]
-		public bool multiMode { get { return secondModule != null; } }
+		public bool multiMode => secondModule != null;
 		[Description("Has gimbal module.")]
-		public bool hasGimbal { get { return gimbalModule != null; } }
+		public bool hasGimbal => gimbalModule != null;
 
 		[Description("Accepts `sensor`. (Case insensitive)")]
 		public override bool istype(string name)
@@ -175,45 +217,48 @@ namespace RedOnion.KSP.Parts
 		[DisplayName("Shutdown / deactivate the engine.")]
 		public void shutdown() => activeModule.Shutdown();
 
-		[DisplayName("Current ISP. (Specific impulse)")]
-		public float isp => activeModule.realIsp;
-		[DisplayName("Vacuum ISP.")]
-		public float visp => activeModule.atmosphereCurve.Evaluate(0f);
-		[DisplayName("Sea-level ISP.")]
-		public float gisp => activeModule.atmosphereCurve.Evaluate(1f);
-		[DisplayName("Sea-level ISP.")]
-		public float slisp => activeModule.atmosphereCurve.Evaluate(1f);
-		[DisplayName("Vacuum ISP.")]
-		public float vacuumIsp => activeModule.atmosphereCurve.Evaluate(0f);
-		[DisplayName("Sea-level ISP.")]
-		public float groundIsp => activeModule.atmosphereCurve.Evaluate(1f);
-		[DisplayName("Sea-level ISP.")]
-		public float seaLevelIsp => activeModule.atmosphereCurve.Evaluate(1f);
+		[Description("Get specific impulse [kN] at atmospheric pressure"
+			+ " (0 = vacuum, 1 = Kerbin sea-level pressure, NaN = current pressure).")]
+		public double getIsp(double atm = double.NaN)
+			=> activeModule.atmosphereCurve.Evaluate((float)(
+				double.IsNaN(atm) ? activeModule.part.staticPressureAtm : atm));
 
-		[Description("Current thrust (at current pressure, with current `thrustPercentage` and current throttle).")]
-		public float thrust => activeModule.finalThrust;
-		[Description("Thrust limiter in percents.")]
-		public float thrustPercentage
-		{
-			get => activeModule.thrustPercentage;
-			set => activeModule.thrustPercentage = RosMath.Clamp(value, 0f, 100f);
-		}
-		[Description("Get thrust at atmospheric pressure"
+		[Description("Get thrust [kN] at atmospheric pressure"
 			+ " (0 = vacuum, 1 = Kerbin sea-level pressure, NaN = current pressure)"
 			+ " and throttle (default 1 = full throttle). Ignores `thrustPercentage`.")]
-		public float getThrust(float atm = float.NaN, float throttle = 1f)
+		public double getThrust(double atm = float.NaN, double throttle = 1f)
 		{
 			var module = activeModule;
-			if (float.IsNaN(atm))
-				atm = (float)module.part.staticPressureAtm;
+			if (double.IsNaN(atm))
+				atm = module.part.staticPressureAtm;
 			return module.GetEngineThrust(module.atmosphereCurve.Evaluate(
 				RosMath.Clamp((float)atm, 0f, 10f)),
-				RosMath.Clamp(throttle, 0f, 1f));
+				RosMath.Clamp((float)throttle, 0f, 1f));
 		}
 
-		// TODO: find out the amount of fuel left in tanks by this engine
-		// ..... there is some 'ignition threshold'
+		[DisplayName("Current ISP. (Specific impulse)")]
+		public double isp => activeModule.realIsp;
+		[DisplayName("Vacuum ISP.")]
+		public double visp => activeModule.atmosphereCurve.Evaluate(0f);
+		[DisplayName("Sea-level ISP.")]
+		public double gisp => activeModule.atmosphereCurve.Evaluate(1f);
+		[DisplayName("Sea-level ISP.")]
+		public double slisp => activeModule.atmosphereCurve.Evaluate(1f);
+		[DisplayName("Vacuum ISP.")]
+		public double vacuumIsp => activeModule.atmosphereCurve.Evaluate(0f);
+		[DisplayName("Sea-level ISP.")]
+		public double groundIsp => activeModule.atmosphereCurve.Evaluate(1f);
+		[DisplayName("Sea-level ISP.")]
+		public double seaLevelIsp => activeModule.atmosphereCurve.Evaluate(1f);
 
+		[Description("Current thrust [kN] (at current pressure, with current `thrustPercentage` and current throttle).")]
+		public double thrust => activeModule.finalThrust;
+		[Description("Thrust limiter in percents.")]
+		public double thrustPercentage
+		{
+			get => activeModule.thrustPercentage;
+			set => activeModule.thrustPercentage = RosMath.Clamp((float)value, 0f, 100f);
+		}
 		public double ratioSum => activeModule.ratioSum;
 		public double mixtureDensity => activeModule.mixtureDensity;
 		public double mixtureDensityRecip => activeModule.mixtureDensityRecip;

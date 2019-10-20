@@ -67,8 +67,10 @@ namespace RedOnion.ROS
 		/// </summary>
 		public class Procedure0<T> : Callable
 		{
-			public Procedure0(string name)
-				: base(name, typeof(Action<T>), true) { }
+			public Procedure0(MethodInfo m)
+				: this(m.Name, m) { }
+			public Procedure0(string name, MethodInfo m = null)
+				: base(name, typeof(Action<T>), true, m) { }
 
 			public override bool Call(ref Value result, object self, Arguments args, bool create)
 			{
@@ -84,8 +86,10 @@ namespace RedOnion.ROS
 		/// </summary>
 		public class Method0<T> : Callable
 		{
-			public Method0(string name)
-				: base(name, typeof(Func<T, Value>), true) { }
+			public Method0(MethodInfo m)
+				: this(m.Name, m) { }
+			public Method0(string name, MethodInfo m = null)
+				: base(name, typeof(Func<T, Value>), true, m) { }
 
 			public override bool Call(ref Value result, object self, Arguments args, bool create)
 			{
