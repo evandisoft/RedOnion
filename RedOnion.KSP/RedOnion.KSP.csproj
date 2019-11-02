@@ -67,6 +67,11 @@
     <Compile Include="API\Globals.cs" />
     <Compile Include="API\InteropUtilities.cs" />
     <Compile Include="API\VectorUtils.cs" />
+    <Compile Include="Lua\Descriptors\LuaDescriptor.cs" />
+    <Compile Include="Lua\Descriptors\LuaEventDescriptor.cs" />
+    <Compile Include="Lua\Proxies\LuaEventProxy.cs" />
+    <Compile Include="Utilities\Extensions.cs" />
+    <Compile Include="Utilities\MultiValueDictionary.cs" />
     <Compile Include="Utilities\Properties.cs" />
     <Compile Include="Utilities\ReadOnlyList.cs" />
     <Compile Include="Utilities\ReadOnlySet.cs" />
@@ -126,6 +131,7 @@
     <Compile Include="UnsafeAPI\BodiesDictionary.cs" />
     <Compile Include="UnsafeAPI\KerbalsDictionary.cs" />
     <Compile Include="UnsafeAPI\UnsafeAPI.cs" />
+    <Compile Include="Utilities\ReferenceEqualityComparer.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RedOnion.ROS\RedOnion.ROS.csproj">
