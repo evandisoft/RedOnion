@@ -12,9 +12,12 @@ namespace RedOnion.KSP.API
 	[Description("Active vessel")]
 	public class Ship : ISpaceObject, IDisposable
 	{
+		// for script cleanup
 		[Browsable(false), MoonSharpHidden]
 		public static void DisableAutopilot()
 			=> active?._autopilot?.disable();
+
+		#region Active Ship
 
 		static Ship active;
 		[Browsable(false), MoonSharpHidden]
@@ -58,6 +61,10 @@ namespace RedOnion.KSP.API
 		void VesselChange(Vessel vessel)
 			=> ClearActive();
 
+		#endregion
+
+		#region Create and destroy
+
 		protected Ship(Vessel vessel)
 		{
 			native = vessel;
@@ -97,6 +104,9 @@ namespace RedOnion.KSP.API
 			if (scene != GameScenes.FLIGHT)
 				Dispose();
 		}
+		#endregion
+
+		#region Autopilot
 
 		[Description("Autopilot of this ship (vehicle/vessel).")]
 		public Autopilot autopilot => _autopilot ?? (_autopilot = new Autopilot(this));
@@ -113,6 +123,9 @@ namespace RedOnion.KSP.API
 				autopilot.throttle = value;
 			}
 		}
+		#endregion
+
+		#region Native and name
 
 		[Unsafe, Description("Native `Vessel` for unrestricted access to KSP API."
 			+ " Same as `FlightGlobals.ActiveVessel` if accessed through global `ship`.")]
@@ -128,6 +141,9 @@ namespace RedOnion.KSP.API
 			}
 		}
 		internal readonly static string autoLocMarker = "#autoLOC_";
+		#endregion
+
+		#region Parts
 
 		[Description("All parts of this ship/vessel/vehicle.")]
 		public ShipPartSet parts { get; private set; }
@@ -147,6 +163,10 @@ namespace RedOnion.KSP.API
 		public EngineSet engines => parts.engines;
 		[Description("All sensors.")]
 		public ReadOnlyList<Sensor> sensors => parts.sensors;
+
+		#endregion
+
+		#region Basic properties
 
 		[Description("Unique identifier of the ship (vehicle/vessel). Can change when docking/undocking.")]
 		public Guid ID => native.id;
@@ -175,6 +195,9 @@ namespace RedOnion.KSP.API
 		[Description("Dynamic pressure [atm = 101.325kPa]")]
 		public double q => native.dynamicPressurekPa * (1.0/101.325);
 
+		#endregion
+
+		#region Orbit - basic
 
 		[Description("KSP API. Orbited body.")]
 		public SpaceBody body => Bodies.Instance[native.mainBody];
@@ -205,6 +228,10 @@ namespace RedOnion.KSP.API
 		public double trueAnomaly => RosMath.Deg.Clamp360(native.orbit.trueAnomaly * RosMath.Rad2Deg);
 		[Description("Angle in degrees between the direction of periapsis and the current position extrapolated on circular orbit.")]
 		public double meanAnomaly => native.orbit.meanAnomaly;
+
+		#endregion
+
+		#region Orbit - vectors
 
 		[Convert(typeof(Vector)), Description("Current position relative to active ship (so `ship.position` always reads zero).")]
 		public Vector3d position => native.transform.position;
@@ -243,6 +270,10 @@ namespace RedOnion.KSP.API
 		public Vector3d east => native.east;
 		[Convert(typeof(Vector)), Description("Vector pointing away from orbited body (aka *up*, but we use `up` for cockpit-up).")]
 		public Vector3d away => native.up;
+
+		#endregion
+
+		#region Pitch, heading and roll
 
 		[Description("Current pitch / elevation (the angle between forward vector and tangent plane) [-90..+90]")]
 		public double pitch
@@ -302,6 +333,10 @@ namespace RedOnion.KSP.API
 				autopilot.roll = value;
 			}
 		}
+
+		#endregion
+
+		#region Properties for autopilot
 
 		[Convert(typeof(Vector)), Description("Center of mass.")]
 		public Vector3d centerOfMass => native.CoMD;
@@ -386,6 +421,10 @@ namespace RedOnion.KSP.API
 			}
 		}
 
+		#endregion
+
+		#region Tools
+
 		[Description("Translate vector/direction into local coordinates.")]
 		public Vector local(ConstVector v)
 			=> new Vector(native.transform.InverseTransformDirection(v));
@@ -393,5 +432,7 @@ namespace RedOnion.KSP.API
 			=> native.transform.InverseTransformDirection(v);
 		public Vector3 local(Vector3 v)
 			=> native.transform.InverseTransformDirection(v);
+
+		#endregion
 	}
 }
