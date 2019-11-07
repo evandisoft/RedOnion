@@ -625,7 +625,7 @@ Any other key gives focus to input box.
 				bool lastEventWasMouseDown = Event.current.type == EventType.MouseDown;
 				string lastControlname = GUI.GetNameOfFocusedControl();
 				//completionBoxRect = UpdateBoxPositionWithWindow(completionBoxRect, mainWindowRect.width);
-				if (inputIsLocked && Event.current.type == EventType.scrollWheel)
+				if (inputIsLocked && Event.current.type == EventType.ScrollWheel)
 				{
 					Event.current.Use();
 				}
