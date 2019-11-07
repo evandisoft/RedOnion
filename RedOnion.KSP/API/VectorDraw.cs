@@ -146,7 +146,7 @@ namespace RedOnion.KSP.API
 				if (_bodyObject == null)
 				{
 					// see https://github.com/GER-Space/Kerbal-Konstructs/wiki/Shaders-in-KSP
-					var shader = Shader.Find("Particles/Additive");
+					var shader = Shader.Find("Legacy Shaders/Particles/Additive");
 
 					_bodyObject = new GameObject("RedOnion.Vector.Draw.Body");
 					_bodyRender = _bodyObject.AddComponent<LineRenderer>();
