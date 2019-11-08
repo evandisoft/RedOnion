@@ -88,10 +88,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="LiveRepl\Main\KerbaluaMain.cs" />
-    <Compile Include="LiveRepl\Other\EditAreaCompletionAdapter.cs" />
-    <Compile Include="LiveRepl\Main\ScriptWindow.cs" />
-    <Compile Include="LiveRepl\Main\KerbaluaRepl.cs" />
+    <Compile Include="Main\KerbaluaMain.cs" />
+    <Compile Include="Main\KerbaluaRepl.cs" />
+    <Compile Include="Main\ScriptWindow.cs" />
+    <Compile Include="Main\TestWindow.cs" />
+    <Compile Include="Other\EditAreaCompletionAdapter.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
@@ -115,6 +116,10 @@
       <Project>{7A943166-A67E-420A-BCA0-5231D57A18BD}</Project>
       <Name>Kerbalui</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Main\" />
+    <Folder Include="Other\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

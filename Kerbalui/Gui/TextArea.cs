@@ -14,13 +14,27 @@ namespace Kerbalui.Gui
 		{
 			if (Visible)
 			{
-				if (style != null)
+				if (Event.current.type==EventType.KeyDown && HasFocus())
 				{
-					content.text = GUI.TextArea(rect, content.text, style);
+					Debug.Log("Key is before "+Event.current);
+					//GUI.SetNextControlName(ControlName);
 				}
-				else
+
+				RunBaseControl(() =>
 				{
-					content.text = GUI.TextArea(rect, content.text);
+					if (style != null)
+					{
+						content.text = GUI.TextArea(rect, content.text, style);
+					}
+					else
+					{
+						content.text = GUI.TextArea(rect, content.text);
+					}
+				});
+
+				if (Event.current.type==EventType.KeyDown && HasFocus())
+				{
+					Debug.Log("Key is after "+Event.current);
 				}
 			}
 		}

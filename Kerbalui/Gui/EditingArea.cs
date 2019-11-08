@@ -64,6 +64,7 @@ namespace Kerbalui.Gui
 				editor.text = content.text;
 				editor.cursorIndex = cursorIndex;
 				editor.selectIndex = selectIndex;
+				
 
 				HandleInput();
 
@@ -72,13 +73,16 @@ namespace Kerbalui.Gui
 
 				content.text = editor.text;
 
+
 				protectedUpdate.Invoke();
 
 				cursorIndex = editor.cursorIndex;
 				selectIndex = editor.selectIndex;
 
+				if (hadKeyDownThisUpdate) Debug.Log("Hadkeydown");
 				if (hadKeyDownThisUpdate && Event.current.type == EventType.Used)
 				{
+					Debug.Log("hadKeyDownThisUpdate");
 					//Debug.Log(CursorX() + "," + CursorY() + "," + Event.current.mousePosition);
 					AdjustScrollX();
 					AdjustScrollY();

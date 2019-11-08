@@ -22,6 +22,12 @@ namespace Kerbalui.Gui {
 		public readonly string ControlName = "Control-"+NextID++;
 		public bool ReceivedInput { get; set; }
 
+		protected void RunBaseControl(Action action)
+		{
+			GUI.SetNextControlName(ControlName);
+			action();
+		}
+
 		string IFocusable.ControlName => ControlName;
 		/// <summary>
 		/// Will be assigned on each Update.
@@ -40,6 +46,12 @@ namespace Kerbalui.Gui {
 		/// <param name="style">Style.</param>
 		public void Update(Rect rect, bool visible = true, GUIStyle style = null)
 		{
+			//bool lastEventWasMouseDown = Event.current.type == EventType.MouseDown && GUILibUtil.MouseInRect(rect);
+			//if (lastEventWasMouseDown)
+			//{
+			//	GrabFocus();
+			//	Event.current.Use();
+			//}
 			CommonUpdateProcessing(visible, style, () => ProtectedUpdate(rect));
 		}
 		/// <summary>
@@ -76,9 +88,11 @@ namespace Kerbalui.Gui {
 			ClearMarkedCharEvent();
 			hadKeyDownThisUpdate = Event.current.type == EventType.KeyDown;
 
-			if(Visible) GUI.SetNextControlName(ControlName);
-			protectedUpdate.Invoke();
 
+			//if (Visible) GUI.SetNextControlName(ControlName);
+			//else Debug.Log("not visible");
+			protectedUpdate.Invoke();
+			
 			ReceivedInput = hadKeyDownThisUpdate && Event.current.type == EventType.Used;
 		}
 
@@ -88,6 +102,12 @@ namespace Kerbalui.Gui {
 		/// </summary>
 		public bool HasFocus()
 		{
+			//if(GUI.GetNameOfFocusedControl() == ControlName)
+			//{
+			//	Debug.Log("hasFocus ("+GUI.GetNameOfFocusedControl()+") ("+ControlName);
+			//}
+
+
 			return GUI.GetNameOfFocusedControl() == ControlName;
 		}
 
@@ -97,7 +117,9 @@ namespace Kerbalui.Gui {
 		/// </summary>
 		public void GrabFocus()
 		{
+			Debug.Log("Grabbing Focus in "+ControlName);
 			GUI.FocusControl(ControlName);
+
 		}
 
 		protected void ClearMarkedCharEvent()

@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 
 
-namespace LiveRepl {
+namespace LiveRepl.Main {
 	public class KerbaluaRepl {
 		public ScriptWindow scriptWindow;
 
@@ -29,6 +29,7 @@ namespace LiveRepl {
 			if (!guiActive) return;
 
 			try {
+				//TestWindow.TestGUI();
 				scriptWindow.Update();
 			} catch (Exception e) {
 				//Debug.Log("yes");
