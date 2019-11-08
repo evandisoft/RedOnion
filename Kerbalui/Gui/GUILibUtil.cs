@@ -21,6 +21,7 @@ namespace Kerbalui.Gui
 			absoluteRect.width = rect.width;
 			absoluteRect.height = rect.height;
 
+
 			//Debug.Log($"{absoluteRect.Contains(Mouse.screenPos)},{Mouse.screenPos},{absoluteRect}");
 			return absoluteRect.Contains(Mouse.screenPos);
 		}
@@ -87,7 +88,6 @@ namespace Kerbalui.Gui
 		/// <param name="event1">Event1.</param>
 		static public void ConsumeMarkedCharEvent(Event event1)
 		{
-
 			if (consumeNextCharEvent && event1.keyCode == KeyCode.None)
 			{
 				event1.Use();

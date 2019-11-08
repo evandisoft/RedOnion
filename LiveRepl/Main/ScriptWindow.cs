@@ -9,7 +9,7 @@ using RedOnion.KSP.API;
 using Kerbalui.Gui;
 using LiveRepl.Other;
 
-namespace LiveRepl
+namespace LiveRepl.Main
 {
 	public class ScriptWindow
 	{
@@ -36,6 +36,7 @@ namespace LiveRepl
 		Rect completionBoxRect;
 		Rect editorRect;
 		//Rect scriptNameRect;
+		string testReplContent="";
 		ScriptNameInputArea scriptIOTextArea = new ScriptNameInputArea();
 		// Should be a label but I haven't made a label yet.
 		TextArea replEvaluatorLabel = new TextArea();
@@ -144,6 +145,7 @@ namespace LiveRepl
 
 		public ScriptWindow(Rect param_mainWindowRect)
 		{
+
 			editorVisible = bool.Parse(SavedSettings.LoadSetting("editorVisible", "true"));
 
 			replEvaluators["ROS Engine"] = new RedOnionReplEvaluator()
@@ -443,6 +445,7 @@ Any other key gives focus to input box.
 			{
 				if (!inputIsLocked)
 				{
+					//Debug.Log("Input is now locked");
 					inputIsLocked = true;
 					InputLockManager.SetControlLock(ControlTypes.KEYBOARDINPUT, "kerbalua");
 				}
@@ -451,6 +454,7 @@ Any other key gives focus to input box.
 			{
 				if (inputIsLocked)
 				{
+					//Debug.Log("Input is no longer locked");
 					inputIsLocked = false;
 					InputLockManager.ClearControlLocks();
 				}
@@ -460,7 +464,11 @@ Any other key gives focus to input box.
 		bool hadMouseDownLastUpdate = false;
 		public void Update()
 		{
-
+			if (Event.current.type==EventType.KeyDown)
+			{
+				Debug.Log(Event.current);
+			}
+			//GUI.FocusControl("Control-0");
 			//UnityEngine.Debug.Log("blah");
 			SetOrReleaseInputLock();
 
@@ -598,6 +606,7 @@ Any other key gives focus to input box.
 			currentWidgetBarRect.height -= 20;
 			recentFiles.Update(currentWidgetBarRect);
 
+			//testReplContent=GUI.TextArea(GetCurrentReplRect(),testReplContent);
 			if (replVisible)
 			{
 				//if(repl.outputBox.HasFocus()) {
@@ -625,10 +634,10 @@ Any other key gives focus to input box.
 				bool lastEventWasMouseDown = Event.current.type == EventType.MouseDown;
 				string lastControlname = GUI.GetNameOfFocusedControl();
 				//completionBoxRect = UpdateBoxPositionWithWindow(completionBoxRect, mainWindowRect.width);
-				if (inputIsLocked && Event.current.type == EventType.ScrollWheel)
-				{
-					Event.current.Use();
-				}
+				//if (inputIsLocked && Event.current.type == EventType.ScrollWheel)
+				//{
+				//	Event.current.Use();
+				//}
 				completionBox.Update(GetCurrentCompletionBoxRect());
 				if (lastEventWasMouseDown && Event.current.type == EventType.Used)
 				{
@@ -642,6 +651,7 @@ Any other key gives focus to input box.
 					};
 					if (GUILibUtil.MouseInRect(rectMinusScrollBar))
 					{
+						Debug.Log("Mouse in completion Rect");
 						completionManager.Complete();
 						//GUI.FocusControl(lastControlname);
 						completionManager.DisplayCurrentCompletions();

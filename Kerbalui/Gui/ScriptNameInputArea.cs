@@ -97,7 +97,7 @@ namespace Kerbalui.Gui {
 			}
 
 			Directory.CreateDirectory(SavedSettings.BaseScriptsPath);
-			string fullPath = Path.Combine(SavedSettings.BaseScriptsPath, content.text);
+			string fullPath = Path.Combine(SavedSettings.BaseScriptsPath, content.text.Trim());
 
 			if (forSave && !File.Exists(fullPath)) {
 				File.WriteAllText(fullPath, "");

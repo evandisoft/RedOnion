@@ -99,6 +99,9 @@
       <HintPath>$(KerbalLibs)\Ionic.Zip.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>..\ksp\KSP_Data\Managed\UnityEngine.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />

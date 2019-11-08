@@ -3,7 +3,7 @@ using UnityEngine;
 using KSP.UI.Screens;
 using System.Collections.Generic;
 
-namespace LiveRepl
+namespace LiveRepl.Main
 {
     [KSPAddon(KSPAddon.Startup.AllGameScenes, false)]
     public class KerbaluaMain : MonoBehaviour

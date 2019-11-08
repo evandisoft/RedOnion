@@ -12,12 +12,18 @@ namespace Kerbalui.Gui
 
 		protected override void ProtectedUpdate(Rect rect)
 		{
+			//GUI.BeginGroup(rect);
+			//rect.x = 0;
+			//rect.y = 0;
+			//base.ProtectedUpdate(rect);
+			//GUI.EndGroup();
+			//return;
 
 			GUI.BeginGroup(rect);
 			{
 				rect.x = 0;
 				rect.y = 0;
-				HandleScrolling(rect);
+				//HandleScrolling(rect);
 
 				if (style == null)
 				{
@@ -35,6 +41,7 @@ namespace Kerbalui.Gui
 				}
 				else
 				{
+
 					scrollPos = GUI.BeginScrollView(rect, scrollPos, contentRect);
 					{
 

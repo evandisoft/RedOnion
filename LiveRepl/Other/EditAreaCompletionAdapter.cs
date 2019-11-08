@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Kerbalui.Gui;
+using LiveRepl.Main;
 
 namespace LiveRepl.Other {
 	/// <summary>
