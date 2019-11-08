@@ -100,7 +100,7 @@ namespace Kerbalua.MoonSharp
 			Globals.MetaTable = API.LuaGlobals.Instance;
 			//Globals["Vessel"] = FlightGlobals.ActiveVessel;
 			var defaultMappings = NamespaceMappings.DefaultAssemblies;
-			//Globals["KSP"] = new KspApi();
+			//Globals["KSP"] = new KspApi()
 			Globals["new"] = Constructor.Instance;
 			Globals["static"] = new Func<object, DynValue>((o) =>
 			{
@@ -144,6 +144,10 @@ namespace Kerbalua.MoonSharp
 			//Globals["UI"] = new UI();
 			//UserData.RegisterExtensionType(typeof(System.Linq.Enumerable));
 			//UserData.RegisterAssembly(Assembly.GetAssembly(typeof(System.Linq.Enumerable)),true);
+			var coroutines=Globals["coroutine"] as Table;
+			var coroYield=coroutines["yield"];
+			coroutines.Clear();
+			coroutines["yield"]=coroYield;
 		}
 
 		//private Table ImporterImpl(string name)

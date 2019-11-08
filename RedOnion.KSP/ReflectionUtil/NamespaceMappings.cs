@@ -47,6 +47,7 @@ namespace RedOnion.KSP.ReflectionUtil
 			"System",
 			"KSPTrackIR",
 			"KSPAssets",
+			"UnityEngine.CoreModule",
 			"UnityEngine.Analytics",
 			"UnityEngine.Timeline",
 			"UnityEngine.Networking",
