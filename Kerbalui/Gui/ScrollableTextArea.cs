@@ -23,7 +23,7 @@ namespace Kerbalui.Gui
 			{
 				rect.x = 0;
 				rect.y = 0;
-				HandleScrolling(rect);
+				//HandleScrolling(rect);
 
 				if (style == null)
 				{

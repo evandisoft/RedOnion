@@ -12,46 +12,41 @@ namespace Kerbalui.Gui
 
 		protected override void ProtectedUpdate(Rect rect)
 		{
-			if (Visible)
+			RunBaseControl(() =>
 			{
-				if (Event.current.type==EventType.KeyDown && HasFocus())
+				if (Visible)
 				{
-					Debug.Log("Key is before "+Event.current);
-					//GUI.SetNextControlName(ControlName);
-				}
 
-				RunBaseControl(() =>
-				{
-					if (style != null)
-					{
-						content.text = GUI.TextArea(rect, content.text, style);
-					}
-					else
-					{
-						content.text = GUI.TextArea(rect, content.text);
-					}
-				});
-
-				if (Event.current.type==EventType.KeyDown && HasFocus())
-				{
-					Debug.Log("Key is after "+Event.current);
+						if (style != null)
+						{
+							content.text = GUI.TextArea(rect, content.text, style);
+						}
+						else
+						{
+							content.text = GUI.TextArea(rect, content.text);
+						}
+					
 				}
-			}
+			});
 		}
 
 		protected override void ProtectedUpdate()
 		{
-			if (Visible)
+			RunBaseControl(() => 
 			{
-				if (style != null)
+				if (Visible)
 				{
-					content.text = GUILayout.TextArea(content.text, style);
+					if (style != null)
+					{
+						content.text = GUILayout.TextArea(content.text, style);
+					}
+					else
+					{
+						content.text = GUILayout.TextArea(content.text);
+					}
 				}
-				else
-				{
-					content.text = GUILayout.TextArea(content.text);
-				}
-			}
+			});
+
 		}
 	}
 }

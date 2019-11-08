@@ -10,34 +10,78 @@ using RedOnion.ROS;
 namespace RedOnion
 {
 	[KSPAddon(KSPAddon.Startup.AllGameScenes, false)]
-	public class Launcher : MonoBehaviour
+	public class Executor : MonoBehaviour
 	{
-		public static Launcher Instance { get; private set; }
-
-		private static Texture2D icon;
-		private ApplicationLauncherButton button;
-		private IEnumerator adder;
-
+		public static Executor Instance { get; private set; }
 		private void Awake()
 		{
 			if (Instance == null)
 				Instance = this;
 			else
 			{
-				Debug.Log("RedOnion.Launcher.Awake: Instance already exists", gameObject);
+				Debug.Log("[RedOnion] Executor.Awake: Instance already exists", gameObject);
 				Destroy(this);
 			}
 		}
 
+		private RosProcessor processor;
+
+		private void Update()
+			=> processor?.UpdateGraphic();
+		private void FixedUpdate()
+		{
+			if (processor == null)
+				return;
+			processor.UpdatePhysics();
+			if (!processor.Paused && !processor.HasEvents)
+			{
+				processor.Dispose();
+				processor = null;
+			}
+		}
+
+		private IEnumerator waiter;
 		private void Start()
 		{
-			if (icon == null)
-				icon = UI.Element.LoadIcon(38, 38, "RedOnionLauncherIcon.png");
-
-			if (adder != null)
-				StopCoroutine(adder);
-			StartCoroutine(adder = AddButton());
+			if (waiter != null)
+				StopCoroutine(waiter);
+			StartCoroutine(waiter = StartScript("os/main.ros"));
 		}
+
+		private void OnDestroy()
+			=> StopScript();
+
+		private void StopScript()
+		{
+			if (waiter != null)
+			{
+				StopCoroutine(waiter);
+				waiter = null;
+			}
+			if (processor != null)
+			{
+				processor.Dispose();
+				processor = null;
+			}
+		}
+		private IEnumerator StartScript(string path)
+		{
+			while (ApplicationLauncher.Instance == null || !ApplicationLauncher.Ready)
+				yield return null;
+			waiter = null;
+			StopScript();
+			var script = RosProcessor.LoadScript(path);
+			if (script == null)
+				yield break;
+			processor = new RosProcessor();
+			processor.Execute(script, path, 0);
+		}
+
+
+		/*
+		private static Texture2D icon;
+		private ApplicationLauncherButton button;
+		private IEnumerator adder;
 
 		private void OnDestroy()
 		{
@@ -71,7 +115,6 @@ namespace RedOnion
 			button = null;
 		}
 
-		RosProcessor core;
 		private void RunScript()
 		{
 			var script = RosProcessor.LoadScript("launcher.ros");
@@ -108,15 +151,6 @@ namespace RedOnion
 			core = null;
 			stopping = false;
 		}
-
-		private void FixedUpdate()
-		{
-			core?.UpdatePhysics();
-		}
-
-		private static void Log(string msg)
-			=> Debug.Log("[RedOnion] Launcher." + msg);
-		private static void Log(string msg, params object[] args)
-			=> Debug.Log(string.Format("[RedOnion] Launcher." + msg, args));
+		*/
 	}
 }

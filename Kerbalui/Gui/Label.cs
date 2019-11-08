@@ -13,32 +13,38 @@ namespace Kerbalui.Gui
 
 		protected override void ProtectedUpdate(Rect rect)
 		{
-			if (Visible)
+			RunBaseControl(() =>
 			{
-				if (style != null)
+				if (Visible)
 				{
-					GUI.Label(rect, content.text, style);
+					if (style != null)
+					{
+						GUI.Label(rect, content.text, style);
+					}
+					else
+					{
+						GUI.Label(rect, content.text);
+					}
 				}
-				else
-				{
-					GUI.Label(rect, content.text);
-				}
-			}
+			});
 		}
 
 		protected override void ProtectedUpdate()
 		{
-			if (Visible)
+			RunBaseControl(() => 
 			{
-				if (style != null)
+				if (Visible)
 				{
-					GUILayout.Label(content.text, style);
+					if (style != null)
+					{
+						GUILayout.Label(content.text, style);
+					}
+					else
+					{
+						GUILayout.Label(content.text);
+					}
 				}
-				else
-				{
-					GUILayout.Label(content.text);
-				}
-			}
+			});
 		}
 	}
 }
