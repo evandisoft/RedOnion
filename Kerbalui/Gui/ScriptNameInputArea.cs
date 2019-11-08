@@ -8,12 +8,13 @@ using RedOnion.KSP.Settings;
 namespace Kerbalui.Gui {
 	public class ScriptNameInputArea:EditingArea, ICompletableElement {
 		public bool receivedInput;
-
+		Editor editor;
 
 		static string defaultScriptFilename= "untitled.lua";
 
-		public ScriptNameInputArea()
+		public ScriptNameInputArea(Editor editor)
 		{
+			this.editor=editor;
 			content.text = SavedSettings.LoadSetting("lastScriptName",defaultScriptFilename);
 			if (!File.Exists(Path.Combine(SavedSettings.BaseScriptsPath, content.text))) {
 				IList<string> recentFiles = SavedSettings.LoadListSetting("recentFiles");
@@ -40,6 +41,7 @@ namespace Kerbalui.Gui {
 				content.text = completionContent[index];
 				selectIndex=cursorIndex = content.text.Length;
 			}
+			editor.content.text=Load();
 		}
 
 		public string PartialCompletion()

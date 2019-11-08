@@ -37,7 +37,7 @@ namespace LiveRepl.Main
 		Rect editorRect;
 		//Rect scriptNameRect;
 		string testReplContent="";
-		ScriptNameInputArea scriptIOTextArea = new ScriptNameInputArea();
+		ScriptNameInputArea scriptIOTextArea;
 		// Should be a label but I haven't made a label yet.
 		TextArea replEvaluatorLabel = new TextArea();
 
@@ -145,7 +145,7 @@ namespace LiveRepl.Main
 
 		public ScriptWindow(Rect param_mainWindowRect)
 		{
-
+			scriptIOTextArea = new ScriptNameInputArea(editor);
 			editorVisible = bool.Parse(SavedSettings.LoadSetting("editorVisible", "true"));
 
 			replEvaluators["ROS Engine"] = new RedOnionReplEvaluator()
