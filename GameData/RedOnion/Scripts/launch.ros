@@ -8,8 +8,8 @@ var speedRatio     = 5    // speed/altitude ratio to base the curve on (higher i
 var maxSpeed       = .9   // target escape speed (fraction of minimal or in m/s if above 2)
 var safeAltitude   = 2 + math.max atmosphere.depth/1000, 8 // safe altitude above atmosphere and mountains
 var startAngle     = math.round(ship.pitch,1) // usually 90 but e.g. DynaWing starts with 81.2
-var firstAngle     = 60   // angle from up (90) to use simple ratio
-var firstAltitude  = math.max safeAltitude/10, 3 // altitude (in km) of first phase (to reach pitch=90-firstAngle)
+var firstAngle     = 60   // angle upto which to use simple ratio
+var firstAltitude  = math.max safeAltitude/10, 3 // altitude (in km) of first phase (to reach pitch=firstAngle)
 var narrowAltitude = 100  // altitude (in m) upto which to go straight up
 
 if startAngle > 89
@@ -45,26 +45,27 @@ def gui
       uni.text = units
       uni.minWidth = uniWidth
     return box
+  
   var ta = row "Target altitude: ",  targetAltitude, "km",    "Final Apoapsis"
   var ah = row "Ascent heading: ",   ascentHeading,  "°",     "Course during ascent (not inclination)"
   var ar = row "Ascent roll: ",      ascentRoll,     "°",     "Roll/bank during ascent"
   var cr = row "Circularize roll: ", circleRoll,     "°",     "Roll/bank during circularization"
-  var pf = row "Ascent profile: ",  ascentProfile,   "1-9",   "Lower means less agressive turn"
-  var pr = row "Speed/Alt ratio: ", speedRatio,      "*10%",  "Higher for speed, above 10 means earlier"
-  var ms = row "Max. Speed: ",      maxSpeed,        "*|m/s", "<= 2 for fraction of minimal, or m/s"
-  var sa = row "Safe altitude: ",   safeAltitude,    "km",    "Above atmposhepre and mountains"
-  var sd = row "Start angle: ",     startAngle,      "°",     "Degrees of pitch for first phase"
-  var fa = row "First angle: ",     firstAngle,      "°",     "Degrees of pitch for first phase"
-  var a1 = row "First altitude: ",  firstAltitude,   "km",    "Altitude for first phase"
-  var na = row "Narrow altitude: ", narrowAltitude,   "m",    "Minimal altitude to go straight"
-
+  var pf = row "Ascent profile: ",   ascentProfile,  "1-9",   "Lower means less agressive turn"
+  var pr = row "Speed/Alt ratio: ",  speedRatio,     "*10%",  "Higher for speed, above 10 means earlier"
+  var ms = row "Max. Speed: ",       maxSpeed,       "*|m/s", "<= 2 for fraction of minimal, or m/s"
+  var sa = row "Safe altitude: ",    safeAltitude,   "km",    "Above atmposhepre and mountains"
+  var sd = row "Start angle: ",      startAngle,     "°",     "Start degrees of pitch"
+  var fa = row "First angle: ",      firstAngle,     "°",     "Degrees of pitch for first phase"
+  var a1 = row "First altitude: ",   firstAltitude,  "km",    "Altitude for first phase"
+  var na = row "Narrow altitude: ",  narrowAltitude,  "m",    "Minimal altitude to go straight up"
+  
   var apsel = wnd.addHorizontal()
   apsel.addLabel "Pilot: "
   var xfirda = apsel.addExclusive "Firda"
-  var xevan = apsel.addExclusive "Evan"
-  var xcust = apsel.addExclusive "Custom"
+  var xevan  = apsel.addExclusive "Evan"
+  var xcust  = apsel.addExclusive "Custom"
   xfirda.pressed = true
-
+  
   wnd.add hintLabel
   var brow = wnd.addHorizontal()
   var selected = 0
@@ -72,12 +73,16 @@ def gui
   brow.addButton("Cancel",  def => selected = 1).flexWidth = 1
   brow.addButton("Control", def => selected = 2).flexWidth = 1
   brow.addButton("Launch",  def => selected = 3).flexWidth = 1
+  
   while selected == 0
     wait
-  if selected == 2
+  
+  if selected == 2 // control
     wnd.dispose()
     run.replace "control.ros"
-  if selected == 3
+    //script not continuing here, replaced by control.ros
+  
+  if selected == 3 // launch
     targetAltitude = double ta.text
     ascentHeading  = double ah.text
     ascentRoll     = double ar.text
@@ -90,10 +95,11 @@ def gui
     firstAngle     = double fa.text
     firstAltitude  = double a1.text
     narrowAltitude = double na.text
+
   wnd.dispose
   firda = xfirda.pressed
-  evan = xevan.pressed
-  cust = xcust.pressed
+  evan  = xevan.pressed
+  cust  = xcust.pressed
   return selected == 3
 if !gui()
   return
@@ -276,14 +282,14 @@ ship.throttle = 0
 user.throttle = 1
 if !evan
   ship.heading = ascentHeading
+  ship.roll = ascentRoll
 var ctlsub = system.update def
   throttle()
   steer()
-var stgsub = system.idle(staging)
-var vdraws = system.update(vectors)
-var steers = customSteering == null ? null : system.update(customSteering)
-if !evan
-  ship.roll = ascentRoll
+var stgsub = system.idle staging
+var vdraws = system.update vectors
+var steers = customSteering == null ? null :
+  system.update customSteering
 
 print "Target apoapsis: " + targetAltitude
 print "Safe altitude:   " + safeAltitude
@@ -294,7 +300,7 @@ ctlsub.remove()
 user.throttle = 0
 ship.autopilot.disable
 print "Safe altitude reached"
-vd[3].hide
+vd[3].hide //srfvel
 
 
 //: CIRCULARIZE
@@ -351,6 +357,7 @@ for
     prevEtaReport = time.now
     print "ETA: {0:F1}s", eta
   if eta <= 5 and !switched
+  //TODO: warp to this point
     switched = true
     ctlsub.remove
     ctlsub = system.update circle

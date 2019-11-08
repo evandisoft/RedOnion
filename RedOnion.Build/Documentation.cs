@@ -60,7 +60,8 @@ namespace RedOnion.Build
 		static ListCore<Type> queue = new ListCore<Type>();
 		static void RegisterType(Type type)
 		{
-			if (type.Assembly != typeof(Globals).Assembly)
+			if (type.Assembly != typeof(Globals).Assembly
+				&& type.Assembly != typeof(RedOnion.UI.Element).Assembly)
 				return;
 			if (type.IsGenericType)
 				type = type.GetGenericTypeDefinition();
@@ -109,7 +110,11 @@ namespace RedOnion.Build
 					if (prev != null && !(prev is MethodInfo && member is MethodInfo))
 						continue;
 					if (member is FieldInfo f)
-						RegisterType(f.FieldType);
+						RegisterType(
+							f.FieldType == typeof(Type)
+							&& f.IsInitOnly && f.IsStatic
+							? (Type)f.GetValue(null)
+							: f.FieldType);
 					else if (member is PropertyInfo p)
 						RegisterType(p.PropertyType);
 					else if (member is MethodInfo m)
@@ -165,7 +170,11 @@ namespace RedOnion.Build
 				var mname = GetName(member);
 				if (member is FieldInfo f)
 				{
-					PrintSimpleMember(wr, doc, mname, member, f.FieldType);
+					PrintSimpleMember(wr, doc, mname, member,
+						f.FieldType == typeof(Type)
+						&& f.IsStatic && f.IsInitOnly
+						? (Type)f.GetValue(null)
+						: f.FieldType);
 					continue;
 				}
 				if (member is PropertyInfo p)

@@ -18,33 +18,6 @@ using static RedOnion.KSP.API.Reflect;
 
 namespace Kerbalua.MoonSharp
 {
-	public class KspApi
-	{
-		public FlightControl FlightControl = FlightControl.GetInstance();
-		public FlightGlobals FlightGlobals = FlightGlobals.fetch;
-		public UnityEngine.Time Time = new UnityEngine.Time();
-		public Mathf Mathf = new Mathf();
-		public Scalar Scalar = new Scalar();
-		public Vec Vec = new Vec();
-		public EditorPanels EditorPanels = EditorPanels.Instance;
-		public EditorLogic EditorLogic = EditorLogic.fetch;
-		public ShipConstruction ShipConstruction = new ShipConstruction();
-		public UnityEngine.Random Random = new UnityEngine.Random();
-		public FlightDriver FlightDriver = FlightDriver.fetch;
-		public HighLogic HighLogic = HighLogic.fetch;
-		public StageManager StageManager = StageManager.Instance;
-		public PartLoader PartLoader = PartLoader.Instance;
-	}
-
-	public class UI
-	{
-		public Type Window = typeof(Window);
-		public Type Panel = typeof(Panel);
-		public Type Button = typeof(Button);
-		public Anchors Anchors = new Anchors();
-		public Layout Layout = new Layout();
-	}
-
 	public class KerbaluaScript : Script
 	{
 		public Action<string> PrintErrorAction { get; set; }
@@ -100,7 +73,6 @@ namespace Kerbalua.MoonSharp
 			Globals.MetaTable = API.LuaGlobals.Instance;
 			//Globals["Vessel"] = FlightGlobals.ActiveVessel;
 			var defaultMappings = NamespaceMappings.DefaultAssemblies;
-			//Globals["KSP"] = new KspApi()
 			Globals["new"] = Constructor.Instance;
 			Globals["static"] = new Func<object, DynValue>((o) =>
 			{
@@ -133,7 +105,6 @@ namespace Kerbalua.MoonSharp
 			@"
 				return function(lst) for i=0,lst.Count-1 do print(i..' '..lst[i].ToString()) end end
 				");
-			//Globals["unity"] = Assembly.GetAssembly(typeof(Vector3));
 			//Globals["Assembly"] = typeof(Assembly);
 			//Assembly blah;
 			Globals["import"] = defaultMappings.GetNamespace("");
@@ -141,7 +112,6 @@ namespace Kerbalua.MoonSharp
 			Globals["reldir"] = new Func<double, double, RelativeDirection>((heading, pitch) => new RelativeDirection(heading, pitch));
 			//Globals["AppDomain"] = UserData.CreateStatic(typeof(AppDomain));
 			//Globals["AssemblyStatic"] = UserData.CreateStatic(typeof(Assembly));
-			//Globals["UI"] = new UI();
 			//UserData.RegisterExtensionType(typeof(System.Linq.Enumerable));
 			//UserData.RegisterAssembly(Assembly.GetAssembly(typeof(System.Linq.Enumerable)),true);
 			var coroutines=Globals["coroutine"] as Table;

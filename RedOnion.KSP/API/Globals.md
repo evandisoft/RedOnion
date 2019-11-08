@@ -20,3 +20,18 @@ Global variables, objects and functions.
 - `periapsis`: double - Alias to `ship.periapsis`.
 - `body`: SpaceBody - Orbited body (redirects to `ship.body`).
 - `atmosphere`: Atmosphere - Atmosphere parameters of orbited body (redirects to `ship.body.atmosphere`).
+- `app`: [App](App.md) - Safe API for KSP Application Launcher (toolbar/buttons).
+- `pid`: [PID](PID.md) - PID regulator (alias to `system.pid` in ROS).
+- `pidloop`: [PID](PID.md) - PID regulator (alias to `pid`).
+- `ui`: UI_Namespace - User Interface.
+- `ksp`: KSP_Namespace - Shortcuts to (unsafe) KSP API + some tools.
+- `unity`: Unity_Namespace - Shortcuts to (unsafe) Unity API.
+- `window`: [Window](../Window.md) - UI.Window
+- `anchors`: Anchors - UI.Anchors
+- `padding`: Padding - UI.Padding
+- `layoutPadding`: LayoutPadding - UI.LayoutPadding
+- `layout`: Layout - UI.Layout
+- `panel`: Panel - UI.Panel
+- `label`: Label - UI.Label
+- `button`: Button - UI.Button
+- `textBox`: TextBox - UI.TextBox
