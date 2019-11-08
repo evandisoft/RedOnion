@@ -516,6 +516,8 @@ Any other key gives focus to input box.
 		/// <param name="id">Identifier.</param>
 		void MainWindow(int id)
 		{
+			Rect effectiveWindowRect = GetCurrentWindowRect();
+			GUI.DragWindow(new Rect(0, 0, effectiveWindowRect.width, titleHeight));
 
 			if (evaluationList.Count!=0
 					&& Event.current.type == EventType.KeyDown
@@ -545,8 +547,7 @@ Any other key gives focus to input box.
 				hadMouseDownLastUpdate = true;
 			}
 
-			Rect effectiveWindowRect = GetCurrentWindowRect();
-			GUI.DragWindow(new Rect(0, 0, effectiveWindowRect.width, titleHeight));
+
 			GlobalKeyBindings.ExecuteAndConsumeIfMatched(Event.current);
 
 			Rect currentWidgetBarRect = GetCurrentWidgetBarRect();
