@@ -7,6 +7,7 @@ using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.REPL;
 using MoonSharp.Interpreter.Interop;
 using System.Collections.Generic;
+using Kerbalua.Parsing;
 
 namespace Kerbalua.Completion {
 	public static class LuaIntellisense {
@@ -88,9 +89,12 @@ namespace Kerbalua.Completion {
 			var parser = new IncompleteLuaParser(tokens) {
 				BuildParseTree = true
 			};
+			var errorListener = new AnyErrorsListener();
 
 			var incompleteChunk = parser.incompleteChunk();
-			if (incompleteChunk.exception != null)
+
+			//if (incompleteChunk.exception != null)
+			if (errorListener.HasError)
 			{
 				throw new LuaIntellisenseException("Could not parse incompleteChunk");
 			}

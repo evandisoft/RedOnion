@@ -1,91 +1,130 @@
 using MoonSharp.Interpreter;
-using RedOnion.Script;
-using RedOnion.Script.BasicObjects;
+using RedOnion.ROS;
 using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using UnityEngine;
-
-//NOTE: Never move Instance above MemberList ;)
 
 namespace RedOnion.KSP.API
 {
-	public partial class VectorCreator : InteropObject
+	[Description("Function to create 3D vector / coordinate, also aliased as simple `V`."
+		+ " Receives either three arguments (x,y,z), two (x,y - z=0), or one (x=y=z)."
+		+ " Can also convert array / list of numbers (`V([1,2,3])` becomes `V(1,2,3)`).")]
+	public partial class VectorCreator : ICallable, IType
 	{
-		public static MemberList MemberList { get; } = new MemberList(
-		ObjectFeatures.Function|ObjectFeatures.Constructor
-		|ObjectFeatures.Converter|ObjectFeatures.TypeReference,
-
-@"Function to create 3D vector / coordinate, also aliased as simple `V`.
-Receives either three arguments (x,y,z), two (x,y - z=0), or one (x=y=z).
-Can also convert array / list of numbers (`V([1,2,3])` becomes `V(1,2,3)`).",
-
-		new IMember[]
-		{
-			new Interop("zero", "Vector", "Vector(0, 0, 0).", () => Zero),
-			new Interop("one",  "Vector", "Vector(1, 1, 1).", () => One),
-			new Interop("forward","Vector","Vector(0, 0, 1).", () => Forward),
-			new Interop("fwd",  "Vector", "Alias to forward - Vector(0, 0, 1).", () => Forward),
-			new Interop("back", "Vector", "Vector(0, 0, -1).", () => Back),
-			new Interop("up",   "Vector", "Vector(0, 1, 0).", () => Up),
-			new Interop("down", "Vector", "Vector(0, -1, 0).", () => Down),
-			new Interop("left", "Vector", "Vector(-1, 0, 0).", () => Left),
-			new Interop("right","Vector", "Vector(1, 0, 0).", () => Right),
-
-			new Function("cross", "Vector", "Cross product.", () => CrossFunction.Instance),
-			new Function("crs", "Vector", "Cross product. (Alias to cross.)", () => CrossFunction.Instance),
-			new Function("dot", "Vector", "Dot product.", () => DotFunction.Instance),
-			new Function("abs", "Vector", "Vector with coordinates changed to non-negative.", () => AbsFunction.Instance),
-			new Function("angle", "Vector", "Angle between vectors (0..180).", () => AngleFunction.Instance),
-		});
-
+		[Browsable(false), MoonSharpHidden]
 		public static VectorCreator Instance { get; } = new VectorCreator();
-		public VectorCreator() : base(MemberList) { }
+		protected VectorCreator() { }
 
-		public static Vector Zero = new Vector(Vector3d.zero, true);
-		public static Vector One = new Vector(Vector3d.one, true);
-		public static Vector Forward = new Vector(Vector3d.forward, true);
-		public static Vector Back = new Vector(Vector3d.back, true);
-		public static Vector Up = new Vector(Vector3d.up, true);
-		public static Vector Down = new Vector(Vector3d.down, true);
-		public static Vector Left = new Vector(Vector3d.left, true);
-		public static Vector Right = new Vector(Vector3d.right, true);
+		Type IType.Type => typeof(Vector);
+		bool IType.IsType(object type)
+			=> type is string str ? str.Equals("vector", StringComparison.OrdinalIgnoreCase)
+			: type is Type t ? t.IsAssignableFrom(typeof(Vector)) : false;
 
-		public override Type Type => typeof(Vector);
+		[Description("Vector(0, 0, 0).")]
+		public static readonly ConstVector zero = new ConstVector(Vector3d.zero);
+		[Description("Vector(1, 1, 1).")]
+		public static readonly ConstVector one = new ConstVector(Vector3d.one);
+		[Description("Vector(0, 0, 1).")]
+		public static readonly ConstVector forward = new ConstVector(Vector3d.forward);
+		[Description("Alias to forward - Vector(0, 0, 1).")]
+		public static readonly ConstVector fwd = forward;
+		[Description("Vector(0, 0, -1).")]
+		public static readonly ConstVector back = new ConstVector(Vector3d.back);
+		[Description("Vector(0, 1, 0).")]
+		public static readonly ConstVector up = new ConstVector(Vector3d.up);
+		[Description("Vector(0, -1, 0).")]
+		public static readonly ConstVector down = new ConstVector(Vector3d.down);
+		[Description("Vector(-1, 0, 0).")]
+		public static readonly ConstVector left = new ConstVector(Vector3d.left);
+		[Description("Vector(1, 0, 0).")]
+		public static readonly ConstVector right = new ConstVector(Vector3d.right);
+		[Description("Vector(nan, nan, nan).")]
+		public static readonly ConstVector none = new ConstVector(new Vector3d(double.NaN, double.NaN, double.NaN));
 
-		public override Value Call(IObject self, Arguments args)
-			=> new Value(Create(args));
-		public override IObject Create(Arguments args)
+		[Description("Cross product.")]
+		public static Vector cross(ConstVector a, ConstVector b)
+			=> new Vector(Vector3d.Cross(a.native, b.native));
+		[Description("Cross product. (Alias to cross)")]
+		public static Vector crs(ConstVector a, ConstVector b)
+			=> new Vector(Vector3d.Cross(a.native, b.native));
+		[Description("Scale vector by vector. Per axis. Multiplication does the same.")]
+		public static Vector scale(ConstVector a, ConstVector b)
+			=> a * b;
+		[Description("Shrink vector by vector. Per axis. Division does the same.")]
+		public static Vector shrink(ConstVector a, ConstVector b)
+			=> a / b;
+		[Description("Vector with coordinates changed to non-negative.")]
+		public static Vector abs(ConstVector v)
+			=> new Vector(Math.Abs(v.x), Math.Abs(v.y), Math.Abs(v.z));
+		[Description("Dot product.")]
+		public static double dot(ConstVector a, ConstVector b)
+			=> Vector3d.Dot(a.native, b.native);
+		[Description("Angle between vectors (0..180).")]
+		public static double angle(ConstVector a, ConstVector b)
+			=> Vector3d.Angle(a.native, b.native);
+
+		public static Vector3d scale(Vector3d a, Vector3d b)
+			=> new Vector3d(a.x * b.x, a.y * b.y, a.z * b.z);
+		public static Vector3d shrink(Vector3d a, Vector3d b)
+			=> new Vector3d(a.x / b.x, a.y / b.y, a.z / b.z);
+		public static Vector3 scale(Vector3 a, Vector3 b)
+			=> new Vector3(a.x * b.x, a.y * b.y, a.z * b.z);
+		public static Vector3 shrink(Vector3 a, Vector3 b)
+			=> new Vector3(a.x / b.x, a.y / b.y, a.z / b.z);
+
+		bool ICallable.Call(ref Value result, object self, Arguments args, bool create)
+			=> Call(ref result, self, args, create);
+		static bool Call(ref Value result, object self, Arguments args, bool create)
 		{
 			switch (args.Length)
 			{
 			case 0:
-				return new Vector();
+				result = new Value(new Vector());
+				return true;
 			case 1:
 				var arg = args[0];
 				var vec = ToVector(arg);
 				if (vec == null)
 					throw new InvalidOperationException(string.Format(Value.Culture,
 						"Could not convert {0} to vector", arg.Name));
-				return vec;
+				result = new Value(vec);
+				return true;
 			case 2:
-				return new Vector(args[0], args[1]);
+				result = new Value(new Vector(args[0].ToDouble(), args[1].ToDouble()));
+				return true;
 			default:
-				return new Vector(args[0], args[1], args[2]);
+				result = new Value(new Vector(args[0].ToDouble(), args[1].ToDouble(), args[2].ToDouble()));
+				return true;
 			}
 		}
-		public override IObject Convert(object value)
-			=> ToVector(value);
+		[MoonSharpUserDataMetamethod("__call"), Browsable(false)]
+		public static DynValue Call(ScriptExecutionContext ctx, CallbackArguments args)
+		{
+			var result = Value.Void;
+			var self = args.ToRos(out var ros);
+			return Call(ref result, self, ros, false) ? result.ToLua() : DynValue.Void;
+		}
+
 		public static Vector ToVector(object value)
 			=> ToVector3d(value, out var v) ? new Vector(v) : null;
 		public static Vector ToVector(Value value)
 			=> ToVector3d(value, out var v) ? new Vector(v) : null;
-		public static Vector ToVector(IObject obj)
-			=> obj is Vector v ? v : ToVector3d(obj, out var v3d) ? new Vector(v3d) : null;
+		[Browsable(false), MoonSharpHidden]
+		public static ConstVector ToConstVector(object value)
+			=> ToVector3d(value, out var v) ? new ConstVector(v) : null;
+		[Browsable(false), MoonSharpHidden]
+		public static ConstVector ToConstVector(Value value)
+			=> ToVector3d(value, out var v) ? new ConstVector(v) : null;
 		public static bool ToVector3d(object value, out Vector3d result)
 		{
 			if (value != null)
 			{
-				if (value is IObject obj)
-					return ToVector3d(obj, out result);
+				if (value is ConstVector v)
+				{
+					result = v.native;
+					return true;
+				}
 				if (value is Value val)
 					return ToVector3d(val, out result);
 				if (value is Vector3d v3d)
@@ -108,12 +147,30 @@ Can also convert array / list of numbers (`V([1,2,3])` becomes `V(1,2,3)`).",
 					result = new Vector3d(v2.x, v2.y);
 					return true;
 				}
-				var pval = Value.FromPrimitive(value);
-				if (pval.IsNumber)
+				if (value is IConvertible cv)
 				{
-					var d = pval.Double;
+					var d = cv.ToDouble(Value.Culture);
 					result = new Vector3d(d, d, d);
 					return true;
+				}
+				if (value is IList<Value> list)
+				{
+					switch (list.Count)
+					{
+					case 0:
+						result = new Vector3d();
+						return true;
+					case 1:
+						var all = list[0].ToDouble();
+						result = new Vector3d(all, all, all);
+						return true;
+					case 2:
+						result = new Vector3d(list[0].ToDouble(), list[1].ToDouble());
+						return true;
+					default:
+						result = new Vector3d(list[0].ToDouble(), list[1].ToDouble(), list[2].ToDouble());
+						return true;
+					}
 				}
 			}
 			result = new Vector3d();
@@ -121,46 +178,13 @@ Can also convert array / list of numbers (`V([1,2,3])` becomes `V(1,2,3)`).",
 		}
 		public static bool ToVector3d(Value value, out Vector3d result)
 		{
-			if (value.IsNumber)
+			if (value.IsNumberOrChar)
 			{
-				var d = value.Double;
+				var d = value.ToDouble();
 				result = new Vector3d(d, d, d);
 				return true;
 			}
-			return ToVector3d(value.Object, out result);
-		}
-		public static bool ToVector3d(IObject obj, out Vector3d result)
-		{
-			result = new Vector3d();
-			if (obj == null)
-				return false;
-			if (obj is Vector v)
-			{
-				result = v.Native;
-				return true;
-			}
-			if (obj is IListObject list)
-			{
-				switch (list.Count)
-				{
-				case 0:
-					result = new Vector3d();
-					return true;
-				case 1:
-					var all = list[0].Double;
-					result = new Vector3d(all, all, all);
-					return true;
-				case 2:
-					result = new Vector3d(list[0].Double, list[1].Double);
-					return true;
-				default:
-					result = new Vector3d(list[0].Double, list[1].Double, list[2].Double);
-					return true;
-				}
-			}
-			if (obj.HasFeature(ObjectFeatures.Proxy))
-				return ToVector3d(obj.Target, out result);
-			return false;
+			return ToVector3d(value.obj, out result);
 		}
 	}
 }

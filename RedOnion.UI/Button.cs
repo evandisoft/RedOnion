@@ -8,7 +8,7 @@ namespace RedOnion.UI
 {
 	public class Button : Element
 	{
-		protected UUI.Button Core { get; private set; }
+		protected ToggleableButton Core { get; private set; }
 		protected BackgroundImage Image { get; private set; }
 
 		protected Label label;
@@ -20,14 +20,19 @@ namespace RedOnion.UI
 				{
 					if (GameObject == null)
 						throw new ObjectDisposedException(Name);
-					label = Add(new Label("Label") { Text = "Button" });
+					label = Add(new Label("Label")
+					{
+						Text = "Button",
+						TextColor = Skin.button.normal.textColor,
+						FontStyle = Skin.button.fontStyle
+					});
 				}
 				return label;
 			}
 		}
 
-		protected Icon icon;
-		protected Icon IconCore
+		protected Image icon;
+		protected Image IconCore
 		{
 			get
 			{
@@ -35,30 +40,37 @@ namespace RedOnion.UI
 				{
 					if (GameObject == null)
 						throw new ObjectDisposedException(Name);
-					icon = Add(new Icon("Icon"));
+					icon = Add(new Image());
 				}
 				return icon;
 			}
 		}
 
-		public Button(string name = null)
-			: base(name)
+		public Button()
 		{
-			Core = GameObject.AddComponent<UUI.Button>();
 			Image = GameObject.AddComponent<BackgroundImage>();
-			Image.sprite = Skin.button.normal.background;
 			Image.type = UUI.Image.Type.Sliced;
+			Image.sprite = Skin.button.normal.background;
+			Core = GameObject.AddComponent<ToggleableButton>();
+			Core.Button = this;
+			Core.colors = UUI.ColorBlock.defaultColorBlock;
 			Core.image = Image;
+			Core.normalSprite = Skin.button.normal.background;
+			Core.normalHighlight = Skin.button.highlight.background;
+			Core.pressedHighlight = Skin.button.active.background;
 			Core.spriteState = new UUI.SpriteState()
 			{
 				pressedSprite = Skin.button.active.background,
 				highlightedSprite = Skin.button.highlight.background,
 				disabledSprite = Skin.button.disabled.background
 			};
+			Core.transition = UUI.Selectable.Transition.SpriteSwap;
 			InnerPadding = new Padding(8f, 4f);
 			Spacing = 6f;
 			Layout = Layout.Horizontal;
 		}
+		public Button(string text) : this() => Text = text;
+		public Button(string text, Action<Button> click) : this(text) => Core.Click += click;
 
 		protected override void Dispose(bool disposing)
 		{
@@ -71,11 +83,36 @@ namespace RedOnion.UI
 			base.Dispose(true);
 		}
 
-		public Event Click
+		public event Action<Button> Click
 		{
-			get => new Event(Core.onClick);
-			set { }
+			add => Core.Click += value;
+			remove => Core.Click -= value;
 		}
+
+		public bool Toggleable
+		{
+			get => Core.Toggleable;
+			set => Core.Toggleable = value;
+		}
+		public bool Pressed
+		{
+			get => Core.Pressed;
+			set => Core.Pressed = value;
+		}
+		public bool Exclusive
+		{
+			get => Core.Exclusive;
+			set => Core.Exclusive = value;
+		}
+		public int ExclusiveLevel
+		{
+			get => Core.ExclusiveLevel;
+			set => Core.ExclusiveLevel = value;
+		}
+		public void Press() => Core.Press();
+		public void Toggle() => Core.Toggle();
+		public void Press(bool action) => Core.Press(action);
+		public void Toggle(bool action) => Core.Toggle(action);
 
 		public string Text
 		{
@@ -105,8 +142,25 @@ namespace RedOnion.UI
 						return;
 					icon.Dispose();
 					icon = null;
+					return;
 				}
 				IconCore.Texture = value;
+			}
+		}
+		public Sprite IconSprite
+		{
+			get => icon?.Sprite;
+			set
+			{
+				if (value == null)
+				{
+					if (icon == null)
+						return;
+					icon.Dispose();
+					icon = null;
+					return;
+				}
+				IconCore.Sprite = value;
 			}
 		}
 

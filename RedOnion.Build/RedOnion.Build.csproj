@@ -11,11 +11,12 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>RedOnion.Build</RootNamespace>
     <AssemblyName>RedOnion.Build</AssemblyName>
-    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
     <ReleaseVersion>0.3.0</ReleaseVersion>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -37,6 +38,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="KerbaluaMoonSharp, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\OtherDLLs\KerbaluaMoonSharp\KerbaluaMoonSharp.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.IO.Compression" />
@@ -60,9 +65,6 @@
     <Reference Include="Ionic.Zip.dll">
       <HintPath>$(KerbalLibs)\Ionic.Zip.dll</HintPath>
     </Reference>
-    <Reference Include="MoonSharp.Interpreter">
-      <HintPath>..\packages\MoonSharp.2.0.0.0\lib\net35-client\MoonSharp.Interpreter.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Documentation.cs" />
@@ -78,9 +80,9 @@
       <Project>{dec12e09-29ad-4666-9954-8c8a1d7bf454}</Project>
       <Name>RedOnion.KSP</Name>
     </ProjectReference>
-    <ProjectReference Include="..\RedOnion.Script\RedOnion.Script.csproj">
-      <Project>{0d0a04f3-0a82-49cd-8178-7640ace88bff}</Project>
-      <Name>RedOnion.Script</Name>
+    <ProjectReference Include="..\RedOnion.ROS\RedOnion.ROS.csproj">
+      <Project>{59399c9e-ebac-4d7c-b2cb-6ece22fe8d6e}</Project>
+      <Name>RedOnion.ROS</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

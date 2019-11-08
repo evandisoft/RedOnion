@@ -12,13 +12,13 @@ namespace RedOnion.UI
 		public Label Label { get; private set; }
 		protected BackgroundImage Image { get; private set; }
 
-		public TextBox(string name = null)
-			: base(name)
+		public TextBox()
 		{
 			Image = GameObject.AddComponent<BackgroundImage>();
 			Image.sprite = Skin.textField.normal.background;
 			Image.type = UUI.Image.Type.Sliced;
 			Core = GameObject.AddComponent<InputField>();
+			Core.TextBox = this;
 			Label = Add(new Label()
 			{
 				Anchors = Anchors.Fill,
@@ -27,6 +27,7 @@ namespace RedOnion.UI
 			});
 			Core.textComponent = Label.Core;
 		}
+		public TextBox(string text) : this() => Text = text;
 
 		protected override void Dispose(bool disposing)
 		{
@@ -74,15 +75,25 @@ namespace RedOnion.UI
 			set => Label.FontStyle = value;
 		}
 
-		public Event<string> Submitted
+		public event Action<TextBox> Enter
 		{
-			get => new Event<string>(Core.onEndEdit);
-			set { }
+			add => Core.Selected += value;
+			remove => Core.Selected -= value;
 		}
-		public Event<string> Changed
+		public event Action<TextBox> Exit
 		{
-			get => new Event<string>(Core.onValueChanged);
-			set { }
+			add => Core.Deselected += value;
+			remove => Core.Deselected -= value;
+		}
+		public event Action<TextBox, string> Changed
+		{
+			add => Core.Changed += value;
+			remove => Core.Changed -= value;
+		}
+		public event Action<TextBox, string> Submitted
+		{
+			add => Core.Submitted += value;
+			remove => Core.Submitted += value;
 		}
 
 		public int CaretPosition

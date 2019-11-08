@@ -1,0 +1,37 @@
+var targetAltitude = 800000000
+var karmanAltitude = 75000
+var ascentHeading = 90
+
+var vessel=native.FlightGlobals.ActiveVessel
+
+def checkStaging
+  if !stage.ready
+    return
+  var nextDecoupler = ship.parts.nextDecoupler
+  if nextDecoupler == null
+    return
+  if nextDecoupler.isType("LaunchClamp")
+    print "Releasing launch clamps"
+    stage
+    return
+  if stage.engines.count == 0
+    print "No active engines"
+    stage
+    return
+  var sum = stage.solidFuel + stage.liquidFuel
+  if sum < 0.1
+    print "Stage out of fuel"
+    stage
+    return
+
+print "Target apoapsis: " + targetAltitude
+var ctrl = ksp.flightControl
+until ship.apoapsis > targetAltitude
+  checkStaging()
+  var ratio = ship.apoapsis / karmanAltitude
+  if ratio > 1 then ratio = 1
+  if ratio < 0 then ratio = 0
+  ctrl.setRel ascentHeading, 90
+  wait
+
+print "Apoapsis reached"

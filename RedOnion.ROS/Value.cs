@@ -5,8 +5,25 @@ using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
+/*	The reason for using struct is to avoid memory allocation
+ *	(and therefore frequent garbage collection),
+ *	because these would get created very often being a class.
+ *	Most values are instead held in Core.Arguments (ArgumentList vals),
+ *	which uses Utilities.ListCore<Value>, which maintains Value[].
+ *	Rarely returned from functions, ref Value argument used instead
+ *	(first argument is most often reused for result output,
+ *	just like in real CPUs some register like AX or R0 is used).
+ */
 namespace RedOnion.ROS
 {
+	/// <summary>
+	/// Object that can provide descriptor for itself
+	/// </summary>
+	public interface ISelfDescribing
+	{
+		Descriptor Descriptor { get; }
+	}
+
 	/// <summary>
 	/// Value with descriptor.
 	/// </summary>
@@ -17,31 +34,38 @@ namespace RedOnion.ROS
 		/// Culture settings for formatting (invariant by default).
 		/// </summary>
 		public static CultureInfo Culture = CultureInfo.InvariantCulture;
+		public static string Format(string msg) => msg;
+		public static string Format(string msg, params object[] args)
+			=> string.Format(Culture, msg, args);
+
+		public static Action<string> LogListener;
+		public static void Log(string msg)
+			=> LogListener?.Invoke(msg);
+		public static void Log(string msg, params object[] args)
+			=> LogListener?.Invoke(Format(msg, args));
+		[Conditional("DEBUG")]
+		public static void DebugLog(string msg)
+			=> LogListener?.Invoke(msg);
+		[Conditional("DEBUG")]
+		public static void DebugLog(string msg, params object[] args)
+			=> LogListener?.Invoke(Format(msg, args));
 
 		/// <summary>
-		/// The descriptor for the object
+		/// The descriptor - how the core interacts with the value
+		/// or what type it represents if obj == null
+		/// (except for null and void - these are type-less values)
 		/// </summary>
 		public Descriptor desc;
 		/// <summary>
-		/// The object itself (if any)
+		/// The object unless primitive value (number, null, void or type).
 		/// </summary>
 		public object obj;
 		/// <summary>
-		/// Numeric data
+		/// Numeric / extra data. Only internal / built-in descriptors can use this,
+		/// standard descriptors (of objects) are not allowed to use this,
+		/// because non-zero numeric data marks references (and possibly other things).
 		/// </summary>
 		internal NumericData num;
-
-		/// <summary>
-		/// The descriptor for the object
-		/// </summary>
-		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		public Descriptor Descriptor => desc;
-
-		/// <summary>
-		/// The object or boxed value
-		/// </summary>
-		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		public object Object => desc.Box(ref this);
 
 		public static readonly Value Void = new Value(Descriptor.Void, null);
 		public static readonly Value Null = new Value(Descriptor.Null, null);
@@ -49,10 +73,15 @@ namespace RedOnion.ROS
 		public static readonly Value False = new Value(false);
 		public static readonly Value True = new Value(true);
 
-		public Value(UserObject it) : this(it, it) {}
+		public Value(Descriptor it) : this(it ?? Descriptor.Null, it) { }
 		public Value(Type type) : this(Descriptor.Of(type), null) { }
 		public Value(object it) : this()
 		{
+			if (it == null)
+			{
+				desc = Descriptor.Null;
+				return;
+			}
 			if (it is Value v)
 			{
 				desc = v.desc;
@@ -65,14 +94,25 @@ namespace RedOnion.ROS
 				obj = desc = d;
 				return;
 			}
-			desc = Descriptor.Of(it is Type t ? t : it.GetType());
-			if (!IsNumber)
+			if (it is ISelfDescribing sd)
+			{
+				obj = it;
+				desc = sd.Descriptor;
+				return;
+			}
+			if (it is Type t)
+			{
+				desc = Descriptor.Of(t);
+				return;
+			}
+			desc = Descriptor.Of(it.GetType());
+			if (!IsNumberOrChar)
 			{
 				obj = it;
 				return;
 			}
 			var n = (IConvertible)it;
-			switch((OpCode)desc.Primitive)
+			switch ((OpCode)desc.Primitive)
 			{
 			case OpCode.Char:
 			case OpCode.WideChar:
@@ -140,6 +180,8 @@ namespace RedOnion.ROS
 			=> DebugString;
 		public string ToString(string format, IFormatProvider provider)
 			=> desc.ToString(ref this, format, provider, true);
+		public string ToStr()
+			=> desc.ToString(ref this, null, Culture, false);
 
 		public Value(double v) : this(Descriptor.Double, null) => num.Double = v;
 		public Value(float v) : this(Descriptor.Float, null) => num.Float = v;
@@ -168,19 +210,45 @@ namespace RedOnion.ROS
 		public static implicit operator Value(ushort v) => new Value(v);
 		public static implicit operator Value(ulong v) => new Value(v);
 
-		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		public string Name => desc.Name;
-
 		public override bool Equals(object obj)
 			=> desc.Equals(ref this, obj);
 		public override int GetHashCode()
 			=> desc.GetHashCode(ref this);
 
+		public string Name => desc.Name;
+		public object Box() => desc.Box(ref this);
+		public Value(Action action) : this(Descriptor.Actions[0], action) { }
+
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+		public bool IsVoid => desc.Primitive == ExCode.Void;
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+		public bool IsNull => desc.Primitive == ExCode.Null;
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+		public bool IsFunction => desc.Primitive == ExCode.Function;
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		public bool IsString => desc.Primitive == ExCode.String;
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		public bool IsNumber => desc.Primitive > ExCode.String;
+		public bool IsStringOrChar => desc.IsStringOrChar;
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+		public bool IsNumber => desc.IsNumber;
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+		public bool IsNumberOrChar => desc.IsNumberOrChar;
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+		public bool IsFpNumber => desc.IsFpNumber;
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+		public bool IsIntegral => desc.IsIntegral;
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		public bool IsInt => desc.Primitive == ExCode.Int;
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+		internal bool IsReference => num.HighInt != 0 && !IsNumberOrChar;
+		// note: the higher part may get changed (but must be non-zero)
+		internal void SetRef(int idx)
+			=> num.Long = (uint)idx | ((long)~idx << 32);
+		internal void SetRef(UserObject ctx, int idx)
+		{
+			obj = desc = ctx;
+			num.Long = (uint)idx | ((long)~idx << 32);
+		}
 
 		public int ToInt()
 		{
@@ -194,6 +262,126 @@ namespace RedOnion.ROS
 			if (it.desc.Convert(ref it, Descriptor.Int))
 				return it.num.Int;
 			throw InvalidOperation("Could not convert {0} to int", this);
+		}
+		public double ToDouble()
+		{
+			var type = desc.Primitive;
+			if (type == ExCode.Double || type == ExCode.Float)
+				return num.Double;
+			if (type.Kind() == OpKind.Number)
+				return num.Long;
+			var it = this;
+			if (it.desc.Convert(ref it, Descriptor.Double))
+				return it.num.Double;
+			throw InvalidOperation("Could not convert {0} to double", this);
+		}
+		public uint ToUInt()
+		{
+			var type = desc.Primitive;
+			if (type == ExCode.UInt)
+				return num.UInt;
+			if (type.Kind() == OpKind.Number)
+				return type == ExCode.Double || type == ExCode.Float
+					? (uint)num.Double : (uint)num.Long;
+			var it = this;
+			if (it.desc.Convert(ref it, Descriptor.UInt))
+				return it.num.UInt;
+			throw InvalidOperation("Could not convert {0} to uint", this);
+		}
+		public long ToLong()
+		{
+			var type = desc.Primitive;
+			if (type == ExCode.Long)
+				return num.Long;
+			if (type.Kind() == OpKind.Number)
+				return type == ExCode.Double || type == ExCode.Float
+					? (long)num.Double : num.Long;
+			var it = this;
+			if (it.desc.Convert(ref it, Descriptor.Long))
+				return it.num.Long;
+			throw InvalidOperation("Could not convert {0} to long", this);
+		}
+		public ulong ToULong()
+		{
+			var type = desc.Primitive;
+			if (type == ExCode.ULong)
+				return num.ULong;
+			if (type.Kind() == OpKind.Number)
+				return type == ExCode.Double || type == ExCode.Float
+					? (ulong)num.Double : num.ULong;
+			var it = this;
+			if (it.desc.Convert(ref it, Descriptor.ULong))
+				return it.num.ULong;
+			throw InvalidOperation("Could not convert {0} to ulong", this);
+		}
+		public bool ToBool()
+		{
+			var type = desc.Primitive;
+			if (type == ExCode.Bool)
+				return num.Long != 0;
+			if (type.Kind() == OpKind.Number)
+				return type == ExCode.Double || type == ExCode.Float
+					? !double.IsNaN(num.Double) && num.Double != 0.0 : num.Long != 0;
+			var it = this;
+			if (it.desc.Convert(ref it, Descriptor.Bool))
+				return it.num.Long != 0;
+			throw InvalidOperation("Could not convert {0} to boolean", this);
+		}
+		public char ToChar()
+		{
+			var type = desc.Primitive;
+			if (type == ExCode.WideChar)
+				return num.Char;
+			var it = this;
+			if (it.desc.Convert(ref it, Descriptor.Char))
+				return it.num.Char;
+			throw InvalidOperation("Could not convert {0} to char", this);
+		}
+
+		public T ToType<T>() => (T)ToType(typeof(T));
+		public object ToType(Type type)
+		{
+			if (type == typeof(Value))
+				return this;
+			if (type.IsPrimitive)
+			{
+				if (type == typeof(int))
+					return ToInt();
+				if (type == typeof(string))
+					return ToStr();
+				if (type == typeof(double))
+					return ToDouble();
+				if (type == typeof(float))
+					return (float)ToDouble();
+				if (type == typeof(uint))
+					return ToUInt();
+				if (type == typeof(long))
+					return ToLong();
+				if (type == typeof(ulong))
+					return ToULong();
+				if (type == typeof(bool))
+					return ToBool();
+				if (type == typeof(char))
+					return ToChar();
+				if (type == typeof(byte))
+					return (byte)ToUInt();
+				if (type == typeof(sbyte))
+					return (sbyte)ToInt();
+				if (type == typeof(short))
+					return (short)ToInt();
+				if (type == typeof(ushort))
+					return (ushort)ToUInt();
+			}
+			var it = obj;
+			if (it != null && !type.IsAssignableFrom(it.GetType()))
+			{
+				var tmp = this;
+				desc.Convert(ref tmp, Descriptor.Of(type));
+				it = tmp.obj;
+				if (type.IsSubclassOf(typeof(Delegate)) && it.GetType() != type)
+					it = Delegate.CreateDelegate(type, it, "Invoke");
+			}
+			return it;
 		}
 
 		/// <summary>
@@ -281,14 +469,6 @@ namespace RedOnion.ROS
 				set => Long = (uint)Long | ((long)value << 32);
 			}
 		}
-		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		internal bool IsReference => num.HighInt != 0 && (OpCode)desc.Primitive <= OpCode.String;
-		internal void SetRef(int idx) => num.Long = (uint)idx | ((long)~idx << 32);
-		internal void SetRef(Context ctx, int idx)
-		{
-			obj = desc = ctx;
-			num.Long = (uint)idx | ((long)~idx << 32);
-		}
 
 		static internal InvalidOperationException InvalidOperation(string msg, params object[] args)
 			=> new InvalidOperationException(string.Format(Culture, msg, args));
@@ -298,6 +478,8 @@ namespace RedOnion.ROS
 		{
 			get
 			{
+				if (desc == null)
+					return obj == null ? "null" : obj.ToString();
 				if (IsReference)
 				{
 					var name = desc.NameOf(obj, num.Int);

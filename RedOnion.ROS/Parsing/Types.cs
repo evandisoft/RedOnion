@@ -54,7 +54,7 @@ namespace RedOnion.ROS.Parsing
 					if (Word.Length > 127)
 						throw new ParseError(this, "Identifier name too long");
 					Push(ExCode.Identifier, Word);
-					PrepareOperator(ExCode.Dot);
+					PrepareOperator(ExCode.Dot, bottom);
 					Next();
 					unary = false;
 					goto next;
@@ -78,7 +78,7 @@ namespace RedOnion.ROS.Parsing
 						Next();
 					}
 				}
-				PrepareOperator(ExCode.Array);
+				PrepareOperator(ExCode.Array, bottom);
 				Next();
 				goto next;
 			}
@@ -93,7 +93,7 @@ namespace RedOnion.ROS.Parsing
 				return;
 			}
 			while (operators.size > bottom)
-				PrepareOperator(PopOperator());
+				PrepareOperator(PopOperator(), bottom);
 		}
 	}
 }

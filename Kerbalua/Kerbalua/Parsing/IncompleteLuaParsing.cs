@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Kerbalua.Parsing
 {
-	public class IncompleteLuaParsing
+	public partial class IncompleteLuaParsing
 	{
 		public IncompleteLuaParsing()
 		{
@@ -15,9 +15,12 @@ namespace Kerbalua.Parsing
 		static public bool IsImplicitReturn(string source)
 		{
 			var parser = GetParser(source);
-			var implicitReturn = parser.implicitReturn();
+			var errorListener = new AnyErrorsListener();
+			parser.AddErrorListener(errorListener);
 
-			return implicitReturn.exception==null;
+			var implicitReturn = parser.implicitReturn();
+			return !errorListener.HasError;
+			//return implicitReturn.exception==null;
 		}
 
 		static public IncompleteLuaParser GetParser(string source)

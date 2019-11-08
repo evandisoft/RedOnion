@@ -1,24 +1,53 @@
 using System;
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
 using RedOnion.ROS.Objects;
 using RedOnion.ROS.Parsing;
 using RedOnion.ROS.Utilities;
 
 namespace RedOnion.ROS
 {
-	public class Core : ICore
+	[DebuggerDisplay("{DebugString}")]
+	public partial class Core : IDisposable
 	{
+		public Core(Processor processor)
+		{
+			this.processor = processor ?? this as Processor;
+			vals = new ArgumentList(this);
+		}
+
 		protected int at;
 		protected byte[] code;
 		protected string[] str;
-		protected ArgumentList vals = new ArgumentList();
+		protected Processor processor;
+		protected Globals globals;
+		protected ArgumentList vals;
 		protected Context ctx;
 		protected Value self; // `this` for current code
 		protected Value result;
+		protected struct SavedContext
+		{
+			public Context context;
+			public Value prevSelf;
+			public CompiledCode code;
+			public int at, vtop;
+			public bool create;
+			// run.library (context unchanged)
+			public OpCode blockCode;
+			public int blockEnd;
+		}
+		protected ListCore<SavedContext> stack;
 
-		public UserObject Globals { get; set; }
-		public OpCode Exit { get; protected set; }
+		public Globals Globals
+		{
+			get => globals;
+			set => SetGlobals(value);
+		}
+		protected virtual void SetGlobals(Globals value)
+			=> globals = value;
+		public Processor Processor => processor;
+		public Context Context => ctx;
+		public ExitCode Exit { get; protected set; }
+		public bool Paused => Exit == ExitCode.Yield || Exit == ExitCode.Countdown;
 		public Value Result => result;
 		public int Countdown { get; set; }
 		public ArgumentList Arguments => vals;
@@ -27,22 +56,30 @@ namespace RedOnion.ROS
 		public CompiledCode Code
 		{
 			get => compiled;
-			protected set
-			{
-				at = 0;
-				code = value?.Code;
-				str = value?.Strings;
-				vals.Clear();
-				self = Value.Null;
-				Exit = OpCode.Void;
-				result = Value.Void;
-				compiled = value;
-			}
+			protected set => SetCode(value);
 		}
-
-		protected Parser Parser { get; } = new Parser();
-		public CompiledCode Compile(string source, string path = null)
-			=> Parser.Compile(source, path);
+		protected internal void SetCode(CompiledCode value, bool reset = false)
+		{
+			if (stack.size > 0)
+			{
+				if (!reset)
+					ctx = stack[0].context;
+				stack.Clear();
+			}
+			at = 0;
+			code = value?.Code;
+			str = value?.Strings;
+			vals.Clear();
+			self = Value.Null;
+			Exit = ExitCode.None;
+			result = Value.Void;
+			compiled = value;
+			if (ctx == null || reset)
+				ctx = new Context();
+			ctx.RootStart = 0;
+			ctx.RootEnd = code.Length;
+			ctx.PopAll();
+		}
 
 		public virtual void Log(string msg)
 			=> Debug.Print(msg);
@@ -59,374 +96,89 @@ namespace RedOnion.ROS
 		public void Dispose() => Dispose(true);
 		protected virtual void Dispose(bool disposing) { }
 
-		public void ResetContext() => ctx = null;
+		public void ResetContext()
+		{
+			if (stack.size > 0)
+			{
+				ctx = stack[0].context;
+				stack.Clear();
+			}
+			ctx?.Reset();
+		}
+
+		/// <summary>
+		/// Execute script from source. Returns true if finished
+		/// (<see cref="Exit" /> is set to <see cref="ExitCode.Countdown"/>
+		/// or <see cref="ExitCode.Yield"/> when returning false).
+		/// </summary>
+		/// <param name="script">Source code of the script</param>
+		/// <param name="path">Path to the script (optional, for error tracking)</param>
+		/// <param name="countdown">Countdown until auto-yield</param>
 		public bool Execute(string script, string path = null, int countdown = 1000)
 		{
-			Code = Compile(script, path);
+			if (script == null) script = processor.ReadScript(path);
+			Code = processor.Compile(script, path);
 			if (Globals == null) Globals = new Globals();
 			return Execute(countdown);
 		}
-		public bool Execute(int countdown = 1000)
+		/// <summary>
+		/// Execute compiled script. Returns true if finished
+		/// (<see cref="Exit" /> is set to <see cref="ExitCode.Countdown"/>
+		/// when returning false).
+		/// </summary>
+		/// <param name="code">Compiled script</param>
+		/// <param name="countdown">Countdown until auto-yield</param>
+		public bool Execute(CompiledCode code, int countdown = 1000)
 		{
-			var at = this.at;
-			var code = this.code;
-			var str = this.str;
-			try
+			Code = code;
+			if (Globals == null) Globals = new Globals();
+			return Execute(countdown);
+		}
+		/// <summary>
+		/// Execute function without arguments. Returns true if finished
+		/// (<see cref="Exit" /> is set to <see cref="ExitCode.Countdown"/>
+		/// when returning false).
+		/// </summary>
+		/// <param name="fn">The function to execute</param>
+		/// <param name="countdown">Countdown until auto-yield</param>
+		public bool Execute(Function fn, int countdown = 1000)
+		{
+			ctx = new Context(fn, fn.Context, null);
+			Code = fn.Code;
+			ctx.RootStart = at = fn.CodeAt;
+			ctx.RootEnd = at + fn.CodeSize;
+			ctx.PopAll();
+			ctx.Push(at, at + fn.CodeSize, OpCode.Function);
+			if (fn.BoundArguments == null)
+				ctx.Add("arguments", new Value[0]);
+			else
 			{
-				while (at < code.Length)
+				var args = new Value[fn.BoundArguments.Length];
+				fn.BoundArguments.CopyTo(args, 0);
+				ctx.Add("arguments", args);
+				for (int i = 0; i < fn.ArgumentCount; i++)
 				{
-					if (countdown <= 0)
-					{
-						Countdown = countdown;
-						return false;
-					}
-					countdown--;
-					var op = (OpCode)code[at++];
-					switch (op)
-					{
-					case OpCode.Void:
-						vals.Add(Value.Void);
-						continue;
-					case OpCode.Null:
-						vals.Add(Value.Null);
-						continue;
-					case OpCode.False:
-						vals.Add(Value.False);
-						continue;
-					case OpCode.True:
-						vals.Add(Value.True);
-						continue;
-					case OpCode.This:
-						vals.Add(self);
-						continue;
-
-					case OpCode.Identifier:
-						Identifier(at);
-						at += 4;
-						continue;
-
-					case OpCode.String:
-						vals.Add(str[Int(code, at)]);
-						at += 4;
-						continue;
-					case OpCode.Char:
-						vals.Add((char)code[at++]);
-						continue;
-					case OpCode.WideChar:
-						vals.Add((char)Short(code, at));
-						at += 2;
-						continue;
-					case OpCode.UInt:
-						vals.Add((uint)Int(code, at));
-						at += 4;
-						continue;
-					case OpCode.Int:
-						vals.Add(Int(code, at));
-						at += 4;
-						continue;
-					case OpCode.Long:
-						vals.Add(Long(code, at));
-						at += 8;
-						continue;
-					case OpCode.Float:
-						vals.Add(Float(code, at));
-						at += 4;
-						continue;
-					case OpCode.Double:
-						vals.Add(Double(code, at));
-						at += 8;
-						continue;
-
-					case OpCode.Create:
-						op = (OpCode)code[at++];
-						if (op == OpCode.Identifier)
-						{
-							Identifier(at);
-							at += 4;
-							ref var it = ref vals.Top();
-							if (it.desc.Call(ref it, null, new Arguments(), true))
-								continue;
-							throw InvalidOperation("Could not create new {0}", it.Name);
-						}
-						if (op == OpCode.Call0)
-						{
-							ref var it = ref vals.Top();
-							if (it.desc.Call(ref it, null, new Arguments(), true))
-								continue;
-							throw InvalidOperation("Could not create new {0}", it.Name);
-						}
-						throw new NotImplementedException("Not implemented: OpCode.Create + " + op.ToString());
-
-					case OpCode.Autocall:
-					case OpCode.Call0:
-					{
-						object self = null;
-						Descriptor selfDesc = null;
-						int idx = -1;
-						ref var it = ref vals.Top();
-						if (it.IsReference)
-						{
-							selfDesc = it.desc;
-							self = it.obj;
-							idx = it.num.Int;
-							if (!it.desc.Get(ref it, idx))
-								throw CouldNotGet(ref it);
-						}
-						if (it.desc.Call(ref it, self, new Arguments(), false))
-							continue;
-						if (op == OpCode.Autocall)
-							continue;
-						throw InvalidOperation((self != null ? selfDesc.NameOf(self, idx) : it.Name)
-							+ " cannot be called with zero arguments");
-					}
-
-					case OpCode.Index:
-					{
-						ref var lhs = ref vals.Top(-2);
-						if (lhs.IsReference && !lhs.desc.Get(ref lhs, lhs.num.Int))
-							throw CouldNotGet(ref lhs);
-						var idx = lhs.desc.IndexFind(ref lhs, new Arguments(Arguments, 1));
-						if (idx < 0)
-							throw InvalidOperation("'{0}' cannot be indexed by '{1}'", lhs.Name, vals.Top().ToString());
-						lhs.SetRef(idx);
-						vals.Pop(1);
-						continue;
-					}
-					case OpCode.IndexN:
-					{
-						var n = code[at++];
-						ref var it = ref vals.Top(-n);
-						if (it.IsReference && !it.desc.Get(ref it, it.num.Int))
-							throw CouldNotGet(ref it);
-						var idx = it.desc.IndexFind(ref it, new Arguments(Arguments, n-1));
-						if (idx < 0)
-							throw InvalidOperation("'{0}' cannot be indexed by '{1}'", it.Name, vals.Top().ToString());
-						it.SetRef(idx);
-						vals.Pop(n-1);
-						continue;
-					}
-					case OpCode.Dot:
-					{
-						//TODO: convert to hard index if we know the type for sure
-						var name = str[Int(code, at)];
-						at += 4;
-						ref var it = ref vals.Top();
-						if (it.IsReference && !it.desc.Get(ref it, it.num.Int))
-							throw CouldNotGet(ref it);
-						if (it.IsNumber)
-							throw InvalidOperation("Numbers do not have properties");
-						var idx = it.desc.Find(it.obj, name, true);
-						if (idx < 0)
-							throw InvalidOperation("'{0}' does not have property '{1}'", it.Name, name);
-						it.SetRef(idx);
-						continue;
-					}
-					case OpCode.Var:
-					{
-						var name = str[Int(code, at)];
-						at += 4;
-						if (ctx == null)
-							ctx = new Context();
-						var idx = ctx.Add(name, ref vals.Top());
-						vals.Pop(1);
-						ref var it = ref vals.Top();
-						it.SetRef(ctx, idx);
-						continue;
-					}
-					case OpCode.Array:
-					{
-						byte n = code[at++];
-						ref var type = ref vals.Top(-n);
-						if (type.desc != Descriptor.Void)
-							throw new NotImplementedException("Typed array");
-						var arr = new Value[n-1];
-						for (int i = 0; i < arr.Length; i++)
-							arr[i] = vals.Top(i-arr.Length);
-						type = new Value(arr);
-						vals.Pop(n-1);
-						continue;
-					}
-
-					case OpCode.Ternary:
-					{
-						ref var cond = ref vals.Top();
-						if (cond.IsReference && !cond.desc.Get(ref cond, cond.num.Int))
-							throw CouldNotGet(ref cond);
-						if (cond.desc.Primitive != ExCode.Bool && !cond.desc.Convert(ref cond, Descriptor.Bool))
-							throw InvalidOperation("Could not convert '{0}' to boolean", cond.Name);
-						int sz = Int(code, at);
-						at += 4;
-						var it = cond.num.Bool;
-						vals.Pop();
-						if (!it)
-							at += sz + 5;
-						continue;
-					}
-
-					case OpCode.Assign:
-					case OpCode.OrAssign:
-					case OpCode.XorAssign:
-					case OpCode.AndAssign:
-					case OpCode.LshAssign:
-					case OpCode.RshAssign:
-					case OpCode.AddAssign:
-					case OpCode.SubAssign:
-					case OpCode.MulAssign:
-					case OpCode.DivAssign:
-					case OpCode.ModAssign:
-					{
-						ref var lhs = ref vals.Top(-2);
-						if (!lhs.IsReference)
-							throw InvalidOperation(
-								"Cannot {0} '{1}'",
-								op == OpCode.Assign ? "assign to" : "modify",
-								lhs.desc.Name);
-						ref var rhs = ref vals.Top(-1);
-						if (rhs.IsReference && !rhs.desc.Get(ref rhs, rhs.num.Int))
-							throw CouldNotGet(ref rhs);
-						if (!lhs.desc.Set(ref lhs, lhs.num.Int, op, ref rhs))
-							throw InvalidOperation(
-								"Property '{0}' of '{1}' {2}",
-								lhs.desc.NameOf(lhs.obj, lhs.num.Int), lhs.desc.Name,
-								op == OpCode.Assign ? "is read only" : "cannot be modified");
-						if (op == OpCode.Assign)
-							lhs = rhs;
-						vals.Pop(1);
-						continue;
-					}
-
-					case OpCode.BitOr:
-					case OpCode.BitXor:
-					case OpCode.BitAnd:
-					case OpCode.ShiftLeft:
-					case OpCode.ShiftRight:
-					case OpCode.Add:
-					case OpCode.Sub:
-					case OpCode.Mul:
-					case OpCode.Div:
-					case OpCode.Equals:
-					case OpCode.Differ:
-					case OpCode.Less:
-					case OpCode.More:
-					case OpCode.LessEq:
-					case OpCode.MoreEq:
-					{
-						ref var lhs = ref vals.Top(-2);
-						if (lhs.IsReference && !lhs.desc.Get(ref lhs, lhs.num.Int))
-							throw CouldNotGet(ref lhs);
-						ref var rhs = ref vals.Top(-1);
-						if (rhs.IsReference && !rhs.desc.Get(ref rhs, rhs.num.Int))
-							throw CouldNotGet(ref rhs);
-						if (!lhs.desc.Binary(ref lhs, op, ref rhs)
-						&& !rhs.desc.Binary(ref lhs, op, ref rhs))
-							throw InvalidOperation(
-								"Binary operator '{0}' not supported on operands '{1}' and '{2}'",
-								op.Text(), lhs.desc.Name, rhs.desc.Name);
-						vals.Pop(1);
-						continue;
-					}
-					case OpCode.LogicOr:
-					case OpCode.LogicAnd:
-					{
-						ref var lhs = ref vals.Top();
-						if (lhs.IsReference && !lhs.desc.Get(ref lhs, lhs.num.Int))
-							throw CouldNotGet(ref lhs);
-						if (lhs.desc.Primitive != ExCode.Bool && !lhs.desc.Convert(ref lhs, Descriptor.Bool))
-							throw InvalidOperation("Could not convert '{0}' to boolean", lhs.Name);
-						int sz = Int(code, at);
-						at += 4;
-						if (lhs.num.Bool == (op == OpCode.LogicOr))
-						{
-							at += sz;
-							continue;
-						}
-						vals.Pop(1);
-						continue;
-					}
-					case OpCode.Identity:
-					case OpCode.NotIdentity:
-					{
-						ref var lhs = ref vals.Top(-2);
-						if (lhs.IsReference && !lhs.desc.Get(ref lhs, lhs.num.Int))
-							throw CouldNotGet(ref lhs);
-						ref var rhs = ref vals.Top(-1);
-						if (rhs.IsReference && !rhs.desc.Get(ref rhs, rhs.num.Int))
-							throw CouldNotGet(ref rhs);
-						lhs = (lhs.desc == rhs.desc && lhs.obj == rhs.obj
-							&& lhs.num.Long == rhs.num.Long) == (op == OpCode.Identity);
-						vals.Pop(1);
-						continue;
-					}
-
-					case OpCode.Plus:
-					case OpCode.Neg:
-					case OpCode.Flip:
-					case OpCode.Not:
-					{
-						ref var it = ref vals.Top();
-						if (it.IsReference && !it.desc.Get(ref it, it.num.Int))
-							throw CouldNotGet(ref it);
-						if (!it.desc.Unary(ref it, op))
-							throw InvalidOperation(
-								"Unary operator '{0}' not supported on operand '{1}'",
-								op.Text(), it.desc.Name);
-						continue;
-					}
-
-					case OpCode.PostInc:
-					case OpCode.PostDec:
-					case OpCode.Inc:
-					case OpCode.Dec:
-					{
-						ref var it = ref vals.Top();
-						if (!it.IsReference)
-							throw InvalidOperation("Cannot modify '{0}'", it.desc.Name);
-						if (!it.desc.Set(ref it, it.num.Int, op, ref it))
-							throw InvalidOperation(
-								"Property '{0}' of '{1}' cannot be modified",
-								it.desc.NameOf(it.obj, it.num.Int), it.desc.Name);
-						continue;
-					}
-
-					case OpCode.Else:
-					{
-						int sz = Int(code, at);
-						at += sz + 4;
-						continue;
-					}
-
-					default:
-						throw new NotImplementedException("Not implemented: " + op.ToString());
-					}
+					if (i < args.Length)
+						ctx.Add(fn.ArgumentName(i), ref args[i]);
+					else ctx.Add(fn.ArgumentName(i), Value.Null);
 				}
-				Exit = OpCode.Void;
-				if (vals.Count == 0)
-					result = Value.Void;
-				else
-				{
-					result = vals.Pop();
-					if (result.IsReference && !result.desc.Get(ref result, result.num.Int))
-						throw InvalidOperation(
-							"Property '{0}' of '{1}' is write only",
-							result.desc.NameOf(result.obj, result.num.Int), result.desc.Name);
-				}
-				vals.Clear();
-				Countdown = countdown;
-				return true;
 			}
-			catch (Exception ex)
-			{
-				this.at = at;
-				if (ex is RuntimeError)
-					throw;
-				throw new RuntimeError(compiled, at, ex);
-			}
+			result = Value.Void;
+			return Execute(countdown);
 		}
 
 		protected void Identifier(int at)
 		{
 			var code = this.code;
 			int idx = Int(code, at);
+
+			/* The following optimisation is too dangerous
+			 * because sometimes slots are created at first access
+			 * which then causes problems when invoking the same function
+			 * or lambda/closure for second time, where the slot does not exist yet.
+			 * TODO: Create OpCode.Local and let parser/compiler do the optimisation
+			 * for local variables where we are 100% sure it must have been created already.
+
 			int found;
 			string name;
 			if (idx >= 0)
@@ -434,9 +186,13 @@ namespace RedOnion.ROS
 				// encountered this for the first time
 				// => try to find it in local variables
 				name = str[idx];
-				found = ctx?.Find(name) ?? -1;
+				found = ctx.Find(name);
 				if (found >= 0)
 				{
+					!! WARNING !!
+					!! exactly that needs some indicator (e.g. int Find(string, out bool local))
+					!! becase found is not automatically local (see closures)
+
 					// we found it to be local, mark it as such
 					// and embed known index to speed things up
 					// TODO: do that in parser/compiler
@@ -478,7 +234,19 @@ namespace RedOnion.ROS
 				idx = found & 0x3FFFFFFF;
 				name = str[idx];
 			}
-			// try this first
+			*/
+
+			string name = str[idx];
+			int found = ctx.Find(name);
+			// if local (or tracked reference in closure)
+			if (found >= 0)
+			{
+				ref var it = ref vals.Push();
+				it.obj = it.desc = ctx;
+				it.num = new Value.NumericData(found, ~found);
+				return;
+			}
+			// try `this` first
 			if (self.obj != null
 			&& (found = self.desc.Find(self.obj, name, false)) >= 0)
 			{
@@ -499,6 +267,118 @@ namespace RedOnion.ROS
 			throw InvalidOperation("Variable '{0}' not found", name);
 		}
 
+		protected void Dereference(int argc)
+		{
+			for (int i = 0; i < argc; i++)
+			{
+				ref var arg = ref vals.Top(i - argc);
+				if (arg.IsReference && !arg.desc.Get(ref arg, arg.num.Int))
+					throw CouldNotGet(ref arg);
+			}
+		}
+
+		protected void Call(int argc, bool create, OpCode op = OpCode.Void)
+		{
+			if (argc > 0)
+				Dereference(argc);
+			object self = null;
+			Descriptor selfDesc = null;
+			int idx = -1;
+			ref var it = ref vals.Top(-argc-1);
+			if (it.IsReference)
+			{
+				selfDesc = it.desc;
+				self = it.obj;
+				idx = it.num.Int;
+				if (!it.desc.Get(ref it, idx))
+					throw CouldNotGet(ref it);
+			}
+			if (it.IsFunction)
+			{
+				var fn = (Function)it.desc;
+				ref var ret = ref stack.Add();
+				ret.context = ctx;
+				ret.prevSelf = this.self;
+				ret.code = compiled;
+				ret.at = at;
+				ret.vtop = vals.Size - argc;
+				ret.create = create;
+				compiled = fn.Code;
+				code = compiled.Code;
+				str = compiled.Strings;
+				at = fn.CodeAt;
+				ctx = new Context(fn, fn.Context, null);
+				if (create)
+					this.self = new Value(new UserObject(fn.Prototype));
+				else this.self = new Value(selfDesc, self);
+				var args = new Value[argc];
+				for (int i = 0; i < argc; i++)
+					args[i] = vals.Top(i - argc);
+				if (fn.BoundArguments != null)
+				{
+					var combined = new Value[fn.BoundArguments.Length + args.Length];
+					fn.BoundArguments.CopyTo(combined, 0);
+					args.CopyTo(combined, fn.BoundArguments.Length);
+					args = combined;
+					argc += fn.BoundArguments.Length;
+				}
+				ctx.Add("arguments", args);
+				for (int i = 0; i < fn.ArgumentCount; i++)
+				{
+					if (i < argc)
+						ctx.Add(fn.ArgumentName(i), ref args[i]);
+					else ctx.Add(fn.ArgumentName(i), Value.Null);
+				}
+				result = Value.Void;
+				return;
+			}
+#if DEBUG
+			bool wasReplace = it.desc is Functions.Run.RunReplace || it.desc is Functions.Run.RunReplaceSource;
+#endif
+			if (!it.desc.Call(ref it, self, new Arguments(Arguments, argc), create)
+				&& op != OpCode.Autocall)
+			{
+				throw InvalidOperation(create ? op == OpCode.Identifier
+					? "Could not create new {0}" : argc == 0
+					? "{0} cannot create object given zero arguments" : argc == 1
+					? "{0} cannot create object given that argument"
+					: "{0} cannot create object given these arguments" : argc == 0
+					? "{0} cannot be called with zero arguments" : argc == 1
+					? "{0} cannot be called with that argument"
+					: "{0} cannot be called with these two arguments",
+					self != null ? selfDesc.NameOf(self, idx) : it.Name);
+			}
+#if DEBUG
+			Debug.Assert(argc <= vals.Count || wasReplace);
+#endif
+			vals.Pop(Math.Min(argc, vals.Count));
+		}
+		// see Functions.Run
+		internal void CallScript(CompiledCode script, bool include = false)
+		{
+			ref var ret = ref stack.Add();
+			ret.context = ctx;
+			ret.prevSelf = this.self;
+			ret.code = compiled;
+			ret.at = at;
+			ret.vtop = vals.Size - 1;
+			ret.create = false;
+			compiled = script;
+			code = compiled.Code;
+			str = compiled.Strings;
+			at = 0;
+			if (include)
+			{
+				ret.blockCode = ctx.BlockCode;
+				ret.blockEnd = ctx.BlockEnd;
+				ctx.BlockEnd = code.Length;
+				// see Execute(int): `while (at == blockEnd)` at the top
+				ctx.BlockCode = OpCode.Import;
+			}
+			else ctx = new Context() { RootEnd = code.Length };
+			result = Value.Void;
+			vals.GetRef(2, 0) = Value.Void;
+		}
 
 		public static unsafe float Float(byte[] code, int at)
 		{
@@ -513,7 +393,7 @@ namespace RedOnion.ROS
 		public static long Long(byte[] code, int at)
 		{
 			uint lo = (uint)Int(code, at);
-			int hi = Int(code, at+4);
+			int hi = Int(code, at + 4);
 			return lo | ((long)hi << 32);
 		}
 		public static int Int(byte[] code, int at)
@@ -536,5 +416,29 @@ namespace RedOnion.ROS
 		static internal InvalidOperationException CouldNotGet(ref Value it)
 			=> new InvalidOperationException(string.Format(Value.Culture,
 			"Could not get '{0}' of '{1}'", it.desc.NameOf(it.obj, it.num.Int), it.desc.Name));
+
+		private string DebugString
+		{
+			get
+			{
+				var code = this.compiled;
+				if (code == null)
+					return "null";
+				var lineMap = code.LineMap;
+				if (lineMap == null || lineMap.Length == 0)
+					return "no line map";
+				var lines = code.Lines;
+				if (lines == null)
+					return "no lines";
+				int i = Array.BinarySearch(lineMap, at - 1);
+				if (i < 0)
+				{
+					i = ~i;
+					if (i > 0)
+						i--;
+				}
+				return i >= 0 && lines != null && i < lines.Count ? lines[i].ToString() : "#" + i;
+			}
+		}
 	}
 }

@@ -1,69 +1,134 @@
 using System;
 using System.Collections.Generic;
-using RedOnion.Script;
 using UnityEngine;
+using RedOnion.ROS;
 using RedOnion.KSP;
 using RedOnion.KSP.Autopilot;
-using RedOnion.Script.Parsing;
+using RedOnion.KSP.ROS;
+using RedOnion.ROS.Objects;
 
 namespace Kerbalua.Other
 {
 	public class RedOnionReplEvaluator : ReplEvaluator
 	{
-		ImmediateEngine engine;
-		ReplHintsEngine hints;
+		RosProcessor processor;
+		RosSuggest suggest;
 		string source, path;
-		bool skipUpdate;
+		State state;
+		enum State { Idle, NewSource, Yielding, Events }
+
 
 		public RedOnionReplEvaluator()
 		{
-			engine = new ImmediateEngine();
-			hints = new ReplHintsEngine(engine);
-
-			engine.Printing += msg => PrintAction?.Invoke(msg);
+			suggest = new RosSuggest(processor = new RosProcessor());
+			processor.Print += PrintRedirect;
+			processor.PrintError += ErrorRedirect;
 		}
+		protected override void Dispose(bool disposing)
+		{
+			processor.Print -= PrintRedirect;
+			processor.PrintError -= ErrorRedirect;
+			if (disposing)
+				processor.Dispose();
+			base.Dispose(disposing);
+		}
+		protected void PrintRedirect(string msg)
+			=> PrintAction?.Invoke(msg);
+		protected void ErrorRedirect(string msg)
+			=> PrintErrorAction?.Invoke(msg);
 
 		public override void FixedUpdate()
 		{
-			if (skipUpdate)
-			{
-				skipUpdate = false;
+			if (state < State.Yielding)
 				return;
+			try
+			{
+				processor.UpdatePhysics();
 			}
-			engine.FixedUpdate();
+			catch (Exception e)
+			{
+				Debug.Log(e);
+				PrintErrorAction?.Invoke(e.Message);
+
+				if (e is Error err)
+				{
+					var atLine = string.Format(Value.Culture,
+					err.Line == null ? "At line {0}." : "At line {0}: {1}",
+					err.LineNumber+1, err.Line);
+					Debug.Log(atLine);
+					PrintErrorAction?.Invoke(atLine);
+				}
+
+				Terminate();
+			}
+		}
+		public override void Update()
+		{
+			try
+			{
+				processor.UpdateGraphic();
+			}
+			catch (Exception e)
+			{
+				Debug.Log(e);
+				PrintErrorAction?.Invoke(e.Message);
+
+				if (e is Error err)
+				{
+					var atLine = string.Format(Value.Culture,
+					err.Line == null ? "At line {0}." : "At line {0}: {1}",
+					err.LineNumber+1, err.Line);
+					Debug.Log(atLine);
+					PrintErrorAction?.Invoke(atLine);
+				}
+
+				Terminate();
+			}
 		}
 
 		protected override void ProtectedSetSource(string source, string path)
 		{
 			this.source = source;
 			this.path = path;
+			state = State.NewSource;
 			//TODO: unsubscribe events from last execution if path is the same
 		}
 		public override bool Evaluate(out string result)
 		{
 			try
 			{
-				skipUpdate = true;
-				engine.ExecutionCountdown = 10000;
-				engine.Execute(source);
-				result = engine.Result.ToString();
-				return true; // for now we always complete immediately
+				var prevState = state;
+				if (state == State.NewSource)
+				{
+					state = processor.Execute(source, path, 10000)
+						? processor.HasEvents ? State.Events : State.Idle : State.Yielding;
+				}
+				else if (state == State.Yielding && !processor.Paused)
+					state = processor.HasEvents ? State.Events : State.Idle;
+				else if (state == State.Events && !processor.HasEvents)
+					state = State.Idle;
+				if (prevState <= State.Yielding
+					&& (state == State.Events || state == State.Idle))
+				{
+					result = processor.Result.ToString();
+					return true;
+				}
+				result = "";
+				return state != State.Yielding;
 			}
 			catch (Exception e)
 			{
+				Debug.Log(e);
 				PrintErrorAction?.Invoke(e.Message);
 
-				string FormatLine(int lineNumber, string line)
-					=> string.Format(Value.Culture,
-					line == null ? "At line {0}." : "At line {0}: {1}",
-					lineNumber+1, line);
-
-				if (e is RuntimeError runError)
-					PrintErrorAction?.Invoke(FormatLine(runError.LineNumber, runError.Line));
-				else if (e is ParseError parseError)
-					PrintErrorAction?.Invoke(FormatLine(parseError.LineNumber, parseError.Line));
-
-				Debug.Log(e);
+				if (e is Error err)
+				{
+					var atLine = string.Format(Value.Culture,
+					err.Line == null ? "At line {0}." : "At line {0}: {1}",
+					err.LineNumber+1, err.Line);
+					Debug.Log(atLine);
+					PrintErrorAction?.Invoke(atLine);
+				}
 			}
 			Terminate();
 			result = "";
@@ -77,7 +142,7 @@ namespace Kerbalua.Other
 		{
 			try
 			{
-				return hints.Complete(source, cursorPos, out replaceStart, out replaceEnd);
+				return suggest.GetCompletions(source, cursorPos, out replaceStart, out replaceEnd);
 			}
 			catch (Exception e)
 			{
@@ -90,18 +155,25 @@ namespace Kerbalua.Other
 
 		public override void ResetEngine()
 		{
+			state = State.Idle;
 			source = null;
 			path = null;
-			engine.Reset();
-			hints.Reset();
-			FlightControl.GetInstance().Shutdown();
+			processor.Reset();
+			suggest.Reset();
+			base.ResetEngine();
 		}
 
 		public override void Terminate()
 		{
+			state = State.Idle;
 			source = null;
 			path = null;
-			engine.ClearEvents();
+			processor.ClearEvents();
+		}
+
+		public override IList<string> GetDisplayableCompletions(string source, int cursorPos, out int replaceStart, out int replaceEnd)
+		{
+			return GetCompletions(source,cursorPos,out replaceStart,out replaceEnd);
 		}
 	}
 }

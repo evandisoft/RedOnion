@@ -84,6 +84,8 @@ namespace RedOnion.ROS
 		Exception		= 0x08, // exception in catch block
 		Default			= 0x09, // default value	+[index to string table]
 		Identifier		= 0x0A, // identifier		+[index to string table]
+
+		//note: [String, Create) is used for type identification
 		String			= 0x0B, // string			+[index to string table]
 		Char			= 0x0C, // short char		+[byte]
 		WideChar		= 0x0D, // wide char		+[2B char]
@@ -94,18 +96,18 @@ namespace RedOnion.ROS
 		UShort			= 0x11, // u16
 		UInt			= 0x12, // u32
 		ULong			= 0x13, // u64
-		SByte			= 0x14, // s8
-		Short			= 0x15, // s16
-		Int				= 0x16, // s32
-		Long			= 0x17, // s64
-		Float			= 0x18, // f32
-		Double			= 0x19, // f64
-		LongDouble		= 0x1A, // f80
-		Bool			= 0x1B, // used only as type specifier (true/false used in expressions)
-		Complex			= 0x1C, // reserved for complex numbers
-		Decimal			= 0x1D, // f128
-		Quad			= 0x1E, // u128
-		Hyper			= 0x1F, // s128
+		Quad			= 0x14, // u128
+		SByte			= 0x15, // s8
+		Short			= 0x16, // s16
+		Int				= 0x17, // s32
+		Long			= 0x18, // s64
+		Hyper			= 0x19, // s128
+		Bool			= 0x1A, // used only as type specifier (true/false used in expressions)
+		Complex			= 0x1B, // reserved for complex numbers
+		Float			= 0x1C, // f32
+		Double			= 0x1D, // f64
+		LongDouble		= 0x1E, // f80
+		Decimal			= 0x1F, // x128 (fixed point)
 
 	//	special
 		Create			= 0x20, // new
@@ -127,29 +129,30 @@ namespace RedOnion.ROS
 
 	//	assign
 		Assign			= 0x30, // =
-		OrAssign		= 0x31, // |=
-		XorAssign		= 0x32, // ^=
-		AndAssign		= 0x33, // &=
-		LshAssign		= 0x34, // <<=
-		RshAssign		= 0x35, // >>=
-		AddAssign		= 0x36, // +=
-		SubAssign		= 0x37, // -=
-		MulAssign		= 0x38, // *=
-		DivAssign		= 0x39, // /=
-		ModAssign		= 0x3A, // %=
+		AddAssign		= 0x31, // +=
+		SubAssign		= 0x32, // -=
+		MulAssign		= 0x33, // *=
+		DivAssign		= 0x34, // /=
+		ModAssign		= 0x35, // %=
+		PwrAssign		= 0x36, // **=
+		OrAssign		= 0x37, // |=
+		XorAssign		= 0x38, // ^=
+		AndAssign		= 0x39, // &=
+		LshAssign		= 0x3A, // <<=
+		RshAssign		= 0x3B, // >>=
 
 	//	binary
-		BitOr			= 0x41, // |
-		BitXor			= 0x42, // ^
-		BitAnd			= 0x43, // &
-		ShiftLeft		= 0x44, // <<
-		ShiftRight		= 0x45, // >>
-		Add				= 0x46, // +
-		Sub				= 0x47, // -
-		Mul				= 0x48, // *
-		Div				= 0x49, // /
-		Mod				= 0x4A, // %
-		Power			= 0x4B, // **		(reserved)
+		Add				= 0x41, // +
+		Sub				= 0x42, // -
+		Mul				= 0x43, // *
+		Div				= 0x44, // /
+		Mod				= 0x45, // %
+		Power			= 0x46, // **
+		BitOr			= 0x47, // |		!! changed priority from C#/C++ !!
+		BitXor			= 0x48, // ^		!! changed priority from C#/C++ !!
+		BitAnd			= 0x49, // &		!! changed priority from C#/C++ !!
+		ShiftLeft		= 0x4A, // <<		!! changed priority from C#/C++ !!
+		ShiftRight		= 0x4B, // >>		!! changed priority from C#/C++ !!
 
 	//	logic + casts
 		LogicOr			= 0x50, // ||
@@ -168,6 +171,7 @@ namespace RedOnion.ROS
 		Cast			= 0x5C, // !		(type! value)
 		Is				= 0x5D, // is
 		IsNot			= 0x5E, // is!
+		In				= 0x5F, // in		(contains or for/foreach in)
 	
 	//	unary
 		Plus			= 0x60, // +x
@@ -193,7 +197,7 @@ namespace RedOnion.ROS
 	//	statements
 		Block			= 0x80, // block with its own scope
 		Autocall		= 0x81, // expression that should be called (like Call0) if it is a function
-		Return			= 0x82, // return
+		Return			= 0x82, // return (also used to mark scripts run as library)
 		Raise			= 0x83, // throw/raise (Python uses raise)
 		Break			= 0x84, // break
 		Continue		= 0x85, // continue
@@ -206,15 +210,19 @@ namespace RedOnion.ROS
 		If				= 0x8C, // if cond then truestts
 		Unless			= 0x8D, // unless cond do falsestts
 		Else			= 0x8E, // if cond then truestts else falsestts
+		Cond			= 0x8F, // condition of loops (for/while/unless in postfix)
 
-		Goto			= 0x90, // goto label
-		GotoCase		= 0x91, // goto case
-		Switch			= 0x92, // switch x: case 1: break; case 2: break; default: continue
-		SwitchCond		= 0x93, // switch x: case < 0: ...; case 0: ...; case > 0: ...
-		Using			= 0x94, // using macro (try..finally dispose)
-		Catch			= 0x95, // try..catch..finally
-		With			= 0x96, // with var do stts
-		From			= 0x97, // LINQ
+		Pop				= 0x90,	// discard top value
+		Yield			= 0x91,	// wait/yield (cooperative multitasking)
+
+		Goto			= 0x92, // goto label
+		GotoCase		= 0x93, // goto case
+		Switch			= 0x94, // switch x: case 1: break; case 2: break; default: continue
+		SwitchCond		= 0x95, // switch x: case < 0: ...; case 0: ...; case > 0: ...
+		Using			= 0x96, // using macro (try..finally dispose)
+		Catch			= 0x97, // try..catch..finally
+		With			= 0x98, // with var do stts
+		From			= 0x99, // LINQ
 
 	//	model
 		Import			= 0xD0, // using/import/include
@@ -286,18 +294,18 @@ namespace RedOnion.ROS
 		UShort			= 0x0211, // u16
 		UInt			= 0x0412, // u32
 		ULong			= 0x0813, // u64
-		SByte			= 0x4114, // s8
-		Short			= 0x4215, // s16
-		Int				= 0x4416, // s32
-		Long			= 0x4817, // s64
-		Float			= 0xC418, // f32
-		Double			= 0xC819, // f64
-		LongDouble		= 0xCA1A, // f80
-		Bool			= 0x011B, // used only as type specifier (true/false used in expressions)
-		Complex			= 0x101C, // reserved for complex numbers
-		Decimal			= 0x901D, // f128
-		Quad			= 0x101E, // u128
-		Hyper			= 0x501F, // s128
+		Quad			= 0x1014, // u128
+		SByte			= 0x4115, // s8
+		Short			= 0x4216, // s16
+		Int				= 0x4417, // s32
+		Long			= 0x4818, // s64
+		Hyper			= 0x5019, // s128
+		Bool			= 0x011A, // used only as type specifier (true/false used in expressions)
+		Complex			= 0x101B, // reserved for complex numbers
+		Float			= 0xC41C, // f32
+		Double			= 0xC81D, // f64
+		LongDouble		= 0xCA1E, // f80
+		Decimal			= 0x901F, // f128
 
 	//	special
 		Create			= 0x4020, // new
@@ -312,76 +320,78 @@ namespace RedOnion.ROS
 		Type			= 0x6029, //		special marker for built-in types in postfix notation
 		Array			= 0x602A, // t[n]	array declaration or creation
 		BigArray		= 0x602B, // t[n]	array declaration or creation
-		NullCol			= 0x002C, // ??		(one ?? two)
+		NullCol			= 0x022C, // ??		(one ?? two)
 		NullCall		= 0x002D, // ?.()
 		NullDot			= 0x002E, // ?.it
 		Ternary			= 0x202F, // ?:		(or: val1 if cond else val2)
 
 	//	assign
 		Assign			= 0x0130, // =
-		OrAssign		= 0x0131, // |=
-		XorAssign		= 0x0132, // ^=
-		AndAssign		= 0x0133, // &=
-		LshAssign		= 0x0134, // <<=
-		RshAssign		= 0x0135, // >>=
-		AddAssign		= 0x0136, // +=
-		SubAssign		= 0x0137, // -=
-		MulAssign		= 0x0138, // *=
-		DivAssign		= 0x0139, // /=
-		ModAssign		= 0x013A, // %=
+		AddAssign		= 0x0131, // +=
+		SubAssign		= 0x0132, // -=
+		MulAssign		= 0x0133, // *=
+		DivAssign		= 0x0134, // /=
+		ModAssign		= 0x0135, // %=
+		PwrAssign		= 0x0136, // **=
+		OrAssign		= 0x0137, // |=
+		XorAssign		= 0x0138, // ^=
+		AndAssign		= 0x0139, // &=
+		LshAssign		= 0x013A, // <<=
+		RshAssign		= 0x013B, // >>=
 
 	//	binary
-		BitOr			= 0x0941, // |		!! changed priority !! 4 in C#
-		BitXor			= 0x0A42, // ^		!! changed priority !! 5 in C#
-		BitAnd			= 0x0B43, // &		!! changed priority !! 6 in C#
-		ShiftLeft		= 0x0C44, // <<
-		ShiftRight		= 0x0C45, // >>
-		Add				= 0x0D46, // +
-		Sub				= 0x0D47, // -
-		Mul				= 0x0E48, // *
-		Div				= 0x0E49, // /
-		Mod				= 0x0E4A, // %
-		Power			= 0x8F4B, // **		(reserved)
+		Add				= 0x0B41, // +
+		Sub				= 0x0B42, // -
+		Mul				= 0x0C43, // *
+		Div				= 0x0C44, // /
+		Mod				= 0x0C45, // %
+		Power			= 0x0D46, // **
+		BitOr			= 0x0E47, // |		!! changed priority from C#/C++ !!
+		BitXor			= 0x0F48, // ^		!! changed priority from C#/C++ !!
+		BitAnd			= 0x1049, // &		!! changed priority from C#/C++ !!
+		ShiftLeft		= 0x114A, // <<		!! changed priority from C#/C++ !!
+		ShiftRight		= 0x114B, // >>		!! changed priority from C#/C++ !!
 
 	//	logic + casts
-		LogicOr			= 0x0250, // ||
-		LogicAnd		= 0x0351, // &&
-	//	priority 4..6 reserved for C# binary or, xor, and
-		Equals			= 0x0752, // ==
-		Differ			= 0x0753, // !=
-		Less			= 0x0854, // <
-		More			= 0x0855, // >
-		LessEq			= 0x0856, // <=
-		MoreEq			= 0x0857, // >=
-		Identity		= 0x0858, // ===
-		NotIdentity		= 0x0859, // !==
+		LogicOr			= 0x0350, // ||
+		LogicAnd		= 0x0451, // &&
+	//	priority 5..8 reserved for C# binary or, xor, and, <<, >>
+		Equals			= 0x0952, // ==
+		Differ			= 0x0953, // !=
+		Less			= 0x0A54, // <
+		More			= 0x0A55, // >
+		LessEq			= 0x0A56, // <=
+		MoreEq			= 0x0A57, // >=
+		Identity		= 0x0A58, // ===
+		NotIdentity		= 0x0A59, // !==
 
-		As				= 0x085A, // as
-		AsCast			= 0x085B, // as!
-		Cast			= 0x085C, // !		(type! value)
-		Is				= 0x085D, // is
-		IsNot			= 0x085E, // is!
+		As				= 0x0A5A, // as
+		AsCast			= 0x0A5B, // as!
+		Cast			= 0x0A5C, // !		(type! value)
+		Is				= 0x0A5D, // is
+		IsNot			= 0x0A5E, // is!
+		In				= 0x0A5F, // in		(contains + for/foreach in)
 	
 	//	unary
-		Plus			= 0x4E60, // +x
-		Neg				= 0x4E61, // -x
-		Flip			= 0x4E62, // ~x
-		Not				= 0x4E63, // !x
-		AddrOf			= 0xCE64, // &x		(reserved)
-		Deref			= 0xCE65, // *x		(reserved)
+		Plus			= 0x5260, // +x
+		Neg				= 0x5261, // -x
+		Flip			= 0x5262, // ~x
+		Not				= 0x5263, // !x
+		AddrOf			= 0xD264, // &x		(reserved)
+		Deref			= 0xD265, // *x		(reserved)
 
-		TypeOf			= 0xCE68, // typeof x
-		NameOf			= 0xCE69, // nameof x
-		Await			= 0x406A, // await task
-		Delete			= 0x406D, // delete
-		Ref				= 0x406E, // ref
-		Out				= 0x406F, // out
+		TypeOf			= 0xD268, // typeof x
+		NameOf			= 0xD269, // nameof x
+		Await			= 0x526A, // await task
+		Delete			= 0x526D, // delete
+		Ref				= 0x526E, // ref
+		Out				= 0x526F, // out
 
 	//	unary post/pre
-		PostInc			= 0x5070, // x++
-		PostDec			= 0x5071, // x--
-		Inc				= 0x5178, // ++x
-		Dec				= 0x5179, // --x
+		PostInc			= 0x5370, // x++
+		PostDec			= 0x5371, // x--
+		Inc				= 0x5478, // ++x
+		Dec				= 0x5479, // --x
 
 	//	statements
 		Block			= 0x0080, // block with its own scope
@@ -393,7 +403,6 @@ namespace RedOnion.ROS
 		Continue		= 0x0085, // continue
 		For				= 0x0086, // for init; test; iter: stts
 		ForEach			= 0x0087, // for var in list: stts
-		In				= 0x0187, // (for parsing only)
 		While			= 0x0088, // while cond do stts
 		Do				= 0x0089, // do stts; while cond
 		Until			= 0x008A, // until cond do stts  
@@ -402,22 +411,26 @@ namespace RedOnion.ROS
 		Then			= 0x018C, // (for parsing only)
 		Unless			= 0x008D, // unless cond do falsestts
 		Else			= 0x008E, // if cond then truestts else falsestts
+		Cond			= 0x008F, // condition of loops (for/while/unless in postfix)
 
-		Goto			= 0x0090, // goto label
-		Label			= 0x0190, // label:   (for 1st phase of parsing/compilation)
-		GotoCase		= 0x0091, // goto case
-		Case			= 0x0191, // case 0:  (for parsing only)
-		Switch			= 0x0092, // switch x: case 1: break; case 2: break; default: continue
-		SwitchCond		= 0x0093, // switch x: case < 0: ...; case 0: ...; case > 0: ...
-		Using			= 0x0094, // using macro (try..finally dispose)
-		Catch			= 0x0095, // try..catch..finally
-		Try				= 0x0195, // (for parsing only)
-		Finally			= 0x0295, // (for parsing only)
-		Except			= 0x0395, // catch from Python
-		With			= 0x0096, // with var do stts
-		From			= 0x0097, // LINQ
-		Select			= 0x0197, // (for parsing only)
-		OrderBy			= 0x0297, // (for parsing only)
+		Pop				= 0x0090, // discard top value
+		Yield			= 0x0091, // yield (cooperative multitasking)
+		Wait			= 0x0191, // wait (cooperative multitasking)
+		Goto			= 0x0092, // goto label
+		Label			= 0x0192, // label:   (for 1st phase of parsing/compilation)
+		GotoCase		= 0x0093, // goto case
+		Case			= 0x0193, // case 0:  (for parsing only)
+		Switch			= 0x0094, // switch x: case 1: break; case 2: break; default: continue
+		SwitchCond		= 0x0095, // switch x: case < 0: ...; case 0: ...; case > 0: ...
+		Using			= 0x0096, // using macro (try..finally dispose)
+		Catch			= 0x0097, // try..catch..finally
+		Try				= 0x0197, // (for parsing only)
+		Finally			= 0x0297, // (for parsing only)
+		Except			= 0x0397, // catch from Python
+		With			= 0x0098, // with var do stts
+		From			= 0x0099, // LINQ
+		Select			= 0x0199, // (for parsing only)
+		OrderBy			= 0x0299, // (for parsing only)
 
 	//NOTE: acces, scope and other modifiers were moved to TypeFlags
 	//..... could thus be changed to parsing-only codes
@@ -517,8 +530,8 @@ namespace RedOnion.ROS
 		/// </summary>
 		public static ExCode StdPriority(this ExCode self)
 			=> self.Code() >= ExCode.BitOr.Code()
-			&& self.Code() <= ExCode.BitAnd.Code()
-			? self.Priority() - 0x0500
+			&& self.Code() <= ExCode.ShiftRight.Code()
+			? self.Priority() - 0x0900
 			: self.Code() == ExCode.Cast.Code()
 			? 0 : self.Priority();
 
@@ -530,10 +543,10 @@ namespace RedOnion.ROS
 			=> (OpKind)(self & (OpCode)ExCode.mKind);
 		public static OpKind Kind(this ExCode self)
 			=> (OpKind)(self & ExCode.mKind);
-		public static bool IsNumber(this ExCode self)
-			=> (OpCode)self > OpCode.String;
-		public static bool IsNumber(this OpCode self)
-			=> self > OpCode.String;
+		public static bool IsNumberOrChar(this ExCode self)
+			=> (OpCode)self > OpCode.String && (OpCode)self < OpCode.Create;
+		public static bool IsNumberOrChar(this OpCode self)
+			=> self > OpCode.String && self < OpCode.Create;
 		public static bool IsSigned(this ExCode self)
 			=> (self & ExCode.fSig) != 0;
 		public static bool IsFloatPoint(this ExCode self)
@@ -565,13 +578,13 @@ namespace RedOnion.ROS
 		private static readonly byte[] _info = new byte[] {
 			// 0    1    2    3    4    5    6    7     8    9    A    B    C    D    E    F
 			0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00, 0x00,0x00,0x00,0x00,0x01,0x02,0x04,0x00, //0 constants
-			0x01,0x02,0x04,0x08,0x41,0x42,0x44,0x48, 0xC4,0xC8,0xCA,0x01,0x10,0x90,0x10,0x50, //1 numbers
-			0x40,0x40,0x00,0x20,0x60,0x00,0x60,0x00, 0x20,0x60,0x60,0x60,0x00,0x00,0x00,0x20, //2 special
-			0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01, 0x01,0x01,0x01,0x81,0x81,0x81,0x81,0x81, //3 assign
-			0x81,0x09,0x0A,0x0B,0x0C,0x0C,0x0D,0x0D, 0x0E,0x0E,0x0E,0x8F,0x8F,0x8F,0x8F,0x8F, //4 binary
-			0x02,0x03,0x07,0x07,0x08,0x08,0x08,0x08, 0x08,0x08,0x08,0x08,0x08,0x08,0x08,0x88, //5 logic + casts
-			0x4E,0x4E,0x4E,0x4E,0xCE,0xCE,0xCE,0xCE, 0xCE,0xCE,0x40,0xC0,0xC0,0x40,0x40,0x40, //6 unary
-			0x50,0x50,0xD0,0xD0,0xD0,0xD0,0xD0,0xD0, 0x51,0x51,0xD1,0xD1,0xD1,0xD1,0xD1,0xD1, //7 post/pre
+			0x01,0x02,0x04,0x08,0x10,0x41,0x42,0x44, 0x48,0x50,0x01,0x10,0xC4,0xC8,0xCA,0x90, //1 numbers
+			0x40,0x40,0x00,0x20,0x60,0x00,0x60,0x00, 0x20,0x60,0x60,0x60,0x02,0x00,0x00,0x20, //2 special
+			0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01, 0x01,0x01,0x01,0x01,0x81,0x81,0x81,0x81, //3 assign
+			0x81,0x0B,0x0B,0x0C,0x0C,0x0C,0x0D,0x0E, 0x0F,0x10,0x11,0x11,0x91,0x91,0x91,0x91, //4 binary
+			0x03,0x04,0x09,0x09,0x0A,0x0A,0x0A,0x0A, 0x0A,0x0A,0x0A,0x0A,0x0A,0x0A,0x0A,0x0A, //5 logic + casts
+			0x52,0x52,0x52,0x52,0xD2,0xD2,0xD2,0xD2, 0xD2,0xD2,0x52,0x52,0x52,0x52,0x52,0x52, //6 unary
+			0x53,0x53,0xD3,0xD3,0xD3,0xD3,0xD3,0xD3, 0x54,0x54,0xD4,0xD4,0xD4,0xD4,0xD4,0xD4, //7 post/pre
 			// the rest of this table must be zeros
 			0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00, 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00, //8 statements
 			0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00, 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00, //9 statements
@@ -587,20 +600,20 @@ namespace RedOnion.ROS
 			"void", "null", "false", "true", "this", "base", "value", null,
 			"exception", "default", null, "string", "char", "wchar", "lchar", "number",
 		//	numbers
-			"byte", "ushort", "uint", "ulong", "sbyte", "short", "int", "long",
-			"float", "double", "long double", "bool", "complex", "decimal", "quad", "hyper",
+			"byte", "ushort", "uint", "ulong", "quad", "sbyte", "short", "int",
+			"long", "hyper", "bool", "complex", "float", "double", "long double", "decimal",
 		//	special
 			"new",  "()",   "()",   "()",   "()",   "[]",   "[]",   ".",
 			"var",  ".[]",  "[]",   "??",   "?.",   "?.()", "?:",   "=>",
 		//	assign
-			"=",    "|=",   "^=",   "&=",   "<<=",  ">>=",  "+=",   "-=",
-			"*=",   "/=",   "%=",   null,   null,   null,   null,   "var",
+			"=",    "+=",   "-=",   "*=",   "/=",   "%=",   "**=",  "|=",
+			"^=",   "&=",   "<<=",  ">>=",  null,   null,   null,   null,
 		//	binary
-			null,   "|",    "^",    "&",    "<<",   ">>",   "+",    "-",
-			"*",    "/",    "%",    "**",   null,   null,   "as",   "as!",
+			null,   "+",    "-",    "*",    "/",    "%",    "**",   "|",
+			"^",	"&",    "<<",   ">>",   null,   null,   null,   null,
 		//	logic + casts
 			"||",   "&&",   "==",   "!=",   "<",    ">",    "<=",   ">=",
-			"===",  "!==",  "as",   "as!",  "!",    "is",   "is!",  null,
+			"===",  "!==",  "as",   "as!",  "!",    "is",   "is!",  "in",
 		//	unary
 			"+",    "-",    "~",    "!",    "&",    "*",    "[]",   null,
 			"typeof", "nameof", "await", null,  "new", "delete", "ref", "out",
@@ -609,9 +622,9 @@ namespace RedOnion.ROS
 			null,   null,   null,   null,   null,   null,   null,   null,
 		//	statements
 			"{}", null, "return", "throw", "break", "continue", "for", "foreach",
-			"while", "do", "until", "do-until", "if", "unless", "else", "with",
-			"switch", "case", "default", "label", "goto", "using", "catch", "from",
-			null,   null,   null,   null,   null,   null,   null,   null,
+			"while", "do", "until", "do-until", "if", "unless", "else", null,
+			"pop", "yield", "goto", "case", "switch", null, "using", "catch",
+			"with", "from", null,   null,   null,   null,   null,	null,
 		//	access
 			null, "public", "private", "protected",
 			"internal", null, "private internal", "protected internal",

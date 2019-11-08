@@ -12,10 +12,11 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>RedOnion.KSP</RootNamespace>
     <AssemblyName>RedOnion.KSP</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
     <ReleaseVersion>0.3.0</ReleaseVersion>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -25,6 +26,8 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <NoWarn>IDE1006</NoWarn>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -33,6 +36,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System">
@@ -43,8 +47,16 @@
       <HintPath>$(KerbalLibs)\UnityEngine.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>$(KerbalLibs)\UnityEngine.CoreModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>$(KerbalLibs)\UnityEngine.UI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.UIModule">
+      <HintPath>$(KerbalLibs)\UnityEngine.UIModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Assembly-CSharp">
@@ -58,26 +70,51 @@
     <Reference Include="KerbaluaMoonSharp">
       <HintPath>..\OtherDLLs\KerbaluaMoonSharp\KerbaluaMoonSharp.dll</HintPath>
     </Reference>
+    <Reference Include="mscorlib" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="API\FunctionBase.cs" />
+    <Compile Include="API\Autopilot.cs" />
+    <Compile Include="API\ConstVector.cs" />
     <Compile Include="API\Globals.cs" />
-    <Compile Include="API\Interface.cs" />
-    <Compile Include="API\InteropObject.cs" />
     <Compile Include="API\InteropUtilities.cs" />
-    <Compile Include="API\MethodBase.cs" />
+    <Compile Include="API\VectorUtils.cs" />
+    <Compile Include="Lua\Descriptors\LuaDescriptor.cs" />
+    <Compile Include="Lua\Descriptors\LuaEventDescriptor.cs" />
+    <Compile Include="Lua\Proxies\LuaEventProxy.cs" />
+    <Compile Include="Utilities\Extensions.cs" />
+    <Compile Include="Utilities\MultiValueDictionary.cs" />
+    <Compile Include="Utilities\Properties.cs" />
+    <Compile Include="Utilities\ReadOnlyList.cs" />
+    <Compile Include="Utilities\ReadOnlySet.cs" />
+    <Compile Include="API\Bodies.cs" />
+    <Compile Include="API\Time.cs" />
+    <Compile Include="API\Player.cs" />
+    <Compile Include="API\VectorDraw.cs" />
+    <Compile Include="Namespaces\KSP.cs" />
+    <Compile Include="Namespaces\UI.cs" />
+    <Compile Include="Namespaces\Unity.cs" />
+    <Compile Include="Parts\Decoupler.cs" />
+    <Compile Include="Parts\DockingPort.cs" />
+    <Compile Include="Parts\Engine.cs" />
+    <Compile Include="Parts\LaunchClamp.cs" />
+    <Compile Include="Parts\PartBase.cs" />
     <Compile Include="API\Reflect.cs" />
     <Compile Include="API\Ship.cs" />
+    <Compile Include="Parts\PartSet.cs" />
     <Compile Include="API\Stage.cs" />
     <Compile Include="API\Vector.cs" />
-    <Compile Include="API\Vector.Functions.cs" />
-    <Compile Include="API\Vector.Methods.cs" />
     <Compile Include="API\VectorCreator.cs" />
+    <Compile Include="API\PID.cs" />
+    <Compile Include="Parts\Propellant.cs" />
+    <Compile Include="Parts\Resource.cs" />
+    <Compile Include="Parts\Sensor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReflectionUtil\GetMappings.ROS.cs" />
     <Compile Include="ReflectionUtil\NamespaceInstance.ROS.cs" />
-    <Compile Include="ROS\KspRosEngine.cs" />
-    <Compile Include="ROS\UI\Window.cs" />
-    <Compile Include="ROS\RuntimeRoot.cs" />
+    <Compile Include="ROS\RosProcessor.cs" />
+    <Compile Include="ROS\RosProps.cs" />
+    <Compile Include="ROS\RosSuggest.cs" />
+    <Compile Include="Namespaces\UI.Window.cs" />
     <Compile Include="Autopilot\FlightControl.cs" />
     <Compile Include="MathUtil\Vec.cs" />
     <Compile Include="MathUtil\Scalar.cs" />
@@ -99,17 +136,25 @@
     <Compile Include="ReflectionUtil\DualCaseSensitivityDict.cs" />
     <Compile Include="ReflectionUtil\GetMappings.cs" />
     <Compile Include="ReflectionUtil\GetMappings.Lua.cs" />
+    <Compile Include="API\AutoRun.cs" />
+    <Compile Include="Settings\SavedSettings.cs" />
+    <Compile Include="CommonAPIHelpers\ScriptStringKeyedConstDictionary.cs" />
+    <Compile Include="UnsafeAPI\BodiesDictionary.cs" />
+    <Compile Include="UnsafeAPI\KerbalsDictionary.cs" />
+    <Compile Include="UnsafeAPI\UnsafeAPI.cs" />
+    <Compile Include="Utilities\ReferenceEqualityComparer.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\RedOnion.Script\RedOnion.Script.csproj">
-      <Project>{0D0A04F3-0A82-49CD-8178-7640ACE88BFF}</Project>
-      <Name>RedOnion.Script</Name>
+    <ProjectReference Include="..\RedOnion.ROS\RedOnion.ROS.csproj">
+      <Project>{59399c9e-ebac-4d7c-b2cb-6ece22fe8d6e}</Project>
+      <Name>RedOnion.ROS</Name>
     </ProjectReference>
     <ProjectReference Include="..\RedOnion.UI\RedOnion.UI.csproj">
       <Project>{034C16AB-D16E-4AFE-9837-812499EE2F3D}</Project>
       <Name>RedOnion.UI</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup />
   <ItemGroup />
   <ItemGroup />

@@ -1,0 +1,36 @@
+var wnd = new window
+function shutdown
+  wnd.dispose
+
+wnd.layout = layout.horizontal
+var left = wnd.add new panel
+left.layout = layout.vertical
+
+var top = left.add new textbox
+var box = left.add new textbox
+box.multiline = true
+box.flexHeight = 1
+
+var right = wnd.add new panel
+right.layout = layout.vertical
+
+var btn = right.add new button
+btn.text = "Click Me!"
+var lbl = right.add new label
+lbl.text = "Clicked 0x"
+
+var counter = 0
+btn.click.add def
+  counter++
+  lbl.text = "Clicked " + counter + "x"
+
+var spc = right.add new panel
+spc.height = 20
+var tgl = right.add new ui.toggle
+tgl.text = "toggle"
+var tbt = right.add new button
+tbt.text = "toggle"
+tbt.toggleable = true
+
+wnd.x -= unity.screen.width / 3
+wnd.y -= unity.screen.height / 3

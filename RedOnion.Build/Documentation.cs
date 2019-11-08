@@ -1,7 +1,9 @@
 using RedOnion.KSP.API;
-using RedOnion.Script;
+using RedOnion.ROS;
+using RedOnion.ROS.Utilities;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Reflection;
 
@@ -14,90 +16,114 @@ namespace RedOnion.Build
 			public Type type;
 			public string name;
 			public string path;
-			public MemberList members;
-
-			public bool HasFeature(ObjectFeatures feature)
-				=> (members.Features & feature) != 0;
+			public string desc;
+			public ListCore<MemberInfo> members;
 		}
 		static Dictionary<string, Document> docs = new Dictionary<string, Document>();
 		static Dictionary<Type, Document> types = new Dictionary<Type, Document>();
-		static HashSet<Type> proxied = new HashSet<Type>();
 		static HashSet<Type> discovered = new HashSet<Type>();
 		static Dictionary<Type, Type> obj2fn = new Dictionary<Type, Type>();
 		static Dictionary<Type, Type> fn2obj = new Dictionary<Type, Type>();
+		static Dictionary<Type, string> typeNames = new Dictionary<Type, string>()
+		{
+			{ typeof(void), "void" },
+			{ typeof(string), "string" },
+			{ typeof(double), "double" },
+			{ typeof(float), "float" },
+			{ typeof(int), "int" },
+			{ typeof(uint), "uint" },
+			{ typeof(long), "long" },
+			{ typeof(ulong), "ulong" },
+			{ typeof(short), "short" },
+			{ typeof(ushort), "ushort" },
+			{ typeof(sbyte), "sbyte" },
+			{ typeof(byte), "byte" },
+			{ typeof(bool), "bool" },
+		};
+
+		static IEnumerable<MemberInfo> GetMembers(Type type)
+		{
+			var members = type.GetMembers(BindingFlags.Public|BindingFlags.Instance);
+			if (members.Length > 1)
+				Array.Sort(members, Descriptor.Reflected.MemberComparer.Instance);
+			foreach (var member in members)
+				yield return member;
+			members = type.GetMembers(BindingFlags.Public|BindingFlags.Static|BindingFlags.FlattenHierarchy);
+			if (members.Length > 1)
+				Array.Sort(members, Descriptor.Reflected.MemberComparer.Instance);
+			foreach (var member in members)
+				yield return member;
+		}
+		static string GetName(ICustomAttributeProvider member)
+			=> Descriptor.Reflected.GetName(member);
+
+		static ListCore<Type> queue = new ListCore<Type>();
+		static void RegisterType(Type type)
+		{
+			if (type.Assembly != typeof(Globals).Assembly)
+				return;
+			if (type.IsGenericType)
+				type = type.GetGenericTypeDefinition();
+			if (type.IsGenericParameter || type.FullName == null)
+				return;
+			var desc = type.GetCustomAttribute<DescriptionAttribute>()?.Description;
+			if (desc != null && discovered.Add(type))
+				queue.Add(type);
+		}
 		internal static void Exec()
 		{
-			foreach (var type in typeof(GlobalMembers).Assembly.GetTypes())
+			Descriptor.Reflected.LowerFirstLetter = false;
+			RegisterType(typeof(Globals));
+			var members = new Dictionary<string, MemberInfo>();
+			for (int i = 0; i < queue.size; i++)
 			{
-				if (type.IsDefined(typeof(IgnoreForDocsAttribute)))
-					continue;
-				var proxy = type.GetCustomAttribute<ProxyDocsAttribute>();
-				if (proxy != null)
+				var type = queue[i];
+				var desc = type.GetCustomAttribute<DescriptionAttribute>()?.Description;
+				var name = type.GetCustomAttribute<DisplayNameAttribute>(false)?.DisplayName
+					?? type.Name.Replace('`', '.');
+				var full = type.FullName;
+				if (full.StartsWith("RedOnion.KSP."))
+					full = full.Substring("RedOnion.KSP.".Length);
+				var creator = type.GetCustomAttribute<CreatorAttribute>();
+				if (creator != null)
 				{
-					proxied.Add(proxy.ForType);
-					discovered.Add(type);
-					continue;
+					obj2fn[type] = creator.Creator;
+					fn2obj[creator.Creator] = type;
 				}
-				bool found = false;
-				foreach (var face in type.GetInterfaces())
-				{
-					if (face == typeof(IType))
-					{
-						found = true;
-						break;
-					}
-				}
-				if (found)
-				{
-					discovered.Add(type);
-					var creator = type.GetCustomAttribute<CreatorAttribute>();
-					if (creator != null)
-					{
-						obj2fn[type] = creator.Creator;
-						fn2obj[creator.Creator] = type;
-					}
-				}
-			}
-			foreach (var type in proxied)
-				discovered.Remove(type);
-			foreach (var type in discovered)
-			{
-				var doctype = type;
-				var proxy = type.GetCustomAttribute<ProxyDocsAttribute>();
-				if (proxy != null) doctype = proxy.ForType;
-				var name = doctype.Name;
-				var full = doctype.FullName.Substring("RedOnion.KSP.".Length);
-				MemberList members;
 
-				var getMembers = type.GetProperty("MemberList",
-					BindingFlags.Public|BindingFlags.Static|BindingFlags.GetProperty);
-
-				if (getMembers != null)
-					members = (MemberList)getMembers.GetValue(null);
-				else
-				{
-					var instance = doctype.GetProperty("Instance",
-					BindingFlags.Public|BindingFlags.Static|BindingFlags.GetProperty);
-					if (instance == null || !instance.CanRead)
-					{
-						if (proxy == null)
-							continue;
-						instance = type.GetProperty("Instance",
-						BindingFlags.Public|BindingFlags.Static|BindingFlags.GetProperty);
-						if (instance == null || !instance.CanRead)
-							continue;
-					}
-					members = ((IType)instance.GetValue(null)).Members;
-				}
 				var doc = new Document()
 				{
-					type = doctype,
+					type = type,
 					name = name,
-					path = "RedOnion.KSP/" + string.Join("/", full.Split('.')),
-					members = members
+					path = "RedOnion.KSP/" + string.Join("/", full.Split('.')).Replace('`', '.'),
+					desc = desc
 				};
 				docs.Add(name, doc);
-				types.Add(doctype, doc);
+				types.Add(type, doc);
+				foreach (var member in GetMembers(type))
+				{
+					if (member.GetCustomAttribute<DescriptionAttribute>() == null)
+						continue;
+					var mname = GetName(member);
+					members.TryGetValue(mname, out var prev);
+					if (prev != null && !(prev is MethodInfo && member is MethodInfo))
+						continue;
+					if (member is FieldInfo f)
+						RegisterType(f.FieldType);
+					else if (member is PropertyInfo p)
+						RegisterType(p.PropertyType);
+					else if (member is MethodInfo m)
+					{
+						RegisterType(m.ReturnType);
+						foreach (var mp in m.GetParameters())
+							RegisterType(mp.ParameterType);
+					}
+					else continue;
+					doc.members.Add(member);
+					if (prev == null)
+						members.Add(mname, member);
+				}
+				members.Clear();
 			}
 			foreach (var doc in docs.Values)
 			{
@@ -111,45 +137,109 @@ namespace RedOnion.Build
 				{
 					if (cdoc != null)
 					{
-						wr.WriteLine(
-							cdoc.HasFeature(ObjectFeatures.Function)
-							? "## {0} Function" :
-							cdoc.HasFeature(ObjectFeatures.Constructor)
-							? "## {0} Constructor"
-							: "## {0}", doc.name);
+						wr.WriteLine("## {0} (Function)", doc.name);
 						Print(wr, cdoc, doc.name);
 						wr.WriteLine();
 					}
-					wr.WriteLine("## " + doc.name);
+					wr.WriteLine(cdoc == null ? "## {0}" : "## {0} (Instance)", doc.name);
 					Print(wr, doc, doc.name);
 				}
 			}
-			void Print(StreamWriter wr, Document doc, string name)
+		}
+
+		// Compare by RID (record ID)
+		class MetaCmp : IComparer<MemberInfo>
+		{
+			public static readonly MetaCmp It = new MetaCmp();
+			public int Compare(MemberInfo x, MemberInfo y)
+				=> (x.MetadataToken & 0xffffff).CompareTo(y.MetadataToken & 0xffffff);
+		}
+		static void Print(StreamWriter wr, Document doc, string name)
+		{
+			wr.WriteLine();
+			wr.WriteLine(doc.desc);
+			wr.WriteLine();
+			doc.members.Sort(MetaCmp.It);
+			foreach (var member in doc.members)
 			{
-				wr.WriteLine();
-				wr.WriteLine(doc.members.Help);
-				wr.WriteLine();
-				foreach (var member in doc.members)
+				var mname = GetName(member);
+				if (member is FieldInfo f)
 				{
-					string typePath = null;
-					string typeName = member.Type;
-					if (member.Type != name
-						&& docs.TryGetValue(member.Type, out var tdoc))
-					{
-						if (fn2obj.TryGetValue(tdoc.type, out var objtype))
-						{
-							tdoc = docs[objtype.Name];
-							typeName = objtype.Name + " Function";
-						}
-						typePath = GetRelativePath(doc.path, tdoc.path) + ".md";
-					}
-					wr.WriteLine(typePath == null
-						? "- `{0}`: {1} - {3}"
-						: "- `{0}`: [{1}]({2}) - {3}",
-						member is Method ? member.Name + "()" : member.Name,
-						typeName, typePath, member.Help);
+					PrintSimpleMember(wr, doc, mname, member, f.FieldType);
+					continue;
+				}
+				if (member is PropertyInfo p)
+				{
+					PrintSimpleMember(wr, doc, mname, member, p.PropertyType);
+					continue;
+				}
+				if (member is MethodInfo m)
+				{
+					PrintMethod(wr, doc, mname, m);
+					continue;
 				}
 			}
+		}
+
+		static string ResolveType(Document doc, Type type, out string name)
+		{
+			string path = null;
+			if (!typeNames.TryGetValue(type, out name))
+				name = type.Name;
+			if (types.TryGetValue(type, out var tdoc))
+			{
+				name = tdoc.name;
+				if (type != doc.type)
+				{
+					if (fn2obj.TryGetValue(tdoc.type, out var objtype))
+					{
+						tdoc = docs[objtype.Name];
+						name = objtype.Name;
+					}
+					path = GetRelativePath(doc.path, tdoc.path) + ".md";
+				}
+			}
+			return path;
+		}
+		static void PrintSimpleMember(StreamWriter wr, Document doc, string name, MemberInfo member, Type type)
+		{
+			var desc = member.GetCustomAttribute<DescriptionAttribute>().Description;
+			var alias = member.GetCustomAttribute<AliasAttribute>();
+			if (alias != null && alias.Name == null)
+			{
+				//TODO link to the alias
+				wr.WriteLine("- `{0}` - {1}", name, desc);
+				return;
+			}
+			var typePath = ResolveType(doc, type, out var typeName);
+			if (member is MethodInfo || typeof(ICallable).IsAssignableFrom(type))
+				name += "()";
+			else if (member is PropertyInfo p && p.GetIndexParameters().Length > 0)
+				name = "[index]";
+			wr.WriteLine(typePath == null
+				? "- `{0}`: {1} - {3}"
+				: "- `{0}`: [{1}]({2}) - {3}",
+				name, typeName, typePath, desc);
+		}
+
+		static void PrintMethod(StreamWriter wr, Document doc, string name, MethodInfo method)
+		{
+			var desc = method.GetCustomAttribute<DescriptionAttribute>().Description;
+			var type = method.ReturnType;
+			var typePath = ResolveType(doc, type, out var typeName);
+			var pars = method.GetParameters();
+			wr.Write("- `{0}()`: ", name);
+			wr.Write(typePath == null ? "{0}" : "[{0}]({1})", typeName, typePath);
+			foreach (var par in pars)
+			{
+				type = par.ParameterType;
+				typePath = ResolveType(doc, type, out typeName);
+				wr.Write(typePath == null ? ", {0} {1}" : ", {0} [{1}]({2})",
+					par.Name, typeName, typePath);
+			}
+			if (pars.Length > 0)
+				wr.WriteLine();
+			wr.WriteLine(pars.Length == 0 ? " - {0}" : "  - {0}", desc);
 		}
 
 		static string GetRelativePath(string fromPath, string toPath)

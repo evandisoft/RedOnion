@@ -1,4 +1,3 @@
-using System.Runtime.Remoting.Proxies;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
 using RedOnion.KSP.Autopilot;
@@ -10,13 +9,11 @@ using RedOnion.KSP.Lua.Proxies;
 using Kerbalua.Parsing;
 using RedOnion.UI;
 using System.Reflection;
-using System.Globalization;
 using UnityEngine.Events;
 using System.Collections.Generic;
 using System.Linq;
 using API = RedOnion.KSP.API;
 using RedOnion.KSP.ReflectionUtil;
-using RedOnion.KSP.API;
 using static RedOnion.KSP.API.Reflect;
 
 namespace Kerbalua.MoonSharp
@@ -25,7 +22,7 @@ namespace Kerbalua.MoonSharp
 	{
 		public FlightControl FlightControl = FlightControl.GetInstance();
 		public FlightGlobals FlightGlobals = FlightGlobals.fetch;
-		public Time Time = new Time();
+		public UnityEngine.Time Time = new UnityEngine.Time();
 		public Mathf Mathf = new Mathf();
 		public Scalar Scalar = new Scalar();
 		public Vec Vec = new Vec();
@@ -63,6 +60,33 @@ namespace Kerbalua.MoonSharp
 					);
 			GlobalOptions.CustomConverters
 				.SetScriptToClrCustomConversion(DataType.Function
+					, typeof(Func<object,object>), (f) => new Func<object, object>((item) =>
+					{
+						var co = CreateCoroutine(f);
+						co.Coroutine.AutoYieldCounter = 10000;
+						object retval=co.Coroutine.Resume(item);
+						if (co.Coroutine.State == CoroutineState.ForceSuspended)
+						{
+							PrintErrorAction?.Invoke("Action<object> callback unable to finish");
+							return null;
+						}
+						return retval;
+					}));
+			GlobalOptions.CustomConverters
+				.SetScriptToClrCustomConversion(DataType.Function
+					, typeof(System.Action<object>), (f) => new Action<object>((item) =>
+				{
+
+					var co = CreateCoroutine(f);
+					co.Coroutine.AutoYieldCounter = 10000;
+					co.Coroutine.Resume(item);
+					if (co.Coroutine.State == CoroutineState.ForceSuspended)
+					{
+						PrintErrorAction?.Invoke("Action<object> callback unable to finish");
+					}
+				}));
+			GlobalOptions.CustomConverters
+				.SetScriptToClrCustomConversion(DataType.Function
 					, typeof(UnityAction), (f) => new UnityAction(() =>
 				{
 					var co = CreateCoroutine(f);
@@ -73,7 +97,7 @@ namespace Kerbalua.MoonSharp
 						PrintErrorAction?.Invoke("UnityAction callback unable to finish");
 					}
 				}));
-			Globals.MetaTable = API.Globals.Instance;
+			Globals.MetaTable = API.LuaGlobals.Instance;
 			//Globals["Vessel"] = FlightGlobals.ActiveVessel;
 			var defaultMappings = NamespaceMappings.DefaultAssemblies;
 			//Globals["KSP"] = new KspApi();

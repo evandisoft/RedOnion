@@ -118,7 +118,7 @@ namespace RedOnion.ROS.Tests
 
 		public void ValueTopMark(int at, int value)
 		{
-			Assert.IsTrue(at < values.size, "values.size: {0} >= {1}", at, values.size);
+			Assert.Less(at, values.size, "ValueTopMark at:{0} >= values.size:{1}", at, values.size);
 			Assert.AreEqual(value, TopInt(at), "ValueTopMark {0}", at);
 		}
 		public void ValueTopMark(int value)
@@ -401,6 +401,69 @@ namespace RedOnion.ROS.Tests
 					}
 				);
 			}
+
+			Test("x = false ? 1 : 2.0^2",
+				() =>
+				{
+					ValueCheck	( 0, 0, "x");
+					ValueCheck	( 4, OpCode.Identifier);
+					ValueTopMark( 9, 0);
+					ValueCheck	( 9, OpCode.False);
+					ValueTopMark(14, 9);
+					ValueCheck  (14, 1);
+					ValueCheck	(18, OpCode.Int);
+					ValueTopMark(23, 14);
+					ValueCheck  (23, 2.0);
+					ValueCheck  (31, OpCode.Double);
+					ValueTopMark(36, 23);
+					ValueCheck  (36, 2);
+					ValueCheck  (40, OpCode.Int);
+					ValueTopMark(45, 36);
+					ValueCheck  (45, OpCode.BitXor);
+					ValueTopMark(50, 23);
+					ValueCheck	(50, OpCode.Ternary);
+					ValueTopMark(55, 9);
+					ValueCheck	(55, OpCode.Assign);
+					ValueFinal	(60);
+				},
+				() =>
+				{
+					CodeCheck( 0, OpCode.Assign);
+					CodeCheck( 1, OpCode.Identifier);
+					CodeCheck( 2, 0, "x");
+					CodeCheck( 6, OpCode.Ternary);
+					CodeCheck( 7, OpCode.False);
+					CodeCheck( 8, 5); // size of true-expression for quick skip
+					CodeCheck(12, OpCode.Int);
+					CodeCheck(13, 1);
+					CodeCheck(17, 15); // size of false-expression for quick skip
+					CodeCheck(21, OpCode.BitXor);
+					CodeCheck(22, OpCode.Double);
+					CodeCheck(23, 2.0);
+					CodeCheck(31, OpCode.Int);
+					CodeCheck(32, 2);
+					CodeCheck(36);
+				},
+				() =>
+				{
+					CodeCheck( 0, OpCode.Identifier);
+					CodeCheck( 1, 0, "x");
+					CodeCheck( 5, OpCode.False);
+					CodeCheck( 6, OpCode.Ternary);
+					CodeCheck( 7, 5); // size of true-expression for quick skip
+					CodeCheck(11, OpCode.Int);
+					CodeCheck(12, 1);
+					CodeCheck(16, OpCode.Else);
+					CodeCheck(17, 15); // size of false-expression for quick skip
+					CodeCheck(21, OpCode.Double);
+					CodeCheck(22, 2.0);
+					CodeCheck(30, OpCode.Int);
+					CodeCheck(31, 2);
+					CodeCheck(35, OpCode.BitXor);
+					CodeCheck(36, OpCode.Assign);
+					CodeCheck(37);
+				}
+			);
 		}
 
 		[Test]
@@ -855,7 +918,212 @@ namespace RedOnion.ROS.Tests
 		}
 
 		[Test]
-		public void ROS_PExpr13_Variable()
+		public void ROS_PExpr13_NewNoArg()
+		{
+			Test(
+				"new pt",
+				() =>
+				{
+					ValueCheck(0, 0, "pt");
+					ValueCheck(4, OpCode.Identifier);
+					ValueCheck(5, OpCode.Create);
+					ValueFinal(10);
+				},
+				() =>
+				{
+					CodeCheck(0, OpCode.Create);
+					CodeCheck(1, OpCode.Identifier);
+					CodeCheck(2, 0, "pt");
+					CodeCheck(6);
+				},
+				() =>
+				{
+					CodeCheck(0, OpCode.Create);
+					CodeCheck(1, OpCode.Identifier);
+					CodeCheck(2, 0, "pt");
+					CodeCheck(6);
+				}
+			);
+		}
+
+		[Test]
+		public void ROS_PExpr14_NewZeroArgs()
+		{
+			Test(
+				"new pt()",
+				() =>
+				{
+					ValueCheck( 0, 0, "pt");
+					ValueCheck( 4, OpCode.Identifier);
+					ValueCheck( 5, OpCode.Call0);
+					ValueCheck( 6, OpCode.Create);
+					ValueFinal(11);
+				},
+				() =>
+				{
+					CodeCheck(0, OpCode.Create);
+					CodeCheck(1, OpCode.Call0);
+					CodeCheck(2, OpCode.Identifier);
+					CodeCheck(3, 0, "pt");
+					CodeCheck(7);
+				},
+				() =>
+				{
+					CodeCheck(0, OpCode.Identifier);
+					CodeCheck(1, 0, "pt");
+					CodeCheck(5, OpCode.Create);
+					CodeCheck(6, OpCode.Call0);
+					CodeCheck(7);
+				}
+			);
+		}
+
+		[Test]
+		public void ROS_PExpr15_NewOneArg()
+		{
+			Test(
+				"new pt 1",
+				() =>
+				{
+					ValueCheck  ( 0, 0, "pt");
+					ValueCheck  ( 4, OpCode.Identifier);
+					ValueTopMark( 9, 0);
+					ValueCheck  ( 9, 1);
+					ValueCheck  (13, OpCode.Int);
+					ValueTopMark(18, 9);
+					ValueCheck  (18, OpCode.Call1);
+					ValueCheck  (19, OpCode.Create);
+					ValueFinal  (24);
+				},
+				() =>
+				{
+					CodeCheck( 0, OpCode.Create);
+					CodeCheck( 1, OpCode.Call1);
+					CodeCheck( 2, OpCode.Identifier);
+					CodeCheck( 3, 0, "pt");
+					CodeCheck( 7, OpCode.Int);
+					CodeCheck( 8, 1);
+					CodeCheck(12);
+				},
+				() =>
+				{
+					CodeCheck( 0, OpCode.Identifier);
+					CodeCheck( 1, 0, "pt");
+					CodeCheck( 5, OpCode.Int);
+					CodeCheck( 6, 1);
+					CodeCheck(10, OpCode.Create);
+					CodeCheck(11, OpCode.Call1);
+					CodeCheck(12);
+				}
+			);
+		}
+
+		[Test]
+		public void ROS_PExpr16_NewTwoArgs()
+		{
+			Test(
+				"new pt 1,2",
+				() =>
+				{
+					ValueCheck  ( 0, 0, "pt");
+					ValueCheck  ( 4, OpCode.Identifier);
+					ValueTopMark( 9, 0);
+					ValueCheck  ( 9, 1);
+					ValueCheck  (13, OpCode.Int);
+					ValueTopMark(18, 9);
+					ValueCheck  (18, 2);
+					ValueCheck  (22, OpCode.Int);
+					ValueTopMark(27, 18);
+					ValueCheck  (27, OpCode.Call2);
+					ValueCheck  (28, OpCode.Create);
+					ValueFinal  (33);
+				},
+				() =>
+				{
+					CodeCheck( 0, OpCode.Create);
+					CodeCheck( 1, OpCode.Call2);
+					CodeCheck( 2, OpCode.Identifier);
+					CodeCheck( 3, 0, "pt");
+					CodeCheck( 7, OpCode.Int);
+					CodeCheck( 8, 1);
+					CodeCheck(12, OpCode.Int);
+					CodeCheck(13, 2);
+					CodeCheck(17);
+				},
+				() =>
+				{
+					CodeCheck( 0, OpCode.Identifier);
+					CodeCheck( 1, 0, "pt");
+					CodeCheck( 5, OpCode.Int);
+					CodeCheck( 6, 1);
+					CodeCheck(10, OpCode.Int);
+					CodeCheck(11, 2);
+					CodeCheck(15, OpCode.Create);
+					CodeCheck(16, OpCode.Call2);
+					CodeCheck(17);
+				}
+			);
+		}
+
+		[Test]
+		public void ROS_PExpr17_NewThreeArgs()
+		{
+			Test(
+				"new pt 1,2,3",
+				() =>
+				{
+					ValueCheck  ( 0, 0, "pt");
+					ValueCheck  ( 4, OpCode.Identifier);
+					ValueTopMark( 9, 0);
+					ValueCheck  ( 9, 1);
+					ValueCheck  (13, OpCode.Int);
+					ValueTopMark(18, 9);
+					ValueCheck  (18, 2);
+					ValueCheck  (22, OpCode.Int);
+					ValueTopMark(27, 18);
+					ValueCheck  (27, 3);
+					ValueCheck  (31, OpCode.Int);
+					ValueTopMark(36, 27);
+					ValueCheck	(36, (byte)4);
+					ValueCheck  (37, OpCode.CallN);
+					ValueCheck  (38, OpCode.Create);
+					ValueFinal  (43);
+				},
+				() =>
+				{
+					CodeCheck( 0, OpCode.Create);
+					CodeCheck( 1, OpCode.CallN);
+					CodeCheck( 2, (byte)4);
+					CodeCheck( 3, OpCode.Identifier);
+					CodeCheck( 4, 0, "pt");
+					CodeCheck( 8, OpCode.Int);
+					CodeCheck( 9, 1);
+					CodeCheck(13, OpCode.Int);
+					CodeCheck(14, 2);
+					CodeCheck(18, OpCode.Int);
+					CodeCheck(19, 3);
+					CodeCheck(23);
+				},
+				() =>
+				{
+					CodeCheck( 0, OpCode.Identifier);
+					CodeCheck( 1, 0, "pt");
+					CodeCheck( 5, OpCode.Int);
+					CodeCheck( 6, 1);
+					CodeCheck(10, OpCode.Int);
+					CodeCheck(11, 2);
+					CodeCheck(15, OpCode.Int);
+					CodeCheck(16, 3);
+					CodeCheck(20, OpCode.Create);
+					CodeCheck(21, OpCode.CallN);
+					CodeCheck(22, (byte)4);
+					CodeCheck(23);
+				}
+			);
+		}
+
+		[Test]
+		public void ROS_PExpr18_Variable()
 		{
 			Test("var x",
 				() =>
@@ -890,7 +1158,7 @@ namespace RedOnion.ROS.Tests
 		}
 
 		[Test]
-		public void ROS_PExpr14_TypedVariable()
+		public void ROS_PExpr19_TypedVariable()
 		{
 			Test(
 				"var x int", // pure style
@@ -927,7 +1195,7 @@ namespace RedOnion.ROS.Tests
 		}
 
 		[Test]
-		public void ROS_PExpr15_ArrayVariable()
+		public void ROS_PExpr20_ArrayVariable()
 		{
 			foreach (var s in new string[]
 			{
@@ -938,7 +1206,7 @@ namespace RedOnion.ROS.Tests
 				Test(s,
 					() =>
 					{
-						ValueCheck( 0, 0, "a");
+						ValueCheck  ( 0, 0, "a");
 						ValueCheck	( 4, OpCode.Identifier);
 						ValueTopMark( 9, 0);
 						ValueCheck	( 9, OpCode.Byte);
@@ -978,7 +1246,7 @@ namespace RedOnion.ROS.Tests
 		}
 
 		[Test]
-		public void ROS_PExpr16_CreateArray()
+		public void ROS_PExpr21_CreateArray()
 		{
 			Test(
 				"var a = new byte[n]",
@@ -1032,7 +1300,7 @@ namespace RedOnion.ROS.Tests
 		}
 
 		[Test]
-		public void ROS_PExpr17_AutocallWithNew()
+		public void ROS_PExpr22_AutocallWithNew()
 		{
 			Test(
 				"fn new pt 1, 2",
@@ -1085,6 +1353,55 @@ namespace RedOnion.ROS.Tests
 					CodeCheck(21, OpCode.Call2);
 					CodeCheck(22, OpCode.Call1);
 					CodeCheck(23);
+				}
+			);
+		}
+
+		[Test]
+		public void ROS_PExpr23_NewWithDot()
+		{
+			Test(
+				"var wnd = new ui.window",
+				() =>
+				{
+					ValueCheck	( 0, 0, "wnd");
+					ValueCheck	( 4, OpCode.Identifier);
+					ValueTopMark( 9, 0);
+					ValueCheck	( 9, OpCode.Void);
+					ValueTopMark(14, 9);
+					ValueCheck	(14, 1, "ui");
+					ValueCheck	(18, OpCode.Identifier);
+					ValueTopMark(23, 14);
+					ValueCheck	(23, 2, "window");
+					ValueCheck	(27, OpCode.Identifier);
+					ValueTopMark(32, 23);
+					ValueCheck	(32, OpCode.Dot);
+					ValueCheck	(33, OpCode.Create);
+					ValueTopMark(38, 14);
+				},
+				() =>
+				{
+					CodeCheck( 0, OpCode.Var);
+					CodeCheck( 1, 0, "wnd");
+					CodeCheck( 5, OpCode.Void);
+					CodeCheck( 6, OpCode.Create);
+					CodeCheck( 7, OpCode.Dot);
+					CodeCheck( 8, OpCode.Identifier);
+					CodeCheck( 9, 1, "ui");
+					CodeCheck(13, 2, "window");
+					CodeCheck(17);
+				},
+				() =>
+				{
+					CodeCheck( 0, OpCode.Void);
+					CodeCheck( 1, OpCode.Identifier);
+					CodeCheck( 2, 0, "ui");
+					CodeCheck( 6, OpCode.Create);
+					CodeCheck( 7, OpCode.Dot);
+					CodeCheck( 8, 1, "window");
+					CodeCheck(12, OpCode.Var);
+					CodeCheck(13, 2, "wnd");
+					CodeCheck(17);
 				}
 			);
 		}

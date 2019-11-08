@@ -5,15 +5,15 @@ using RedOnion.ROS.Objects;
 
 namespace RedOnion.ROS.Tests
 {
-	public class CoreTests : Core
+	public class CoreTests : Processor
 	{
-		public void Test(string script, int countdown = 100)
+		public void Test(string script, int countdown = 1000)
 		{
 			try
 			{
 				Code = Compile(script);
 				if (Globals == null) Globals = new Globals();
-				Execute(countdown);
+				Assert.IsTrue(Execute(countdown));
 			}
 			catch (Exception e)
 			{
@@ -21,14 +21,30 @@ namespace RedOnion.ROS.Tests
 					e.GetType().ToString(), e.Message, script), e);
 			}
 		}
-		public void Test(object value, string script, int countdown = 100)
+		public void Test(object value, string script, int countdown = 1000)
 		{
 			Test(script, countdown);
-			var result = Result.Object;
-			Assert.AreEqual(value, result, "Different result: <{0}>", script);
-			Assert.AreEqual(value.GetType(), result.GetType(), "Different type: <{0}>", script);
+			if (result.IsFpNumber)
+			{
+				Assert.IsTrue(value is double || value is float || value is decimal,
+					"Different type! Actual: {0} Expected: {1}\n<{2}>",
+					Result.desc.Type.Name, value.GetType().Name, script);
+				var result = Result.ToDouble();
+				var expect = ((IConvertible)value).ToDouble(Value.Culture);
+				Assert.IsTrue(
+					double.IsNaN(result) && double.IsNaN(expect) ||
+					Math.Abs(result - expect) < (value is float ? 1e-6 : 1e-12),
+					"Different result! Actual: {0} Expected: {1}\n<{2}>",
+					Result, value, script);
+			}
+			else
+			{
+				var result = Result.Box();
+				Assert.AreEqual(value, result, "Different result: <{0}>", script);
+				Assert.AreEqual(value?.GetType(), result?.GetType(), "Different type: <{0}>", script);
+			}
 		}
-		public void Expect<Ex>(string script, int countdown = 100) where Ex : Exception
+		public void Expect<Ex>(string script, int countdown = 1000) where Ex : Exception
 		{
 			try
 			{
@@ -106,6 +122,13 @@ namespace RedOnion.ROS.Tests
 			Test(10,        "--x");         // pre-decrement
 			Test(-10,        "-x");         // unary minus
 			Test(10,         "+x");         // unary plus
+			Test(11,        "x+=1");        // compound assignment - add
+			Test(22,		"x*=2");        // compound assignment - mul
+
+			Test(1, "var v = 1");  // integer
+			Test(2.0, "v += 1.0"); // double
+			Test(1.5, "v = math.clamp v, math.max(0, 1.0), math.min(1.5, 2)");
+			//Test("var i, j");//TODO: maybe only as statement, because `if var x = true, y = false` could be a problem (return last?)
 		}
 
 		[Test]
@@ -123,6 +146,14 @@ namespace RedOnion.ROS.Tests
 			Test(3,			"obj[\"s\"].length");
 			Test(3,			"obj[\"s\"][\"length\"]");
 			Test(3,			"obj[\"s\", \"length\"]");
+
+			Test("obj.test = new obj");     // derived object
+			Test(3.14, "obj.test.x");       // inherited property
+			Test("obj.test.x = 2.7");
+			Test(3.14, "obj.x");            // must not change parent's property
+			Test(2.7, "obj.test.x");
+			Test("var test = new obj.test");
+			Test(2.7, "test.x");
 		}
 
 		[Test]
@@ -134,11 +165,30 @@ namespace RedOnion.ROS.Tests
 			Test(true,		"true || false");
 			Test(true,		"false || true");
 			Test(false,		"true && false");
-			Test(false,		"false && true");
+			Test(false,		"false and true");
 			Test(true,		"true && true");
+			Test(true,      "null ?? true");
+			Test(false,		"false ?? true");
+			Test(1,			"0 or 1");
+			Test(1,			"1 || 2");
 
+			// this was causing some problems (fixed)
 			Test("var s = \"hello\"");
 			Test(false, "s.length <= 3 || s[3] == '.'");
+
+			// type tests
+			Test(true, "s is string");
+			Test(false, "s is int");
+			Test(true, "1 is int");
+			Test(true, "2.0 is double");
+			Test(true, "3f is! double"); // is! means 'is not' = negated 'is'
+			Test(true, "4f is float");
+
+			// property existence tests (comes from JavaScript)
+			Test(true, "\"length\" in s");
+			Test(true, "\"length\" in string");
+			Test(false, "\"blah\" in s");
+			Test(false, "\"blah\" in string");
 		}
 
 		[Test]
@@ -180,6 +230,12 @@ namespace RedOnion.ROS.Tests
 			Test(2, "a.length");
 			Test("hello", "a[0]");
 			Test("world", "a[1]");
+
+			Lines(3,
+				"var x = 1",
+				"var y = 2",
+				"var a = [x, y]",
+				"return a[0] + a[1]");
 		}
 
 		[Test]
@@ -188,11 +244,20 @@ namespace RedOnion.ROS.Tests
 			foreach (var s in new[]
 			{
 				"(\n+1\n)",
-				//"def pass x => x\npass(\n1\n)"
+				"-1\\\n+ 2",
+				"def pass x => x\npass(\n1\n)",
+				"def sum2 x,y => x+y"
+				+ "\nsum2 pass(2),\npass(-1)"
 			})
 			{
 				Test(1, s);
 			}
+		}
+
+		[Test]
+		public void ROS_Expr10_Print()
+		{
+			Test("3.14", @"print ""{0:F2}"", math.pi");
 		}
 	}
 }

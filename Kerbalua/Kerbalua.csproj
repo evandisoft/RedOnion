@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <KerbalLibs Condition=" '$(KerbalLibs)' == '' And '$(OS)' == 'Windows_NT' And Exists('$(SolutionDir)\ksp')">$(SolutionDir)\ksp\KSP_x64_Data\Managed</KerbalLibs>
     <KerbalLibs Condition=" '$(KerbalLibs)' == '' And '$(OS)' != 'Windows_NT' And Exists('$(SolutionDir)\ksp')">$(SolutionDir)\ksp\KSP_Data\Managed</KerbalLibs>
@@ -10,8 +10,9 @@
     <OutputType>Library</OutputType>
     <RootNamespace>Kerbalua</RootNamespace>
     <AssemblyName>Kerbalua</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <ReleaseVersion>0.3.0</ReleaseVersion>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -23,6 +24,7 @@
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
     <NoWarn>3021</NoWarn>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
@@ -31,8 +33,25 @@
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
     <NoWarn>3021</NoWarn>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>$(KerbalLibs)\UnityEngine.CoreModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>$(KerbalLibs)\UnityEngine.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>$(KerbalLibs)\Assembly-CSharp.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Assembly-CSharp-firstpass">
+      <HintPath>$(KerbalLibs)\Assembly-CSharp-firstpass.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Antlr4.Runtime.Standard">
       <HintPath>..\packages\Antlr4.Runtime.Standard.4.7.1.1\lib\net35\Antlr4.Runtime.Standard.dll</HintPath>
     </Reference>
@@ -56,57 +75,17 @@
       <HintPath>$(KerbalLibs)\System.Xml.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Assembly-CSharp">
-      <HintPath>$(KerbalLibs)\Assembly-CSharp.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Assembly-CSharp-firstpass">
-      <HintPath>$(KerbalLibs)\Assembly-CSharp-firstpass.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="UnityEngine">
-      <HintPath>$(KerbalLibs)\UnityEngine.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="KerbaluaMoonSharp">
       <HintPath>..\OtherDLLs\KerbaluaMoonSharp\KerbaluaMoonSharp.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Kerbalua\Main\KerbaluaMain.cs" />
     <Compile Include="Kerbalua\Other\MoonSharpReplEvaluator.cs" />
-    <Compile Include="Kerbalua\Gui\KerbaluaRepl.cs" />
     <Compile Include="Kerbalua\Utility\prin.cs" />
     <Compile Include="Kerbalua\Utility\QueueLogger.cs" />
-    <Compile Include="Kerbalua\Gui\InputBox.cs" />
-    <Compile Include="Kerbalua\Gui\ScriptWindow.cs" />
-    <Compile Include="Kerbalua\Gui\Repl.cs" />
-    <Compile Include="Kerbalua\Gui\OutputBox.cs" />
-    <Compile Include="Kerbalua\Gui\CompletionBox.cs" />
-    <Compile Include="Kerbalua\Gui\TextArea.cs" />
-    <Compile Include="Kerbalua\Gui\AutoLayoutBox.cs" />
-    <Compile Include="Kerbalua\Gui\Button.cs" />
-    <Compile Include="Kerbalua\Gui\ScrollableTextArea.cs" />
-    <Compile Include="Kerbalua\Gui\GUIUtil.cs" />
-    <Compile Include="Kerbalua\Gui\ILayoutRenderer.cs" />
-    <Compile Include="Kerbalua\Gui\Editor.cs" />
-    <Compile Include="Kerbalua\Gui\UIElement.cs" />
-    <Compile Include="Kerbalua\Gui\EditingArea.cs" />
     <Compile Include="Kerbalua\Other\ReplEvaluator.cs" />
     <Compile Include="Kerbalua\Other\RedOnionReplEvaluator.cs" />
-    <Compile Include="Kerbalua\Gui\EventKey.cs" />
-    <Compile Include="Kerbalua\Gui\KeyBindings.cs" />
-    <Compile Include="Kerbalua\Gui\ScriptNameInputArea.cs" />
-    <Compile Include="Kerbalua\Gui\CompletionManager.cs" />
-    <Compile Include="Kerbalua\Gui\ICompletionSelector.cs" />
-    <Compile Include="Kerbalua\Gui\ICompletableElement.cs" />
-    <Compile Include="Kerbalua\Gui\IFocusable.cs" />
-    <Compile Include="Kerbalua\Other\EditAreaCompletionAdapter.cs" />
-    <Compile Include="Kerbalua\Gui\IRectRenderer.cs" />
-    <Compile Include="Kerbalua\Gui\IRenderer.cs" />
-    <Compile Include="Kerbalua\Gui\RecentFilesList.cs" />
-    <Compile Include="Kerbalua\Gui\Label.cs" />
     <Compile Include="Kerbalua\MoonSharp\KerbaluaExecutionManager.cs" />
     <Compile Include="Kerbalua\MoonSharp\ExecutionLimitException.cs" />
     <Compile Include="Kerbalua\Completion\LuaIntellisense.cs" />
@@ -119,7 +98,6 @@
     <Compile Include="Kerbalua\Completion\Grammar\IncompleteLuaVisitor.cs" />
     <Compile Include="Kerbalua\Completion\ProcessedIncompleteVar.cs" />
     <Compile Include="Kerbalua\Completion\LuaIntellisenseException.cs" />
-    <Compile Include="Kerbalua\Utility\Settings.cs" />
     <Compile Include="Kerbalua\Other\Evaluation.cs" />
     <Compile Include="Kerbalua\Parsing\IncompleteLuaParsing.cs" />
     <Compile Include="Kerbalua\MoonSharp\KerbaluaScript.cs" />
@@ -134,6 +112,7 @@
     <Compile Include="Kerbalua\Completion\CompletionReflectionUtil.cs" />
     <Compile Include="Kerbalua\Completion\Instance.cs" />
     <Compile Include="Kerbalua\Completion\OperationsProcessorNative.cs" />
+    <Compile Include="Kerbalua\Parsing\AnyErrorsListener.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -147,28 +126,18 @@
     <None Include="Kerbalua\Completion\Grammar\IncompleteLua.g4" />
     <None Include="Kerbalua\Completion\Grammar\FinalExpLua.g4" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Kerbalua\" />
-    <Folder Include="Kerbalua\Main\" />
-    <Folder Include="Kerbalua\Other\" />
-    <Folder Include="Kerbalua\Gui\" />
-    <Folder Include="Kerbalua\Utility\" />
-    <Folder Include="Kerbalua\Completion\" />
-    <Folder Include="Kerbalua\MoonSharp\" />
-    <Folder Include="Kerbalua\Completion\Grammar\" />
-    <Folder Include="Kerbalua\Parsing\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\RedOnion.KSP\RedOnion.KSP.csproj">
       <Project>{DEC12E09-29AD-4666-9954-8C8A1D7BF454}</Project>
       <Name>RedOnion.KSP</Name>
     </ProjectReference>
-    <ProjectReference Include="..\RedOnion.Script\RedOnion.Script.csproj">
-      <Project>{0D0A04F3-0A82-49CD-8178-7640ACE88BFF}</Project>
-      <Name>RedOnion.Script</Name>
+    <ProjectReference Include="..\RedOnion.ROS\RedOnion.ROS.csproj">
+      <Project>{59399c9e-ebac-4d7c-b2cb-6ece22fe8d6e}</Project>
+      <Name>RedOnion.ROS</Name>
     </ProjectReference>
     <ProjectReference Include="..\RedOnion.UI\RedOnion.UI.csproj">
-      <Project>{034C16AB-D16E-4AFE-9837-812499EE2F3D}</Project>
+      <Project>{034c16ab-d16e-4afe-9837-812499ee2f3d}</Project>
       <Name>RedOnion.UI</Name>
     </ProjectReference>
   </ItemGroup>

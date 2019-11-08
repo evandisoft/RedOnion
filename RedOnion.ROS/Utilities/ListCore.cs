@@ -115,6 +115,22 @@ namespace RedOnion.ROS.Utilities
 
 			return ref items[size++];
 		}
+		public void AddRange(IEnumerable<T> range)
+		{
+			if (range is ICollection<T> col)
+			{
+				AddRange(col);
+				return;
+			}
+			foreach (var e in range)
+				Add(e);
+		}
+		public void AddRange(ICollection<T> range)
+		{
+			EnsureCapacity(size + range.Count);
+			foreach (var e in range)
+				items[size++] = e;
+		}
 
 		public void Insert(int index, T item)
 		{
@@ -163,6 +179,8 @@ namespace RedOnion.ROS.Utilities
 				items[index] = value;
 			}
 		}
+		public T GetOrDefault(int index)
+			=> index >= 0 && index < size ? items[index] : default;
 
 		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 		public IEnumerator<T> GetEnumerator()
@@ -213,7 +231,16 @@ namespace RedOnion.ROS.Utilities
 			items[size] = default;
 			return it;
 		}
+		public ref T Top()
+			=> ref items[size-1];
+		public ref T Top(int fromEnd)
+			=> ref items[size+fromEnd];
 
+		public void Sort(IComparer<T> cmp)
+		{
+			if (size > 1)
+				Array.Sort(items, 0, size, cmp);
+		}
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		bool ICollection<T>.IsReadOnly => false;
 

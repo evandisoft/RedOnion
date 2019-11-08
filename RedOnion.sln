@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.168
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29009.5
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedOnion", "RedOnion\RedOnion.csproj", "{3A40C452-1B11-4769-9D6B-FD318F2CB514}"
 EndProject
@@ -27,17 +27,24 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Resources", "Resources", "{
 	ProjectSection(SolutionItems) = preProject
 		GameData\RedOnion\Resources\RedOnionLauncherIcon.png = GameData\RedOnion\Resources\RedOnionLauncherIcon.png
 		GameData\RedOnion\Resources\WindowCloseButtonIcon.png = GameData\RedOnion\Resources\WindowCloseButtonIcon.png
+		GameData\RedOnion\Resources\LiveRepl.png = GameData\RedOnion\Resources\LiveRepl.png
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedOnion.Shell", "RedOnion.Shell\RedOnion.Shell.csproj", "{94420503-B08C-4944-8820-D8596AEBACF2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedOnion.Build", "RedOnion.Build\RedOnion.Build.csproj", "{976203CB-DAF8-4320-BA90-A3987EC0F82A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedOnion.KSP.ApiNUnit", "RedOnion.KSP.ApiNUnit\RedOnion.KSP.ApiNUnit.csproj", "{7E7D0224-887F-4DFB-93C3-F3738440271A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedOnion.KSP.Tests", "RedOnion.KSP.Tests\RedOnion.KSP.Tests.csproj", "{7E7D0224-887F-4DFB-93C3-F3738440271A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedOnion.ROS", "RedOnion.ROS\RedOnion.ROS.csproj", "{59399C9E-EBAC-4D7C-B2CB-6ECE22FE8D6E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedOnion.ROS.Tests", "RedOnion.ROS.Tests\RedOnion.ROS.Tests.csproj", "{8EDF4429-251A-416D-BB68-93F227191BCF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LiveRepl", "LiveRepl\LiveRepl.csproj", "{9A325200-04F2-42D2-994E-06E7711EF9AA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedOnion.OS", "RedOnion.OS\RedOnion.OS.csproj", "{3B9ED14D-ED22-4F94-91BF-951BF9B01552}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kerbalui", "Kerbalui\Kerbalui.csproj", "{7A943166-A67E-420A-BCA0-5231D57A18BD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -93,6 +100,18 @@ Global
 		{8EDF4429-251A-416D-BB68-93F227191BCF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8EDF4429-251A-416D-BB68-93F227191BCF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8EDF4429-251A-416D-BB68-93F227191BCF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9A325200-04F2-42D2-994E-06E7711EF9AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9A325200-04F2-42D2-994E-06E7711EF9AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9A325200-04F2-42D2-994E-06E7711EF9AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9A325200-04F2-42D2-994E-06E7711EF9AA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B9ED14D-ED22-4F94-91BF-951BF9B01552}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B9ED14D-ED22-4F94-91BF-951BF9B01552}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B9ED14D-ED22-4F94-91BF-951BF9B01552}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B9ED14D-ED22-4F94-91BF-951BF9B01552}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7A943166-A67E-420A-BCA0-5231D57A18BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A943166-A67E-420A-BCA0-5231D57A18BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7A943166-A67E-420A-BCA0-5231D57A18BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7A943166-A67E-420A-BCA0-5231D57A18BD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

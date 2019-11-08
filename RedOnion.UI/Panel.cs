@@ -1,92 +1,52 @@
+using RedOnion.UI.Components;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UUI = UnityEngine.UI;
 
 namespace RedOnion.UI
 {
-	public partial class Panel : Element
+	public class Panel : Simple, IEnumerable<Element>
 	{
-		protected UUI.RawImage image;
-		protected UUI.RawImage Image
+		public Panel() : base() { }
+		public Panel(Layout layout) : base(layout) { }
+
+		protected List<Element> children;
+		protected override void AddElement(Element element)
+		{
+			base.AddElement(element);
+			if (children == null)
+				children = new List<Element>();
+			children.Add(element);
+		}
+		protected override void RemoveElement(Element element)
+		{
+			base.RemoveElement(element);
+			children.Remove(element);
+		}
+		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+		public IEnumerator<Element> GetEnumerator()
+		{
+			if (children == null)
+				yield break;
+			foreach (var e in children)
+				yield return e;
+		}
+		public Element this[string name]
 		{
 			get
 			{
-				if (image == null)
-				{
-					if (GameObject == null)
-						throw new ObjectDisposedException(Name);
-					image = GameObject.AddComponent<UUI.RawImage>();
-				}
-				return image;
-			}
-			set
-			{
-				if (image == value)
-					return;
-				if (image != null)
-					GameObject.Destroy(image);
-				image = value;
+				foreach (var e in this)
+					if (e.Name == name)
+						return e;
+				return null;
 			}
 		}
-
-		public Panel(string name = null)
-			: base(name)
-		{
-		}
-
-		protected override void Dispose(bool disposing)
-		{
-			if (!disposing || GameObject == null)
-				return;
-			image = null;
-			base.Dispose(disposing);
-		}
-
-		public Color Color
-		{
-			get => image?.color ?? new Color();
-			set => Image.color = value;
-		}
-		public Texture Texture
-		{
-			get => image?.texture;
-			set => Image.texture = value;
-		}
-
-		public new Layout Layout
-		{
-			get => base.Layout;
-			set => base.Layout = value;
-		}
-		public new LayoutPadding LayoutPadding
-		{
-			get => base.LayoutPadding;
-			set => base.LayoutPadding = value;
-		}
-		public new Anchors ChildAnchors
-		{
-			get => base.ChildAnchors;
-			set => base.ChildAnchors = value;
-		}
-		public new Padding InnerPadding
-		{
-			get => base.InnerPadding;
-			set => base.InnerPadding = value;
-		}
-		public new Vector2 InnerSpacing
-		{
-			get => base.InnerSpacing;
-			set => base.InnerSpacing = value;
-		}
-		public new float Padding
-		{
-			get => base.Padding;
-			set => base.Padding = value;
-		}
-		public new float Spacing
-		{
-			get => base.Spacing;
-			set => base.Spacing = value;
-		}
+		public Element this[int index]
+			=> children != null ? children[index] : throw new IndexOutOfRangeException();
+		public int Count => children?.Count ?? 0;
+		public int IndexOf(Element item) => children != null ? children.IndexOf(item) : -1;
+		public bool Contains(Element item) => children != null && children.Contains(item);
 	}
 }

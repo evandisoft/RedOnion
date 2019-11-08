@@ -12,10 +12,11 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>RedOnion.UI</RootNamespace>
     <AssemblyName>RedOnion.UI</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
     <ReleaseVersion>0.3.0</ReleaseVersion>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -25,6 +26,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -33,20 +35,22 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Button.cs" />
+    <Compile Include="Collector.cs" />
     <Compile Include="Components\BackgroundImage.cs" />
     <Compile Include="Components\DragHandler.cs" />
     <Compile Include="Components\InputField.cs" />
-    <Compile Include="Event.cs" />
-    <Compile Include="Icon.cs" />
+    <Compile Include="Components\ToggleableButton.cs" />
+    <Compile Include="Image.cs" />
     <Compile Include="Label.cs" />
     <Compile Include="Element.cs" />
     <Compile Include="Enums.cs" />
     <Compile Include="Components\LayoutComponent.cs" />
-    <Compile Include="Panel.Children.cs" />
     <Compile Include="ScrollBox.cs" />
+    <Compile Include="Simple.cs" />
     <Compile Include="Structures\Anchors.cs" />
     <Compile Include="Structures\LayoutPadding.cs" />
     <Compile Include="Panel.cs" />
@@ -54,12 +58,33 @@
     <Compile Include="Structures\Padding.cs" />
     <Compile Include="Structures\SizeConstraint.cs" />
     <Compile Include="TextBox.cs" />
+    <Compile Include="Toggle.cs" />
     <Compile Include="Window.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="System">
+      <HintPath>$(KerbalLibs)\System.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="UnityEngine">
       <HintPath>$(KerbalLibs)\UnityEngine.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>$(KerbalLibs)\UnityEngine.CoreModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.TextRenderingModule">
+      <HintPath>$(KerbalLibs)\UnityEngine.TextRenderingModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.ImageConversionModule">
+      <HintPath>$(KerbalLibs)\UnityEngine.ImageConversionModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.UIModule">
+      <HintPath>$(KerbalLibs)\UnityEngine.UIModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UI">

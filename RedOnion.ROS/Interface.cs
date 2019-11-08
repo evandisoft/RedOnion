@@ -107,18 +107,9 @@ namespace RedOnion.ROS
 			{
 				if (lineNumber < 0)
 				{
-					lineNumber = 0;
-					if (Code?.LineMap != null && Code.LineMap.Length > 0)
-					{
-						int it = Array.BinarySearch(Code.LineMap, CodeAt-1);
-						if (it < 0)
-						{
-							it = ~it;
-							if (it > 0)
-								it--;
-							lineNumber = it;
-						}
-					}
+					lineNumber = Code?.FindLine(CodeAt-1) ?? -1;
+					if (lineNumber < 0)
+						lineNumber = 0;
 				}
 				return lineNumber;
 			}
@@ -196,6 +187,19 @@ namespace RedOnion.ROS
 		/// Index to Code for each line
 		/// </summary>
 		public int[] LineMap { get; }
+		public int FindLine(int at)
+		{
+			if (LineMap == null || LineMap.Length == 0)
+				return -1;
+			int it = Array.BinarySearch(LineMap, at);
+			if (it < 0)
+			{
+				it = ~it;
+				if (it > 0)
+					it--;
+			}
+			return it;
+		}
 
 		/// <summary>
 		/// Prefix notation of the code is good for analyzers,
@@ -231,44 +235,70 @@ namespace RedOnion.ROS
 			Position = position;
 			Text = text;
 		}
+		public override string ToString()
+			=> string.Format(Value.Culture, "{0}: {1}", Position, Text);
 	}
 
 	#endregion
 
-	#region Processor Core, Arguments and related
+	#region Processor, Arguments and related
 
-	public interface ICore : IDisposable
+	/// <summary>
+	/// The root of scripting engine, usually the main core
+	/// </summary>
+	public interface IProcessor
 	{
 		/// <summary>
-		/// Exit code (of last statement, code block or whole program)
+		/// Event invoked on engine shutdown or reset.
+		/// (All subscriptions are removed prior to executing the handlers.)
 		/// </summary>
-		OpCode Exit { get; }
+		event Action Shutdown;
 		/// <summary>
-		/// Result of last expression (rvalue)
+		/// Event invoked on every physics update (Unity FixedUpdate).
 		/// </summary>
-		Value Result { get; }
+		event Action PhysicsUpdate;
 		/// <summary>
-		/// Argument list for function calls
+		/// Event invoked on every graphic update (Unity Update).
 		/// </summary>
-		ArgumentList Arguments { get; }
+		event Action GraphicUpdate;
+
 		/// <summary>
-		/// Compiled code for execution
+		/// Invoked by print function
 		/// </summary>
-		CompiledCode Code { get; }
-		/// <summary>
-		/// Compile source to code
-		/// </summary>
-		CompiledCode Compile(string source, string path = null);
-		/// <summary>
-		/// Run the script.
-		/// Returns true if finished, false if countdown reached zero.
-		/// </summary>
-		bool Execute(int countdown = 1000);
+		void Print(string msg);
 
 		/// <summary>
 		/// Log message
 		/// </summary>
 		void Log(string msg);
+	}
+
+	/// <summary>
+	/// Exit code (of last statement, code block or whole program)
+	/// </summary>
+	public enum ExitCode : sbyte
+	{
+		/// <summary>
+		/// End of block/program reached without return statement
+		/// </summary>
+		None = 0,
+		/// <summary>
+		/// Return statement
+		/// </summary>
+		Return = 1,
+		/// <summary>
+		/// Yield/wait statement
+		/// </summary>
+		Yield = 2,
+		/// <summary>
+		/// Countdown reached
+		/// </summary>
+		Countdown = 3,
+
+		/// <summary>
+		/// Exception (raise/throw statement)
+		/// </summary>
+		Exception = -1,
 	}
 
 	/// <summary>
@@ -289,6 +319,10 @@ namespace RedOnion.ROS
 	{
 		[DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
 		protected ListCore<Value> list;
+		public Core Core { get; }
+		public Processor Processor => Core?.Processor;
+		public ArgumentList(Core core)
+			=> Core = core;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		public int Length => list.Count;
@@ -346,14 +380,19 @@ namespace RedOnion.ROS
 	{
 		readonly ArgumentList list;
 		public readonly int argc;
+		public Processor Processor => list?.Processor;
+		public Core Core => list?.Core;
 		public int Length => argc;
 		public int Count => argc;
 		public int Size => argc;
+
+		[DebuggerStepThrough]
 		public Arguments(ArgumentList list, int argc)
 		{
 			this.list = list;
 			this.argc = argc;
 		}
+		[DebuggerStepThrough]
 		public Arguments(Arguments args, int argc)
 		{
 			this.list = args.list;
@@ -375,6 +414,100 @@ namespace RedOnion.ROS
 				arr[i] = list.Get(argc, i);
 			return arr;
 		}
+	}
+
+	#endregion
+
+	#region Attributes and interfaces for reflection
+
+	/// <summary>
+	/// Callable object (function which can also have properties).
+	/// </summary>
+	public interface ICallable
+	{
+		bool Call(ref Value result, object self, Arguments args, bool create);
+	}
+	/// <summary>
+	/// Object with custom operator implementation.
+	/// </summary>
+	public interface IOperators
+	{
+		bool Unary(ref Value self, OpCode op);
+		bool Binary(ref Value lhs, OpCode op, ref Value rhs);
+	}
+	/// <summary>
+	/// Object that is able to convert itself into different type.
+	/// </summary>
+	public interface IConvert
+	{
+		bool Convert(ref Value self, Descriptor to);
+	}
+	/// <summary>
+	/// Interface for type system ('is' and 'as' operators).
+	/// </summary>
+	public interface IType
+	{
+		Type Type { get; }
+		bool IsType(object type);
+	}
+
+	/// <summary>
+	/// Marker for potentially dangerous API.
+	/// </summary>
+	public class UnsafeAttribute : Attribute { }
+
+	/// <summary>
+	/// Alternative name for a member (if name not null),
+	/// or readonly string field with path to implementation.
+	/// </summary>
+	public class AliasAttribute : Attribute
+	{
+		public string Name { get; }
+		public AliasAttribute() { }
+		public AliasAttribute(string name) => Name = name;
+	}
+
+	/// <summary>
+	/// Link from instance to creator (ROS object to function).
+	/// </summary>
+	public class CreatorAttribute : Attribute
+	{
+		public Type Creator { get; }
+		public CreatorAttribute(Type creator)
+			=> Creator = creator;
+	}
+
+	/// <summary>
+	/// Convert values to specified type (when presenting to script)
+	/// </summary>
+	[AttributeUsage(AttributeTargets.Property|AttributeTargets.Field|AttributeTargets.ReturnValue|AttributeTargets.Parameter)]
+	public class ConvertAttribute : Attribute
+	{
+		public Type Type { get; }
+		public ConvertAttribute(Type type) => Type = type;
+	}
+
+	//TODO: use this in reflected descriptors to disable modification
+
+	/// <summary>
+	/// Make the value read-only for the script (disable writes and most methods)
+	/// </summary>
+	[AttributeUsage(AttributeTargets.Property|AttributeTargets.Field|AttributeTargets.ReturnValue)]
+	public class ReadOnlyContent : Attribute
+	{
+		public bool ContentIsReadOnly { get; }
+		public ReadOnlyContent() => ContentIsReadOnly = true;
+		public ReadOnlyContent(bool contentIsReadOnly) => ContentIsReadOnly = contentIsReadOnly;
+	}
+	/// <summary>
+	/// Make items of collection read-only for the script (disable writes and most methods)
+	/// </summary>
+	[AttributeUsage(AttributeTargets.Property|AttributeTargets.Field|AttributeTargets.ReturnValue)]
+	public class ReadOnlyItems : Attribute
+	{
+		public bool ItemsAreReadOnly { get; }
+		public ReadOnlyItems() => ItemsAreReadOnly = true;
+		public ReadOnlyItems(bool itemsAreReadOnly) => ItemsAreReadOnly = itemsAreReadOnly;
 	}
 
 	#endregion

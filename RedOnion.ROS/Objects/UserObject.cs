@@ -5,35 +5,13 @@ using RedOnion.ROS.Utilities;
 
 namespace RedOnion.ROS.Objects
 {
-	public class UserObject : Descriptor
+	/// <summary>
+	/// Script object created by `new object` or any function or class in the script.
+	/// The design is based on JavaScript (ECMA-262)
+	/// </summary>
+	public class UserObject : Descriptor, ISelfDescribing
 	{
-		[DebuggerDisplay("{name} = {value}")]
-		protected struct Prop
-		{
-			public string name;
-			public Value value;
-			public override string ToString()
-				=> string.Format(Value.Culture, "{0} = {1}", name, value.ToString());
-		}
-		protected ListCore<Prop> prop;
-		protected Dictionary<string, int> dict;
-		protected UserObject parent;
-		protected int readOnlyTop = 0;
-
-		public UserObject()
-			: base("user object", typeof(UserObject)) { }
-		public UserObject(string name)
-			: base(name, typeof(UserObject)) { }
-		public UserObject(string name, Type type)
-			: base(name, type) { }
-		public UserObject(UserObject parent)
-			: this() => this.parent = parent;
-		public UserObject(string name, UserObject parent)
-			: this(name, typeof(UserObject))
-			=> this.parent = parent;
-		public UserObject(string name, Type type, UserObject parent)
-			: this(name, type)
-			=> this.parent = parent;
+		Descriptor ISelfDescribing.Descriptor => this;
 
 		/// <summary>
 		/// Create new user object inheriting from this one
@@ -46,6 +24,61 @@ namespace RedOnion.ROS.Objects
 		}
 
 		/// <summary>
+		/// Single property of an object (with name and value)
+		/// </summary>
+		[DebuggerDisplay("{name} = {value}")]
+		protected internal struct Prop
+		{
+			public string name;
+			public Value value;
+			public override string ToString()
+				=> string.Format(Value.Culture, "{0} = {1}", name, value.ToString());
+		}
+		/// <summary>
+		/// All properties of the object
+		/// (properties from parent are auto-added when accessed)
+		/// </summary>
+		protected internal ListCore<Prop> prop;
+		/// <summary>
+		/// Map of all properties (name-to-index into <see cref="prop"/>)
+		/// </summary>
+		protected internal Dictionary<string, int> dict;
+		/// <summary>
+		/// Parent object (this one is derived from, null if no such)
+		/// </summary>
+		protected internal UserObject parent;
+		/// <summary>
+		/// Number of locked / read-only properties
+		/// </summary>
+		protected int readOnlyTop = 0;
+
+		public UserObject()
+			: base("user object", typeof(UserObject)) { }
+		public UserObject(string name)
+			: base(name, typeof(UserObject)) { }
+		public UserObject(string name, Type type)
+			: base(name, type) { }
+		public UserObject(string name, Type type, UserObject parent)
+			: base(name, type)
+			=> this.parent = parent;
+
+		public UserObject(Type type)
+			: base(type.Name, type) { }
+		public UserObject(Type type, UserObject parent)
+			: base(type.Name, type)
+			=> this.parent = parent;
+
+		public UserObject(UserObject parent)
+			: this() => this.parent = parent;
+		public UserObject(string name, UserObject parent)
+			: this(name, typeof(UserObject))
+			=> this.parent = parent;
+
+		internal UserObject(string name, Type type, ExCode primitive, TypeCode typeCode, UserObject parent)
+			: base(name, type, primitive, typeCode)
+			=> this.parent = parent;
+
+		/// <summary>
 		/// Make all current properties read-only
 		/// </summary>
 		public void Lock()
@@ -53,7 +86,7 @@ namespace RedOnion.ROS.Objects
 		/// <summary>
 		/// Remove all writable properties (those added after last <see cref="Lock()"/>)
 		/// </summary>
-		public void Reset()
+		public virtual void Reset()
 		{
 			prop.Count = readOnlyTop;
 			if (dict != null)
@@ -78,7 +111,7 @@ namespace RedOnion.ROS.Objects
 			=> Add(name, new Value(it));
 		public int Add(string name, Value value)
 			=> Add(name, ref value);
-		public int Add(string name, ref Value value)
+		public virtual int Add(string name, ref Value value)
 		{
 			var idx = prop.size;
 			ref var it = ref prop.Add();
@@ -92,7 +125,7 @@ namespace RedOnion.ROS.Objects
 			}
 			return idx;
 		}
-		public int Find(string name)
+		public virtual int Find(string name)
 		{
 			if (dict != null && dict.TryGetValue(name, out var idx))
 				return idx;
@@ -103,6 +136,8 @@ namespace RedOnion.ROS.Objects
 				return idx;
 			return Add(name, ref parent.prop.items[idx].value);
 		}
+		protected int ImportFrom(UserObject space, string name, int at)
+			=> Add(name, ref space.prop.items[at].value);
 		public Value this[string name]
 		{
 			get
@@ -122,23 +157,19 @@ namespace RedOnion.ROS.Objects
 		}
 		public override int Find(object self, string name, bool add)
 		{
-			if (dict != null && dict.TryGetValue(name, out var idx))
-				return idx;
-			if (parent != null)
-			{
-				idx = parent.Find(name);
-				if (idx >= 0)
-					return Add(name, ref parent.prop.items[idx].value);
-			}
-			return add ? Add(name, Value.Void) : -1;
+			int at = Find(name);
+			return at < 0 && add ? Add(name, Value.Void) : at;
 		}
 		public override string NameOf(object self, int at)
-			=> prop[at].name ?? "#" + at;
+			=> prop.GetOrDefault(at).name ?? "#" + at;
 		public override bool Get(ref Value self, int at)
 		{
 			if (at < 0 || at >= prop.size)
 				return false;
-			self = prop.items[at].value;
+			ref var it = ref prop.items[at].value;
+			if (it.IsVoid)
+				return false;
+			self = it;
 			return true;
 		}
 		public override bool Set(ref Value self, int at, OpCode op, ref Value value)
@@ -170,12 +201,7 @@ namespace RedOnion.ROS.Objects
 			{
 				at = index.ToInt();
 				if (at < 0 || at >= prop.size)
-				{
-					if (at >= prop.size || args.Length > 1)
-						return -1;
-					at = prop.size;
-					prop.Add(new Prop());
-				}
+					return -1;
 			}
 			else
 			{
@@ -183,17 +209,28 @@ namespace RedOnion.ROS.Objects
 					return -1;
 				var name = index.obj.ToString();
 				at = Find(name);
-				if (at < 0 || at >= prop.size)
-				{
-					if (at > prop.size || args.Length > 1)
-						return -1;
-					at = Add(name, Value.Void);
-				}
+				if (at < 0)
+					return -1;
 			}
 			if (args.Length == 1)
 				return at;
 			self = prop.items[at].value;
 			return self.desc.IndexFind(ref self, new Arguments(args, args.Length-1));
+		}
+
+		public override IEnumerable<string> EnumerateProperties(object self)
+		{
+			foreach (var p in prop)
+			{
+				var name = p.name;
+				if (name != null)
+					yield return name;
+			}
+			if (parent == null)
+				yield break;
+			foreach (var name in parent.EnumerateProperties(self))
+				if (!dict.ContainsKey(name))
+					yield return name;
 		}
 	}
 }
