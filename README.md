@@ -1,3 +1,15 @@
+*(A LOT OF THIS README IS OUTDATED. WILL BE UPDATED IN THE FUTURE)*
+**Disclaimer: This is not a sandbox! This is an unrestricted scripting environment. You have the power to do anything a mod can do. Don't use scripts from untrusted sources!**
+
+**This is necessary because:**
+
+- We want people eventually to be able to create mods using this mod.
+- We want people to be able to debug their mod using this mod.
+- We want people to be able to explore their own or other's mods using this mod.
+- We want users to be able to interact with the program in an unrestricted way.
+
+**We may, in the future, create an optional sandbox. But that will come later.**
+
 # RedOnion and Kerbalua
 
 A joint effort of Evan Dickinson and Lukáš Fireš to create
