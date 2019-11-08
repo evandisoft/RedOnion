@@ -532,11 +532,21 @@ Any other key gives focus to input box.
 				}
 				repl.outputBox.AddError("Execution Manually Terminated");
 			}
-
+			
+			Rect currentWidgetBarRect = GetCurrentWidgetBarRect();
+			Rect runsafeWidgetBar = new Rect(
+				currentWidgetBarRect.x,
+				currentWidgetBarRect.y,
+				currentWidgetBarRect.width,
+				43);
 			if (evaluationList.Count != 0)
 			{
 				EventType t = Event.current.type;
-				if (t == EventType.KeyDown || t == EventType.MouseDown)
+				if (t == EventType.KeyDown)
+				{
+					Event.current.Use();
+				}
+				else if (t == EventType.MouseDown && !runsafeWidgetBar.Contains(Event.current.mousePosition))
 				{
 					Event.current.Use();
 				}
@@ -550,7 +560,6 @@ Any other key gives focus to input box.
 
 			GlobalKeyBindings.ExecuteAndConsumeIfMatched(Event.current);
 
-			Rect currentWidgetBarRect = GetCurrentWidgetBarRect();
 			widgetBar.Update(currentWidgetBarRect);
 			GUILayout.BeginArea(new Rect(
 				currentWidgetBarRect.x,
