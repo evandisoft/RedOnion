@@ -1,8 +1,10 @@
 using System;
-using LiveRepl.UI.Elements;
+using LiveRepl.UI.Base;
+using LiveRepl.UI.Controls;
+using LiveRepl.UI.Panes;
 using UnityEngine;
 
-namespace LiveRepl.UI.Panes
+namespace LiveRepl.UI.Parts
 {
 	public class FileIOPane:Pane
 	{

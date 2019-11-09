@@ -1,17 +1,17 @@
 ﻿using Kerbalui.Gui;
+using LiveRepl.UI.Base;
 using UnityEngine;
 
-namespace LiveRepl.UI.Panes
+namespace LiveRepl.UI.Parts
 {
 	/// <summary>
-	/// The Center Pane between the Editor and Repl.
-	/// Will tend to contain functionality for the overall ScriptWindow
+	/// The pane that holds the Repl and related functionality.
 	/// </summary>
-	public class CenterPane : Pane
+	public class ReplPane : Pane
 	{
 		public ContentPane contentPane;
 
-		public CenterPane(ContentPane contentPane)
+		public ReplPane(ContentPane contentPane)
 		{
 			this.contentPane=contentPane;
 		}

@@ -1,16 +1,17 @@
 ﻿using Kerbalui.Gui;
+using LiveRepl.UI.Base;
 using UnityEngine;
 
-namespace LiveRepl.UI.Panes
+namespace LiveRepl.UI.Parts
 {
 	/// <summary>
-	/// The pane that holds the Repl and related functionality.
+	/// The pane that contains the completion area.
 	/// </summary>
-	public class ReplPane : Pane
+	public class CompletionPane : Pane
 	{
 		public ContentPane contentPane;
 
-		public ReplPane(ContentPane contentPane)
+		public CompletionPane(ContentPane contentPane)
 		{
 			this.contentPane=contentPane;
 		}

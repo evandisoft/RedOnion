@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using LiveRepl.UI.Elements;
+using LiveRepl.UI.Base;
+using LiveRepl.UI.Controls;
 using UnityEngine;
 
 namespace LiveRepl.UI.Panes
@@ -10,10 +11,10 @@ namespace LiveRepl.UI.Panes
 	{
 		List<SpacerEntry> spacerEntries=new List<SpacerEntry>();
 
-		public void Add(float weight,IRectRenderable renderable)
+		public void Add(float weight,UIElement element)
 		{
-			spacerEntries.Add(new SpacerEntry(weight, renderable));
-			RegisterForUpdate(renderable);
+			spacerEntries.Add(new SpacerEntry(weight, element));
+			RegisterForUpdate(element);
 		}
 
 		public override void SetRect(Rect rect)
@@ -51,7 +52,7 @@ namespace LiveRepl.UI.Panes
 				//Debug.Log(spacerEntry);
 				//Debug.Log("startPoint "+startPoint+", endPoint "+endPoint);
 
-				spacerEntry.renderable.SetRect(new Rect(startPoint, 0, endPoint-startPoint, rect.height));
+				spacerEntry.element.SetRect(new Rect(startPoint, 0, endPoint-startPoint, rect.height));
 				startPoint=endPoint;
 			}
 		}
@@ -60,7 +61,7 @@ namespace LiveRepl.UI.Panes
 		{
 			float weight=spacerEntry.weight;
 #pragma warning disable RECS0018 // Comparison of floating point numbers with equality operator
-			if (weight==0 && spacerEntry.renderable is TextElement textElement && textElement.style!=null)
+			if (weight==0 && spacerEntry.element is TextElement textElement && textElement.style!=null)
 #pragma warning restore RECS0018 // Comparison of floating point numbers with equality operator
 			{
 				return textElement.style.CalcSize(textElement.content).x;
@@ -71,12 +72,12 @@ namespace LiveRepl.UI.Panes
 		public struct SpacerEntry
 		{
 			public float weight;
-			public IRectRenderable renderable;
+			public UIElement element;
 
-			public SpacerEntry(float weight, IRectRenderable renderable)
+			public SpacerEntry(float weight, UIElement element)
 			{
 				this.weight=weight;
-				this.renderable=renderable;
+				this.element=element;
 			}
 		}
 	}

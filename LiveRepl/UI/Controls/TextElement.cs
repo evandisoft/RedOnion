@@ -1,9 +1,10 @@
 using System;
+using LiveRepl.UI.Base;
 using UnityEngine;
 
-namespace LiveRepl.UI.Elements
+namespace LiveRepl.UI.Controls
 {
-	public abstract class TextElement:Element
+	public abstract class TextElement:Control
 	{
 		public GUIContent content=new GUIContent("");
 		public GUIStyle style;

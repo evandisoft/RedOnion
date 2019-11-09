@@ -1,8 +1,9 @@
 using System;
 using Kerbalui.Gui;
+using LiveRepl.UI.Base;
 using UnityEngine;
 
-namespace LiveRepl.UI.Panes
+namespace LiveRepl.UI.Parts
 {
 	/// <summary>
 	/// The pane that holds the Editor, Center, Repl, and CompletionArea Panes.

@@ -1,9 +1,10 @@
 ﻿using System;
+using LiveRepl.UI.Base;
 using UnityEngine;
 
-namespace LiveRepl.UI.Elements
+namespace LiveRepl.UI.Controls
 {
-	public class TextAreaScroller:Element
+	public class TextAreaScroller:Control
 	{
 		public Vector2 scrollPos = new Vector2();
 		bool resetScroll;

@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace LiveRepl.UI.Elements {
+namespace LiveRepl.UI.Controls {
 	public class Button:TextElement {
 		//public GUIContent content = new GUIContent("");
 		public Action action;

@@ -1,7 +1,8 @@
-﻿using LiveRepl.UI.Elements;
+﻿using LiveRepl.UI.Base;
+using LiveRepl.UI.Controls;
 using UnityEngine;
 
-namespace LiveRepl.UI.Panes
+namespace LiveRepl.UI.Parts
 {
 	/// <summary>
 	/// The pane that holds the Editor and related functionality.

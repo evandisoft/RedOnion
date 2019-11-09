@@ -100,25 +100,23 @@
     <Compile Include="UI\ScriptWindow.Evaluation.cs" />
     <Compile Include="UI\ScriptWindow.KeyBindings.cs" />
     <Compile Include="UI\ScriptWindow.Layout.cs" />
-    <Compile Include="UI\Panes\CenterPane.cs" />
-    <Compile Include="UI\Panes\CompletionPane.cs" />
-    <Compile Include="UI\Panes\ContentPane.cs" />
-    <Compile Include="UI\Panes\EditorPane.cs" />
-    <Compile Include="UI\Panes\Pane.cs" />
-    <Compile Include="UI\Panes\ReplPane.cs" />
-    <Compile Include="UI\Elements\Element.cs" />
-    <Compile Include="UI\Parts\UIPart.cs" />
-    <Compile Include="UI\Elements\TextArea.cs" />
-    <Compile Include="UI\Elements\TextAreaScroller.cs" />
-    <Compile Include="UI\Elements\EditingArea.cs" />
-    <Compile Include="UI\Panes\FileIOPane.cs" />
-    <Compile Include="UI\Interfaces\IUpdateable.cs" />
-    <Compile Include="UI\Elements\Button.cs" />
-    <Compile Include="UI\Elements\TextField.cs" />
-    <Compile Include="UI\Elements\TextElement.cs" />
+    <Compile Include="UI\Controls\TextArea.cs" />
+    <Compile Include="UI\Controls\TextAreaScroller.cs" />
+    <Compile Include="UI\Controls\EditingArea.cs" />
+    <Compile Include="UI\Controls\Button.cs" />
+    <Compile Include="UI\Controls\TextField.cs" />
+    <Compile Include="UI\Controls\TextElement.cs" />
     <Compile Include="UI\Panes\HorizontalSpacer.cs" />
-    <Compile Include="UI\Interfaces\IRectRenderable.cs" />
-    <Compile Include="UI\Elements\Label.cs" />
+    <Compile Include="UI\Controls\Label.cs" />
+    <Compile Include="UI\Base\UIElement.cs" />
+    <Compile Include="UI\Base\Control.cs" />
+    <Compile Include="UI\Base\Pane.cs" />
+    <Compile Include="UI\Parts\CenterPane.cs" />
+    <Compile Include="UI\Parts\CompletionPane.cs" />
+    <Compile Include="UI\Parts\ContentPane.cs" />
+    <Compile Include="UI\Parts\EditorPane.cs" />
+    <Compile Include="UI\Parts\FileIOPane.cs" />
+    <Compile Include="UI\Parts\ReplPane.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
@@ -148,7 +146,7 @@
     <Folder Include="Other\" />
     <Folder Include="UI\" />
     <Folder Include="UI\Panes\" />
-    <Folder Include="UI\Elements\" />
+    <Folder Include="UI\Controls\" />
     <Folder Include="UI\Parts\" />
     <Folder Include="UI\Interfaces\" />
     <Folder Include="UI\Base\" />

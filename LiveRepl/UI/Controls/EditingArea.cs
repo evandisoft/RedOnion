@@ -3,7 +3,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using Kerbalui.Gui;
 
-namespace LiveRepl.UI.Elements
+namespace LiveRepl.UI.Controls
 {
 	public class EditingArea : TextAreaScroller
 	{

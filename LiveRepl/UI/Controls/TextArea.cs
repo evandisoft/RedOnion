@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace LiveRepl.UI.Elements
+namespace LiveRepl.UI.Controls
 {
 	public class TextArea:TextElement
 	{
