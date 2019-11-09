@@ -106,17 +106,17 @@
     <Compile Include="UI\Controls\Button.cs" />
     <Compile Include="UI\Controls\TextField.cs" />
     <Compile Include="UI\Controls\TextElement.cs" />
-    <Compile Include="UI\Panes\HorizontalSpacer.cs" />
+    <Compile Include="UI\Groups\HorizontalSpacer.cs" />
     <Compile Include="UI\Controls\Label.cs" />
     <Compile Include="UI\Base\UIElement.cs" />
     <Compile Include="UI\Base\Control.cs" />
-    <Compile Include="UI\Base\Pane.cs" />
-    <Compile Include="UI\Parts\CenterPane.cs" />
-    <Compile Include="UI\Parts\CompletionPane.cs" />
-    <Compile Include="UI\Parts\ContentPane.cs" />
-    <Compile Include="UI\Parts\EditorPane.cs" />
-    <Compile Include="UI\Parts\FileIOPane.cs" />
-    <Compile Include="UI\Parts\ReplPane.cs" />
+    <Compile Include="UI\Base\Group.cs" />
+    <Compile Include="UI\Parts\CenterGroup.cs" />
+    <Compile Include="UI\Parts\CompletionGroup.cs" />
+    <Compile Include="UI\Parts\ContentGroup.cs" />
+    <Compile Include="UI\Parts\EditorGroup.cs" />
+    <Compile Include="UI\Parts\FileIOGroup.cs" />
+    <Compile Include="UI\Parts\ReplGroup.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
@@ -145,10 +145,9 @@
     <Folder Include="Main\" />
     <Folder Include="Other\" />
     <Folder Include="UI\" />
-    <Folder Include="UI\Panes\" />
+    <Folder Include="UI\Groups\" />
     <Folder Include="UI\Controls\" />
     <Folder Include="UI\Parts\" />
-    <Folder Include="UI\Interfaces\" />
     <Folder Include="UI\Base\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

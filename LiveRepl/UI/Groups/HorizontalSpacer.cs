@@ -5,9 +5,9 @@ using LiveRepl.UI.Base;
 using LiveRepl.UI.Controls;
 using UnityEngine;
 
-namespace LiveRepl.UI.Panes
+namespace LiveRepl.UI.Groups
 {
-	public class HorizontalSpacer:Pane
+	public class HorizontalSpacer:Group
 	{
 		List<SpacerEntry> spacerEntries=new List<SpacerEntry>();
 

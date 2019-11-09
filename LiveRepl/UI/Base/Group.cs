@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using LiveRepl.UI.Controls;
 using UnityEngine;
@@ -6,7 +6,7 @@ using UnityEngine;
 namespace LiveRepl.UI.Base
 {
 	/// <summary>
-	/// A Group has multiple sub Controls, and displays them within a GUI.BeginGroup on each update
+	/// A Pane has multiple sub Controls, and displays them within a GUI.BeginGroup on each update
 	/// </summary>
 	public abstract class Group:UIElement
 	{

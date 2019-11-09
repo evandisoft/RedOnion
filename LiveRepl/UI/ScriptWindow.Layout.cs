@@ -15,25 +15,25 @@ namespace LiveRepl.UI
 
 		public const float windowHeight=600;
 		public const float titleHeight = 20;
-		public const float contentPaneHeight = windowHeight-titleHeight;
-		public const float editorPaneWidth = 500;
-		public const float centerPaneWidth = 100;
-		public const float replPaneWidth = 400;
-		public const float completionPaneWidth = 150;
+		public const float contentGroupHeight = windowHeight-titleHeight;
+		public const float editorGroupWidth = 500;
+		public const float centerGroupWidth = 100;
+		public const float replGroupWidth = 400;
+		public const float completionGroupWidth = 150;
 
 		float WindowWidth()
 		{
-			float width=centerPaneWidth;
+			float width=centerGroupWidth;
 			if (editorVisible || replVisible)
 			{
-				width+=completionPaneWidth;
+				width+=completionGroupWidth;
 				if (editorVisible)
 				{
-					width+=editorPaneWidth;
+					width+=editorGroupWidth;
 				}
 				if (replVisible)
 				{
-					width+=replPaneWidth;
+					width+=replGroupWidth;
 				}
 			}
 			return width;
@@ -44,7 +44,7 @@ namespace LiveRepl.UI
 			float x=baseWindowPos.x;
 			if (!editorVisible)
 			{
-				x+=editorPaneWidth;
+				x+=editorGroupWidth;
 			}
 			return x;
 		}
@@ -54,13 +54,13 @@ namespace LiveRepl.UI
 		Rect windowRect;
 		Rect titleBarRect;
 
-		ContentPane contentPane;
+		ContentGroup contentGroup;
 
 		public void RecalculateRects()
 		{
 			windowRect=WindowRect();
 			titleBarRect=TitleBarRect();
-			contentPane.SetRect(new Rect(0, titleHeight, windowRect.width, windowRect.height-titleHeight));
+			contentGroup.SetRect(new Rect(0, titleHeight, windowRect.width, windowRect.height-titleHeight));
 		}
 
 		Rect WindowRect()
@@ -76,7 +76,7 @@ namespace LiveRepl.UI
 		void InitLayout()
 		{
 			windowRect=WindowRect();
-			contentPane=new ContentPane(this);
+			contentGroup=new ContentGroup(this);
 			RecalculateRects();
 		}
 
@@ -89,7 +89,7 @@ namespace LiveRepl.UI
 		void WindowFunction(int id)
 		{
 			GUI.DragWindow(titleBarRect);
-			contentPane.Update();
+			contentGroup.Update();
 		}
 
 		public void SetOrReleaseInputLock()
