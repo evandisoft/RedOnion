@@ -28,6 +28,7 @@ namespace LiveRepl.UI.Groups
 		{
 			spacerEntries.Add(new SpacerEntry(weight, element));
 			RegisterForUpdate(element);
+			needsRecalculation=true;
 		}
 
 		protected override void SetChildRects()
@@ -96,6 +97,16 @@ namespace LiveRepl.UI.Groups
 			{
 				this.weight=weight;
 				this.element=element;
+			}
+		}
+
+		public override void Update()
+		{
+			base.Update();
+			if (needsRecalculation)
+			{
+				SetRect(rect);
+				needsRecalculation=false;
 			}
 		}
 	}
