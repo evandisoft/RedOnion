@@ -18,8 +18,22 @@ namespace LiveRepl.UI.Base
 			this.rect=rect;
 		}
 
-		public virtual void Update()
+		/// <summary>
+		/// The main update function. Calls TypeSpecificUpdate which will do different things depending on the
+		/// type of subclass that is implementing it.
+		/// 
+		/// Trigers a Rect recalculation if "needsRecalculation" was true
+		/// </summary>
+		public void Update()
 		{
+			TypeSpecificUpdate();
+			if (needsRecalculation)
+			{
+				SetRect(rect);
+				needsRecalculation=false;
+			}
 		}
+
+		protected abstract void TypeSpecificUpdate();
 	}
 }

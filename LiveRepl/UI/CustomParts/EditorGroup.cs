@@ -23,13 +23,12 @@ namespace LiveRepl.UI.CustomParts
 			RegisterForUpdate(editingArea=new EditingArea(new TextArea()));
 		}
 
-		public override void Update()
+		protected override void GroupUpdate()
 		{
 			if (Event.current.type==EventType.KeyDown)
 			{
-				SetRect(rect);
+				fileIOGroup.horizontalSpacer.needsRecalculation=true;
 			}
-			base.Update();
 		}
 
 		protected override void SetChildRects()

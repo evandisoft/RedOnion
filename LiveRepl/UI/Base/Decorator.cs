@@ -14,6 +14,13 @@ namespace LiveRepl.UI.Base
 			SetChildRect();
 		}
 
+		protected override void TypeSpecificUpdate()
+		{
+			DecoratorUpdate();
+		}
+
+		protected abstract void DecoratorUpdate();
+
 		/// <summary>
 		/// Implemented by the subclass. Sets the rect of the child after its own rect was set by SetRect
 		/// </summary>

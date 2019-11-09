@@ -12,16 +12,26 @@ namespace LiveRepl.UI.Base
 	{
 		List<UIElement> elements=new List<UIElement>();
 
-		public override void Update()
+		/// <summary>
+		/// Starts a GUI.BeginGroup, then calls GroupUpdate (which may be overriden in a subclass), and then
+		/// calls update on all the elements.
+		/// </summary>
+		protected override void TypeSpecificUpdate()
 		{
-			base.Update();
-
 			GUI.BeginGroup(rect);
-			foreach(var element in elements)
+			GroupUpdate();
+			foreach (var element in elements)
 			{
 				element.Update();
 			}
 			GUI.EndGroup();
+		}
+
+		/// <summary>
+		/// Will be called at the start of GUI.BeginGroup.
+		/// </summary>
+		protected virtual void GroupUpdate()
+		{
 		}
 
 		/// <summary>

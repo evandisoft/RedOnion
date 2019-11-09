@@ -35,7 +35,7 @@ namespace LiveRepl.UI.Decorators
 			InitializeDefaultKeyBindings();
 		}
 
-		public override void Update()
+		protected override void DecoratorUpdate()
 		{
 			// Initialize editor
 			if (editor == null)
@@ -71,7 +71,7 @@ namespace LiveRepl.UI.Decorators
 
 				editableTextControl.content.text = editor.text;
 
-				base.Update();
+				base.DecoratorUpdate();
 
 				cursorIndex = editor.cursorIndex;
 				selectIndex = editor.selectIndex;
@@ -87,7 +87,7 @@ namespace LiveRepl.UI.Decorators
 			}
 			else
 			{
-				base.Update();
+				base.DecoratorUpdate();
 			}
 		}
 

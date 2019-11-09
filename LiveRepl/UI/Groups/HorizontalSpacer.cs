@@ -99,15 +99,5 @@ namespace LiveRepl.UI.Groups
 				this.element=element;
 			}
 		}
-
-		public override void Update()
-		{
-			base.Update();
-			if (needsRecalculation)
-			{
-				SetRect(rect);
-				needsRecalculation=false;
-			}
-		}
 	}
 }

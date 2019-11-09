@@ -21,7 +21,22 @@ namespace LiveRepl.UI.Decorators
 			this.contentControl=contentControl;
 		}
 
-		public override void Update()
+		public virtual void ResetScroll()
+		{
+			resetScroll = true;
+		}
+
+		protected override void SetChildRect()
+		{
+			Debug.Log("SetChildRect called");
+			Vector2 contentSize = contentControl.StyleOrDefault.CalcSize(contentControl.content);
+			contentControl.rect = new Rect(0, 0,
+				Math.Max(contentSize.x, rect.width),
+				Math.Max(contentSize.y, rect.height)
+				);
+		}
+
+		protected override void DecoratorUpdate()
 		{
 			scrollPos = GUI.BeginScrollView(rect, scrollPos, contentControl.rect);
 			{
@@ -38,21 +53,6 @@ namespace LiveRepl.UI.Decorators
 
 			}
 			GUI.EndScrollView();
-		}
-
-		public virtual void ResetScroll()
-		{
-			resetScroll = true;
-		}
-
-		protected override void SetChildRect()
-		{
-			Debug.Log("SetChildRect called");
-			Vector2 contentSize = contentControl.StyleOrDefault.CalcSize(contentControl.content);
-			contentControl.rect = new Rect(0, 0,
-				Math.Max(contentSize.x, rect.width),
-				Math.Max(contentSize.y, rect.height)
-				);
 		}
 	}
 }

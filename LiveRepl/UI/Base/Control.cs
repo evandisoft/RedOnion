@@ -27,12 +27,8 @@ namespace LiveRepl.UI.Base
 			GUI.FocusControl(ControlName);
 		}
 
-		/// <summary>
-		/// Calls the base update, then sets the next control, then calls the Control's update.
-		/// </summary>
-		public override void Update()
+		protected override void TypeSpecificUpdate()
 		{
-			base.Update();
 			GUI.SetNextControlName(ControlName);
 			ControlUpdate();
 		}
