@@ -2,10 +2,10 @@
 using UnityEngine;
 
 namespace LiveRepl.UI.Elements {
-	public class Button:Element {
-		public GUIContent content = new GUIContent("");
+	public class Button:TextElement {
+		//public GUIContent content = new GUIContent("");
 		public Action action;
-		public GUIStyle style;
+		//public GUIStyle style;
 
 		public Button(string text, Action action)
 		{
@@ -13,12 +13,14 @@ namespace LiveRepl.UI.Elements {
 			this.action = action;
 		}
 
+		public override void SetDefaultStyle()
+		{
+			style=GUI.skin.button;
+		}
+
 		public override void Update()
 		{
-			if (style==null)
-			{
-				style=GUI.skin.button;
-			}
+			InitStyle();
 
 			LabelNextControl();
 			if (GUI.Button(rect, content, style))

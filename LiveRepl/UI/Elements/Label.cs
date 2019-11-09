@@ -1,10 +1,26 @@
 using System;
+using UnityEngine;
+
 namespace LiveRepl.UI.Elements
 {
-	public class Label
+	public class Label : TextElement
 	{
-		public Label()
+		public Label(string text)
 		{
+			content.text=text;
+		}
+
+		public override void SetDefaultStyle()
+		{
+			style=GUI.skin.label;
+		}
+
+		public override void Update()
+		{
+			InitStyle();
+
+			LabelNextControl();
+			GUI.Label(rect, content, style);
 		}
 	}
 }

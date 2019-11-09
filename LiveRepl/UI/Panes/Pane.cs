@@ -16,7 +16,7 @@ namespace LiveRepl.UI.Panes
 		public Rect rect;
 		List<IUpdateable> updateables=new List<IUpdateable>();
 
-		public void Update()
+		public virtual void Update()
 		{
 			GUI.BeginGroup(rect);
 			foreach(var updateable in updateables)

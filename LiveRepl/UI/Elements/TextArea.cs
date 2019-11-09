@@ -5,12 +5,14 @@ namespace LiveRepl.UI.Elements
 {
 	public class TextArea:TextElement
 	{
+		public override void SetDefaultStyle()
+		{
+			style=GUI.skin.textArea;
+		}
+
 		public override void Update()
 		{
-			if (style == null)
-			{
-				style=GUI.skin.textArea;
-			}
+			InitStyle();
 
 			LabelNextControl();
 			content.text=GUI.TextArea(rect, content.text,style);

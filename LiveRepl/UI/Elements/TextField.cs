@@ -5,15 +5,19 @@ namespace LiveRepl.UI.Elements
 {
 	public class TextField : TextElement
 	{
+		public override void SetDefaultStyle()
+		{
+			style=GUI.skin.textField;
+		}
+
 		public override void Update()
 		{
-			if (style == null)
-			{
-				style=GUI.skin.textField;
-			}
+			InitStyle();
 
 			LabelNextControl();
 			content.text=GUI.TextField(rect, content.text, style);
 		}
+
+		
 	}
 }

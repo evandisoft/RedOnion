@@ -30,5 +30,14 @@ namespace LiveRepl.UI.Panes
 			editingArea.rect=new Rect(0, fileIOPane.rect.height, rect.width, rect.height-fileIOPane.rect.height);
 			//TODO: EditorStatusPane
 		}
+
+		public override void Update()
+		{
+			if (Event.current.type==EventType.KeyDown)
+			{
+				SetRect(rect);
+			}
+			base.Update();
+		}
 	}
 }

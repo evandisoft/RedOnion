@@ -151,6 +151,7 @@
     <Folder Include="UI\Elements\" />
     <Folder Include="UI\Parts\" />
     <Folder Include="UI\Interfaces\" />
+    <Folder Include="UI\Base\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

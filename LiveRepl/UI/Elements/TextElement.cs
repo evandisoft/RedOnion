@@ -8,9 +8,13 @@ namespace LiveRepl.UI.Elements
 		public GUIContent content=new GUIContent("");
 		public GUIStyle style;
 
-		public override void Update()
+		public abstract void SetDefaultStyle();
+		public void InitStyle()
 		{
-			throw new NotImplementedException();
+			if (style==null)
+			{
+				SetDefaultStyle();
+			}
 		}
 	}
 }
