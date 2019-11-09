@@ -1,21 +1,20 @@
 using System;
+using LiveRepl.UI.Base;
 using UnityEngine;
 
 namespace LiveRepl.UI.Controls
 {
 	public class TextArea:EditableTextControl
 	{
-		public override void SetDefaultStyle()
+		public override GUIStyle DefaultStyle()
 		{
-			style=GUI.skin.textArea;
+			return ScriptWindow.defaultSkin.textArea;
 		}
 
 		public override void Update()
 		{
-			InitStyle();
-
 			LabelNextControl();
-			content.text=GUI.TextArea(rect, content.text,style);
+			content.text=GUI.TextArea(rect, content.text, StyleOrDefault);
 		}
 	}
 }

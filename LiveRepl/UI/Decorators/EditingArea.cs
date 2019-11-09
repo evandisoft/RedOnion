@@ -3,10 +3,10 @@ using UnityEngine;
 using Kerbalui.Gui;
 using LiveRepl.UI.Base;
 
-namespace LiveRepl.UI.Widgets
+namespace LiveRepl.UI.Decorators
 {
 	/// <summary>
-	/// Contains a text area which it manages as an editing area.
+	/// Contains an EditableTextControl which it manages as an editing area.
 	/// </summary>
 	public class EditingArea : ContentScroller
 	{

@@ -63,6 +63,7 @@ namespace LiveRepl.UI
 		/// </summary>
 		CompletionManager completionManager;
 
+
 		public ScriptWindow(Rect param_mainWindowRect)
 		{
 			InitLayout();

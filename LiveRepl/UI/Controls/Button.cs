@@ -1,11 +1,10 @@
 ﻿using System;
+using LiveRepl.UI.Base;
 using UnityEngine;
 
 namespace LiveRepl.UI.Controls {
 	public class Button:ContentControl {
-		//public GUIContent content = new GUIContent("");
 		public Action action;
-		//public GUIStyle style;
 
 		public Button(string text, Action action)
 		{
@@ -13,17 +12,15 @@ namespace LiveRepl.UI.Controls {
 			this.action = action;
 		}
 
-		public override void SetDefaultStyle()
+		public override GUIStyle DefaultStyle()
 		{
-			style=GUI.skin.button;
+			return ScriptWindow.defaultSkin.button;
 		}
 
 		public override void Update()
 		{
-			InitStyle();
-
 			LabelNextControl();
-			if (GUI.Button(rect, content, style))
+			if (GUI.Button(rect, content, StyleOrDefault))
 			{
 				action.Invoke();
 			}

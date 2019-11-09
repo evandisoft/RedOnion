@@ -8,7 +8,7 @@ using UnityEngine;
 namespace LiveRepl.UI.Groups
 {
 	/// <summary>
-	/// Accepts UIElements with assocaited weights. A weight of 0 will reserve, for that element, space
+	/// Accepts UIElements with associated weights. A weight of 0 will reserve, for that element, space
 	/// equal to its content size, but only works for elements that are ContentControls.
 	/// 
 	/// The space not taken up by weight 0 content controls is divided up among the rest of the elements based on their
@@ -18,6 +18,12 @@ namespace LiveRepl.UI.Groups
 	{
 		List<SpacerEntry> spacerEntries=new List<SpacerEntry>();
 
+		/// <summary>
+		/// Adds a weight and associates it with an element to be rendered.
+		/// A weight of 0 makes the element be rendered by it's minimum content size.
+		/// </summary>
+		/// <param name="weight">Weight.</param>
+		/// <param name="element">Element.</param>
 		public void Add(float weight,UIElement element)
 		{
 			spacerEntries.Add(new SpacerEntry(weight, element));
@@ -37,11 +43,14 @@ namespace LiveRepl.UI.Groups
 
 			float totalMinContentSize=spacerEntries.Select(MinContentSize).Sum();
 			float minfract=totalMinContentSize/rect.width;
-			//Debug.Log("minfract:"+minfract);
+
 			float totalWeightFract=1-minfract;
-			// spacerEntryWidth=spacerEntry.weight/totalWeight*totalWeightFract*rect.width
+
+			// Multiplying weightMultiplier to spacerEntry.weight, gives us the width for that entry
+			// spacerEntryWidth=spacerEntry.weight*weightMultiplier
+			// weightMultiplier=1/totalWeight*totalWeightFract*rect.width
 			float weightMultiplier=totalWeightFract/totalWeight*rect.width;
-			//Debug.Log("weightMul "+weightMultiplier);
+
 			float minContentSize=0;
 			float startPoint=0;
 			float endPoint=0;
@@ -56,27 +65,31 @@ namespace LiveRepl.UI.Groups
 				{
 					endPoint=startPoint+spacerEntry.weight*weightMultiplier;
 				}
-				//Debug.Log(spacerEntry);
-				//Debug.Log("startPoint "+startPoint+", endPoint "+endPoint);
 
 				spacerEntry.element.SetRect(new Rect(startPoint, 0, endPoint-startPoint, rect.height));
 				startPoint=endPoint;
 			}
 		}
 
+		/// <summary>
+		/// Returns the minimum content size for elements that are contentControls and have style initialized.
+		/// Otherwise returns zero.
+		/// </summary>
+		/// <returns>The content size.</returns>
+		/// <param name="spacerEntry">Spacer entry.</param>
 		float MinContentSize(SpacerEntry spacerEntry)
 		{
 			float weight=spacerEntry.weight;
 #pragma warning disable RECS0018 // Comparison of floating point numbers with equality operator
-			if (weight==0 && spacerEntry.element is ContentControl contentControl && contentControl.style!=null)
+			if (weight==0 && spacerEntry.element is ContentControl contentControl)
 #pragma warning restore RECS0018 // Comparison of floating point numbers with equality operator
 			{
-				return contentControl.style.CalcSize(contentControl.content).x;
+				return contentControl.StyleOrDefault.CalcSize(contentControl.content).x;
 			}
 			return 0;
 		}
 
-		public struct SpacerEntry
+		struct SpacerEntry
 		{
 			public float weight;
 			public UIElement element;

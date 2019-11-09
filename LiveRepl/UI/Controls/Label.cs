@@ -1,4 +1,5 @@
 using System;
+using LiveRepl.UI.Base;
 using UnityEngine;
 
 namespace LiveRepl.UI.Controls
@@ -10,17 +11,15 @@ namespace LiveRepl.UI.Controls
 			content.text=text;
 		}
 
-		public override void SetDefaultStyle()
+		public override GUIStyle DefaultStyle()
 		{
-			style=GUI.skin.label;
+			return ScriptWindow.defaultSkin.label;
 		}
 
 		public override void Update()
 		{
-			InitStyle();
-
 			LabelNextControl();
-			GUI.Label(rect, content, style);
+			GUI.Label(rect, content, StyleOrDefault);
 		}
 	}
 }

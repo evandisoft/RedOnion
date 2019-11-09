@@ -6,7 +6,7 @@ using UnityEngine;
 namespace LiveRepl.UI.Base
 {
 	/// <summary>
-	/// A Pane has multiple sub Controls, and displays them within a GUI.BeginGroup on each update
+	/// A Group has multiple sub Controls, and displays them within a GUI.BeginGroup on each update
 	/// </summary>
 	public abstract class Group:UIElement
 	{
@@ -15,13 +15,17 @@ namespace LiveRepl.UI.Base
 		public override void Update()
 		{
 			GUI.BeginGroup(rect);
-			foreach(var updateable in elements)
+			foreach(var element in elements)
 			{
-				updateable.Update();
+				element.Update();
 			}
 			GUI.EndGroup();
 		}
 
+		/// <summary>
+		/// Registers an element to be updated whenever update is called.
+		/// </summary>
+		/// <param name="element">Element.</param>
 		protected void RegisterForUpdate(UIElement element)
 		{
 			elements.Add(element);

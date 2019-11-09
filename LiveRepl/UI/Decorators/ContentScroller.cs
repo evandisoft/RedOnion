@@ -2,12 +2,12 @@
 using LiveRepl.UI.Base;
 using UnityEngine;
 
-namespace LiveRepl.UI.Widgets
+namespace LiveRepl.UI.Decorators
 {
 	/// <summary>
 	/// Contains a ContentControl, which it manages scrolling for.
 	/// </summary>
-	public class ContentScroller:Widget
+	public class ContentScroller:Decorator
 	{
 		public Vector2 scrollPos = new Vector2();
 		bool resetScroll;

@@ -21,6 +21,8 @@ namespace LiveRepl.UI
 		public const float replGroupWidth = 400;
 		public const float completionGroupWidth = 150;
 
+		static public GUISkin defaultSkin=new GUISkin();
+
 		float WindowWidth()
 		{
 			float width=centerGroupWidth;
@@ -82,6 +84,7 @@ namespace LiveRepl.UI
 
 		public void Update()
 		{
+			defaultSkin=GUI.skin;
 			SetOrReleaseInputLock();
 			windowRect=GUI.Window(windowID, windowRect, WindowFunction, Title);
 		}

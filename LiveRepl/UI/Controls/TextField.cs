@@ -6,19 +6,15 @@ namespace LiveRepl.UI.Controls
 {
 	public class TextField : EditableTextControl
 	{
-		public override void SetDefaultStyle()
+		public override GUIStyle DefaultStyle()
 		{
-			style=GUI.skin.textField;
+			return ScriptWindow.defaultSkin.textField;
 		}
 
 		public override void Update()
 		{
-			InitStyle();
-
 			LabelNextControl();
-			content.text=GUI.TextField(rect, content.text, style);
+			content.text=GUI.TextField(rect, content.text, StyleOrDefault);
 		}
-
-		
 	}
 }
