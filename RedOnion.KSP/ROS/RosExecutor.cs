@@ -1,18 +1,17 @@
 using System;
 using System.Collections;
-using System.IO;
 using UnityEngine;
 using KSP.UI.Screens;
-using RedOnion.KSP;
-using RedOnion.KSP.ROS;
-using RedOnion.ROS;
 
-namespace RedOnion
+// will start "os/main.ros" on first scene load, if such script exists
+// - it will not restart it if it fails
+
+namespace RedOnion.KSP.ROS
 {
 	[KSPAddon(KSPAddon.Startup.AllGameScenes, false)]
-	public class Executor : MonoBehaviour
+	public class RosExecutor : MonoBehaviour
 	{
-		public static Executor Instance { get; private set; }
+		public static RosExecutor Instance { get; private set; }
 		private void Awake()
 		{
 			if (Instance == null)

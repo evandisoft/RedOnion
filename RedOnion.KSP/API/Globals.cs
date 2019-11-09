@@ -10,6 +10,7 @@ using RedOnion.KSP.Autopilot;
 using RedOnion.KSP.Namespaces;
 using System.Linq;
 using RedOnion.KSP.UnsafeAPI;
+using RedOnion.KSP.ReflectionUtil;
 
 namespace RedOnion.KSP.API
 {
@@ -31,10 +32,12 @@ namespace RedOnion.KSP.API
 		//[Unsafe, Description("A map of kerbal names to kerbals for kerbals in the crew.")]
 		//public static KerbalsDictionary kerbals => KerbalsDictionary.Instance;
 
-		[Unsafe, Description("All the reflection stuff and namespaces.")]
+		[Unsafe, Description("All the reflection stuff and namespaces. (Lua also has `import`.)")]
 		public static Reflect reflect => Reflect.Instance;
 		[Unsafe, Description("Alias to `reflect` because of the namespaces.")]
 		public static Reflect native => Reflect.Instance;
+		[Unsafe, Description("Reflected/imported stuff by assembly name.")]
+		public static readonly GetMappings assembly = new GetMappings();
 
 		[Description("Function for creating 3D vector / coordinate.")]
 		public static VectorCreator vector => VectorCreator.Instance;

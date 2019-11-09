@@ -13,8 +13,8 @@ hi def link rosStorageClass		StorageClass
 hi def link rosType				Type
 hi def link rosConstant			Constant
 hi def link rosComment			Comment
-hi def link	rosDocComment		Preproc
-hi def link	rosDocCommentBody	Comment
+hi def link rosDocComment		Preproc
+hi def link rosDocCommentBody	Comment
 hi def link rosPreproc			Preproc
 hi def link rosPreCmd			Statement
 hi def link rosSpecial			SpecialChar
@@ -33,15 +33,15 @@ hi def link rosOctal			rosNumber
 hi def link rosOctalError		rosError
 hi def link rosCommentLine		rosComment
 hi def link rosDocCommentLine	rosDocComment
-hi def link	rosDocCommentLBdy	rosDocCommentBody
+hi def link rosDocCommentLBdy	rosDocCommentBody
 hi def link rosParenError		rosError
 
 syn case match
 
 syn keyword rosStatement		return break continue goto
-syn keyword	rosStatement		yield function def var new using import
-syn keyword	rosStatement		raise throw try catch finally
-syn keyword	rosStatement		as in is out ref params lock
+syn keyword rosStatement		yield function def var new using import
+syn keyword rosStatement		raise throw try catch finally
+syn keyword rosStatement		as in is out ref params lock
 syn keyword rosStatement		get set add remove value
 syn keyword rosConditional		if unless then else switch
 syn keyword rosLabel			case default

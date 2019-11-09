@@ -99,8 +99,6 @@ namespace Kerbalua.MoonSharp
 				return AppDomain.CurrentDomain.GetAssemblies().ToList();
 			});
 
-			Globals["assembly"] = new GetMappings();
-
 			Globals["printall"] = DoString(
 			@"
 				return function(lst) for i=0,lst.Count-1 do print(i..' '..lst[i].ToString()) end end
