@@ -12,16 +12,6 @@ namespace LiveRepl.UI.Base
 		public readonly string ControlName = "Control-"+NextID++;
 
 		/// <summary>
-		/// This associates the ControlName of this element with its control
-		/// for the IMGUI system, allowing it to be focused with GUI.FocusControl(ControlName),
-		/// and allowing its focus to be checked with GUI.GetNameOfFocusedControl()==ControlName.
-		/// </summary>
-		protected void LabelNextControl()
-		{
-			GUI.SetNextControlName(ControlName);
-		}
-
-		/// <summary>
 		/// </summary>
 		/// <returns><c>true</c>, if this control has focus, <c>false</c> otherwise.</returns>
 		public bool HasFocus()
@@ -37,9 +27,19 @@ namespace LiveRepl.UI.Base
 			GUI.FocusControl(ControlName);
 		}
 
-		public override void SetRect(Rect rect)
+		/// <summary>
+		/// Calls the base update, then sets the next control, then calls the Control's update.
+		/// </summary>
+		public override void Update()
 		{
-			this.rect=rect;
+			base.Update();
+			GUI.SetNextControlName(ControlName);
+			ControlUpdate();
 		}
+
+		/// <summary>
+		/// The Control's defined update function containing the call to a GUI control function.
+		/// </summary>
+		protected abstract void ControlUpdate();
 	}
 }

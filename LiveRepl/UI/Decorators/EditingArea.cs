@@ -37,14 +37,12 @@ namespace LiveRepl.UI.Decorators
 
 		public override void Update()
 		{
-
 			// Initialize editor
 			if (editor == null)
 			{
 				editableTextControl.GrabFocus();
 				int id = GUIUtility.keyboardControl;
 				editor = (TextEditor)GUIUtility.GetStateObject(typeof(TextEditor), id);
-				//Debug.Log("initializing editor");
 			}
 
 			if (editableTextControl.style == null)

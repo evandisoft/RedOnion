@@ -29,10 +29,8 @@ namespace LiveRepl.UI.CustomParts
 			horizontalSpacer.Add(1, new Button("Run", () => throw new NotImplementedException("Run Button not Implemented")));
 		}
 
-		public override void SetRect(Rect rect)
+		protected override void SetChildRects()
 		{
-			this.rect=rect;
-
 			horizontalSpacer.SetRect(FillGroup());
 		}
 	}

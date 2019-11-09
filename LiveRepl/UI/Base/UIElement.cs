@@ -8,7 +8,14 @@ namespace LiveRepl.UI.Base
 	{
 		public Rect rect;
 		public bool needsRecalculation;
-		public abstract void SetRect(Rect rect);
-		public abstract void Update();
+		public virtual void SetRect(Rect rect)
+		{
+			this.rect=rect;
+		}
+
+		public virtual void Update()
+		{
+
+		}
 	}
 }

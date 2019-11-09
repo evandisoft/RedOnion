@@ -23,17 +23,6 @@ namespace LiveRepl.UI.Decorators
 
 		public override void Update()
 		{
-			if (contentControl.style == null)
-			{
-				contentControl.style = new GUIStyle(GUI.skin.textArea);
-			}
-
-			Vector2 contentSize = contentControl.style.CalcSize(contentControl.content);
-			contentControl.rect = new Rect(0, 0,
-				Math.Max(contentSize.x, rect.width),
-				Math.Max(contentSize.y, rect.height)
-				);
-
 			scrollPos = GUI.BeginScrollView(rect, scrollPos, contentControl.rect);
 			{
 				contentControl.Update();
@@ -56,9 +45,14 @@ namespace LiveRepl.UI.Decorators
 			resetScroll = true;
 		}
 
-		public override void SetRect(Rect rect)
+		protected override void SetChildRect()
 		{
-			throw new NotImplementedException();
+			Debug.Log("SetChildRect called");
+			Vector2 contentSize = contentControl.StyleOrDefault.CalcSize(contentControl.content);
+			contentControl.rect = new Rect(0, 0,
+				Math.Max(contentSize.x, rect.width),
+				Math.Max(contentSize.y, rect.height)
+				);
 		}
 	}
 }

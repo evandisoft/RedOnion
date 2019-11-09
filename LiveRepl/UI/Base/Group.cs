@@ -14,6 +14,8 @@ namespace LiveRepl.UI.Base
 
 		public override void Update()
 		{
+			base.Update();
+
 			GUI.BeginGroup(rect);
 			foreach(var element in elements)
 			{
@@ -35,5 +37,16 @@ namespace LiveRepl.UI.Base
 		{
 			return new Rect(0, 0, rect.width, rect.height);
 		}
+
+		public override void SetRect(Rect rect)
+		{
+			base.SetRect(rect);
+			SetChildRects();
+		}
+
+		/// <summary>
+		/// Called by SetRect. This is implemented by the subclass and sets the all the rects for the children.
+		/// </summary>
+		protected abstract void SetChildRects();
 	}
 }

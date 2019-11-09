@@ -17,9 +17,8 @@ namespace LiveRepl.UI.Controls {
 			return ScriptWindow.defaultSkin.button;
 		}
 
-		public override void Update()
+		protected override void ControlUpdate()
 		{
-			LabelNextControl();
 			if (GUI.Button(rect, content, StyleOrDefault))
 			{
 				action.Invoke();

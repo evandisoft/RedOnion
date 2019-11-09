@@ -11,9 +11,8 @@ namespace LiveRepl.UI.Controls
 			return ScriptWindow.defaultSkin.textField;
 		}
 
-		public override void Update()
+		protected override void ControlUpdate()
 		{
-			LabelNextControl();
 			content.text=GUI.TextField(rect, content.text, StyleOrDefault);
 		}
 	}

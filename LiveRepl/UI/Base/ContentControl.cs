@@ -30,7 +30,7 @@ namespace LiveRepl.UI.Base
 
 		/// <summary>
 		/// Subclasses inherit this to provide default styles for the Style property to return
-		/// by default.
+		/// by default for their control.
 		/// </summary>
 		/// <returns>The style.</returns>
 		public abstract GUIStyle DefaultStyle();

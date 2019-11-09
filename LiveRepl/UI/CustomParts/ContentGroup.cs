@@ -27,9 +27,8 @@ namespace LiveRepl.UI.CustomParts
 			RegisterForUpdate(completionGroup=new CompletionGroup(this));
 		}
 
-		public override void SetRect(Rect rect)
+		protected override void SetChildRects()
 		{
-			this.rect=rect;
 			editorGroup.SetRect(new Rect(0, 0, ScriptWindow.editorGroupWidth, rect.height));
 
 			float x=0;

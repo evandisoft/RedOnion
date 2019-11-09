@@ -23,16 +23,6 @@ namespace LiveRepl.UI.CustomParts
 			RegisterForUpdate(editingArea=new EditingArea(new TextArea()));
 		}
 
-		public override void SetRect(Rect rect)
-		{
-			this.rect=rect;
-
-			fileIOGroup.SetRect(new Rect(0, 0, rect.width, 20));
-			//TODO: TabsGroup
-			editingArea.rect=new Rect(0, fileIOGroup.rect.height, rect.width, rect.height-fileIOGroup.rect.height);
-			//TODO: EditorStatusGroup
-		}
-
 		public override void Update()
 		{
 			if (Event.current.type==EventType.KeyDown)
@@ -40,6 +30,14 @@ namespace LiveRepl.UI.CustomParts
 				SetRect(rect);
 			}
 			base.Update();
+		}
+
+		protected override void SetChildRects()
+		{
+			fileIOGroup.SetRect(new Rect(0, 0, rect.width, 20));
+			//TODO: TabsGroup
+			editingArea.SetRect(new Rect(0, fileIOGroup.rect.height, rect.width, rect.height-fileIOGroup.rect.height));
+			//TODO: EditorStatusGroup
 		}
 	}
 }

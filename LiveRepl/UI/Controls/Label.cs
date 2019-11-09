@@ -16,9 +16,8 @@ namespace LiveRepl.UI.Controls
 			return ScriptWindow.defaultSkin.label;
 		}
 
-		public override void Update()
+		protected override void ControlUpdate()
 		{
-			LabelNextControl();
 			GUI.Label(rect, content, StyleOrDefault);
 		}
 	}

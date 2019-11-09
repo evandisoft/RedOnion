@@ -17,9 +17,8 @@ namespace LiveRepl.UI.CustomParts
 			this.contentGroup=contentGroup;
 		}
 
-		public override void SetRect(Rect rect)
+		protected override void SetChildRects()
 		{
-			this.rect=rect;
 			//TODO
 		}
 	}

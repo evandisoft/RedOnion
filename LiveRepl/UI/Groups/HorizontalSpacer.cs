@@ -30,13 +30,11 @@ namespace LiveRepl.UI.Groups
 			RegisterForUpdate(element);
 		}
 
-		public override void SetRect(Rect rect)
+		protected override void SetChildRects()
 		{
-			this.rect=rect;
-
 			float totalWeight=0;
 
-			foreach(var spacerEntry in spacerEntries)
+			foreach (var spacerEntry in spacerEntries)
 			{
 				totalWeight+=spacerEntry.weight;
 			}
