@@ -2,7 +2,7 @@
 using LiveRepl.UI.Controls;
 using UnityEngine;
 
-namespace LiveRepl.UI.Parts
+namespace LiveRepl.UI.CustomParts
 {
 	/// <summary>
 	/// The Group that holds the Editor and related functionality.

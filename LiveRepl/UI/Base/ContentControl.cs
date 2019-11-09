@@ -2,9 +2,12 @@ using System;
 using LiveRepl.UI.Base;
 using UnityEngine;
 
-namespace LiveRepl.UI.Controls
+namespace LiveRepl.UI.Base
 {
-	public abstract class TextElement:Control
+	/// <summary>
+	/// A control that displays content.
+	/// </summary>
+	public abstract class ContentControl:Control
 	{
 		public GUIContent content=new GUIContent("");
 		public GUIStyle style;

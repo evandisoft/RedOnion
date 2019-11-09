@@ -2,7 +2,7 @@
 using UnityEngine;
 
 namespace LiveRepl.UI.Controls {
-	public class Button:TextElement {
+	public class Button:ContentControl {
 		//public GUIContent content = new GUIContent("");
 		public Action action;
 		//public GUIStyle style;

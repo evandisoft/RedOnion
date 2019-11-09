@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace LiveRepl.UI.Controls
 {
-	public class Label : TextElement
+	public class Label : ContentControl
 	{
 		public Label(string text)
 		{

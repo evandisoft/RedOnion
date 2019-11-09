@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace LiveRepl.UI.Controls
 {
-	public class TextArea:TextElement
+	public class TextArea:EditableTextControl
 	{
 		public override void SetDefaultStyle()
 		{

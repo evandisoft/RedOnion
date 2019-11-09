@@ -1,6 +1,6 @@
 using System;
 using Kerbalui.Gui;
-using LiveRepl.UI.Parts;
+using LiveRepl.UI.CustomParts;
 using UnityEngine;
 
 namespace LiveRepl.UI

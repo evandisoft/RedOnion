@@ -3,7 +3,7 @@ using Kerbalui.Gui;
 using LiveRepl.UI.Base;
 using UnityEngine;
 
-namespace LiveRepl.UI.Parts
+namespace LiveRepl.UI.CustomParts
 {
 	/// <summary>
 	/// The Group that holds the Editor, Center, Repl, and CompletionArea Groups.

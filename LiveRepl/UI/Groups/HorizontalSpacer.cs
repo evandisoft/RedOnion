@@ -7,6 +7,13 @@ using UnityEngine;
 
 namespace LiveRepl.UI.Groups
 {
+	/// <summary>
+	/// Accepts UIElements with assocaited weights. A weight of 0 will reserve, for that element, space
+	/// equal to its content size, but only works for elements that are ContentControls.
+	/// 
+	/// The space not taken up by weight 0 content controls is divided up among the rest of the elements based on their
+	/// weights relative to the total weight sum of all elements.
+	/// </summary>
 	public class HorizontalSpacer:Group
 	{
 		List<SpacerEntry> spacerEntries=new List<SpacerEntry>();
@@ -61,10 +68,10 @@ namespace LiveRepl.UI.Groups
 		{
 			float weight=spacerEntry.weight;
 #pragma warning disable RECS0018 // Comparison of floating point numbers with equality operator
-			if (weight==0 && spacerEntry.element is TextElement textElement && textElement.style!=null)
+			if (weight==0 && spacerEntry.element is ContentControl contentControl && contentControl.style!=null)
 #pragma warning restore RECS0018 // Comparison of floating point numbers with equality operator
 			{
-				return textElement.style.CalcSize(textElement.content).x;
+				return contentControl.style.CalcSize(contentControl.content).x;
 			}
 			return 0;
 		}

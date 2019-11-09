@@ -4,8 +4,11 @@ using LiveRepl.UI.Controls;
 using LiveRepl.UI.Groups;
 using UnityEngine;
 
-namespace LiveRepl.UI.Parts
+namespace LiveRepl.UI.CustomParts
 {
+	/// <summary>
+	/// This group holds the FileIO related functionality, including save, load, and also has the "run script" button.
+	/// </summary>
 	public class FileIOGroup:Group
 	{
 		public EditorGroup editorGroup;

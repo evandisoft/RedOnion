@@ -1,9 +1,10 @@
 using System;
+using LiveRepl.UI.Base;
 using UnityEngine;
 
 namespace LiveRepl.UI.Controls
 {
-	public class TextField : TextElement
+	public class TextField : EditableTextControl
 	{
 		public override void SetDefaultStyle()
 		{

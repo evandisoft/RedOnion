@@ -2,17 +2,16 @@
 using LiveRepl.UI.Base;
 using UnityEngine;
 
-namespace LiveRepl.UI.Parts
+namespace LiveRepl.UI.CustomParts
 {
 	/// <summary>
-	/// The Center Group between the Editor and Repl.
-	/// Will tend to contain functionality for the overall ScriptWindow
+	/// The Group that contains the completion area.
 	/// </summary>
-	public class CenterGroup : Group
+	public class CompletionGroup : Group
 	{
 		public ContentGroup contentGroup;
 
-		public CenterGroup(ContentGroup contentGroup)
+		public CompletionGroup(ContentGroup contentGroup)
 		{
 			this.contentGroup=contentGroup;
 		}

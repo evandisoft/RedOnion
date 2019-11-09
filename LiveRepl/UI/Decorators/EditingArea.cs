@@ -1,11 +1,14 @@
 ﻿using System;
 using UnityEngine;
-using System.Collections.Generic;
 using Kerbalui.Gui;
+using LiveRepl.UI.Base;
 
-namespace LiveRepl.UI.Controls
+namespace LiveRepl.UI.Widgets
 {
-	public class EditingArea : TextAreaScroller
+	/// <summary>
+	/// Contains a text area which it manages as an editing area.
+	/// </summary>
+	public class EditingArea : ContentScroller
 	{
 		//int inc = 0;
 		const int spacesPerTab = 4;
@@ -16,6 +19,8 @@ namespace LiveRepl.UI.Controls
 		public int cursorIndex { get; private set; }
 		public int selectIndex { get; private set; }
 
+		public EditableTextControl editableTextControl;
+
 		public bool hadKeyDownThisUpdate=false;
 
 		/// <summary>
@@ -24,8 +29,9 @@ namespace LiveRepl.UI.Controls
 		/// </summary>
 		protected bool onlyUseKeyBindings;
 
-		public EditingArea(TextArea textArea) : base(textArea)
+		public EditingArea(EditableTextControl editableTextControl) : base(editableTextControl)
 		{
+			this.editableTextControl=editableTextControl;
 			InitializeDefaultKeyBindings();
 		}
 
@@ -35,27 +41,27 @@ namespace LiveRepl.UI.Controls
 			// Initialize editor
 			if (editor == null)
 			{
-				textArea.GrabFocus();
+				editableTextControl.GrabFocus();
 				int id = GUIUtility.keyboardControl;
 				editor = (TextEditor)GUIUtility.GetStateObject(typeof(TextEditor), id);
 				//Debug.Log("initializing editor");
 			}
 
-			if (textArea.style == null)
+			if (editableTextControl.style == null)
 			{
-				textArea.style = new GUIStyle(GUI.skin.textArea);
-				textArea.style.font = GUILibUtil.GetMonoSpaceFont();
-				textArea.style.hover.textColor
-					= textArea.style.normal.textColor
-					= textArea.style.active.textColor
+				editableTextControl.style = new GUIStyle(GUI.skin.textArea);
+				editableTextControl.style.font = GUILibUtil.GetMonoSpaceFont();
+				editableTextControl.style.hover.textColor
+					= editableTextControl.style.normal.textColor
+					= editableTextControl.style.active.textColor
 					= Color.white;
 			}
 
-			if (textArea.HasFocus())
+			if (editableTextControl.HasFocus())
 			{
 				int id = GUIUtility.keyboardControl;
 				editor = (TextEditor)GUIUtility.GetStateObject(typeof(TextEditor), id);
-				editor.text = textArea.content.text;
+				editor.text = editableTextControl.content.text;
 				editor.cursorIndex = cursorIndex;
 				editor.selectIndex = selectIndex;
 
@@ -65,7 +71,7 @@ namespace LiveRepl.UI.Controls
 				LineNumber = CurrentLineNumber()+1;
 				ColumnNumber = CharsFromLineStart()+1;
 
-				textArea.content.text = editor.text;
+				editableTextControl.content.text = editor.text;
 
 				base.Update();
 
@@ -74,7 +80,7 @@ namespace LiveRepl.UI.Controls
 
 				if (hadKeyDownThisUpdate && Event.current.type == EventType.Used)
 				{
-					Debug.Log("hadKeyDownThisUpdate");
+					//Debug.Log("hadKeyDownThisUpdate");
 					//Debug.Log(CursorX() + "," + CursorY() + "," + Event.current.mousePosition);
 					AdjustScrollX();
 					AdjustScrollY();
@@ -94,13 +100,13 @@ namespace LiveRepl.UI.Controls
 			float diff = lastContentVector2.x - lastScrollViewVector2.x;
 			float contentStartX = scrollPos.x;
 			float contentEndX = contentStartX + lastScrollViewVector2.x;
-			if (Math.Max(cursorX - textArea.style.lineHeight, 0) < contentStartX)
+			if (Math.Max(cursorX - editableTextControl.style.lineHeight, 0) < contentStartX)
 			{
-				scrollPos.x = Math.Max(cursorX - textArea.style.lineHeight, 0);
+				scrollPos.x = Math.Max(cursorX - editableTextControl.style.lineHeight, 0);
 			}
-			else if (cursorX + textArea.style.lineHeight > contentEndX)
+			else if (cursorX + editableTextControl.style.lineHeight > contentEndX)
 			{
-				scrollPos.x = cursorX - lastContentVector2.x + textArea.style.lineHeight;
+				scrollPos.x = cursorX - lastContentVector2.x + editableTextControl.style.lineHeight;
 			}
 		}
 
@@ -115,14 +121,14 @@ namespace LiveRepl.UI.Controls
 			//Debug.Log("contentStartY " + contentStartY);
 			float contentEndY = contentStartY + lastScrollViewVector2.y;
 			//Debug.Log("contentEndY " + contentEndY);
-			if (cursorY - textArea.style.lineHeight < contentStartY)
+			if (cursorY - editableTextControl.style.lineHeight < contentStartY)
 			{
-				scrollPos.y = cursorY - textArea.style.lineHeight;
+				scrollPos.y = cursorY - editableTextControl.style.lineHeight;
 				//Debug.Log("reducing to " + scrollPos.y);
 			}
-			else if (cursorY + textArea.style.lineHeight > contentEndY)
+			else if (cursorY + editableTextControl.style.lineHeight > contentEndY)
 			{
-				scrollPos.y = cursorY - lastContentVector2.y + textArea.style.lineHeight;
+				scrollPos.y = cursorY - lastContentVector2.y + editableTextControl.style.lineHeight;
 				//Debug.Log("expanding to " + scrollPos.y);
 			}
 		}
@@ -132,14 +138,14 @@ namespace LiveRepl.UI.Controls
 			int c = CharsFromLineStart();
 			string startOfLineToCursor = CurrentLine().Substring(0, c);
 			GUIContent tempContent = new GUIContent(startOfLineToCursor);
-			return textArea.style.CalcSize(tempContent).x;
+			return editableTextControl.style.CalcSize(tempContent).x;
 		}
 
 		float CursorY()
 		{
-			string contentToCursor = textArea.content.text.Substring(0, cursorIndex);
+			string contentToCursor = editableTextControl.content.text.Substring(0, cursorIndex);
 			GUIContent tempContent = new GUIContent(contentToCursor);
-			return textArea.style.CalcSize(tempContent).y;
+			return editableTextControl.style.CalcSize(tempContent).y;
 		}
 
 		void HandleInput()

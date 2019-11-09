@@ -101,22 +101,24 @@
     <Compile Include="UI\ScriptWindow.KeyBindings.cs" />
     <Compile Include="UI\ScriptWindow.Layout.cs" />
     <Compile Include="UI\Controls\TextArea.cs" />
-    <Compile Include="UI\Controls\TextAreaScroller.cs" />
-    <Compile Include="UI\Controls\EditingArea.cs" />
     <Compile Include="UI\Controls\Button.cs" />
     <Compile Include="UI\Controls\TextField.cs" />
-    <Compile Include="UI\Controls\TextElement.cs" />
     <Compile Include="UI\Groups\HorizontalSpacer.cs" />
     <Compile Include="UI\Controls\Label.cs" />
     <Compile Include="UI\Base\UIElement.cs" />
     <Compile Include="UI\Base\Control.cs" />
     <Compile Include="UI\Base\Group.cs" />
-    <Compile Include="UI\Parts\CenterGroup.cs" />
-    <Compile Include="UI\Parts\CompletionGroup.cs" />
-    <Compile Include="UI\Parts\ContentGroup.cs" />
-    <Compile Include="UI\Parts\EditorGroup.cs" />
-    <Compile Include="UI\Parts\FileIOGroup.cs" />
-    <Compile Include="UI\Parts\ReplGroup.cs" />
+    <Compile Include="UI\CustomParts\CenterGroup.cs" />
+    <Compile Include="UI\CustomParts\CompletionGroup.cs" />
+    <Compile Include="UI\CustomParts\ContentGroup.cs" />
+    <Compile Include="UI\CustomParts\EditorGroup.cs" />
+    <Compile Include="UI\CustomParts\FileIOGroup.cs" />
+    <Compile Include="UI\CustomParts\ReplGroup.cs" />
+    <Compile Include="UI\Decorators\EditingArea.cs" />
+    <Compile Include="UI\Decorators\ContentScroller.cs" />
+    <Compile Include="UI\Base\ContentControl.cs" />
+    <Compile Include="UI\Base\EditableTextControl.cs" />
+    <Compile Include="UI\Base\Decorator.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
@@ -147,8 +149,9 @@
     <Folder Include="UI\" />
     <Folder Include="UI\Groups\" />
     <Folder Include="UI\Controls\" />
-    <Folder Include="UI\Parts\" />
+    <Folder Include="UI\CustomParts\" />
     <Folder Include="UI\Base\" />
+    <Folder Include="UI\Decorators\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
