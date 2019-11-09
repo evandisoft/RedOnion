@@ -74,6 +74,10 @@
       <HintPath>$(KerbalLibs)\UnityEngine.CoreModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="UnityEngine.TextRenderingModule">
+      <HintPath>$(KerbalLibs)\UnityEngine.TextRenderingModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="UnityEngine.AnimationModule">
       <HintPath>$(KerbalLibs)\UnityEngine.AnimationModule.dll</HintPath>
       <Private>False</Private>
@@ -90,9 +94,31 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Main\KerbaluaMain.cs" />
     <Compile Include="Main\KerbaluaRepl.cs" />
-    <Compile Include="Main\ScriptWindow.cs" />
     <Compile Include="Main\TestWindow.cs" />
     <Compile Include="Other\EditAreaCompletionAdapter.cs" />
+    <Compile Include="UI\ScriptWindow.cs" />
+    <Compile Include="UI\ScriptWindow.Evaluation.cs" />
+    <Compile Include="UI\ScriptWindow.KeyBindings.cs" />
+    <Compile Include="UI\ScriptWindow.Layout.cs" />
+    <Compile Include="UI\Panes\CenterPane.cs" />
+    <Compile Include="UI\Panes\CompletionPane.cs" />
+    <Compile Include="UI\Panes\ContentPane.cs" />
+    <Compile Include="UI\Panes\EditorPane.cs" />
+    <Compile Include="UI\Panes\Pane.cs" />
+    <Compile Include="UI\Panes\ReplPane.cs" />
+    <Compile Include="UI\Elements\Element.cs" />
+    <Compile Include="UI\Parts\UIPart.cs" />
+    <Compile Include="UI\Elements\TextArea.cs" />
+    <Compile Include="UI\Elements\TextAreaScroller.cs" />
+    <Compile Include="UI\Elements\EditingArea.cs" />
+    <Compile Include="UI\Panes\FileIOPane.cs" />
+    <Compile Include="UI\Interfaces\IUpdateable.cs" />
+    <Compile Include="UI\Elements\Button.cs" />
+    <Compile Include="UI\Elements\TextField.cs" />
+    <Compile Include="UI\Elements\TextElement.cs" />
+    <Compile Include="UI\Panes\HorizontalSpacer.cs" />
+    <Compile Include="UI\Interfaces\IRectRenderable.cs" />
+    <Compile Include="UI\Elements\Label.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
@@ -120,6 +146,11 @@
   <ItemGroup>
     <Folder Include="Main\" />
     <Folder Include="Other\" />
+    <Folder Include="UI\" />
+    <Folder Include="UI\Panes\" />
+    <Folder Include="UI\Elements\" />
+    <Folder Include="UI\Parts\" />
+    <Folder Include="UI\Interfaces\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -1,6 +1,6 @@
 using System;
 using UnityEngine;
-
+using LiveRepl.UI;
 
 namespace LiveRepl.Main {
 	public class KerbaluaRepl {

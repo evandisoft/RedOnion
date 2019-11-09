@@ -9,27 +9,25 @@ using RedOnion.KSP.API;
 using Kerbalui.Gui;
 using LiveRepl.Other;
 
-namespace LiveRepl.Main
+namespace LiveRepl.UI
 {
-	public class ScriptWindow
+	public partial class ScriptWindow
 	{
 		const int maxOutputBytes = 80000;
-		public string Title = "Live REPL";
+
 
 		public Editor editor = new Editor();
 		public Repl repl = new Repl();
 
 		public CompletionBox completionBox = new CompletionBox();
 		public AutoLayoutBox widgetBar = new AutoLayoutBox();
+		public AutoLayoutBox editorControlBox = new AutoLayoutBox();
 		public RecentFilesList recentFiles;
-		public ReplEvaluator currentReplEvaluator;
-		public Dictionary<string, ReplEvaluator> replEvaluators = new Dictionary<string, ReplEvaluator>();
 
-		const int windowID = 0;
+
 		const int modalID = 1;
 		Rect mainWindowRect;
-		bool editorVisible = true;
-		bool replVisible = true;
+
 
 		Rect widgetBarRect;
 		Rect replRect;
@@ -43,13 +41,13 @@ namespace LiveRepl.Main
 
 		public string saveLoadFilename = "untitled.b";
 
-		const float titleHeight = 20;
 
-		List<Evaluation> evaluationList = new List<Evaluation>();
+
+
 		bool inputIsLocked;
 		//bool evaluationNotFinished = false;
 
-		public KeyBindings GlobalKeyBindings = new KeyBindings();
+		
 
 		internal void OnDestroy()
 		{
@@ -65,86 +63,12 @@ namespace LiveRepl.Main
 		/// </summary>
 		CompletionManager completionManager;
 
-		public void SetCurrentEvaluator(string evaluatorName)
-		{
-			currentReplEvaluator = replEvaluators[evaluatorName];
-			replEvaluatorLabel.content.text = evaluatorName;
-		}
-
-
-		void RunStartupScripts(string engineName)
-		{
-			if(engineName=="Lua Engine")
-			{
-				RunLuaStartupScripts();
-			}
-			if(engineName=="ROS Engine")
-			{
-				RunRosStartupScripts();
-			}
-		}
-
-		void RunLuaStartupScripts()
-		{
-			var scriptnames = AutoRun.Instance.scripts();
-			foreach(var scriptname in scriptnames)
-			{
-				string extension = Path.GetExtension(scriptname).ToLower();
-				string basename = Path.GetFileNameWithoutExtension(scriptname);
-				if (extension==".lua")
-				{
-					repl.outputBox.AddFileContent("loading "+scriptname+"...");
-					var newEvaluation = new Evaluation("require(\"" + basename + "\")",scriptname,replEvaluators["Lua Engine"]);
-					evaluationList.Add(newEvaluation);
-				}
-			}
-		}
-
-		void RunRosStartupScripts()
-		{
-			var scriptnames = AutoRun.Instance.scripts();
-			foreach (var scriptname in scriptnames)
-			{
-				string extension = Path.GetExtension(scriptname).ToLower();
-				string basename = Path.GetFileNameWithoutExtension(scriptname);
-				if (extension == ".ros")
-				{
-					repl.outputBox.AddFileContent("loading " + scriptname + "...");
-					var newEvaluation = new Evaluation("run \"" + scriptname+"\"", scriptname, replEvaluators["ROS Engine"]);
-					evaluationList.Add(newEvaluation);
-				}
-			}
-		}
-
-		public void FixedUpdate()
-		{
-			if (evaluationList.Count!=0)
-			{
-				var currentEvaluation = evaluationList[0];
-				if (currentEvaluation.Evaluate())
-				{
-					repl.outputBox.AddReturnValue(currentEvaluation.Result);
-					evaluationList.RemoveAt(0);
-				}
-			}
-			foreach(var engineName in replEvaluators.Keys)
-			{
-				var repl = replEvaluators[engineName];
-				try
-				{
-					repl.FixedUpdate();
-				}
-				catch (Exception ex)
-				{
-					Debug.Log("Exception in REPL.FixedUpdate: " + ex.Message);
-					repl.ResetEngine();
-					RunStartupScripts(engineName);
-				}
-			}
-		}
-
 		public ScriptWindow(Rect param_mainWindowRect)
 		{
+			InitLayout();
+
+			return;
+
 			scriptIOTextArea = new ScriptNameInputArea(editor);
 			editorVisible = bool.Parse(SavedSettings.LoadSetting("editorVisible", "true"));
 
@@ -264,7 +188,7 @@ namespace LiveRepl.Main
 			}));
 			widgetBar.renderables.Add(new Button("Show Hotkeys", () =>
 			{
-				PrintHotkeysInOutputArea();
+				PrintKeyBindingsInOutputArea();
 			}));
 
 			foreach (var evaluatorName in replEvaluators.Keys)
@@ -282,137 +206,6 @@ namespace LiveRepl.Main
 			}));
 
 			InitializeKeyBindings();
-		}
-
-		void PrintHotkeysInOutputArea()
-		{
-			string hotkeyText =
-
-@"CURRENT KEYBINDINGS(partially inspired by vim):
-
-Common to Editor and Repl input area:
-			shift + space: Intellisense completion. 
-ctrl + e: evaluate content. For editor this also saves to the file in the filename input area
-tab: indent
-shift + tab: unindent
-ctrl + tab: make current line's indentation match previous line's indentation
-ctrl + j: move cursor left
-ctrl + k: move cursor down
-ctrl + l: move cursor up
-ctrl +;: move cursor right
-ctrl + m: move cursor to next tab left
-shift + backspace: delete to next tab left
-ctrl + backspace: delete to next '.' left
-ctrl + comma: move cursor 4 lines down
-ctrl + period: move cursor 4 lines up
-ctrl +/: move cursor to next tab right
-ctrl + Home: move cursor to start
-ctrl + End: move cursor to end
-Shift plus movement commands selects text.
-ctrl + insert: copy selected text
-shift + insert: paste selected text
-ctrl + u: focus editor
-ctrl + i: focus scriptNameTextArea
-ctrl + o: focus repl input area
-ctrl + p: focus completion/ intellisense box
-ctrl + n: insert and move to new line after current line
-ctrl + h: insert and move to new line before current line
-  When creating a new line, its indentation starts matched with the indentation of the line above it.
-
-Editor only:
-ctrl + s: Saves the file in `Scripts` folder within KSP folder based on the name specified in the textarea that is dedicated to this.
-ctrl + d: Loads the file from `Scripts` folder within KSP folder based on the name specified in the textarea that is dedicated to this.
-
-REPL input area only:
-enter: evaluate content and clear repl input area.
-shift + enter: add newline
-ctrl +[or ctrl + UpArrow: go to previous history
-ctrl + ' or ctrl+DownArrow: go to next history
-
-Completion area only:
-ctrl + k: select next line down
-ctrl + l: select next line up
-ctrl + comma: select line 4 lines down
-ctrl + period: select line 4 lines up
-ctrl + enter: submit completion
-
-Output Area:
-Only allows the following.
-ctrl + c: copy selected area.
-ctrl + insert: copy selected area.
-Any other key gives focus to input box.
-";
-
-			repl.outputBox.content.text += "\n" + hotkeyText;
-		}
-
-		void InitializeKeyBindings()
-		{
-			repl.inputBox.KeyBindings.Add(new EventKey(KeyCode.LeftBracket, true), () =>
-			{
-				//Debug.Log("history up");
-				repl.inputBox.content.text = currentReplEvaluator.HistoryUp();
-				repl.inputBox.selectIndex = repl.inputBox.content.text.Length;
-				repl.inputBox.cursorIndex = repl.inputBox.content.text.Length;
-			});
-			repl.inputBox.KeyBindings.Add(new EventKey(KeyCode.Quote, true), () =>
-			{
-				//Debug.Log("history down");
-				repl.inputBox.content.text = currentReplEvaluator.HistoryDown();
-				repl.inputBox.selectIndex = repl.inputBox.content.text.Length;
-				repl.inputBox.cursorIndex = repl.inputBox.content.text.Length;
-			});
-			repl.inputBox.KeyBindings.Add(new EventKey(KeyCode.UpArrow, true), () =>
-			{
-				//Debug.Log("history up");
-				repl.inputBox.content.text = currentReplEvaluator.HistoryUp();
-				repl.inputBox.selectIndex = repl.inputBox.content.text.Length;
-				repl.inputBox.cursorIndex = repl.inputBox.content.text.Length;
-			});
-			repl.inputBox.KeyBindings.Add(new EventKey(KeyCode.DownArrow, true), () =>
-			{
-				//Debug.Log("history down");
-				repl.inputBox.content.text = currentReplEvaluator.HistoryDown();
-				repl.inputBox.selectIndex = repl.inputBox.content.text.Length;
-				repl.inputBox.cursorIndex = repl.inputBox.content.text.Length;
-			});
-
-			GlobalKeyBindings.Add(new EventKey(KeyCode.U, true), () => editor.GrabFocus());
-			GlobalKeyBindings.Add(new EventKey(KeyCode.I, true), () => scriptIOTextArea.GrabFocus());
-			GlobalKeyBindings.Add(new EventKey(KeyCode.O, true), () => repl.inputBox.GrabFocus());
-			GlobalKeyBindings.Add(new EventKey(KeyCode.P, true), () => completionBox.GrabFocus());
-			GlobalKeyBindings.Add(new EventKey(KeyCode.D, true), () =>
-			{
-				editor.content.text = scriptIOTextArea.Load();
-			});
-			GlobalKeyBindings.Add(new EventKey(KeyCode.S, true), () =>
-			{
-				scriptIOTextArea.Save(editor.content.text);
-			});
-			GlobalKeyBindings.Add(new EventKey(KeyCode.Space, false, true), completionManager.Complete);
-			GlobalKeyBindings.Add(new EventKey(KeyCode.Return, true), completionManager.Complete);
-
-			editor.KeyBindings.Add(new EventKey(KeyCode.E, true), () =>
-			{
-				scriptIOTextArea.Save(editor.content.text);
-				repl.outputBox.AddFileContent(scriptIOTextArea.content.text);
-				evaluationList.Add(new Evaluation(editor.content.text, scriptIOTextArea.content.text, currentReplEvaluator));
-			});
-			repl.inputBox.KeyBindings.Add(new EventKey(KeyCode.E, true), () =>
-			{
-				repl.outputBox.AddSourceString(repl.inputBox.content.text);
-				evaluationList.Add(new Evaluation(repl.inputBox.content.text, null, currentReplEvaluator));
-			});
-			repl.inputBox.KeyBindings.Add(new EventKey(KeyCode.Return), () =>
-			{
-				repl.outputBox.AddSourceString(repl.inputBox.content.text);
-				// OperatingSystem.
-				evaluationList.Add(new Evaluation(repl.inputBox.content.text, null, currentReplEvaluator, true));
-				repl.inputBox.content.text = "";
-				completionBox.content.text = "";
-			});
-
-
 		}
 
 		/// <summary>
@@ -439,70 +232,50 @@ Any other key gives focus to input box.
 			return GetCurrentWindowRect();
 		}
 
-		public void SetOrReleaseInputLock()
-		{
-			if (GetTotalArea().Contains(Mouse.screenPos))
-			{
-				if (!inputIsLocked)
-				{
-					//Debug.Log("Input is now locked");
-					inputIsLocked = true;
-					InputLockManager.SetControlLock(ControlTypes.KEYBOARDINPUT, "kerbalua");
-				}
-			}
-			else
-			{
-				if (inputIsLocked)
-				{
-					//Debug.Log("Input is no longer locked");
-					inputIsLocked = false;
-					InputLockManager.ClearControlLocks();
-				}
-			}
-		}
+
 
 		bool hadMouseDownLastUpdate = false;
-		public void Update()
-		{
-			if (Event.current.type==EventType.KeyDown)
-			{
-				Debug.Log(Event.current);
-			}
-			//GUI.FocusControl("Control-0");
-			//UnityEngine.Debug.Log("blah");
-			SetOrReleaseInputLock();
+		//public void Update()
+		//{
+		//	if (Event.current.type==EventType.KeyDown)
+		//	{
+		//		Debug.Log(Event.current);
+		//	}
+		//	//GUI.FocusControl("Control-0");
+		//	//UnityEngine.Debug.Log("blah");
+		//	SetOrReleaseInputLock();
 
-			completionManager.Update(hadMouseDownLastUpdate);
-			hadMouseDownLastUpdate = false;
+		//	completionManager.Update(hadMouseDownLastUpdate);
+		//	hadMouseDownLastUpdate = false;
 
 
-			//if (replVisible) {
-			//	mainWindowRect.width = buttonBarRect.width + replRect.width;
-			//} else {
-			//	mainWindowRect.width = buttonBarRect.width;
-			//}
+		//	//if (replVisible) {
+		//	//	mainWindowRect.width = buttonBarRect.width + replRect.width;
+		//	//} else {
+		//	//	mainWindowRect.width = buttonBarRect.width;
+		//	//}
 
-			Rect effectiveWindowRect = GetCurrentWindowRect();
-			Rect modifiedEffectiveRect = GUI.Window(windowID, effectiveWindowRect, MainWindow, Title);
-			mainWindowRect.x += modifiedEffectiveRect.x - effectiveWindowRect.x;
-			mainWindowRect.y += modifiedEffectiveRect.y - effectiveWindowRect.y;
-			//GlobalKeyBindings.ExecuteAndConsumeIfMatched(Event.current)
+		//	Rect effectiveWindowRect = GetCurrentWindowRect();
+		//	Rect modifiedEffectiveRect = GUI.Window(windowID, effectiveWindowRect, MainWindow, Title);
+		//	mainWindowRect.x += modifiedEffectiveRect.x - effectiveWindowRect.x;
+		//	mainWindowRect.y += modifiedEffectiveRect.y - effectiveWindowRect.y;
+		//	//GlobalKeyBindings.ExecuteAndConsumeIfMatched(Event.current)
 
-			foreach (var engineName in replEvaluators.Keys)
-			{
-				var repl = replEvaluators[engineName];
-				try
-				{
-					repl.Update();
-				}
-				catch (Exception ex)
-				{
-					Debug.Log("Exception in REPL.Update: " + ex.Message);
-					repl.ResetEngine();
-					RunStartupScripts(engineName);
-				}
-			}
-		}
+		//	foreach (var engineName in replEvaluators.Keys)
+		//	{
+		//		var repl = replEvaluators[engineName];
+		//		try
+		//		{
+		//			repl.Update();
+		//		}
+		//		catch (Exception ex)
+		//		{
+		//			Debug.Log("Exception in REPL.Update: " + ex.Message);
+		//			repl.ResetEngine();
+		//			RunStartupScripts(engineName);
+		//		}
+		//	}
+		//}
 
 
 
@@ -519,38 +292,11 @@ Any other key gives focus to input box.
 			Rect effectiveWindowRect = GetCurrentWindowRect();
 			GUI.DragWindow(new Rect(0, 0, effectiveWindowRect.width, titleHeight));
 
-			if (evaluationList.Count!=0
-					&& Event.current.type == EventType.KeyDown
-					&& Event.current.keyCode == KeyCode.C
-					&& Event.current.control)
+			if (evaluationList.Count!=0)
 			{
-				GUILibUtil.ConsumeAndMarkNextCharEvent(Event.current);
-				evaluationList.Clear();
-				foreach(var replEvaluator in replEvaluators.Values)
-				{
-					replEvaluator.Terminate();
-				}
-				repl.outputBox.AddError("Execution Manually Terminated");
+				HandleInputWhenExecuting();
 			}
-			
-			Rect currentWidgetBarRect = GetCurrentWidgetBarRect();
-			Rect runsafeWidgetBar = new Rect(
-				currentWidgetBarRect.x,
-				currentWidgetBarRect.y,
-				currentWidgetBarRect.width,
-				43);
-			if (evaluationList.Count != 0)
-			{
-				EventType t = Event.current.type;
-				if (t == EventType.KeyDown)
-				{
-					Event.current.Use();
-				}
-				else if (t == EventType.MouseDown && !runsafeWidgetBar.Contains(Event.current.mousePosition))
-				{
-					Event.current.Use();
-				}
-			}
+
 
 			if (Event.current.type == EventType.MouseDown)
 			{
@@ -559,7 +305,7 @@ Any other key gives focus to input box.
 
 
 			GlobalKeyBindings.ExecuteAndConsumeIfMatched(Event.current);
-
+			Rect currentWidgetBarRect = GetCurrentWidgetBarRect();
 			widgetBar.Update(currentWidgetBarRect);
 			GUILayout.BeginArea(new Rect(
 				currentWidgetBarRect.x,
@@ -669,6 +415,8 @@ Any other key gives focus to input box.
 				}
 			}
 		}
+
+
 
 		Rect GetCurrentWindowRect()
 		{
