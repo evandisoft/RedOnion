@@ -1,9 +1,10 @@
+using RedOnion.KSP.Utilities;
 using System;
 using System.ComponentModel;
 
 namespace RedOnion.KSP.Namespaces
 {
-	[DisplayName("UI")]
+	[DisplayName("UI"), DocBuild("RedOnion.KSP/Namespaces/UI")]
 	public static class UI_Namespace
 	{
 		public static readonly Type Window = typeof(Window);

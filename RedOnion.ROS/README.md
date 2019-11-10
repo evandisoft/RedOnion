@@ -32,6 +32,7 @@ def sum x,y
 var sum3 = def a,b,c => a+b+c
 ```
 
+
 ## Invoke without parentheses
 
 You have probably noticed that there are no parentheses in the example above.
@@ -94,6 +95,90 @@ print "{0} and {1} {2}", abs(start-now), sum(x, y), "seconds"
 print "{0} and {1} {2}", (abs start-now), (sum x, y), "seconds"
 ```
 
+
+## Number types
+
+Beware that ROS distinguishes between various types of numbers,
+especially integers (`int`, `uint`, `byte`, ...) vs. floating-point number (`double` or `float`).
+This could sometimes surprise you: `1/3` is `0` but `1.0/3` is `0.333...`
+because `1/3` uses integer arithmetic, but `1.0/3` uses floating-point arithmetic.
+Integer types get promoted to floating-point (`double`)
+if used in any operation involving floating-point number (the `3` gets converted to `3.0`
+making the expression `1.0/3.0`). Smaller integer types always get promoted to `int` or `double`.
+
+Operator `^` could also surprise you, because it means bitwise-xor in C#/C++.
+ROS translates the operator to `math.pow` if used with floating-point number,
+but again, remember that you first have to enforce floating-point arithmetic,
+or just use `**` operator (which works like `math.pow` even for integers).
+Also note that bitwise operators (`&`, `|`, `^`, `<<` and `>>`)
+have much higher priority/precedence in ROS than in C#/C++.
+
+
+## Statements
+
+All the usual statements can be found in ROS.
+Most of them come from C#, some from other languages.
+
+`var` is used to declare new (local) variable (`global` or `globals`
+can be used for global variables - like `global.x = 1` or `system.globals.x`).
+Variable names are searched from the point of reference, up through all
+(non-function) blocks, then in `this` if function was executed as method,
+then in outer function or script and lastly in globals
+(notice that function `click` in example above modified script-local `x`
+when called as function, but `obj.x` when called as method).
+
+`if/unless` is followed by a condition,
+optional `then`, colon (`:`) or semicolon (`;`).
+Statement may follow, more statements must be indented.
+`else` with another block of statements may follow last.
+
+```
+if condition
+  doSomething()
+if condition then doSomething() else somethingElse()
+unless condition; doIfFalse()
+unless condition: doIfFalse(); else: somethingElse()
+```
+
+`while/until` works in similar way but loops `while` (as long as)
+a condition is true or `until` it becomes true (loops while it is false).
+The test can be moved at the end, by starting the loop with `do`.
+Optional `do` after condition can also be used.
+
+```
+while condition do something()
+while condition do:
+  something()
+until apoapsis > desired
+  ship.throttle = 1
+
+do something()
+until done()
+```
+
+`for` and `foreach` are the advanced loops.
+`for` can either be used in the form of
+`for init; test; final; block`
+or like `foreach var e in list` with just `for var e in list`.
+
+```
+for var int i = 0; i < arguments.length; i++
+  print arguments[i]
+for var e in list
+  print e
+foreach var e in list
+  print e
+
+var sum = 0
+for var e in arguments: sum += e
+foreach var e in arguments do sum += e
+for var i = 0; i < arguments.length; i++; print arguments[i]
+```
+
+`break` can break the execution of any loop (jumping after the loop),
+`continue` can continue at the start of the loop (skipping the rest of the block).
+
+
 ## Multi-line statements
 
 Parentheses can also be useful when you want to write an expression
@@ -119,22 +204,6 @@ z = x \
   + y
 ```
 
-## Number types
-
-Beware that ROS distinguishes between various types of numbers,
-especially integers (`int`, `uint`, `byte`, ...) vs. floating-point number (`double` or `float`).
-This could sometimes surprise you: `1/3` is `0` but `1.0/3` is `0.333...`
-because `1/3` uses integer arithmetic, but `1.0/3` uses floating-point arithmetic.
-Integer types get promoted to floating-point (`double`)
-if used in any operation involving floating-point number (the `3` gets converted to `3.0`
-making the expression `1.0/3.0`). Smaller integer types always get promoted to `int` or `double`.
-
-Operator `^` could also surprise you, because it means bitwise-xor in C#/C++.
-ROS translates the operator to `math.pow` if used with floating-point number,
-but again, remember that you first have to enforce floating-point arithmetic,
-or just use `**` operator (which works like `math.pow` even for integers).
-Also note that bitwise operators (`&`, `|`, `^`, `<<` and `>>`)
-have much higher priority/precedence in ROS than in C#/C++.
 
 ## Functions and lambdas
 
@@ -176,61 +245,46 @@ fill a, 1 // a = [1,1,1]
 
 *Future plan: default arguments.*
 
-## Statements
 
-All the usual statements can be found in ROS.
-Most of them come from C#, some from other languages.
+## Events and parallelism
 
-`if/unless` is followed by a condition,
-optional `then`, colon (`:`) or semicolon (`;`).
-Statement may follow, more statements must be indented.
-`else` with another block of statements may follow last.
+ROS offers parallelism (coroutines / fibers / threads)
+through `system.update`, `system.idle` and `system.once` events.
+These events cannot be used with `+=` and `-=` operators,
+but are functions, that accept delegate (reference to function)
+and return a subscription object (which has `.remove` method).
+You have to keep a reference to that object in order to
+keep the subscription alive and executed.
+(There also are `.add` and `.remove` methods, which return different
+subscription object without the auto-remove functionality,
+but it is adviced to use the call instead.)
 
-```
-if condition
-  doSomething()
-if condition then doSomething() else somethingElse()
-unless condition; doIfFalse()
-unless condition: doIfFalse(); else: somethingElse()
-```
+* `update` is designed for things that need to run every physics tick
+  (like steering and throttle control). At least 100 instructions
+  of subscribers will be executed in each tick (upto 500 if possible).
+* `idle` is for less important things (like staging) and subscribed functions
+  may get executed less often (depends on load), but always at least
+  every 10th physics tick (at least 100 instructions).
+* `once` is designed for things that need to run only once
+  and is mostly used for UI events like `Button.Click`
+  (and generally for any native/reflected event from .NET - functions
+  are converted to delegates by using lambda that subscribes it to `once`).
 
-`while/until` works in similar way but loops `while` (as long as)
-a condition is true or `until` it becomes false.
-The test can be moved at the end, by starting the loop with `do`.
-Optional `do` after condition can also be used.
+The script, currently being executed, gets a share every tick as well,
+depending on the load, but always at least 100 instructions
+or until `yield` or `wait` statement is reached - this serves as
+voluntary release of the processor/core and can also be used
+in the functions subscribed to `update`/`idle`/`once`.
 
-```
-while condition do something()
-while condition do:
-  something()
-until apoapsis > desired
-  ship.throttle = 1
+Take extra caution when script and functions subsribed to those events
+are accessing same variables! Reading (get) and writing (set/assign)
+is atomic (cannot be interrupted), but `.` (dot) operator is instruction
+on its own, which means that `object.name` is not atomic operation
+(`if obj != null then doSomethingWith obj.name` is not safe
+if some other parallel function can do `obj = null`).
 
-do something()
-until done()
-```
+*Future plan: `using` statement - subscription objects are disposable.*
 
-`for` and `foreach` are the advanced loops.
-`for` can either be used in the form of
-`for init; test; final; block`
-or like `foreach var e in list` with just `for var e in list`.
-
-```
-for var int i = 0; i < arguments.length; i++
-  print arguments[i]
-for var e in list
-  print e
-foreach var e in list
-  print e
-
-var sum = 0
-for var e in arguments: sum += e
-foreach var e in arguments do sum += e
-for var i = 0; i < arguments.length; i++; print arguments[i]
-```
-
-`break` can break the execution of any loop (jumping after the loop),
-`continue` can continue at the start of the loop (skipping the rest of the block).
 
 ## Advanced stuff
 

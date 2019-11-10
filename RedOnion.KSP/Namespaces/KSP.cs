@@ -4,10 +4,11 @@ using KSP.UI.Screens;
 using UE = UnityEngine;
 using System.ComponentModel;
 using RedOnion.KSP.MathUtil;
+using RedOnion.KSP.Utilities;
 
 namespace RedOnion.KSP.Namespaces
 {
-	[DisplayName("KSP")]
+	[DisplayName("KSP"), DocBuild("RedOnion.KSP/Namespaces/KSP")]
 	public static class KSP_Namespace
 	{
 		public static readonly Type Vessel = typeof(Vessel);

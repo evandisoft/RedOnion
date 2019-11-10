@@ -4,10 +4,11 @@ using UUI = UnityEngine.UI;
 using UIC = RedOnion.UI.Components;
 using KSP.UI;
 using System.ComponentModel;
+using RedOnion.KSP.Utilities;
 
 namespace RedOnion.KSP.Namespaces
 {
-	[DisplayName("Unity")]
+	[DisplayName("Unity"), DocBuild("RedOnion.KSP/Namespaces/Unity")]
 	public static class Unity_Namespace
 	{
 		public static Type Vector2 = typeof(UE.Vector2);

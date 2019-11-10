@@ -2,7 +2,7 @@ using MoonSharp.Interpreter;
 using RedOnion.ROS;
 using System;
 
-namespace RedOnion.KSP.API
+namespace RedOnion.KSP.Utilities
 {
 	public static class InteropUtilities
 	{

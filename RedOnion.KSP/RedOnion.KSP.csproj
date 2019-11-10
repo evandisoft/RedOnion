@@ -81,7 +81,8 @@
     <Compile Include="API\Autopilot.cs" />
     <Compile Include="API\ConstVector.cs" />
     <Compile Include="API\Globals.cs" />
-    <Compile Include="API\InteropUtilities.cs" />
+    <Compile Include="Utilities\DocBuildAttribute.cs" />
+    <Compile Include="Utilities\InteropUtilities.cs" />
     <Compile Include="API\VectorUtils.cs" />
     <Compile Include="Lua\Descriptors\LuaDescriptor.cs" />
     <Compile Include="Lua\Descriptors\LuaEventDescriptor.cs" />

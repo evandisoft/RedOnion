@@ -63,10 +63,35 @@ namespace RedOnion.KSP.API
 			= UI.Element.LoadIcon(38, 38, "RedOnionLauncherIcon.png"));
 		private static Texture2D _defaultIcon;
 
-		//TODO: button wrapper
+		[Description("Button handle (keep it in variable).")]
+		public sealed class Button : IDisposable
+		{
+			internal ApplicationLauncherButton it;
+			internal Button(ApplicationLauncherButton it)
+				=> this.it = it;
+			~Button() => Dispose(false);
+			void IDisposable.Dispose()
+			{
+				GC.SuppressFinalize(this);
+				Dispose(true);
+			}
+			void Dispose(bool disposing)
+			{
+				if (it == null)
+					return;
+				if (disposing)
+				{
+					ApplicationLauncher.Instance?.RemoveApplication(it);
+					it = null;
+				}
+				// see UI.Window/Vector.Draw for another example of this
+				else UI.Collector.Add(this);
+			}
+		}
 
-		[Description("Add new app launcher button.")]
-		public static void add(
+		[Description("Add new app launcher button. Keep the returned object in a variable,"
+			+ " the button would eventually be removed otherwise.")]
+		public static Button add(
 			Scenes scenes, string iconPath,
 			Callback onTrue, Callback onFalse,
 			Callback onHover = null, Callback onHoverOut = null,
@@ -75,8 +100,9 @@ namespace RedOnion.KSP.API
 			scenes, string.IsNullOrEmpty(iconPath) ? defaultIcon
 			: UI.Element.LoadIcon(38, 38, iconPath) ?? defaultIcon);
 
-		[Description("Add new app launcher button.")]
-		public static void add(
+		[Description("Add new app launcher button. Keep the returned object in a variable,"
+			+ " the button would eventually be removed otherwise.")]
+		public static Button add(
 			Callback onTrue, Callback onFalse,
 			Callback onHover = null, Callback onHoverOut = null,
 			Callback onEnable = null, Callback onDisable = null,
@@ -90,23 +116,24 @@ namespace RedOnion.KSP.API
 				var it = ApplicationLauncher.Instance;
 				if (it != null)
 				{
-					it.AddModApplication(
+					return new Button(it.AddModApplication(
 						onTrue, onFalse,
 						onHover, onHoverOut,
 						onEnable, onDisable,
 						scenes, texture ?? defaultIcon
-					);
-					return;
+					));
 				}
 			}
+			var btn = new Button(null);
 			RosExecutor.Instance.StartCoroutine(CallbackUtil.WaitUntil(
 			() => ApplicationLauncher.Ready && ApplicationLauncher.Instance != null,
-			() => ApplicationLauncher.Instance.AddModApplication(
+			() => btn.it = ApplicationLauncher.Instance.AddModApplication(
 				onTrue, onFalse,
 				onHover, onHoverOut,
 				onEnable, onDisable,
 				scenes, texture ?? defaultIcon
 			)));
+			return btn;
 		}
 	}
 }
