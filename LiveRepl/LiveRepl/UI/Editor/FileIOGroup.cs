@@ -1,10 +1,10 @@
 ﻿using System;
-using LiveRepl.UI.ElementTypes;
-using LiveRepl.UI.Controls;
-using LiveRepl.UI.Groups;
 using UnityEngine;
+using Kerbalui.Types;
+using Kerbalui.Groups;
+using Kerbalui.Controls;
 
-namespace LiveRepl.UI.Layout
+namespace LiveRepl.UI.Editor
 {
 	/// <summary>
 	/// This group holds the FileIO related functionality, including save, load, and also has the "run script" button.

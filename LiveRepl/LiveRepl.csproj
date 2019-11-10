@@ -92,20 +92,20 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Main\KerbaluaMain.cs" />
-    <Compile Include="Main\KerbaluaRepl.cs" />
-    <Compile Include="Main\TestWindow.cs" />
-    <Compile Include="Other\EditAreaCompletionAdapter.cs" />
-    <Compile Include="UI\Layout\CenterGroup.cs" />
-    <Compile Include="UI\Layout\CompletionGroup.cs" />
-    <Compile Include="UI\Layout\ReplGroup.cs" />
-    <Compile Include="UI\ScriptWindow.cs" />
-    <Compile Include="Main\ReplMain.cs" />
-    <Compile Include="Main\ReplMain.Evaluation.cs" />
-    <Compile Include="Main\ReplMain.KeyBindings.cs" />
-    <Compile Include="UI\Layout\ContentGroup.cs" />
-    <Compile Include="UI\Layout\Editor\FileIOGroup.cs" />
-    <Compile Include="UI\Layout\Editor\EditorGroup.cs" />
+    <Compile Include="LiveRepl\Main\KerbaluaMain.cs" />
+    <Compile Include="LiveRepl\Main\KerbaluaRepl.cs" />
+    <Compile Include="LiveRepl\Main\ReplMain.cs" />
+    <Compile Include="LiveRepl\Main\ReplMain.Evaluation.cs" />
+    <Compile Include="LiveRepl\Main\ReplMain.KeyBindings.cs" />
+    <Compile Include="LiveRepl\Main\TestWindow.cs" />
+    <Compile Include="LiveRepl\UI\ScriptWindow.cs" />
+    <Compile Include="LiveRepl\Other\EditAreaCompletionAdapter.cs" />
+    <Compile Include="LiveRepl\UI\ContentGroup.cs" />
+    <Compile Include="LiveRepl\UI\Editor\EditorGroup.cs" />
+    <Compile Include="LiveRepl\UI\Editor\FileIOGroup.cs" />
+    <Compile Include="LiveRepl\UI\Center\CenterGroup.cs" />
+    <Compile Include="LiveRepl\UI\Completion\CompletionGroup.cs" />
+    <Compile Include="LiveRepl\UI\Repl\ReplGroup.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
@@ -131,11 +131,23 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Main\" />
-    <Folder Include="Other\" />
-    <Folder Include="UI\" />
-    <Folder Include="UI\Layout\" />
-    <Folder Include="UI\Layout\Editor\" />
+    <Folder Include="LiveRepl\" />
+    <Folder Include="LiveRepl\Main\" />
+    <Folder Include="LiveRepl\UI\" />
+    <Folder Include="LiveRepl\Other\" />
+    <Folder Include="LiveRepl\UI\Editor\" />
+    <Folder Include="LiveRepl\UI\Completion\" />
+    <Folder Include="LiveRepl\UI\Center\" />
+    <Folder Include="LiveRepl\UI\Repl\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ProjectExtensions>
+    <MonoDevelop>
+      <Properties>
+        <Policies>
+          <DotNetNamingPolicy ResourceNamePolicy="FileFormatDefault" DirectoryNamespaceAssociation="Hierarchical" />
+        </Policies>
+      </Properties>
+    </MonoDevelop>
+  </ProjectExtensions>
 </Project>

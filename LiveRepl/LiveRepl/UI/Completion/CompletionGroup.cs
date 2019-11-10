@@ -1,16 +1,16 @@
 ﻿using Kerbalui.Types;
 using UnityEngine;
 
-namespace LiveRepl.UI.Layout
+namespace LiveRepl.UI.Completion
 {
 	/// <summary>
-	/// The Group that holds the Repl and related functionality.
+	/// The Group that contains the completion area.
 	/// </summary>
-	public class ReplGroup : Group
+	public class CompletionGroup : Group
 	{
 		public ContentGroup contentGroup;
 
-		public ReplGroup(ContentGroup contentGroup)
+		public CompletionGroup(ContentGroup contentGroup)
 		{
 			this.contentGroup=contentGroup;
 		}

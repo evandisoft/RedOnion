@@ -8,7 +8,6 @@ using RedOnion.KSP.Settings;
 using RedOnion.KSP.API;
 using Kerbalui.Gui;
 using LiveRepl.Other;
-using LiveRepl.UI.Layout;
 using LiveRepl.UI;
 
 namespace LiveRepl.Main

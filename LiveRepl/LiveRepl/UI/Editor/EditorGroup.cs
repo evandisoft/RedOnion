@@ -1,9 +1,9 @@
-﻿using LiveRepl.UI.ElementTypes;
-using LiveRepl.UI.Controls;
-using LiveRepl.UI.Decorators;
-using UnityEngine;
+﻿using UnityEngine;
+using Kerbalui.Types;
+using Kerbalui.Decorators;
+using Kerbalui.Controls;
 
-namespace LiveRepl.UI.Layout
+namespace LiveRepl.UI.Editor
 {
 	/// <summary>
 	/// The Group that holds the Editor and related functionality.

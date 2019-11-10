@@ -1,8 +1,15 @@
 using Kerbalui.Types;
+using LiveRepl.UI.Center;
+using LiveRepl.UI.Completion;
+using LiveRepl.UI.Editor;
+using LiveRepl.UI.Repl;
 using UnityEngine;
 
-namespace LiveRepl.UI.Layout
+namespace LiveRepl.UI
 {
+	/// <summary>
+	/// This Group represents the content area of the ScriptWindow
+	/// </summary>
 	public class ContentGroup:Group
 	{
 		public ScriptWindow scriptWindow;

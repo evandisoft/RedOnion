@@ -1,7 +1,7 @@
 ﻿using Kerbalui.Types;
 using UnityEngine;
 
-namespace LiveRepl.UI.Layout
+namespace LiveRepl.UI.Center
 {
 	/// <summary>
 	/// The Center Group between the Editor and Repl.

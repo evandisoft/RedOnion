@@ -116,20 +116,20 @@
     <Compile Include="OldGui\ScrollableTextArea.cs" />
     <Compile Include="OldGui\TextArea.cs" />
     <Compile Include="OldGui\UIElement.cs" />
-    <Compile Include="Controls\Abstract\ContentControl.cs" />
-    <Compile Include="Controls\Abstract\EditableText.cs" />
-    <Compile Include="Controls\Button.cs" />
-    <Compile Include="Controls\Label.cs" />
-    <Compile Include="Controls\TextArea.cs" />
-    <Compile Include="Controls\TextField.cs" />
-    <Compile Include="Decorators\ContentScroller.cs" />
-    <Compile Include="Decorators\EditingArea.cs" />
-    <Compile Include="Types\Control.cs" />
-    <Compile Include="Types\Decorator.cs" />
-    <Compile Include="Types\Element.cs" />
-    <Compile Include="Types\Group.cs" />
-    <Compile Include="Types\Window.cs" />
-    <Compile Include="Groups\HorizontalSpacer.cs" />
+    <Compile Include="Kerbalui\Controls\Abstract\ContentControl.cs" />
+    <Compile Include="Kerbalui\Controls\Abstract\EditableText.cs" />
+    <Compile Include="Kerbalui\Controls\Button.cs" />
+    <Compile Include="Kerbalui\Controls\Label.cs" />
+    <Compile Include="Kerbalui\Controls\TextArea.cs" />
+    <Compile Include="Kerbalui\Controls\TextField.cs" />
+    <Compile Include="Kerbalui\Decorators\ContentScroller.cs" />
+    <Compile Include="Kerbalui\Decorators\EditingArea.cs" />
+    <Compile Include="Kerbalui\Groups\HorizontalSpacer.cs" />
+    <Compile Include="Kerbalui\Types\Control.cs" />
+    <Compile Include="Kerbalui\Types\Decorator.cs" />
+    <Compile Include="Kerbalui\Types\Element.cs" />
+    <Compile Include="Kerbalui\Types\Group.cs" />
+    <Compile Include="Kerbalui\Types\Window.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
@@ -143,10 +143,20 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Controls\" />
-    <Folder Include="Decorators\" />
-    <Folder Include="Types\" />
-    <Folder Include="Groups\" />
+    <Folder Include="Kerbalui\" />
+    <Folder Include="Kerbalui\Controls\" />
+    <Folder Include="Kerbalui\Decorators\" />
+    <Folder Include="Kerbalui\Groups\" />
+    <Folder Include="Kerbalui\Types\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ProjectExtensions>
+    <MonoDevelop>
+      <Properties>
+        <Policies>
+          <DotNetNamingPolicy ResourceNamePolicy="FileFormatDefault" DirectoryNamespaceAssociation="Hierarchical" />
+        </Policies>
+      </Properties>
+    </MonoDevelop>
+  </ProjectExtensions>
 </Project>
