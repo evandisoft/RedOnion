@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using LiveRepl.UI.Base;
+using LiveRepl.UI.ElementTypes;
 using LiveRepl.UI.Controls;
 using UnityEngine;
+using LiveRepl.UI.Controls.Abstract;
 
 namespace LiveRepl.UI.Groups
 {
@@ -24,7 +25,7 @@ namespace LiveRepl.UI.Groups
 		/// </summary>
 		/// <param name="weight">Weight.</param>
 		/// <param name="element">Element.</param>
-		public void Add(float weight,UIElement element)
+		public void Add(float weight,Element element)
 		{
 			spacerEntries.Add(new SpacerEntry(weight, element));
 			RegisterForUpdate(element);
@@ -91,9 +92,9 @@ namespace LiveRepl.UI.Groups
 		struct SpacerEntry
 		{
 			public float weight;
-			public UIElement element;
+			public Element element;
 
-			public SpacerEntry(float weight, UIElement element)
+			public SpacerEntry(float weight, Element element)
 			{
 				this.weight=weight;
 				this.element=element;

@@ -1,12 +1,12 @@
 ﻿using System;
 using UnityEngine;
 using Kerbalui.Gui;
-using LiveRepl.UI.Base;
+using LiveRepl.UI.ElementTypes;
 
 namespace LiveRepl.UI.Decorators
 {
 	/// <summary>
-	/// Contains an EditableTextControl which it manages as an editing area.
+	/// Contains an EditableText Control which it manages as an editing area.
 	/// </summary>
 	public class EditingArea : ContentScroller
 	{
@@ -19,7 +19,7 @@ namespace LiveRepl.UI.Decorators
 		public int cursorIndex { get; private set; }
 		public int selectIndex { get; private set; }
 
-		public EditableTextControl editableTextControl;
+		public EditableText editableTextControl;
 
 		public bool hadKeyDownThisUpdate=false;
 
@@ -29,7 +29,7 @@ namespace LiveRepl.UI.Decorators
 		/// </summary>
 		protected bool onlyUseKeyBindings;
 
-		public EditingArea(EditableTextControl editableTextControl) : base(editableTextControl)
+		public EditingArea(EditableText editableTextControl) : base(editableTextControl)
 		{
 			this.editableTextControl=editableTextControl;
 			InitializeDefaultKeyBindings();

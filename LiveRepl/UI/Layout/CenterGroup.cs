@@ -1,8 +1,8 @@
 ﻿using Kerbalui.Gui;
-using LiveRepl.UI.Base;
+using LiveRepl.UI.ElementTypes;
 using UnityEngine;
 
-namespace LiveRepl.UI.CustomParts
+namespace LiveRepl.UI.Layout
 {
 	/// <summary>
 	/// The Center Group between the Editor and Repl.
@@ -10,11 +10,11 @@ namespace LiveRepl.UI.CustomParts
 	/// </summary>
 	public class CenterGroup : Group
 	{
-		public ContentGroup contentGroup;
+		public ScriptWindow scriptWindow;
 
-		public CenterGroup(ContentGroup contentGroup)
+		public CenterGroup(ScriptWindow scriptWindow)
 		{
-			this.contentGroup=contentGroup;
+			this.scriptWindow=scriptWindow;
 		}
 
 		protected override void SetChildRects()

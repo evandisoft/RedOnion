@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using LiveRepl.UI.Controls;
 using UnityEngine;
 
-namespace LiveRepl.UI.Base
+namespace LiveRepl.UI.ElementTypes
 {
 	/// <summary>
-	/// A Group has multiple sub Controls, and displays them within a GUI.BeginGroup on each update
+	/// A Group has multiple sub Elements, and displays them within a GUI.BeginGroup on each update
 	/// </summary>
-	public abstract class Group:UIElement
+	public abstract class Group:Element
 	{
-		List<UIElement> elements=new List<UIElement>();
+		List<Element> elements=new List<Element>();
 
 		/// <summary>
 		/// Starts a GUI.BeginGroup, then calls GroupUpdate (which may be overriden in a subclass), and then
@@ -28,7 +28,7 @@ namespace LiveRepl.UI.Base
 		}
 
 		/// <summary>
-		/// Will be called at the start of GUI.BeginGroup.
+		/// Subclasses can extend this for it to be called at the start of GUI.BeginGroup.
 		/// </summary>
 		protected virtual void GroupUpdate()
 		{
@@ -38,7 +38,7 @@ namespace LiveRepl.UI.Base
 		/// Registers an element to be updated whenever update is called.
 		/// </summary>
 		/// <param name="element">Element.</param>
-		protected void RegisterForUpdate(UIElement element)
+		protected void RegisterForUpdate(Element element)
 		{
 			elements.Add(element);
 		}

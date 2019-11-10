@@ -1,10 +1,10 @@
 using System;
 using UnityEngine;
 
-namespace LiveRepl.UI.Base
+namespace LiveRepl.UI.ElementTypes
 {
 	// Base class of all UI parts
-	public abstract class UIElement
+	public abstract class Element
 	{
 		public Rect rect;
 		/// <summary>

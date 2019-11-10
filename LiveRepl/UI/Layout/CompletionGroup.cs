@@ -1,19 +1,19 @@
 ﻿using Kerbalui.Gui;
-using LiveRepl.UI.Base;
+using LiveRepl.UI.ElementTypes;
 using UnityEngine;
 
-namespace LiveRepl.UI.CustomParts
+namespace LiveRepl.UI.Layout
 {
 	/// <summary>
 	/// The Group that contains the completion area.
 	/// </summary>
 	public class CompletionGroup : Group
 	{
-		public ContentGroup contentGroup;
+		public ScriptWindow scriptWindow;
 
-		public CompletionGroup(ContentGroup contentGroup)
+		public CompletionGroup(ScriptWindow scriptWindow)
 		{
-			this.contentGroup=contentGroup;
+			this.scriptWindow=scriptWindow;
 		}
 
 		protected override void SetChildRects()

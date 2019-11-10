@@ -1,5 +1,5 @@
 ﻿using System;
-using LiveRepl.UI.Base;
+using LiveRepl.UI.ElementTypes;
 using UnityEngine;
 
 namespace LiveRepl.UI.Decorators

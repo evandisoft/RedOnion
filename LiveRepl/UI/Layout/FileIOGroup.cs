@@ -1,10 +1,10 @@
 ﻿using System;
-using LiveRepl.UI.Base;
+using LiveRepl.UI.ElementTypes;
 using LiveRepl.UI.Controls;
 using LiveRepl.UI.Groups;
 using UnityEngine;
 
-namespace LiveRepl.UI.CustomParts
+namespace LiveRepl.UI.Layout
 {
 	/// <summary>
 	/// This group holds the FileIO related functionality, including save, load, and also has the "run script" button.

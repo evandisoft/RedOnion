@@ -12,9 +12,9 @@ namespace LiveRepl.Other {
 	/// </summary>
 	public class EditingAreaCompletionAdapter:ICompletableElement {
 		public EditingArea editingArea;
-		public ScriptWindow scriptWindow;
+		public UI.LiveRepl scriptWindow;
 
-		public EditingAreaCompletionAdapter(EditingArea editingArea,ScriptWindow scriptWindow)
+		public EditingAreaCompletionAdapter(EditingArea editingArea, UI.LiveRepl scriptWindow)
 		{
 			this.editingArea = editingArea;
 			this.scriptWindow = scriptWindow;

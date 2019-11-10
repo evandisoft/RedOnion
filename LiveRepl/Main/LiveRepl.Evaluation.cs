@@ -6,9 +6,9 @@ using Kerbalui.Gui;
 using RedOnion.KSP.API;
 using UnityEngine;
 
-namespace LiveRepl.UI
+namespace LiveRepl.UI.Main
 {
-	public partial class ScriptWindow
+	public partial class LiveRepl
 	{
 		List<Evaluation> evaluationList = new List<Evaluation>();
 		public ReplEvaluator currentReplEvaluator;

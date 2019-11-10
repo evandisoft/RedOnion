@@ -4,23 +4,23 @@ using LiveRepl.UI;
 
 namespace LiveRepl.Main {
 	public class KerbaluaRepl {
-		public ScriptWindow scriptWindow;
+		public UI.LiveRepl liveRepl;
 
 		public KerbaluaRepl()
 		{
 			InputLockManager.ClearControlLocks();
 
-			scriptWindow = new ScriptWindow(new Rect(100, 100, 1000, 600));
+			liveRepl = new UI.LiveRepl(); //(new Rect(100, 100, 1000, 600));
 		}
 
 		public void Print(string str)
 		{
-			scriptWindow.repl.outputBox.content.text += "\n" + str;
+			liveRepl.repl.outputBox.content.text += "\n" + str;
 		}
 
 		public void FixedUpdate()
 		{
-			scriptWindow.FixedUpdate();
+			liveRepl.FixedUpdate();
 		}
 
 		public void Render(bool guiActive)
@@ -30,7 +30,7 @@ namespace LiveRepl.Main {
 
 			try {
 				//TestWindow.TestGUI();
-				scriptWindow.Update();
+				liveRepl.Update();
 			} catch (Exception e) {
 				//Debug.Log("yes");
 				Debug.Log(e);
@@ -39,7 +39,7 @@ namespace LiveRepl.Main {
 
 		public void OnDestroy()
 		{
-			scriptWindow.OnDestroy();
+			liveRepl.OnDestroy();
 		}
 	}
 }

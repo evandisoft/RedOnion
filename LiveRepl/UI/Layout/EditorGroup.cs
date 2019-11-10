@@ -1,23 +1,23 @@
-﻿using LiveRepl.UI.Base;
+﻿using LiveRepl.UI.ElementTypes;
 using LiveRepl.UI.Controls;
 using LiveRepl.UI.Decorators;
 using UnityEngine;
 
-namespace LiveRepl.UI.CustomParts
+namespace LiveRepl.UI.Layout
 {
 	/// <summary>
 	/// The Group that holds the Editor and related functionality.
 	/// </summary>
 	public class EditorGroup : Group
 	{
-		public ContentGroup contentGroup;
+		public ScriptWindow scriptWindow;
 
 		public FileIOGroup fileIOGroup;
 		public EditingArea editingArea;
 
-		public EditorGroup(ContentGroup contentGroup)
+		public EditorGroup(ScriptWindow scriptWindow)
 		{
-			this.contentGroup=contentGroup;
+			this.scriptWindow=scriptWindow;
 
 			RegisterForUpdate(fileIOGroup=new FileIOGroup(this));
 			RegisterForUpdate(editingArea=new EditingArea(new TextArea()));

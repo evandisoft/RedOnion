@@ -1,14 +1,15 @@
 using System;
-using LiveRepl.UI.Base;
+using LiveRepl.UI.Controls.Abstract;
+using LiveRepl.UI.ElementTypes;
 using UnityEngine;
 
 namespace LiveRepl.UI.Controls
 {
-	public class TextField : EditableTextControl
+	public class TextField : EditableText
 	{
 		public override GUIStyle DefaultStyle()
 		{
-			return ScriptWindow.defaultSkin.textField;
+			return Window.DefaultSkin.textField;
 		}
 
 		protected override void ControlUpdate()

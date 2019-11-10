@@ -1,12 +1,12 @@
 using System;
 using UnityEngine;
 
-namespace LiveRepl.UI.Base
+namespace LiveRepl.UI.ElementTypes
 {
 	/// <summary>
 	/// An Control wraps the functionality of a specific IMGUI control
 	/// </summary>
-	public abstract class Control:UIElement
+	public abstract class Control:Element
 	{
 		static long NextID = 0;
 		public readonly string ControlName = "Control-"+NextID++;

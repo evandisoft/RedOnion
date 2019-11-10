@@ -1,8 +1,8 @@
 using System;
-using LiveRepl.UI.Base;
+using LiveRepl.UI.ElementTypes;
 using UnityEngine;
 
-namespace LiveRepl.UI.Base
+namespace LiveRepl.UI.Controls.Abstract
 {
 	/// <summary>
 	/// A Control that contains content.
@@ -29,7 +29,7 @@ namespace LiveRepl.UI.Base
 		}
 
 		/// <summary>
-		/// Subclasses inherit this to provide default styles for the Style property to return
+		/// Subclasses inherit this to provide default styles for the StyleOrDefault property to return
 		/// by default for their control.
 		/// </summary>
 		/// <returns>The style.</returns>

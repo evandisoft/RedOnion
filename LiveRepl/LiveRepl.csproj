@@ -96,29 +96,29 @@
     <Compile Include="Main\KerbaluaRepl.cs" />
     <Compile Include="Main\TestWindow.cs" />
     <Compile Include="Other\EditAreaCompletionAdapter.cs" />
-    <Compile Include="UI\ScriptWindow.cs" />
-    <Compile Include="UI\ScriptWindow.Evaluation.cs" />
-    <Compile Include="UI\ScriptWindow.KeyBindings.cs" />
-    <Compile Include="UI\ScriptWindow.Layout.cs" />
     <Compile Include="UI\Controls\TextArea.cs" />
     <Compile Include="UI\Controls\Button.cs" />
     <Compile Include="UI\Controls\TextField.cs" />
     <Compile Include="UI\Groups\HorizontalSpacer.cs" />
     <Compile Include="UI\Controls\Label.cs" />
-    <Compile Include="UI\Base\UIElement.cs" />
-    <Compile Include="UI\Base\Control.cs" />
-    <Compile Include="UI\Base\Group.cs" />
-    <Compile Include="UI\CustomParts\CenterGroup.cs" />
-    <Compile Include="UI\CustomParts\CompletionGroup.cs" />
-    <Compile Include="UI\CustomParts\ContentGroup.cs" />
-    <Compile Include="UI\CustomParts\EditorGroup.cs" />
-    <Compile Include="UI\CustomParts\FileIOGroup.cs" />
-    <Compile Include="UI\CustomParts\ReplGroup.cs" />
+    <Compile Include="UI\Layout\CenterGroup.cs" />
+    <Compile Include="UI\Layout\CompletionGroup.cs" />
+    <Compile Include="UI\Layout\EditorGroup.cs" />
+    <Compile Include="UI\Layout\FileIOGroup.cs" />
+    <Compile Include="UI\Layout\ReplGroup.cs" />
     <Compile Include="UI\Decorators\EditingArea.cs" />
     <Compile Include="UI\Decorators\ContentScroller.cs" />
-    <Compile Include="UI\Base\ContentControl.cs" />
-    <Compile Include="UI\Base\EditableTextControl.cs" />
-    <Compile Include="UI\Base\Decorator.cs" />
+    <Compile Include="UI\ElementTypes\Group.cs" />
+    <Compile Include="UI\ElementTypes\Element.cs" />
+    <Compile Include="UI\ElementTypes\Control.cs" />
+    <Compile Include="UI\ElementTypes\Window.cs" />
+    <Compile Include="UI\ElementTypes\Decorator.cs" />
+    <Compile Include="UI\Controls\Abstract\ContentControl.cs" />
+    <Compile Include="UI\Controls\Abstract\EditableText.cs" />
+    <Compile Include="UI\ScriptWindow.cs" />
+    <Compile Include="Main\LiveRepl.cs" />
+    <Compile Include="Main\LiveRepl.Evaluation.cs" />
+    <Compile Include="Main\LiveRepl.KeyBindings.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
@@ -149,9 +149,10 @@
     <Folder Include="UI\" />
     <Folder Include="UI\Groups\" />
     <Folder Include="UI\Controls\" />
-    <Folder Include="UI\CustomParts\" />
-    <Folder Include="UI\Base\" />
+    <Folder Include="UI\Layout\" />
     <Folder Include="UI\Decorators\" />
+    <Folder Include="UI\ElementTypes\" />
+    <Folder Include="UI\Controls\Abstract\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
