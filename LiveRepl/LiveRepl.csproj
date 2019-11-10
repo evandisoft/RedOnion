@@ -103,8 +103,6 @@
     <Compile Include="UI\Controls\Label.cs" />
     <Compile Include="UI\Layout\CenterGroup.cs" />
     <Compile Include="UI\Layout\CompletionGroup.cs" />
-    <Compile Include="UI\Layout\EditorGroup.cs" />
-    <Compile Include="UI\Layout\FileIOGroup.cs" />
     <Compile Include="UI\Layout\ReplGroup.cs" />
     <Compile Include="UI\Decorators\EditingArea.cs" />
     <Compile Include="UI\Decorators\ContentScroller.cs" />
@@ -116,9 +114,12 @@
     <Compile Include="UI\Controls\Abstract\ContentControl.cs" />
     <Compile Include="UI\Controls\Abstract\EditableText.cs" />
     <Compile Include="UI\ScriptWindow.cs" />
-    <Compile Include="Main\LiveRepl.cs" />
-    <Compile Include="Main\LiveRepl.Evaluation.cs" />
-    <Compile Include="Main\LiveRepl.KeyBindings.cs" />
+    <Compile Include="Main\ReplMain.cs" />
+    <Compile Include="Main\ReplMain.Evaluation.cs" />
+    <Compile Include="Main\ReplMain.KeyBindings.cs" />
+    <Compile Include="UI\Layout\ContentGroup.cs" />
+    <Compile Include="UI\Layout\Editor\FileIOGroup.cs" />
+    <Compile Include="UI\Layout\Editor\EditorGroup.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
@@ -153,6 +154,7 @@
     <Folder Include="UI\Decorators\" />
     <Folder Include="UI\ElementTypes\" />
     <Folder Include="UI\Controls\Abstract\" />
+    <Folder Include="UI\Layout\Editor\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

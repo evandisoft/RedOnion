@@ -9,11 +9,11 @@ namespace LiveRepl.UI.Layout
 	/// </summary>
 	public class ReplGroup : Group
 	{
-		public ScriptWindow scriptWindow;
+		public ContentGroup contentGroup;
 
-		public ReplGroup(ScriptWindow scriptWindow)
+		public ReplGroup(ContentGroup contentGroup)
 		{
-			this.scriptWindow=scriptWindow;
+			this.contentGroup=contentGroup;
 		}
 
 		protected override void SetChildRects()

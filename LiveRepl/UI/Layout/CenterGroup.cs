@@ -10,11 +10,11 @@ namespace LiveRepl.UI.Layout
 	/// </summary>
 	public class CenterGroup : Group
 	{
-		public ScriptWindow scriptWindow;
+		public ContentGroup contentGroup;
 
-		public CenterGroup(ScriptWindow scriptWindow)
+		public CenterGroup(ContentGroup contentGroup)
 		{
-			this.scriptWindow=scriptWindow;
+			this.contentGroup=contentGroup;
 		}
 
 		protected override void SetChildRects()

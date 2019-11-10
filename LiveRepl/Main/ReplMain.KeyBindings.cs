@@ -3,9 +3,9 @@ using Kerbalua.Other;
 using Kerbalui.Gui;
 using UnityEngine;
 
-namespace LiveRepl.UI.Main
+namespace LiveRepl.Main
 {
-	public partial class LiveRepl
+	public partial class ReplMain
 	{
 		public KeyBindings GlobalKeyBindings = new KeyBindings();
 

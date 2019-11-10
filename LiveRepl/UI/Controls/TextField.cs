@@ -9,7 +9,7 @@ namespace LiveRepl.UI.Controls
 	{
 		public override GUIStyle DefaultStyle()
 		{
-			return Window.DefaultSkin.textField;
+			return Window.defaultSkin.textField;
 		}
 
 		protected override void ControlUpdate()

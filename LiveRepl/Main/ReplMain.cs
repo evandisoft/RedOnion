@@ -9,10 +9,11 @@ using RedOnion.KSP.API;
 using Kerbalui.Gui;
 using LiveRepl.Other;
 using LiveRepl.UI.Layout;
+using LiveRepl.UI;
 
-namespace LiveRepl.UI.Main
+namespace LiveRepl.Main
 {
-	public partial class LiveRepl
+	public partial class ReplMain
 	{
 		const int maxOutputBytes = 80000;
 		public const string title="Live REPL";
@@ -24,14 +25,15 @@ namespace LiveRepl.UI.Main
 		public AutoLayoutBox widgetBar = new AutoLayoutBox();
 		public AutoLayoutBox editorControlBox = new AutoLayoutBox();
 
-		internal void Update()
+		public void Update()
 		{
-			throw new NotImplementedException();
+
+			scriptWindow.Update();
 		}
 
 		public ScriptWindow scriptWindow=new ScriptWindow(title);
 
-		public LiveRepl()
+		public ReplMain()
 		{
 
 		}
@@ -242,15 +244,15 @@ namespace LiveRepl.UI.Main
 		/// <summary>
 		/// Returns the rectangle covering the entire area of the editor/repl/completion
 		/// </summary>
-		public Rect GetTotalArea()
-		{
-			return GetCurrentWindowRect();
-		}
+		//public Rect GetTotalArea()
+		//{
+		//	return GetCurrentWindowRect();
+		//}
 
 
 
-		bool hadMouseDownLastUpdate = false;
-		private Rect rect;
+		//bool hadMouseDownLastUpdate = false;
+		//private Rect rect;
 
 
 
@@ -306,209 +308,209 @@ namespace LiveRepl.UI.Main
 		/// of IMGUI.
 		/// </summary>
 		/// <param name="id">Identifier.</param>
-		void MainWindow(int id)
-		{
-			Rect effectiveWindowRect = GetCurrentWindowRect();
-			GUI.DragWindow(new Rect(0, 0, effectiveWindowRect.width, titleHeight));
+		//void MainWindow(int id)
+		//{
+		//	Rect effectiveWindowRect = GetCurrentWindowRect();
+		//	GUI.DragWindow(new Rect(0, 0, effectiveWindowRect.width, titleHeight));
 
-			if (evaluationList.Count!=0)
-			{
-				HandleInputWhenExecuting();
-			}
-
-
-			if (Event.current.type == EventType.MouseDown)
-			{
-				hadMouseDownLastUpdate = true;
-			}
+		//	if (evaluationList.Count!=0)
+		//	{
+		//		HandleInputWhenExecuting();
+		//	}
 
 
-			GlobalKeyBindings.ExecuteAndConsumeIfMatched(Event.current);
-			Rect currentWidgetBarRect = GetCurrentWidgetBarRect();
-			widgetBar.Update(currentWidgetBarRect);
-			GUILayout.BeginArea(new Rect(
-				currentWidgetBarRect.x,
-				currentWidgetBarRect.height,
-				currentWidgetBarRect.width,
-				25
-				));
-			{
-				GUILayout.BeginHorizontal();
-				{
-					GUILayout.Label("Tabs");
-					if (GUILayout.Button("+"))
-					{
-						List<string> recentFilesList = new List<string>(SavedSettings.LoadListSetting("recentFiles"));
-						if (!recentFilesList.Contains(scriptIOTextArea.content.text))
-						{
-							recentFilesList.Add(scriptIOTextArea.content.text);
-						}
-						recentFilesList.RemoveAll((string filename) => !File.Exists(Path.Combine(SavedSettings.BaseScriptsPath, filename)));
-						recentFilesList.Sort((string s1, string s2) =>
-						{
-							var t1 = Directory.GetLastWriteTime(Path.Combine(SavedSettings.BaseScriptsPath, s1));
-							var t2 = Directory.GetLastWriteTime(Path.Combine(SavedSettings.BaseScriptsPath, s2));
-							if (t1 < t2) return 1;
-							if (t1 > t2) return -1;
-							return 0;
-						});
-						if (recentFilesList.Count > 10)
-						{
-							recentFilesList.RemoveAt(recentFilesList.Count - 1);
-						}
-						SavedSettings.SaveListSetting("recentFiles", recentFilesList);
-					}
-					if (GUILayout.Button("-"))
-					{
-						List<string> recentFilesList = new List<string>(SavedSettings.LoadListSetting("recentFiles"));
-						if (!recentFilesList.Contains(scriptIOTextArea.content.text))
-						{
-							recentFilesList.Add(scriptIOTextArea.content.text);
-						}
-						recentFilesList.RemoveAll((string filename) => !File.Exists(Path.Combine(SavedSettings.BaseScriptsPath, filename)));
-						recentFilesList.Remove(scriptIOTextArea.content.text);
-						if (recentFilesList.Count > 10)
-						{
-							recentFilesList.RemoveAt(recentFilesList.Count - 1);
-						}
-						SavedSettings.SaveListSetting("recentFiles", recentFilesList);
-					}
-				}
-				GUILayout.EndHorizontal();
-			}
-			GUILayout.EndArea();
-			currentWidgetBarRect.y += widgetBarRect.height + 20;
-			currentWidgetBarRect.height -= 20;
-			recentFiles.Update(currentWidgetBarRect);
-
-			//testReplContent=GUI.TextArea(GetCurrentReplRect(),testReplContent);
-			if (replVisible)
-			{
-				//if(repl.outputBox.HasFocus()) {
-				//	repl.inputBox.GrabFocus();
-				//}
-				repl.Update(GetCurrentReplRect(), replVisible);
-			}
-
-			if (editorVisible)
-			{
-				//editorRect = UpdateBoxPositionWithWindow(editorRect, -editorRect.width);
-				var scriptIORect = GetCurrentScriptNameRect();
-				scriptIORect.width /= 2;
-				scriptIOTextArea.Update(scriptIORect, true);
-				var editorInfoRect = new Rect(scriptIORect);
-				editorInfoRect.x = scriptIORect.x + scriptIORect.width;
-				GUI.Label(editorInfoRect, "Line: " + editor.LineNumber+", Column: "+editor.ColumnNumber);
-				editor.Update(GetCurrentEditorRect(), editorVisible);
-			}
-
-			// Lots of hacks here. I will eventually better understand how this
-			// works and replace it.
-			if (replVisible || editorVisible)
-			{
-				bool lastEventWasMouseDown = Event.current.type == EventType.MouseDown;
-				string lastControlname = GUI.GetNameOfFocusedControl();
-				//completionBoxRect = UpdateBoxPositionWithWindow(completionBoxRect, mainWindowRect.width);
-				//if (inputIsLocked && Event.current.type == EventType.ScrollWheel)
-				//{
-				//	Event.current.Use();
-				//}
-				completionBox.Update(GetCurrentCompletionBoxRect());
-				if (lastEventWasMouseDown && Event.current.type == EventType.Used)
-				{
-					//Debug.Log("completionBox got a mouse down");
-					//Debug.Log("trying to complete");
-					Rect currentCompletionBoxRect = GetCurrentCompletionBoxRect();
-					Rect rectMinusScrollBar = new Rect(currentCompletionBoxRect)
-					{
-						width = currentCompletionBoxRect.width - 20,
-						height = currentCompletionBoxRect.height - 20
-					};
-					if (GUILibUtil.MouseInRect(rectMinusScrollBar))
-					{
-						Debug.Log("Mouse in completion Rect");
-						completionManager.Complete();
-						//GUI.FocusControl(lastControlname);
-						completionManager.DisplayCurrentCompletions();
-					}
-				}
-			}
-		}
+		//	if (Event.current.type == EventType.MouseDown)
+		//	{
+		//		hadMouseDownLastUpdate = true;
+		//	}
 
 
+		//	GlobalKeyBindings.ExecuteAndConsumeIfMatched(Event.current);
+		//	Rect currentWidgetBarRect = GetCurrentWidgetBarRect();
+		//	widgetBar.Update(currentWidgetBarRect);
+		//	GUILayout.BeginArea(new Rect(
+		//		currentWidgetBarRect.x,
+		//		currentWidgetBarRect.height,
+		//		currentWidgetBarRect.width,
+		//		25
+		//		));
+		//	{
+		//		GUILayout.BeginHorizontal();
+		//		{
+		//			GUILayout.Label("Tabs");
+		//			if (GUILayout.Button("+"))
+		//			{
+		//				List<string> recentFilesList = new List<string>(SavedSettings.LoadListSetting("recentFiles"));
+		//				if (!recentFilesList.Contains(scriptIOTextArea.content.text))
+		//				{
+		//					recentFilesList.Add(scriptIOTextArea.content.text);
+		//				}
+		//				recentFilesList.RemoveAll((string filename) => !File.Exists(Path.Combine(SavedSettings.BaseScriptsPath, filename)));
+		//				recentFilesList.Sort((string s1, string s2) =>
+		//				{
+		//					var t1 = Directory.GetLastWriteTime(Path.Combine(SavedSettings.BaseScriptsPath, s1));
+		//					var t2 = Directory.GetLastWriteTime(Path.Combine(SavedSettings.BaseScriptsPath, s2));
+		//					if (t1 < t2) return 1;
+		//					if (t1 > t2) return -1;
+		//					return 0;
+		//				});
+		//				if (recentFilesList.Count > 10)
+		//				{
+		//					recentFilesList.RemoveAt(recentFilesList.Count - 1);
+		//				}
+		//				SavedSettings.SaveListSetting("recentFiles", recentFilesList);
+		//			}
+		//			if (GUILayout.Button("-"))
+		//			{
+		//				List<string> recentFilesList = new List<string>(SavedSettings.LoadListSetting("recentFiles"));
+		//				if (!recentFilesList.Contains(scriptIOTextArea.content.text))
+		//				{
+		//					recentFilesList.Add(scriptIOTextArea.content.text);
+		//				}
+		//				recentFilesList.RemoveAll((string filename) => !File.Exists(Path.Combine(SavedSettings.BaseScriptsPath, filename)));
+		//				recentFilesList.Remove(scriptIOTextArea.content.text);
+		//				if (recentFilesList.Count > 10)
+		//				{
+		//					recentFilesList.RemoveAt(recentFilesList.Count - 1);
+		//				}
+		//				SavedSettings.SaveListSetting("recentFiles", recentFilesList);
+		//			}
+		//		}
+		//		GUILayout.EndHorizontal();
+		//	}
+		//	GUILayout.EndArea();
+		//	currentWidgetBarRect.y += widgetBarRect.height + 20;
+		//	currentWidgetBarRect.height -= 20;
+		//	recentFiles.Update(currentWidgetBarRect);
 
-		Rect GetCurrentWindowRect()
-		{
-			Rect currentWindowRect = new Rect(mainWindowRect);
-			if (!editorVisible)
-			{
-				currentWindowRect.x += editorRect.width;
-				currentWindowRect.width -= editorRect.width;
-			}
-			if (!replVisible)
-			{
-				currentWindowRect.width -= replRect.width;
-			}
-			if (!replVisible && !editorVisible)
-			{
-				currentWindowRect.width -= completionBoxRect.width;
-			}
-			return currentWindowRect;
-		}
+		//	//testReplContent=GUI.TextArea(GetCurrentReplRect(),testReplContent);
+		//	if (replVisible)
+		//	{
+		//		//if(repl.outputBox.HasFocus()) {
+		//		//	repl.inputBox.GrabFocus();
+		//		//}
+		//		repl.Update(GetCurrentReplRect(), replVisible);
+		//	}
 
-		Rect GetCurrentEditorRect()
-		{
-			Rect currentEditorRect = new Rect(editorRect);
-			float scriptNameHeight = GetCurrentScriptNameRect().height;
-			currentEditorRect.y += scriptNameHeight;
-			currentEditorRect.height = currentEditorRect.height - scriptNameHeight;
+		//	if (editorVisible)
+		//	{
+		//		//editorRect = UpdateBoxPositionWithWindow(editorRect, -editorRect.width);
+		//		var scriptIORect = GetCurrentScriptNameRect();
+		//		scriptIORect.width /= 2;
+		//		scriptIOTextArea.Update(scriptIORect, true);
+		//		var editorInfoRect = new Rect(scriptIORect);
+		//		editorInfoRect.x = scriptIORect.x + scriptIORect.width;
+		//		GUI.Label(editorInfoRect, "Line: " + editor.LineNumber+", Column: "+editor.ColumnNumber);
+		//		editor.Update(GetCurrentEditorRect(), editorVisible);
+		//	}
 
-			return currentEditorRect;
-		}
+		//	// Lots of hacks here. I will eventually better understand how this
+		//	// works and replace it.
+		//	if (replVisible || editorVisible)
+		//	{
+		//		bool lastEventWasMouseDown = Event.current.type == EventType.MouseDown;
+		//		string lastControlname = GUI.GetNameOfFocusedControl();
+		//		//completionBoxRect = UpdateBoxPositionWithWindow(completionBoxRect, mainWindowRect.width);
+		//		//if (inputIsLocked && Event.current.type == EventType.ScrollWheel)
+		//		//{
+		//		//	Event.current.Use();
+		//		//}
+		//		completionBox.Update(GetCurrentCompletionBoxRect());
+		//		if (lastEventWasMouseDown && Event.current.type == EventType.Used)
+		//		{
+		//			//Debug.Log("completionBox got a mouse down");
+		//			//Debug.Log("trying to complete");
+		//			Rect currentCompletionBoxRect = GetCurrentCompletionBoxRect();
+		//			Rect rectMinusScrollBar = new Rect(currentCompletionBoxRect)
+		//			{
+		//				width = currentCompletionBoxRect.width - 20,
+		//				height = currentCompletionBoxRect.height - 20
+		//			};
+		//			if (GUILibUtil.MouseInRect(rectMinusScrollBar))
+		//			{
+		//				Debug.Log("Mouse in completion Rect");
+		//				completionManager.Complete();
+		//				//GUI.FocusControl(lastControlname);
+		//				completionManager.DisplayCurrentCompletions();
+		//			}
+		//		}
+		//	}
+		//}
 
-		Rect GetCurrentScriptNameRect()
-		{
-			Rect currentScriptNameRect = new Rect();
-			currentScriptNameRect.y = titleHeight;
-			currentScriptNameRect.x = 0;
-			currentScriptNameRect.width = editorRect.width;
-			currentScriptNameRect.height = 25;
-			return currentScriptNameRect;
-		}
 
-		Rect GetCurrentWidgetBarRect()
-		{
-			Rect currentWidgetRect = new Rect(widgetBarRect);
-			if (!editorVisible)
-			{
-				currentWidgetRect.x -= editorRect.width;
-			}
-			return currentWidgetRect;
-		}
 
-		Rect GetCurrentReplRect()
-		{
-			Rect currentReplRect = new Rect(replRect);
-			if (!editorVisible)
-			{
-				currentReplRect.x -= editorRect.width;
-			}
-			return currentReplRect;
-		}
+		//Rect GetCurrentWindowRect()
+		//{
+		//	Rect currentWindowRect = new Rect(mainWindowRect);
+		//	if (!editorVisible)
+		//	{
+		//		currentWindowRect.x += editorRect.width;
+		//		currentWindowRect.width -= editorRect.width;
+		//	}
+		//	if (!replVisible)
+		//	{
+		//		currentWindowRect.width -= replRect.width;
+		//	}
+		//	if (!replVisible && !editorVisible)
+		//	{
+		//		currentWindowRect.width -= completionBoxRect.width;
+		//	}
+		//	return currentWindowRect;
+		//}
 
-		Rect GetCurrentCompletionBoxRect()
-		{
-			Rect currentCompletionBoxRect = new Rect(completionBoxRect);
-			if (!editorVisible)
-			{
-				currentCompletionBoxRect.x -= editorRect.width;
-			}
-			if (!replVisible)
-			{
-				currentCompletionBoxRect.x -= replRect.width;
-			}
+		//Rect GetCurrentEditorRect()
+		//{
+		//	Rect currentEditorRect = new Rect(editorRect);
+		//	float scriptNameHeight = GetCurrentScriptNameRect().height;
+		//	currentEditorRect.y += scriptNameHeight;
+		//	currentEditorRect.height = currentEditorRect.height - scriptNameHeight;
 
-			return currentCompletionBoxRect;
-		}
+		//	return currentEditorRect;
+		//}
+
+		//Rect GetCurrentScriptNameRect()
+		//{
+		//	Rect currentScriptNameRect = new Rect();
+		//	currentScriptNameRect.y = titleHeight;
+		//	currentScriptNameRect.x = 0;
+		//	currentScriptNameRect.width = editorRect.width;
+		//	currentScriptNameRect.height = 25;
+		//	return currentScriptNameRect;
+		//}
+
+		//Rect GetCurrentWidgetBarRect()
+		//{
+		//	Rect currentWidgetRect = new Rect(widgetBarRect);
+		//	if (!editorVisible)
+		//	{
+		//		currentWidgetRect.x -= editorRect.width;
+		//	}
+		//	return currentWidgetRect;
+		//}
+
+		//Rect GetCurrentReplRect()
+		//{
+		//	Rect currentReplRect = new Rect(replRect);
+		//	if (!editorVisible)
+		//	{
+		//		currentReplRect.x -= editorRect.width;
+		//	}
+		//	return currentReplRect;
+		//}
+
+		//Rect GetCurrentCompletionBoxRect()
+		//{
+		//	Rect currentCompletionBoxRect = new Rect(completionBoxRect);
+		//	if (!editorVisible)
+		//	{
+		//		currentCompletionBoxRect.x -= editorRect.width;
+		//	}
+		//	if (!replVisible)
+		//	{
+		//		currentCompletionBoxRect.x -= replRect.width;
+		//	}
+
+		//	return currentCompletionBoxRect;
+		//}
 	}
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using LiveRepl.UI.Controls.Abstract;
 using LiveRepl.UI.ElementTypes;
 using UnityEngine;
 
@@ -14,7 +15,7 @@ namespace LiveRepl.UI.Controls {
 
 		public override GUIStyle DefaultStyle()
 		{
-			return Window.DefaultSkin.button;
+			return Window.defaultSkin.button;
 		}
 
 		protected override void ControlUpdate()

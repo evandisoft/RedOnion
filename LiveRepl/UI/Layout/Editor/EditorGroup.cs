@@ -10,14 +10,14 @@ namespace LiveRepl.UI.Layout
 	/// </summary>
 	public class EditorGroup : Group
 	{
-		public ScriptWindow scriptWindow;
+		public ContentGroup contentGroup;
 
 		public FileIOGroup fileIOGroup;
 		public EditingArea editingArea;
 
-		public EditorGroup(ScriptWindow scriptWindow)
+		public EditorGroup(ContentGroup contentGroup)
 		{
-			this.scriptWindow=scriptWindow;
+			this.contentGroup=contentGroup;
 
 			RegisterForUpdate(fileIOGroup=new FileIOGroup(this));
 			RegisterForUpdate(editingArea=new EditingArea(new TextArea()));

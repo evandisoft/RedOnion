@@ -9,79 +9,62 @@ namespace LiveRepl.UI.ElementTypes
 	/// </summary>
 	public abstract class Window:Element
 	{
-		static int NextID = 0;
-		public readonly int WindowID=NextID++;
+		static int nextID = 0;
+		public readonly int windowID=nextID++;
 
-		static public GUISkin DefaultSkin=new GUISkin();
-		public GUIContent TitleContent=new GUIContent("");
-		public GUIStyle TitleStyle;
-		Rect TitleRect;
-		Rect ContentRect;
+		static public GUISkin defaultSkin=new GUISkin();
+		public GUIContent titleContent=new GUIContent("");
+		public GUIStyle titleStyle;
+		Rect titleRect;
+		Group content;
 
 		public GUIStyle TitleStyleOrDefault
 		{
 			get
 			{
-				if (TitleStyle==null)
+				if (titleStyle==null)
 				{
-					return DefaultSkin.window;
+					return defaultSkin.textField;
 				}
-				return TitleStyle;
+				return titleStyle;
 			}
 		}
 
-		List<Element> elements=new List<Element>();
-
 		public Window(string title)
 		{
-			TitleContent.text=title;
+			titleContent.text=title;
 			needsRecalculation=true;
 		}
 
-		/// <summary>
-		/// Registers an element to be updated whenever update is called.
-		/// </summary>
-		/// <param name="element">Element.</param>
-		protected void RegisterForUpdate(Element element)
+		protected void AssignContent(Group content)
 		{
-			elements.Add(element);
+			this.content=content;
 		}
 
 		protected override void TypeSpecificUpdate()
 		{
-			DefaultSkin=GUI.skin;
-			GUI.DragWindow(TitleRect);
-			rect=GUI.Window(WindowID, rect, PointlessFunc, TitleContent);
+			defaultSkin=GUI.skin;
+
+			rect=GUI.Window(windowID, rect, PointlessFunc, titleContent);
 		}
 
 		void PointlessFunc(int id)
 		{
+			GUI.DragWindow(titleRect);
 			WindowsUpdate();
 		}
 
 		protected virtual void WindowsUpdate()
 		{
-			GUI.BeginGroup(ContentRect);
-			foreach (var element in elements)
-			{
-				element.Update();
-			}
-			GUI.EndGroup();
+			content?.Update();
 		}
 
 		public override void SetRect(Rect rect)
 		{
 			base.SetRect(rect);
 
-			TitleRect=new Rect(0, 0, rect.width, Math.Max(TitleStyleOrDefault.CalcSize(TitleContent).y, 10));
-			ContentRect=new Rect(0, TitleRect.height, rect.width, rect.height-TitleRect.height);
-
-			SetChildRects();
+			titleRect=new Rect(0, 0, rect.width, Math.Max(TitleStyleOrDefault.CalcSize(titleContent).y, 10));
+			content.SetRect(new Rect(0, titleRect.height, rect.width, rect.height-titleRect.height));
 		}
-
-		/// <summary>
-		/// Called by SetRect. This is implemented by the subclass and sets the all the rects for the children.
-		/// </summary>
-		protected abstract void SetChildRects();
 	}
 }

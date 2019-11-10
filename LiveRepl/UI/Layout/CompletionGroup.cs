@@ -9,11 +9,11 @@ namespace LiveRepl.UI.Layout
 	/// </summary>
 	public class CompletionGroup : Group
 	{
-		public ScriptWindow scriptWindow;
+		public ContentGroup contentGroup;
 
-		public CompletionGroup(ScriptWindow scriptWindow)
+		public CompletionGroup(ContentGroup contentGroup)
 		{
-			this.scriptWindow=scriptWindow;
+			this.contentGroup=contentGroup;
 		}
 
 		protected override void SetChildRects()

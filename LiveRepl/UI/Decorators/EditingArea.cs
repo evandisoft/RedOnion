@@ -2,6 +2,7 @@
 using UnityEngine;
 using Kerbalui.Gui;
 using LiveRepl.UI.ElementTypes;
+using LiveRepl.UI.Controls.Abstract;
 
 namespace LiveRepl.UI.Decorators
 {

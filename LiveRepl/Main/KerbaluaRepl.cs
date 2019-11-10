@@ -1,16 +1,15 @@
 using System;
 using UnityEngine;
-using LiveRepl.UI;
 
 namespace LiveRepl.Main {
 	public class KerbaluaRepl {
-		public UI.LiveRepl liveRepl;
+		public ReplMain liveRepl;
 
 		public KerbaluaRepl()
 		{
 			InputLockManager.ClearControlLocks();
 
-			liveRepl = new UI.LiveRepl(); //(new Rect(100, 100, 1000, 600));
+			liveRepl = new ReplMain(); //(new Rect(100, 100, 1000, 600));
 		}
 
 		public void Print(string str)
