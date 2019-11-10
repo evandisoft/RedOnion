@@ -1,8 +1,8 @@
 using System;
-using LiveRepl.UI.ElementTypes;
+using Kerbalui.Types;
 using UnityEngine;
 
-namespace LiveRepl.UI.Controls.Abstract
+namespace Kerbalui.Controls.Abstract
 {
 	/// <summary>
 	/// A Control that contains content.
@@ -29,8 +29,8 @@ namespace LiveRepl.UI.Controls.Abstract
 		}
 
 		/// <summary>
-		/// Subclasses inherit this to provide default styles for the StyleOrDefault property to return
-		/// by default for their control.
+		/// Subclasses implement this to return the default style they want to be returned from 
+		/// StyleOrDefault when style is null.
 		/// </summary>
 		/// <returns>The style.</returns>
 		public abstract GUIStyle DefaultStyle();

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace LiveRepl.UI.ElementTypes
+namespace Kerbalui.Types
 {
 	/// <summary>
 	/// Base class for a Window

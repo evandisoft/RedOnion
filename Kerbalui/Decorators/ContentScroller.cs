@@ -1,9 +1,9 @@
 ﻿using System;
-using LiveRepl.UI.Controls.Abstract;
-using LiveRepl.UI.ElementTypes;
+using Kerbalui.Controls.Abstract;
+using Kerbalui.Types;
 using UnityEngine;
 
-namespace LiveRepl.UI.Decorators
+namespace Kerbalui.Decorators
 {
 	/// <summary>
 	/// Contains a ContentControl, which it manages scrolling for.

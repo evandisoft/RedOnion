@@ -1,10 +1,10 @@
 ﻿using System;
 using UnityEngine;
 using Kerbalui.Gui;
-using LiveRepl.UI.ElementTypes;
-using LiveRepl.UI.Controls.Abstract;
+using Kerbalui.Types;
+using Kerbalui.Controls.Abstract;
 
-namespace LiveRepl.UI.Decorators
+namespace Kerbalui.Decorators
 {
 	/// <summary>
 	/// Contains an EditableText Control which it manages as an editing area.
@@ -13,10 +13,10 @@ namespace LiveRepl.UI.Decorators
 	{
 		//int inc = 0;
 		const int spacesPerTab = 4;
-		public KeyBindings KeyBindings = new KeyBindings();
+		public KeyBindings keybindings = new KeyBindings();
 		protected TextEditor editor;
-		public int LineNumber { get; private set; } = 1;
-		public int ColumnNumber { get; private set; } = 1;
+		public int lineNumber { get; private set; } = 1;
+		public int columnNumber { get; private set; } = 1;
 		public int cursorIndex { get; private set; }
 		public int selectIndex { get; private set; }
 
@@ -67,8 +67,8 @@ namespace LiveRepl.UI.Decorators
 				hadKeyDownThisUpdate=Event.current.type==EventType.KeyDown;
 				HandleInput();
 
-				LineNumber = CurrentLineNumber()+1;
-				ColumnNumber = CharsFromLineStart()+1;
+				lineNumber = CurrentLineNumber()+1;
+				columnNumber = CharsFromLineStart()+1;
 
 				editableTextControl.content.text = editor.text;
 
@@ -149,7 +149,7 @@ namespace LiveRepl.UI.Decorators
 
 		void HandleInput()
 		{
-			KeyBindings.ExecuteAndConsumeIfMatched(Event.current);
+			keybindings.ExecuteAndConsumeIfMatched(Event.current);
 
 			// Intercept all keydown events that are about to be processed by the
 			// control itself if onlyUseKeyBindings is set to true.
@@ -161,31 +161,31 @@ namespace LiveRepl.UI.Decorators
 
 		void InitializeDefaultKeyBindings()
 		{
-			KeyBindings.Add(new EventKey(KeyCode.Home, true, true), () =>
+			keybindings.Add(new EventKey(KeyCode.Home, true, true), () =>
 			{
 				editor.SelectTextStart();
 			});
-			KeyBindings.Add(new EventKey(KeyCode.End, true, true), () =>
+			keybindings.Add(new EventKey(KeyCode.End, true, true), () =>
 			{
 				editor.SelectTextEnd();
 			});
-			KeyBindings.Add(new EventKey(KeyCode.Home, true), () =>
+			keybindings.Add(new EventKey(KeyCode.Home, true), () =>
 			{
 				editor.MoveTextStart();
 			});
-			KeyBindings.Add(new EventKey(KeyCode.End, true), () =>
+			keybindings.Add(new EventKey(KeyCode.End, true), () =>
 			{
 				editor.MoveTextEnd();
 			});
-			KeyBindings.Add(new EventKey(KeyCode.Insert, true), () =>
+			keybindings.Add(new EventKey(KeyCode.Insert, true), () =>
 			{
 				editor.Copy();
 			});
-			KeyBindings.Add(new EventKey(KeyCode.Insert, false, true), () =>
+			keybindings.Add(new EventKey(KeyCode.Insert, false, true), () =>
 			{
 				editor.Paste();
 			});
-			KeyBindings.Add(new EventKey(KeyCode.Backspace, false, true), () =>
+			keybindings.Add(new EventKey(KeyCode.Backspace, false, true), () =>
 			 {
 				 int toMove = NextTabLeft(cursorIndex);
 				 for (int i = 0; i < toMove; i++)
@@ -193,7 +193,7 @@ namespace LiveRepl.UI.Decorators
 					 editor.Backspace();
 				 }
 			 });
-			KeyBindings.Add(new EventKey(KeyCode.Backspace, true), () =>
+			keybindings.Add(new EventKey(KeyCode.Backspace, true), () =>
 			{
 				while (true)
 				{
@@ -220,18 +220,18 @@ namespace LiveRepl.UI.Decorators
 
 				}
 			});
-			KeyBindings.Add(new EventKey(KeyCode.Tab), () => Indent());
-			KeyBindings.Add(new EventKey(KeyCode.Tab, false, true), () => Unindent());
-			KeyBindings.Add(new EventKey(KeyCode.Tab, true), () => IndentToPreviousLine());
-			KeyBindings.Add(new EventKey(KeyCode.J, true), () => editor.MoveLeft());
-			KeyBindings.Add(new EventKey(KeyCode.J, true, true), () => editor.SelectLeft());
-			KeyBindings.Add(new EventKey(KeyCode.K, true), () => editor.MoveDown());
-			KeyBindings.Add(new EventKey(KeyCode.K, true, true), () => editor.SelectDown());
-			KeyBindings.Add(new EventKey(KeyCode.L, true), () => editor.MoveUp());
-			KeyBindings.Add(new EventKey(KeyCode.L, true, true), () => editor.SelectUp());
-			KeyBindings.Add(new EventKey(KeyCode.Semicolon, true), () => editor.MoveRight());
-			KeyBindings.Add(new EventKey(KeyCode.Semicolon, true, true), () => editor.SelectRight());
-			KeyBindings.Add(new EventKey(KeyCode.M, true), () =>
+			keybindings.Add(new EventKey(KeyCode.Tab), () => Indent());
+			keybindings.Add(new EventKey(KeyCode.Tab, false, true), () => Unindent());
+			keybindings.Add(new EventKey(KeyCode.Tab, true), () => IndentToPreviousLine());
+			keybindings.Add(new EventKey(KeyCode.J, true), () => editor.MoveLeft());
+			keybindings.Add(new EventKey(KeyCode.J, true, true), () => editor.SelectLeft());
+			keybindings.Add(new EventKey(KeyCode.K, true), () => editor.MoveDown());
+			keybindings.Add(new EventKey(KeyCode.K, true, true), () => editor.SelectDown());
+			keybindings.Add(new EventKey(KeyCode.L, true), () => editor.MoveUp());
+			keybindings.Add(new EventKey(KeyCode.L, true, true), () => editor.SelectUp());
+			keybindings.Add(new EventKey(KeyCode.Semicolon, true), () => editor.MoveRight());
+			keybindings.Add(new EventKey(KeyCode.Semicolon, true, true), () => editor.SelectRight());
+			keybindings.Add(new EventKey(KeyCode.M, true), () =>
 			{
 				int toMove = NextTabLeft(cursorIndex);
 				for (int i = 0; i < toMove; i++)
@@ -239,7 +239,7 @@ namespace LiveRepl.UI.Decorators
 					editor.MoveLeft();
 				}
 			});
-			KeyBindings.Add(new EventKey(KeyCode.M, true, true), () =>
+			keybindings.Add(new EventKey(KeyCode.M, true, true), () =>
 			{
 				int toMove = NextTabLeft(selectIndex);
 				for (int i = 0; i < toMove; i++)
@@ -247,35 +247,35 @@ namespace LiveRepl.UI.Decorators
 					editor.MoveLeft();
 				}
 			});
-			KeyBindings.Add(new EventKey(KeyCode.Comma, true), () =>
+			keybindings.Add(new EventKey(KeyCode.Comma, true), () =>
 			{
 				for (int i = 0; i < 4; i++)
 				{
 					editor.MoveDown();
 				}
 			});
-			KeyBindings.Add(new EventKey(KeyCode.Comma, true, true), () =>
+			keybindings.Add(new EventKey(KeyCode.Comma, true, true), () =>
 			{
 				for (int i = 0; i < 4; i++)
 				{
 					editor.SelectDown();
 				}
 			});
-			KeyBindings.Add(new EventKey(KeyCode.Period, true), () =>
+			keybindings.Add(new EventKey(KeyCode.Period, true), () =>
 			{
 				for (int i = 0; i < 4; i++)
 				{
 					editor.MoveUp();
 				}
 			});
-			KeyBindings.Add(new EventKey(KeyCode.Period, true, true), () =>
+			keybindings.Add(new EventKey(KeyCode.Period, true, true), () =>
 			{
 				for (int i = 0; i < 4; i++)
 				{
 					editor.SelectUp();
 				}
 			});
-			KeyBindings.Add(new EventKey(KeyCode.Slash, true), () =>
+			keybindings.Add(new EventKey(KeyCode.Slash, true), () =>
 			{
 				int toMove = NextTabRight(cursorIndex);
 				for (int i = 0; i < toMove; i++)
@@ -283,7 +283,7 @@ namespace LiveRepl.UI.Decorators
 					editor.MoveRight();
 				}
 			});
-			KeyBindings.Add(new EventKey(KeyCode.Slash, true, true), () =>
+			keybindings.Add(new EventKey(KeyCode.Slash, true, true), () =>
 			{
 				int toMove = NextTabRight(selectIndex);
 				for (int i = 0; i < toMove; i++)
@@ -291,22 +291,22 @@ namespace LiveRepl.UI.Decorators
 					editor.MoveRight();
 				}
 			});
-			KeyBindings.Add(new EventKey(KeyCode.H, true), () =>
+			keybindings.Add(new EventKey(KeyCode.H, true), () =>
 			{
 				InsertLineBefore();
 				IndentToPreviousLine();
 			});
-			KeyBindings.Add(new EventKey(KeyCode.N, true), () =>
+			keybindings.Add(new EventKey(KeyCode.N, true), () =>
 			{
 				InsertLineAfter();
 				IndentToPreviousLine();
 			});
-			KeyBindings.Add(new EventKey(KeyCode.Return), () =>
+			keybindings.Add(new EventKey(KeyCode.Return), () =>
 			{
 				editor.ReplaceSelection("\n");
 				IndentToPreviousLine();
 			});
-			KeyBindings.Add(new EventKey(KeyCode.Return,false,true), () =>
+			keybindings.Add(new EventKey(KeyCode.Return,false,true), () =>
 			{
 				editor.ReplaceSelection("\n");
 				IndentToPreviousLine();

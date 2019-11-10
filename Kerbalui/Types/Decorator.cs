@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace LiveRepl.UI.ElementTypes
+namespace Kerbalui.Types
 {
 	/// <summary>
 	/// A Decorator contains, rather than extends, a Control, and adds extra functionality.

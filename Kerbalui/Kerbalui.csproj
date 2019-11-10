@@ -92,30 +92,44 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Gui\AutoLayoutBox.cs" />
-    <Compile Include="Gui\Button.cs" />
-    <Compile Include="Gui\CompletionBox.cs" />
-    <Compile Include="Gui\CompletionManager.cs" />
-    <Compile Include="Gui\EditingArea.cs" />
-    <Compile Include="Gui\Editor.cs" />
-    <Compile Include="Gui\EventKey.cs" />
-    <Compile Include="Gui\GUILibUtil.cs" />
-    <Compile Include="Gui\ICompletableElement.cs" />
-    <Compile Include="Gui\ICompletionSelector.cs" />
-    <Compile Include="Gui\IFocusable.cs" />
-    <Compile Include="Gui\ILayoutRenderer.cs" />
-    <Compile Include="Gui\InputBox.cs" />
-    <Compile Include="Gui\IRectRenderer.cs" />
-    <Compile Include="Gui\IRenderer.cs" />
-    <Compile Include="Gui\KeyBindings.cs" />
-    <Compile Include="Gui\Label.cs" />
-    <Compile Include="Gui\OutputBox.cs" />
-    <Compile Include="Gui\RecentFilesList.cs" />
-    <Compile Include="Gui\Repl.cs" />
-    <Compile Include="Gui\ScriptNameInputArea.cs" />
-    <Compile Include="Gui\ScrollableTextArea.cs" />
-    <Compile Include="Gui\TextArea.cs" />
-    <Compile Include="Gui\UIElement.cs" />
+    <Compile Include="OldGui\AutoLayoutBox.cs" />
+    <Compile Include="OldGui\Button.cs" />
+    <Compile Include="OldGui\CompletionBox.cs" />
+    <Compile Include="OldGui\CompletionManager.cs" />
+    <Compile Include="OldGui\EditingArea.cs" />
+    <Compile Include="OldGui\Editor.cs" />
+    <Compile Include="OldGui\EventKey.cs" />
+    <Compile Include="OldGui\GUILibUtil.cs" />
+    <Compile Include="OldGui\ICompletableElement.cs" />
+    <Compile Include="OldGui\ICompletionSelector.cs" />
+    <Compile Include="OldGui\IFocusable.cs" />
+    <Compile Include="OldGui\ILayoutRenderer.cs" />
+    <Compile Include="OldGui\InputBox.cs" />
+    <Compile Include="OldGui\IRectRenderer.cs" />
+    <Compile Include="OldGui\IRenderer.cs" />
+    <Compile Include="OldGui\KeyBindings.cs" />
+    <Compile Include="OldGui\Label.cs" />
+    <Compile Include="OldGui\OutputBox.cs" />
+    <Compile Include="OldGui\RecentFilesList.cs" />
+    <Compile Include="OldGui\Repl.cs" />
+    <Compile Include="OldGui\ScriptNameInputArea.cs" />
+    <Compile Include="OldGui\ScrollableTextArea.cs" />
+    <Compile Include="OldGui\TextArea.cs" />
+    <Compile Include="OldGui\UIElement.cs" />
+    <Compile Include="Controls\Abstract\ContentControl.cs" />
+    <Compile Include="Controls\Abstract\EditableText.cs" />
+    <Compile Include="Controls\Button.cs" />
+    <Compile Include="Controls\Label.cs" />
+    <Compile Include="Controls\TextArea.cs" />
+    <Compile Include="Controls\TextField.cs" />
+    <Compile Include="Decorators\ContentScroller.cs" />
+    <Compile Include="Decorators\EditingArea.cs" />
+    <Compile Include="Types\Control.cs" />
+    <Compile Include="Types\Decorator.cs" />
+    <Compile Include="Types\Element.cs" />
+    <Compile Include="Types\Group.cs" />
+    <Compile Include="Types\Window.cs" />
+    <Compile Include="Groups\HorizontalSpacer.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
@@ -127,6 +141,12 @@
       <Project>{59399C9E-EBAC-4D7C-B2CB-6ECE22FE8D6E}</Project>
       <Name>RedOnion.ROS</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Controls\" />
+    <Folder Include="Decorators\" />
+    <Folder Include="Types\" />
+    <Folder Include="Groups\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

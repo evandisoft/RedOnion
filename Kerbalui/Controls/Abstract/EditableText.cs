@@ -1,5 +1,5 @@
 using System;
-namespace LiveRepl.UI.Controls.Abstract
+namespace Kerbalui.Controls.Abstract
 {
 	/// <summary>
 	/// A Control that contains text that is user-editable

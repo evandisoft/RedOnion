@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace LiveRepl.UI.ElementTypes
+namespace Kerbalui.Types
 {
 	// Base class of all UI parts
 	public abstract class Element

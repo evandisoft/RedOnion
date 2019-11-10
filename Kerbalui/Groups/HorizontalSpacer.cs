@@ -1,15 +1,13 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using LiveRepl.UI.ElementTypes;
-using LiveRepl.UI.Controls;
+using Kerbalui.Types;
 using UnityEngine;
-using LiveRepl.UI.Controls.Abstract;
+using Kerbalui.Controls.Abstract;
 
-namespace LiveRepl.UI.Groups
+namespace Kerbalui.Groups
 {
 	/// <summary>
-	/// Accepts UIElements with associated weights. A weight of 0 will reserve, for that element, space
+	/// Accepts Elements with associated weights. A weight of 0 will reserve, for that element, space
 	/// equal to its content size, but only works for elements that are ContentControls.
 	/// 
 	/// The space not taken up by weight 0 content controls is divided up among the rest of the elements based on their

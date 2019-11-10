@@ -1,9 +1,9 @@
 using System;
-using LiveRepl.UI.Controls.Abstract;
-using LiveRepl.UI.ElementTypes;
+using Kerbalui.Controls.Abstract;
+using Kerbalui.Types;
 using UnityEngine;
 
-namespace LiveRepl.UI.Controls
+namespace Kerbalui.Controls
 {
 	public class TextField : EditableText
 	{

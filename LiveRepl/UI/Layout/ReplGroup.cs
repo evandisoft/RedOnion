@@ -1,5 +1,4 @@
-﻿using Kerbalui.Gui;
-using LiveRepl.UI.ElementTypes;
+﻿using Kerbalui.Types;
 using UnityEngine;
 
 namespace LiveRepl.UI.Layout

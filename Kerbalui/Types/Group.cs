@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using LiveRepl.UI.Controls;
+using Kerbalui.Controls;
 using UnityEngine;
 
-namespace LiveRepl.UI.ElementTypes
+namespace Kerbalui.Types
 {
 	/// <summary>
 	/// A Group has multiple sub Elements, and displays them within a GUI.BeginGroup on each update
