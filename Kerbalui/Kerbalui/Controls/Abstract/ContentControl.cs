@@ -12,6 +12,8 @@ namespace Kerbalui.Controls.Abstract
 		public GUIContent content=new GUIContent("");
 		public GUIStyle style;
 
+		public override Vector2 MinSize => StyleOrDefault.CalcSize(content);
+
 		/// <summary>
 		/// Returns default style if style is null
 		/// </summary>
@@ -42,5 +44,7 @@ namespace Kerbalui.Controls.Abstract
 				DefaultStyle();
 			}
 		}
+
+
 	}
 }

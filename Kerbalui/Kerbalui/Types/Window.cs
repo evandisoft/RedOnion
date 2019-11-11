@@ -33,7 +33,6 @@ namespace Kerbalui.Types
 		public Window(string title)
 		{
 			titleContent.text=title;
-			needsRecalculation=true;
 		}
 
 		protected void AssignContent(Group content)

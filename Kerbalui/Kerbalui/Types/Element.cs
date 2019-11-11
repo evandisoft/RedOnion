@@ -8,14 +8,15 @@ namespace Kerbalui.Types
 	{
 		public Rect rect;
 		/// <summary>
-		/// needsRecalculation is not yet used. Not sure what I want to do with it yet.
-		/// One use for this is that until the first update, some controls don't have their real style set,
-		/// and as such don't have their real content size properly accounted for in rect calculation
+		/// needsRecalculation triggers an recalculation of rects after the first update.
+		/// I'm setting it to true by default because before the first update the defaultSkin is not set.
+		/// And it needs to be set for some things to run properly.
 		/// </summary>
-		public bool needsRecalculation;
+		public bool needsRecalculation=true;
 		public virtual void SetRect(Rect rect)
 		{
 			this.rect=rect;
+			needsRecalculation=false;
 		}
 
 		/// <summary>
@@ -30,10 +31,11 @@ namespace Kerbalui.Types
 			if (needsRecalculation)
 			{
 				SetRect(rect);
-				needsRecalculation=false;
 			}
 		}
 
 		protected abstract void TypeSpecificUpdate();
+
+		public virtual Vector2 MinSize => new Vector2();
 	}
 }

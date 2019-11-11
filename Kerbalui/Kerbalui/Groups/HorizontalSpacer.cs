@@ -17,6 +17,24 @@ namespace Kerbalui.Groups
 	{
 		List<SpacerEntry> spacerEntries=new List<SpacerEntry>();
 
+		public override Vector2 MinSize
+		{
+			get
+			{
+				Vector2 minSize=new Vector2();
+				foreach(var spacerEntry in spacerEntries)
+				{
+					if(spacerEntry.element is ContentControl contentControl)
+					{
+						Vector2 contentMinSize=contentControl.MinSize;
+						minSize.y=Mathf.Max(minSize.y, contentMinSize.y);
+						minSize.x+=contentMinSize.x;
+					}
+				}
+				return minSize;
+			}
+		}
+
 		/// <summary>
 		/// Adds a weight and associates it with an element to be rendered.
 		/// A weight of 0 makes the element be rendered by it's minimum content size.
@@ -26,7 +44,7 @@ namespace Kerbalui.Groups
 		public void Add(float weight,Element element)
 		{
 			spacerEntries.Add(new SpacerEntry(weight, element));
-			RegisterForUpdate(element);
+			RegisterForUpdates(element);
 			needsRecalculation=true;
 		}
 
@@ -39,8 +57,8 @@ namespace Kerbalui.Groups
 				totalWeight+=spacerEntry.weight;
 			}
 
-			float totalMinContentSize=spacerEntries.Select(MinContentSize).Sum();
-			float minfract=totalMinContentSize/rect.width;
+			float totalMinContentWidth=spacerEntries.Select(MinContentWidth).Sum();
+			float minfract=totalMinContentWidth/rect.width;
 
 			float totalWeightFract=1-minfract;
 
@@ -54,7 +72,7 @@ namespace Kerbalui.Groups
 			float endPoint=0;
 			foreach (var spacerEntry in spacerEntries)
 			{
-				minContentSize=MinContentSize(spacerEntry);
+				minContentSize=MinContentWidth(spacerEntry);
 				if (minContentSize>0)
 				{
 					endPoint=startPoint+minContentSize;
@@ -75,14 +93,14 @@ namespace Kerbalui.Groups
 		/// </summary>
 		/// <returns>The content size.</returns>
 		/// <param name="spacerEntry">Spacer entry.</param>
-		float MinContentSize(SpacerEntry spacerEntry)
+		float MinContentWidth(SpacerEntry spacerEntry)
 		{
 			float weight=spacerEntry.weight;
 #pragma warning disable RECS0018 // Comparison of floating point numbers with equality operator
 			if (weight==0 && spacerEntry.element is ContentControl contentControl)
 #pragma warning restore RECS0018 // Comparison of floating point numbers with equality operator
 			{
-				return contentControl.StyleOrDefault.CalcSize(contentControl.content).x;
+				return contentControl.MinSize.x;
 			}
 			return 0;
 		}

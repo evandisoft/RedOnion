@@ -12,6 +12,11 @@ namespace Kerbalui.Controls
 			content.text=text;
 		}
 
+		public Label()
+		{
+			content.text="";
+		}
+
 		public override GUIStyle DefaultStyle()
 		{
 			return Window.defaultSkin.label;

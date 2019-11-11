@@ -1,8 +1,8 @@
 using Kerbalui.Types;
-using LiveRepl.UI.Center;
-using LiveRepl.UI.Completion;
-using LiveRepl.UI.Editor;
-using LiveRepl.UI.Repl;
+using LiveRepl.UI.CenterParts;
+using LiveRepl.UI.CompletionParts;
+using LiveRepl.UI.EditorParts;
+using LiveRepl.UI.ReplParts;
 using UnityEngine;
 
 namespace LiveRepl.UI
@@ -23,10 +23,10 @@ namespace LiveRepl.UI
 		{
 			this.scriptWindow=scriptWindow;
 
-			RegisterForUpdate(editorGroup=new EditorGroup(this));
-			RegisterForUpdate(centerGroup=new CenterGroup(this));
-			RegisterForUpdate(replGroup=new ReplGroup(this));
-			RegisterForUpdate(completionGroup=new CompletionGroup(this));
+			RegisterForUpdates(editorGroup=new EditorGroup(this));
+			RegisterForUpdates(centerGroup=new CenterGroup(this));
+			RegisterForUpdates(replGroup=new ReplGroup(this));
+			RegisterForUpdates(completionGroup=new CompletionGroup(this));
 		}
 
 		protected override void SetChildRects()

@@ -1,8 +1,9 @@
 ﻿using System;
 using UnityEngine;
-using Kerbalui.Gui;
 using Kerbalui.Types;
 using Kerbalui.Controls.Abstract;
+using Kerbalui.EventHandling;
+using Kerbalui.Util;
 
 namespace Kerbalui.Decorators
 {
@@ -15,10 +16,10 @@ namespace Kerbalui.Decorators
 		const int spacesPerTab = 4;
 		public KeyBindings keybindings = new KeyBindings();
 		protected TextEditor editor;
-		public int lineNumber { get; private set; } = 1;
-		public int columnNumber { get; private set; } = 1;
-		public int cursorIndex { get; private set; }
-		public int selectIndex { get; private set; }
+		public int LineNumber { get; private set; } = 1;
+		public int ColumnNumber { get; private set; } = 1;
+		public int CursorIndex { get; private set; }
+		public int SelectIndex { get; private set; }
 
 		public EditableText editableTextControl;
 
@@ -61,21 +62,21 @@ namespace Kerbalui.Decorators
 				int id = GUIUtility.keyboardControl;
 				editor = (TextEditor)GUIUtility.GetStateObject(typeof(TextEditor), id);
 				editor.text = editableTextControl.content.text;
-				editor.cursorIndex = cursorIndex;
-				editor.selectIndex = selectIndex;
+				editor.cursorIndex = CursorIndex;
+				editor.selectIndex = SelectIndex;
 
 				hadKeyDownThisUpdate=Event.current.type==EventType.KeyDown;
 				HandleInput();
 
-				lineNumber = CurrentLineNumber()+1;
-				columnNumber = CharsFromLineStart()+1;
+				LineNumber = CurrentLineNumber()+1;
+				ColumnNumber = CharsFromLineStart()+1;
 
 				editableTextControl.content.text = editor.text;
 
 				base.DecoratorUpdate();
 
-				cursorIndex = editor.cursorIndex;
-				selectIndex = editor.selectIndex;
+				CursorIndex = editor.cursorIndex;
+				SelectIndex = editor.selectIndex;
 
 				if (hadKeyDownThisUpdate && Event.current.type == EventType.Used)
 				{
@@ -142,7 +143,7 @@ namespace Kerbalui.Decorators
 
 		float CursorY()
 		{
-			string contentToCursor = editableTextControl.content.text.Substring(0, cursorIndex);
+			string contentToCursor = editableTextControl.content.text.Substring(0, CursorIndex);
 			GUIContent tempContent = new GUIContent(contentToCursor);
 			return editableTextControl.style.CalcSize(tempContent).y;
 		}
@@ -187,7 +188,7 @@ namespace Kerbalui.Decorators
 			});
 			keybindings.Add(new EventKey(KeyCode.Backspace, false, true), () =>
 			 {
-				 int toMove = NextTabLeft(cursorIndex);
+				 int toMove = NextTabLeft(CursorIndex);
 				 for (int i = 0; i < toMove; i++)
 				 {
 					 editor.Backspace();
@@ -233,7 +234,7 @@ namespace Kerbalui.Decorators
 			keybindings.Add(new EventKey(KeyCode.Semicolon, true, true), () => editor.SelectRight());
 			keybindings.Add(new EventKey(KeyCode.M, true), () =>
 			{
-				int toMove = NextTabLeft(cursorIndex);
+				int toMove = NextTabLeft(CursorIndex);
 				for (int i = 0; i < toMove; i++)
 				{
 					editor.MoveLeft();
@@ -241,7 +242,7 @@ namespace Kerbalui.Decorators
 			});
 			keybindings.Add(new EventKey(KeyCode.M, true, true), () =>
 			{
-				int toMove = NextTabLeft(selectIndex);
+				int toMove = NextTabLeft(SelectIndex);
 				for (int i = 0; i < toMove; i++)
 				{
 					editor.MoveLeft();
@@ -277,7 +278,7 @@ namespace Kerbalui.Decorators
 			});
 			keybindings.Add(new EventKey(KeyCode.Slash, true), () =>
 			{
-				int toMove = NextTabRight(cursorIndex);
+				int toMove = NextTabRight(CursorIndex);
 				for (int i = 0; i < toMove; i++)
 				{
 					editor.MoveRight();
@@ -285,7 +286,7 @@ namespace Kerbalui.Decorators
 			});
 			keybindings.Add(new EventKey(KeyCode.Slash, true, true), () =>
 			{
-				int toMove = NextTabRight(selectIndex);
+				int toMove = NextTabRight(SelectIndex);
 				for (int i = 0; i < toMove; i++)
 				{
 					editor.MoveRight();

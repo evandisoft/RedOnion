@@ -29,7 +29,6 @@ namespace Kerbalui.Decorators
 
 		protected override void SetChildRect()
 		{
-			Debug.Log("SetChildRect called");
 			Vector2 contentSize = contentControl.StyleOrDefault.CalcSize(contentControl.content);
 			contentControl.rect = new Rect(0, 0,
 				Math.Max(contentSize.x, rect.width),

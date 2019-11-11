@@ -101,11 +101,13 @@
     <Compile Include="LiveRepl\UI\ScriptWindow.cs" />
     <Compile Include="LiveRepl\Other\EditAreaCompletionAdapter.cs" />
     <Compile Include="LiveRepl\UI\ContentGroup.cs" />
-    <Compile Include="LiveRepl\UI\Editor\EditorGroup.cs" />
-    <Compile Include="LiveRepl\UI\Editor\FileIOGroup.cs" />
-    <Compile Include="LiveRepl\UI\Center\CenterGroup.cs" />
-    <Compile Include="LiveRepl\UI\Completion\CompletionGroup.cs" />
-    <Compile Include="LiveRepl\UI\Repl\ReplGroup.cs" />
+    <Compile Include="LiveRepl\UI\EditorParts\EditorGroup.cs" />
+    <Compile Include="LiveRepl\UI\EditorParts\FileIOGroup.cs" />
+    <Compile Include="LiveRepl\UI\CenterParts\CenterGroup.cs" />
+    <Compile Include="LiveRepl\UI\CompletionParts\CompletionGroup.cs" />
+    <Compile Include="LiveRepl\UI\ReplParts\ReplGroup.cs" />
+    <Compile Include="LiveRepl\UI\EditorParts\Editor.cs" />
+    <Compile Include="LiveRepl\UI\EditorParts\EditorStatusLabel.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
@@ -135,10 +137,10 @@
     <Folder Include="LiveRepl\Main\" />
     <Folder Include="LiveRepl\UI\" />
     <Folder Include="LiveRepl\Other\" />
-    <Folder Include="LiveRepl\UI\Editor\" />
-    <Folder Include="LiveRepl\UI\Completion\" />
-    <Folder Include="LiveRepl\UI\Center\" />
-    <Folder Include="LiveRepl\UI\Repl\" />
+    <Folder Include="LiveRepl\UI\EditorParts\" />
+    <Folder Include="LiveRepl\UI\CompletionParts\" />
+    <Folder Include="LiveRepl\UI\CenterParts\" />
+    <Folder Include="LiveRepl\UI\ReplParts\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>

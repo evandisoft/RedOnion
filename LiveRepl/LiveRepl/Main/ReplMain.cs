@@ -26,7 +26,6 @@ namespace LiveRepl.Main
 
 		public void Update()
 		{
-
 			scriptWindow.Update();
 		}
 
