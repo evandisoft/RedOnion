@@ -18,11 +18,11 @@ namespace Kerbalui.Groups
 	{
 		protected override void SetChildRects()
 		{
-			var points=CalculateSpacingPoints(MinContentHeight,rect.height);
+			var spacingPoints=CalculateSpacingPoints(MinContentHeight,rect.height);
 
 			for(int i = 0; i<spacerEntries.Count; i++)
 			{
-				spacerEntries[i].element.SetRect(new Rect(0, points[i], rect.width, points[i+1]-points[i]));
+				spacerEntries[i].element.SetRect(new Rect(0, spacingPoints[i], rect.width, spacingPoints[i+1]-spacingPoints[i]));
 			}
 		}
 	}

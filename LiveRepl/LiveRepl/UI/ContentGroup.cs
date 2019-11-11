@@ -23,10 +23,10 @@ namespace LiveRepl.UI
 		{
 			this.scriptWindow=scriptWindow;
 
-			RegisterForUpdates(editorGroup=new EditorGroup(this));
-			RegisterForUpdates(centerGroup=new CenterGroup(this));
-			RegisterForUpdates(replGroup=new ReplGroup(this));
-			RegisterForUpdates(completionGroup=new CompletionGroup(this));
+			RegisterForUpdate(editorGroup=new EditorGroup(this));
+			RegisterForUpdate(centerGroup=new CenterGroup(this));
+			RegisterForUpdate(replGroup=new ReplGroup(this));
+			RegisterForUpdate(completionGroup=new CompletionGroup(this));
 		}
 
 		protected override void SetChildRects()

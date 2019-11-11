@@ -20,23 +20,22 @@ namespace LiveRepl.UI.EditorParts
 		{
 			this.contentGroup=contentGroup;
 
-			RegisterForUpdates(fileIOGroup=new FileIOGroup(this));
-			RegisterForUpdates(editor=new Editor(this));
-			RegisterForUpdates(editorStatusLabel=new EditorStatusLabel());
+			RegisterForUpdate(fileIOGroup=new FileIOGroup(this));
+			RegisterForUpdate(editor=new Editor(this));
+			RegisterForUpdate(editorStatusLabel=new EditorStatusLabel());
 		}
 
 		protected override void GroupUpdate()
 		{
-			//TODO: This isn't correct at the moment
 			if (Event.current.type==EventType.KeyDown)
 			{
-				fileIOGroup.horizontalSpacer.needsRecalculation=true;
+				fileIOGroup.needsRecalculation=true;
 			}
 		}
 
 		protected override void SetChildRects()
 		{
-			fileIOGroup.SetRect(new Rect(0, 0, rect.width, fileIOGroup.horizontalSpacer.MinSize.y));
+			fileIOGroup.SetRect(new Rect(0, 0, rect.width, fileIOGroup.MinSize.y));
 			//TODO: TabsGroup
 			//y+=fileIOGroup.rect.height;
 			//height-=fileIOGroup.rect.height;

@@ -7,6 +7,9 @@ using UnityEngine;
 
 namespace Kerbalui.Groups.Abstract
 {
+	/// <summary>
+	/// Contains common functionality for the Vertical and Horizontal Spacers.
+	/// </summary>
 	public abstract class Spacer:Group
 	{
 		protected List<SpacerEntry> spacerEntries=new List<SpacerEntry>();
@@ -20,7 +23,7 @@ namespace Kerbalui.Groups.Abstract
 		public void Add(float weight, Element element)
 		{
 			spacerEntries.Add(new SpacerEntry(weight, element));
-			RegisterForUpdates(element);
+			RegisterForUpdate(element);
 			needsRecalculation=true;
 		}
 

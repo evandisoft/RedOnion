@@ -38,7 +38,7 @@ namespace Kerbalui.Types
 		/// Registers an element to be updated whenever update is called.
 		/// </summary>
 		/// <param name="element">Element.</param>
-		protected void RegisterForUpdates(Element element)
+		protected virtual void RegisterForUpdate(Element element)
 		{
 			elements.Add(element);
 		}
