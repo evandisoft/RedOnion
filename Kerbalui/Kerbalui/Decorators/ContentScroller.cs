@@ -15,6 +15,10 @@ namespace Kerbalui.Decorators
 		protected Vector2 lastScrollViewVector2 = new Vector2();
 		protected Vector2 lastContentVector2 = new Vector2();
 
+		public bool HorizontalScrollBarPresent => rect.width<contentControl.rect.width;
+		public bool VerticalScrollBarPresent => rect.height<contentControl.rect.height;
+		public const int ScrollbarWidth=20;
+
 		public ContentControl contentControl;
 
 		public ContentScroller(ContentControl contentControl)
@@ -34,6 +38,7 @@ namespace Kerbalui.Decorators
 				Math.Max(contentSize.x, rect.width),
 				Math.Max(contentSize.y, rect.height)
 				);
+			
 		}
 
 		protected override void DecoratorUpdate()

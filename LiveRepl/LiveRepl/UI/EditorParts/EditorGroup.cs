@@ -2,13 +2,14 @@
 using Kerbalui.Types;
 using Kerbalui.Decorators;
 using Kerbalui.Controls;
+using Kerbalui.Groups;
 
 namespace LiveRepl.UI.EditorParts
 {
 	/// <summary>
 	/// The Group that holds the Editor and related functionality.
 	/// </summary>
-	public class EditorGroup : Group
+	public class EditorGroup : VerticalSpacer
 	{
 		public ContentGroup contentGroup;
 
@@ -20,29 +21,29 @@ namespace LiveRepl.UI.EditorParts
 		{
 			this.contentGroup=contentGroup;
 
-			RegisterForUpdate(fileIOGroup=new FileIOGroup(this));
-			RegisterForUpdate(editor=new Editor(this));
-			RegisterForUpdate(editorStatusLabel=new EditorStatusLabel());
+			AddMinSized(fileIOGroup=new FileIOGroup(this));
+			AddWeighted(1,editor=new Editor(this));
+			AddMinSized(editorStatusLabel=new EditorStatusLabel());
 		}
 
 		protected override void GroupUpdate()
 		{
 			if (Event.current.type==EventType.KeyDown)
 			{
-				fileIOGroup.needsRecalculation=true;
+				fileIOGroup.needsResize=true;
 			}
 		}
 
-		protected override void SetChildRects()
-		{
-			fileIOGroup.SetRect(new Rect(0, 0, rect.width, fileIOGroup.MinSize.y));
-			//TODO: TabsGroup
-			//y+=fileIOGroup.rect.height;
-			//height-=fileIOGroup.rect.height;
-			editorStatusLabel.SetRect(new Rect(0,rect.height-editorStatusLabel.MinSize.y, rect.width, editorStatusLabel.MinSize.y));
+		//protected override void SetChildRects()
+		//{
+		//	fileIOGroup.SetRect(new Rect(0, 0, rect.width, fileIOGroup.MinSize.y));
+		//	//TODO: TabsGroup
+		//	//y+=fileIOGroup.rect.height;
+		//	//height-=fileIOGroup.rect.height;
+		//	editorStatusLabel.SetRect(new Rect(0,rect.height-editorStatusLabel.MinSize.y, rect.width, editorStatusLabel.MinSize.y));
 
-			editor.SetRect(new Rect(0, fileIOGroup.rect.height, rect.width, rect.height-fileIOGroup.rect.height-editorStatusLabel.rect.height));
+		//	editor.SetRect(new Rect(0, fileIOGroup.rect.height, rect.width, rect.height-fileIOGroup.rect.height-editorStatusLabel.rect.height));
 
-		}
+		//}
 	}
 }

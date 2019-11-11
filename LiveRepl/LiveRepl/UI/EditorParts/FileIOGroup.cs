@@ -13,7 +13,7 @@ namespace LiveRepl.UI.EditorParts
 	{
 		public EditorGroup editorGroup;
 
-		public Label changesIndicator=new Label("*");
+		public Label changesIndicator=new Label("");
 
 		public TextField inputField;
 

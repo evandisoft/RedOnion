@@ -88,7 +88,7 @@ namespace LiveRepl.UI
 
 					contentGroup.completionGroup.active=editorVisible || replVisible;
 					contentGroup.editorGroup.active=editorVisible=value;
-					needsRecalculation=true;
+					needsResize=true;
 				}
 			}
 		}
@@ -112,7 +112,7 @@ namespace LiveRepl.UI
 
 					contentGroup.completionGroup.active=editorVisible || replVisible;
 					contentGroup.replGroup.active=replVisible=value;
-					needsRecalculation=true;
+					needsResize=true;
 				}
 			}
 		}

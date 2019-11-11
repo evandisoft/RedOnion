@@ -24,7 +24,7 @@ namespace Kerbalui.Groups.Abstract
 		{
 			spacerEntries.Add(spacerEntry);
 			RegisterForUpdate(spacerEntry.element);
-			needsRecalculation=true;
+			needsResize=true;
 		}
 		public void AddWeighted(float weight, Element element)
 		{

@@ -34,6 +34,12 @@ namespace LiveRepl.UI.EditorParts
 			base.DecoratorUpdate();
 
 			editorGroup.editorStatusLabel.UpdateCursorInfo(LineNumber, ColumnNumber);
+
+			if (hadKeyDownThisUpdate)
+			{
+				editorGroup.fileIOGroup.changesIndicator.content.text="*";
+				editorGroup.fileIOGroup.needsResize=true;
+			}
 		}
 	}
 }

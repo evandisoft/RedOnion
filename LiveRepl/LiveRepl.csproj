@@ -108,6 +108,9 @@
     <Compile Include="LiveRepl\UI\ReplParts\ReplGroup.cs" />
     <Compile Include="LiveRepl\UI\EditorParts\Editor.cs" />
     <Compile Include="LiveRepl\UI\EditorParts\EditorStatusLabel.cs" />
+    <Compile Include="LiveRepl\UI\ReplParts\Repl.cs" />
+    <Compile Include="LiveRepl\UI\ReplParts\ReplInputArea.cs" />
+    <Compile Include="LiveRepl\UI\ReplParts\ReplOutoutArea.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

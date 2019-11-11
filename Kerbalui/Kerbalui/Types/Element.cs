@@ -19,11 +19,11 @@ namespace Kerbalui.Types
 		/// I'm setting it to true by default because before the first update the defaultSkin is not set.
 		/// And it needs to be set for some things to run properly.
 		/// </summary>
-		public bool needsRecalculation=true;
+		public bool needsResize=true;
 		public virtual void SetRect(Rect rect)
 		{
 			this.rect=rect;
-			needsRecalculation=false;
+			needsResize=false;
 		}
 
 		/// <summary>
@@ -37,7 +37,7 @@ namespace Kerbalui.Types
 			if (!active) return;
 
 			TypeSpecificUpdate();
-			if (needsRecalculation)
+			if (needsResize)
 			{
 				SetRect(rect);
 			}
