@@ -20,7 +20,6 @@ namespace LiveRepl.UI.ReplParts
 			{
 				repl.needsResize=true;
 			}
-			//repl.needsResize=true;
 		}
 
 		public override Vector2 MinSize
@@ -32,6 +31,7 @@ namespace LiveRepl.UI.ReplParts
 				{
 					minHeight+=ScrollbarWidth;
 				}
+				Debug.Log("minHeight "+minHeight);
 				return new Vector2(0, minHeight);
 			}
 		}

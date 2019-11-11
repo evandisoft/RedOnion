@@ -62,6 +62,8 @@ namespace LiveRepl.UI.ReplParts
 				};
 			}
 
+			InterceptMostInput();
+
 			bool hadKeyDownThisUpdate=Event.current.type==EventType.KeyDown;
 
 			base.DecoratorUpdate();
@@ -73,6 +75,31 @@ namespace LiveRepl.UI.ReplParts
 					contentControl.content.text = contentControl.content.text.Substring(contentControl.content.text.Length - OUTPUT_LENGTH_LIMIT, OUTPUT_LENGTH_LIMIT);
 				}
 				needsResize=true;
+			}
+		}
+
+		void InterceptMostInput()
+		{
+			if (contentControl.HasFocus() && Event.current.type == EventType.KeyDown)
+			{
+				switch (Event.current.keyCode) {
+				case KeyCode.Insert:
+				case KeyCode.LeftControl:
+				case KeyCode.RightControl:
+				case KeyCode.C:
+					if (!Event.current.control) {
+						// Don't give focus for the followup char events.
+						if(Event.current.keyCode!=KeyCode.None)
+							repl.replInputArea.contentControl.GrabFocus();
+					}
+					break;
+
+				default:
+					// Don't give focus for the followup char events.
+					if (Event.current.keyCode != KeyCode.None)
+						repl.replInputArea.contentControl.GrabFocus();
+					break;
+				}
 			}
 		}
 	}

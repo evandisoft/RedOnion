@@ -18,8 +18,8 @@ namespace Kerbalui.Decorators
 		protected TextEditor editor;
 		public int LineNumber { get; private set; } = 1;
 		public int ColumnNumber { get; private set; } = 1;
-		public int CursorIndex { get; private set; }
-		public int SelectIndex { get; private set; }
+		public int CursorIndex { get; set; }
+		public int SelectIndex { get; set; }
 
 		public EditableText editableTextControl;
 
