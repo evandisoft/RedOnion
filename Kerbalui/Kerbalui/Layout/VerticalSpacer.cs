@@ -3,9 +3,9 @@ using System.Linq;
 using Kerbalui.Types;
 using UnityEngine;
 using Kerbalui.Controls.Abstract;
-using Kerbalui.Groups.Abstract;
+using Kerbalui.Layout.Abstract;
 
-namespace Kerbalui.Groups
+namespace Kerbalui.Layout
 {
 	/// <summary>
 	/// Accepts Elements with associated weights. A weight of 0 will reserve, for that element, space

@@ -2,7 +2,7 @@
 using Kerbalui.Types;
 using Kerbalui.Decorators;
 using Kerbalui.Controls;
-using Kerbalui.Groups;
+using Kerbalui.Layout;
 
 namespace LiveRepl.UI.EditorParts
 {

@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using Kerbalui.Types;
-using Kerbalui.Groups;
+using Kerbalui.Layout;
 using Kerbalui.Controls;
 
 namespace LiveRepl.UI.EditorParts

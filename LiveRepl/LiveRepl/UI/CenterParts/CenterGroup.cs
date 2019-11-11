@@ -1,8 +1,7 @@
 ﻿using System;
 using Kerbalui.Controls;
-using Kerbalui.Groups;
+using Kerbalui.Layout;
 using Kerbalui.Types;
-using UnityEngine;
 
 namespace LiveRepl.UI.CenterParts
 {
@@ -18,9 +17,9 @@ namespace LiveRepl.UI.CenterParts
 		{
 			this.contentGroup=contentGroup;
 
-			AddMinSized(new Button("Stop", ()=>throw new NotImplementedException("Centergroup stop button")));
 			AddMinSized(new Button("<<", contentGroup.scriptWindow.ToggleEditor));
 			AddMinSized(new Button(">>", contentGroup.scriptWindow.ToggleRepl));
+			AddMinSized(new Button("Terminate", () => throw new NotImplementedException("Centergroup stop button")));
 		}
 	}
 }

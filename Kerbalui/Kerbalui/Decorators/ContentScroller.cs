@@ -38,7 +38,6 @@ namespace Kerbalui.Decorators
 				Math.Max(contentSize.x, rect.width),
 				Math.Max(contentSize.y, rect.height)
 				);
-			
 		}
 
 		protected override void DecoratorUpdate()

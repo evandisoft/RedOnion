@@ -124,7 +124,7 @@
     <Compile Include="Kerbalui\Controls\TextField.cs" />
     <Compile Include="Kerbalui\Decorators\ContentScroller.cs" />
     <Compile Include="Kerbalui\Decorators\EditingArea.cs" />
-    <Compile Include="Kerbalui\Groups\HorizontalSpacer.cs" />
+    <Compile Include="Kerbalui\Layout\HorizontalSpacer.cs" />
     <Compile Include="Kerbalui\Types\Control.cs" />
     <Compile Include="Kerbalui\Types\Decorator.cs" />
     <Compile Include="Kerbalui\Types\Element.cs" />
@@ -133,8 +133,9 @@
     <Compile Include="Kerbalui\EventHandling\KeyBindings.cs" />
     <Compile Include="Kerbalui\EventHandling\EventKey.cs" />
     <Compile Include="Kerbalui\Util\GUILibUtil.cs" />
-    <Compile Include="Kerbalui\Groups\Abstract\Spacer.cs" />
-    <Compile Include="Kerbalui\Groups\VerticalSpacer.cs" />
+    <Compile Include="Kerbalui\Layout\Abstract\Spacer.cs" />
+    <Compile Include="Kerbalui\Layout\VerticalSpacer.cs" />
+    <Compile Include="Kerbalui\Layout\Filler.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
@@ -151,12 +152,12 @@
     <Folder Include="Kerbalui\" />
     <Folder Include="Kerbalui\Controls\" />
     <Folder Include="Kerbalui\Decorators\" />
-    <Folder Include="Kerbalui\Groups\" />
+    <Folder Include="Kerbalui\Layout\" />
     <Folder Include="Kerbalui\Types\" />
     <Folder Include="Kerbalui\EventHandling\" />
     <Folder Include="Kerbalui\Util\" />
     <Folder Include="Kerbalui\Interfaces\" />
-    <Folder Include="Kerbalui\Groups\Abstract\" />
+    <Folder Include="Kerbalui\Layout\Abstract\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>

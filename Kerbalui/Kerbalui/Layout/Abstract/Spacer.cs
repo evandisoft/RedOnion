@@ -5,7 +5,7 @@ using Kerbalui.Controls.Abstract;
 using Kerbalui.Types;
 using UnityEngine;
 
-namespace Kerbalui.Groups.Abstract
+namespace Kerbalui.Layout.Abstract
 {
 	/// <summary>
 	/// Contains common functionality for the Vertical and Horizontal Spacers.
