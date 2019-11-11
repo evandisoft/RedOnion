@@ -133,6 +133,8 @@
     <Compile Include="Kerbalui\EventHandling\KeyBindings.cs" />
     <Compile Include="Kerbalui\EventHandling\EventKey.cs" />
     <Compile Include="Kerbalui\Util\GUILibUtil.cs" />
+    <Compile Include="Kerbalui\Groups\Abstract\Spacer.cs" />
+    <Compile Include="Kerbalui\Groups\VerticalSpacer.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
@@ -154,6 +156,7 @@
     <Folder Include="Kerbalui\EventHandling\" />
     <Folder Include="Kerbalui\Util\" />
     <Folder Include="Kerbalui\Interfaces\" />
+    <Folder Include="Kerbalui\Groups\Abstract\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>

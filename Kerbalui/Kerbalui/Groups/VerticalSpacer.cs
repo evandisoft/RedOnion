@@ -14,15 +14,15 @@ namespace Kerbalui.Groups
 	/// The space not taken up by weight 0 content controls is divided up among the rest of the elements based on their
 	/// weights relative to the total weight sum of all elements.
 	/// </summary>
-	public class HorizontalSpacer:Spacer
+	public class VerticalSpacer:Spacer
 	{
 		protected override void SetChildRects()
 		{
-			var points=CalculateSpacingPoints(MinContentWidth,rect.width);
+			var points=CalculateSpacingPoints(MinContentHeight,rect.height);
 
-			for (int i = 0; i<spacerEntries.Count; i++)
+			for(int i = 0; i<spacerEntries.Count; i++)
 			{
-				spacerEntries[i].element.SetRect(new Rect(points[i],0, points[i+1]-points[i], rect.height));
+				spacerEntries[i].element.SetRect(new Rect(0, points[i], rect.width, points[i+1]-points[i]));
 			}
 		}
 	}
