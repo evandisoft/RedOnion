@@ -44,7 +44,9 @@ namespace RedOnion.KSP.ROS
 		{
 			if (waiter != null)
 				StopCoroutine(waiter);
+#if DEBUG // not ready yet for release
 			StartCoroutine(waiter = StartScript("os/main.ros"));
+#endif
 		}
 
 		private void OnDestroy()

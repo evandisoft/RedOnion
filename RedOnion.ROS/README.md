@@ -286,6 +286,27 @@ if some other parallel function can do `obj = null`).
 *Future plan: `using` statement - subscription objects are disposable.*
 
 
+## Running other scripts
+
+Function `run` (`system.run` - but namespace `system`
+is automatically included in the scope) can execute other scripts.
+
+* `run path` - calls a script like a function
+  (suspends execution of current script until the one called exits).
+* `run.library path` - calls a script in current context, sharing script-local scope.
+  This is useful for libraries if you want to share script-local scope
+  (you would otherwise have to use `system.globals`).
+* `run.replace path` - terminates current script and replaces it with the one referenced.
+  This is good for big switch in logic (e.g. launch - circularize - gen. control).
+
+* `run.source string` - like `run path`, but parses the input string directly
+  This can be used to evaluate expressions or whole scripts created as text.
+* `run.library.source` and `run.replace.source` - like the respective *`run.xxx path`*
+  but accepting text.
+
+*Future plan: creating new processors/processes and load monitoring.*
+
+
 ## Advanced stuff
 
 ```
