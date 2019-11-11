@@ -111,6 +111,7 @@
     <Compile Include="LiveRepl\UI\ReplParts\Repl.cs" />
     <Compile Include="LiveRepl\UI\ReplParts\ReplInputArea.cs" />
     <Compile Include="LiveRepl\UI\ReplParts\ReplOutoutArea.cs" />
+    <Compile Include="LiveRepl\UI\CompletionParts\CompletionArea.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
