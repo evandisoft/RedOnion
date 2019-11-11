@@ -57,29 +57,39 @@ namespace LiveRepl.UI
 			return width;
 		}
 
+		public void ToggleEditor()
+		{
+			EditorVisible=!editorVisible;
+		}
+
+		public void ToggleRepl()
+		{
+			ReplVisible=!replVisible;
+		}
+
 		private bool editorVisible = true;
 		public bool EditorVisible
 		{
 			get => editorVisible;
 			set
 			{
-				if (value)
-				{
-					if (!editorVisible)
-					{
-						rect.x-=editorGroupWidth;
-						rect.width+=editorGroupWidth;
-					}
-				}
-				else
+				if (value!=editorVisible) 
 				{
 					if (editorVisible)
 					{
 						rect.x+=editorGroupWidth;
 						rect.width-=editorGroupWidth;
 					}
+					else
+					{
+						rect.x-=editorGroupWidth;
+						rect.width+=editorGroupWidth;
+					}
+
+					contentGroup.completionGroup.active=editorVisible || replVisible;
+					contentGroup.editorGroup.active=editorVisible=value;
+					needsRecalculation=true;
 				}
-				editorVisible=value;
 			}
 		}
 
@@ -89,21 +99,21 @@ namespace LiveRepl.UI
 			get => replVisible;
 			set
 			{
-				if (value)
-				{
-					if (!replVisible)
-					{
-						rect.width+=replGroupWidth;
-					}
-				}
-				else
+				if (value!=replVisible)
 				{
 					if (replVisible)
 					{
 						rect.width-=replGroupWidth;
 					}
+					else
+					{
+						rect.width+=replGroupWidth;
+					}
+
+					contentGroup.completionGroup.active=editorVisible || replVisible;
+					contentGroup.replGroup.active=replVisible=value;
+					needsRecalculation=true;
 				}
-				replVisible=value;
 			}
 		}
 	}

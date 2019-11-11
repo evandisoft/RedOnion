@@ -21,11 +21,11 @@ namespace LiveRepl.UI.EditorParts
 		{
 			this.editorGroup=editorGroup;
 			//TODO: use script name input field instead of generic textfield
-			Add(3, inputField=new TextField());
-			Add(0, changesIndicator);
-			Add(1, new Button("Save", () => throw new NotImplementedException("Save Button not Implemented")));
-			Add(1, new Button("Load", () => throw new NotImplementedException("Load Button not Implemented")));
-			Add(1, new Button("Run", () => throw new NotImplementedException("Run Button not Implemented")));
+			AddWeighted(3, inputField=new TextField());
+			AddMinSized(changesIndicator);
+			AddWeighted(1, new Button("Save", () => throw new NotImplementedException("Save Button not Implemented")));
+			AddWeighted(1, new Button("Load", () => throw new NotImplementedException("Load Button not Implemented")));
+			AddWeighted(1, new Button("Run", () => throw new NotImplementedException("Run Button not Implemented")));
 		}
 	}
 }

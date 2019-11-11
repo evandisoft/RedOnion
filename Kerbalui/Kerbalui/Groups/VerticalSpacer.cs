@@ -25,5 +25,23 @@ namespace Kerbalui.Groups
 				spacerEntries[i].element.SetRect(new Rect(0, spacingPoints[i], rect.width, spacingPoints[i+1]-spacingPoints[i]));
 			}
 		}
+
+		public override Vector2 MinSize
+		{
+			get
+			{
+				Vector2 minSize=new Vector2();
+				foreach (var spacerEntry in spacerEntries)
+				{
+					if (spacerEntry.element is ContentControl contentControl)
+					{
+						Vector2 contentMinSize=contentControl.MinSize;
+						minSize.x=Mathf.Max(minSize.x, contentMinSize.x);
+						minSize.y+=contentMinSize.y;
+					}
+				}
+				return minSize;
+			}
+		}
 	}
 }

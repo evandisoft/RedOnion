@@ -17,7 +17,7 @@ namespace LiveRepl.UI.CompletionParts
 
 		protected override void SetChildRects()
 		{
-			//TODO
+			//TODO:
 		}
 	}
 }

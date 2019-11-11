@@ -20,7 +20,7 @@ namespace LiveRepl.UI.EditorParts
 		public Editor(EditorGroup editorGroup) : base(new TextArea())
 		{
 			this.editorGroup=editorGroup;
-			//TODO Define keybindings here.
+			//TODO: Define keybindings here.
 		}
 
 		protected override void DecoratorUpdate()
@@ -30,10 +30,7 @@ namespace LiveRepl.UI.EditorParts
 
 				keybindings.ExecuteAndConsumeIfMatched(Event.current);
 			} 
-			//if (HasFocus()) {
-			//	int id = GUIUtility.keyboardControl;
-			//	Debug.Log("Id for editor is " + id);
-			//}
+
 			base.DecoratorUpdate();
 
 			editorGroup.editorStatusLabel.UpdateCursorInfo(LineNumber, ColumnNumber);

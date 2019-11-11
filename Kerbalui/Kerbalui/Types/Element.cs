@@ -7,6 +7,13 @@ namespace Kerbalui.Types
 	public abstract class Element
 	{
 		public Rect rect;
+
+		/// <summary>
+		/// If the update function for this element should be called. Setting this to false will disable update
+		/// and also disable taking up space in a spacer.
+		/// </summary>
+		public bool active=true;
+
 		/// <summary>
 		/// needsRecalculation triggers an recalculation of rects after the first update.
 		/// I'm setting it to true by default because before the first update the defaultSkin is not set.
@@ -27,6 +34,8 @@ namespace Kerbalui.Types
 		/// </summary>
 		public void Update()
 		{
+			if (!active) return;
+
 			TypeSpecificUpdate();
 			if (needsRecalculation)
 			{

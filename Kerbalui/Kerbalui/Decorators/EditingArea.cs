@@ -80,12 +80,9 @@ namespace Kerbalui.Decorators
 
 				if (hadKeyDownThisUpdate && Event.current.type == EventType.Used)
 				{
-					//Debug.Log("hadKeyDownThisUpdate");
-					//Debug.Log(CursorX() + "," + CursorY() + "," + Event.current.mousePosition);
 					AdjustScrollX();
 					AdjustScrollY();
 				}
-				//Debug.Log(scrollPos);
 			}
 			else
 			{

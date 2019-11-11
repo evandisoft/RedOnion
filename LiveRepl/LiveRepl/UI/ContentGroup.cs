@@ -1,3 +1,4 @@
+using Kerbalui.Groups;
 using Kerbalui.Types;
 using LiveRepl.UI.CenterParts;
 using LiveRepl.UI.CompletionParts;
@@ -10,46 +11,23 @@ namespace LiveRepl.UI
 	/// <summary>
 	/// This Group represents the content area of the ScriptWindow
 	/// </summary>
-	public class ContentGroup:Group
+	public class ContentGroup:HorizontalSpacer
 	{
 		public ScriptWindow scriptWindow;
 
-		private EditorGroup editorGroup;
-		private CenterGroup centerGroup;
-		private ReplGroup replGroup;
-		private CompletionGroup completionGroup;
+		public EditorGroup editorGroup;
+	    public CenterGroup centerGroup;
+		public ReplGroup replGroup;
+		public CompletionGroup completionGroup;
 
 		public ContentGroup(ScriptWindow scriptWindow)
 		{
 			this.scriptWindow=scriptWindow;
 
-			RegisterForUpdate(editorGroup=new EditorGroup(this));
-			RegisterForUpdate(centerGroup=new CenterGroup(this));
-			RegisterForUpdate(replGroup=new ReplGroup(this));
-			RegisterForUpdate(completionGroup=new CompletionGroup(this));
-		}
-
-		protected override void SetChildRects()
-		{
-			editorGroup.SetRect(new Rect(0, 0, ScriptWindow.editorGroupWidth, rect.height));
-
-			float x=0;
-			if (scriptWindow.EditorVisible)
-			{
-				x+=editorGroup.rect.width;
-			}
-			centerGroup.SetRect(new Rect(x, 0, ScriptWindow.centerGroupWidth, rect.height));
-
-			Rect centerGroupRect=centerGroup.rect;
-			x=centerGroupRect.x+centerGroupRect.width;
-			replGroup.SetRect(new Rect(x, 0, ScriptWindow.replGroupWidth, rect.height));
-
-			x=centerGroupRect.x+centerGroupRect.width;
-			if (scriptWindow.ReplVisible)
-			{
-				x+=replGroup.rect.width;
-			}
-			completionGroup.SetRect(new Rect(x, 0, ScriptWindow.completionGroupWidth, rect.height));
+			AddFixed(ScriptWindow.editorGroupWidth, editorGroup=new EditorGroup(this));
+			AddFixed(ScriptWindow.centerGroupWidth, centerGroup=new CenterGroup(this));
+			AddFixed(ScriptWindow.replGroupWidth, replGroup=new ReplGroup(this));
+			AddFixed(ScriptWindow.completionGroupWidth, completionGroup=new CompletionGroup(this));
 		}
 	}
 }
