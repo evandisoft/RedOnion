@@ -12,7 +12,7 @@ using LiveRepl.UI;
 
 namespace LiveRepl.Main
 {
-	public partial class ReplMain
+	public partial class OldReplMain
 	{
 		const int maxOutputBytes = 80000;
 		public const string title="Live REPL";
@@ -31,7 +31,7 @@ namespace LiveRepl.Main
 
 		public ScriptWindow scriptWindow=new ScriptWindow(title);
 
-		public ReplMain()
+		public OldReplMain()
 		{
 
 		}

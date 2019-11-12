@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace LiveRepl.Main
 {
-	public partial class ReplMain
+	public partial class OldReplMain
 	{
 		List<Evaluation> evaluationList = new List<Evaluation>();
 		public ReplEvaluator currentReplEvaluator;

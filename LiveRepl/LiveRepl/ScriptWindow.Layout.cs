@@ -1,6 +1,7 @@
 using System;
 using Kerbalui.Types;
 using LiveRepl.UI.ReplParts;
+using RedOnion.KSP.Settings;
 using UnityEngine;
 
 namespace LiveRepl
@@ -23,8 +24,10 @@ namespace LiveRepl
 			AssignContent(contentGroup=new ContentGroup(this));
 			repl=contentGroup.replGroup.repl;
 
-			rect.x=startingX;
-			rect.y=startingY;
+			EditorVisible = bool.Parse(SavedSettings.LoadSetting("editorVisible", "true"));
+			ReplVisible = bool.Parse(SavedSettings.LoadSetting("replVisible", "true"));
+			rect.x = float.Parse(SavedSettings.LoadSetting("WindowPositionX", startingX.ToString()));
+			rect.y = float.Parse(SavedSettings.LoadSetting("WindowPositionY",startingY.ToString()));
 			rect.width=WindowWidth();
 			rect.height=windowHeight;
 		}

@@ -22,6 +22,8 @@ namespace LiveRepl
 			InitEvaluation();
 			InitCompletion();
 			InitializeGlobalKeyBindings();
+
+			contentGroup.editorGroup.LoadEditorText();
 		}
 
 		void InitCompletion()
@@ -58,6 +60,14 @@ namespace LiveRepl
 			{
 				Event.current.Use();
 			}
+		}
+
+		public void OnDestroy()
+		{
+			SavedSettings.SaveSetting("WindowPositionX", rect.x.ToString());
+			SavedSettings.SaveSetting("WindowPositionY", rect.y.ToString());
+			SavedSettings.SaveSetting("editorVisible", editorVisible.ToString());
+			SavedSettings.SaveSetting("replVisible", replVisible.ToString());
 		}
 	}
 }

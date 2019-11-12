@@ -12,9 +12,9 @@ namespace LiveRepl.Other {
 	/// </summary>
 	public class OldEditingAreaCompletionAdapter:ICompletableElement {
 		public EditingArea editingArea;
-		public ReplMain replMain;
+		public OldReplMain replMain;
 
-		public OldEditingAreaCompletionAdapter(EditingArea editingArea, ReplMain replMain)
+		public OldEditingAreaCompletionAdapter(EditingArea editingArea, OldReplMain replMain)
 		{
 			this.editingArea = editingArea;
 			this.replMain = replMain;

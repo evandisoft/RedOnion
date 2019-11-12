@@ -26,17 +26,11 @@ namespace LiveRepl.UI.EditorParts {
 				} else {
 					Text = defaultScriptFilename;
 				}
-			}
+			};
+
 			keybindings.Clear();
 		}
 
-		//public new KeyBindings KeyBindings = new KeyBindings();
-
-		//protected override void ProtectedUpdate()
-		//{
-		//	if (HasFocus()) KeyBindings.ExecuteAndConsumeIfMatched(Event.current);
-		//	base.ProtectedUpdate();
-		//}
 		protected override void DecoratorUpdate()
 		{
 			base.DecoratorUpdate();
