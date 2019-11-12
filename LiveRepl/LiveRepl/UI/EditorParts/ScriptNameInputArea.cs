@@ -54,7 +54,7 @@ namespace LiveRepl.UI.EditorParts {
 				SelectIndex=CursorIndex = Text.Length;
 			}
 
-			Text=LoadText();
+			fileIOGroup.editorGroup.editor.editingArea.Text=LoadText();
 		}
 
 		public string PartialCompletion()

@@ -23,6 +23,7 @@ namespace LiveRepl.UI.CenterParts
 			AddMinSized(new Button("<<", scriptWindow.ToggleEditor));
 			AddMinSized(new Button(">>", scriptWindow.ToggleRepl));
 			AddMinSized(new Button("Terminate", scriptWindow.Terminate));
+			AddMinSized(new Button("Show Hotkeys", scriptWindow.PrintKeyBindingsInOutputArea));
 			AddMinSized(scriptEngineSelector=new ScriptEngineSelector(this));
 		}
 	}

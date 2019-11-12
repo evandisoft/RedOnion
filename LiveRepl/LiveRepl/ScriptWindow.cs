@@ -21,6 +21,7 @@ namespace LiveRepl
 			InitLayout();
 			InitEvaluation();
 			InitCompletion();
+			InitializeGlobalKeyBindings();
 		}
 
 		void InitCompletion()
@@ -36,6 +37,7 @@ namespace LiveRepl
 		{
 			if (ScriptRunning) HandleInputWhenExecuting();
 
+			GlobalKeyBindings.ExecuteAndConsumeIfMatched(Event.current);
 			completionManager.Update(hadMouseDownLastUpdate);
 			hadMouseDownLastUpdate=Event.current.type==EventType.MouseDown;
 			base.WindowsUpdate();

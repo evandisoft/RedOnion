@@ -19,6 +19,7 @@ namespace LiveRepl.UI.ReplParts
 		void CommonOutputProcessing()
 		{
 			ResetScroll();
+			repl.needsResize=true;
 		}
 
 		public void AddReturnValue(string str)
