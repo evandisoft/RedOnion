@@ -25,6 +25,7 @@ namespace Kerbalui.Layout.Abstract
 			spacerEntries.Add(spacerEntry);
 			RegisterForUpdate(spacerEntry.element);
 			needsResize=true;
+			PostAddElement();
 		}
 		public void AddWeighted(float weight, Element element)
 		{
@@ -39,6 +40,14 @@ namespace Kerbalui.Layout.Abstract
 			Add(new SpacerEntry(0, element, SpacerEntryType.MINSIZED));
 		}
 
+		/// <summary>
+		/// Subclasses can override this to specify additional behavior occuring after an "Add", for example,
+		/// to trigger a resize on a parent component.
+		/// </summary>
+		protected virtual void PostAddElement()
+		{
+
+		}
 		/// <summary>
 		/// Returns the minimum content size for elements that are contentControls and have style initialized.
 		/// Otherwise returns zero.

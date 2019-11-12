@@ -112,6 +112,8 @@
     <Compile Include="LiveRepl\UI\ReplParts\ReplInputArea.cs" />
     <Compile Include="LiveRepl\UI\ReplParts\ReplOutoutArea.cs" />
     <Compile Include="LiveRepl\UI\CompletionParts\CompletionArea.cs" />
+    <Compile Include="LiveRepl\UI\CenterParts\ScriptEngineSelector.cs" />
+    <Compile Include="LiveRepl\UI\CenterParts\ScriptEngineLabel.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

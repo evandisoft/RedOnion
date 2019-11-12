@@ -13,6 +13,8 @@ namespace LiveRepl.UI.CenterParts
 	{
 		public ContentGroup contentGroup;
 
+		public ScriptEngineSelector scriptEngineSelector;
+
 		public CenterGroup(ContentGroup contentGroup)
 		{
 			this.contentGroup=contentGroup;
@@ -20,6 +22,7 @@ namespace LiveRepl.UI.CenterParts
 			AddMinSized(new Button("<<", contentGroup.scriptWindow.ToggleEditor));
 			AddMinSized(new Button(">>", contentGroup.scriptWindow.ToggleRepl));
 			AddMinSized(new Button("Terminate", () => throw new NotImplementedException("Centergroup stop button")));
+			AddMinSized(scriptEngineSelector=new ScriptEngineSelector(this));
 		}
 	}
 }
