@@ -16,7 +16,7 @@ namespace Kerbalui.Decorators
 		//int inc = 0;
 		const int spacesPerTab = 4;
 		public KeyBindings keybindings = new KeyBindings();
-		public TextEditor editor;
+		public TextEditor backingEditor;
 		public int LineNumber { get; private set; } = 1;
 		public int ColumnNumber { get; private set; } = 1;
 		public int CursorIndex { get; set; }
@@ -29,7 +29,7 @@ namespace Kerbalui.Decorators
 		public void GrabFocus() => editableText.GrabFocus();
 
 		public EditableText editableText;
-		public bool EditorAssigned { get => editor!=null; }
+		public bool EditorAssigned { get => backingEditor!=null; }
 
 		public bool hadKeyDownThisUpdate = false;
 
@@ -50,11 +50,11 @@ namespace Kerbalui.Decorators
 		protected override void DecoratorUpdate()
 		{
 			// Initialize editor
-			if (editor == null)
+			if (backingEditor == null)
 			{
 				editableText.GrabFocus();
 				int id = GUIUtility.keyboardControl;
-				editor = (TextEditor)GUIUtility.GetStateObject(typeof(TextEditor), id);
+				backingEditor = (TextEditor)GUIUtility.GetStateObject(typeof(TextEditor), id);
 			}
 
 			if (editableText.style == null)
@@ -70,10 +70,10 @@ namespace Kerbalui.Decorators
 			if (editableText.HasFocus())
 			{
 				int id = GUIUtility.keyboardControl;
-				editor = (TextEditor)GUIUtility.GetStateObject(typeof(TextEditor), id);
-				editor.text = editableText.content.text;
-				editor.cursorIndex = CursorIndex;
-				editor.selectIndex = SelectIndex;
+				backingEditor = (TextEditor)GUIUtility.GetStateObject(typeof(TextEditor), id);
+				backingEditor.text = editableText.content.text;
+				backingEditor.cursorIndex = CursorIndex;
+				backingEditor.selectIndex = SelectIndex;
 
 				hadKeyDownThisUpdate = Event.current.type == EventType.KeyDown;
 				HandleInput();
@@ -81,12 +81,12 @@ namespace Kerbalui.Decorators
 				LineNumber = CurrentLineNumber() + 1;
 				ColumnNumber = CharsFromLineStart() + 1;
 
-				editableText.content.text = editor.text;
+				editableText.content.text = backingEditor.text;
 
 				editableText.Update();
 
-				CursorIndex = editor.cursorIndex;
-				SelectIndex = editor.selectIndex;
+				CursorIndex = backingEditor.cursorIndex;
+				SelectIndex = backingEditor.selectIndex;
 
 				//if (hadKeyDownThisUpdate && Event.current.type == EventType.Used)
 				//{
@@ -171,57 +171,57 @@ namespace Kerbalui.Decorators
 		{
 			keybindings.Add(new EventKey(KeyCode.Home, true, true), () =>
 			{
-				editor.SelectTextStart();
+				backingEditor.SelectTextStart();
 			});
 			keybindings.Add(new EventKey(KeyCode.End, true, true), () =>
 			{
-				editor.SelectTextEnd();
+				backingEditor.SelectTextEnd();
 			});
 			keybindings.Add(new EventKey(KeyCode.Home, true), () =>
 			{
-				editor.MoveTextStart();
+				backingEditor.MoveTextStart();
 			});
 			keybindings.Add(new EventKey(KeyCode.End, true), () =>
 			{
-				editor.MoveTextEnd();
+				backingEditor.MoveTextEnd();
 			});
 			keybindings.Add(new EventKey(KeyCode.Insert, true), () =>
 			{
-				editor.Copy();
+				backingEditor.Copy();
 			});
 			keybindings.Add(new EventKey(KeyCode.Insert, false, true), () =>
 			{
-				editor.Paste();
+				backingEditor.Paste();
 			});
 			keybindings.Add(new EventKey(KeyCode.Backspace, false, true), () =>
 			{
 				int toMove = NextTabLeft(CursorIndex);
 				for (int i = 0; i < toMove; i++)
 				{
-					editor.Backspace();
+					backingEditor.Backspace();
 				}
 			});
 			keybindings.Add(new EventKey(KeyCode.Backspace, true), () =>
 			{
 				while (true)
 				{
-					if (editor.cursorIndex <= 0)
+					if (backingEditor.cursorIndex <= 0)
 					{
 						break;
 					}
 
-					if (editor.text[editor.cursorIndex - 1] == '\n')
+					if (backingEditor.text[backingEditor.cursorIndex - 1] == '\n')
 					{
 						break;
 					}
 
-					editor.Backspace();
+					backingEditor.Backspace();
 
-					if (editor.cursorIndex <= 0)
+					if (backingEditor.cursorIndex <= 0)
 					{
 						break;
 					}
-					if (editor.text[editor.cursorIndex - 1] == '.')
+					if (backingEditor.text[backingEditor.cursorIndex - 1] == '.')
 					{
 						break;
 					}
@@ -231,20 +231,20 @@ namespace Kerbalui.Decorators
 			keybindings.Add(new EventKey(KeyCode.Tab), () => Indent());
 			keybindings.Add(new EventKey(KeyCode.Tab, false, true), () => Unindent());
 			keybindings.Add(new EventKey(KeyCode.Tab, true), () => IndentToPreviousLine());
-			keybindings.Add(new EventKey(KeyCode.J, true), () => editor.MoveLeft());
-			keybindings.Add(new EventKey(KeyCode.J, true, true), () => editor.SelectLeft());
-			keybindings.Add(new EventKey(KeyCode.K, true), () => editor.MoveDown());
-			keybindings.Add(new EventKey(KeyCode.K, true, true), () => editor.SelectDown());
-			keybindings.Add(new EventKey(KeyCode.L, true), () => editor.MoveUp());
-			keybindings.Add(new EventKey(KeyCode.L, true, true), () => editor.SelectUp());
-			keybindings.Add(new EventKey(KeyCode.Semicolon, true), () => editor.MoveRight());
-			keybindings.Add(new EventKey(KeyCode.Semicolon, true, true), () => editor.SelectRight());
+			keybindings.Add(new EventKey(KeyCode.J, true), () => backingEditor.MoveLeft());
+			keybindings.Add(new EventKey(KeyCode.J, true, true), () => backingEditor.SelectLeft());
+			keybindings.Add(new EventKey(KeyCode.K, true), () => backingEditor.MoveDown());
+			keybindings.Add(new EventKey(KeyCode.K, true, true), () => backingEditor.SelectDown());
+			keybindings.Add(new EventKey(KeyCode.L, true), () => backingEditor.MoveUp());
+			keybindings.Add(new EventKey(KeyCode.L, true, true), () => backingEditor.SelectUp());
+			keybindings.Add(new EventKey(KeyCode.Semicolon, true), () => backingEditor.MoveRight());
+			keybindings.Add(new EventKey(KeyCode.Semicolon, true, true), () => backingEditor.SelectRight());
 			keybindings.Add(new EventKey(KeyCode.M, true), () =>
 			{
 				int toMove = NextTabLeft(CursorIndex);
 				for (int i = 0; i < toMove; i++)
 				{
-					editor.MoveLeft();
+					backingEditor.MoveLeft();
 				}
 			});
 			keybindings.Add(new EventKey(KeyCode.M, true, true), () =>
@@ -252,35 +252,35 @@ namespace Kerbalui.Decorators
 				int toMove = NextTabLeft(SelectIndex);
 				for (int i = 0; i < toMove; i++)
 				{
-					editor.MoveLeft();
+					backingEditor.MoveLeft();
 				}
 			});
 			keybindings.Add(new EventKey(KeyCode.Comma, true), () =>
 			{
 				for (int i = 0; i < 4; i++)
 				{
-					editor.MoveDown();
+					backingEditor.MoveDown();
 				}
 			});
 			keybindings.Add(new EventKey(KeyCode.Comma, true, true), () =>
 			{
 				for (int i = 0; i < 4; i++)
 				{
-					editor.SelectDown();
+					backingEditor.SelectDown();
 				}
 			});
 			keybindings.Add(new EventKey(KeyCode.Period, true), () =>
 			{
 				for (int i = 0; i < 4; i++)
 				{
-					editor.MoveUp();
+					backingEditor.MoveUp();
 				}
 			});
 			keybindings.Add(new EventKey(KeyCode.Period, true, true), () =>
 			{
 				for (int i = 0; i < 4; i++)
 				{
-					editor.SelectUp();
+					backingEditor.SelectUp();
 				}
 			});
 			keybindings.Add(new EventKey(KeyCode.Slash, true), () =>
@@ -288,7 +288,7 @@ namespace Kerbalui.Decorators
 				int toMove = NextTabRight(CursorIndex);
 				for (int i = 0; i < toMove; i++)
 				{
-					editor.MoveRight();
+					backingEditor.MoveRight();
 				}
 			});
 			keybindings.Add(new EventKey(KeyCode.Slash, true, true), () =>
@@ -296,7 +296,7 @@ namespace Kerbalui.Decorators
 				int toMove = NextTabRight(SelectIndex);
 				for (int i = 0; i < toMove; i++)
 				{
-					editor.MoveRight();
+					backingEditor.MoveRight();
 				}
 			});
 			keybindings.Add(new EventKey(KeyCode.H, true), () =>
@@ -311,22 +311,22 @@ namespace Kerbalui.Decorators
 			});
 			keybindings.Add(new EventKey(KeyCode.Return), () =>
 			{
-				editor.ReplaceSelection("\n");
+				backingEditor.ReplaceSelection("\n");
 				IndentToPreviousLine();
 			});
 			keybindings.Add(new EventKey(KeyCode.Return, false, true), () =>
 			{
-				editor.ReplaceSelection("\n");
+				backingEditor.ReplaceSelection("\n");
 				IndentToPreviousLine();
 			});
 		}
 
 		protected int NextTabLeft(int fromIndex)
 		{
-			int prevCursorIndex = editor.cursorIndex;
-			int prevSelectIndex = editor.selectIndex;
+			int prevCursorIndex = backingEditor.cursorIndex;
+			int prevSelectIndex = backingEditor.selectIndex;
 
-			editor.cursorIndex = fromIndex;
+			backingEditor.cursorIndex = fromIndex;
 			int charsFromStart = CharsFromLineStart();
 
 			// Don't spill over to next line
@@ -342,18 +342,18 @@ namespace Kerbalui.Decorators
 			}
 			//Debug.Log("Chars to move is " + charsToMove);
 
-			editor.cursorIndex = prevCursorIndex;
-			editor.selectIndex = prevSelectIndex;
+			backingEditor.cursorIndex = prevCursorIndex;
+			backingEditor.selectIndex = prevSelectIndex;
 
 			return charsToMove;
 		}
 
 		protected int NextTabRight(int fromIndex)
 		{
-			int prevCursorIndex = editor.cursorIndex;
-			int prevSelectIndex = editor.selectIndex;
+			int prevCursorIndex = backingEditor.cursorIndex;
+			int prevSelectIndex = backingEditor.selectIndex;
 
-			editor.cursorIndex = fromIndex;
+			backingEditor.cursorIndex = fromIndex;
 			int charsFromStart = CharsFromLineStart();
 
 
@@ -371,37 +371,37 @@ namespace Kerbalui.Decorators
 			}
 			//Debug.Log("Chars to move is " + charsToMove);
 
-			editor.cursorIndex = prevCursorIndex;
-			editor.selectIndex = prevSelectIndex;
+			backingEditor.cursorIndex = prevCursorIndex;
+			backingEditor.selectIndex = prevSelectIndex;
 
 			return charsToMove;
 		}
 
 		protected void InsertLineBefore()
 		{
-			editor.MoveLineStart();
-			editor.ReplaceSelection("\n");
-			editor.MoveLeft();
+			backingEditor.MoveLineStart();
+			backingEditor.ReplaceSelection("\n");
+			backingEditor.MoveLeft();
 		}
 
 		protected void InsertLineAfter()
 		{
-			editor.MoveLineEnd();
-			editor.ReplaceSelection("\n");
+			backingEditor.MoveLineEnd();
+			backingEditor.ReplaceSelection("\n");
 		}
 
 		protected void IndentToPreviousLine()
 		{
 			RemoveIndentation();
-			int currentIndex = editor.cursorIndex;
-			editor.MoveUp();
+			int currentIndex = backingEditor.cursorIndex;
+			backingEditor.MoveUp();
 			int indentation = StartingSpaces();
-			editor.MoveDown();
-			editor.MoveLineStart();
+			backingEditor.MoveDown();
+			backingEditor.MoveLineStart();
 
 			for (int i = 0; i < indentation; i++)
 			{
-				editor.Insert(' ');
+				backingEditor.Insert(' ');
 			}
 
 			int newIndex = currentIndex + indentation;
@@ -412,11 +412,11 @@ namespace Kerbalui.Decorators
 		protected void RemoveIndentation()
 		{
 			int indentation = StartingSpaces();
-			int newIndex = Math.Max(editor.cursorIndex - indentation, 0);
-			editor.MoveLineStart();
+			int newIndex = Math.Max(backingEditor.cursorIndex - indentation, 0);
+			backingEditor.MoveLineStart();
 			for (int i = 0; i < indentation; i++)
 			{
-				editor.Delete();
+				backingEditor.Delete();
 			}
 
 			MoveToIndex(newIndex);
@@ -431,11 +431,11 @@ namespace Kerbalui.Decorators
 			int charsNeeded = spacesPerTab - startingSpaces % spacesPerTab;
 			//Debug.Log("Chars needed " + charsNeeded);
 
-			int prevCursorIndex = editor.cursorIndex + spacesPerTab;
-			editor.MoveLineStart();
+			int prevCursorIndex = backingEditor.cursorIndex + spacesPerTab;
+			backingEditor.MoveLineStart();
 			for (int i = 0; i < charsNeeded; i++)
 			{
-				editor.Insert(' ');
+				backingEditor.Insert(' ');
 			}
 
 			MoveToIndex(prevCursorIndex);
@@ -461,22 +461,22 @@ namespace Kerbalui.Decorators
 
 			//Debug.Log("charsToDelete " + charsToDelete);
 
-			int prevCursorIndex = editor.cursorIndex;
-			editor.MoveLineStart();
-			int lineStartIndex = editor.cursorIndex;
+			int prevCursorIndex = backingEditor.cursorIndex;
+			backingEditor.MoveLineStart();
+			int lineStartIndex = backingEditor.cursorIndex;
 			int newIndex = Math.Max(lineStartIndex, prevCursorIndex - charsToDelete);
 
 			for (int i = 0; i < charsToDelete; i++)
 			{
-				editor.Delete();
+				backingEditor.Delete();
 			}
 			MoveToIndex(newIndex);
 		}
 
 		protected void MoveToIndex(int index)
 		{
-			editor.cursorIndex = index;
-			editor.selectIndex = index;
+			backingEditor.cursorIndex = index;
+			backingEditor.selectIndex = index;
 		}
 
 		/// <summary>
@@ -486,10 +486,10 @@ namespace Kerbalui.Decorators
 		/// <returns>The from line start.</returns>
 		protected int CharsFromLineStart()
 		{
-			int prevCursorIndex = editor.cursorIndex;
-			int prevSelectIndex = editor.selectIndex;
-			editor.MoveLineStart();
-			int startIndex = editor.cursorIndex;
+			int prevCursorIndex = backingEditor.cursorIndex;
+			int prevSelectIndex = backingEditor.selectIndex;
+			backingEditor.MoveLineStart();
+			int startIndex = backingEditor.cursorIndex;
 
 			int chars = prevCursorIndex - startIndex;
 
@@ -497,24 +497,24 @@ namespace Kerbalui.Decorators
 
 			//MoveToIndex(prevCursorIndex);
 
-			editor.cursorIndex = prevCursorIndex;
-			editor.selectIndex = prevSelectIndex;
+			backingEditor.cursorIndex = prevCursorIndex;
+			backingEditor.selectIndex = prevSelectIndex;
 
 			return chars;
 		}
 
 		protected int CharsFromLineEnd()
 		{
-			int prevCursorIndex = editor.cursorIndex;
-			int prevSelectIndex = editor.selectIndex;
-			editor.MoveLineEnd();
-			int endIndex = editor.cursorIndex;
+			int prevCursorIndex = backingEditor.cursorIndex;
+			int prevSelectIndex = backingEditor.selectIndex;
+			backingEditor.MoveLineEnd();
+			int endIndex = backingEditor.cursorIndex;
 
 			int chars = endIndex - prevCursorIndex;
 
 			//Debug.Log("chars from line start is " + chars);
-			editor.cursorIndex = prevCursorIndex;
-			editor.selectIndex = prevSelectIndex;
+			backingEditor.cursorIndex = prevCursorIndex;
+			backingEditor.selectIndex = prevSelectIndex;
 			//MoveToIndex(prevCursorIndex);
 
 			return chars;
@@ -551,19 +551,19 @@ namespace Kerbalui.Decorators
 		/// <returns>The line.</returns>
 		protected string CurrentLine()
 		{
-			int prevCursorIndex = editor.cursorIndex;
-			int prevSelectIndex = editor.selectIndex;
-			editor.MoveLineEnd();
-			int endIndex = editor.cursorIndex;
-			editor.MoveLineStart();
-			int startIndex = editor.cursorIndex;
-			string currentLine = editor.text.Substring(startIndex, endIndex - startIndex);
+			int prevCursorIndex = backingEditor.cursorIndex;
+			int prevSelectIndex = backingEditor.selectIndex;
+			backingEditor.MoveLineEnd();
+			int endIndex = backingEditor.cursorIndex;
+			backingEditor.MoveLineStart();
+			int startIndex = backingEditor.cursorIndex;
+			string currentLine = backingEditor.text.Substring(startIndex, endIndex - startIndex);
 
 			//Debug.Log("The Line is " + currentLine);
 
 			//MoveToIndex(prevCursorIndex);
-			editor.cursorIndex = prevCursorIndex;
-			editor.selectIndex = prevSelectIndex;
+			backingEditor.cursorIndex = prevCursorIndex;
+			backingEditor.selectIndex = prevSelectIndex;
 
 			return currentLine;
 		}
@@ -571,23 +571,23 @@ namespace Kerbalui.Decorators
 
 		protected int CurrentLineNumber()
 		{
-			int prevCursorIndex = editor.cursorIndex;
-			int prevSelectIndex = editor.selectIndex;
+			int prevCursorIndex = backingEditor.cursorIndex;
+			int prevSelectIndex = backingEditor.selectIndex;
 
 			int lineNum = 0;
-			editor.MoveLineStart();
+			backingEditor.MoveLineStart();
 			//Debug.Log("index is " + editor.cursorIndex);
 			//Debug.Log("lineNum is " + lineNum);
-			while (editor.cursorIndex > 0)
+			while (backingEditor.cursorIndex > 0)
 			{
-				editor.MoveUp();
+				backingEditor.MoveUp();
 				lineNum++;
 				//Debug.Log("index is " + editor.cursorIndex);
 				//Debug.Log("lineNum is " + lineNum);
 			}
 
-			editor.cursorIndex = prevCursorIndex;
-			editor.selectIndex = prevSelectIndex;
+			backingEditor.cursorIndex = prevCursorIndex;
+			backingEditor.selectIndex = prevSelectIndex;
 
 			return lineNum;
 		}

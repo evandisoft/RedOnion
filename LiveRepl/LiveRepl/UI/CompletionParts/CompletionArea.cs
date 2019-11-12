@@ -37,19 +37,19 @@ namespace LiveRepl.UI.CompletionParts
 
 		void UpdateCursorPosition()
 		{
-			if (editingArea.editor==null)
+			if (editingArea.backingEditor==null)
 			{
 				return;
 			}
 
-			editingArea.editor.MoveTextStart();
+			editingArea.backingEditor.MoveTextStart();
 			for (int i = 0; i < SelectionIndex; i++)
 			{
-				editingArea.editor.MoveDown();
+				editingArea.backingEditor.MoveDown();
 			}
 
-			editingArea.CursorIndex = editingArea.editor.cursorIndex;
-			editingArea.SelectIndex = editingArea.editor.selectIndex;
+			editingArea.CursorIndex = editingArea.backingEditor.cursorIndex;
+			editingArea.SelectIndex = editingArea.backingEditor.selectIndex;
 		}
 	}
 }

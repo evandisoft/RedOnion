@@ -16,11 +16,11 @@ namespace LiveRepl.UI
 		public const float startingY = 100;
 		public ContentGroup contentGroup;
 
-		public bool ScriptRunning { get; set; } = true;
+		public bool ScriptRunning { get; set; }
 
 		/// <summary>
 		/// Takes an action, action1, and returns an action that, when executed, will only
-		/// execute action1 if ScriptRuning returns true.
+		/// execute action1 if ScriptRunning returns true.
 		/// </summary>
 		/// <returns>The disabled action.</returns>
 		/// <param name="action1">The action.</param>

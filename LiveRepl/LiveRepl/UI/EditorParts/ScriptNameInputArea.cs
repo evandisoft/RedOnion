@@ -52,8 +52,8 @@ namespace LiveRepl.UI.EditorParts {
 				Text = completionContent[index];
 				SelectIndex=CursorIndex = Text.Length;
 			}
-			//editor.text=Load();
-			Text=Load();
+
+			Text=LoadText();
 		}
 
 		public string PartialCompletion()
@@ -66,7 +66,12 @@ namespace LiveRepl.UI.EditorParts {
 			SavedSettings.SaveSetting("lastScriptName", Text);
 		}
 
-		public void Save(string text)
+		public void SaveEditorText()
+		{
+			SaveText(fileIOGroup.editorGroup.editor.editingArea.Text);
+		}
+
+		public void SaveText(string text)
 		{
 			try {
 				var previousText = ""; 
@@ -90,7 +95,13 @@ namespace LiveRepl.UI.EditorParts {
 			}
 		}
 
-		public string Load()
+		public void LoadEditorText()
+		{
+			string text=LoadText();
+			fileIOGroup.editorGroup.editor.editingArea.Text=text;
+		}
+
+		public string LoadText()
 		{
 			string result = "";
 			try { 
