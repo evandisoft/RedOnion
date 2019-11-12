@@ -8,6 +8,8 @@ namespace Kerbalui.Decorators
 	{
 		public EditingArea editingArea;
 
+
+
 		public EditingAreaScroller(EditingArea editingArea)
 		{
 			this.editingArea=editingArea;
@@ -59,7 +61,7 @@ namespace Kerbalui.Decorators
 				resetScroll = false;
 			}
 
-			if (editingArea.hadKeyDownThisUpdate)
+			if (editingArea.ReceivedInput)
 			{
 				AdjustScrollX();
 				AdjustScrollY();

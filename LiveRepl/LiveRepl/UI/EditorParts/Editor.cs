@@ -15,7 +15,7 @@ namespace LiveRepl.UI.EditorParts
 		/// <summary>
 		/// These bindings intentionally shadow the base class bindings.
 		/// </summary>
-		public new KeyBindings keybindings = new KeyBindings();
+		public KeyBindings keybindings = new KeyBindings();
 
 		public Editor(EditorGroup editorGroup) : base(new EditingArea(new TextArea()))
 		{
@@ -34,9 +34,9 @@ namespace LiveRepl.UI.EditorParts
 
 			editorGroup.editorStatusLabel.UpdateCursorInfo(editingArea.LineNumber, editingArea.ColumnNumber);
 
-			if (editingArea.hadKeyDownThisUpdate)
+			if (editingArea.ReceivedInput)
 			{
-				editorGroup.fileIOGroup.changesIndicator.content.text="*";
+				editorGroup.fileIOGroup.editorChangesIndicator.Changed();
 				editorGroup.needsResize=true;
 			}
 		}

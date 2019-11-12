@@ -98,7 +98,6 @@
     <Compile Include="LiveRepl\Main\ReplMain.Evaluation.cs" />
     <Compile Include="LiveRepl\Main\ReplMain.KeyBindings.cs" />
     <Compile Include="LiveRepl\Main\TestWindow.cs" />
-    <Compile Include="LiveRepl\UI\ScriptWindow.cs" />
     <Compile Include="LiveRepl\Other\EditAreaCompletionAdapter.cs" />
     <Compile Include="LiveRepl\UI\ContentGroup.cs" />
     <Compile Include="LiveRepl\UI\EditorParts\EditorGroup.cs" />
@@ -115,6 +114,12 @@
     <Compile Include="LiveRepl\UI\CenterParts\ScriptEngineSelector.cs" />
     <Compile Include="LiveRepl\UI\CenterParts\ScriptEngineLabel.cs" />
     <Compile Include="LiveRepl\UI\EditorParts\ScriptNameInputArea.cs" />
+    <Compile Include="LiveRepl\ScriptWindow.cs" />
+    <Compile Include="LiveRepl\Interfaces\ICompletableElement.cs" />
+    <Compile Include="LiveRepl\Interfaces\ICompletionSelector.cs" />
+    <Compile Include="LiveRepl\Interfaces\IFocusable.cs" />
+    <Compile Include="LiveRepl\Adapters\EditAreaCompletionAdapter.cs" />
+    <Compile Include="LiveRepl\UI\EditorParts\EditorChangesIndicator.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
@@ -148,6 +153,8 @@
     <Folder Include="LiveRepl\UI\CompletionParts\" />
     <Folder Include="LiveRepl\UI\CenterParts\" />
     <Folder Include="LiveRepl\UI\ReplParts\" />
+    <Folder Include="LiveRepl\Interfaces\" />
+    <Folder Include="LiveRepl\Adapters\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>

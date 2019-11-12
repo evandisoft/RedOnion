@@ -7,12 +7,7 @@ namespace Kerbalui.Types
 	public abstract class Element
 	{
 		public Rect rect;
-
-		/// <summary>
-		/// If the update function for this element should be called. Setting this to false will disable update
-		/// and also disable taking up space in a spacer.
-		/// </summary>
-		public bool active=true;
+		public bool Active { get; set; } = true;
 
 		/// <summary>
 		/// needsRecalculation triggers an recalculation of rects after the first update.
@@ -34,7 +29,7 @@ namespace Kerbalui.Types
 		/// </summary>
 		public void Update()
 		{
-			if (!active) return;
+			if (!Active) return;
 
 			TypeSpecificUpdate();
 			if (needsResize)

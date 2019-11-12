@@ -13,7 +13,7 @@ namespace LiveRepl.UI.EditorParts
 	{
 		public EditorGroup editorGroup;
 
-		public Label changesIndicator=new Label("");
+		public EditorChangesIndicator editorChangesIndicator;
 
 		public ScriptNameInputArea scriptNameInputArea;
 
@@ -22,7 +22,7 @@ namespace LiveRepl.UI.EditorParts
 			this.editorGroup=editorGroup;
 
 			AddWeighted(3, scriptNameInputArea=new ScriptNameInputArea(this));
-			AddMinSized(changesIndicator);
+			AddMinSized(editorChangesIndicator=new EditorChangesIndicator(this));
 
 			ScriptWindow scriptWindow=editorGroup.contentGroup.scriptWindow;
 			AddWeighted(1, new Button("Save", scriptWindow.ScriptDisabledAction(scriptNameInputArea.LoadEditorText)));

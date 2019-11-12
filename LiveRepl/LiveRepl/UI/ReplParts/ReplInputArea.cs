@@ -16,7 +16,7 @@ namespace LiveRepl.UI.ReplParts
 		protected override void DecoratorUpdate()
 		{
 			base.DecoratorUpdate();
-			if (editingArea.hadKeyDownThisUpdate)
+			if (editingArea.ReceivedInput)
 			{
 				repl.needsResize=true;
 			}

@@ -22,7 +22,7 @@ namespace Kerbalui.Layout
 
 			for (int i = 0; i<spacerEntries.Count; i++)
 			{
-				if (spacerEntries[i].element.active)
+				if (spacerEntries[i].element.Active)
 				{
 					spacerEntries[i].element.SetRect(new Rect(spacingPoints[i], 0, spacingPoints[i+1]-spacingPoints[i], rect.height));
 				}

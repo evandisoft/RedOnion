@@ -1,8 +1,9 @@
 using System;
 using Kerbalui.Types;
+using LiveRepl.UI;
 using UnityEngine;
 
-namespace LiveRepl.UI
+namespace LiveRepl
 {
 	public partial class ScriptWindow:Window
 	{
@@ -103,8 +104,8 @@ namespace LiveRepl.UI
 						rect.width+=editorGroupWidth;
 					}
 
-					contentGroup.editorGroup.active=editorVisible=value;
-					contentGroup.completionGroup.active=editorVisible || replVisible;
+					contentGroup.editorGroup.Active=editorVisible=value;
+					contentGroup.completionGroup.Active=editorVisible || replVisible;
 					needsResize=true;
 				}
 			}
@@ -128,8 +129,8 @@ namespace LiveRepl.UI
 					}
 
 
-					contentGroup.replGroup.active=replVisible=value;
-					contentGroup.completionGroup.active=editorVisible || replVisible;
+					contentGroup.replGroup.Active=replVisible=value;
+					contentGroup.completionGroup.Active=editorVisible || replVisible;
 					needsResize=true;
 				}
 			}

@@ -31,8 +31,7 @@ namespace Kerbalui.Decorators
 		public EditableText editableText;
 		public bool EditorAssigned { get => backingEditor!=null; }
 
-		public bool hadKeyDownThisUpdate = false;
-
+		public bool ReceivedInput { get; set; }
 		/// <summary>
 		/// Setting this to true will not allow any key-down input events
 		/// to reach the control's default handling of events.
@@ -69,13 +68,14 @@ namespace Kerbalui.Decorators
 
 			if (editableText.HasFocus())
 			{
+				ReceivedInput = Event.current.type == EventType.KeyDown;
 				int id = GUIUtility.keyboardControl;
 				backingEditor = (TextEditor)GUIUtility.GetStateObject(typeof(TextEditor), id);
 				backingEditor.text = editableText.content.text;
 				backingEditor.cursorIndex = CursorIndex;
 				backingEditor.selectIndex = SelectIndex;
 
-				hadKeyDownThisUpdate = Event.current.type == EventType.KeyDown;
+
 				HandleInput();
 
 				LineNumber = CurrentLineNumber() + 1;
@@ -87,12 +87,6 @@ namespace Kerbalui.Decorators
 
 				CursorIndex = backingEditor.cursorIndex;
 				SelectIndex = backingEditor.selectIndex;
-
-				//if (hadKeyDownThisUpdate && Event.current.type == EventType.Used)
-				//{
-				//	AdjustScrollX();
-				//	AdjustScrollY();
-				//}
 			}
 			else
 			{

@@ -39,7 +39,7 @@ namespace LiveRepl.UI.EditorParts {
 		protected override void DecoratorUpdate()
 		{
 			base.DecoratorUpdate();
-			if (hadKeyDownThisUpdate)
+			if (ReceivedInput)
 			{
 				fileIOGroup.editorGroup.needsResize=true;
 			}
@@ -69,6 +69,7 @@ namespace LiveRepl.UI.EditorParts {
 		public void SaveEditorText()
 		{
 			SaveText(fileIOGroup.editorGroup.editor.editingArea.Text);
+			fileIOGroup.editorChangesIndicator.Unchanged();
 		}
 
 		public void SaveText(string text)
@@ -99,6 +100,7 @@ namespace LiveRepl.UI.EditorParts {
 		{
 			string text=LoadText();
 			fileIOGroup.editorGroup.editor.editingArea.Text=text;
+			fileIOGroup.editorChangesIndicator.Unchanged();
 		}
 
 		public string LoadText()

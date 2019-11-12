@@ -9,14 +9,15 @@ namespace Kerbalui.Types
 	public abstract class Control:Element
 	{
 		static long nextID = 0;
-		public readonly string controlName = "Control-"+nextID++;
+
+		public string ControlName { get; } = "Control-" + nextID++;
 
 		/// <summary>
 		/// </summary>
 		/// <returns><c>true</c>, if this control has focus, <c>false</c> otherwise.</returns>
 		public bool HasFocus()
 		{
-			return GUI.GetNameOfFocusedControl()==controlName;
+			return GUI.GetNameOfFocusedControl()==ControlName;
 		}
 
 		/// <summary>
@@ -24,12 +25,12 @@ namespace Kerbalui.Types
 		/// </summary>
 		public void GrabFocus()
 		{
-			GUI.FocusControl(controlName);
+			GUI.FocusControl(ControlName);
 		}
 
 		protected override void TypeSpecificUpdate()
 		{
-			GUI.SetNextControlName(controlName);
+			GUI.SetNextControlName(ControlName);
 			ControlUpdate();
 		}
 
