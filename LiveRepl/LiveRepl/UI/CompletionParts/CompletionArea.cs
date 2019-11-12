@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace LiveRepl.UI.CompletionParts
 {
-	public class CompletionArea:EditingArea
+	public class CompletionArea:OldEditingArea
 	{
 		public CompletionGroup completionGroup;
 
@@ -22,10 +22,10 @@ namespace LiveRepl.UI.CompletionParts
 			bool lastEventWasMouseDown = Event.current.type == EventType.MouseDown && rect.Contains(Event.current.mousePosition);
 			if (lastEventWasMouseDown)
 			{
-				editableTextControl.GrabFocus();
+				editableText.GrabFocus();
 			}
 
-			if (editableTextControl.HasFocus()) keybindings.ExecuteAndConsumeIfMatched(Event.current);
+			if (editableText.HasFocus()) keybindings.ExecuteAndConsumeIfMatched(Event.current);
 			base.DecoratorUpdate();
 
 			if (lastEventWasMouseDown && Event.current.type == EventType.Used && rect.Contains(Event.current.mousePosition))

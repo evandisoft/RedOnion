@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace LiveRepl.UI.ReplParts
 {
-	public class ReplOutoutArea:ContentScroller
+	public class ReplOutoutArea:OldContentScroller
 	{
 		public Repl repl;
 

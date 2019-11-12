@@ -1,9 +1,10 @@
+using System;
 using Kerbalui.Types;
 using UnityEngine;
 
 namespace LiveRepl.UI
 {
-	public class ScriptWindow:Window
+	public partial class ScriptWindow:Window
 	{
 		public const float windowHeight=600;
 		public const float editorGroupWidth = 500;
@@ -13,8 +14,23 @@ namespace LiveRepl.UI
 
 		public const float startingX = 100;
 		public const float startingY = 100;
-
 		public ContentGroup contentGroup;
+
+		public bool ScriptRunning { get; set; } = true;
+
+		/// <summary>
+		/// Returns an action that will not fire whenever the script is not running.
+		/// </summary>
+		/// <returns>The disabled action.</returns>
+		/// <param name="theAction">The action.</param>
+		public Action ScriptDisabledAction(Action theAction)
+		{
+			return () =>
+			{
+				if (ScriptRunning) return;
+				theAction();
+			};
+		}
 
 		public ScriptWindow(string title) : base(title)
 		{

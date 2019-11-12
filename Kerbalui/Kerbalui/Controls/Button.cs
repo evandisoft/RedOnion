@@ -5,13 +5,15 @@ using UnityEngine;
 
 namespace Kerbalui.Controls {
 	public class Button:ContentControl {
-		public Action action;
+		protected Action action;
 
 		public Button(string text, Action action)
 		{
 			content.text = text;
 			this.action = action;
 		}
+
+		public virtual Action Action { get => action; set => action=value; }
 
 		public override GUIStyle DefaultStyle()
 		{

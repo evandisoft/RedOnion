@@ -122,8 +122,8 @@
     <Compile Include="Kerbalui\Controls\Label.cs" />
     <Compile Include="Kerbalui\Controls\TextArea.cs" />
     <Compile Include="Kerbalui\Controls\TextField.cs" />
-    <Compile Include="Kerbalui\Decorators\ContentScroller.cs" />
-    <Compile Include="Kerbalui\Decorators\EditingArea.cs" />
+    <Compile Include="Kerbalui\Decorators\OldContentScroller.cs" />
+    <Compile Include="Kerbalui\Decorators\OldEditingArea.cs" />
     <Compile Include="Kerbalui\Layout\HorizontalSpacer.cs" />
     <Compile Include="Kerbalui\Types\Control.cs" />
     <Compile Include="Kerbalui\Types\Decorator.cs" />
@@ -136,6 +136,8 @@
     <Compile Include="Kerbalui\Layout\Abstract\Spacer.cs" />
     <Compile Include="Kerbalui\Layout\VerticalSpacer.cs" />
     <Compile Include="Kerbalui\Layout\Filler.cs" />
+    <Compile Include="Kerbalui\Decorators\EditingArea.cs" />
+    <Compile Include="Kerbalui\Decorators\EditingAreaScroller.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

@@ -8,7 +8,7 @@ using Kerbalui.Controls;
 
 namespace LiveRepl.UI.EditorParts 
 {
-    public class Editor:EditingArea
+    public class Editor:EditingAreaScroller
     {
 		public EditorGroup editorGroup;
 
@@ -17,7 +17,7 @@ namespace LiveRepl.UI.EditorParts
 		/// </summary>
 		public new KeyBindings keybindings = new KeyBindings();
 
-		public Editor(EditorGroup editorGroup) : base(new TextArea())
+		public Editor(EditorGroup editorGroup) : base(new EditingArea(new TextArea()))
 		{
 			this.editorGroup=editorGroup;
 			//TODO: Define keybindings here.
@@ -25,20 +25,19 @@ namespace LiveRepl.UI.EditorParts
 
 		protected override void DecoratorUpdate()
 		{
-			if (editableTextControl.HasFocus()) 
+			if (editingArea.HasFocus()) 
 			{
-
 				keybindings.ExecuteAndConsumeIfMatched(Event.current);
 			} 
 
 			base.DecoratorUpdate();
 
-			editorGroup.editorStatusLabel.UpdateCursorInfo(LineNumber, ColumnNumber);
+			editorGroup.editorStatusLabel.UpdateCursorInfo(editingArea.LineNumber, editingArea.ColumnNumber);
 
-			if (hadKeyDownThisUpdate)
+			if (editingArea.hadKeyDownThisUpdate)
 			{
 				editorGroup.fileIOGroup.changesIndicator.content.text="*";
-				editorGroup.fileIOGroup.needsResize=true;
+				editorGroup.needsResize=true;
 			}
 		}
 	}

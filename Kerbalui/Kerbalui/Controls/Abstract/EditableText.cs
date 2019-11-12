@@ -6,5 +6,6 @@ namespace Kerbalui.Controls.Abstract
 	/// </summary>
 	public abstract class EditableText:ContentControl
 	{
+		public virtual string Text { get => content.text; set => content.text=value; }
 	}
 }

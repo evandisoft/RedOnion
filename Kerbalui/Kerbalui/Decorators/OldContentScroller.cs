@@ -8,7 +8,7 @@ namespace Kerbalui.Decorators
 	/// <summary>
 	/// Contains a ContentControl, which it manages scrolling for.
 	/// </summary>
-	public class ContentScroller:Decorator
+	public class OldContentScroller:Decorator
 	{
 		public Vector2 scrollPos = new Vector2();
 		bool resetScroll;
@@ -23,7 +23,7 @@ namespace Kerbalui.Decorators
 
 		public ContentControl contentControl;
 
-		public ContentScroller(ContentControl contentControl)
+		public OldContentScroller(ContentControl contentControl)
 		{
 			this.contentControl=contentControl;
 		}

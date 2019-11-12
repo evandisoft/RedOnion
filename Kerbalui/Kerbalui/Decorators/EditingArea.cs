@@ -1,16 +1,17 @@
-﻿using System;
-using UnityEngine;
-using Kerbalui.Types;
+using System;
 using Kerbalui.Controls.Abstract;
 using Kerbalui.EventHandling;
+using Kerbalui.Types;
 using Kerbalui.Util;
+using UnityEngine;
 
 namespace Kerbalui.Decorators
 {
 	/// <summary>
-	/// Contains an EditableText Control which it manages as an editing area.
+	/// Editing area. Contains an EditableText (currently only either aTextArea or Text Field), 
+	/// and handles editing for them.
 	/// </summary>
-	public class EditingArea : ContentScroller
+	public class EditingArea:Decorator
 	{
 		//int inc = 0;
 		const int spacesPerTab = 4;
@@ -21,9 +22,15 @@ namespace Kerbalui.Decorators
 		public int CursorIndex { get; set; }
 		public int SelectIndex { get; set; }
 
-		public EditableText editableTextControl;
+		public string Text { get => editableText.content.text; set => editableText.content.text=value; }
+		public override Vector2 MinSize => editableText.MinSize;
+		public GUIStyle StyleOrDefault => editableText.StyleOrDefault;
+		public bool HasFocus() => editableText.HasFocus();
+		public void GrabFocus() => editableText.GrabFocus();
 
-		public bool hadKeyDownThisUpdate=false;
+		public EditableText editableText;
+
+		public bool hadKeyDownThisUpdate = false;
 
 		/// <summary>
 		/// Setting this to true will not allow any key-down input events
@@ -31,118 +38,120 @@ namespace Kerbalui.Decorators
 		/// </summary>
 		protected bool onlyUseKeyBindings;
 
-		public EditingArea(EditableText editableTextControl) : base(editableTextControl)
+		public EditingArea(EditableText editableText)
 		{
-			this.editableTextControl=editableTextControl;
+			this.editableText = editableText;
 			InitializeDefaultKeyBindings();
 		}
+
+		protected override void SetChildRect() => editableText.SetRect(rect);
 
 		protected override void DecoratorUpdate()
 		{
 			// Initialize editor
 			if (editor == null)
 			{
-				editableTextControl.GrabFocus();
+				editableText.GrabFocus();
 				int id = GUIUtility.keyboardControl;
 				editor = (TextEditor)GUIUtility.GetStateObject(typeof(TextEditor), id);
 			}
 
-			if (editableTextControl.style == null)
+			if (editableText.style == null)
 			{
-				editableTextControl.style = new GUIStyle(GUI.skin.textArea);
-				editableTextControl.style.font = GUILibUtil.GetMonoSpaceFont();
-				editableTextControl.style.hover.textColor
-					= editableTextControl.style.normal.textColor
-					= editableTextControl.style.active.textColor
+				editableText.style = new GUIStyle(GUI.skin.textArea);
+				editableText.style.font = GUILibUtil.GetMonoSpaceFont();
+				editableText.style.hover.textColor
+					= editableText.style.normal.textColor
+					= editableText.style.active.textColor
 					= Color.white;
 			}
 
-			if (editableTextControl.HasFocus())
+			if (editableText.HasFocus())
 			{
 				int id = GUIUtility.keyboardControl;
 				editor = (TextEditor)GUIUtility.GetStateObject(typeof(TextEditor), id);
-				editor.text = editableTextControl.content.text;
+				editor.text = editableText.content.text;
 				editor.cursorIndex = CursorIndex;
 				editor.selectIndex = SelectIndex;
 
-				hadKeyDownThisUpdate=Event.current.type==EventType.KeyDown;
+				hadKeyDownThisUpdate = Event.current.type == EventType.KeyDown;
 				HandleInput();
 
-				LineNumber = CurrentLineNumber()+1;
-				ColumnNumber = CharsFromLineStart()+1;
+				LineNumber = CurrentLineNumber() + 1;
+				ColumnNumber = CharsFromLineStart() + 1;
 
-				editableTextControl.content.text = editor.text;
+				editableText.content.text = editor.text;
 
-				base.DecoratorUpdate();
+				editableText.Update();
 
 				CursorIndex = editor.cursorIndex;
 				SelectIndex = editor.selectIndex;
 
-				if (hadKeyDownThisUpdate && Event.current.type == EventType.Used)
-				{
-					AdjustScrollX();
-					AdjustScrollY();
-				}
+				//if (hadKeyDownThisUpdate && Event.current.type == EventType.Used)
+				//{
+				//	AdjustScrollX();
+				//	AdjustScrollY();
+				//}
 			}
 			else
 			{
-				base.DecoratorUpdate();
+				editableText.Update();
 			}
 		}
 
-		void AdjustScrollX()
-		{
-			//Debug.Log("Adjusting scroll x");
-			float cursorX = CursorX();
-			float diff = lastContentVector2.x - lastScrollViewVector2.x;
-			float contentStartX = scrollPos.x;
-			float contentEndX = contentStartX + lastScrollViewVector2.x;
-			if (Math.Max(cursorX - editableTextControl.style.lineHeight, 0) < contentStartX)
-			{
-				scrollPos.x = Math.Max(cursorX - editableTextControl.style.lineHeight, 0);
-			}
-			else if (cursorX + editableTextControl.style.lineHeight > contentEndX)
-			{
-				scrollPos.x = cursorX - lastContentVector2.x + editableTextControl.style.lineHeight;
-			}
-		}
+		//void AdjustScrollX()
+		//{
+		//	//Debug.Log("Adjusting scroll x");
+		//	float cursorX = CursorX();
+		//	float diff = lastContentVector2.x - lastScrollViewVector2.x;
+		//	float contentStartX = scrollPos.x;
+		//	float contentEndX = contentStartX + lastScrollViewVector2.x;
+		//	if (Math.Max(cursorX - editableText.style.lineHeight, 0) < contentStartX)
+		//	{
+		//		scrollPos.x = Math.Max(cursorX - editableText.style.lineHeight, 0);
+		//	}
+		//	else if (cursorX + editableText.style.lineHeight > contentEndX)
+		//	{
+		//		scrollPos.x = cursorX - lastContentVector2.x + editableText.style.lineHeight;
+		//	}
+		//}
 
-		void AdjustScrollY()
-		{
-			//Debug.Log("Adjusting scroll y");
-			float cursorY = CursorY();
-			//Debug.Log("CursorY " + cursorY);
-			float diff = lastContentVector2.y - lastScrollViewVector2.y;
-			//Debug.Log("diff " + diff);
-			float contentStartY = scrollPos.y;
-			//Debug.Log("contentStartY " + contentStartY);
-			float contentEndY = contentStartY + lastScrollViewVector2.y;
-			//Debug.Log("contentEndY " + contentEndY);
-			if (cursorY - editableTextControl.style.lineHeight < contentStartY)
-			{
-				scrollPos.y = cursorY - editableTextControl.style.lineHeight;
-				//Debug.Log("reducing to " + scrollPos.y);
-			}
-			else if (cursorY + editableTextControl.style.lineHeight > contentEndY)
-			{
-				scrollPos.y = cursorY - lastContentVector2.y + editableTextControl.style.lineHeight;
-				//Debug.Log("expanding to " + scrollPos.y);
-			}
-		}
+		//void AdjustScrollY()
+		//{
+		//	//Debug.Log("Adjusting scroll y");
+		//	float cursorY = CursorY();
+		//	//Debug.Log("CursorY " + cursorY);
+		//	float diff = lastContentVector2.y - lastScrollViewVector2.y;
+		//	//Debug.Log("diff " + diff);
+		//	float contentStartY = scrollPos.y;
+		//	//Debug.Log("contentStartY " + contentStartY);
+		//	float contentEndY = contentStartY + lastScrollViewVector2.y;
+		//	//Debug.Log("contentEndY " + contentEndY);
+		//	if (cursorY - editableText.style.lineHeight < contentStartY)
+		//	{
+		//		scrollPos.y = cursorY - editableText.style.lineHeight;
+		//		//Debug.Log("reducing to " + scrollPos.y);
+		//	}
+		//	else if (cursorY + editableText.style.lineHeight > contentEndY)
+		//	{
+		//		scrollPos.y = cursorY - lastContentVector2.y + editableText.style.lineHeight;
+		//		//Debug.Log("expanding to " + scrollPos.y);
+		//	}
+		//}
 
-		float CursorX()
+		public float CursorX()
 		{
 			int c = CharsFromLineStart();
 			string startOfLineToCursor = CurrentLine().Substring(0, c);
 			GUIContent tempContent = new GUIContent(startOfLineToCursor);
-			return editableTextControl.style.CalcSize(tempContent).x;
+			return editableText.style.CalcSize(tempContent).x;
 		}
 
-		float CursorY()
+		public float CursorY()
 		{
-			string contentToCursor = editableTextControl.content.text.Substring(0, CursorIndex);
+			string contentToCursor = editableText.content.text.Substring(0, CursorIndex);
 			GUIContent tempContent = new GUIContent(contentToCursor);
-			return editableTextControl.style.CalcSize(tempContent).y;
+			return editableText.style.CalcSize(tempContent).y;
 		}
 
 		void HandleInput()
@@ -184,13 +193,13 @@ namespace Kerbalui.Decorators
 				editor.Paste();
 			});
 			keybindings.Add(new EventKey(KeyCode.Backspace, false, true), () =>
-			 {
-				 int toMove = NextTabLeft(CursorIndex);
-				 for (int i = 0; i < toMove; i++)
-				 {
-					 editor.Backspace();
-				 }
-			 });
+			{
+				int toMove = NextTabLeft(CursorIndex);
+				for (int i = 0; i < toMove; i++)
+				{
+					editor.Backspace();
+				}
+			});
 			keybindings.Add(new EventKey(KeyCode.Backspace, true), () =>
 			{
 				while (true)
@@ -304,7 +313,7 @@ namespace Kerbalui.Decorators
 				editor.ReplaceSelection("\n");
 				IndentToPreviousLine();
 			});
-			keybindings.Add(new EventKey(KeyCode.Return,false,true), () =>
+			keybindings.Add(new EventKey(KeyCode.Return, false, true), () =>
 			{
 				editor.ReplaceSelection("\n");
 				IndentToPreviousLine();
@@ -581,5 +590,7 @@ namespace Kerbalui.Decorators
 
 			return lineNum;
 		}
+
+
 	}
 }

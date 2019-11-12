@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace LiveRepl.UI.ReplParts
 {
-	public class ReplInputArea:EditingArea
+	public class ReplInputArea:OldEditingArea
 	{
 		public Repl repl;
 
@@ -26,12 +26,12 @@ namespace LiveRepl.UI.ReplParts
 		{
 			get
 			{
-				float minHeight=editableTextControl.MinSize.y;
+				float minHeight=editableText.MinSize.y;
 				if (HorizontalScrollBarPresent)
 				{
 					minHeight+=ScrollbarWidth;
 				}
-				Debug.Log("minHeight "+minHeight);
+				//Debug.Log("minHeight "+minHeight);
 				return new Vector2(0, minHeight);
 			}
 		}
