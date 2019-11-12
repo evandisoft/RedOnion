@@ -37,6 +37,8 @@ namespace LiveRepl
 		bool hadMouseDownLastUpdate;
 		protected override void WindowsUpdate()
 		{
+			GUILibUtil.ConsumeMarkedCharEvent(Event.current);
+
 			if (ScriptRunning) HandleInputWhenExecuting();
 
 			GlobalKeyBindings.ExecuteAndConsumeIfMatched(Event.current);
