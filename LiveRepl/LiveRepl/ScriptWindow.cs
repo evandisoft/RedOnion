@@ -1,22 +1,18 @@
 using System;
+using System.Collections.Generic;
+using Kerbalua.Other;
+using Kerbalui.Controls;
 using Kerbalui.Types;
+using LiveRepl.Misc;
 using LiveRepl.UI;
+using LiveRepl.UI.ReplParts;
+using RedOnion.KSP.Settings;
 using UnityEngine;
 
 namespace LiveRepl
 {
-	public partial class ScriptWindow:Window
+	public partial class ScriptWindow
 	{
-		public const float windowHeight=600;
-		public const float editorGroupWidth = 500;
-		public const float centerGroupWidth = 100;
-		public const float replGroupWidth = 400;
-		public const float completionGroupWidth = 150;
-
-		public const float startingX = 100;
-		public const float startingY = 100;
-		public ContentGroup contentGroup;
-
 		public bool ScriptRunning { get; set; }
 
 		/// <summary>
@@ -34,106 +30,59 @@ namespace LiveRepl
 			};
 		}
 
+		public void SetCurrentEvaluator(string evaluatorName)
+		{
+			currentReplEvaluator = replEvaluators[evaluatorName];
+			contentGroup.centerGroup.scriptEngineSelector.scriptEngineLabel.SetEngine(evaluatorName);
+		}
+
+		Dictionary<string,ReplEvaluator> replEvaluators=new Dictionary<string, ReplEvaluator>();
+		CompletionManager completionManager;
+		public ReplEvaluator currentReplEvaluator;
+
 		public ScriptWindow(string title) : base(title)
 		{
-			AssignContent(contentGroup=new ContentGroup(this));
+			InitLayout();
 
-			rect.x=startingX;
-			rect.y=startingY;
-			rect.width=WindowWidth();
-			rect.height=windowHeight;
-		}
-
-		public override void SetRect(Rect rect)
-		{
-			rect.width=WindowWidth();
-			rect.height=windowHeight;
-
-			base.SetRect(rect);
-		}
-
-		protected override void WindowsUpdate()
-		{
-			base.WindowsUpdate();
-		}
-
-		float WindowWidth()
-		{
-			float width=centerGroupWidth;
-			if (EditorVisible || ReplVisible)
+			var repl=contentGroup.replGroup.repl;
+			replEvaluators["ROS"] = new RedOnionReplEvaluator()
 			{
-				width+=completionGroupWidth;
-				if (EditorVisible)
+				PrintAction = repl.replOutoutArea.AddOutput,
+				PrintErrorAction = repl.replOutoutArea.AddError
+			};
+			replEvaluators["Lua"] = new MoonSharpReplEvaluator()
+			{
+				PrintAction = repl.replOutoutArea.AddOutput,
+				PrintErrorAction = repl.replOutoutArea.AddError
+			};
+			var scriptEngineSelector=contentGroup.centerGroup.scriptEngineSelector;
+
+			string lastEngineName = SavedSettings.LoadSetting("lastEngine", "Lua");
+			if (replEvaluators.ContainsKey(lastEngineName))
+			{
+				SetCurrentEvaluator(lastEngineName);
+			}
+			else
+			{
+				foreach (var evaluatorName in replEvaluators.Keys)
 				{
-					width+=editorGroupWidth;
-				}
-				if (ReplVisible)
-				{
-					width+=replGroupWidth;
+					SetCurrentEvaluator(evaluatorName);
+					SavedSettings.SaveSetting("lastEngine", evaluatorName);
+					break;
 				}
 			}
-			return width;
-		}
 
-		public void ToggleEditor()
-		{
-			EditorVisible=!editorVisible;
-		}
-
-		public void ToggleRepl()
-		{
-			ReplVisible=!replVisible;
-		}
-
-		private bool editorVisible = true;
-		public bool EditorVisible
-		{
-			get => editorVisible;
-			set
+			foreach (var evaluatorName in replEvaluators.Keys)
 			{
-				if (value!=editorVisible) 
+				scriptEngineSelector.AddMinSized(new Button(evaluatorName, () =>
 				{
-					if (editorVisible)
-					{
-						rect.x+=editorGroupWidth;
-						rect.width-=editorGroupWidth;
-					}
-					else
-					{
-						rect.x-=editorGroupWidth;
-						rect.width+=editorGroupWidth;
-					}
-
-					contentGroup.editorGroup.Active=editorVisible=value;
-					contentGroup.completionGroup.Active=editorVisible || replVisible;
-					needsResize=true;
-				}
+					SetCurrentEvaluator(evaluatorName);
+					SavedSettings.SaveSetting("lastEngine", evaluatorName);
+				}));
 			}
-		}
 
-		private bool replVisible = true;
-		public bool ReplVisible
-		{
-			get => replVisible;
-			set
-			{
-				if (value!=replVisible)
-				{
-					if (replVisible)
-					{
-						rect.width-=replGroupWidth;
-					}
-					else
-					{
-						rect.width+=replGroupWidth;
-					}
-
-
-					contentGroup.replGroup.Active=replVisible=value;
-					contentGroup.completionGroup.Active=editorVisible || replVisible;
-					needsResize=true;
-				}
-			}
+			//completionManager=new CompletionManager(contentGroup.completionGroup.completionArea);
+			//completionManager.AddCompletable(new EditingAreaCompletionAdapter(contentGroup.editorGroup.editor));
 		}
 	}
 }

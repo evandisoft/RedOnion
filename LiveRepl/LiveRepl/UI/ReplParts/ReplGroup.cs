@@ -11,11 +11,13 @@ namespace LiveRepl.UI.ReplParts
 	{
 		public ContentGroup contentGroup;
 
+		public Repl repl;
+
 		public ReplGroup(ContentGroup contentGroup)
 		{
 			this.contentGroup=contentGroup;
 
-			AddWeighted(1, new Repl(this));
+			AddWeighted(1, repl=new Repl(this));
 		}
 	}
 }

@@ -10,11 +10,11 @@ namespace LiveRepl.Other {
 	/// scriptWindow. Scriptwindow is used in order to complete based off of its
 	/// currentReplEvaluator.
 	/// </summary>
-	public class EditingAreaCompletionAdapter:ICompletableElement {
+	public class OldEditingAreaCompletionAdapter:ICompletableElement {
 		public EditingArea editingArea;
 		public ReplMain replMain;
 
-		public EditingAreaCompletionAdapter(EditingArea editingArea, ReplMain replMain)
+		public OldEditingAreaCompletionAdapter(EditingArea editingArea, ReplMain replMain)
 		{
 			this.editingArea = editingArea;
 			this.replMain = replMain;

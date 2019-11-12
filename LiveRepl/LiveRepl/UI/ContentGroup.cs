@@ -6,7 +6,7 @@ using LiveRepl.UI.EditorParts;
 using LiveRepl.UI.ReplParts;
 using UnityEngine;
 
-namespace LiveRepl.UI
+namespace LiveRepl
 {
 	/// <summary>
 	/// This Group represents the content area of the ScriptWindow
