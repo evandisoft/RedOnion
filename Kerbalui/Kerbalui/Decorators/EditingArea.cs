@@ -16,7 +16,7 @@ namespace Kerbalui.Decorators
 		//int inc = 0;
 		const int spacesPerTab = 4;
 		public KeyBindings keybindings = new KeyBindings();
-		protected TextEditor editor;
+		public TextEditor editor;
 		public int LineNumber { get; private set; } = 1;
 		public int ColumnNumber { get; private set; } = 1;
 		public int CursorIndex { get; set; }
@@ -29,6 +29,7 @@ namespace Kerbalui.Decorators
 		public void GrabFocus() => editableText.GrabFocus();
 
 		public EditableText editableText;
+		public bool EditorAssigned { get => editor!=null; }
 
 		public bool hadKeyDownThisUpdate = false;
 

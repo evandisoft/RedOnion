@@ -4,11 +4,11 @@ using UnityEngine;
 
 namespace LiveRepl.UI.ReplParts
 {
-	public class ReplInputArea:OldEditingArea
+	public class ReplInputArea:EditingAreaScroller
 	{
 		public Repl repl;
 
-		public ReplInputArea(Repl repl):base(new TextArea())
+		public ReplInputArea(Repl repl):base(new EditingArea(new TextArea()))
 		{
 			this.repl=repl;
 		}
@@ -16,7 +16,7 @@ namespace LiveRepl.UI.ReplParts
 		protected override void DecoratorUpdate()
 		{
 			base.DecoratorUpdate();
-			if (hadKeyDownThisUpdate)
+			if (editingArea.hadKeyDownThisUpdate)
 			{
 				repl.needsResize=true;
 			}
@@ -26,7 +26,7 @@ namespace LiveRepl.UI.ReplParts
 		{
 			get
 			{
-				float minHeight=editableText.MinSize.y;
+				float minHeight=editingArea.MinSize.y;
 				if (HorizontalScrollBarPresent)
 				{
 					minHeight+=ScrollbarWidth;

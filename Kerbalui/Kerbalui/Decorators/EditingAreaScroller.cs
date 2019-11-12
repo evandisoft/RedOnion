@@ -13,6 +13,9 @@ namespace Kerbalui.Decorators
 			this.editingArea=editingArea;
 		}
 
+		public bool HasFocus() => editingArea.HasFocus();
+		public void GrabFocus() => editingArea.GrabFocus();
+
 		public Vector2 scrollPos = new Vector2();
 		bool resetScroll;
 		protected Vector2 lastScrollViewVector2 = new Vector2();

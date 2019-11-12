@@ -25,7 +25,7 @@ namespace LiveRepl.UI.EditorParts
 
 		protected override void DecoratorUpdate()
 		{
-			if (editingArea.HasFocus()) 
+			if (HasFocus()) 
 			{
 				keybindings.ExecuteAndConsumeIfMatched(Event.current);
 			} 

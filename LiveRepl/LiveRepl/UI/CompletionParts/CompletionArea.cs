@@ -6,13 +6,13 @@ using UnityEngine;
 
 namespace LiveRepl.UI.CompletionParts
 {
-	public class CompletionArea:OldEditingArea
+	public class CompletionArea:EditingAreaScroller
 	{
 		public CompletionGroup completionGroup;
 
 		public int SelectionIndex { get; private set; } = 0;
 
-		public CompletionArea(CompletionGroup completionGroup) : base(new TextArea())
+		public CompletionArea(CompletionGroup completionGroup) : base(new EditingArea(new TextArea()))
 		{
 			this.completionGroup=completionGroup;
 		}
@@ -22,34 +22,34 @@ namespace LiveRepl.UI.CompletionParts
 			bool lastEventWasMouseDown = Event.current.type == EventType.MouseDown && rect.Contains(Event.current.mousePosition);
 			if (lastEventWasMouseDown)
 			{
-				editableText.GrabFocus();
+				editingArea.GrabFocus();
 			}
 
-			if (editableText.HasFocus()) keybindings.ExecuteAndConsumeIfMatched(Event.current);
+			if (HasFocus()) editingArea.keybindings.ExecuteAndConsumeIfMatched(Event.current);
 			base.DecoratorUpdate();
 
 			if (lastEventWasMouseDown && Event.current.type == EventType.Used && rect.Contains(Event.current.mousePosition))
 			{
-				SelectionIndex = CurrentLineNumber();
+				SelectionIndex = editingArea.LineNumber;
 				UpdateCursorPosition();
 			}
 		}
 
 		void UpdateCursorPosition()
 		{
-			if (editor == null)
+			if (editingArea.editor==null)
 			{
 				return;
 			}
 
-			editor.MoveTextStart();
+			editingArea.editor.MoveTextStart();
 			for (int i = 0; i < SelectionIndex; i++)
 			{
-				editor.MoveDown();
+				editingArea.editor.MoveDown();
 			}
 
-			CursorIndex = editor.cursorIndex;
-			SelectIndex = editor.selectIndex;
+			editingArea.CursorIndex = editingArea.editor.cursorIndex;
+			editingArea.SelectIndex = editingArea.editor.selectIndex;
 		}
 	}
 }

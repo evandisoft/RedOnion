@@ -90,14 +90,14 @@ namespace LiveRepl.UI.ReplParts
 					if (!Event.current.control) {
 						// Don't give focus for the followup char events.
 						if(Event.current.keyCode!=KeyCode.None)
-							repl.replInputArea.contentControl.GrabFocus();
+							repl.replInputArea.GrabFocus();
 					}
 					break;
 
 				default:
 					// Don't give focus for the followup char events.
 					if (Event.current.keyCode != KeyCode.None)
-						repl.replInputArea.contentControl.GrabFocus();
+						repl.replInputArea.GrabFocus();
 					break;
 				}
 			}
