@@ -92,29 +92,30 @@ namespace LiveRepl.Main
 
 		public void FixedUpdate()
 		{
-			if (evaluationList.Count!=0)
-			{
-				var currentEvaluation = evaluationList[0];
-				if (currentEvaluation.Evaluate())
-				{
-					repl.outputBox.AddReturnValue(currentEvaluation.Result);
-					evaluationList.RemoveAt(0);
-				}
-			}
-			foreach (var engineName in replEvaluators.Keys)
-			{
-				var repl = replEvaluators[engineName];
-				try
-				{
-					repl.FixedUpdate();
-				}
-				catch (Exception ex)
-				{
-					Debug.Log("Exception in REPL.FixedUpdate: " + ex.Message);
-					repl.ResetEngine();
-					RunStartupScripts(engineName);
-				}
-			}
+			scriptWindow.FixedUpdate();
+			//if (evaluationList.Count!=0)
+			//{
+			//	var currentEvaluation = evaluationList[0];
+			//	if (currentEvaluation.Evaluate())
+			//	{
+			//		repl.outputBox.AddReturnValue(currentEvaluation.Result);
+			//		evaluationList.RemoveAt(0);
+			//	}
+			//}
+			//foreach (var engineName in replEvaluators.Keys)
+			//{
+			//	var repl = replEvaluators[engineName];
+			//	try
+			//	{
+			//		repl.FixedUpdate();
+			//	}
+			//	catch (Exception ex)
+			//	{
+			//		Debug.Log("Exception in REPL.FixedUpdate: " + ex.Message);
+			//		repl.ResetEngine();
+			//		RunStartupScripts(engineName);
+			//	}
+			//}
 		}
 	}
 }

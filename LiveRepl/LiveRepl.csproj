@@ -122,6 +122,7 @@
     <Compile Include="LiveRepl\UI\EditorParts\EditorChangesIndicator.cs" />
     <Compile Include="LiveRepl\ScriptWindow.Layout.cs" />
     <Compile Include="LiveRepl\Misc\CompletionManager.cs" />
+    <Compile Include="LiveRepl\ScriptWindow.Evaluation.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

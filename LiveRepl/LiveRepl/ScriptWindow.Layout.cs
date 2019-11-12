@@ -1,5 +1,6 @@
 using System;
 using Kerbalui.Types;
+using LiveRepl.UI.ReplParts;
 using UnityEngine;
 
 namespace LiveRepl
@@ -15,10 +16,12 @@ namespace LiveRepl
 		public const float startingX = 100;
 		public const float startingY = 100;
 		public ContentGroup contentGroup;
+		public Repl repl;
 
 		void InitLayout()
 		{
 			AssignContent(contentGroup=new ContentGroup(this));
+			repl=contentGroup.replGroup.repl;
 
 			rect.x=startingX;
 			rect.y=startingY;
@@ -34,10 +37,7 @@ namespace LiveRepl
 			base.SetRect(rect);
 		}
 
-		protected override void WindowsUpdate()
-		{
-			base.WindowsUpdate();
-		}
+
 
 		float WindowWidth()
 		{
@@ -109,7 +109,6 @@ namespace LiveRepl
 					{
 						rect.width+=replGroupWidth;
 					}
-
 
 					contentGroup.replGroup.Active=replVisible=value;
 					contentGroup.completionGroup.Active=editorVisible || replVisible;

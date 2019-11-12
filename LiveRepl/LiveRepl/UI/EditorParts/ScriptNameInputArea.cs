@@ -66,12 +66,6 @@ namespace LiveRepl.UI.EditorParts {
 			SavedSettings.SaveSetting("lastScriptName", Text);
 		}
 
-		public void SaveEditorText()
-		{
-			SaveText(fileIOGroup.editorGroup.editor.editingArea.Text);
-			fileIOGroup.editorChangesIndicator.Unchanged();
-		}
-
 		public void SaveText(string text)
 		{
 			try {
@@ -96,12 +90,7 @@ namespace LiveRepl.UI.EditorParts {
 			}
 		}
 
-		public void LoadEditorText()
-		{
-			string text=LoadText();
-			fileIOGroup.editorGroup.editor.editingArea.Text=text;
-			fileIOGroup.editorChangesIndicator.Unchanged();
-		}
+	
 
 		public string LoadText()
 		{

@@ -1,4 +1,5 @@
 using System;
+using Kerbalui.EventHandling;
 using Kerbalui.Types;
 using UnityEngine;
 
@@ -8,7 +9,7 @@ namespace Kerbalui.Decorators
 	{
 		public EditingArea editingArea;
 
-
+		public KeyBindings keybindings= new KeyBindings();
 
 		public EditingAreaScroller(EditingArea editingArea)
 		{
@@ -45,6 +46,7 @@ namespace Kerbalui.Decorators
 
 		protected override void DecoratorUpdate()
 		{
+			if (HasFocus()) keybindings.ExecuteAndConsumeIfMatched(Event.current);
 			scrollPos = GUI.BeginScrollView(rect, scrollPos, editingArea.rect);
 			{
 				editingArea.Update();

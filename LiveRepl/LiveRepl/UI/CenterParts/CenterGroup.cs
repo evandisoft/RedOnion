@@ -19,9 +19,10 @@ namespace LiveRepl.UI.CenterParts
 		{
 			this.contentGroup=contentGroup;
 
-			AddMinSized(new Button("<<", contentGroup.scriptWindow.ToggleEditor));
-			AddMinSized(new Button(">>", contentGroup.scriptWindow.ToggleRepl));
-			AddMinSized(new Button("Terminate", () => throw new NotImplementedException("Centergroup stop button")));
+			ScriptWindow scriptWindow=contentGroup.scriptWindow;
+			AddMinSized(new Button("<<", scriptWindow.ToggleEditor));
+			AddMinSized(new Button(">>", scriptWindow.ToggleRepl));
+			AddMinSized(new Button("Terminate", scriptWindow.Terminate));
 			AddMinSized(scriptEngineSelector=new ScriptEngineSelector(this));
 		}
 	}

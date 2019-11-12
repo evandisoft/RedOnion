@@ -77,6 +77,11 @@ namespace Kerbalua.Other {
 
 		public string HistoryUp()
 		{
+			if (History.Count==0)
+			{
+				return "";
+			}
+
 			if (currentHistoryItem == null) {
 				currentHistoryItem = History.First;
 			} else if(currentHistoryItem != History.Last) {

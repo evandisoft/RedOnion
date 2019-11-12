@@ -34,16 +34,24 @@ namespace LiveRepl.UI.EditorParts
 			}
 		}
 
-		//protected override void SetChildRects()
-		//{
-		//	fileIOGroup.SetRect(new Rect(0, 0, rect.width, fileIOGroup.MinSize.y));
-		//	//TODO: TabsGroup
-		//	//y+=fileIOGroup.rect.height;
-		//	//height-=fileIOGroup.rect.height;
-		//	editorStatusLabel.SetRect(new Rect(0,rect.height-editorStatusLabel.MinSize.y, rect.width, editorStatusLabel.MinSize.y));
+		public void SaveEditorText()
+		{
+			fileIOGroup.scriptNameInputArea.SaveText(editor.editingArea.Text);
+			fileIOGroup.editorChangesIndicator.Unchanged();
+		}
 
-		//	editor.SetRect(new Rect(0, fileIOGroup.rect.height, rect.width, rect.height-fileIOGroup.rect.height-editorStatusLabel.rect.height));
+		public void LoadEditorText()
+		{
+			string text=fileIOGroup.scriptNameInputArea.LoadText();
+			editor.editingArea.Text=text;
+			fileIOGroup.editorChangesIndicator.Unchanged();
+		}
 
-		//}
+		public void RunEditorScript()
+		{
+			SaveEditorText();
+			contentGroup.scriptWindow.Evaluate(editor.editingArea.Text, fileIOGroup.scriptNameInputArea.Text);
+			contentGroup.replGroup.repl.replOutoutArea.AddFileContent(fileIOGroup.scriptNameInputArea.Text);
+		}
 	}
 }
