@@ -7,9 +7,10 @@ using RedOnion.KSP.Settings;
 using Kerbalui.Decorators;
 using Kerbalui.Controls;
 using Kerbalui.EventHandling;
+using LiveRepl.Interfaces;
 
 namespace LiveRepl.UI.EditorParts {
-	public class ScriptNameInputArea:EditingArea {
+	public class ScriptNameInputArea:EditingArea, ICompletableElement {
 		static string defaultScriptFilename= "untitled.lua";
 		public FileIOGroup fileIOGroup;
 
@@ -143,6 +144,9 @@ namespace LiveRepl.UI.EditorParts {
 		Stopwatch ioDelayWatch = new Stopwatch();
 		List<string> scriptList;
 		const int ioDelayMillis = 1000;
+
+		public string ControlName => editableText.ControlName;
+
 		/// <summary>
 		/// This is used to update the script list at most every ioDelayMillis milliseconds.
 		/// </summary>

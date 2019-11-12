@@ -13,12 +13,12 @@ namespace LiveRepl.Misc {
 	/// </summary>
 	public class EditingAreaCompletionAdapter:ICompletableElement {
 		public EditingArea editingArea;
-		public ReplMain replMain;
+		public ScriptWindow scriptWindow;
 
-		public EditingAreaCompletionAdapter(EditingArea editingArea, ReplMain replMain)
+		public EditingAreaCompletionAdapter(EditingArea editingArea, ScriptWindow scriptWindow)
 		{
 			this.editingArea = editingArea;
-			this.replMain = replMain;
+			this.scriptWindow = scriptWindow;
 		}
 
 		public string ControlName => editingArea.editableText.ControlName;
@@ -27,7 +27,7 @@ namespace LiveRepl.Misc {
 
 		public void Complete(int index)
 		{
-			var completions = replMain.currentReplEvaluator.GetCompletions(editingArea.Text, editingArea.CursorIndex,out int replaceStart,out int replaceEnd);
+			var completions = scriptWindow.currentReplEvaluator.GetCompletions(editingArea.Text, editingArea.CursorIndex,out int replaceStart,out int replaceEnd);
 			if (completions.Count > index) {
 				int partialLength = replaceEnd - replaceStart;
 				int partialStart = replaceStart;
@@ -43,7 +43,7 @@ namespace LiveRepl.Misc {
 
 		public IList<string> GetCompletionContent(out int replaceStart,out int replaceEnd)
 		{
-			return replMain.currentReplEvaluator.GetDisplayableCompletions(
+			return scriptWindow.currentReplEvaluator.GetDisplayableCompletions(
 				editingArea.Text,
 				editingArea.CursorIndex,
 				out replaceStart,

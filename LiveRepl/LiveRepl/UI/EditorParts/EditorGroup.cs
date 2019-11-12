@@ -3,6 +3,7 @@ using Kerbalui.Types;
 using Kerbalui.Decorators;
 using Kerbalui.Controls;
 using Kerbalui.Layout;
+using Kerbalui.EventHandling;
 
 namespace LiveRepl.UI.EditorParts
 {
@@ -24,6 +25,8 @@ namespace LiveRepl.UI.EditorParts
 			AddMinSized(fileIOGroup=new FileIOGroup(this));
 			AddWeighted(1,editor=new Editor(this));
 			AddMinSized(editorStatusLabel=new EditorStatusLabel());
+
+			editor.keybindings.Add(new EventKey(KeyCode.E, true), RunEditorScript);
 		}
 
 		protected override void GroupUpdate()

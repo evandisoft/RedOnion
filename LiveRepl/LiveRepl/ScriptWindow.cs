@@ -20,15 +20,24 @@ namespace LiveRepl
 		{
 			InitLayout();
 			InitEvaluation();
-
-			//completionManager=new CompletionManager(contentGroup.completionGroup.completionArea);
-			//completionManager.AddCompletable(new EditingAreaCompletionAdapter(contentGroup.editorGroup.editor));
+			InitCompletion();
 		}
 
+		void InitCompletion()
+		{
+			completionManager=new CompletionManager(contentGroup.completionGroup.completionArea);
+			completionManager.AddCompletable(new EditingAreaCompletionAdapter(contentGroup.editorGroup.editor.editingArea, this));
+			completionManager.AddCompletable(new EditingAreaCompletionAdapter(contentGroup.replGroup.repl.replInputArea.editingArea, this));
+			completionManager.AddCompletable(contentGroup.editorGroup.fileIOGroup.scriptNameInputArea);
+		}
+
+		bool hadMouseDownLastUpdate;
 		protected override void WindowsUpdate()
 		{
 			if (ScriptRunning) HandleInputWhenExecuting();
 
+			completionManager.Update(hadMouseDownLastUpdate);
+			hadMouseDownLastUpdate=Event.current.type==EventType.MouseDown;
 			base.WindowsUpdate();
 		}
 
