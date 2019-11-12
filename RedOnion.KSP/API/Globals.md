@@ -25,7 +25,7 @@ Global variables, objects and functions.
 - `pid`: [PID](PID.md) - PID regulator (alias to `system.pid` in ROS).
 - `pidloop`: [PID](PID.md) - PID regulator (alias to `pid`).
 - `ui`: UI_Namespace - User Interface.
-- `ksp`: KSP_Namespace - Shortcuts to (unsafe) KSP API + some tools.
+- `ksp`: [KSP](../Namespaces/KSP.md) - Shortcuts to (unsafe) KSP API + some tools.
 - `unity`: Unity_Namespace - Shortcuts to (unsafe) Unity API.
 - `window`: [Window](../../RedOnion.UI/Window.md) - UI.Window
 - `anchors`: Anchors - UI.Anchors

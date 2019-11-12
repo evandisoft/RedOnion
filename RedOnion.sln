@@ -15,8 +15,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kerbalua", "Kerbalua\Kerbal
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documents", "Documents", "{DE741118-9A60-4308-A521-1B73E6A56854}"
 	ProjectSection(SolutionItems) = preProject
+		ChangeLog.md = ChangeLog.md
+		CommonScriptApi.md = CommonScriptApi.md
+		Contributing.md = Contributing.md
 		LICENSE = LICENSE
+		NextRelease.md = NextRelease.md
+		PlannedFeatures.md = PlannedFeatures.md
 		README.md = README.md
+		TroubleShooting.md = TroubleShooting.md
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KerbaluaNUnit", "KerbaluaNUnit\KerbaluaNUnit.csproj", "{756350DA-DC41-438F-A3E1-B09BCEBB7DBE}"

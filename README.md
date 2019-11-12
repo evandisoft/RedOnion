@@ -1,15 +1,3 @@
-*(A LOT OF THIS README IS OUTDATED. WILL BE UPDATED IN THE FUTURE)*
-**Disclaimer: This is not a sandbox! This is an unrestricted scripting environment. You have the power to do anything a mod can do. Don't use scripts from untrusted sources!**
-
-**This is necessary because:**
-
-- We want people eventually to be able to create mods using this mod.
-- We want people to be able to debug their mod using this mod.
-- We want people to be able to explore their own or other's mods using this mod.
-- We want users to be able to interact with the program in an unrestricted way.
-
-**We may, in the future, create an optional sandbox. But that will come later.**
-
 # RedOnion and Kerbalua
 
 A joint effort of Evan Dickinson and Lukáš Fireš to create
@@ -20,17 +8,16 @@ vessels, anything, with own script.
 **Warning: Do not use scripts from untrusted sources!**
 This is not a sandbox, any script has the power to do almost anything.
 We plan to eventually implement a switch to limit the power
-(disable what is now marked `[Unsafe]` in the code),
+(disable what is marked `[Unsafe]` in the code),
 but our goal now is to:
 
 - Allow users to do whatever they wish to do to the game environment to have fun.
 - Help modders develop and debug their mods using this mod.
-- Help anybody to explore KSP API, their own or other's mods.
-
-**We may, in the future, create an optional sandbox. But that will come later.**
+- Help anybody to explore KSP API, their own or other's mods
+  (read the license of each mod, we expose only `public` members).
 
  
-## Differences between ROS and LUA
+## Differences between ROS and Lua
 
 [**Lua**](https://github.com/evandisoft/RedOnion/blob/master/Kerbalua/README.md)
 is well known scripting language
@@ -38,7 +25,7 @@ and may offer more comfort and safety, while
 [**ROS** (Red Onion Script)](https://github.com/evandisoft/RedOnion/blob/master/RedOnion.ROS/README.md)
 aims to make coding easier.
 **ROS** was created anew and may contain bugs,
-**LUA** may lack some features but should be more stable.
+**Lua** may lack some features but should be more stable.
 
 Scripts are currently stored in GameData/RedOnion/Scripts,
 our own scripts are packed inside GameData/RedOnion/Scripts.zip.
@@ -47,9 +34,7 @@ and saving the modified version (which will become a file outside of the zip).
 
 ## Documentation
 
-[Common Globals](https://github.com/evandisoft/RedOnion/blob/master/RedOnion.KSP/API/Globals.md) - Objects and functions accessible by both LUA and ROS.
-
-[Common Script Api](https://github.com/evandisoft/RedOnion/blob/master/CommonScriptApi.md) - Previous documentation of the common features (deprecated).
+[Common Globals](https://github.com/evandisoft/RedOnion/blob/master/RedOnion.KSP/API/Globals.md) - Objects and functions accessible by both Lua and ROS.
 
 [Red Onion Script (ROS)](https://github.com/evandisoft/RedOnion/blob/master/RedOnion.ROS/README.md) - A powerful in-game scripting engine taking inspiration from several popular languages (Ruby,Python,Javascript,etc)
 
@@ -59,10 +44,16 @@ and saving the modified version (which will become a file outside of the zip).
 
 [Troubleshooting](https://github.com/evandisoft/RedOnion/blob/master/TroubleShooting.md) - Some possible issues and solutions
 
+**Outdated:**
+
+[Common Script Api](https://github.com/evandisoft/RedOnion/blob/master/CommonScriptApi.md) - Previous documentation of the common features. Should soon become part of [Common Globals: KSP](https://github.com/evandisoft/RedOnion/blob/master/RedOnion.KSP/API/Globals.md)
+
 ## Videos
+
 Demonstration videos for this mod are on [this channel](https://www.youtube.com/channel/UChduoYTVOtAH0NA-Lj8EiKA).
 
 ## Releases
+
 Releases are hosted at [spacedock](https://spacedock.info/mod/2116/Red%20Onion) and [curseforge](https://kerbal.curseforge.com/projects/redonion).
 
 ## Upcoming Features
@@ -72,6 +63,7 @@ Releases are hosted at [spacedock](https://spacedock.info/mod/2116/Red%20Onion) 
 [Planned](https://github.com/evandisoft/RedOnion/blob/master/ChangeLog.md#planned-features)
 
 ## Feedback
+
 Feedback can be left on our forum [thread](https://forum.kerbalspaceprogram.com/index.php?/topic/183050-wip-redonion-020-unrestricted-in-game-scripting-has-repl-editor-and-intellisense-lua-and-a-custom-jsruby-like-language-implemented-tested-on-ksp-161/), on this repository as a new issue, or as a comment on any of our videos.
 
 ## Contributing
