@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Kerbalui.Controls;
 using Kerbalui.Decorators;
+using Kerbalui.EventHandling;
 using Kerbalui.Util;
 using LiveRepl.Interfaces;
 using UnityEngine;
@@ -22,6 +23,8 @@ namespace LiveRepl.UI.CompletionParts
 		public CompletionArea(CompletionGroup completionGroup) : base(new EditingArea(new TextArea()))
 		{
 			this.completionGroup=completionGroup;
+
+			InitializeKeyBindings();
 		}
 
 		protected override void DecoratorUpdate()
@@ -80,6 +83,30 @@ namespace LiveRepl.UI.CompletionParts
 			SelectionIndex = 0;
 			partialLength = replaceEnd - replaceStart;
 			UpdateCursorPosition();
+		}
+
+		void InitializeKeyBindings()
+		{
+			// Clear default bindings
+			editingArea.keybindings.Clear();
+			// Prevent underlying control from processing any keydown events.
+			editingArea.onlyUseKeyBindings = true;
+			keybindings.Add(new EventKey(KeyCode.K, true), () => {
+				SelectionIndex = Math.Min(contentStrings.Count-1, SelectionIndex + 1);
+				UpdateCursorPosition();
+			});
+			keybindings.Add(new EventKey(KeyCode.L, true), () => {
+				SelectionIndex = Math.Max(0, SelectionIndex - 1);
+				UpdateCursorPosition();
+			});
+			keybindings.Add(new EventKey(KeyCode.Comma, true), () => {
+				SelectionIndex = Math.Min(contentStrings.Count - 1, SelectionIndex + 4);
+				UpdateCursorPosition();
+			});
+			keybindings.Add(new EventKey(KeyCode.Period, true), () => {
+				SelectionIndex = Math.Max(0, SelectionIndex - 4);
+				UpdateCursorPosition();
+			});
 		}
 	}
 }

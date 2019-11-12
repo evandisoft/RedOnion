@@ -36,7 +36,7 @@ namespace Kerbalui.Decorators
 		/// Setting this to true will not allow any key-down input events
 		/// to reach the control's default handling of events.
 		/// </summary>
-		protected bool onlyUseKeyBindings;
+		public bool onlyUseKeyBindings;
 
 		public EditingArea(EditableText editableText)
 		{

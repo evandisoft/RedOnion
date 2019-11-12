@@ -55,6 +55,7 @@ namespace LiveRepl.UI.EditorParts {
 			}
 
 			fileIOGroup.editorGroup.editor.editingArea.Text=LoadText();
+			fileIOGroup.editorGroup.editor.GrabFocus();
 		}
 
 		public string PartialCompletion()
