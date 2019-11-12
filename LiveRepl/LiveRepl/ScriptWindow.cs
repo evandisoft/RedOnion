@@ -15,6 +15,7 @@ namespace LiveRepl
 	public partial class ScriptWindow
 	{
 		CompletionManager completionManager;
+		bool inputIsLocked;
 
 		public ScriptWindow(string title) : base(title)
 		{
@@ -24,6 +25,28 @@ namespace LiveRepl
 			InitializeGlobalKeyBindings();
 
 			contentGroup.editorGroup.LoadEditorText();
+		}
+
+		public void SetOrReleaseInputLock()
+		{
+			if (rect.Contains(Mouse.screenPos))
+			{
+				if (!inputIsLocked)
+				{
+					//Debug.Log("Input is now locked");
+					inputIsLocked = true;
+					InputLockManager.SetControlLock(ControlTypes.KEYBOARDINPUT, "kerbalua");
+				}
+			}
+			else
+			{
+				if (inputIsLocked)
+				{
+					//Debug.Log("Input is no longer locked");
+					inputIsLocked = false;
+					InputLockManager.ClearControlLocks();
+				}
+			}
 		}
 
 		void InitCompletion()
@@ -37,6 +60,8 @@ namespace LiveRepl
 		bool hadMouseDownLastUpdate;
 		protected override void WindowsUpdate()
 		{
+			SetOrReleaseInputLock();
+
 			GUILibUtil.ConsumeMarkedCharEvent(Event.current);
 
 			if (ScriptRunning) HandleInputWhenExecuting();
@@ -45,6 +70,11 @@ namespace LiveRepl
 			completionManager.Update(hadMouseDownLastUpdate);
 			hadMouseDownLastUpdate=Event.current.type==EventType.MouseDown;
 			base.WindowsUpdate();
+
+			if (inputIsLocked && Event.current.type == EventType.ScrollWheel)
+			{
+				Event.current.Use();
+			}
 		}
 
 		private void HandleInputWhenExecuting()
