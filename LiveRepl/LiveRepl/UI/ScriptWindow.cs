@@ -19,16 +19,17 @@ namespace LiveRepl.UI
 		public bool ScriptRunning { get; set; } = true;
 
 		/// <summary>
-		/// Returns an action that will not fire whenever the script is not running.
+		/// Takes an action, action1, and returns an action that, when executed, will only
+		/// execute action1 if ScriptRuning returns true.
 		/// </summary>
 		/// <returns>The disabled action.</returns>
-		/// <param name="theAction">The action.</param>
-		public Action ScriptDisabledAction(Action theAction)
+		/// <param name="action1">The action.</param>
+		public Action ScriptDisabledAction(Action action1)
 		{
 			return () =>
 			{
 				if (ScriptRunning) return;
-				theAction();
+				action1();
 			};
 		}
 

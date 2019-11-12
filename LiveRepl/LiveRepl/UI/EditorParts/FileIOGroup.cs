@@ -3,7 +3,6 @@ using UnityEngine;
 using Kerbalui.Types;
 using Kerbalui.Layout;
 using Kerbalui.Controls;
-using LiveRepl.UI.Controls;
 
 namespace LiveRepl.UI.EditorParts
 {

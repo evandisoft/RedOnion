@@ -114,7 +114,6 @@
     <Compile Include="LiveRepl\UI\CompletionParts\CompletionArea.cs" />
     <Compile Include="LiveRepl\UI\CenterParts\ScriptEngineSelector.cs" />
     <Compile Include="LiveRepl\UI\CenterParts\ScriptEngineLabel.cs" />
-    <Compile Include="LiveRepl\UI\Controls\ScriptDisabledButton.cs" />
     <Compile Include="LiveRepl\UI\EditorParts\ScriptNameInputArea.cs" />
   </ItemGroup>
   <ItemGroup />
@@ -149,7 +148,6 @@
     <Folder Include="LiveRepl\UI\CompletionParts\" />
     <Folder Include="LiveRepl\UI\CenterParts\" />
     <Folder Include="LiveRepl\UI\ReplParts\" />
-    <Folder Include="LiveRepl\UI\Controls\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>

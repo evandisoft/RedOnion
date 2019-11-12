@@ -5,11 +5,11 @@ using UnityEngine;
 
 namespace LiveRepl.UI.ReplParts
 {
-	public class ReplOutoutArea:OldContentScroller
+	public class ReplOutoutArea:EditingAreaScroller
 	{
 		public Repl repl;
 
-		public ReplOutoutArea(Repl repl) : base(new TextArea())
+		public ReplOutoutArea(Repl repl) : base(new EditingArea(new TextArea()))
 		{
 			this.repl=repl;
 		}
@@ -23,39 +23,39 @@ namespace LiveRepl.UI.ReplParts
 
 		public void AddReturnValue(string str)
 		{
-			contentControl.content.text += "\nr> " + str;
+			editingArea.Text += "\nr> " + str;
 			CommonOutputProcessing();
 		}
 
 		public void AddOutput(string str)
 		{
-			contentControl.content.text += "\no> " + str;
+			editingArea.Text += "\no> " + str;
 			CommonOutputProcessing();
 		}
 
 		public void AddError(string str)
 		{
-			contentControl.content.text += "\ne> " + str;
+			editingArea.Text += "\ne> " + str;
 			CommonOutputProcessing();
 		}
 
 		public void AddSourceString(string str)
 		{
-			contentControl.content.text += "\ni> " + str;
+			editingArea.Text += "\ni> " + str;
 			CommonOutputProcessing();
 		}
 
 		public void AddFileContent(string str)
 		{
-			contentControl.content.text += "\nf> " + str;
+			editingArea.Text += "\nf> " + str;
 			CommonOutputProcessing();
 		}
 
 		protected override void DecoratorUpdate()
 		{
-			if (contentControl.style==null)
+			if (editingArea.editableText.style==null)
 			{
-				contentControl.style = new GUIStyle(GUI.skin.textArea)
+				editingArea.editableText.style = new GUIStyle(GUI.skin.textArea)
 				{
 					alignment = TextAnchor.LowerLeft,
 					font = GUILibUtil.GetMonoSpaceFont()
@@ -70,9 +70,9 @@ namespace LiveRepl.UI.ReplParts
 
 			if (hadKeyDownThisUpdate && Event.current.type==EventType.Used)
 			{
-				if (contentControl.content.text.Length > OUTPUT_LENGTH_LIMIT)
+				if (editingArea.Text.Length > OUTPUT_LENGTH_LIMIT)
 				{
-					contentControl.content.text = contentControl.content.text.Substring(contentControl.content.text.Length - OUTPUT_LENGTH_LIMIT, OUTPUT_LENGTH_LIMIT);
+					editingArea.Text = editingArea.Text.Substring(editingArea.Text.Length - OUTPUT_LENGTH_LIMIT, OUTPUT_LENGTH_LIMIT);
 				}
 				needsResize=true;
 			}
@@ -80,7 +80,7 @@ namespace LiveRepl.UI.ReplParts
 
 		void InterceptMostInput()
 		{
-			if (contentControl.HasFocus() && Event.current.type == EventType.KeyDown)
+			if (HasFocus() && Event.current.type == EventType.KeyDown)
 			{
 				switch (Event.current.keyCode) {
 				case KeyCode.Insert:
