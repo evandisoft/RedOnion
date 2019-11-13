@@ -78,12 +78,12 @@ namespace LiveRepl
 				{
 					if (editorVisible)
 					{
-						rect.x+=editorGroupWidth;
+
 						rect.width-=editorGroupWidth;
 					}
 					else
 					{
-						rect.x-=editorGroupWidth;
+
 						rect.width+=editorGroupWidth;
 					}
 
@@ -104,10 +104,12 @@ namespace LiveRepl
 				{
 					if (replVisible)
 					{
+						rect.x+=replGroupWidth;
 						rect.width-=replGroupWidth;
 					}
 					else
 					{
+						rect.x-=replGroupWidth;
 						rect.width+=replGroupWidth;
 					}
 

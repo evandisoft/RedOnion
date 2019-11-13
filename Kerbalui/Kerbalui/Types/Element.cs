@@ -7,11 +7,7 @@ namespace Kerbalui.Types
 	public abstract class Element
 	{
 		public Rect rect;
-		/// <summary>
-		/// The Rect that represents the bounds of the content inside 'rect'
-		/// </summary>
-		/// <value>The content rect.</value>
-		public Rect ContentRect { get; set; }
+
 		public bool Active { get; set; } = true;
 
 
@@ -25,7 +21,6 @@ namespace Kerbalui.Types
 		public virtual void SetRect(Rect rect)
 		{
 			this.rect=rect;
-			ContentRect=new Rect(0, 0, rect.width, rect.height);
 			needsResize=false;
 		}
 

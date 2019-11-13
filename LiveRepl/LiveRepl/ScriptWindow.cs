@@ -30,7 +30,7 @@ namespace LiveRepl
 
 		public void SetOrReleaseInputLock()
 		{
-			if (GUILibUtil.MouseInRect(ContentRect)) //ContentRect.Contains(Event.current.mousePosition))//GUILibUtil.MouseInRect(rect))
+			if (GUILibUtil.MouseInRect(contentGroup.rect)) //ContentRect.Contains(Event.current.mousePosition))//GUILibUtil.MouseInRect(rect))
 			{
 				if (!inputIsLocked)
 				{

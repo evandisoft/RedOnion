@@ -53,14 +53,14 @@ namespace Kerbalui.Decorators
 				keybindings.ExecuteAndConsumeIfMatched(Event.current);
 			}
 
-			if ((Event.current.type==EventType.MouseDown || Event.current.type==EventType.ScrollWheel) && !HasFocus() && GUILibUtil.MouseInRect(ContentRect))//.Contains(Event.current.mousePosition))
+			if ((Event.current.type==EventType.MouseDown || Event.current.type==EventType.ScrollWheel) && !HasFocus() && GUILibUtil.MouseInRect(rect))//.Contains(Event.current.mousePosition))
 			{
 				//Debug.Log("edit area scroller grabbing mouse");
 				GrabFocus();
 			}
 			scrollPos = GUI.BeginScrollView(rect, scrollPos, editingArea.rect);
 			{
-				var scrollbarlessrect=new Rect(ContentRect);
+				//var scrollbarlessrect=new Rect(ContentRect);
 				//if(VerticalScrollBarPresent)
 				//	scrollbarlessrect.width-=ScrollbarWidth;
 				//if (HorizontalScrollBarPresent)

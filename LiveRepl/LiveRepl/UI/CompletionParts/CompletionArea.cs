@@ -29,12 +29,12 @@ namespace LiveRepl.UI.CompletionParts
 
 		protected override void DecoratorUpdate()
 		{
-			bool lastEventWasMouseDown = Event.current.type == EventType.MouseDown && GUILibUtil.MouseInRect(ContentRect);// ContentRect.Contains(Event.current.mousePosition); //GUILibUtil.MouseInRect(rect);
+			bool lastEventWasMouseDown = Event.current.type == EventType.MouseDown && GUILibUtil.MouseInRect(rect);// ContentRect.Contains(Event.current.mousePosition); //GUILibUtil.MouseInRect(rect);
 			string lastControlname = GUI.GetNameOfFocusedControl();
 
 			base.DecoratorUpdate();
 
-			var scrollbarlessrect=new Rect(ContentRect);
+			var scrollbarlessrect=new Rect(rect); //new Rect(ContentRect);
 			if (VerticalScrollBarPresent)
 				scrollbarlessrect.width-=ScrollbarWidth;
 			if (HorizontalScrollBarPresent)

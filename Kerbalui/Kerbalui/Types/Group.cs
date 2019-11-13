@@ -13,6 +13,12 @@ namespace Kerbalui.Types
 		List<Element> elements=new List<Element>();
 
 		/// <summary>
+		/// Represents the rect of the content.
+		/// </summary>
+		/// <value>The content rect.</value>
+		public Rect ContentRect { get; set; }
+
+		/// <summary>
 		/// Starts a GUI.BeginGroup, then calls GroupUpdate (which may be overriden in a subclass), and then
 		/// calls update on all the elements.
 		/// </summary>
@@ -51,6 +57,7 @@ namespace Kerbalui.Types
 		public override void SetRect(Rect rect)
 		{
 			base.SetRect(rect);
+			ContentRect=new Rect(0, 0, rect.width, rect.height);
 			SetChildRects();
 		}
 
