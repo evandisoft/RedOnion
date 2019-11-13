@@ -95,9 +95,8 @@ namespace LiveRepl.Completion
 			//Debug.Log("completing");
 			ICompletableElement completable;
 			if (completableMap.TryGetValue(mostRecentlyFocusedCompletable,out completable)) {
-
-				completable.Complete(completionSelector.SelectionIndex);
 				completable.GrabFocus();
+				completable.Complete(completionSelector.SelectionIndex);
 			} 
 		}
 	}

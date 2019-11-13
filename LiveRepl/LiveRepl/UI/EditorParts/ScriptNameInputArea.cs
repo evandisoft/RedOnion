@@ -8,6 +8,7 @@ using Kerbalui.Decorators;
 using Kerbalui.Controls;
 using Kerbalui.EventHandling;
 using LiveRepl.Interfaces;
+using Kerbalui.Util;
 
 namespace LiveRepl.UI.EditorParts {
 	public class ScriptNameInputArea:EditingArea, ICompletableElement {
@@ -33,6 +34,13 @@ namespace LiveRepl.UI.EditorParts {
 
 		protected override void DecoratorUpdate()
 		{
+			if ((Event.current.type==EventType.MouseDown || Event.current.type==EventType.ScrollWheel) && !HasFocus() && GUILibUtil.MouseInRect(ContentRect))//.Contains(Event.current.mousePosition))
+			{
+				//Debug.Log("edit area scroller grabbing mouse");
+				GrabFocus();
+				Text="";
+			}
+
 			base.DecoratorUpdate();
 			if (ReceivedInput)
 			{
