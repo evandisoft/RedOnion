@@ -3,7 +3,7 @@ using UnityEngine;
 using KSP.UI.Screens;
 using System.Collections.Generic;
 
-namespace LiveRepl.Main
+namespace LiveRepl
 {
     [KSPAddon(KSPAddon.Startup.AllGameScenes, false)]
     public class LiveReplMain : MonoBehaviour

@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29009.5
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedOnion", "RedOnion\RedOnion.csproj", "{3A40C452-1B11-4769-9D6B-FD318F2CB514}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedOnion.UI", "RedOnion.UI\RedOnion.UI.csproj", "{034C16AB-D16E-4AFE-9837-812499EE2F3D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedOnion.Script", "RedOnion.Script\RedOnion.Script.csproj", "{0D0A04F3-0A82-49CD-8178-7640ACE88BFF}"
@@ -17,17 +15,23 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kerbalua", "Kerbalua\Kerbal
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documents", "Documents", "{DE741118-9A60-4308-A521-1B73E6A56854}"
 	ProjectSection(SolutionItems) = preProject
+		ChangeLog.md = ChangeLog.md
+		CommonScriptApi.md = CommonScriptApi.md
+		Contributing.md = Contributing.md
 		LICENSE = LICENSE
+		NextRelease.md = NextRelease.md
+		PlannedFeatures.md = PlannedFeatures.md
 		README.md = README.md
+		TroubleShooting.md = TroubleShooting.md
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KerbaluaNUnit", "KerbaluaNUnit\KerbaluaNUnit.csproj", "{756350DA-DC41-438F-A3E1-B09BCEBB7DBE}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Resources", "Resources", "{54E3F385-C4B1-4A7E-9299-DD5BF5D19204}"
 	ProjectSection(SolutionItems) = preProject
+		GameData\RedOnion\Resources\LiveRepl.png = GameData\RedOnion\Resources\LiveRepl.png
 		GameData\RedOnion\Resources\RedOnionLauncherIcon.png = GameData\RedOnion\Resources\RedOnionLauncherIcon.png
 		GameData\RedOnion\Resources\WindowCloseButtonIcon.png = GameData\RedOnion\Resources\WindowCloseButtonIcon.png
-		GameData\RedOnion\Resources\LiveRepl.png = GameData\RedOnion\Resources\LiveRepl.png
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedOnion.Shell", "RedOnion.Shell\RedOnion.Shell.csproj", "{94420503-B08C-4944-8820-D8596AEBACF2}"
@@ -52,10 +56,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{3A40C452-1B11-4769-9D6B-FD318F2CB514}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3A40C452-1B11-4769-9D6B-FD318F2CB514}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3A40C452-1B11-4769-9D6B-FD318F2CB514}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3A40C452-1B11-4769-9D6B-FD318F2CB514}.Release|Any CPU.Build.0 = Release|Any CPU
 		{034C16AB-D16E-4AFE-9837-812499EE2F3D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{034C16AB-D16E-4AFE-9837-812499EE2F3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{034C16AB-D16E-4AFE-9837-812499EE2F3D}.Release|Any CPU.ActiveCfg = Release|Any CPU

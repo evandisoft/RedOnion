@@ -50,21 +50,20 @@ namespace RedOnion.KSP.API
 				=> _processor = processor;
 
 			~Draw() => Dispose(false);
-			[Browsable(false), MoonSharpHidden]
-			public void Dispose()
+			void IDisposable.Dispose()
 			{
 				GC.SuppressFinalize(this);
 				Dispose(true);
 			}
 			protected virtual void Dispose(bool disposing)
 			{
-				// this is probably unnecessary (you cannot call Dispose unless you have reference
-				// and the desctructor cannot be called when there is one, but for sure...)
-				var processor = Interlocked.Exchange(ref _processor, null);
-				if (processor == null)
+				if (_processor == null)
 					return;
 				if (disposing)
+				{
 					Hide();
+					_processor = null;
+				}
 				// see UI.Window for another example of this
 				else UI.Collector.Add(this);
 			}
@@ -146,6 +145,7 @@ namespace RedOnion.KSP.API
 				if (_bodyObject == null)
 				{
 					// see https://github.com/GER-Space/Kerbal-Konstructs/wiki/Shaders-in-KSP
+					// + KSP 1.8: https://forum.kerbalspaceprogram.com/index.php?/topic/188933-180-modders-notes/
 					var shader = Shader.Find("Legacy Shaders/Particles/Additive");
 
 					_bodyObject = new GameObject("RedOnion.Vector.Draw.Body");

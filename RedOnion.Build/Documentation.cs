@@ -1,4 +1,5 @@
 using RedOnion.KSP.API;
+using RedOnion.KSP.Utilities;
 using RedOnion.ROS;
 using RedOnion.ROS.Utilities;
 using System;
@@ -24,6 +25,7 @@ namespace RedOnion.Build
 		static HashSet<Type> discovered = new HashSet<Type>();
 		static Dictionary<Type, Type> obj2fn = new Dictionary<Type, Type>();
 		static Dictionary<Type, Type> fn2obj = new Dictionary<Type, Type>();
+		static Dictionary<Type, Type> redirects = new Dictionary<Type, Type>();
 		static Dictionary<Type, string> typeNames = new Dictionary<Type, string>()
 		{
 			{ typeof(void), "void" },
@@ -60,7 +62,14 @@ namespace RedOnion.Build
 		static ListCore<Type> queue = new ListCore<Type>();
 		static void RegisterType(Type type)
 		{
-			if (type.Assembly != typeof(Globals).Assembly)
+			var docb = type.GetCustomAttribute<DocBuildAttribute>();
+			if (docb != null && docb.AsType != null)
+			{
+				redirects[type] = docb.AsType;
+				type = docb.AsType;
+			}
+			if (type.Assembly != typeof(Globals).Assembly
+				&& type.Assembly != typeof(RedOnion.UI.Element).Assembly)
 				return;
 			if (type.IsGenericType)
 				type = type.GetGenericTypeDefinition();
@@ -81,9 +90,22 @@ namespace RedOnion.Build
 				var desc = type.GetCustomAttribute<DescriptionAttribute>()?.Description;
 				var name = type.GetCustomAttribute<DisplayNameAttribute>(false)?.DisplayName
 					?? type.Name.Replace('`', '.');
+				var path = "";
 				var full = type.FullName;
 				if (full.StartsWith("RedOnion.KSP."))
+				{
 					full = full.Substring("RedOnion.KSP.".Length);
+					path = "RedOnion.KSP/";
+				}
+				else if (full.StartsWith("RedOnion.UI."))
+				{
+					full = full.Substring("RedOnion.UI.".Length);
+					path = "RedOnion.UI/";
+				}
+				path += string.Join("/", full.Split('.')).Replace('`', '.');
+				var docb = type.GetCustomAttribute<DocBuildAttribute>();
+				if (docb != null && !string.IsNullOrEmpty(docb.Path))
+					path = docb.Path;
 				var creator = type.GetCustomAttribute<CreatorAttribute>();
 				if (creator != null)
 				{
@@ -95,7 +117,7 @@ namespace RedOnion.Build
 				{
 					type = type,
 					name = name,
-					path = "RedOnion.KSP/" + string.Join("/", full.Split('.')).Replace('`', '.'),
+					path = path,
 					desc = desc
 				};
 				docs.Add(name, doc);
@@ -109,7 +131,11 @@ namespace RedOnion.Build
 					if (prev != null && !(prev is MethodInfo && member is MethodInfo))
 						continue;
 					if (member is FieldInfo f)
-						RegisterType(f.FieldType);
+						RegisterType(
+							f.FieldType == typeof(Type)
+							&& f.IsInitOnly && f.IsStatic
+							? (Type)f.GetValue(null)
+							: f.FieldType);
 					else if (member is PropertyInfo p)
 						RegisterType(p.PropertyType);
 					else if (member is MethodInfo m)
@@ -165,7 +191,11 @@ namespace RedOnion.Build
 				var mname = GetName(member);
 				if (member is FieldInfo f)
 				{
-					PrintSimpleMember(wr, doc, mname, member, f.FieldType);
+					PrintSimpleMember(wr, doc, mname, member,
+						f.FieldType == typeof(Type)
+						&& f.IsStatic && f.IsInitOnly
+						? (Type)f.GetValue(null)
+						: f.FieldType);
 					continue;
 				}
 				if (member is PropertyInfo p)
@@ -184,6 +214,8 @@ namespace RedOnion.Build
 		static string ResolveType(Document doc, Type type, out string name)
 		{
 			string path = null;
+			if (redirects.TryGetValue(type, out var redir))
+				type = redir;
 			if (!typeNames.TryGetValue(type, out name))
 				name = type.Name;
 			if (types.TryGetValue(type, out var tdoc))

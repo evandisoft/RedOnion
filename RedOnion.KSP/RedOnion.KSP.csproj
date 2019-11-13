@@ -59,6 +59,10 @@
       <HintPath>$(KerbalLibs)\UnityEngine.UIModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="UnityEngine.Animation">
+      <HintPath>$(KerbalLibs)\UnityEngine.AnimationModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Assembly-CSharp">
       <HintPath>$(KerbalLibs)\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
@@ -73,14 +77,17 @@
     <Reference Include="mscorlib" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="API\App.cs" />
     <Compile Include="API\Autopilot.cs" />
     <Compile Include="API\ConstVector.cs" />
     <Compile Include="API\Globals.cs" />
-    <Compile Include="API\InteropUtilities.cs" />
+    <Compile Include="Utilities\DocBuildAttribute.cs" />
+    <Compile Include="Utilities\InteropUtilities.cs" />
     <Compile Include="API\VectorUtils.cs" />
     <Compile Include="Lua\Descriptors\LuaDescriptor.cs" />
     <Compile Include="Lua\Descriptors\LuaEventDescriptor.cs" />
     <Compile Include="Lua\Proxies\LuaEventProxy.cs" />
+    <Compile Include="ROS\RosExecutor.cs" />
     <Compile Include="Utilities\Extensions.cs" />
     <Compile Include="Utilities\MultiValueDictionary.cs" />
     <Compile Include="Utilities\Properties.cs" />

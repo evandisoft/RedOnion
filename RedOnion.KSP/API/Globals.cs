@@ -10,6 +10,7 @@ using RedOnion.KSP.Autopilot;
 using RedOnion.KSP.Namespaces;
 using System.Linq;
 using RedOnion.KSP.UnsafeAPI;
+using RedOnion.KSP.ReflectionUtil;
 
 namespace RedOnion.KSP.API
 {
@@ -18,6 +19,8 @@ namespace RedOnion.KSP.API
 	{
 		[Description("An api for setting which scripts will be ran when an engine is reset.")]
 		public static AutoRun autorun => AutoRun.Instance;
+		[Description("Safe API for KSP Application Launcher (toolbar/buttons).")]
+		public static readonly Type app = typeof(App);
 
 		[Description("A collection of space/celestial bodies. (Safe API)")]
 		public static Bodies bodies => Bodies.Instance;
@@ -29,10 +32,12 @@ namespace RedOnion.KSP.API
 		//[Unsafe, Description("A map of kerbal names to kerbals for kerbals in the crew.")]
 		//public static KerbalsDictionary kerbals => KerbalsDictionary.Instance;
 
-		[Unsafe, Description("All the reflection stuff and namespaces.")]
+		[Unsafe, Description("All the reflection stuff and namespaces. (Lua also has `import`.)")]
 		public static Reflect reflect => Reflect.Instance;
 		[Unsafe, Description("Alias to `reflect` because of the namespaces.")]
 		public static Reflect native => Reflect.Instance;
+		[Unsafe, Description("Reflected/imported stuff by assembly name.")]
+		public static readonly GetMappings assembly = new GetMappings();
 
 		[Description("Function for creating 3D vector / coordinate.")]
 		public static VectorCreator vector => VectorCreator.Instance;
@@ -63,6 +68,37 @@ namespace RedOnion.KSP.API
 		[Description("Atmosphere parameters of orbited body (redirects to `ship.body.atmosphere`).")]
 		public static SpaceBody.Atmosphere atmosphere => ship.body.atmosphere;
 
+		[Description("PID regulator (alias to `system.pid` in ROS).")]
+		public static readonly Type pid = typeof(PID);
+		[Description("PID regulator (alias to `pid`).")]
+		public static readonly Type pidloop = typeof(PID);
+
+		[Description("User Interface.")]
+		public static readonly Type ui = typeof(UI_Namespace);
+		[Unsafe, Description("Shortcuts to (unsafe) KSP API + some tools.")]
+		public static readonly Type ksp = typeof(KSP_Namespace);
+		[Unsafe, Description("Shortcuts to (unsafe) Unity API.")]
+		public static readonly Type unity = typeof(Unity_Namespace);
+
+		[Description("UI.Window")]
+		public static readonly Type window = typeof(Window);
+		[Description("UI.Anchors")]
+		public static readonly Type anchors = typeof(UI.Anchors);
+		[Description("UI.Padding")]
+		public static readonly Type padding = typeof(UI.Padding);
+		[Description("UI.LayoutPadding")]
+		public static readonly Type layoutPadding = typeof(UI.LayoutPadding);
+		[Description("UI.Layout")]
+		public static readonly Type layout = typeof(UI.Layout);
+		[Description("UI.Panel")]
+		public static readonly Type panel = typeof(UI.Panel);
+		[Description("UI.Label")]
+		public static readonly Type label = typeof(UI.Label);
+		[Description("UI.Button")]
+		public static readonly Type button = typeof(UI.Button);
+		[Description("UI.TextBox")]
+		public static readonly Type textBox = typeof(UI.TextBox);
+
 #if API_GLOBAL_ALIASES
 		// TODO: move aliases to startup/setup script/library
 		[Alias, Description("Alias to `Vector.dot` (or `V.dot`).")]
@@ -87,20 +123,6 @@ namespace RedOnion.KSP.API
 			System.Add(typeof(UnityEngine.Color));
 			System.Add(typeof(UnityEngine.Rect));
 			System.Add(typeof(PID));
-			System.Add("PIDloop", typeof(PID));
-
-			System.Add("UI", typeof(UI_Namespace));
-			Add(typeof(Window));
-			Add(typeof(UI.Anchors));
-			Add(typeof(UI.Padding));
-			Add(typeof(UI.Layout));
-			Add(typeof(UI.Panel));
-			Add(typeof(UI.Label));
-			Add(typeof(UI.Button));
-			Add(typeof(UI.TextBox));
-
-			Add("KSP", typeof(KSP_Namespace));
-			Add("Unity", typeof(Unity_Namespace));
 		}
 
 		class ReflectedGlobals : Reflected

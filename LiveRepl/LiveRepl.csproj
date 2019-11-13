@@ -92,7 +92,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="LiveRepl\Main\LiveReplMain.cs" />
     <Compile Include="LiveRepl\UI\ContentGroup.cs" />
     <Compile Include="LiveRepl\UI\EditorParts\EditorGroup.cs" />
     <Compile Include="LiveRepl\UI\EditorParts\FileIOGroup.cs" />
@@ -121,6 +120,7 @@
     <Compile Include="LiveRepl\Old\OldEditAreaCompletionAdapter.cs" />
     <Compile Include="LiveRepl\Old\OldReplMain.cs" />
     <Compile Include="LiveRepl\Old\OldReplMain.Evaluation.cs" />
+    <Compile Include="LiveRepl\LiveReplMain.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
@@ -147,7 +147,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="LiveRepl\" />
-    <Folder Include="LiveRepl\Main\" />
     <Folder Include="LiveRepl\UI\" />
     <Folder Include="LiveRepl\UI\EditorParts\" />
     <Folder Include="LiveRepl\UI\CompletionParts\" />
@@ -158,13 +157,11 @@
     <Folder Include="LiveRepl\Old\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <ProjectExtensions>
-    <MonoDevelop>
-      <Properties>
-        <Policies>
-          <DotNetNamingPolicy ResourceNamePolicy="FileFormatDefault" DirectoryNamespaceAssociation="Hierarchical" />
-        </Policies>
-      </Properties>
-    </MonoDevelop>
-  </ProjectExtensions>
+  <Target Name="AfterBuild">
+    <ZipDirectory SourceDirectory="..\GameData\RedOnion\Resources" Overwrite="True" DestinationFile="..\GameData\RedOnion\Resources.zip" />
+    <ItemGroup>
+      <OutputFiles Include="$(OutDir)**\*.dll" />
+    </ItemGroup>
+    <Copy SourceFiles="@(OutputFiles)" DestinationFolder="..\GameData\RedOnion\Plugins\%(RecursiveDir)" OverwriteReadOnlyFiles="true" />
+  </Target>
 </Project>

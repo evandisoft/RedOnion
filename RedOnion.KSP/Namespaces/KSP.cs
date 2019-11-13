@@ -3,30 +3,64 @@ using RedOnion.KSP.Autopilot;
 using KSP.UI.Screens;
 using UE = UnityEngine;
 using System.ComponentModel;
+using RedOnion.KSP.MathUtil;
+using RedOnion.KSP.Utilities;
+using RedOnion.ROS;
 
 namespace RedOnion.KSP.Namespaces
 {
-	[DisplayName("KSP")]
+	[DisplayName("KSP"), DocBuild("RedOnion.KSP/Namespaces/KSP")]
+	[Unsafe, Description("Unsafe KSP API - see [CommonScriptApi](../../CommonScriptApi.md)")]
 	public static class KSP_Namespace
 	{
-		public static Type Vessel = typeof(Vessel);
-		public static Type VesselType = typeof(VesselType);
-		public static Type FlightCtrlState = typeof(FlightCtrlState);
-		public static FlightGlobals FlightGlobals = FlightGlobals.fetch;
+		[Description("UnityEngine.Time")]
+		public static readonly Type Time = typeof(UE.Time);
+		[Description("UnityEngine.Random")]
+		public static readonly Type Random = typeof(UE.Random);
+		[Description("UnityEngine.Mathf")]
+		public static readonly Type Mathf = typeof(UE.Mathf);
+
+		[Description("Math utilities.")]
+		public static readonly Scalar Scalar = new Scalar();
+		[Description("Vector utilities.")]
+		public static readonly Vec Vec = new Vec();
+
+		[Description("[KSP API](https://kerbalspaceprogram.com/api/class_vessel.html): Vessel (class).")]
+		public static readonly Type Vessel = typeof(Vessel);
+		[Description("[KSP API](https://kerbalspaceprogram.com/api/_vessel_8cs.html#afa39c7ec7cc0926b332fcd2d77425edb): Vessel Type (enum).")]
+		public static readonly Type VesselType = typeof(VesselType);
+
+		[Description("[KSP API](https://kerbalspaceprogram.com/api/class_flight_ctrl_state.html): Flight Control State (class for fly-by-wire/autopilot).")]
+		public static readonly Type FlightCtrlState = typeof(FlightCtrlState);
+		[Description("[KSP API](https://kerbalspaceprogram.com/api/class_flight_globals.html): Flight Globals (for autopilot).")]
+		public static FlightGlobals FlightGlobals => FlightGlobals.fetch;
+		[Description("Custom autopilot.")]
 		public static FlightControl FlightControl => FlightControl.GetInstance();
+		[Description("[KSP API](https://kerbalspaceprogram.com/api/class_flight_driver.html)")]
 		public static FlightDriver FlightDriver => FlightDriver.fetch;
+
+		[Description("[KSP API](https://kerbalspaceprogram.com/api/class_k_s_p_1_1_u_i_1_1_screens_1_1_stage_manager.html): Staging logic.")]
+		public static readonly Type StageManager = typeof(StageManager);
+
+		[Description("[KSP API](https://kerbalspaceprogram.com/api/class_high_logic.html): LoadedScene indicator and other global state.")]
 		public static HighLogic HighLogic => HighLogic.fetch;
-		public static Type InputLockManager = typeof(InputLockManager);
-		public static Type InputLock = typeof(InputLockManager);
-		public static Type StageManager = typeof(StageManager);
-		public static Type EditorLogic = typeof(EditorLogic);
-		public static Type EditorPanels = typeof(EditorPanels);
-		public static Type ShipConstruction = typeof(ShipConstruction);
-		public static Type GameScenes = typeof(GameScenes);
-		public static Type PartLoader = typeof(PartLoader);
+		[Description("[KSP API](https://kerbalspaceprogram.com/api/_high_logic_8cs.html#a0687e907db3af3681f90377d69f32090): Game scenes (enum).")]
+		public static readonly Type GameScenes = typeof(GameScenes);
+
+		[Description("[KSP API](https://kerbalspaceprogram.com/api/class_editor_logic.html): For use in editor (VAB/SPH).")]
+		public static readonly Type EditorLogic = typeof(EditorLogic);
+		[Description("[KSP API](https://kerbalspaceprogram.com/api/class_k_s_p_1_1_u_i_1_1_screens_1_1_editor_panels.html)")]
+		public static readonly Type EditorPanels = typeof(EditorPanels);
+		[Description("[KSP API](https://kerbalspaceprogram.com/api/class_ship_construction.html)")]
+		public static readonly Type ShipConstruction = typeof(ShipConstruction);
+		[Description("[KSP API](https://kerbalspaceprogram.com/api/class_part_loader.html)")]
+		public static readonly Type PartLoader = typeof(PartLoader);
+		[Description("[KSP API](https://kerbalspaceprogram.com/api/class_part_resource_library.html)")]
 		public static PartResourceLibrary PartResourceLibrary => PartResourceLibrary.Instance;
-		public static Type Time = typeof(UE.Time);
-		public static Type Random = typeof(UE.Random);
-		public static Type Mathf = typeof(UE.Mathf);
+
+		[Description("[KSP API](https://kerbalspaceprogram.com/api/class_input_lock_manager.html): For locking input.")]
+		public static readonly Type InputLockManager = typeof(InputLockManager);
+		[Description("Alias to `InputLockManager`.")]
+		public static readonly Type InputLock = typeof(InputLockManager);
 	}
 }

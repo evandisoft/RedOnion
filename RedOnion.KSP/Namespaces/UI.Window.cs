@@ -1,10 +1,12 @@
 using System;
 using RedOnion.KSP.API;
 using RedOnion.KSP.ROS;
+using RedOnion.KSP.Utilities;
 using RedOnion.ROS;
 
 namespace RedOnion.KSP
 {
+	[DocBuild(typeof(UI.Window))]
 	public class Window : UI.Window
 	{
 		protected IProcessor _processor;
