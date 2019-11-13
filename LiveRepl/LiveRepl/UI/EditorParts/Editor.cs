@@ -15,12 +15,10 @@ namespace LiveRepl.UI.EditorParts
 		/// <summary>
 		/// These bindings intentionally shadow the base class bindings.
 		/// </summary>
-		public KeyBindings keybindings = new KeyBindings();
 
 		public Editor(EditorGroup editorGroup) : base(new EditingArea(new TextArea()))
 		{
 			this.editorGroup=editorGroup;
-			//TODO: Define keybindings here.
 		}
 
 		protected override void DecoratorUpdate()

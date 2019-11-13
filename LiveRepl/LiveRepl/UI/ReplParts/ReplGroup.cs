@@ -65,7 +65,7 @@ namespace LiveRepl.UI.ReplParts
 		{
 			EvaluateReplText();
 			repl.replInputArea.editingArea.Text = "";
-			//TODO: deal with completion afterwords.
+
 			needsResize=true;
 		}
 	}

@@ -15,9 +15,16 @@ namespace LiveRepl.UI.ReplParts
 
 		protected override void DecoratorUpdate()
 		{
-			base.DecoratorUpdate();
-			if (editingArea.ReceivedInput)
+			bool receivedInput=false;
+			if (HasFocus())
 			{
+				receivedInput=Event.current.type==EventType.KeyDown;
+			}
+			base.DecoratorUpdate();
+
+			if (editingArea.ReceivedInput || receivedInput)
+			{
+				editingArea.ReceivedInput=true;
 				repl.needsResize=true;
 			}
 		}

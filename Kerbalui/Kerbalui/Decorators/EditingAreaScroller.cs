@@ -47,7 +47,12 @@ namespace Kerbalui.Decorators
 
 		protected override void DecoratorUpdate()
 		{
-			if (HasFocus()) keybindings.ExecuteAndConsumeIfMatched(Event.current);
+			bool receivedInput=false;
+			if (HasFocus())
+			{
+				keybindings.ExecuteAndConsumeIfMatched(Event.current);
+			}
+
 			scrollPos = GUI.BeginScrollView(rect, scrollPos, editingArea.rect);
 			{
 				// Without this, it takes two clicks to update the cursor when the editingArea is not focused.
