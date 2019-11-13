@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace Kerbalui.Gui {
+namespace Kerbalui.Obsolete {
 	/// <summary>
 	/// Subclasses of this class are expected to have no more or less than one control.
 	/// This class calls GUI.SetNextControl(ControlName) immediately prior

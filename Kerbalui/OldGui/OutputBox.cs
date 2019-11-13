@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace Kerbalui.Gui {
+namespace Kerbalui.Obsolete {
 	public class OutputBox:ScrollableTextArea {
 		public const int OUTPUT_LENGTH_LIMIT = 10000;
 

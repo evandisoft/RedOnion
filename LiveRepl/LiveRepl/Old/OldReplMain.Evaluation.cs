@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Kerbalua.Other;
-using Kerbalui.Gui;
+using Kerbalui.Obsolete;
 using RedOnion.KSP.API;
 using UnityEngine;
 

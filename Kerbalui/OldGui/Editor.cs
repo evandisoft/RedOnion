@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System;
 
-namespace Kerbalui.Gui {
+namespace Kerbalui.Obsolete {
     public class Editor:EditingArea{
 		/// <summary>
 		/// These bindings intentionally shadow the base class bindings.

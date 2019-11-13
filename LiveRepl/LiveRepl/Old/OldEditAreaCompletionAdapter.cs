@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
-using Kerbalui.Gui;
+using Kerbalui.Obsolete;
 using LiveRepl.Main;
 using LiveRepl.UI;
 
-namespace LiveRepl.Other {
+namespace LiveRepl.Obsolete {
 	/// <summary>
 	/// Represents an ICompletable using an editingArea and the
 	/// scriptWindow. Scriptwindow is used in order to complete based off of its

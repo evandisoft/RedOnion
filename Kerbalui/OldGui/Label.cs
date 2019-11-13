@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace Kerbalui.Gui
+namespace Kerbalui.Obsolete
 {
 	public class Label : UIElement
 	{

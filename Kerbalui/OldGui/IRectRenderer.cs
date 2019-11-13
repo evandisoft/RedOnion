@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace Kerbalui.Gui {
+namespace Kerbalui.Obsolete {
 	public interface IRectRenderer {
 		void Update(Rect rect, bool visible = true, GUIStyle style = null);
 	}

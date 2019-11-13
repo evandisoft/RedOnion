@@ -2,7 +2,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-namespace Kerbalui.Gui {
+namespace Kerbalui.Obsolete {
 	/// <summary>
 	/// Manages an interaction between focusable objects that can produce a 
 	/// list of possible completions (ICompletable) and an object for displaying 

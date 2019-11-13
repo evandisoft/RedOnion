@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace Kerbalui.Gui {
+namespace Kerbalui.Obsolete {
 	/// <summary>
 	/// Can render itself with GUILayout.
 	/// </summary>

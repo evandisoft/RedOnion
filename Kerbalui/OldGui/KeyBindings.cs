@@ -2,7 +2,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-namespace Kerbalui.Gui
+namespace Kerbalui.Obsolete
 {
 	public class KeyBindings : Dictionary<EventKey, Action>
 	{

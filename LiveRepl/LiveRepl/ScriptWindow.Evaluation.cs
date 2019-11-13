@@ -37,6 +37,11 @@ namespace LiveRepl
 			repl.replOutoutArea.AddError("Execution Manually Terminated");
 		}
 
+		public void ResetEngine()
+		{
+			currentReplEvaluator?.ResetEngine();
+		}
+
 		public void Evaluate(string source, string path, bool withHistory = false)
 		{
 			evaluationList.Add(new Evaluation(source, path, currentReplEvaluator, withHistory));
@@ -62,6 +67,7 @@ namespace LiveRepl
 				{
 					repl.replOutoutArea.AddReturnValue(currentEvaluation.Result);
 					evaluationList.RemoveAt(0);
+					completionManager.DisplayCurrentCompletions();
 				}
 			}
 			foreach (var engineName in replEvaluators.Keys)

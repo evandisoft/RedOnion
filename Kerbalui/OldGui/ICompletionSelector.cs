@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Kerbalui.Gui {
+namespace Kerbalui.Obsolete {
     public interface ICompletionSelector:IFocusable {
 		void SetContentFromICompletable(ICompletableElement completable);
 		int SelectionIndex { get; }

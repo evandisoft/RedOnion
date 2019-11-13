@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Kerbalui.Gui {
+namespace Kerbalui.Obsolete {
 	/// <summary>
 	/// Interface for focusable objects that can complete. Completable objects
 	/// can produce a list of possible completions, and can complete the indexth

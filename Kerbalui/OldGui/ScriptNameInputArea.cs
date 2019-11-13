@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using RedOnion.KSP.Settings;
 
-namespace Kerbalui.Gui {
+namespace Kerbalui.Obsolete {
 	public class ScriptNameInputArea:EditingArea, ICompletableElement {
 		public bool receivedInput;
 		Editor editor;

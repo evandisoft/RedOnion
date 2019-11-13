@@ -1,5 +1,5 @@
 ﻿using System;
-namespace Kerbalui.Gui {
+namespace Kerbalui.Obsolete {
 	public interface IRenderer:IRectRenderer,ILayoutRenderer {
 	}
 }
