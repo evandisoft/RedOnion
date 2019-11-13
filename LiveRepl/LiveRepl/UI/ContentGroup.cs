@@ -24,9 +24,9 @@ namespace LiveRepl
 		{
 			this.scriptWindow=scriptWindow;
 
-			AddFixed(ScriptWindow.editorGroupWidth, editorGroup=new EditorGroup(this));
-			AddFixed(ScriptWindow.centerGroupWidth, centerGroup=new CenterGroup(this));
 			AddFixed(ScriptWindow.replGroupWidth, replGroup=new ReplGroup(this));
+			AddFixed(ScriptWindow.centerGroupWidth, centerGroup=new CenterGroup(this));
+			AddFixed(ScriptWindow.editorGroupWidth, editorGroup=new EditorGroup(this));
 			AddFixed(ScriptWindow.completionGroupWidth, completionGroup=new CompletionGroup(this));
 		}
 	}

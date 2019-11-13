@@ -34,7 +34,7 @@ namespace LiveRepl.UI.EditorParts {
 
 		protected override void DecoratorUpdate()
 		{
-			if ((Event.current.type==EventType.MouseDown || Event.current.type==EventType.ScrollWheel) && !HasFocus() && GUILibUtil.MouseInRect(ContentRect))//.Contains(Event.current.mousePosition))
+			if ((Event.current.type==EventType.MouseDown || Event.current.type==EventType.ScrollWheel) && !HasFocus() && GUILibUtil.MouseInRect(rect))//ContentRect.Contains(Event.current.mousePosition))
 			{
 				//Debug.Log("edit area scroller grabbing mouse");
 				GrabFocus();

@@ -21,13 +21,12 @@ namespace LiveRepl.UI.EditorParts
 		{
 			this.editorGroup=editorGroup;
 
-			AddWeighted(3, scriptNameInputArea=new ScriptNameInputArea(this));
-			AddMinSized(editorChangesIndicator=new EditorChangesIndicator(this));
-
 			ScriptWindow scriptWindow=editorGroup.contentGroup.scriptWindow;
 			AddWeighted(1, new Button("Save", scriptWindow.ScriptDisabledAction(editorGroup.SaveEditorText)));
 			AddWeighted(1, new Button("Load", scriptWindow.ScriptDisabledAction(editorGroup.LoadEditorText)));
 			AddWeighted(1, new Button("Run", scriptWindow.ScriptDisabledAction(editorGroup.RunEditorScript)));
+			AddMinSized(editorChangesIndicator=new EditorChangesIndicator(this));
+			AddWeighted(3, scriptNameInputArea=new ScriptNameInputArea(this));
 		}
 	}
 }
