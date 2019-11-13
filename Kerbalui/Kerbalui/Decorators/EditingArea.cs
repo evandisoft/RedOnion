@@ -66,12 +66,6 @@ namespace Kerbalui.Decorators
 					= Color.white;
 			}
 
-			// Without this, it takes two clicks to update the cursor when the editingArea is not focused.
-			if (Event.current.type==EventType.MouseDown && !HasFocus() && GUILibUtil.MouseInRect(rect))
-			{
-				GrabFocus();
-			}
-
 			if (editableText.HasFocus())
 			{
 				ReceivedInput = Event.current.type == EventType.KeyDown;
@@ -81,15 +75,22 @@ namespace Kerbalui.Decorators
 				backingEditor.cursorIndex = CursorIndex;
 				backingEditor.selectIndex = SelectIndex;
 
-
 				HandleInput();
+
+				editableText.content.text = backingEditor.text;
+				
+				//bool wasmousedown=Event.current.type==EventType.MouseDown;
+				editableText.Update();
 
 				LineNumber = CurrentLineNumber() + 1;
 				ColumnNumber = CharsFromLineStart() + 1;
 
-				editableText.content.text = backingEditor.text;
-
-				editableText.Update();
+				//if (wasmousedown)
+				//{
+				//	Debug.Log("was");
+				//	Debug.Log(LineNumber);
+				//	Debug.Log(ColumnNumber);
+				//}
 
 				CursorIndex = backingEditor.cursorIndex;
 				SelectIndex = backingEditor.selectIndex;

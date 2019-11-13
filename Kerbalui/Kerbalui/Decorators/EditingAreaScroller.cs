@@ -1,6 +1,7 @@
 using System;
 using Kerbalui.EventHandling;
 using Kerbalui.Types;
+using Kerbalui.Util;
 using UnityEngine;
 
 namespace Kerbalui.Decorators
@@ -49,6 +50,13 @@ namespace Kerbalui.Decorators
 			if (HasFocus()) keybindings.ExecuteAndConsumeIfMatched(Event.current);
 			scrollPos = GUI.BeginScrollView(rect, scrollPos, editingArea.rect);
 			{
+				// Without this, it takes two clicks to update the cursor when the editingArea is not focused.
+				if ((Event.current.type==EventType.MouseDown || Event.current.type==EventType.ScrollWheel) && !HasFocus() && GUILibUtil.MouseInRect(rect))
+				{
+					//Debug.Log("edit area scroller mouse check");
+					GrabFocus();
+				}
+
 				editingArea.Update();
 
 				lastScrollViewVector2 = new Vector2(rect.width, rect.height);

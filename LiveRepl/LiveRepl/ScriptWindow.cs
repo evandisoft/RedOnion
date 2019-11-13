@@ -14,7 +14,7 @@ namespace LiveRepl
 {
 	public partial class ScriptWindow
 	{
-		CompletionManager completionManager;
+		public CompletionManager completionManager;
 		public bool inputIsLocked;
 
 		public ScriptWindow(string title) : base(title)

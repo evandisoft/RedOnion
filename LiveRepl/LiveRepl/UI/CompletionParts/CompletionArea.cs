@@ -29,19 +29,19 @@ namespace LiveRepl.UI.CompletionParts
 
 		protected override void DecoratorUpdate()
 		{
-			bool lastEventWasMouseDown = Event.current.type == EventType.MouseDown && rect.Contains(Event.current.mousePosition);
-			if (lastEventWasMouseDown)
-			{
-				editingArea.GrabFocus();
-			}
+			bool lastEventWasMouseDown = Event.current.type == EventType.MouseDown && GUILibUtil.MouseInRect(rect);
+			string lastControlname = GUI.GetNameOfFocusedControl();
 
-			if (HasFocus()) editingArea.keybindings.ExecuteAndConsumeIfMatched(Event.current);
 			base.DecoratorUpdate();
 
-			if (lastEventWasMouseDown && Event.current.type == EventType.Used && rect.Contains(Event.current.mousePosition))
+			if (lastEventWasMouseDown && Event.current.type == EventType.Used && GUILibUtil.MouseInRect(rect))
 			{
-				SelectionIndex = editingArea.LineNumber;
+				//Debug.Log("This was clicked");
+				SelectionIndex = editingArea.LineNumber-1;
+				//Debug.Log("Selection is "+SelectionIndex);
 				UpdateCursorPosition();
+				completionGroup.contentGroup.scriptWindow.completionManager.Complete();
+				completionGroup.contentGroup.scriptWindow.needsResize=true;
 			}
 		}
 
@@ -91,19 +91,19 @@ namespace LiveRepl.UI.CompletionParts
 			editingArea.keybindings.Clear();
 			// Prevent underlying control from processing any keydown events.
 			editingArea.onlyUseKeyBindings = true;
-			keybindings.Add(new EventKey(KeyCode.K, true), () => {
+			editingArea.keybindings.Add(new EventKey(KeyCode.K, true), () => {
 				SelectionIndex = Math.Min(contentStrings.Count-1, SelectionIndex + 1);
 				UpdateCursorPosition();
 			});
-			keybindings.Add(new EventKey(KeyCode.L, true), () => {
+			editingArea.keybindings.Add(new EventKey(KeyCode.L, true), () => {
 				SelectionIndex = Math.Max(0, SelectionIndex - 1);
 				UpdateCursorPosition();
 			});
-			keybindings.Add(new EventKey(KeyCode.Comma, true), () => {
+			editingArea.keybindings.Add(new EventKey(KeyCode.Comma, true), () => {
 				SelectionIndex = Math.Min(contentStrings.Count - 1, SelectionIndex + 4);
 				UpdateCursorPosition();
 			});
-			keybindings.Add(new EventKey(KeyCode.Period, true), () => {
+			editingArea.keybindings.Add(new EventKey(KeyCode.Period, true), () => {
 				SelectionIndex = Math.Max(0, SelectionIndex - 4);
 				UpdateCursorPosition();
 			});
