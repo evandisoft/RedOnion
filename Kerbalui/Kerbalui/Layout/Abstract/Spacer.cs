@@ -120,17 +120,17 @@ namespace Kerbalui.Layout.Abstract
                 if (spacerEntry.element.Active)
                 {
                     minContentSize = getMinSize(spacerEntry);
-                    if (minContentSize > 0)
+                    if (spacerEntry.type==SpacerEntryType.WEIGHTED)
                     {
-                        endPoint = startPoint + minContentSize;
-                    }
+						endPoint = startPoint + spacerEntry.size * weightMultiplier;
+					}
                     else
                     {
-                        endPoint = startPoint + spacerEntry.size * weightMultiplier;
+						endPoint = startPoint + minContentSize;
                     }
                 }
 
-                spacingPoints.Add(endPoint);
+				spacingPoints.Add(endPoint);
                 startPoint = endPoint;
             }
 

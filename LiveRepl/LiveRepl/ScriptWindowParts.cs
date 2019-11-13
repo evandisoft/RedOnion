@@ -20,7 +20,7 @@ namespace LiveRepl
 		public EditorChangesIndicator editorChangesIndicator;
 		public EditorGroup editorGroup;
 		public EditorStatusLabel editorStatusLabel;
-		public FileIOGroup fileIOGroup;
+		public EditorStatusGroup editorStatusGroup;
 		public Repl repl;
 		public ReplGroup replGroup;
 		public ReplInputArea replInputArea;

@@ -115,7 +115,7 @@
     <Compile Include="LiveRepl\Parts\EditorChangesIndicator.cs" />
     <Compile Include="LiveRepl\Parts\EditorGroup.cs" />
     <Compile Include="LiveRepl\Parts\EditorStatusLabel.cs" />
-    <Compile Include="LiveRepl\Parts\FileIOGroup.cs" />
+    <Compile Include="LiveRepl\Parts\EditorStatusGroup.cs" />
     <Compile Include="LiveRepl\Parts\ScriptNameInputArea.cs" />
     <Compile Include="LiveRepl\Parts\CompletionArea.cs" />
     <Compile Include="LiveRepl\Parts\CompletionGroup.cs" />

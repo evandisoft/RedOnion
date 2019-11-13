@@ -18,9 +18,9 @@ namespace LiveRepl.Parts
 		{
 			this.uiparts=uiparts;
 
-			AddMinSized(uiparts.fileIOGroup=new FileIOGroup(uiparts));
+			AddMinSized(uiparts.editorStatusGroup=new EditorStatusGroup(uiparts));
+
 			AddWeighted(1,uiparts.editor=new Editor(uiparts));
-			AddMinSized(uiparts.editorStatusLabel=new EditorStatusLabel());
 
 			uiparts.editor.keybindings.Add(new EventKey(KeyCode.E, true), uiparts.scriptWindow.RunEditorScript);
 		}
@@ -29,7 +29,7 @@ namespace LiveRepl.Parts
 		{
 			if (Event.current.type==EventType.KeyDown)
 			{
-				uiparts.fileIOGroup.needsResize=true;
+				uiparts.editorStatusGroup.needsResize=true;
 			}
 		}
 	}

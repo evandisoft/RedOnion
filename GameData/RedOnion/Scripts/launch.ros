@@ -15,7 +15,6 @@ var narrowAltitude = 100  // altitude (in m) upto which to go straight up
 if startAngle > 89
   startAngle = 90
 
-
 //: PARAM GUI
 
 var firda = true
