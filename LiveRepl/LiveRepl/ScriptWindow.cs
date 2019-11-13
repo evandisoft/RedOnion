@@ -27,9 +27,10 @@ namespace LiveRepl
 			contentGroup.editorGroup.LoadEditorText();
 		}
 
+
 		public void SetOrReleaseInputLock()
 		{
-			if (GUILibUtil.MouseInRect(rect))
+			if (ContentRect.Contains(Event.current.mousePosition))//GUILibUtil.MouseInRect(rect))
 			{
 				if (!inputIsLocked)
 				{

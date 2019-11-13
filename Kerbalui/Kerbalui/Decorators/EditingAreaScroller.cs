@@ -56,7 +56,7 @@ namespace Kerbalui.Decorators
 			scrollPos = GUI.BeginScrollView(rect, scrollPos, editingArea.rect);
 			{
 				// Without this, it takes two clicks to update the cursor when the editingArea is not focused.
-				if ((Event.current.type==EventType.MouseDown || Event.current.type==EventType.ScrollWheel) && !HasFocus() && GUILibUtil.MouseInRect(rect))
+				if ((Event.current.type==EventType.MouseDown || Event.current.type==EventType.ScrollWheel) && !HasFocus() && ContentRect.Contains(Event.current.mousePosition))
 				{
 					//Debug.Log("edit area scroller mouse check");
 					GrabFocus();

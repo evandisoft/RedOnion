@@ -29,12 +29,12 @@ namespace LiveRepl.UI.CompletionParts
 
 		protected override void DecoratorUpdate()
 		{
-			bool lastEventWasMouseDown = Event.current.type == EventType.MouseDown && GUILibUtil.MouseInRect(rect);
+			bool lastEventWasMouseDown = Event.current.type == EventType.MouseDown && ContentRect.Contains(Event.current.mousePosition); //GUILibUtil.MouseInRect(rect);
 			string lastControlname = GUI.GetNameOfFocusedControl();
 
 			base.DecoratorUpdate();
 
-			if (lastEventWasMouseDown && Event.current.type == EventType.Used && GUILibUtil.MouseInRect(rect))
+			if (lastEventWasMouseDown && Event.current.type == EventType.Used && ContentRect.Contains(Event.current.mousePosition))
 			{
 				//Debug.Log("This was clicked");
 				SelectionIndex = editingArea.LineNumber-1;
