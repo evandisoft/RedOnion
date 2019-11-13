@@ -3,7 +3,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using LiveRepl.Interfaces;
 
-namespace LiveRepl.Misc
+namespace LiveRepl.Completion
 {
 	/// <summary>
 	/// Manages an interaction between focusable objects that can produce a 
@@ -95,8 +95,9 @@ namespace LiveRepl.Misc
 			//Debug.Log("completing");
 			ICompletableElement completable;
 			if (completableMap.TryGetValue(mostRecentlyFocusedCompletable,out completable)) {
-				completable.GrabFocus();
+
 				completable.Complete(completionSelector.SelectionIndex);
+				completable.GrabFocus();
 			} 
 		}
 	}

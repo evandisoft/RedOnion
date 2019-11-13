@@ -4,7 +4,7 @@ using Kerbalua.Other;
 using Kerbalui.Controls;
 using Kerbalui.Types;
 using Kerbalui.Util;
-using LiveRepl.Misc;
+using LiveRepl.Completion;
 using LiveRepl.UI;
 using LiveRepl.UI.ReplParts;
 using RedOnion.KSP.Settings;
@@ -34,7 +34,7 @@ namespace LiveRepl
 			{
 				if (!inputIsLocked)
 				{
-					Debug.Log("Input is now locked");
+					//Debug.Log("Input is now locked");
 					inputIsLocked = true;
 					InputLockManager.SetControlLock(ControlTypes.KEYBOARDINPUT, "kerbalua");
 				}
@@ -43,7 +43,7 @@ namespace LiveRepl
 			{
 				if (inputIsLocked)
 				{
-					Debug.Log("Input is no longer locked");
+					//Debug.Log("Input is no longer locked");
 					inputIsLocked = false;
 					InputLockManager.ClearControlLocks();
 				}

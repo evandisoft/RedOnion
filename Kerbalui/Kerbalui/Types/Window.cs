@@ -40,9 +40,22 @@ namespace Kerbalui.Types
 			this.content=content;
 		}
 
+		bool firstRunPassed=false;
+		bool secondRunPassed=false;
 		protected override void TypeSpecificUpdate()
 		{
-			defaultSkin=GUI.skin;
+			if (!firstRunPassed)
+			{
+				defaultSkin=GUI.skin;
+				firstRunPassed=true;
+				needsResize=true;
+			}
+			if (!secondRunPassed)
+			{
+				secondRunPassed=true;
+				needsResize=true;
+			}
+
 
 			rect=GUI.Window(windowID, rect, PointlessFunc, titleContent);
 		}

@@ -5,7 +5,7 @@ using LiveRepl.Interfaces;
 using LiveRepl.Main;
 using LiveRepl.UI;
 
-namespace LiveRepl.Misc {
+namespace LiveRepl.Completion {
 	/// <summary>
 	/// Represents an ICompletable using an editingArea and the
 	/// scriptWindow. Scriptwindow is used in order to complete based off of its

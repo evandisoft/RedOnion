@@ -53,17 +53,20 @@ namespace Kerbalui.Decorators
 				keybindings.ExecuteAndConsumeIfMatched(Event.current);
 			}
 
+			if ((Event.current.type==EventType.MouseDown || Event.current.type==EventType.ScrollWheel) && !HasFocus() && GUILibUtil.MouseInRect(ContentRect))//.Contains(Event.current.mousePosition))
+			{
+				//Debug.Log("edit area scroller grabbing mouse");
+				GrabFocus();
+			}
 			scrollPos = GUI.BeginScrollView(rect, scrollPos, editingArea.rect);
 			{
 				var scrollbarlessrect=new Rect(ContentRect);
-				if(VerticalScrollBarPresent)
-					scrollbarlessrect.width-=ScrollbarWidth;
+				//if(VerticalScrollBarPresent)
+				//	scrollbarlessrect.width-=ScrollbarWidth;
+				//if (HorizontalScrollBarPresent)
+					//scrollbarlessrect.height-=ScrollbarWidth;
 				// Without this, it takes two clicks to update the cursor when the editingArea is not focused.
-				if ((Event.current.type==EventType.MouseDown || Event.current.type==EventType.ScrollWheel) && !HasFocus() && GUILibUtil.MouseInRect(scrollbarlessrect))//.Contains(Event.current.mousePosition))
-				{
-					//Debug.Log("edit area scroller mouse check");
-					GrabFocus();
-				}
+
 
 				editingArea.Update();
 
