@@ -48,6 +48,11 @@ namespace LiveRepl.Main
 
 		void LocalToggleGui()
         {
+			if (scriptWindow.inputIsLocked)
+			{
+				InputLockManager.ClearControlLocks();
+				scriptWindow.inputIsLocked=false;
+			}
 			guiActive = !guiActive;
         }
 

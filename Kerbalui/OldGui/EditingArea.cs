@@ -55,6 +55,8 @@ namespace Kerbalui.Gui
 					= Color.white;
 			}
 
+
+
 			if (HasFocus())
 			{
 

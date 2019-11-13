@@ -37,7 +37,7 @@ namespace LiveRepl.Misc
 		//int inc = 0;
 		bool newInput = false;
 		bool focusChanged = false;
-		public void Update(bool hadMouseDownLastUpdate)
+		public bool Update(bool hadMouseDownLastUpdate)
 		{
 			newInput|= hadMouseDownLastUpdate;
 			//if (hadMouseDownLastUpdate) {
@@ -65,8 +65,10 @@ namespace LiveRepl.Misc
 				if (completableMap.TryGetValue(mostRecentlyFocusedCompletable, out currentCompletable)) {
 					//Debug.Log("Displaying completions");
 					DisplayCurrentCompletions(currentCompletable);
+					return true;
 				}
 			}
+			return false;
 		}
 
 		//public void CompleteOnNextUpdate()

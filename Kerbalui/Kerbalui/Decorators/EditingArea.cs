@@ -66,6 +66,12 @@ namespace Kerbalui.Decorators
 					= Color.white;
 			}
 
+			// Without this, it takes two clicks to update the cursor when the editingArea is not focused.
+			if (Event.current.type==EventType.MouseDown && !HasFocus() && GUILibUtil.MouseInRect(rect))
+			{
+				GrabFocus();
+			}
+
 			if (editableText.HasFocus())
 			{
 				ReceivedInput = Event.current.type == EventType.KeyDown;

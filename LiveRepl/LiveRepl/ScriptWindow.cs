@@ -15,7 +15,7 @@ namespace LiveRepl
 	public partial class ScriptWindow
 	{
 		CompletionManager completionManager;
-		bool inputIsLocked;
+		public bool inputIsLocked;
 
 		public ScriptWindow(string title) : base(title)
 		{
@@ -29,7 +29,7 @@ namespace LiveRepl
 
 		public void SetOrReleaseInputLock()
 		{
-			if (rect.Contains(Mouse.screenPos))
+			if (GUILibUtil.MouseInRect(rect))
 			{
 				if (!inputIsLocked)
 				{
@@ -67,7 +67,10 @@ namespace LiveRepl
 			if (ScriptRunning) HandleInputWhenExecuting();
 
 			GlobalKeyBindings.ExecuteAndConsumeIfMatched(Event.current);
-			completionManager.Update(hadMouseDownLastUpdate);
+			if (completionManager.Update(hadMouseDownLastUpdate))
+			{
+				contentGroup.completionGroup.completionArea.needsResize=true;
+			}
 			hadMouseDownLastUpdate=Event.current.type==EventType.MouseDown;
 			base.WindowsUpdate();
 

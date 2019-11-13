@@ -1,4 +1,5 @@
 using System;
+using Kerbalui.Util;
 using UnityEngine;
 
 namespace Kerbalui.Types
@@ -30,6 +31,8 @@ namespace Kerbalui.Types
 
 		protected override void TypeSpecificUpdate()
 		{
+
+
 			GUI.SetNextControlName(ControlName);
 			ControlUpdate();
 		}
