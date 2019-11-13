@@ -55,8 +55,11 @@ namespace Kerbalui.Decorators
 
 			scrollPos = GUI.BeginScrollView(rect, scrollPos, editingArea.rect);
 			{
+				var scrollbarlessrect=new Rect(ContentRect);
+				if(VerticalScrollBarPresent)
+					scrollbarlessrect.width-=ScrollbarWidth;
 				// Without this, it takes two clicks to update the cursor when the editingArea is not focused.
-				if ((Event.current.type==EventType.MouseDown || Event.current.type==EventType.ScrollWheel) && !HasFocus() && GUILibUtil.MouseInRect(ContentRect))//.Contains(Event.current.mousePosition))
+				if ((Event.current.type==EventType.MouseDown || Event.current.type==EventType.ScrollWheel) && !HasFocus() && GUILibUtil.MouseInRect(scrollbarlessrect))//.Contains(Event.current.mousePosition))
 				{
 					//Debug.Log("edit area scroller mouse check");
 					GrabFocus();

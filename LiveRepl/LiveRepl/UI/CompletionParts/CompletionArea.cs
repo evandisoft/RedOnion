@@ -34,7 +34,12 @@ namespace LiveRepl.UI.CompletionParts
 
 			base.DecoratorUpdate();
 
-			if (lastEventWasMouseDown && Event.current.type == EventType.Used && GUILibUtil.MouseInRect(ContentRect)) //ContentRect.Contains(Event.current.mousePosition))
+			var scrollbarlessrect=new Rect(ContentRect);
+			if (VerticalScrollBarPresent)
+				scrollbarlessrect.width-=ScrollbarWidth;
+			if (HorizontalScrollBarPresent)
+				scrollbarlessrect.height-=ScrollbarWidth;
+			if (lastEventWasMouseDown && Event.current.type == EventType.Used && GUILibUtil.MouseInRect(scrollbarlessrect)) //ContentRect.Contains(Event.current.mousePosition))
 			{
 				//Debug.Log("This was clicked");
 				SelectionIndex = editingArea.LineNumber-1;
