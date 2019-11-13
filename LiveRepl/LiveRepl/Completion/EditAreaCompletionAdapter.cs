@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Kerbalui.Decorators;
 using LiveRepl.Interfaces;
 using LiveRepl.Main;
-using LiveRepl.UI;
 
 namespace LiveRepl.Completion {
 	/// <summary>

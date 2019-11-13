@@ -6,19 +6,19 @@ using Kerbalui.Controls.Abstract;
 using Kerbalui.Decorators;
 using Kerbalui.Controls;
 
-namespace LiveRepl.UI.EditorParts 
+namespace LiveRepl.Parts
 {
     public class Editor:EditingAreaScroller
     {
-		public EditorGroup editorGroup;
+		public ScriptWindowParts uiparts;
 
 		/// <summary>
 		/// These bindings intentionally shadow the base class bindings.
 		/// </summary>
 
-		public Editor(EditorGroup editorGroup) : base(new EditingArea(new TextArea()))
+		public Editor(ScriptWindowParts uiparts) : base(new EditingArea(new TextArea()))
 		{
-			this.editorGroup=editorGroup;
+			this.uiparts=uiparts;
 		}
 
 		protected override void DecoratorUpdate()
@@ -30,12 +30,12 @@ namespace LiveRepl.UI.EditorParts
 
 			base.DecoratorUpdate();
 
-			editorGroup.editorStatusLabel.UpdateCursorInfo(editingArea.LineNumber, editingArea.ColumnNumber);
+			uiparts.editorStatusLabel.UpdateCursorInfo(editingArea.LineNumber, editingArea.ColumnNumber);
 
 			if (editingArea.ReceivedInput)
 			{
-				editorGroup.fileIOGroup.editorChangesIndicator.Changed();
-				editorGroup.needsResize=true;
+				uiparts.editorChangesIndicator.Changed();
+				uiparts.scriptWindow.needsResize=true;
 			}
 		}
 	}

@@ -3,15 +3,15 @@ using Kerbalui.Decorators;
 using Kerbalui.Util;
 using UnityEngine;
 
-namespace LiveRepl.UI.ReplParts
+namespace LiveRepl.Parts
 {
 	public class ReplOutoutArea:EditingAreaScroller
 	{
-		public Repl repl;
+		public ScriptWindowParts uiparts;
 
-		public ReplOutoutArea(Repl repl) : base(new EditingArea(new TextArea()))
+		public ReplOutoutArea(ScriptWindowParts uiparts) : base(new EditingArea(new TextArea()))
 		{
-			this.repl=repl;
+			this.uiparts=uiparts;
 		}
 
 		public const int OUTPUT_LENGTH_LIMIT = 10000;
@@ -19,7 +19,7 @@ namespace LiveRepl.UI.ReplParts
 		void CommonOutputProcessing()
 		{
 			ResetScroll();
-			repl.needsResize=true;
+			uiparts.scriptWindow.needsResize=true;
 		}
 
 		public void AddReturnValue(string str)
@@ -91,14 +91,14 @@ namespace LiveRepl.UI.ReplParts
 					if (!Event.current.control) {
 						// Don't give focus for the followup char events.
 						if(Event.current.keyCode!=KeyCode.None)
-							repl.replInputArea.GrabFocus();
+							uiparts.replInputArea.GrabFocus();
 					}
 					break;
 
 				default:
 					// Don't give focus for the followup char events.
 					if (Event.current.keyCode != KeyCode.None)
-						repl.replInputArea.GrabFocus();
+						uiparts.replInputArea.GrabFocus();
 					break;
 				}
 			}

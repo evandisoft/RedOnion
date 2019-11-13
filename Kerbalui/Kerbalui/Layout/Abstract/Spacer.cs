@@ -23,9 +23,9 @@ namespace Kerbalui.Layout.Abstract
         void Add(SpacerEntry spacerEntry)
         {
             spacerEntries.Add(spacerEntry);
-            RegisterForUpdate(spacerEntry.element);
-            needsResize = true;
-            PostAddElement();
+			RegisterForUpdate(spacerEntry.element);
+			needsResize = true;
+			PostAddElement();
         }
         public void AddWeighted(float weight, Element element)
         {

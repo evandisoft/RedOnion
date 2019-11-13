@@ -12,47 +12,14 @@ namespace LiveRepl
 	{
 		public bool ScriptRunning => evaluationList.Count!=0;
 
-		/// <summary>
-		/// Takes an action, action1, and returns an action that, when executed, will only
-		/// execute action1 if ScriptRunning returns true.
-		/// </summary>
-		/// <returns>The disabled action.</returns>
-		/// <param name="action1">The action.</param>
-		public Action ScriptDisabledAction(Action action1)
-		{
-			return () =>
-			{
-				if (ScriptRunning) return;
-				action1();
-			};
-		}
 
-		public void Terminate()
-		{
-			evaluationList.Clear();
-			foreach (var replEvaluator in replEvaluators.Values)
-			{
-				replEvaluator.Terminate();
-			}
-			repl.replOutoutArea.AddError("Execution Manually Terminated");
-		}
-
-		public void ResetEngine()
-		{
-			currentReplEvaluator?.ResetEngine();
-		}
-
-		public void Evaluate(string source, string path, bool withHistory = false)
-		{
-			evaluationList.Add(new Evaluation(source, path, currentReplEvaluator, withHistory));
-		}
 
 		List<Evaluation> evaluationList = new List<Evaluation>();
 
 		public void SetCurrentEvaluator(string evaluatorName)
 		{
 			currentReplEvaluator = replEvaluators[evaluatorName];
-			contentGroup.centerGroup.scriptEngineSelector.scriptEngineLabel.SetEngine(evaluatorName);
+			uiparts.scriptEngineLabel.SetEngine(evaluatorName);
 		}
 
 		Dictionary<string,ReplEvaluator> replEvaluators=new Dictionary<string, ReplEvaluator>();
@@ -65,7 +32,7 @@ namespace LiveRepl
 				var currentEvaluation = evaluationList[0];
 				if (currentEvaluation.Evaluate())
 				{
-					repl.replOutoutArea.AddReturnValue(currentEvaluation.Result);
+					uiparts.replOutoutArea.AddReturnValue(currentEvaluation.Result);
 					evaluationList.RemoveAt(0);
 					completionManager.DisplayCurrentCompletions();
 				}
@@ -90,15 +57,15 @@ namespace LiveRepl
 		{
 			replEvaluators["ROS"] = new RedOnionReplEvaluator()
 			{
-				PrintAction = repl.replOutoutArea.AddOutput,
-				PrintErrorAction = repl.replOutoutArea.AddError
+				PrintAction = uiparts.replOutoutArea.AddOutput,
+				PrintErrorAction = uiparts.replOutoutArea.AddError
 			};
 			replEvaluators["Lua"] = new MoonSharpReplEvaluator()
 			{
-				PrintAction = repl.replOutoutArea.AddOutput,
-				PrintErrorAction = repl.replOutoutArea.AddError
+				PrintAction = uiparts.replOutoutArea.AddOutput,
+				PrintErrorAction = uiparts.replOutoutArea.AddError
 			};
-			var scriptEngineSelector=contentGroup.centerGroup.scriptEngineSelector;
+			var scriptEngineSelector=uiparts.scriptEngineSelector;
 
 			string lastEngineName = SavedSettings.LoadSetting("lastEngine", "Lua");
 			if (replEvaluators.ContainsKey(lastEngineName))

@@ -1,6 +1,5 @@
 using System;
 using Kerbalui.Types;
-using LiveRepl.UI.ReplParts;
 using RedOnion.KSP.Settings;
 using UnityEngine;
 
@@ -16,13 +15,13 @@ namespace LiveRepl
 
 		public const float startingX = 100;
 		public const float startingY = 100;
-		public ContentGroup contentGroup;
-		public Repl repl;
+
+		public ScriptWindowParts uiparts;
 
 		void InitLayout()
 		{
-			AssignContent(contentGroup=new ContentGroup(this));
-			repl=contentGroup.replGroup.repl;
+			uiparts=new ScriptWindowParts(this);
+			AssignContent(uiparts.contentGroup);
 
 			EditorVisible = bool.Parse(SavedSettings.LoadSetting("editorVisible", "true"));
 			ReplVisible = bool.Parse(SavedSettings.LoadSetting("replVisible", "true"));
@@ -42,10 +41,9 @@ namespace LiveRepl
 
 		float WindowWidth()
 		{
-			float width=centerGroupWidth;
+			float width=completionGroupWidth+centerGroupWidth;
 			if (EditorVisible || ReplVisible)
 			{
-				width+=completionGroupWidth;
 				if (EditorVisible)
 				{
 					width+=editorGroupWidth;
@@ -58,15 +56,7 @@ namespace LiveRepl
 			return width;
 		}
 
-		public void ToggleEditor()
-		{
-			EditorVisible=!editorVisible;
-		}
 
-		public void ToggleRepl()
-		{
-			ReplVisible=!replVisible;
-		}
 
 		private bool editorVisible = true;
 		public bool EditorVisible
@@ -87,8 +77,8 @@ namespace LiveRepl
 						rect.width+=editorGroupWidth;
 					}
 
-					contentGroup.editorGroup.Active=editorVisible=value;
-					contentGroup.completionGroup.Active=editorVisible || replVisible;
+					uiparts.editorGroup.Active=editorVisible=value;
+					//contentGroup.completionGroup.Active=editorVisible || replVisible;
 					needsResize=true;
 				}
 			}
@@ -113,8 +103,8 @@ namespace LiveRepl
 						rect.width+=replGroupWidth;
 					}
 
-					contentGroup.replGroup.Active=replVisible=value;
-					contentGroup.completionGroup.Active=editorVisible || replVisible;
+					uiparts.replGroup.Active=replVisible=value;
+					//contentGroup.completionGroup.Active=editorVisible || replVisible;
 					needsResize=true;
 				}
 			}

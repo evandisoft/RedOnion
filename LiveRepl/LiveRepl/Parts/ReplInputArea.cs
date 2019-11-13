@@ -2,16 +2,16 @@
 using Kerbalui.Decorators;
 using UnityEngine;
 
-namespace LiveRepl.UI.ReplParts
+namespace LiveRepl.Parts
 {
 	public class ReplInputArea:EditingAreaScroller
 	{
-		public Repl repl;
+		public ScriptWindowParts uiparts;
 		const float extraBottomSpace=5;
 
-		public ReplInputArea(Repl repl):base(new EditingArea(new TextArea()))
+		public ReplInputArea(ScriptWindowParts uiparts):base(new EditingArea(new TextArea()))
 		{
-			this.repl=repl;
+			this.uiparts=uiparts;
 		}
 
 		protected override void DecoratorUpdate()
@@ -26,7 +26,7 @@ namespace LiveRepl.UI.ReplParts
 			if (editingArea.ReceivedInput || receivedInput)
 			{
 				editingArea.ReceivedInput=true;
-				repl.needsResize=true;
+				uiparts.scriptWindow.needsResize=true;
 			}
 		}
 
@@ -43,7 +43,7 @@ namespace LiveRepl.UI.ReplParts
 				//Debug.Log("minHeight "+minHeight);
 				if (!firstUse)
 				{
-					repl.needsResize=true;
+					uiparts.scriptWindow.needsResize=true;
 					firstUse=true;
 				}
 				return new Vector2(0, minHeight);

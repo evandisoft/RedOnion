@@ -5,8 +5,6 @@ using Kerbalui.Controls;
 using Kerbalui.Types;
 using Kerbalui.Util;
 using LiveRepl.Completion;
-using LiveRepl.UI;
-using LiveRepl.UI.ReplParts;
 using RedOnion.KSP.Settings;
 using UnityEngine;
 
@@ -24,13 +22,13 @@ namespace LiveRepl
 			InitCompletion();
 			InitializeGlobalKeyBindings();
 
-			contentGroup.editorGroup.LoadEditorText();
+			LoadEditorText();
 		}
 
 
 		public void SetOrReleaseInputLock()
 		{
-			if (GUILibUtil.MouseInRect(contentGroup.rect)) //ContentRect.Contains(Event.current.mousePosition))//GUILibUtil.MouseInRect(rect))
+			if (GUILibUtil.MouseInRect(uiparts.contentGroup.rect)) //ContentRect.Contains(Event.current.mousePosition))//GUILibUtil.MouseInRect(rect))
 			{
 				if (!inputIsLocked)
 				{
@@ -52,10 +50,11 @@ namespace LiveRepl
 
 		void InitCompletion()
 		{
-			completionManager=new CompletionManager(contentGroup.completionGroup.completionArea);
-			completionManager.AddCompletable(new EditingAreaCompletionAdapter(contentGroup.editorGroup.editor.editingArea, this));
-			completionManager.AddCompletable(new EditingAreaCompletionAdapter(contentGroup.replGroup.repl.replInputArea.editingArea, this));
-			completionManager.AddCompletable(contentGroup.editorGroup.fileIOGroup.scriptNameInputArea);
+			completionManager=new CompletionManager(uiparts.completionArea);
+			completionManager.AddCompletable(new EditingAreaCompletionAdapter(uiparts.editor.editingArea, this));
+			completionManager.AddCompletable(new EditingAreaCompletionAdapter(uiparts.replInputArea.editingArea, this));
+			completionManager.AddCompletable(uiparts.scriptNameInputArea);
+			completionManager.AddCompletable(uiparts.scriptNameInputArea);
 		}
 
 		bool hadMouseDownLastUpdate;
@@ -70,7 +69,7 @@ namespace LiveRepl
 			GlobalKeyBindings.ExecuteAndConsumeIfMatched(Event.current);
 			if (completionManager.Update(hadMouseDownLastUpdate))
 			{
-				contentGroup.completionGroup.completionArea.needsResize=true;
+				uiparts.completionArea.needsResize=true;
 			}
 			hadMouseDownLastUpdate=Event.current.type==EventType.MouseDown;
 			base.WindowsUpdate();

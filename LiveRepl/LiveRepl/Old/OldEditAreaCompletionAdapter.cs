@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using Kerbalui.Obsolete;
 using LiveRepl.Main;
-using LiveRepl.UI;
 
 namespace LiveRepl.Obsolete {
 	/// <summary>

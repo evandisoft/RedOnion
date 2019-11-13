@@ -8,21 +8,21 @@ using Kerbalui.Util;
 using LiveRepl.Interfaces;
 using UnityEngine;
 
-namespace LiveRepl.UI.CompletionParts
+namespace LiveRepl.Parts
 {
 	public class CompletionArea: EditingAreaScroller, ICompletionSelector
 	{
 		IList<string> contentStrings = new List<string>();
-		public CompletionGroup completionGroup;
+		ScriptWindowParts uiparts;
 		int partialLength;
 
 		public string ControlName => editingArea.editableText.ControlName;
 
 		public int SelectionIndex { get; private set; } = 0;
 
-		public CompletionArea(CompletionGroup completionGroup) : base(new EditingArea(new TextArea()))
+		public CompletionArea(ScriptWindowParts uiparts) : base(new EditingArea(new TextArea()))
 		{
-			this.completionGroup=completionGroup;
+			this.uiparts=uiparts;
 
 			InitializeKeyBindings();
 		}
@@ -45,8 +45,8 @@ namespace LiveRepl.UI.CompletionParts
 				SelectionIndex = editingArea.LineNumber-1;
 				//Debug.Log("Selection is "+SelectionIndex);
 				UpdateCursorPosition();
-				completionGroup.contentGroup.scriptWindow.completionManager.Complete();
-				completionGroup.contentGroup.scriptWindow.needsResize=true;
+				uiparts.scriptWindow.completionManager.Complete();
+				uiparts.scriptWindow.needsResize=true;
 			}
 		}
 

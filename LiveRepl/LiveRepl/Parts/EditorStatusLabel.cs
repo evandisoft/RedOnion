@@ -1,7 +1,7 @@
 using System;
 using Kerbalui.Controls;
 
-namespace LiveRepl.UI.EditorParts
+namespace LiveRepl.Parts
 {
 	public class EditorStatusLabel : Label
 	{

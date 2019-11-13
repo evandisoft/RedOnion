@@ -10,14 +10,14 @@ using Kerbalui.EventHandling;
 using LiveRepl.Interfaces;
 using Kerbalui.Util;
 
-namespace LiveRepl.UI.EditorParts {
+namespace LiveRepl.Parts {
 	public class ScriptNameInputArea:EditingArea, ICompletableElement {
 		static string defaultScriptFilename= "untitled.lua";
-		public FileIOGroup fileIOGroup;
+		public ScriptWindowParts uiparts;
 
-		public ScriptNameInputArea(FileIOGroup fileIOGroup):base(new TextField())
+		public ScriptNameInputArea(ScriptWindowParts uiparts):base(new TextField())
 		{
-			this.fileIOGroup=fileIOGroup;
+			this.uiparts=uiparts;
 
 			Text = SavedSettings.LoadSetting("lastScriptName",defaultScriptFilename);
 			if (!File.Exists(Path.Combine(SavedSettings.BaseScriptsPath, Text))) {
@@ -44,7 +44,7 @@ namespace LiveRepl.UI.EditorParts {
 			base.DecoratorUpdate();
 			if (ReceivedInput)
 			{
-				fileIOGroup.editorGroup.needsResize=true;
+				uiparts.scriptWindow.needsResize=true;
 			}
 		}
 
@@ -56,8 +56,8 @@ namespace LiveRepl.UI.EditorParts {
 				SelectIndex=CursorIndex = Text.Length;
 			}
 
-			fileIOGroup.editorGroup.editor.editingArea.Text=LoadText();
-			fileIOGroup.editorGroup.editor.GrabFocus();
+			uiparts.editor.editingArea.Text=LoadText();
+			uiparts.editor.GrabFocus();
 		}
 
 		public string PartialCompletion()

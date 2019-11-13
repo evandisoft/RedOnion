@@ -10,12 +10,12 @@ namespace LiveRepl
 
 		void InitializeGlobalKeyBindings()
 		{
-			GlobalKeyBindings.Add(new EventKey(KeyCode.U, true), contentGroup.editorGroup.editor.GrabFocus);
-			GlobalKeyBindings.Add(new EventKey(KeyCode.I, true), contentGroup.editorGroup.fileIOGroup.scriptNameInputArea.GrabFocus);
-			GlobalKeyBindings.Add(new EventKey(KeyCode.O, true), contentGroup.replGroup.repl.replInputArea.GrabFocus);
-			GlobalKeyBindings.Add(new EventKey(KeyCode.P, true), contentGroup.completionGroup.completionArea.GrabFocus);
-			GlobalKeyBindings.Add(new EventKey(KeyCode.S, true), contentGroup.editorGroup.SaveEditorText);
-			GlobalKeyBindings.Add(new EventKey(KeyCode.D, true), contentGroup.editorGroup.LoadEditorText);
+			GlobalKeyBindings.Add(new EventKey(KeyCode.U, true), uiparts.editor.GrabFocus);
+			GlobalKeyBindings.Add(new EventKey(KeyCode.I, true), uiparts.scriptNameInputArea.GrabFocus);
+			GlobalKeyBindings.Add(new EventKey(KeyCode.O, true), uiparts.replInputArea.GrabFocus);
+			GlobalKeyBindings.Add(new EventKey(KeyCode.P, true), uiparts.completionArea.GrabFocus);
+			GlobalKeyBindings.Add(new EventKey(KeyCode.S, true), SaveEditorText);
+			GlobalKeyBindings.Add(new EventKey(KeyCode.D, true), LoadEditorText);
 			GlobalKeyBindings.Add(new EventKey(KeyCode.Space, false, true), completionManager.Complete);
 			GlobalKeyBindings.Add(new EventKey(KeyCode.Return, true), completionManager.Complete);
 		}
@@ -79,7 +79,7 @@ ctrl + insert: copy selected area.
 Any other key gives focus to input box.
 ";
 
-			repl.replOutoutArea.AddOutput("\n" + hotkeyText);
+			uiparts.replOutoutArea.AddOutput("\n" + hotkeyText);
 		}
 	}
 }

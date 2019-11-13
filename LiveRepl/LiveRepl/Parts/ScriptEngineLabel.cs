@@ -2,7 +2,7 @@ using System;
 using Kerbalui.Controls;
 using UnityEngine;
 
-namespace LiveRepl.UI.CenterParts
+namespace LiveRepl.Parts
 {
 	public class ScriptEngineLabel:Label
 	{
