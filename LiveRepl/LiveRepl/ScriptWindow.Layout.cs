@@ -40,8 +40,6 @@ namespace LiveRepl
 			base.SetRect(rect);
 		}
 
-
-
 		float WindowWidth()
 		{
 			float width=centerGroupWidth;
