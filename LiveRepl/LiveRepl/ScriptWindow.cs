@@ -30,11 +30,11 @@ namespace LiveRepl
 
 		public void SetOrReleaseInputLock()
 		{
-			if (ContentRect.Contains(Event.current.mousePosition))//GUILibUtil.MouseInRect(rect))
+			if (GUILibUtil.MouseInRect(ContentRect)) //ContentRect.Contains(Event.current.mousePosition))//GUILibUtil.MouseInRect(rect))
 			{
 				if (!inputIsLocked)
 				{
-					//Debug.Log("Input is now locked");
+					Debug.Log("Input is now locked");
 					inputIsLocked = true;
 					InputLockManager.SetControlLock(ControlTypes.KEYBOARDINPUT, "kerbalua");
 				}
@@ -43,7 +43,7 @@ namespace LiveRepl
 			{
 				if (inputIsLocked)
 				{
-					//Debug.Log("Input is no longer locked");
+					Debug.Log("Input is no longer locked");
 					inputIsLocked = false;
 					InputLockManager.ClearControlLocks();
 				}
