@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Kerbalua.Other;
+using UnityEngine;
 
 namespace LiveRepl
 {
@@ -24,6 +25,7 @@ namespace LiveRepl
 		public void SetReplEvaluatorByFilename(string filename)
 		{
 			string extension=Path.GetExtension(filename);
+
 			foreach(var replEvaluatorEntry in replEvaluators)
 			{
 				if (replEvaluatorEntry.Value.Extension.ToLower()==extension.ToLower())

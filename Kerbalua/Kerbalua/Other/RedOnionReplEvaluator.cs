@@ -16,7 +16,7 @@ namespace Kerbalua.Other
 		string source, path;
 		State state;
 
-		public override string Extension => "ros";
+		public override string Extension => ".ros";
 
 		enum State { Idle, NewSource, Yielding, Events }
 

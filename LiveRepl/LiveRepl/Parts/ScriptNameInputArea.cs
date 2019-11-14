@@ -16,13 +16,13 @@ namespace LiveRepl.Parts {
 		{
 			get
 			{
-				var extension="lua";
+				var extension=".lua";
 				if (uiparts.scriptWindow.currentReplEvaluator!=null)
 				{
 					extension=uiparts.scriptWindow.currentReplEvaluator.Extension;
 				}
 
-				return "untitled."+extension;
+				return "untitled"+extension;
 			}
 		}
 		public ScriptWindowParts uiparts;
@@ -46,12 +46,10 @@ namespace LiveRepl.Parts {
 
 		protected override void DecoratorUpdate()
 		{
-			if ((Event.current.type==EventType.MouseDown || Event.current.type==EventType.ScrollWheel) 
-				&& !HasFocus() && GUILibUtil.MouseInRect(rect))//ContentRect.Contains(Event.current.mousePosition))
+			if (Event.current.type==EventType.MouseDown && GUILibUtil.MouseInRect(rect))
 			{
-				//Debug.Log("edit area scroller grabbing mouse");
-				GrabFocus();
 				Text="";
+				GrabFocus();
 			}
 
 			base.DecoratorUpdate();
@@ -106,8 +104,6 @@ namespace LiveRepl.Parts {
 				UnityEngine.Debug.Log(e.StackTrace);
 			}
 		}
-
-	
 
 		public string LoadText()
 		{

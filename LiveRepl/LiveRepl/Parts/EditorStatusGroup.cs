@@ -17,7 +17,6 @@ namespace LiveRepl.Parts
 		{
 			this.uiparts=uiparts;
 
-
 			AddFixed(ScriptWindow.centerGroupWidth, new Button("Save", uiparts.scriptWindow.SaveEditorText));
 			AddFixed(ScriptWindow.centerGroupWidth, new Button("Load", uiparts.scriptWindow.LoadEditorText));
 			AddMinSized(uiparts.editorChangesIndicator=new EditorChangesIndicator(uiparts));
