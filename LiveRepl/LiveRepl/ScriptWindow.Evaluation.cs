@@ -84,11 +84,11 @@ namespace LiveRepl
 
 			foreach (var evaluatorName in replEvaluators.Keys)
 			{
-				scriptEngineSelector.AddMinSized(new Button(evaluatorName, ScriptDisabledAction(() =>
+				scriptEngineSelector.AddMinSized(new Button(evaluatorName,() =>
 				{
 					SetCurrentEvaluator(evaluatorName);
 					SavedSettings.SaveSetting("lastEngine", evaluatorName);
-				})));
+				}));
 			}
 		}
 	}

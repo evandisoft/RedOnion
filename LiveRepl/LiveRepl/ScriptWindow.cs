@@ -23,6 +23,8 @@ namespace LiveRepl
 			InitializeGlobalKeyBindings();
 
 			LoadEditorText();
+
+
 		}
 
 

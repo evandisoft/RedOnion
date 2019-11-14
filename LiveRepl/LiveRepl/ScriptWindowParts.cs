@@ -28,7 +28,5 @@ namespace LiveRepl
 		public ScriptEngineLabel scriptEngineLabel;
 		public ScriptEngineSelector scriptEngineSelector;
 		public ScriptNameInputArea scriptNameInputArea;
-
-
 	}
 }

@@ -130,6 +130,7 @@ namespace Kerbalui.Layout.Abstract
                     }
                 }
 
+				Debug.Log("endpoint is "+endPoint);
 				spacingPoints.Add(endPoint);
                 startPoint = endPoint;
             }

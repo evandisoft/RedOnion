@@ -18,17 +18,17 @@ namespace LiveRepl.Parts
 		{
 			this.uiparts=uiparts;
 
-			var disableableStuff=new VerticalSpacer();
+			var disableableStuff=new ScriptDisabledButtonsGroup();
 
 			AddMinSized(new Button("<<", uiparts.scriptWindow.ToggleRepl));
 			AddMinSized(new Button(">>", uiparts.scriptWindow.ToggleEditor));
 			AddMinSized(new ScriptDisabledElement(uiparts, 
-				new Button("Run", uiparts.scriptWindow.ScriptDisabledAction(uiparts.scriptWindow.RunEditorScript))));
+				new Button("Run", uiparts.scriptWindow.RunEditorScript)));
 			AddMinSized(new Button("Terminate", uiparts.scriptWindow.Terminate));
-			disableableStuff.AddMinSized(new Button("Save", uiparts.scriptWindow.ScriptDisabledAction(uiparts.scriptWindow.SaveEditorText)));
-			disableableStuff.AddMinSized(new Button("Load", uiparts.scriptWindow.ScriptDisabledAction(uiparts.scriptWindow.LoadEditorText)));
-			disableableStuff.AddMinSized(new Button("Reset Engine", uiparts.scriptWindow.ScriptDisabledAction(uiparts.scriptWindow.ResetEngine)));
-			disableableStuff.AddMinSized(new Button("Show Hotkeys", uiparts.scriptWindow.ScriptDisabledAction(uiparts.scriptWindow.PrintKeyBindingsInOutputArea)));
+			disableableStuff.AddMinSized(new Button("Save", uiparts.scriptWindow.SaveEditorText));
+			disableableStuff.AddMinSized(new Button("Load", uiparts.scriptWindow.LoadEditorText));
+			disableableStuff.AddMinSized(new Button("Reset Engine", uiparts.scriptWindow.ResetEngine));
+			disableableStuff.AddMinSized(new Button("Show Hotkeys", uiparts.scriptWindow.PrintKeyBindingsInOutputArea));
 			disableableStuff.AddMinSized(uiparts.scriptEngineSelector=new ScriptEngineSelector(uiparts));
 			AddMinSized(new ScriptDisabledElement(uiparts, disableableStuff));
 		}

@@ -124,6 +124,7 @@
     <Compile Include="LiveRepl\Parts\ScriptEngineSelector.cs" />
     <Compile Include="LiveRepl\ScriptWindow.Actions.cs" />
     <Compile Include="LiveRepl\Decorators\ScriptDisabledElement.cs" />
+    <Compile Include="LiveRepl\Parts\ScriptDisabledButtonsGroup.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
