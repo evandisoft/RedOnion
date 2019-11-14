@@ -34,12 +34,6 @@ namespace LiveRepl.Parts {
 
 		protected override void DecoratorUpdate()
 		{
-			if (Event.current.type==EventType.MouseDown && GUILibUtil.MouseInRect(rect) 
-				&& uiparts.scriptWindow.ScriptRunning)
-			{
-				Event.current.Use();
-			}
-
 			if ((Event.current.type==EventType.MouseDown || Event.current.type==EventType.ScrollWheel) 
 				&& !HasFocus() && GUILibUtil.MouseInRect(rect))//ContentRect.Contains(Event.current.mousePosition))
 			{

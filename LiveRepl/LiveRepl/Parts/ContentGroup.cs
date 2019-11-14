@@ -1,5 +1,6 @@
 using Kerbalui.Layout;
 using Kerbalui.Types;
+using LiveRepl.Decorators;
 using UnityEngine;
 
 namespace LiveRepl.Parts
@@ -17,8 +18,8 @@ namespace LiveRepl.Parts
 
 			AddFixed(ScriptWindow.replGroupWidth, uiparts.replGroup=new ReplGroup(uiparts));
 			AddFixed(ScriptWindow.centerGroupWidth, uiparts.centerGroup=new CenterGroup(uiparts));
-			AddFixed(ScriptWindow.completionGroupWidth, uiparts.completionGroup=new CompletionGroup(uiparts));
-			AddFixed(ScriptWindow.editorGroupWidth, uiparts.editorGroup=new EditorGroup(uiparts));
+			AddFixed(ScriptWindow.completionGroupWidth, new ScriptDisabledElement(uiparts,uiparts.completionGroup=new CompletionGroup(uiparts)));
+			AddFixed(ScriptWindow.editorGroupWidth, new ScriptDisabledElement(uiparts, uiparts.editorGroup=new EditorGroup(uiparts)));
 		}
 	}
 }

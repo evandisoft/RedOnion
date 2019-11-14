@@ -29,12 +29,6 @@ namespace LiveRepl.Parts
 
 		protected override void DecoratorUpdate()
 		{
-			if (Event.current.type==EventType.MouseDown && GUILibUtil.MouseInRect(rect)
-				&& uiparts.scriptWindow.ScriptRunning)
-			{
-				Event.current.Use();
-			}
-
 			bool lastEventWasMouseDown = Event.current.type == EventType.MouseDown && GUILibUtil.MouseInRect(rect);// ContentRect.Contains(Event.current.mousePosition); //GUILibUtil.MouseInRect(rect);
 			string lastControlname = GUI.GetNameOfFocusedControl();
 

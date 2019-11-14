@@ -16,7 +16,7 @@ namespace Kerbalui.Types
 		public GUIContent titleContent=new GUIContent("");
 		public GUIStyle titleStyle;
 		Rect titleRect;
-		Group content;
+		Element content;
 
 		public GUIStyle TitleStyleOrDefault
 		{
@@ -35,7 +35,7 @@ namespace Kerbalui.Types
 			titleContent.text=title;
 		}
 
-		protected void AssignContent(Group content)
+		protected void AssignContent(Element content)
 		{
 			this.content=content;
 		}

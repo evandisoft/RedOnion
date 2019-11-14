@@ -17,9 +17,10 @@ namespace LiveRepl.Decorators
 
 		protected override void DecoratorUpdate()
 		{
-			element.Active=!uiparts.scriptWindow.ScriptRunning;
-
+			bool prevEnabled=GUI.enabled;
+			GUI.enabled=!uiparts.scriptWindow.ScriptRunning;
 			element.Update();
+			GUI.enabled=prevEnabled;
 		}
 
 		protected override void SetChildRect()

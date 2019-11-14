@@ -10,7 +10,7 @@ namespace Kerbalui.Types
 
 		public bool Active { get; set; } = true;
 
-
+		//public bool Enabled { get; set; } = true;
 
 		/// <summary>
 		/// needsRecalculation triggers an recalculation of rects after the first update.
@@ -34,11 +34,14 @@ namespace Kerbalui.Types
 		{
 			if (!Active) return;
 
+			//bool prevEnabled=GUI.enabled;
+			//GUI.enabled=Enabled;
 			TypeSpecificUpdate();
 			if (needsResize)
 			{
 				SetRect(rect);
 			}
+			//GUI.enabled=prevEnabled;
 		}
 
 		protected abstract void TypeSpecificUpdate();
