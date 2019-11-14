@@ -21,6 +21,8 @@ namespace Kerbalua.Other {
 		public Action<string> PrintAction;
 		public Action<string> PrintErrorAction;
 
+		public abstract string Extension { get; }
+
 		LinkedListNode<string> currentHistoryItem = null;
 		/// <summary>
 		/// Sets the source and return the result of that evaluation.

@@ -12,20 +12,32 @@ using Kerbalui.Util;
 
 namespace LiveRepl.Parts {
 	public class ScriptNameInputArea:EditingArea, ICompletableElement {
-		static string defaultScriptFilename= "untitled.lua";
+		string DefaultScriptFilename
+		{
+			get
+			{
+				var extension="lua";
+				if (uiparts.scriptWindow.currentReplEvaluator!=null)
+				{
+					extension=uiparts.scriptWindow.currentReplEvaluator.Extension;
+				}
+
+				return "untitled."+extension;
+			}
+		}
 		public ScriptWindowParts uiparts;
 
 		public ScriptNameInputArea(ScriptWindowParts uiparts):base(new TextField())
 		{
 			this.uiparts=uiparts;
 
-			Text = SavedSettings.LoadSetting("lastScriptName",defaultScriptFilename);
+			Text = SavedSettings.LoadSetting("lastScriptName",DefaultScriptFilename);
 			if (!File.Exists(Path.Combine(SavedSettings.BaseScriptsPath, Text))) {
 				IList<string> recentFiles = SavedSettings.LoadListSetting("recentFiles");
 				if (recentFiles.Count > 0) {
 					Text = recentFiles[0];
 				} else {
-					Text = defaultScriptFilename;
+					Text = DefaultScriptFilename;
 				}
 			};
 
@@ -57,7 +69,7 @@ namespace LiveRepl.Parts {
 				SelectIndex=CursorIndex = Text.Length;
 			}
 
-			uiparts.editor.editingArea.Text=LoadText();
+			uiparts.scriptWindow.LoadEditorText();
 			uiparts.editor.GrabFocus();
 		}
 
@@ -114,7 +126,7 @@ namespace LiveRepl.Parts {
 		string CreateFullPath(bool forSave = false)
 		{
 			if (Text == "") {
-				Text = defaultScriptFilename;
+				Text = DefaultScriptFilename;
 			}
 
 			Directory.CreateDirectory(SavedSettings.BaseScriptsPath);

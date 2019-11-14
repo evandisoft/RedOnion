@@ -132,7 +132,6 @@
     <Folder Include="Kerbalui\Types\" />
     <Folder Include="Kerbalui\EventHandling\" />
     <Folder Include="Kerbalui\Util\" />
-    <Folder Include="Kerbalui\Interfaces\" />
     <Folder Include="Kerbalui\Layout\Abstract\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

@@ -20,8 +20,8 @@ namespace LiveRepl.Parts
 
 			var disableableStuff=new ScriptDisabledButtonsGroup();
 
-			AddMinSized(new Button("<<", uiparts.scriptWindow.ToggleRepl));
-			AddMinSized(new Button(">>", uiparts.scriptWindow.ToggleEditor));
+			AddMinSized(new Button("<<", uiparts.scriptWindow.ToggleEditor));
+			AddMinSized(new Button(">>", uiparts.scriptWindow.ToggleRepl));
 			AddMinSized(new ScriptDisabledElement(uiparts, 
 				new Button("Run", uiparts.scriptWindow.RunEditorScript)));
 			AddMinSized(new Button("Terminate", uiparts.scriptWindow.Terminate));

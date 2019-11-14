@@ -23,10 +23,7 @@ namespace LiveRepl
 			InitializeGlobalKeyBindings();
 
 			LoadEditorText();
-
-
 		}
-
 
 		public void SetOrReleaseInputLock()
 		{

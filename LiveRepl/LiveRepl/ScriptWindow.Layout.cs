@@ -69,17 +69,16 @@ namespace LiveRepl
 				{
 					if (editorVisible)
 					{
-
+						rect.x+=editorGroupWidth;
 						rect.width-=editorGroupWidth;
 					}
 					else
 					{
-
+						rect.x-=editorGroupWidth;
 						rect.width+=editorGroupWidth;
 					}
 
-					uiparts.editorGroup.Active=editorVisible=value;
-					//contentGroup.completionGroup.Active=editorVisible || replVisible;
+					uiparts.scriptDisabledEditorGroup.Active=editorVisible=value;
 					needsResize=true;
 				}
 			}
@@ -95,17 +94,14 @@ namespace LiveRepl
 				{
 					if (replVisible)
 					{
-						rect.x+=replGroupWidth;
 						rect.width-=replGroupWidth;
 					}
 					else
 					{
-						rect.x-=replGroupWidth;
 						rect.width+=replGroupWidth;
 					}
 
 					uiparts.replGroup.Active=replVisible=value;
-					//contentGroup.completionGroup.Active=editorVisible || replVisible;
 					needsResize=true;
 				}
 			}

@@ -1,4 +1,5 @@
 using System;
+using LiveRepl.Decorators;
 using LiveRepl.Parts;
 
 namespace LiveRepl
@@ -28,5 +29,7 @@ namespace LiveRepl
 		public ScriptEngineLabel scriptEngineLabel;
 		public ScriptEngineSelector scriptEngineSelector;
 		public ScriptNameInputArea scriptNameInputArea;
-	}
+	       internal ScriptDisabledElement scriptDisabledEditorGroup;
+        internal ScriptDisabledElement ScriptDisabledCompletionGroup;
+    }
 }

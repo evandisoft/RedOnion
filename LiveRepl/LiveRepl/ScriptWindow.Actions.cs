@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Kerbalua.Other;
 
 namespace LiveRepl
@@ -18,6 +19,18 @@ namespace LiveRepl
 				if (ScriptRunning) return;
 				action1();
 			};
+		}
+
+		public void SetReplEvaluatorByFilename(string filename)
+		{
+			string extension=Path.GetExtension(filename);
+			foreach(var replEvaluatorEntry in replEvaluators)
+			{
+				if (replEvaluatorEntry.Value.Extension.ToLower()==extension.ToLower())
+				{
+					SetCurrentEvaluator(replEvaluatorEntry.Key);
+				}
+			}
 		}
 
 		public void ToggleEditor()
@@ -41,6 +54,7 @@ namespace LiveRepl
 			string text=uiparts.scriptNameInputArea.LoadText();
 			uiparts.editor.editingArea.Text=text;
 			uiparts.editorChangesIndicator.Unchanged();
+			SetReplEvaluatorByFilename(uiparts.scriptNameInputArea.Text);
 		}
 
 		public void Evaluate(string source, string path, bool withHistory = false)

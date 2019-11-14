@@ -15,8 +15,10 @@ namespace Kerbalua.Other
 		RosSuggest suggest;
 		string source, path;
 		State state;
-		enum State { Idle, NewSource, Yielding, Events }
 
+		public override string Extension => "ros";
+
+		enum State { Idle, NewSource, Yielding, Events }
 
 		public RedOnionReplEvaluator()
 		{

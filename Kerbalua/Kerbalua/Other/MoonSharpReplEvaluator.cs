@@ -17,6 +17,8 @@ namespace Kerbalua.Other
 
 		KerbaluaExecutionManager kem = new KerbaluaExecutionManager();
 
+		public override string Extension => "lua";
+
 		public MoonSharpReplEvaluator()
 		{
 			InternalResetEngine();
