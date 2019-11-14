@@ -34,41 +34,37 @@ namespace RedOnion.KSP.API
 		//[Unsafe, Description("A map of kerbal names to kerbals for kerbals in the crew.")]
 		//public static KerbalsDictionary kerbals => KerbalsDictionary.Instance;
 
-		[Unsafe, Description("All the reflection stuff and namespaces. (Lua also has `import`.)")]
-		public static Reflect reflect => Reflect.Instance;
-		[Unsafe, Description("Alias to `reflect` because of the namespaces.")]
+		[Unsafe, Description("All the reflection stuff and namespaces.")]
 		public static Reflect native => Reflect.Instance;
 		[Unsafe, Description("Reflected/imported stuff by assembly name.")]
 		public static readonly GetMappings assembly = new GetMappings();
 
 		[Description("Function for creating 3D vector / coordinate.")]
 		public static VectorCreator vector => VectorCreator.Instance;
-		[DisplayName("V"), Description("Alias to Vector Function for creating 3D vector / coordinate.")]
-		public static VectorCreator V => VectorCreator.Instance;
 		[Description("Current time and related functions.")]
-		public static Time time => Time.Instance;
+		public static readonly Type time = typeof(Time);
 
 		[Description("Active vessel (in flight only, null otherwise).")]
 		public static Ship ship => Ship.Active;
 		[Description("Staging logic.")]
 		public static Stage stage => Stage.Instance;
-		[Description("Autopilot for active vessel.")]
-		public static Autopilot autopilot => ship.autopilot;
+		[Description("Autopilot for active vessel. (`null` if no ship)")]
+		public static Autopilot autopilot => ship?.autopilot;
 		[Description("User/player controls.")]
 		public static Player player => Player.Instance;
 		[Description("User/player controls.")]
 		public static Player user => Player.Instance;
 
-		[Description("Alias to `ship.altitude`")]
-		public static double altitude => ship.altitude;
-		[Description("Alias to `ship.apoapsis`.")]
-		public static double apoapsis => ship.apoapsis;
-		[Description("Alias to `ship.periapsis`.")]
-		public static double periapsis => ship.periapsis;
-		[Description("Orbited body (redirects to `ship.body`).")]
-		public static SpaceBody body => ship.body;
-		[Description("Atmosphere parameters of orbited body (redirects to `ship.body.atmosphere`).")]
-		public static SpaceBody.Atmosphere atmosphere => ship.body.atmosphere;
+		[Description("Alias to `ship.altitude`. (`NaN` if no ship.)")]
+		public static double altitude => ship?.altitude ?? double.NaN;
+		[Description("Alias to `ship.apoapsis`. (`NaN` if no ship.)")]
+		public static double apoapsis => ship?.apoapsis ?? double.NaN;
+		[Description("Alias to `ship.periapsis`. (`NaN` if no ship.)")]
+		public static double periapsis => ship?.periapsis ?? double.NaN;
+		[Description("Orbited body (redirects to `ship.body`, `null` if no ship).")]
+		public static SpaceBody body => ship?.body;
+		[Description("Atmosphere parameters of orbited body (redirects to `ship.body.atmosphere`, `atmosphere.none` if no ship).")]
+		public static SpaceBody.Atmosphere atmosphere => body?.atmosphere ?? SpaceBody.Atmosphere.none;
 
 		[Description("PID regulator (alias to `system.pid` in ROS).")]
 		public static readonly Type pid = typeof(PID);
@@ -100,20 +96,6 @@ namespace RedOnion.KSP.API
 		public static readonly Type button = typeof(UI.Button);
 		[Description("UI.TextBox")]
 		public static readonly Type textBox = typeof(UI.TextBox);
-
-#if API_GLOBAL_ALIASES
-		// TODO: move aliases to startup/setup script/library
-		[Alias, Description("Alias to `Vector.dot` (or `V.dot`).")]
-		public static readonly string vdot = "Vector.dot";
-		[Alias, Description("Alias to `Vector.cross` (or `V.cross`).")]
-		public static readonly string vcrs = "Vector.cross";
-		[Alias, Description("Alias to `Vector.cross` (or `V.cross`).")]
-		public static readonly string vcross = "Vector.cross";
-		[Alias, Description("Alias to `Vector.angle` (or `V.angle`).")]
-		public static readonly string vangle = "Vector.angle";
-		[Alias, Description("Alias to `Vector.angle` (or `V.angle`).")]
-		public static readonly string vang = "Vector.angle";
-#endif
 	}
 
 	public class RosGlobals : RedOnion.ROS.Objects.Globals
@@ -156,46 +138,8 @@ namespace RedOnion.KSP.API
 			ref var member = ref reflected[at];
 			if (member.read == null)
 				return false;
-#if !API_GLOBAL_ALIASES
 			self = member.read(self.obj);
 			return true;
-#else
-			if (member.kind != Reflected.Prop.Kind.Field || member.write != null)
-			{
-				self = member.read(self.obj);
-				return true;
-			}
-			var fullPath = member.read(self.obj).ToStr();
-			var path = fullPath.Split('.');
-			at = Find(path[0]);
-			if (at < 0)
-			{
-				Value.DebugLog("Globals: Could not find `{0}`", path[0]);
-				return false;
-			}
-			var item = Value.Void;
-			if (!Get(ref item, at))
-			{
-				Value.DebugLog("Globals: Could not get `{0}`", path[0]);
-				return false;
-			}
-			for (int i = 1; i < path.Length; i++)
-			{
-				at = item.desc.Find(item.obj, path[i]);
-				if (at < 0)
-				{
-					Value.DebugLog("Globals: Could not find `{0}` in {1}", path[i], fullPath);
-					return false;
-				}
-				if (!item.desc.Get(ref item, at))
-				{
-					Value.DebugLog("Globals: Could not get `{0}`", path[i], fullPath);
-					return false;
-				}
-			}
-			self = item;
-			return true;
-#endif
 		}
 		public override bool Set(ref Value self, int at, OpCode op, ref Value value)
 		{
@@ -260,39 +204,7 @@ namespace RedOnion.KSP.API
 			var prop = typeof(Globals).GetProperty(name, BindingFlags.Static|BindingFlags.Public);
 			if (prop != null)
 				return DynValue.FromObject(table.OwnerScript, prop.GetValue(null, null));
-#if !API_GLOBAL_ALIASES
 			return null;
-#else
-			var alias = typeof(Globals).GetField(name, BindingFlags.Static|BindingFlags.Public);
-			if (alias == null || alias.FieldType != typeof(string))
-			{
-				/*
-				if (name.Length == 0 || !char.IsLetter(name, 0) || name == "v")
-					return null;
-				name = (char.IsLower(name[0])
-					? char.ToUpperInvariant(name[0])
-					: char.ToLowerInvariant(name[0]))
-					+ name.Substring(1);
-				prop = typeof(Globals).GetProperty(name, BindingFlags.Static|BindingFlags.Public);
-				if (prop != null)
-					return DynValue.FromObject(table.OwnerScript, prop.GetValue(null, null));
-				*/
-				return null;
-			}
-			var fullPath = (string)alias.GetValue(null);
-			var path = fullPath.Split('.');
-			var item = Get(table, DynValue.NewString(path[0]));
-			for (int i = 1; i < path.Length; i++)
-			{
-				var data = item?.UserData;
-				if (data == null)
-					return null;
-				item = data.Descriptor.Index(table.OwnerScript, data.Object, DynValue.NewString(path[i]), false);
-			}
-			return item;
-#endif
 		}
-
-
 	}
 }

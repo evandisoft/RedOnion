@@ -8,13 +8,10 @@ using System.Text;
 
 namespace RedOnion.KSP.API
 {
+	[Callable("now")]
 	[Description("The simulation time, in seconds, since the game or this save was started.")]
-	public class Time : ICallable
+	public static class Time
 	{
-		[Browsable(false), MoonSharpHidden]
-		public static Time Instance { get; } = new Time();
-		protected Time() { }
-
 		[Description("The simulation time, in seconds, since the game or this save was started.")]
 		public static double now => Planetarium.GetUniversalTime();
 		[Description("Seconds since some previous time.")]
@@ -22,14 +19,5 @@ namespace RedOnion.KSP.API
 
 		[Description("Seconds in one tick. (Script engine always runs in physics ticks.)")]
 		public static double tick => TimeWarp.fixedDeltaTime;
-
-		bool ICallable.Call(ref Value result, object self, Arguments args, bool create)
-		{
-			result = now;
-			return true;
-		}
-		[MoonSharpUserDataMetamethod("__call"), Browsable(false)]
-		public DynValue Call(ScriptExecutionContext ctx, CallbackArguments args)
-			=> DynValue.NewNumber(now);
 	}
 }

@@ -91,6 +91,7 @@ namespace RedOnion.KSP.API
 		[Description("Atmosphere parameters of the body. (Alias to `atmosphere`)")]
 		public Atmosphere atm => new Atmosphere(native);
 
+		[Description("Atmosphere parameters of a body.")]
 		public struct Atmosphere
 		{
 			readonly CelestialBody native;
@@ -98,13 +99,16 @@ namespace RedOnion.KSP.API
 				=> this.native = native;
 
 			[Description("Is there any atmosphere (true on Kerbin, false on Moon).")]
-			public bool exists => native.atmosphere;
+			public bool exists => native?.atmosphere ?? false;
 			[Description("Is there oxygen in the atmosphere.")]
-			public bool oxygen => native.atmosphereContainsOxygen;
+			public bool oxygen => native?.atmosphereContainsOxygen ?? false;
 			[Description("Depth/height of the atmosphere.")]
-			public double depth => native.atmosphereDepth;
+			public double depth => native?.atmosphereDepth ?? double.NaN;
 			[Description("Depth/height of the atmosphere.")]
-			public double height => native.atmosphereDepth;
+			public double height => native?.atmosphereDepth ?? double.NaN;
+
+			[Description("Used when there is no body/ship. Returns false/NaN in properties.")]
+			public static readonly Atmosphere none = new Atmosphere();
 		}
 	}
 }

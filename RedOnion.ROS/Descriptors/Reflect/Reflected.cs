@@ -3,6 +3,7 @@ using RedOnion.ROS.Utilities;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -47,11 +48,12 @@ namespace RedOnion.ROS
 			protected Action<object, string, Value> strIndexSet;
 			protected ConstructorInfo defaultCtor;
 			protected ConstructorInfo processorCtor;
+			protected string callableMemberName;
 
 			public Reflected(Type type) : this(type.Name, type) { }
 			public Reflected(string name, Type type) : base(name, type)
 			{
-				//TODO: ignore members with [Browsable(false)]
+				callableMemberName = type.GetCustomAttribute<CallableAttribute>()?.Name;
 				foreach (var member in GetMembers(type, null, false))
 				{
 					try
@@ -107,8 +109,31 @@ namespace RedOnion.ROS
 			{
 				if (result.obj is ICallable call)
 					return call.Call(ref result, self, args, create);
-				if (!create && result.obj != null && !(result.obj is Type))
-					return false;
+				if (!create)
+				{
+					if (callableMemberName?.Length > 0)
+					{
+						int at = Find(result.obj, callableMemberName, false);
+						if (at < 0)
+							throw InvalidOperation("{0}.{1} does not exist", Name, callableMemberName);
+						ref var it = ref prop.items[at];
+						if (it.read == null)
+							throw InvalidOperation("{0}.{1} is not readable", Name, callableMemberName);
+						result = it.read(result.obj);
+						switch (it.kind)
+						{
+						case Prop.Kind.Field:
+						case Prop.Kind.Property:
+							return true;
+						case Prop.Kind.Method:
+						case Prop.Kind.MethodGroup:
+							return result.desc.Call(ref result, self, args);
+						}
+						throw InvalidOperation("{0}.{1} is of type {2} which is not callable", Name, callableMemberName, it.kind);
+					}
+					if (result.obj != null && !(result.obj is Type))
+						return false;
+				}
 				if (args.Count == 0)
 				{
 					if (processorCtor != null
