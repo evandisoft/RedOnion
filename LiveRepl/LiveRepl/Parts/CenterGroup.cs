@@ -20,13 +20,11 @@ namespace LiveRepl.Parts
 
 			var disableableStuff=new ScriptDisabledButtonsGroup();
 
-			AddMinSized(new Button("<<", uiparts.scriptWindow.ToggleEditor));
-			AddMinSized(new Button(">>", uiparts.scriptWindow.ToggleRepl));
+			AddMinSized(new Button("<<", uiparts.scriptWindow.ToggleRepl));
+			AddMinSized(new Button(">>", uiparts.scriptWindow.ToggleEditor));
 			AddMinSized(new ScriptDisabledElement(uiparts, 
 				new Button("Run", uiparts.scriptWindow.RunEditorScript)));
 			AddMinSized(new Button("Terminate", uiparts.scriptWindow.Terminate));
-			disableableStuff.AddMinSized(new Button("Save", uiparts.scriptWindow.SaveEditorText));
-			disableableStuff.AddMinSized(new Button("Load", uiparts.scriptWindow.LoadEditorText));
 			disableableStuff.AddMinSized(new Button("Reset Engine", uiparts.scriptWindow.ResetEngine));
 			disableableStuff.AddMinSized(new Button("Show Hotkeys", uiparts.scriptWindow.PrintKeyBindingsInOutputArea));
 			disableableStuff.AddMinSized(uiparts.scriptEngineSelector=new ScriptEngineSelector(uiparts));

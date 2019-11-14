@@ -42,22 +42,17 @@ namespace LiveRepl
 
 		float WindowWidth()
 		{
-			float width=completionGroupWidth+centerGroupWidth;
-			if (EditorVisible || ReplVisible)
+			float width=centerGroupWidth+completionGroupWidth;
+			if (EditorVisible)
 			{
-				if (EditorVisible)
-				{
-					width+=editorGroupWidth;
-				}
-				if (ReplVisible)
-				{
-					width+=replGroupWidth;
-				}
+				width+=editorGroupWidth;
+			}
+			if (ReplVisible)
+			{
+				width+=replGroupWidth;
 			}
 			return width;
 		}
-
-
 
 		private bool editorVisible = true;
 		public bool EditorVisible
@@ -69,12 +64,12 @@ namespace LiveRepl
 				{
 					if (editorVisible)
 					{
-						rect.x+=editorGroupWidth;
+						//rect.x+=editorGroupWidth;
 						rect.width-=editorGroupWidth;
 					}
 					else
 					{
-						rect.x-=editorGroupWidth;
+						//rect.x-=editorGroupWidth;
 						rect.width+=editorGroupWidth;
 					}
 
@@ -94,10 +89,12 @@ namespace LiveRepl
 				{
 					if (replVisible)
 					{
+						rect.x+=replGroupWidth;
 						rect.width-=replGroupWidth;
 					}
 					else
 					{
+						rect.x-=replGroupWidth;
 						rect.width+=replGroupWidth;
 					}
 
