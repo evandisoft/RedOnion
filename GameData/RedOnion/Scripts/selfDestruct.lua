@@ -13,4 +13,3 @@ function selfDestruct(part)
 end
 
 selfDestruct(vessel.parts[0])
-

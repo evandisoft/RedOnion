@@ -74,6 +74,10 @@
       <HintPath>$(KerbalLibs)\UnityEngine.CoreModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="UnityEngine.TextRenderingModule">
+      <HintPath>$(KerbalLibs)\UnityEngine.TextRenderingModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="UnityEngine.AnimationModule">
       <HintPath>$(KerbalLibs)\UnityEngine.AnimationModule.dll</HintPath>
       <Private>False</Private>
@@ -88,11 +92,36 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Main\KerbaluaMain.cs" />
-    <Compile Include="Main\KerbaluaRepl.cs" />
-    <Compile Include="Main\ScriptWindow.cs" />
-    <Compile Include="Main\TestWindow.cs" />
-    <Compile Include="Other\EditAreaCompletionAdapter.cs" />
+    <Compile Include="LiveRepl\Parts\ContentGroup.cs" />
+    <Compile Include="LiveRepl\ScriptWindow.cs" />
+    <Compile Include="LiveRepl\Interfaces\ICompletableElement.cs" />
+    <Compile Include="LiveRepl\Interfaces\ICompletionSelector.cs" />
+    <Compile Include="LiveRepl\Interfaces\IFocusable.cs" />
+    <Compile Include="LiveRepl\Completion\EditAreaCompletionAdapter.cs" />
+    <Compile Include="LiveRepl\ScriptWindow.Layout.cs" />
+    <Compile Include="LiveRepl\Completion\CompletionManager.cs" />
+    <Compile Include="LiveRepl\ScriptWindow.Evaluation.cs" />
+    <Compile Include="LiveRepl\ScriptWindow.KeyBindings.cs" />
+    <Compile Include="LiveRepl\LiveReplMain.cs" />
+    <Compile Include="LiveRepl\ScriptWindowParts.cs" />
+    <Compile Include="LiveRepl\Parts\Repl.cs" />
+    <Compile Include="LiveRepl\Parts\ReplGroup.cs" />
+    <Compile Include="LiveRepl\Parts\ReplInputArea.cs" />
+    <Compile Include="LiveRepl\Parts\ReplOutoutArea.cs" />
+    <Compile Include="LiveRepl\Parts\Editor.cs" />
+    <Compile Include="LiveRepl\Parts\EditorChangesIndicator.cs" />
+    <Compile Include="LiveRepl\Parts\EditorGroup.cs" />
+    <Compile Include="LiveRepl\Parts\EditorStatusLabel.cs" />
+    <Compile Include="LiveRepl\Parts\EditorStatusGroup.cs" />
+    <Compile Include="LiveRepl\Parts\ScriptNameInputArea.cs" />
+    <Compile Include="LiveRepl\Parts\CompletionArea.cs" />
+    <Compile Include="LiveRepl\Parts\CompletionGroup.cs" />
+    <Compile Include="LiveRepl\Parts\CenterGroup.cs" />
+    <Compile Include="LiveRepl\Parts\ScriptEngineLabel.cs" />
+    <Compile Include="LiveRepl\Parts\ScriptEngineSelector.cs" />
+    <Compile Include="LiveRepl\ScriptWindow.Actions.cs" />
+    <Compile Include="LiveRepl\Decorators\ScriptDisabledElement.cs" />
+    <Compile Include="LiveRepl\Parts\ScriptDisabledButtonsGroup.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
@@ -118,8 +147,11 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Main\" />
-    <Folder Include="Other\" />
+    <Folder Include="LiveRepl\" />
+    <Folder Include="LiveRepl\Parts\" />
+    <Folder Include="LiveRepl\Interfaces\" />
+    <Folder Include="LiveRepl\Completion\" />
+    <Folder Include="LiveRepl\Decorators\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Target Name="AfterBuild">
@@ -129,4 +161,13 @@
     </ItemGroup>
     <Copy SourceFiles="@(OutputFiles)" DestinationFolder="..\GameData\RedOnion\Plugins\%(RecursiveDir)" OverwriteReadOnlyFiles="true" />
   </Target>
+  <ProjectExtensions>
+    <MonoDevelop>
+      <Properties>
+        <Policies>
+          <DotNetNamingPolicy ResourceNamePolicy="FileFormatDefault" DirectoryNamespaceAssociation="Hierarchical" />
+        </Policies>
+      </Properties>
+    </MonoDevelop>
+  </ProjectExtensions>
 </Project>

@@ -8,6 +8,7 @@ using MoonSharp.Interpreter.Loaders;
 using RedOnion.KSP.Lua;
 using RedOnion.KSP.Autopilot;
 using RedOnion.KSP.Settings;
+using System.IO;
 
 namespace Kerbalua.Other
 {
@@ -16,6 +17,8 @@ namespace Kerbalua.Other
 		KerbaluaScript scriptEngine;
 
 		KerbaluaExecutionManager kem = new KerbaluaExecutionManager();
+
+		public override string Extension => ".lua";
 
 		public MoonSharpReplEvaluator()
 		{
@@ -144,6 +147,13 @@ namespace Kerbalua.Other
 		{
 
 			return GetCompletions(source, cursorPos, out replaceStart, out replaceEnd);
+		}
+
+		public override string GetImportString(string scriptname)
+		{
+			string basename = Path.GetFileNameWithoutExtension(scriptname);
+
+			return "require(\""+basename+"\")";
 		}
 	}
 }

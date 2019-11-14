@@ -15,6 +15,7 @@ using System.Linq;
 using API = RedOnion.KSP.API;
 using RedOnion.KSP.ReflectionUtil;
 using static RedOnion.KSP.API.Reflect;
+using System.Diagnostics;
 
 namespace Kerbalua.MoonSharp
 {
@@ -114,8 +115,20 @@ namespace Kerbalua.MoonSharp
 			//UserData.RegisterAssembly(Assembly.GetAssembly(typeof(System.Linq.Enumerable)),true);
 			var coroutines=Globals["coroutine"] as Table;
 			var coroYield=coroutines["yield"];
-			coroutines.Clear();
-			coroutines["yield"]=coroYield;
+
+			Globals["sleep"] = new Action<double>((double waittimeSeconds) =>
+			{
+				//PrintErrorAction("start");
+				//UnityEngine.Debug.Log("start");
+				waittimeMillis=waittimeSeconds*1000;
+				waitwatch.Start();
+				coroutine.Coroutine.AutoYieldCounter=0;
+				//UnityEngine.Debug.Log("end");
+				//PrintErrorAction("end");
+			});
+			Globals["coroutine"]=null;
+			//coroutines.Clear();
+			//coroutines["yield"]=coroYield;
 		}
 
 		//private Table ImporterImpl(string name)
@@ -123,7 +136,8 @@ namespace Kerbalua.MoonSharp
 		//	var a=Assembly.GetAssembly(GetType());
 
 		//}
-
+		double waittimeMillis=0;
+		Stopwatch waitwatch=new Stopwatch();
 		delegate Table Importer(string name);
 
 		DynValue coroutine;
@@ -135,8 +149,27 @@ namespace Kerbalua.MoonSharp
 				throw new System.Exception("Coroutine not set in KerbaluaScript");
 			}
 
+			if (waitwatch.IsRunning)
+			{
+				//PrintErrorAction("time in: "+waitwatch.ElapsedMilliseconds);
+				if (waitwatch.ElapsedMilliseconds>waittimeMillis)
+				{
+					waittimeMillis=0;
+					waitwatch.Reset();
+				}
+				else
+				{
+					result=null;
+					return false;
+				}
+			}
+			//else
+			//{
+			//	PrintErrorAction("time out: "+waitwatch.ElapsedMilliseconds);
+			//}
 			coroutine.Coroutine.AutoYieldCounter = 1000;
 			result = coroutine.Coroutine.Resume();
+
 
 
 			bool isComplete = false;
@@ -163,6 +196,8 @@ namespace Kerbalua.MoonSharp
 		public void Terminate()
 		{
 			coroutine = null;
+			waitwatch.Reset();
+			waittimeMillis=0;
 		}
 	}
 }

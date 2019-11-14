@@ -15,8 +15,10 @@ namespace Kerbalua.Other
 		RosSuggest suggest;
 		string source, path;
 		State state;
-		enum State { Idle, NewSource, Yielding, Events }
 
+		public override string Extension => ".ros";
+
+		enum State { Idle, NewSource, Yielding, Events }
 
 		public RedOnionReplEvaluator()
 		{
@@ -174,6 +176,11 @@ namespace Kerbalua.Other
 		public override IList<string> GetDisplayableCompletions(string source, int cursorPos, out int replaceStart, out int replaceEnd)
 		{
 			return GetCompletions(source,cursorPos,out replaceStart,out replaceEnd);
+		}
+
+		public override string GetImportString(string scriptname)
+		{
+			return "run \""+scriptname+"\"";
 		}
 	}
 }

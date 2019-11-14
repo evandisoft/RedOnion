@@ -21,6 +21,15 @@ namespace Kerbalua.Other {
 		public Action<string> PrintAction;
 		public Action<string> PrintErrorAction;
 
+		public abstract string Extension { get; }
+
+		/// <summary>
+		/// Get a string that will run the file as an import. 
+		/// This is for autorun. The file is to be ran to populate globals
+		/// in the engine.
+		/// </summary>
+		public abstract string GetImportString(string scriptname);
+
 		LinkedListNode<string> currentHistoryItem = null;
 		/// <summary>
 		/// Sets the source and return the result of that evaluation.
@@ -77,6 +86,11 @@ namespace Kerbalua.Other {
 
 		public string HistoryUp()
 		{
+			if (History.Count==0)
+			{
+				return "";
+			}
+
 			if (currentHistoryItem == null) {
 				currentHistoryItem = History.First;
 			} else if(currentHistoryItem != History.Last) {
