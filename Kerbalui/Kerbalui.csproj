@@ -92,30 +92,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="OldGui\AutoLayoutBox.cs" />
-    <Compile Include="OldGui\Button.cs" />
-    <Compile Include="OldGui\CompletionBox.cs" />
-    <Compile Include="OldGui\CompletionManager.cs" />
-    <Compile Include="OldGui\EditingArea.cs" />
-    <Compile Include="OldGui\Editor.cs" />
-    <Compile Include="OldGui\EventKey.cs" />
-    <Compile Include="OldGui\GUILibUtil.cs" />
-    <Compile Include="OldGui\ICompletableElement.cs" />
-    <Compile Include="OldGui\ICompletionSelector.cs" />
-    <Compile Include="OldGui\IFocusable.cs" />
-    <Compile Include="OldGui\ILayoutRenderer.cs" />
-    <Compile Include="OldGui\InputBox.cs" />
-    <Compile Include="OldGui\IRectRenderer.cs" />
-    <Compile Include="OldGui\IRenderer.cs" />
-    <Compile Include="OldGui\KeyBindings.cs" />
-    <Compile Include="OldGui\Label.cs" />
-    <Compile Include="OldGui\OutputBox.cs" />
-    <Compile Include="OldGui\RecentFilesList.cs" />
-    <Compile Include="OldGui\Repl.cs" />
-    <Compile Include="OldGui\ScriptNameInputArea.cs" />
-    <Compile Include="OldGui\ScrollableTextArea.cs" />
-    <Compile Include="OldGui\TextArea.cs" />
-    <Compile Include="OldGui\UIElement.cs" />
     <Compile Include="Kerbalui\Controls\Abstract\ContentControl.cs" />
     <Compile Include="Kerbalui\Controls\Abstract\EditableText.cs" />
     <Compile Include="Kerbalui\Controls\Button.cs" />
