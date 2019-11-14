@@ -6,7 +6,6 @@ using RedOnion.KSP.Completion;
 
 namespace RedOnion.KSP.ReflectionUtil
 {
-	// This is now just a regular class. No Icompletable necessary.
 	public partial class GetMappings : ICompletable
 	{
 		IList<string> ICompletable.PossibleCompletions

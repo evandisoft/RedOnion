@@ -150,6 +150,7 @@
     <Compile Include="UnsafeAPI\KerbalsDictionary.cs" />
     <Compile Include="UnsafeAPI\UnsafeAPI.cs" />
     <Compile Include="Utilities\ReferenceEqualityComparer.cs" />
+    <Compile Include="Lua\CommonAPI\MoonSharpCommonAPI.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RedOnion.ROS\RedOnion.ROS.csproj">
@@ -165,5 +166,8 @@
   <ItemGroup />
   <ItemGroup />
   <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Lua\CommonAPI\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

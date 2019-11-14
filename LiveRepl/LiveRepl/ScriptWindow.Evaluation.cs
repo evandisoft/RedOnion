@@ -52,7 +52,7 @@ namespace LiveRepl
 			else
 			{
 				disableClock.Reset();
-				// have a delay after script ends to enable elements
+				// have a delay after script ends before enabling elements
 				if (!enableClock.IsRunning) 
 				{
 					enableClock.Start();

@@ -18,7 +18,9 @@ namespace RedOnion.KSP.API
 	public static class Globals
 	{
 		[Description("An api for setting which scripts will be ran when an engine is reset.")]
-		public static AutoRun autorun => AutoRun.Instance;
+		//public static AutoRun autorun => AutoRun.Instance;
+
+		public static readonly Type autorun = typeof(AutoRun);
 		[Description("Safe API for KSP Application Launcher (toolbar/buttons).")]
 		public static readonly Type app = typeof(App);
 
@@ -233,7 +235,7 @@ namespace RedOnion.KSP.API
 			{
 				IList<string> completions =
 					typeof(Globals).GetProperties().Select(t => t.Name).Concat(
-						typeof(Globals).GetFields().Select(t => t.Name)).ToList();
+						typeof(Globals).GetFields().Select(t => t.Name)).ToList();  
 				return completions;
 			}
 		}

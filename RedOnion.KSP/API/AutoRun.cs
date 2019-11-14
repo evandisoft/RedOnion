@@ -7,33 +7,30 @@ namespace RedOnion.KSP.API
 {
 	[Description("Used to get, set, or modify the current list of scripts that are to be autoran "
 	+" whenever an engine is initialized or reset.")]
-	public class AutoRun
+	public static class AutoRun
 	{
 		const string AutoRunSettingName = "AutoRun";
 
-		public AutoRun()
-		{
-		}
 
-		public static AutoRun Instance = new AutoRun();
+		//public static AutoRun Instance = new AutoRun();
 
 		[Description("Clears the list and saves the empty list.")]
-		public void clear()
+		public static void clear()
 		{
 			SavedSettings.SaveListSetting(AutoRunSettingName, new List<string>());
 		}
 
 		[Description("Returns a list of the current autorun scripts")]
-		public IList<string> scripts() => SavedSettings.LoadListSetting(AutoRunSettingName);
+		public static IList<string> scripts() => SavedSettings.LoadListSetting(AutoRunSettingName);
 
 		[Description("Saves the given list of scripts as the new list of autorun scripts.")]
-		public void save(IList<string> scripts)
+		public static void save(IList<string> scripts)
 		{
 			SavedSettings.SaveListSetting(AutoRunSettingName, scripts);
 		}
 
 		[Description("Adds a new scriptname to the list of autorun scripts")]
-		public void add(string scriptname)
+		public static void add(string scriptname)
 		{
 			var s = new List<string>(scripts());
 			s.Add(scriptname);
@@ -41,7 +38,7 @@ namespace RedOnion.KSP.API
 		}
 
 		[Description("Removes the given scriptname from the list of autorun sccripts")]
-		public void remove(string scriptname)
+		public static void remove(string scriptname)
 		{
 			var s = new List<string>(scripts());
 			s.Remove(scriptname);

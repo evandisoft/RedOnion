@@ -16,6 +16,7 @@ using API = RedOnion.KSP.API;
 using RedOnion.KSP.ReflectionUtil;
 using static RedOnion.KSP.API.Reflect;
 using System.Diagnostics;
+using RedOnion.KSP.API;
 
 namespace Kerbalua.MoonSharp
 {
@@ -75,6 +76,7 @@ namespace Kerbalua.MoonSharp
 			//Globals["Vessel"] = FlightGlobals.ActiveVessel;
 			var defaultMappings = NamespaceMappings.DefaultAssemblies;
 			Globals["new"] = Constructor.Instance;
+			Globals["blobal"] = Globals;
 			Globals["static"] = new Func<object, DynValue>((o) =>
 			{
 				if (o is Type t)
@@ -120,8 +122,8 @@ namespace Kerbalua.MoonSharp
 			{
 				//PrintErrorAction("start");
 				//UnityEngine.Debug.Log("start");
-				waittimeMillis=waittimeSeconds*1000;
-				waitwatch.Start();
+				sleeptimeMillis=waittimeSeconds*1000;
+				sleepwatch.Start();
 				coroutine.Coroutine.AutoYieldCounter=0;
 				//UnityEngine.Debug.Log("end");
 				//PrintErrorAction("end");
@@ -136,10 +138,11 @@ namespace Kerbalua.MoonSharp
 		//	var a=Assembly.GetAssembly(GetType());
 
 		//}
-		double waittimeMillis=0;
-		Stopwatch waitwatch=new Stopwatch();
+		double sleeptimeMillis=0;
+		Stopwatch sleepwatch=new Stopwatch();
 		delegate Table Importer(string name);
 
+		//Stack<DynValue> coroutineStack=new Stack<DynValue>();
 		DynValue coroutine;
 
 		public bool Evaluate(out DynValue result)
@@ -149,13 +152,12 @@ namespace Kerbalua.MoonSharp
 				throw new System.Exception("Coroutine not set in KerbaluaScript");
 			}
 
-			if (waitwatch.IsRunning)
+			if (sleepwatch.IsRunning)
 			{
-				//PrintErrorAction("time in: "+waitwatch.ElapsedMilliseconds);
-				if (waitwatch.ElapsedMilliseconds>waittimeMillis)
+				if (sleepwatch.ElapsedMilliseconds>sleeptimeMillis)
 				{
-					waittimeMillis=0;
-					waitwatch.Reset();
+					sleeptimeMillis=0;
+					sleepwatch.Reset();
 				}
 				else
 				{
@@ -163,14 +165,9 @@ namespace Kerbalua.MoonSharp
 					return false;
 				}
 			}
-			//else
-			//{
-			//	PrintErrorAction("time out: "+waitwatch.ElapsedMilliseconds);
-			//}
+
 			coroutine.Coroutine.AutoYieldCounter = 1000;
 			result = coroutine.Coroutine.Resume();
-
-
 
 			bool isComplete = false;
 			if (coroutine.Coroutine.State == CoroutineState.Dead)
@@ -196,8 +193,8 @@ namespace Kerbalua.MoonSharp
 		public void Terminate()
 		{
 			coroutine = null;
-			waitwatch.Reset();
-			waittimeMillis=0;
+			sleepwatch.Reset();
+			sleeptimeMillis=0;
 		}
 	}
 }

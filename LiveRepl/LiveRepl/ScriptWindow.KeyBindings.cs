@@ -10,9 +10,9 @@ namespace LiveRepl
 
 		void InitializeGlobalKeyBindings()
 		{
-			GlobalKeyBindings.Add(new EventKey(KeyCode.U, true), uiparts.editor.GrabFocus);
-			GlobalKeyBindings.Add(new EventKey(KeyCode.I, true), uiparts.scriptNameInputArea.GrabFocus);
-			GlobalKeyBindings.Add(new EventKey(KeyCode.O, true), uiparts.replInputArea.GrabFocus);
+			GlobalKeyBindings.Add(new EventKey(KeyCode.U, true), uiparts.replInputArea.GrabFocus);
+			GlobalKeyBindings.Add(new EventKey(KeyCode.I, true), uiparts.editor.GrabFocus);
+			GlobalKeyBindings.Add(new EventKey(KeyCode.O, true), uiparts.scriptNameInputArea.GrabFocus);
 			GlobalKeyBindings.Add(new EventKey(KeyCode.P, true), uiparts.completionArea.GrabFocus);
 			GlobalKeyBindings.Add(new EventKey(KeyCode.S, true), SaveEditorText);
 			GlobalKeyBindings.Add(new EventKey(KeyCode.D, true), LoadEditorText);
@@ -47,9 +47,9 @@ ctrl + End: move cursor to end
 Shift plus movement commands selects text.
 ctrl + insert: copy selected text
 shift + insert: paste selected text
-ctrl + u: focus editor
-ctrl + i: focus scriptNameTextArea
-ctrl + o: focus repl input area
+ctrl + u: focus repl input area
+ctrl + i: focus editor
+ctrl + o: focus scriptNameTextArea
 ctrl + p: focus completion/ intellisense box
 ctrl + n: insert and move to new line after current line
 ctrl + h: insert and move to new line before current line

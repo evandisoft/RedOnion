@@ -127,7 +127,7 @@ namespace LiveRepl
 
 		public void RunAutorunScripts()
 		{
-			var scriptnames = AutoRun.Instance.scripts();
+			var scriptnames = AutoRun.scripts();
 			foreach (var scriptname in scriptnames)
 			{
 				ReplEvaluator replEvaluator=GetReplEvaluatorByFilename(scriptname);

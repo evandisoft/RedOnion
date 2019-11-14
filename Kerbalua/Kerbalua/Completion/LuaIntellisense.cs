@@ -8,6 +8,7 @@ using MoonSharp.Interpreter.REPL;
 using MoonSharp.Interpreter.Interop;
 using System.Collections.Generic;
 using Kerbalua.Parsing;
+using UnityEngine;
 
 namespace Kerbalua.Completion {
 	public static class LuaIntellisense {
@@ -50,8 +51,9 @@ namespace Kerbalua.Completion {
 					}
 				}
 			}
-			catch (LuaIntellisenseException)
+			catch (LuaIntellisenseException e)
 			{
+				Debug.Log(e);
 				replaceStart = replaceEnd = cursorPos;
 				return new List<string>();
 			}
