@@ -14,8 +14,6 @@ namespace LiveRepl
 	{
 		public bool ScriptRunning => evaluationList.Count!=0;
 
-
-
 		List<Evaluation> evaluationList = new List<Evaluation>();
 
 		public void SetCurrentEvaluator(string evaluatorName)
@@ -27,10 +25,22 @@ namespace LiveRepl
 		Dictionary<string,ReplEvaluator> replEvaluators=new Dictionary<string, ReplEvaluator>();
 		public ReplEvaluator currentReplEvaluator;
 
+		public bool DisableElements;
 		public void FixedUpdate()
 		{
 			if (evaluationList.Count!=0)
 			{
+				// make a delay after script starts running before disabling elements
+				if (!disableClock.IsRunning) 
+				{
+					disableClock.Start();
+				}
+				if (disableClock.ElapsedMilliseconds>50)
+				{
+					DisableElements=true;
+					disableClock.Reset();
+				}
+
 				var currentEvaluation = evaluationList[0];
 				if (currentEvaluation.Evaluate())
 				{
@@ -39,6 +49,21 @@ namespace LiveRepl
 					completionManager.DisplayCurrentCompletions();
 				}
 			}
+			else
+			{
+				disableClock.Reset();
+				// have a delay after script ends to enable elements
+				if (!enableClock.IsRunning) 
+				{
+					enableClock.Start();
+				}
+				if (enableClock.ElapsedMilliseconds>50)
+				{
+					DisableElements=false;
+					enableClock.Reset();
+				}
+			}
+
 			foreach (var engineName in replEvaluators.Keys)
 			{
 				var replEvaluator = replEvaluators[engineName];

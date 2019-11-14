@@ -80,6 +80,8 @@ namespace LiveRepl
 			uiparts.replOutoutArea.Clear();
 		}
 
+		public System.Diagnostics.Stopwatch enableClock=new System.Diagnostics.Stopwatch();
+		public System.Diagnostics.Stopwatch disableClock=new System.Diagnostics.Stopwatch();
 		public void Evaluate(string source, string path, bool withHistory = false)
 		{
 			evaluationList.Add(new Evaluation(source, path, currentReplEvaluator, withHistory));

@@ -24,6 +24,7 @@ namespace LiveRepl.Parts
 
 		public void Clear()
 		{
+			editingArea.Text = "";
 			CommonOutputProcessing();
 		}
 

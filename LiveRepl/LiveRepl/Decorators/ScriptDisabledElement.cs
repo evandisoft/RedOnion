@@ -18,7 +18,7 @@ namespace LiveRepl.Decorators
 		protected override void DecoratorUpdate()
 		{
 			bool prevEnabled=GUI.enabled;
-			GUI.enabled=!uiparts.scriptWindow.ScriptRunning;
+			GUI.enabled=!uiparts.scriptWindow.DisableElements;
 			element.Update();
 			GUI.enabled=prevEnabled;
 		}
