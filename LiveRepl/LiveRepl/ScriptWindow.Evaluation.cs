@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using Kerbalua.Other;
 using Kerbalui.Controls;
 using Kerbalui.Util;
+using RedOnion.KSP.API;
 using RedOnion.KSP.Settings;
 using UnityEngine;
 
@@ -90,6 +92,8 @@ namespace LiveRepl
 					SavedSettings.SaveSetting("lastEngine", evaluatorName);
 				}));
 			}
+
+			RunAutorunScripts();
 		}
 	}
 }

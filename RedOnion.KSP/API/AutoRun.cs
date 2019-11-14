@@ -17,6 +17,11 @@ namespace RedOnion.KSP.API
 
 		public static AutoRun Instance = new AutoRun();
 
+		[Description("Clears the list and saves the empty list.")]
+		public void clear()
+		{
+			SavedSettings.SaveListSetting(AutoRunSettingName, new List<string>());
+		}
 
 		[Description("Returns a list of the current autorun scripts")]
 		public IList<string> scripts() => SavedSettings.LoadListSetting(AutoRunSettingName);

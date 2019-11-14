@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Kerbalua.Other;
+using RedOnion.KSP.API;
 using UnityEngine;
 
 namespace LiveRepl
@@ -26,13 +27,27 @@ namespace LiveRepl
 		{
 			string extension=Path.GetExtension(filename);
 
-			foreach(var replEvaluatorEntry in replEvaluators)
+			foreach (var replEvaluatorEntry in replEvaluators)
 			{
 				if (replEvaluatorEntry.Value.Extension.ToLower()==extension.ToLower())
 				{
 					SetCurrentEvaluator(replEvaluatorEntry.Key);
 				}
 			}
+		}
+
+		public ReplEvaluator GetReplEvaluatorByFilename(string filename)
+		{
+			string extension=Path.GetExtension(filename);
+
+			foreach (var replEvaluatorEntry in replEvaluators)
+			{
+				if (replEvaluatorEntry.Value.Extension.ToLower()==extension.ToLower())
+				{
+					return replEvaluatorEntry.Value;
+				}
+			}
+			return null;
 		}
 
 		public void ToggleEditor()
@@ -49,6 +64,7 @@ namespace LiveRepl
 		{
 			uiparts.scriptNameInputArea.SaveText(uiparts.editor.editingArea.Text);
 			uiparts.editorChangesIndicator.Unchanged();
+			SetReplEvaluatorByFilename(uiparts.scriptNameInputArea.Text);
 		}
 
 		public void LoadEditorText()
@@ -72,6 +88,7 @@ namespace LiveRepl
 		public void ResetEngine()
 		{
 			currentReplEvaluator?.ResetEngine();
+			RunAutorunScripts();
 		}
 
 		public void Terminate()
@@ -104,6 +121,19 @@ namespace LiveRepl
 			uiparts.replInputArea.editingArea.Text = "";
 
 			needsResize=true;
+		}
+
+		public void RunAutorunScripts()
+		{
+			var scriptnames = AutoRun.Instance.scripts();
+			foreach (var scriptname in scriptnames)
+			{
+				ReplEvaluator replEvaluator=GetReplEvaluatorByFilename(scriptname);
+				if (replEvaluator==null) continue;
+				uiparts.replOutoutArea.AddFileContent("loading "+scriptname+"...");
+				Evaluation newEvaluation=new Evaluation(replEvaluator.GetImportString(scriptname),scriptname,replEvaluator);
+				evaluationList.Add(newEvaluation);
+			}
 		}
 	}
 }

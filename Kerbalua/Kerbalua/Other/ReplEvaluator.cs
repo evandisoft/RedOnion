@@ -23,6 +23,13 @@ namespace Kerbalua.Other {
 
 		public abstract string Extension { get; }
 
+		/// <summary>
+		/// Get a string that will run the file as an import. 
+		/// This is for autorun. The file is to be ran to populate globals
+		/// in the engine.
+		/// </summary>
+		public abstract string GetImportString(string scriptname);
+
 		LinkedListNode<string> currentHistoryItem = null;
 		/// <summary>
 		/// Sets the source and return the result of that evaluation.

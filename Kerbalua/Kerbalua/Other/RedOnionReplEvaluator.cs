@@ -177,5 +177,10 @@ namespace Kerbalua.Other
 		{
 			return GetCompletions(source,cursorPos,out replaceStart,out replaceEnd);
 		}
+
+		public override string GetImportString(string scriptname)
+		{
+			return "run \""+scriptname+"\"";
+		}
 	}
 }
