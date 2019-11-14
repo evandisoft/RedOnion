@@ -1,4 +1,5 @@
-﻿using Kerbalui.EventHandling;
+﻿using Kerbalui.Controls;
+using Kerbalui.EventHandling;
 using Kerbalui.Layout;
 using Kerbalui.Types;
 using UnityEngine;
@@ -16,6 +17,13 @@ namespace LiveRepl.Parts
 		{
 			this.uiparts=uiparts;
 
+			var replButtons=new HorizontalSpacer();
+
+			replButtons.AddWeighted(1, new Filler());
+			replButtons.AddFixed(ScriptWindow.centerGroupWidth, new Button("Clear Repl", uiparts.scriptWindow.ClearRepl));
+			replButtons.AddFixed(ScriptWindow.centerGroupWidth, new Button("Show Hotkeys", uiparts.scriptWindow.PrintKeyBindingsInOutputArea));
+
+			AddMinSized(replButtons);
 			AddWeighted(1, uiparts.repl=new Repl(uiparts));
 
 			uiparts.replInputArea.keybindings.Add(new EventKey(KeyCode.E, true), uiparts.scriptWindow.EvaluateReplText);

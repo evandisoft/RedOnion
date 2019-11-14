@@ -26,7 +26,6 @@ namespace LiveRepl.Parts
 				new Button("Run", uiparts.scriptWindow.RunEditorScript)));
 			AddMinSized(new Button("Terminate", uiparts.scriptWindow.Terminate));
 			disableableStuff.AddMinSized(new Button("Reset Engine", uiparts.scriptWindow.ResetEngine));
-			disableableStuff.AddMinSized(new Button("Show Hotkeys", uiparts.scriptWindow.PrintKeyBindingsInOutputArea));
 			disableableStuff.AddMinSized(uiparts.scriptEngineSelector=new ScriptEngineSelector(uiparts));
 			AddMinSized(new ScriptDisabledElement(uiparts, disableableStuff));
 		}

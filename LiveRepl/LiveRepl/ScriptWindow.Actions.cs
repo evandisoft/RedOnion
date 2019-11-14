@@ -59,6 +59,11 @@ namespace LiveRepl
 			SetReplEvaluatorByFilename(uiparts.scriptNameInputArea.Text);
 		}
 
+		public void ClearRepl()
+		{
+			uiparts.replOutoutArea.editingArea.Text="";
+		}
+
 		public void Evaluate(string source, string path, bool withHistory = false)
 		{
 			evaluationList.Add(new Evaluation(source, path, currentReplEvaluator, withHistory));
