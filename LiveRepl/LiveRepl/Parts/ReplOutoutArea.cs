@@ -22,6 +22,11 @@ namespace LiveRepl.Parts
 			uiparts.scriptWindow.needsResize=true;
 		}
 
+		public void Clear()
+		{
+			CommonOutputProcessing();
+		}
+
 		public void AddReturnValue(string str)
 		{
 			editingArea.Text += "\nr> " + str;

@@ -61,7 +61,7 @@ namespace LiveRepl
 
 		public void ClearRepl()
 		{
-			uiparts.replOutoutArea.editingArea.Text="";
+			uiparts.replOutoutArea.Clear();
 		}
 
 		public void Evaluate(string source, string path, bool withHistory = false)
