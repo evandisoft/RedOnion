@@ -25,6 +25,7 @@
     <ConsolePause>false</ConsolePause>
     <NoWarn>3021</NoWarn>
     <Prefer32Bit>false</Prefer32Bit>
+    <NoStdLib>true</NoStdLib>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
@@ -34,6 +35,7 @@
     <ConsolePause>false</ConsolePause>
     <NoWarn>3021</NoWarn>
     <Prefer32Bit>false</Prefer32Bit>
+    <NoStdLib>true</NoStdLib>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="UnityEngine.CoreModule">
@@ -77,6 +79,12 @@
     </Reference>
     <Reference Include="KerbaluaMoonSharp">
       <HintPath>..\OtherDLLs\KerbaluaMoonSharp\KerbaluaMoonSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="KeraLua">
+      <HintPath>..\packages\KeraLua.1.0.22\lib\net45\KeraLua.dll</HintPath>
+    </Reference>
+    <Reference Include="NLua">
+      <HintPath>..\packages\NLua.1.4.25\lib\net45\NLua.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -123,6 +131,7 @@
     <Compile Include="Kerbalua\Completion\old\OldInstanceStatic.cs" />
     <Compile Include="Kerbalua\Completion\CompletionTypes\InstanceStaticCompletion.cs" />
     <Compile Include="Kerbalua\Kerbnlua\KerbnluaScript.cs" />
+    <Compile Include="Kerbalua\Kerbnlua\KerbnluaReplEvaluator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -136,6 +145,7 @@
     <None Include="Kerbalua\Completion\Grammar\IncompleteLua.g4" />
     <None Include="Kerbalua\Completion\Grammar\FinalExpLua.g4" />
     <None Include="Kerbalua\Completion\CompletionNotes.md" />
+    <None Include="Kerbalua\Kerbnlua\Kerbnlua.md" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
@@ -168,4 +178,5 @@
       </Properties>
     </MonoDevelop>
   </ProjectExtensions>
+  <Import Project="..\packages\KeraLua.1.0.22\build\net45\KeraLua.targets" Condition="Exists('..\packages\KeraLua.1.0.22\build\net45\KeraLua.targets')" />
 </Project>

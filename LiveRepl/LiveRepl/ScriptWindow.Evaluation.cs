@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Kerbalua.Kerbnlua;
 using Kerbalua.Other;
 using Kerbalui.Controls;
 using Kerbalui.Util;
@@ -88,6 +89,11 @@ namespace LiveRepl
 				PrintErrorAction = uiparts.replOutoutArea.AddError
 			};
 			replEvaluators["Lua"] = new MoonSharpReplEvaluator()
+			{
+				PrintAction = uiparts.replOutoutArea.AddOutput,
+				PrintErrorAction = uiparts.replOutoutArea.AddError
+			};
+			replEvaluators["nLua"] = new KerbnluaReplEvaluator()
 			{
 				PrintAction = uiparts.replOutoutArea.AddOutput,
 				PrintErrorAction = uiparts.replOutoutArea.AddError

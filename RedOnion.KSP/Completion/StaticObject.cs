@@ -20,29 +20,29 @@ namespace RedOnion.KSP.Completion
 
 		public override string FullName => type.FullName;
 
-		public override Guid GUID => throw new NotImplementedException();
+		public override Guid GUID => type.GUID;
 
-		public override Module Module => throw new NotImplementedException();
+		public override Module Module => type.Module;
 
-		public override string Namespace => throw new NotImplementedException();
+		public override string Namespace => type.Namespace;
 
-		public override Type UnderlyingSystemType => throw new NotImplementedException();
+		public override Type UnderlyingSystemType => type.UnderlyingSystemType;
 
-		public override string Name => throw new NotImplementedException();
+		public override string Name => type.Name;
 
 		public override ConstructorInfo[] GetConstructors(BindingFlags bindingAttr)
 		{
-			throw new NotImplementedException();
+			return type.GetConstructors(bindingAttr);
 		}
 
 		public override object[] GetCustomAttributes(bool inherit)
 		{
-			throw new NotImplementedException();
+			return type.GetCustomAttributes(inherit);
 		}
 
 		public override object[] GetCustomAttributes(Type attributeType, bool inherit)
 		{
-			throw new NotImplementedException();
+			return type.GetCustomAttributes(attributeType, inherit);
 		}
 
 		public override Type GetElementType()
