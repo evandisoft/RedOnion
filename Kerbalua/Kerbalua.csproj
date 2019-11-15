@@ -101,18 +101,28 @@
     <Compile Include="Kerbalua\Other\Evaluation.cs" />
     <Compile Include="Kerbalua\Parsing\IncompleteLuaParsing.cs" />
     <Compile Include="Kerbalua\MoonSharp\KerbaluaScript.cs" />
-    <Compile Include="Kerbalua\Completion\OperationsProcessorStatic.cs" />
-    <Compile Include="Kerbalua\Completion\OperationsProcessorInstance.cs" />
-    <Compile Include="Kerbalua\Completion\OperationsProcessorType.cs" />
-    <Compile Include="Kerbalua\Completion\OperationsProcessorICompletable.cs" />
-    <Compile Include="Kerbalua\Completion\OperationsProcessorTable.cs" />
-    <Compile Include="Kerbalua\Completion\OperationsProcessor.cs" />
     <Compile Include="Kerbalua\Completion\CompletionOperation.cs" />
     <Compile Include="Kerbalua\Completion\CompletionOperations.cs" />
     <Compile Include="Kerbalua\Completion\CompletionReflectionUtil.cs" />
-    <Compile Include="Kerbalua\Completion\Instance.cs" />
-    <Compile Include="Kerbalua\Completion\OperationsProcessorNative.cs" />
     <Compile Include="Kerbalua\Parsing\AnyErrorsListener.cs" />
+    <Compile Include="Kerbalua\Completion\CompletionQueue.cs" />
+    <Compile Include="Kerbalua\Completion\OperationsProcessors\OperationsProcessor.cs" />
+    <Compile Include="Kerbalua\Completion\OperationsProcessors\OperationsProcessorICompletable.cs" />
+    <Compile Include="Kerbalua\Completion\OperationsProcessors\OperationsProcessorInstance.cs" />
+    <Compile Include="Kerbalua\Completion\OperationsProcessors\OperationsProcessorNative.cs" />
+    <Compile Include="Kerbalua\Completion\OperationsProcessors\OperationsProcessorStatic.cs" />
+    <Compile Include="Kerbalua\Completion\OperationsProcessors\OperationsProcessorTable.cs" />
+    <Compile Include="Kerbalua\Completion\OperationsProcessors\OperationsProcessorType.cs" />
+    <Compile Include="Kerbalua\Completion\CompletionTypes\TableCompletion.cs" />
+    <Compile Include="Kerbalua\Completion\CompletionTypes\CompletionObject.cs" />
+    <Compile Include="Kerbalua\Completion\CompletionTypes\InstanceCompletion.cs" />
+    <Compile Include="Kerbalua\Completion\CompletionTypes\TypeCompletion.cs" />
+    <Compile Include="Kerbalua\Completion\CompletionTypes\StaticCompletion.cs" />
+    <Compile Include="Kerbalua\Completion\CompletionTypes\CompletableCompletion.cs" />
+    <Compile Include="Kerbalua\Completion\CompletionTypes\HasProxyCompletion.cs" />
+    <Compile Include="Kerbalua\Completion\old\OldInstanceStatic.cs" />
+    <Compile Include="Kerbalua\Completion\CompletionTypes\InstanceStaticCompletion.cs" />
+    <Compile Include="Kerbalua\Kerbnlua\KerbnluaScript.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -125,6 +135,7 @@
     <None Include="Kerbalua\Completion\Grammar\IncompleteLuaLexer.tokens" />
     <None Include="Kerbalua\Completion\Grammar\IncompleteLua.g4" />
     <None Include="Kerbalua\Completion\Grammar\FinalExpLua.g4" />
+    <None Include="Kerbalua\Completion\CompletionNotes.md" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
@@ -140,6 +151,12 @@
       <Project>{034c16ab-d16e-4afe-9837-812499ee2f3d}</Project>
       <Name>RedOnion.UI</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Kerbalua\Completion\OperationsProcessors\" />
+    <Folder Include="Kerbalua\Completion\CompletionTypes\" />
+    <Folder Include="Kerbalua\Completion\old\" />
+    <Folder Include="Kerbalua\Kerbnlua\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>

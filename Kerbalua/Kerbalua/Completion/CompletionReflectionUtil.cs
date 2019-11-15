@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using Kerbalua.Completion.CompletionTypes;
 
 namespace Kerbalua.Completion
 {
@@ -80,6 +81,43 @@ namespace Kerbalua.Completion
 			}
 
 			return methodInfo != null;
+		}
+
+		public static bool TryGetNativeMember(Type type, CompletionOperations operations, out CompletionObject completionObject, BindingFlags flags)
+		{
+			var getMember = operations.Current as GetMemberOperation;
+			if (TryGetMethod(type, getMember.Name, out MethodInfo methodInfo, flags))
+			{
+				Type newType = methodInfo.ReturnType;
+				var nextOp = operations.Peek(1);
+				if (nextOp is CallOperation)
+				{
+					completionObject = new InstanceStaticCompletion(newType);
+					operations.Move(2);
+					return true;
+				}
+			 	completionObject = null;
+				return false;
+			}
+
+			if (TryGetProperty(type, getMember.Name, out PropertyInfo propertyInfo, flags))
+			{
+				Type newType = propertyInfo.PropertyType;
+				completionObject = new InstanceStaticCompletion(newType);
+				operations.MoveNext();
+				return true;
+			}
+
+			if (TryGetField(type, getMember.Name, out FieldInfo fieldInfo, flags))
+			{
+				Type newType = fieldInfo.FieldType;
+				completionObject = new InstanceStaticCompletion(newType);
+				operations.MoveNext();
+				return true;
+			}
+
+			completionObject = null;
+			return false;
 		}
 
 		public const BindingFlags StaticPublic = BindingFlags.Static | BindingFlags.Public;

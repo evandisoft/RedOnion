@@ -11,7 +11,7 @@ using RedOnion.KSP.UnsafeAPI;
 namespace RedOnion.KSP.Namespaces
 {
 	[DisplayName("KSP"), DocBuild("RedOnion.KSP/Namespaces/KSP")]
-	[Unsafe, Description("Unsafe KSP API - see [CommonScriptApi](../../CommonScriptApi.md)")]
+	[Namespace,Unsafe, Description("Unsafe KSP API - see [CommonScriptApi](../../CommonScriptApi.md)")]
 	public static class KSP_Namespace
 	{
 		[Description("UnityEngine.Time")]

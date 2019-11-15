@@ -79,7 +79,7 @@ ctrl + insert: copy selected area.
 Any other key gives focus to input box.
 ";
 
-			uiparts.replOutoutArea.AddOutput("\n" + hotkeyText);
+			uiparts.replOutoutArea.AddText(hotkeyText);
 		}
 	}
 }

@@ -16,28 +16,36 @@ namespace Kerbalua.Completion
 
 		static public IList<string> StaticGetPossibleCompletions(object obj)
 		{
+			CompletionQueue.Log("<Static get possible completions>"+obj.GetType().ToString());
 			var processor = GetCompletionProcessor(obj, out object convertedObj);
-
+			CompletionQueue.Log("<get possible completions processor>"+processor.GetType());
 			return processor.GetPossibleCompletions(convertedObj);
 		}
 
 		static public bool TryProcessOperation(object obj, CompletionOperations operations, out object outObj)
 		{
+
 			if (operations.IsFinished)
 			{
 				outObj = null;
 				return false;
 			}
 			var processor = GetCompletionProcessor(obj,out object convertedObj);
+			CompletionQueue.Log("<processor>"+processor.GetType());
 			var operation = operations.Current;
 			switch (operation)
 			{
 				case GetMemberOperation getMemberOperation:
-					return processor.TryProcessGetMember(convertedObj, operations, out outObj);
+				CompletionQueue.Log("<getmember>");
+				return processor.TryProcessGetMember(convertedObj, operations, out outObj);
+
 				case CallOperation callOperation:
-					return processor.TryProcessCall(convertedObj, operations, out outObj);
+				CompletionQueue.Log("<calloperation>");
+				return processor.TryProcessCall(convertedObj, operations, out outObj);
+
 				case ArrayAccessOperation arrayAccessOperation:
-					return processor.TryProcessArrayAccess(convertedObj, operations, out outObj);
+				CompletionQueue.Log("<arrayaccess>");
+				return processor.TryProcessArrayAccess(convertedObj, operations, out outObj);
 			}
 			throw new LuaIntellisenseException("Operation must be call, getmember, or arrayaccess");
 		}
@@ -109,17 +117,19 @@ namespace Kerbalua.Completion
 
 			obj = GetProxy(obj);
 
-			if (obj is Instance instance)
-			{
-				convertedObj = instance.Type;
-				return OperationsProcessorInstance.Instance;
-			}
-
 			if (obj is ICompletable completable)
 			{
 				convertedObj = completable;
 				return OperationsProcessorICompletable.Instance;
 			}
+
+			if (obj is OldInstanceStatic instance)
+			{
+				convertedObj = instance.Type;
+				return OperationsProcessorInstance.Instance;
+			}
+
+
 
 			if(obj is Table table)
 			{

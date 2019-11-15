@@ -1,4 +1,5 @@
-﻿using Kerbalui.Controls;
+﻿using Kerbalua.Completion;
+using Kerbalui.Controls;
 using Kerbalui.EventHandling;
 using Kerbalui.Layout;
 using Kerbalui.Types;
@@ -22,6 +23,12 @@ namespace LiveRepl.Parts
 			replButtons.AddWeighted(1, new Filler());
 			replButtons.AddFixed(ScriptWindow.centerGroupWidth, new Button("Clear Repl", uiparts.scriptWindow.ClearRepl));
 			replButtons.AddFixed(ScriptWindow.centerGroupWidth, new Button("Show Hotkeys", uiparts.scriptWindow.PrintKeyBindingsInOutputArea));
+			replButtons.AddFixed(ScriptWindow.centerGroupWidth, new Button("Print Logs", () =>
+			{
+				uiparts.replOutoutArea.Clear();
+				uiparts.replOutoutArea.AddText(CompletionQueue.String());
+			}));
+
 
 			AddMinSized(replButtons);
 			AddWeighted(1, uiparts.repl=new Repl(uiparts));

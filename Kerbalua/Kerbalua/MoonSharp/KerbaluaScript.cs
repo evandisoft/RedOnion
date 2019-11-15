@@ -76,7 +76,6 @@ namespace Kerbalua.MoonSharp
 			//Globals["Vessel"] = FlightGlobals.ActiveVessel;
 			var defaultMappings = NamespaceMappings.DefaultAssemblies;
 			Globals["new"] = Constructor.Instance;
-			Globals["blobal"] = Globals;
 			Globals["static"] = new Func<object, DynValue>((o) =>
 			{
 				if (o is Type t)
@@ -117,6 +116,7 @@ namespace Kerbalua.MoonSharp
 			//UserData.RegisterAssembly(Assembly.GetAssembly(typeof(System.Linq.Enumerable)),true);
 			var coroutines=Globals["coroutine"] as Table;
 			var coroYield=coroutines["yield"];
+			Globals["globals"] = UserData.CreateStatic(typeof(Globals));
 
 			Globals["sleep"] = new Action<double>((double waittimeSeconds) =>
 			{

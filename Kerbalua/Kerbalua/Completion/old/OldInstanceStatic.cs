@@ -1,11 +1,11 @@
 using System;
 namespace Kerbalua.Completion
 {
-	public struct Instance
+	public struct OldInstanceStatic
 	{
 		public readonly Type Type;
 
-		public Instance(Type t)
+		public OldInstanceStatic(Type t)
 		{
 			Type = t;
 		}

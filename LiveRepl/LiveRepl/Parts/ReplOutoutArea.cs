@@ -28,6 +28,12 @@ namespace LiveRepl.Parts
 			CommonOutputProcessing();
 		}
 
+		public void AddText(string str)
+		{
+			editingArea.Text += "\n" + str;
+			CommonOutputProcessing();
+		}
+
 		public void AddReturnValue(string str)
 		{
 			editingArea.Text += "\nr> " + str;

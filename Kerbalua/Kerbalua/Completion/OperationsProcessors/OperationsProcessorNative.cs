@@ -22,7 +22,7 @@ namespace Kerbalua.Completion
 				var nextOp = operations.Peek(1);
 				if (nextOp is CallOperation)
 				{
-					outObj = new Instance(newType);
+					outObj = new OldInstanceStatic(newType);
 					operations.Move(2);
 					return true;
 				}
@@ -33,7 +33,7 @@ namespace Kerbalua.Completion
 			if (CompletionReflectionUtil.TryGetProperty(t, getMember.Name, out PropertyInfo propertyInfo, flags))
 			{
 				Type newType = propertyInfo.PropertyType;
-				outObj = new Instance(newType);
+				outObj = new OldInstanceStatic(newType);
 				operations.MoveNext();
 				return true;
 			}
@@ -41,7 +41,7 @@ namespace Kerbalua.Completion
 			if (CompletionReflectionUtil.TryGetField(t, getMember.Name, out FieldInfo fieldInfo, flags))
 			{
 				Type newType = fieldInfo.FieldType;
-				outObj = new Instance(newType);
+				outObj = new OldInstanceStatic(newType);
 				operations.MoveNext();
 				return true;
 			}

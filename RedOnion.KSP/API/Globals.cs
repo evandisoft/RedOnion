@@ -14,7 +14,7 @@ using RedOnion.KSP.ReflectionUtil;
 
 namespace RedOnion.KSP.API
 {
-	[Description("Global variables, objects and functions.")]
+	[Namespace,Description("Global variables, objects and functions.")]
 	public static class Globals
 	{
 		[Description("An api for setting which scripts will be ran when an engine is reset.")]
@@ -185,6 +185,8 @@ namespace RedOnion.KSP.API
 			}
 		}
 
+		public object CompletionProxy => UserData.CreateStatic(typeof(Globals));
+
 		public bool TryGetCompletion(string completionName, out object completion)
 		{
 			completion = Get(this, DynValue.NewString(completionName));
@@ -201,16 +203,27 @@ namespace RedOnion.KSP.API
 		}
 		DynValue Get(Table table, DynValue index)
 		{
+			object obj=null;
 			var name = index.String;
 			var field = typeof(Globals).GetField(name, BindingFlags.Static|BindingFlags.Public);
 			if (field !=null)
 			{
-				return DynValue.FromObject(table.OwnerScript, field.GetValue(null));
+				obj=field.GetValue(null);
 			}
 			var prop = typeof(Globals).GetProperty(name, BindingFlags.Static|BindingFlags.Public);
 			if (prop != null)
-				return DynValue.FromObject(table.OwnerScript, prop.GetValue(null, null));
-			return null;
+			{
+				obj=prop.GetValue(null, null);
+			}
+
+			if (obj.GetType().Name=="RuntimeType")
+			{
+				Type t=obj as Type;
+				obj=UserData.CreateStatic(t);
+			}
+
+
+			return DynValue.FromObject(table.OwnerScript, obj);
 		}
 	}
 }

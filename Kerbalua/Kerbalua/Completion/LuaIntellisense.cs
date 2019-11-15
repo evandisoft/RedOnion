@@ -19,10 +19,13 @@ namespace Kerbalua.Completion {
 		{
 			string relevantText = source.Substring(0, cursorPos);
 
+			CompletionQueue.completionQueue.Clear();
 			ProcessedIncompleteVar processedIncompleteVar;
 			try
 			{
+				CompletionQueue.Log("<CompletedText>:"+relevantText);
 				processedIncompleteVar = Parse(relevantText);
+				CompletionQueue.Log("<processedIncompleteVar>:"+processedIncompleteVar);
 			}
 			catch (LuaIntellisenseException)
 			{
@@ -31,12 +34,14 @@ namespace Kerbalua.Completion {
 			}
 
 			var operations = new CompletionOperations(processedIncompleteVar.Segments);
-
+			CompletionQueue.Log("<operations>:"+operations);
 
 			object currentObject = globals;
 
 			try
 			{
+				CompletionQueue.Log("<operations.LastOperation>:"+operations.LastOperation);
+				CompletionQueue.Log("<currentObject>:"+currentObject.GetType());
 				while (!operations.LastOperation)
 				{
 					if (operations.IsFinished)
@@ -46,9 +51,14 @@ namespace Kerbalua.Completion {
 
 					if (!OperationsProcessor.TryProcessOperation(currentObject, operations, out currentObject))
 					{
+						CompletionQueue.Log("<operations.LastOperation>:"+operations.LastOperation);
+						CompletionQueue.Log("<currentObject>:"+currentObject.GetType());
+						CompletionQueue.Log("<returning empty list>");
 						replaceStart = replaceEnd = cursorPos;
 						return new List<string>();
 					}
+					CompletionQueue.Log("<operations.LastOperation>:"+operations.LastOperation);
+					CompletionQueue.Log("<currentObject>:"+currentObject.GetType());
 				}
 			}
 			catch (LuaIntellisenseException e)
