@@ -6,7 +6,7 @@ using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.REPL;
 using MoonSharp.Interpreter.Interop;
 using Kerbalua.Other;
-using RedOnion.KSP.Lua;
+using RedOnion.KSP.MoonSharp;
 using Kerbalua.MoonSharp;
 //using UnityEngine;
 using System.Reflection;

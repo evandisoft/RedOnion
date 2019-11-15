@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using MoonSharp.Interpreter;
 
-namespace RedOnion.KSP.Lua.Proxies
+namespace RedOnion.KSP.MoonSharp.Proxies
 {
 	public class ProxyException : Exception
 	{
@@ -21,8 +21,8 @@ namespace RedOnion.KSP.Lua.Proxies
 	public class ProxyTable : Table
 	{
 		public object ProxiedObject;
-		MoonSharp.Interpreter.Script script;
-		public ProxyTable(MoonSharp.Interpreter.Script script, object proxied) : base(script)
+		global::MoonSharp.Interpreter.Script script;
+		public ProxyTable(global::MoonSharp.Interpreter.Script script, object proxied) : base(script)
 		{
 			this.script = script;
 			ProxiedObject = proxied;

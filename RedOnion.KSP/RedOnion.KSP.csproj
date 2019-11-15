@@ -150,7 +150,7 @@
     <Compile Include="UnsafeAPI\KerbalsDictionary.cs" />
     <Compile Include="UnsafeAPI\UnsafeAPI.cs" />
     <Compile Include="Utilities\ReferenceEqualityComparer.cs" />
-    <Compile Include="Lua\CommonAPI\MoonSharpCommonAPI.cs" />
+    <Compile Include="Lua\CommonAPI\CommonAPITable.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RedOnion.ROS\RedOnion.ROS.csproj">

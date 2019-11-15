@@ -8,10 +8,10 @@ using MoonSharp.Interpreter.DataStructs;
 using MoonSharp.Interpreter.Interop;
 using MoonSharp.Interpreter.Interop.BasicDescriptors;
 using MoonSharp.Interpreter.Interop.StandardDescriptors;
-using RedOnion.KSP.Lua.Proxies;
+using RedOnion.KSP.MoonSharp.Proxies;
 using RedOnion.KSP.Utilities;
 
-namespace RedOnion.KSP.Lua.Descriptors
+namespace RedOnion.KSP.MoonSharp.Descriptors
 {
 	/// <summary>
 	/// Class providing easier marshalling of CLR events. Handling is limited to a narrow range of handler signatures, which,

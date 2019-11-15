@@ -6,6 +6,7 @@ using System.ComponentModel;
 using RedOnion.KSP.MathUtil;
 using RedOnion.KSP.Utilities;
 using RedOnion.ROS;
+using RedOnion.KSP.UnsafeAPI;
 
 namespace RedOnion.KSP.Namespaces
 {
@@ -42,6 +43,8 @@ namespace RedOnion.KSP.Namespaces
 		[Description("[KSP API](https://kerbalspaceprogram.com/api/class_k_s_p_1_1_u_i_1_1_screens_1_1_stage_manager.html): Staging logic.")]
 		public static readonly Type StageManager = typeof(StageManager);
 
+		[Description("A map of planet names to planet bodies. (Unsafe API)")]
+		public static BodiesDictionary bodies => BodiesDictionary.Instance;
 		[Description("[KSP API](https://kerbalspaceprogram.com/api/class_high_logic.html): LoadedScene indicator and other global state.")]
 		public static HighLogic HighLogic => HighLogic.fetch;
 		[Description("[KSP API](https://kerbalspaceprogram.com/api/_high_logic_8cs.html#a0687e907db3af3681f90377d69f32090): Game scenes (enum).")]

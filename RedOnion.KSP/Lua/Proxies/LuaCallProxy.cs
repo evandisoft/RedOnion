@@ -1,5 +1,5 @@
 using System;
-namespace RedOnion.KSP.Lua.Proxies
+namespace RedOnion.KSP.MoonSharp.Proxies
 {
 	public class LuaCallProxy
 	{

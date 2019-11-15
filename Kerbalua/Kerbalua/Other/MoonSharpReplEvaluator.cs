@@ -5,7 +5,7 @@ using UnityEngine;
 using Kerbalua.MoonSharp;
 using Kerbalua.Completion;
 using MoonSharp.Interpreter.Loaders;
-using RedOnion.KSP.Lua;
+using RedOnion.KSP.MoonSharp;
 using RedOnion.KSP.Autopilot;
 using RedOnion.KSP.Settings;
 using System.IO;

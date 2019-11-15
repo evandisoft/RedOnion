@@ -7,7 +7,7 @@ using MoonSharp.Interpreter.Compatibility;
 using MoonSharp.Interpreter.Interop;
 using MoonSharp.Interpreter.Interop.BasicDescriptors;
 
-namespace RedOnion.KSP.Lua.Descriptors
+namespace RedOnion.KSP.MoonSharp.Descriptors
 {
 	public class LuaDescriptor : DispatchingUserDataDescriptor
 	{

@@ -3,7 +3,7 @@ using System.Reflection;
 using MoonSharp.Interpreter;
 using System.Collections.Generic;
 
-namespace RedOnion.KSP.Lua.Proxies
+namespace RedOnion.KSP.MoonSharp.Proxies
 {
 	/// <summary>
 	/// Not needed anymore.
@@ -11,10 +11,10 @@ namespace RedOnion.KSP.Lua.Proxies
 	public class ProxyCallTable : Table
 	{
 		public object ProxiedObject;
-		MoonSharp.Interpreter.Script script;
+		global::MoonSharp.Interpreter.Script script;
 		public string MemberName;
 
-		public ProxyCallTable(MoonSharp.Interpreter.Script script,object proxiedObject,string memberName) : base(script)
+		public ProxyCallTable(global::MoonSharp.Interpreter.Script script,object proxiedObject,string memberName) : base(script)
 		{
 			this.script = script;
 			MemberName = memberName;

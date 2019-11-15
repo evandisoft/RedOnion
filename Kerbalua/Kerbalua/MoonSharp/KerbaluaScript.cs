@@ -5,7 +5,7 @@ using UnityEngine;
 using RedOnion.KSP.MathUtil;
 using System;
 using KSP.UI.Screens;
-using RedOnion.KSP.Lua.Proxies;
+using RedOnion.KSP.MoonSharp.Proxies;
 using Kerbalua.Parsing;
 using RedOnion.UI;
 using System.Reflection;

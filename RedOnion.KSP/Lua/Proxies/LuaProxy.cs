@@ -5,7 +5,7 @@ using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
 using RedOnion.KSP.Completion;
 
-namespace RedOnion.KSP.Lua.Proxies
+namespace RedOnion.KSP.MoonSharp.Proxies
 {
 	public class LuaProxy:IUserDataType,IHasCompletionProxy
 	{
@@ -16,7 +16,7 @@ namespace RedOnion.KSP.Lua.Proxies
 			this.ProxiedObject = ProxiedObject;
 		}
 
-		public DynValue Index(MoonSharp.Interpreter.Script script, DynValue index, bool isDirectIndexing)
+		public DynValue Index(global::MoonSharp.Interpreter.Script script, DynValue index, bool isDirectIndexing)
 		{
 			if (index.Type != DataType.String)
 			{
@@ -62,12 +62,12 @@ namespace RedOnion.KSP.Lua.Proxies
 			throw new NotImplementedException("Member " + memberName + " was not in proxied object " + ProxiedObject.GetType());
 		}
 
-		public DynValue MetaIndex(MoonSharp.Interpreter.Script script, string metaname)
+		public DynValue MetaIndex(global::MoonSharp.Interpreter.Script script, string metaname)
 		{
 			throw new NotImplementedException();
 		}
 
-		public bool SetIndex(MoonSharp.Interpreter.Script script, DynValue index, DynValue value, bool isDirectIndexing)
+		public bool SetIndex(global::MoonSharp.Interpreter.Script script, DynValue index, DynValue value, bool isDirectIndexing)
 		{
 			throw new NotImplementedException();
 		}

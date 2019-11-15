@@ -26,16 +26,17 @@ namespace RedOnion.KSP.API
 
 		[Description("A collection of space/celestial bodies. (Safe API)")]
 		public static Bodies bodies => Bodies.Instance;
-		[Unsafe, Description("A map of planet names to planet bodies. (Unsafe API)")]
-		public static BodiesDictionary getbody => BodiesDictionary.Instance;
+
 
 		//Not sure if I want to add this yet. It works, but not sure it will be
 		// structured this way.
 		//[Unsafe, Description("A map of kerbal names to kerbals for kerbals in the crew.")]
 		//public static KerbalsDictionary kerbals => KerbalsDictionary.Instance;
+		[Unsafe, Description("Namespace Mappings")]
+		public static readonly NamespaceInstance native = NamespaceMappings.DefaultAssemblies.GetNamespace("");
 
 		[Unsafe, Description("All the reflection stuff and namespaces.")]
-		public static Reflect native => Reflect.Instance;
+		public static Reflect reflect => Reflect.Instance;
 		[Unsafe, Description("Reflected/imported stuff by assembly name.")]
 		public static readonly GetMappings assembly = new GetMappings();
 
@@ -201,6 +202,11 @@ namespace RedOnion.KSP.API
 		DynValue Get(Table table, DynValue index)
 		{
 			var name = index.String;
+			var field = typeof(Globals).GetField(name, BindingFlags.Static|BindingFlags.Public);
+			if (field !=null)
+			{
+				return DynValue.FromObject(table.OwnerScript, field.GetValue(null));
+			}
 			var prop = typeof(Globals).GetProperty(name, BindingFlags.Static|BindingFlags.Public);
 			if (prop != null)
 				return DynValue.FromObject(table.OwnerScript, prop.GetValue(null, null));

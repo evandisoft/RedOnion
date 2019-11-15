@@ -7,7 +7,7 @@ namespace RedOnion.KSP.ReflectionUtil
 {
 	public partial class NamespaceInstance : IUserDataType
 	{
-		public DynValue Index(MoonSharp.Interpreter.Script script, DynValue index, bool isDirectIndexing)
+		public DynValue Index(global::MoonSharp.Interpreter.Script script, DynValue index, bool isDirectIndexing)
 		{
 			//Debug.Log(index);
 
@@ -31,7 +31,7 @@ namespace RedOnion.KSP.ReflectionUtil
 			throw new Exception("No type or subnamespace named " + index + " found in namespace " + ToString());
 		}
 
-		DynValue IUserDataType.MetaIndex(MoonSharp.Interpreter.Script script, string metaname)
+		DynValue IUserDataType.MetaIndex(global::MoonSharp.Interpreter.Script script, string metaname)
 		{
 			//if (metaname == "__tostring")
 			//{
@@ -47,7 +47,7 @@ namespace RedOnion.KSP.ReflectionUtil
 		//}
 
 
-		bool IUserDataType.SetIndex(MoonSharp.Interpreter.Script script, DynValue index, DynValue value, bool isDirectIndexing)
+		bool IUserDataType.SetIndex(global::MoonSharp.Interpreter.Script script, DynValue index, DynValue value, bool isDirectIndexing)
 		{
 			throw new NotSupportedException("Cannot modify fields of "+nameof(NamespaceInstance));
 		}

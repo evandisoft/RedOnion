@@ -1,7 +1,7 @@
 using System;
 using MoonSharp.Interpreter;
 
-namespace RedOnion.KSP.Lua.Proxies
+namespace RedOnion.KSP.MoonSharp.Proxies
 {
 	public class ExperimentalProxy
 	{
