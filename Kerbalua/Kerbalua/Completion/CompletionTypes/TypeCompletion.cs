@@ -13,7 +13,7 @@ namespace Kerbalua.Completion.CompletionTypes
 			
         }
 
-		public override IList<string> StaticGetPossibleCompletions()
+		public override IList<string> GetPossibleCompletions()
 		{
 			throw new System.NotImplementedException();
 		}

@@ -50,10 +50,10 @@ namespace Kerbalua.Completion.CompletionTypes
 			return true;
 		}
 
-		public override IList<string> StaticGetPossibleCompletions()
+		public override IList<string> GetPossibleCompletions()
 		{
 			var completionObject=GetProxy(hasProxy, 100);
-			return completionObject.StaticGetPossibleCompletions();
+			return completionObject.GetPossibleCompletions();
 		}
 
 		public override bool TryArrayAccess(CompletionOperations operations, out CompletionObject completionObject)

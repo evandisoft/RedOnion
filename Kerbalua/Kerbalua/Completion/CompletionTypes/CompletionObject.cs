@@ -30,7 +30,7 @@ namespace Kerbalua.Completion.CompletionTypes
 		public abstract bool TryGetMember(CompletionOperations operations, out CompletionObject completionObject);
 		public abstract bool TryCall(CompletionOperations operations, out CompletionObject completionObject);
 		public abstract bool TryArrayAccess(CompletionOperations operations, out CompletionObject completionObject);
-		public abstract IList<string> StaticGetPossibleCompletions();
+		public abstract IList<string> GetPossibleCompletions();
 
 		public static CompletionObject GetCompletionObject(DynValue dynValue)
 		{

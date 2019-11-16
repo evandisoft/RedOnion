@@ -13,7 +13,7 @@ namespace Kerbalua.Completion.CompletionTypes
             this.v = v;
         }
 
-		public override IList<string> StaticGetPossibleCompletions()
+		public override IList<string> GetPossibleCompletions()
 		{
 			return CompletionReflectionUtil.GetMemberNames(v.GetType(), CompletionReflectionUtil.AllPublic);
 		}
