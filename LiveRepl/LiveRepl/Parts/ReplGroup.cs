@@ -23,11 +23,11 @@ namespace LiveRepl.Parts
 			replButtons.AddWeighted(1, new Filler());
 			replButtons.AddFixed(ScriptWindow.centerGroupWidth, new Button("Clear Repl", uiparts.scriptWindow.ClearRepl));
 			replButtons.AddFixed(ScriptWindow.centerGroupWidth, new Button("Show Hotkeys", uiparts.scriptWindow.PrintKeyBindingsInOutputArea));
-			replButtons.AddFixed(ScriptWindow.centerGroupWidth, new Button("Print Logs", () =>
-			{
-				uiparts.replOutoutArea.Clear();
-				uiparts.replOutoutArea.AddText(CompletionQueue.String());
-			}));
+			//replButtons.AddFixed(ScriptWindow.centerGroupWidth, new Button("Print Logs", () =>
+			//{
+			//	uiparts.replOutoutArea.Clear();
+			//	uiparts.replOutoutArea.AddText(CompletionQueue.String());
+			//}));
 
 
 			AddMinSized(replButtons);
