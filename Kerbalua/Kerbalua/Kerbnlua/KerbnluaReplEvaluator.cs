@@ -19,21 +19,23 @@ namespace Kerbalua.Kerbnlua
 		{
 			var status=script.Evaluate(out object[] retvals);
 			result="";
+			foreach (var retval in retvals)
+			{
+				result+=", "+retval;
+			}
+			if (result!="")
+			{
+				result=result.Substring(2);
+			}
+
 			if (status==KeraLua.LuaStatus.OK)
 			{
-				foreach (var retval in retvals)
-				{
-					result+=retval;
-				}
 				return true;
 			}
 			if (status!=KeraLua.LuaStatus.Yield)
 			{
-				PrintErrorAction?.Invoke("status was "+status);
-				foreach (var retval in retvals)
-				{
-					result+=retval;
-				}
+				PrintErrorAction?.Invoke(result);
+				result="";
 				return true;
 			}
 
