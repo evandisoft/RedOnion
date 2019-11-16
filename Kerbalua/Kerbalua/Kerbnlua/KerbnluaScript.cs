@@ -11,8 +11,7 @@ namespace Kerbalua.Kerbnlua
 
 		public KerbnluaScript()
 		{
-
-
+			state.LoadCLRPackage();
 		}
 
 		private void AutoyieldHook(IntPtr luaState, IntPtr ar)

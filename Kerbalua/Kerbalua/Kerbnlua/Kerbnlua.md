@@ -41,7 +41,25 @@ private void AutoyieldHook(IntPtr luaState, IntPtr ar)
 
 The hook function, `AutoyieldHook` had been set up to be automatically called every 1000 instructions.
 Normally this hook functionality is used for debugging, and can also be set to execute every line, every function call, or every return.
-
 Users can set the hook in lua code (Example: `debug.sethook(hookfunction,'c',1000)`).
-
 As far as I know, only one hook can be active at once, so debugging features will have to be done thoughtfully.
+
+
+`thread.Resume` also traps errors, and will return error information as if it had yielded.
+
+
+Interesting things:
+- `panic function`
+- `error handling`
+- `you can change the metatable of other types by using the debug library`
+- `userdata can have metatables`
+- `string substitution`
+- `string.dump(function)` binary representation of a function
+- `string.pack` for serialization
+- `table.sort`
+- `__gc` metamethod for finalizing objects prior to garbage collection
+- `can control gc` can stop and start it and define out aggressive it is.
+- `there are lots of reflection helpers in nlua`
+- `lua.GetTable(path) for searching through many nested tables`
+- `The actual tables are all implemented in and accessed through C`
+- `Refs`

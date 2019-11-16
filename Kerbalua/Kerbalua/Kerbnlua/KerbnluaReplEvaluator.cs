@@ -11,6 +11,9 @@ namespace Kerbalua.Kerbnlua
 		{
 			script=new KerbnluaScript();
 			script.state["print"]=new Action<object>((obj) => PrintAction.Invoke(obj.ToString()));
+			script.state["os"]=null;
+			script.state["debug"]=null;
+			script.state["io"]=null;
 		}
 
 		public override string Extension => ".nlua";
@@ -72,7 +75,6 @@ namespace Kerbalua.Kerbnlua
 		protected override void ProtectedSetSource(string source, string path)
 		{
 			script.SetSource(source);
-
 		}
 	}
 }

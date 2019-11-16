@@ -95,7 +95,5 @@ namespace Kerbalua.Completion.CompletionTypes
 			CompletionQueue.Log("obj is Instance -> Instance");
 			return new InstanceCompletion(obj);
 		}
-
-
 	}
 }
