@@ -10,7 +10,7 @@ namespace Kerbalua.Kerbnlua
 		public KerbnluaReplEvaluator()
 		{
 			script=new KerbnluaScript();
-
+			script.state["print"]=new Action<object>((obj) => PrintAction.Invoke(obj.ToString()));
 		}
 
 		public override string Extension => ".nlua";
@@ -30,6 +30,10 @@ namespace Kerbalua.Kerbnlua
 			if (status!=KeraLua.LuaStatus.Yield)
 			{
 				PrintErrorAction?.Invoke("status was "+status);
+				foreach (var retval in retvals)
+				{
+					result+=retval;
+				}
 				return true;
 			}
 
@@ -66,7 +70,7 @@ namespace Kerbalua.Kerbnlua
 		protected override void ProtectedSetSource(string source, string path)
 		{
 			script.SetSource(source);
-			script.state["print"]=PrintAction;
+
 		}
 	}
 }

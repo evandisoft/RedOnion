@@ -1,5 +1,6 @@
 using System;
 using NLua;
+using UnityEngine;
 
 namespace Kerbalua.Kerbnlua
 {
@@ -9,7 +10,7 @@ namespace Kerbalua.Kerbnlua
 
 		public KerbnluaScript()
 		{
-			state.State.SetHook(AutoyieldHook, KeraLua.LuaHookMask.Count, 1000);
+
 
 		}
 
@@ -25,17 +26,17 @@ namespace Kerbalua.Kerbnlua
 
 		public KeraLua.LuaStatus Evaluate(out object[] retvals)
 		{
-
-
-			//Console.WriteLine("top is "+state.State.GetTop());
-			//int prevtop = state.State.GetTop();
-			//var what = state.Pop();
-			//Console.WriteLine("what is "+what.GetType());
-			//state.Push(what);
-			//Console.WriteLine(state.State)
+			Debug.Log("top is "+state.State.GetTop());
+			int prevtop = state.State.GetTop();
+			var what = state.Pop();
+			Debug.Log("what is "+what.GetType());
+			state.Push(what);
+			Debug.Log(state.State);
+			Debug.Log("State size is "+state.State.GetTop());
 			KeraLua.LuaStatus status=state.State.Resume(null, 0);
-			//Console.WriteLine("top is " + state.State.GetTop());
-			//Console.WriteLine("Status: "+status);
+			Debug.Log("State size is "+state.State.GetTop());
+			Debug.Log("top is " + state.State.GetTop());
+			Debug.Log("Status: "+status);
 			//state.State.Pop(2);
 
 			retvals = new object[state.State.GetTop()];
@@ -49,6 +50,7 @@ namespace Kerbalua.Kerbnlua
 		}
 		public void SetSource(string source)
 		{
+			state.State.SetHook(AutoyieldHook, KeraLua.LuaHookMask.Count, 1000);
 			state.State.LoadString(source);
 		}
 

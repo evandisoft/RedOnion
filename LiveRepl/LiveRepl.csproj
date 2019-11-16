@@ -158,6 +158,7 @@
     <ZipDirectory SourceDirectory="..\GameData\RedOnion\Resources" Overwrite="True" DestinationFile="..\GameData\RedOnion\Resources.zip" />
     <ItemGroup>
       <OutputFiles Include="$(OutDir)**\*.dll" />
+      <OutputFiles Include="$(OutDir)**\*.so" />
     </ItemGroup>
     <Copy SourceFiles="@(OutputFiles)" DestinationFolder="..\GameData\RedOnion\Plugins\%(RecursiveDir)" OverwriteReadOnlyFiles="true" />
   </Target>
