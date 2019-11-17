@@ -11,6 +11,11 @@ namespace Kerbalua.Completion.CompletionTypes
 	{
 		Type type;
 
+		public override string ToString()
+		{
+			return base.ToString()+"("+type?.Name+")";
+		}
+
 		public InstanceStaticCompletion(Type type)
 		{
 			this.type=type;

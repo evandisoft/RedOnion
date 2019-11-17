@@ -13,7 +13,12 @@ namespace Kerbalua.Completion.CompletionTypes
     {
         protected object obj;
 
-        public InstanceCompletion(object obj):base(obj.GetType())
+		public override string ToString()
+		{
+			return base.ToString()+"("+obj?.GetType().Name+")";
+		}
+
+		public InstanceCompletion(object obj):base(obj.GetType())
         {
             this.obj = obj;
         }
@@ -47,8 +52,13 @@ namespace Kerbalua.Completion.CompletionTypes
 				//Type newType = fieldInfo.FieldType;
 				//Static field access can be completed as an object.
 				var fieldObj = fieldInfo.GetValue(obj);
+				if (fieldObj==null)
+				{
+					completionObject=null;
+					return false;
+				}
 				completionObject=GetCompletionObject(fieldObj);
-				CompletionQueue.Log("static field access");
+				CompletionQueue.Log("instance field access");
 				operations.MoveNext();
 				return true;
 			}
@@ -59,8 +69,13 @@ namespace Kerbalua.Completion.CompletionTypes
 				if (CompletionReflectionUtil.TryGetProperty(type, getMember.Name, out PropertyInfo propertyInfo, CompletionReflectionUtil.AllPublic))
 				{
 					var propObj = propertyInfo.GetValue(obj);
+					if (propObj==null)
+					{
+						completionObject=null;
+						return false;
+					}
 					completionObject=GetCompletionObject(propObj);
-					CompletionQueue.Log("static property access");
+					CompletionQueue.Log("instance safe property access");
 					operations.MoveNext();
 					return true;
 				}

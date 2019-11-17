@@ -10,6 +10,11 @@ namespace Kerbalua.Completion.CompletionTypes
 	{
 		public Table table;
 
+		public override string ToString()
+		{
+			return "TableCompletion("+table?.GetType().Name+")";
+		}
+
 		public TableCompletion(Table table)
 		{
 			this.table=table;
@@ -76,7 +81,8 @@ namespace Kerbalua.Completion.CompletionTypes
 			if (dynValue == null)
 			{
 				CompletionQueue.Log("dynvalue is null");
-				return TryResolveMetatable(table.MetaTable, out completionObject);
+				TryResolveMetatable(table.MetaTable, out completionObject);
+				return false;
 			}
 
 			completionObject=GetCompletionObject(dynValue);
@@ -99,6 +105,10 @@ namespace Kerbalua.Completion.CompletionTypes
 			if(TryTableGet(getMember.Name, out completionObject))
 			{
 				operations.MoveNext();
+				return true;
+			}
+			if (completionObject!=null)
+			{
 				return true;
 			}
 
@@ -133,6 +143,10 @@ namespace Kerbalua.Completion.CompletionTypes
 					operations.MoveNext();
 					return true;
 				}
+				if (completionObject!=null)
+				{
+					return true;
+				}
 			}
 			var num=getArrayAccess.exp.number();
 			if (num!=null)
@@ -140,6 +154,10 @@ namespace Kerbalua.Completion.CompletionTypes
 				if(TryTableGet(num, out completionObject))
 				{
 					operations.MoveNext();
+					return true;
+				}
+				if (completionObject!=null)
+				{
 					return true;
 				}
 			}

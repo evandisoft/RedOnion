@@ -8,7 +8,12 @@ namespace Kerbalua.Completion.CompletionTypes
     {
         private IHasCompletionProxy hasProxy;
 
-        public HasProxyCompletion(IHasCompletionProxy hasProxy)
+		public override string ToString()
+		{
+			return base.ToString()+"("+hasProxy?.GetType().Name+")";
+		}
+
+		public HasProxyCompletion(IHasCompletionProxy hasProxy)
         {
             this.hasProxy = hasProxy;
         }

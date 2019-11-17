@@ -344,4 +344,5 @@ ASALocalRun/
 # Vim
 *.swp
 
+.antlr/ 
 !OtherDLLs/*/*.dll

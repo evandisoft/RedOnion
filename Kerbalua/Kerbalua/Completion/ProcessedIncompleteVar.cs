@@ -21,9 +21,9 @@ namespace Kerbalua.Completion {
 
 		string ProcessIncompleteName(IncompleteLuaParser.IncompleteNameContext incompleteName)
 		{
-			if (incompleteName.NAME() == null) {
-				return incompleteName.keyword().GetText();
-			}
+			//if (incompleteName.NAME() == null) {
+			//	return incompleteName.keyword().GetText();
+			//}
 			return incompleteName.NAME().ToString();
 		}
 
@@ -89,10 +89,6 @@ namespace Kerbalua.Completion {
 			}
 			Success = true;
 		}
-
-
-
-
 	}
 
 

@@ -349,7 +349,7 @@ incompleteString
     ;
 
 incompleteName
-    : NAME | keyword
+    : NAME //| keyword
     ;
 
 keyword

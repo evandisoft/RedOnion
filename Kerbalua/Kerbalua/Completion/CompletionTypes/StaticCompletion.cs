@@ -10,7 +10,12 @@ namespace Kerbalua.Completion.CompletionTypes
     {
         private Type type;
 
-        public StaticCompletion(Type type)
+		public override string ToString()
+		{
+			return base.ToString()+"("+type?.Name+")";
+		}
+
+		public StaticCompletion(Type type)
         {
             this.type = type;
         }
@@ -41,6 +46,11 @@ namespace Kerbalua.Completion.CompletionTypes
 				//Type newType = fieldInfo.FieldType;
 				//Static field access can be completed as an object.
 				var obj = fieldInfo.GetValue(null);
+				if (obj==null)
+				{
+					completionObject=null;
+					return false;
+				}
 				completionObject=GetCompletionObject(obj);
 				CompletionQueue.Log("static field access");
 				operations.MoveNext();
@@ -54,6 +64,11 @@ namespace Kerbalua.Completion.CompletionTypes
 				if (CompletionReflectionUtil.TryGetProperty(type, getMember.Name, out PropertyInfo propertyInfo, CompletionReflectionUtil.StaticPublic))
 				{
 					var obj = propertyInfo.GetValue(null);
+					if (obj==null)
+					{
+						completionObject=null;
+						return false;
+					}
 					completionObject=GetCompletionObject(obj);
 					CompletionQueue.Log("static property access");
 					operations.MoveNext();

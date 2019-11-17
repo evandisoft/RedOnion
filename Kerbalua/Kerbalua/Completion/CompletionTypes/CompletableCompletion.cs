@@ -7,7 +7,12 @@ namespace Kerbalua.Completion.CompletionTypes
     {
         private ICompletable completable;
 
-        public CompletableCompletion(ICompletable completable)
+		public override string ToString()
+		{
+			return base.ToString()+"("+completable?.GetType().Name+")";
+		}
+
+		public CompletableCompletion(ICompletable completable)
         {
             this.completable = completable;
         }

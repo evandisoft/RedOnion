@@ -55,16 +55,16 @@ namespace Kerbalua.Completion.CompletionTypes
 				return null;
 			}
 
-			if (dynValue.UserData==null)
-			{
-				CompletionQueue.Log("userdata is null -> Instance");
-				return new InstanceCompletion(dynValue.ToObject());
-			}
-
-			if (dynValue.UserData.Object==null)
+			if (dynValue.UserData!=null && dynValue.UserData.Object==null)
 			{
 				CompletionQueue.Log("Object is null -> Static");
 				return new StaticCompletion(dynValue.ToObject() as Type);
+			}
+
+			if (dynValue.Table==null && dynValue.UserData==null)
+			{
+				CompletionQueue.Log("Object is Instance -> Instance");
+				return new InstanceCompletion(dynValue.ToObject());
 			}
 
 			object obj=dynValue.ToObject();
@@ -80,6 +80,11 @@ namespace Kerbalua.Completion.CompletionTypes
 		public static CompletionObject GetCompletionObject(object obj)
 		{
 			CompletionQueue.Log("converting object "+obj);
+			if (obj is DynValue dynValue)
+			{
+				CompletionQueue.Log("obj is dynvalue, running dynvalue GetCompletionObject");
+				return GetCompletionObject(dynValue);
+			}
 
 			if (obj.GetType().Name=="RuntimeType")
 			{
