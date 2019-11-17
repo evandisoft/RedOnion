@@ -40,7 +40,7 @@ def gui
       box.preferWidth = boxWidth + 3 + uniWidth
     else
       box.preferWidth = boxWidth
-      var uni = row.add new label
+      var uni = row.add new ui.label
       uni.text = units
       uni.minWidth = uniWidth
     return box
