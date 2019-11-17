@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel;
 using RedOnion.KSP.API;
+using RedOnion.KSP.Attributes;
 using RedOnion.ROS;
 
 namespace RedOnion.KSP.Parts

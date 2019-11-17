@@ -452,13 +452,6 @@ namespace RedOnion.ROS
 	}
 
 	/// <summary>
-	/// Marker for potentially dangerous API.
-	/// </summary>
-	public class UnsafeAttribute : Attribute { }
-
-
-
-	/// <summary>
 	/// To make class (even static) callable by naming a member
 	/// (can be method, property or field - converted to return if not method).
 	/// </summary>
@@ -470,31 +463,6 @@ namespace RedOnion.ROS
 		/// </summary>
 		public string Name { get; }
 		public CallableAttribute(string name) => Name = name;
-	}
-
-	/// <summary>
-	/// To make class (even static) callable by naming a member
-	/// (can be method, property or field - converted to return if not method).
-	/// </summary>
-	[AttributeUsage(AttributeTargets.Class|AttributeTargets.Struct)]
-	public class HideMembersAttribute : Attribute
-	{
-		/// <summary>
-		/// Name of the member to use for the call
-		/// </summary>
-		public string[] Names { get; }
-		public HideMembersAttribute(params string[] names) => Names = names;
-	}
-
-	/// <summary>
-	/// Alternative name for a member (if name not null),
-	/// or readonly string field with path to implementation.
-	/// </summary>
-	public class AliasAttribute : Attribute
-	{
-		public string Name { get; }
-		public AliasAttribute() { }
-		public AliasAttribute(string name) => Name = name;
 	}
 
 	/// <summary>

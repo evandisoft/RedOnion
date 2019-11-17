@@ -1,5 +1,6 @@
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
+using RedOnion.KSP.Attributes;
 using RedOnion.KSP.Completion;
 using RedOnion.KSP.Utilities;
 using RedOnion.ROS;
