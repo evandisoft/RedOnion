@@ -42,7 +42,7 @@ namespace KerbaluaNUnit
 
 		void Setup()
 		{
-			script = new Script();
+			script = new Script(CoreModules.Preset_Complete);
 			UserData.RegistrationPolicy = InteropRegistrationPolicy.Automatic;
 			globals = script.Globals;
 		}
@@ -55,7 +55,7 @@ namespace KerbaluaNUnit
 				@"";
 
 			var completions = GetCompletions(source);
-			Assert.AreEqual(41, completions.Count);
+			Assert.AreEqual(42, completions.Count);
 		}
 
 		[Test()]
@@ -159,7 +159,7 @@ namespace KerbaluaNUnit
 			Setup();
 			string source = "os.";
 			var completions = GetCompletions(source);
-			Assert.AreEqual(4, completions.Count);
+			Assert.AreEqual(11, completions.Count);
 		}
 
 		[Test()]

@@ -103,18 +103,18 @@ namespace KerbaluaNUnit {
 			Assert.AreEqual(0, parsed.Segments[0].Parts.Count);
 		}
 
-		[Test()]
-		public void LUA_TestCase_8_KeywordTest()
-		{
-			var parsed = Parse(
-			@"
-				a,b=blah1.b,blah2.while
-			");
+		//[Test()]
+		//public void LUA_TestCase_8_KeywordTest()
+		//{
+		//	var parsed = Parse(
+		//	@"
+		//		a,b=blah1.b,blah2.while
+		//	");
 
-			Assert.AreEqual(2, parsed.Segments.Count);
-			Assert.AreEqual("while", parsed.Segments[1].Name);
-			Assert.AreEqual(0, parsed.Segments[0].Parts.Count);
-		}
+		//	Assert.AreEqual(2, parsed.Segments.Count);
+		//	Assert.AreEqual("while", parsed.Segments[1].Name);
+		//	Assert.AreEqual(0, parsed.Segments[0].Parts.Count);
+		//}
 
 		[Test()]
 		public void LUA_TestCase_9_GenericFor()
