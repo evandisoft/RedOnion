@@ -46,63 +46,7 @@ namespace KerbaluaNUnit {
 			public static int asdfg = 4;
 		}
 
-		[Test()]
-		public void LUA_TestCase_Static()
-		{
-			var operations = new CompletionOperations(
-				OldLuaIntellisense.Parse(
-				@"Adf.asdfg."
-					).Segments);
-			var globals = script.Globals;
-			globals["Adf"]=UserData.CreateStatic(typeof(Adf));
-			object currentObject = script.Globals;
-			IList<string> completions=new List<string>();
-			//Console.WriteLine(operations);
-			completions = OperationsProcessor.StaticGetPossibleCompletions(currentObject);
 
-			Assert.IsTrue(OperationsProcessor.TryProcessOperation(currentObject, operations, out currentObject));
-			//Console.WriteLine(operations);
-
-			completions = OperationsProcessor.StaticGetPossibleCompletions(currentObject);
-
-			//foreach (var c in OperationsProcessor.StaticGetPossibleCompletions(currentObject,operations))
-			//{
-			//	Console.WriteLine(c);
-			//}
-			Assert.IsTrue(OperationsProcessor.TryProcessOperation(currentObject, operations, out currentObject));
-			//Console.WriteLine(operations);
-			completions = OperationsProcessor.StaticGetPossibleCompletions(currentObject);
-			//PrintAll(completions);
-			Assert.AreEqual(11, completions.Count);
-			//Console.WriteLine(operations);
-		}
-
-		[Test()]
-		public void LUA_TestCase_Instance()
-		{
-			var operations = new CompletionOperations(
-				OldLuaIntellisense.Parse(
-				@"Adf.asd."
-					).Segments);
-			var globals = script.Globals;
-			globals["Adf"] = new Adf();
-			object currentObject = script.Globals;
-			IList<string> completions = new List<string>();
-			//Console.WriteLine(operations);
-			Assert.IsTrue(OperationsProcessor.TryProcessOperation(currentObject, operations, out currentObject));
-			//Console.WriteLine(operations);
-			completions = OperationsProcessor.StaticGetPossibleCompletions(currentObject);
-			//foreach (var c in OperationsProcessor.StaticGetPossibleCompletions(currentObject,operations))
-			//{
-			//	Console.WriteLine(c);
-			//}
-			Assert.IsTrue(OperationsProcessor.TryProcessOperation(currentObject, operations, out currentObject));
-			//Console.WriteLine(operations);
-			completions = OperationsProcessor.StaticGetPossibleCompletions(currentObject);
-			//PrintAll(completions);
-
-			//Console.WriteLine(operations);
-		}
 
 
 
