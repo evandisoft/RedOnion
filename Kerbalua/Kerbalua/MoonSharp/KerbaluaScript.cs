@@ -17,6 +17,7 @@ using RedOnion.KSP.ReflectionUtil;
 using static RedOnion.KSP.API.Reflect;
 using System.Diagnostics;
 using RedOnion.KSP.API;
+using System.Linq.Expressions;
 
 namespace Kerbalua.MoonSharp
 {
@@ -75,7 +76,7 @@ namespace Kerbalua.MoonSharp
 			Globals.MetaTable = API.LuaGlobals.Instance;
 			//Globals["Vessel"] = FlightGlobals.ActiveVessel;
 			var defaultMappings = NamespaceMappings.DefaultAssemblies;
-			Globals["new"] = Constructor.Instance;
+			Globals["new"] = LuaNew;
 			Globals["static"] = new Func<object, DynValue>((o) =>
 			{
 				if (o is Type t)
@@ -84,6 +85,7 @@ namespace Kerbalua.MoonSharp
 				}
 				return UserData.CreateStatic(o.GetType());
 			});
+
 			Globals["gettype"] = new Func<object, DynValue>((o) =>
 			{
 				if (o is DynValue d && d.Type==DataType.UserData)
@@ -129,8 +131,16 @@ namespace Kerbalua.MoonSharp
 				//PrintErrorAction("end");
 			});
 			Globals["coroutine"]=null;
+
 			//coroutines.Clear();
-			//coroutines["yield"]=coroYield;
+
+
+		}
+
+		public int TestFunc(int a,double b,out string outstring)
+		{
+			outstring=a+","+b;
+			return (int)(a + b);
 		}
 
 		//private Table ImporterImpl(string name)
@@ -195,6 +205,60 @@ namespace Kerbalua.MoonSharp
 			coroutine = null;
 			sleepwatch.Reset();
 			sleeptimeMillis=0;
+		}
+
+		public static object LuaNew(Type t, params DynValue[] dynArgs)
+		{
+			var constructors = t.GetConstructors();
+			foreach (var constructor in constructors)
+			{
+				var parinfos = constructor.GetParameters();
+				if (parinfos.Length >= dynArgs.Length)
+				{
+					object[] args = new object[parinfos.Length];
+
+					for (int i = 0; i < args.Length; i++)
+					{
+						var parinfo = parinfos[i];
+						if (i>= dynArgs.Length)
+						{
+							if (!parinfo.IsOptional)
+							{
+								goto nextConstructor;
+							}
+							args[i] = parinfo.DefaultValue;
+						}
+						else
+						{
+							if (parinfo.ParameterType.IsValueType)
+							{
+								try
+								{
+									args[i] = System.Convert.ChangeType(dynArgs[i].ToObject(), parinfo.ParameterType);
+								}
+								catch (Exception)
+								{
+									goto nextConstructor;
+								}
+							}
+							else
+							{
+								args[i] = dynArgs[i].ToObject();
+							}
+						}
+
+					}
+
+					return constructor.Invoke(args);
+				}
+			nextConstructor:;
+			}
+
+			if (dynArgs.Length == 0)
+			{
+				return Activator.CreateInstance(t);
+			}
+			throw new Exception("Could not find constructor accepting given args for type " + t);
 		}
 	}
 }

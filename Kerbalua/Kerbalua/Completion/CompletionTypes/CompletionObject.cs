@@ -18,9 +18,9 @@ namespace Kerbalua.Completion.CompletionTypes
 		/// <param name="completionObject">Completion object.</param>
 		public virtual bool TryOperation(CompletionOperations operations, out CompletionObject completionObject)
 		{
-			CompletionQueue.Log("<Completion object is> "+GetType());
+			//CompletionQueue.Log("<Completion object is> "+GetType());
 			var operation = operations.Current;
-			CompletionQueue.Log("<Completion type is> "+operation.GetType());
+			//CompletionQueue.Log("<Completion type is> "+operation.GetType());
 
 			switch (operation)
 			{
@@ -48,7 +48,7 @@ namespace Kerbalua.Completion.CompletionTypes
 		/// <param name="dynValue">Dyn value.</param>
 		public static CompletionObject GetCompletionObject(DynValue dynValue)
 		{
-			CompletionQueue.Log("converting dynvalue "+dynValue);
+			CompletionQueue.Log("Converting dynvalue "+dynValue);
 			if (dynValue==null)
 			{
 				CompletionQueue.Log("dynvalue is null -> null");
@@ -63,7 +63,7 @@ namespace Kerbalua.Completion.CompletionTypes
 
 			if (dynValue.Table==null && dynValue.UserData==null)
 			{
-				CompletionQueue.Log("Object is Instance -> Instance");
+				CompletionQueue.Log("non-table lua type -> Instance");
 				return new InstanceCompletion(dynValue.ToObject());
 			}
 
@@ -79,7 +79,7 @@ namespace Kerbalua.Completion.CompletionTypes
 		/// <param name="obj">Object.</param>
 		public static CompletionObject GetCompletionObject(object obj)
 		{
-			CompletionQueue.Log("converting object "+obj);
+			CompletionQueue.Log("Converting object "+obj);
 			if (obj is DynValue dynValue)
 			{
 				CompletionQueue.Log("obj is dynvalue, running dynvalue GetCompletionObject");

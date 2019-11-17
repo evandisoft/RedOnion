@@ -8,7 +8,7 @@ namespace RedOnion.KSP.Completion
 	/// </summary>
 	public class Static
 	{
-		public Type type;
+		public readonly Type type;
 
 		public Static(Type type)
 		{

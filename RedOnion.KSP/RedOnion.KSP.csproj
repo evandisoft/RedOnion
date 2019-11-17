@@ -151,8 +151,8 @@
     <Compile Include="UnsafeAPI\UnsafeAPI.cs" />
     <Compile Include="Utilities\ReferenceEqualityComparer.cs" />
     <Compile Include="MoonSharp\CommonAPI\CommonAPITable.cs" />
-    <Compile Include="MoonSharp\CommonAPI\CreateCommonAPI.cs" />
-    <Compile Include="MoonSharp\CommonAPI\PropertyMetatable.cs" />
+    <Compile Include="MoonSharp\CommonAPI\CommonAPICreator.cs" />
+    <Compile Include="MoonSharp\CommonAPI\APIPropertyMetatable.cs" />
     <Compile Include="Completion\ISafeMetatable.cs" />
     <Compile Include="Completion\Static.cs" />
     <Compile Include="Completion\StaticObject.cs" />

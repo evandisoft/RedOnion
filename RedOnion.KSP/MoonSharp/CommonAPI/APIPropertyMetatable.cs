@@ -4,9 +4,12 @@ using MoonSharp.Interpreter;
 
 namespace RedOnion.KSP.MoonSharp.CommonAPI
 {
-	public class PropertyMetatable : Table
+	/// <summary>
+	/// Property metatable.
+	/// </summary>
+	public class APIPropertyMetatable : Table
 	{
-		public PropertyMetatable(Script owner) : base(owner)
+		public APIPropertyMetatable(Script owner) : base(owner)
 		{
 			this["__index"]=new Func<Table, DynValue, object>(GetProperty);
 		}

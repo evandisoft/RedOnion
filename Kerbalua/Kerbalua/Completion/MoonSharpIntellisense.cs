@@ -23,9 +23,8 @@ namespace Kerbalua.Completion
 			ProcessedIncompleteVar processedIncompleteVar;
 			try
 			{
-				CompletionQueue.Log("<CompletedText>:"+relevantText);
+				CompletionQueue.Log($"Source: \"{relevantText}\"");
 				processedIncompleteVar = Parse(relevantText);
-				CompletionQueue.Log("<processedIncompleteVar>:"+processedIncompleteVar);
 			}
 			catch (LuaIntellisenseException)
 			{
@@ -34,32 +33,33 @@ namespace Kerbalua.Completion
 			}
 
 			var operations = new CompletionOperations(processedIncompleteVar.Segments);
-			CompletionQueue.Log("<operations>:"+operations);
+			CompletionQueue.Log(""+operations);
 
 			CompletionObject completionObject=CompletionObject.GetCompletionObject(globals);
 
 			try
 			{
-				CompletionQueue.Log("<operations.LastOperation>:"+operations.LastOperation);
-				CompletionQueue.Log("<currentObject>:"+completionObject.GetType());
+				//CompletionQueue.Log("Last Operation:"+operations.LastOperation);
+				CompletionQueue.Log("Op is "+operations.Current);
+				CompletionQueue.Log("Object is "+completionObject);
 				while (!operations.LastOperation)
 				{
 					if (operations.IsFinished)
 					{
 						throw new LuaIntellisenseException("Operations should not have been finished ");
 					}
-					CompletionQueue.Log("Current operation "+operations.Current);
+
 					if (!completionObject.TryOperation(operations,out completionObject))
 					{
-						CompletionQueue.Log("<operations.LastOperation>:"+operations.LastOperation);
-						CompletionQueue.Log("<currentObject>:"+completionObject);
-						CompletionQueue.Log("<returning empty list>");
+						CompletionQueue.Log("Last Operation:"+operations.LastOperation);
+						CompletionQueue.Log(""+completionObject);
+						CompletionQueue.Log("Operation failed");
 						replaceStart = replaceEnd = cursorPos;
 						return new List<string>();
 					}
 
-					CompletionQueue.Log("<operations.LastOperation>:"+operations.LastOperation);
-					CompletionQueue.Log("<currentObject>:"+completionObject.GetType());
+					CompletionQueue.Log("Op is "+operations.Current);
+					CompletionQueue.Log("Object is "+completionObject);
 				}
 			}
 			catch (LuaIntellisenseException e)
