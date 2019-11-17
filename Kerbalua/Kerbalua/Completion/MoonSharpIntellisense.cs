@@ -48,11 +48,11 @@ namespace Kerbalua.Completion
 					{
 						throw new LuaIntellisenseException("Operations should not have been finished ");
 					}
-
+					CompletionQueue.Log("Current operation "+operations.Current);
 					if (!completionObject.TryOperation(operations,out completionObject))
 					{
 						CompletionQueue.Log("<operations.LastOperation>:"+operations.LastOperation);
-						CompletionQueue.Log("<currentObject>:"+completionObject?.GetType());
+						CompletionQueue.Log("<currentObject>:"+completionObject);
 						CompletionQueue.Log("<returning empty list>");
 						replaceStart = replaceEnd = cursorPos;
 						return new List<string>();

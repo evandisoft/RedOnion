@@ -135,10 +135,14 @@ namespace Kerbalua.Completion.CompletionTypes
 				throw new LuaIntellisenseException("getArrayAccess was null in TryArrayAccess for "+GetType());
 			}
 
-			var str=getArrayAccess.exp.@string();
-			if (str!=null)
+			var strNode=getArrayAccess.exp.@string();
+			if (strNode!=null)
 			{
-				if(TryTableGet(str, out completionObject))
+				var stringLiteral=strNode.NORMALSTRING() ?? strNode.LONGSTRING() ?? strNode.CHARSTRING();
+
+				string str=stringLiteral.ToString();
+				str=str.Substring(1, str.Length-2);
+				if (TryTableGet(str, out completionObject))
 				{
 					operations.MoveNext();
 					return true;
@@ -151,7 +155,8 @@ namespace Kerbalua.Completion.CompletionTypes
 			var num=getArrayAccess.exp.number();
 			if (num!=null)
 			{
-				if(TryTableGet(num, out completionObject))
+				var t=num.INT() ?? num.FLOAT() ?? num.HEX_FLOAT() ?? num.HEX();
+				if (TryTableGet(float.Parse(t.ToString()), out completionObject))
 				{
 					operations.MoveNext();
 					return true;

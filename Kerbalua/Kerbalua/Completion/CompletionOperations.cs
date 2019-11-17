@@ -19,10 +19,9 @@ namespace Kerbalua.Completion
 		public override string ToString()
 		{
 			var sb = new StringBuilder();
-
-			sb.Append("Index: " + Index);
-			sb.Append(", IsFinished: " + IsFinished+", ");
 			sb.Append("Current: " + Current + ", ");
+			sb.Append("Index: " + Index+", ");
+			sb.Append("IsFinished: " + IsFinished+", ");
 			sb.Append("All: ");
 			foreach (var operation in OperationList)
 			{

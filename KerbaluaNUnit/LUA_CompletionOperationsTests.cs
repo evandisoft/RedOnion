@@ -17,8 +17,6 @@ namespace KerbaluaNUnit {
 	[TestFixture()]
 	public class LUA_CompletionOperationsTests
 	{
-
-
 		//public CompletionObject GetCompletionObject(Table globals, string source)
 		//{
 		//	var processed = LuaIntellisense.Parse(source);

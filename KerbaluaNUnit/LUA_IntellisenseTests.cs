@@ -32,6 +32,8 @@ namespace KerbaluaNUnit
 			public static int asdfg = 4;
 		}
 
+		private const int ADF_RUNTIME_MEMBERS = 11;
+		private const int OS_DEFAULT_ENTRIES = 11;
 		Script script;
 		Table globals;
 
@@ -126,7 +128,7 @@ namespace KerbaluaNUnit
 
 			var completions = GetCompletions(source);
 
-			Assert.AreEqual(11, completions.Count);
+			Assert.AreEqual(ADF_RUNTIME_MEMBERS, completions.Count);
 		}
 
 		[Test()]
@@ -217,7 +219,26 @@ namespace KerbaluaNUnit
 			Setup();
 			string source = "os.";
 			var completions = GetCompletions(source);
-			Assert.AreEqual(11, completions.Count);
+			Assert.AreEqual(OS_DEFAULT_ENTRIES, completions.Count);
+		}
+
+		[Test()]
+		public void LUA_IntellisenseTest_StringKeyedTableCompletion()
+		{
+			Setup();
+			string source = "_G['os'].";
+			var completions = GetCompletions(source);
+			Assert.AreEqual(OS_DEFAULT_ENTRIES, completions.Count);
+		}
+
+		[Test()]
+		public void LUA_IntellisenseTest_IntKeyedTableCompletion()
+		{
+			Setup();
+			script.DoString("b={} b.c=3 a={b}");
+			string source = "a[1].";
+			var completions = GetCompletions(source);
+			Assert.AreEqual(1, completions.Count);
 		}
 
 		[Test()]
