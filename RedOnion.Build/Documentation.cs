@@ -236,13 +236,6 @@ namespace RedOnion.Build
 		static void PrintSimpleMember(StreamWriter wr, Document doc, string name, MemberInfo member, Type type)
 		{
 			var desc = member.GetCustomAttribute<DescriptionAttribute>().Description;
-			var alias = member.GetCustomAttribute<AliasAttribute>();
-			if (alias != null && alias.Name == null)
-			{
-				//TODO link to the alias
-				wr.WriteLine("- `{0}` - {1}", name, desc);
-				return;
-			}
 			var typePath = ResolveType(doc, type, out var typeName);
 			if (member is MethodInfo || typeof(ICallable).IsAssignableFrom(type))
 				name += "()";

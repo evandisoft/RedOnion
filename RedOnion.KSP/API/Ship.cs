@@ -6,6 +6,7 @@ using RedOnion.ROS.Utilities;
 using RedOnion.KSP.Parts;
 using UnityEngine;
 using KSP.Localization;
+using RedOnion.KSP.Attributes;
 
 namespace RedOnion.KSP.API
 {
