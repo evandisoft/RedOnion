@@ -5,12 +5,17 @@ using UIC = RedOnion.UI.Components;
 using KSP.UI;
 using System.ComponentModel;
 using RedOnion.KSP.Utilities;
+using RedOnion.KSP.Attributes;
 
 namespace RedOnion.KSP.Namespaces
 {
-	[DisplayName("Unity"), DocBuild("RedOnion.KSP/Namespaces/Unity")]
+	[SafeProps, DisplayName("Unity"), DocBuild("RedOnion.KSP/Namespaces/Unity")]
 	public static class Unity_Namespace
 	{
+		public static Type Debug = typeof(UE.Debug);
+		public static Type Color = typeof(UE.Color);
+		public static Type Rect = typeof(UE.Rect);
+
 		public static Type Vector2 = typeof(UE.Vector2);
 		public static Type Vector3 = typeof(UE.Vector3);
 		public static Type Vector4 = typeof(UE.Vector4);

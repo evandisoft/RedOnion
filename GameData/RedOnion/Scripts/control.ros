@@ -1,4 +1,4 @@
-var wnd = new window "Control " + ship.name
+var wnd = new ui.window "Control " + ship.name
 wnd.x -= (unity.screen.width - 200) / 3
 
 // mode vs. the rest
@@ -21,9 +21,9 @@ mObt.pressed = true
 // main content (buttons and footer)
 var main = split.addVertical()
 main.width = 163
-main.childAnchors = anchors.fill
+main.childAnchors = ui.anchors.fill
 var btns = main.addHorizontal() //TODO: stack
-btns.childAnchors = anchors.fill
+btns.childAnchors = ui.anchors.fill
 
 var dirsubs = null
 def lockdir fn

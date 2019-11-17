@@ -82,25 +82,6 @@ namespace RedOnion.KSP.API
 		public static readonly Type ksp = typeof(KSP_Namespace);
 		[Unsafe, Description("Shortcuts to (unsafe) Unity API.")]
 		public static readonly Type unity = typeof(Unity_Namespace);
-
-		[Description("UI.Window")]
-		public static readonly Type window = typeof(Window);
-		[Description("UI.Anchors")]
-		public static readonly Type anchors = typeof(UI.Anchors);
-		[Description("UI.Padding")]
-		public static readonly Type padding = typeof(UI.Padding);
-		[Description("UI.LayoutPadding")]
-		public static readonly Type layoutPadding = typeof(UI.LayoutPadding);
-		[Description("UI.Layout")]
-		public static readonly Type layout = typeof(UI.Layout);
-		[Description("UI.Panel")]
-		public static readonly Type panel = typeof(UI.Panel);
-		[Description("UI.Label")]
-		public static readonly Type label = typeof(UI.Label);
-		[Description("UI.Button")]
-		public static readonly Type button = typeof(UI.Button);
-		[Description("UI.TextBox")]
-		public static readonly Type textBox = typeof(UI.TextBox);
 	}
 
 	public class RosGlobals : RedOnion.ROS.Objects.Globals
@@ -108,9 +89,6 @@ namespace RedOnion.KSP.API
 		public override void Fill()
 		{
 			base.Fill();
-			System.Add(typeof(UnityEngine.Debug));
-			System.Add(typeof(UnityEngine.Color));
-			System.Add(typeof(UnityEngine.Rect));
 			System.Add(typeof(PID));
 		}
 
@@ -168,7 +146,6 @@ namespace RedOnion.KSP.API
 				seen.Add(member);
 				yield return member;
 			}
-			;
 			foreach (var name in EnumerateProperties(self, seen))
 				yield return name;
 		}
