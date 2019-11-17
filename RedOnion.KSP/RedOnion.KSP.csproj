@@ -105,7 +105,6 @@
     <Compile Include="Parts\Engine.cs" />
     <Compile Include="Parts\LaunchClamp.cs" />
     <Compile Include="Parts\PartBase.cs" />
-    <Compile Include="API\Reflect.cs" />
     <Compile Include="API\Ship.cs" />
     <Compile Include="Parts\PartSet.cs" />
     <Compile Include="API\Stage.cs" />

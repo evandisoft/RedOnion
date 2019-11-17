@@ -14,7 +14,6 @@ using System.Collections.Generic;
 using System.Linq;
 using API = RedOnion.KSP.API;
 using RedOnion.KSP.ReflectionUtil;
-using static RedOnion.KSP.API.Reflect;
 using System.Diagnostics;
 using RedOnion.KSP.API;
 using System.Linq.Expressions;
@@ -76,7 +75,7 @@ namespace Kerbalua.MoonSharp
 			Globals.MetaTable = API.LuaGlobals.Instance;
 			//Globals["Vessel"] = FlightGlobals.ActiveVessel;
 			var defaultMappings = NamespaceMappings.DefaultAssemblies;
-			Globals["new"] = LuaNew;
+			Globals["new"] = new DelegateTypeNew(New);
 			Globals["static"] = new Func<object, DynValue>((o) =>
 			{
 				if (o is Type t)
@@ -207,9 +206,11 @@ namespace Kerbalua.MoonSharp
 			sleeptimeMillis=0;
 		}
 
-		public static object LuaNew(Type t, params DynValue[] dynArgs)
+		delegate object DelegateTypeNew(object obj, params DynValue[] args);
+		object New(object obj, params DynValue[] dynArgs)
 		{
-			var constructors = t.GetConstructors();
+			Type type=obj as Type;
+			var constructors = type.GetConstructors();
 			foreach (var constructor in constructors)
 			{
 				var parinfos = constructor.GetParameters();
@@ -256,9 +257,9 @@ namespace Kerbalua.MoonSharp
 
 			if (dynArgs.Length == 0)
 			{
-				return Activator.CreateInstance(t);
+				return Activator.CreateInstance(type);
 			}
-			throw new Exception("Could not find constructor accepting given args for type " + t);
+			throw new Exception("Could not find constructor accepting given args for type " + type);
 		}
 	}
 }
