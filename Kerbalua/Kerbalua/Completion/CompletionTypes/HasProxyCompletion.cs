@@ -58,17 +58,17 @@ namespace Kerbalua.Completion.CompletionTypes
 
 		public override bool TryArrayAccess(CompletionOperations operations, out CompletionObject completionObject)
 		{
-			throw new System.NotImplementedException();
+			throw new LuaIntellisenseException("HasProxyCompletion does not implement TryArrayAccess");
 		}
 
 		public override bool TryCall(CompletionOperations operations, out CompletionObject completionObject)
 		{
-			throw new System.NotImplementedException();
+			throw new LuaIntellisenseException("HasProxyCompletion does not implement TryCall");
 		}
 
 		public override bool TryGetMember(CompletionOperations operations, out CompletionObject completionObject)
 		{
-			throw new System.NotImplementedException();
+			throw new LuaIntellisenseException("HasProxyCompletion does not implement TryGetMember");
 		}
 	}
 }

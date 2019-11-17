@@ -26,6 +26,8 @@ namespace Kerbalua.Completion
 
 	public class ArrayAccessOperation : CompletionOperation
 	{
+		internal IncompleteLuaParser.ExpContext exp;
+
 		public override string ToString()
 		{
 			return "Array";

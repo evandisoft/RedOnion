@@ -1,6 +1,10 @@
 using System;
 using System.Text;
 using System.Collections.Generic;
+using Antlr4.Runtime.Tree;
+using Kerbalua.Parsing;
+using Antlr4.Runtime;
+using Antlr4.Runtime.Misc;
 
 namespace Kerbalua.Completion {
 	public class ProcessedIncompleteVar {
@@ -51,7 +55,9 @@ namespace Kerbalua.Completion {
 			}
 
 			if (varSuffix.exp() != null) {
-				Segments[Segments.Count - 1].Parts.Add(new ArrayPart());
+				var arrayPart=new ArrayPart();
+				arrayPart.exp=varSuffix.exp();
+				Segments[Segments.Count - 1].Parts.Add(arrayPart);
 			} else {
 				Segments.Add(new Segment() { Name = varSuffix.NAME().ToString() });
 			}
@@ -83,6 +89,10 @@ namespace Kerbalua.Completion {
 			}
 			Success = true;
 		}
+
+
+
+
 	}
 
 
@@ -95,6 +105,8 @@ namespace Kerbalua.Completion {
 	}
 
 	public class ArrayPart : Part {
+		public IncompleteLuaParser.ExpContext exp;
+
 		public ArrayPart() { Symbol = "[]"; }
 	}
 	public class CallPart : Part {
@@ -115,4 +127,6 @@ namespace Kerbalua.Completion {
 			return sb.ToString();
 		}
 	}
+
+
 }

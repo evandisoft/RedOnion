@@ -31,7 +31,7 @@ namespace Kerbalua.Other
 		public override IList<string> GetCompletions(string source, int cursorPos,out int replaceStart,out int replaceEnd)
 		{
 			try {
-				return LuaIntellisense.GetCompletions(scriptEngine.Globals, source, cursorPos, out replaceStart, out replaceEnd);
+				return MoonSharpIntellisense.GetCompletions(scriptEngine.Globals, source, cursorPos, out replaceStart, out replaceEnd);
 			} catch (Exception e) {
 				Debug.Log(e);
 				replaceStart = replaceEnd = cursorPos;
@@ -52,7 +52,6 @@ namespace Kerbalua.Other
 			((ScriptLoaderBase)scriptEngine.Options.ScriptLoader).IgnoreLuaPathGlobal = true;
 			((ScriptLoaderBase)scriptEngine.Options.ScriptLoader).ModulePaths = new string[] { SavedSettings.BaseScriptsPath+"/?.lua" };
 		
-		 	
 		 }
 
 		public override void ResetEngine()

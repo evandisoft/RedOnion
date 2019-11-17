@@ -87,7 +87,9 @@ namespace Kerbalua.Completion
 					}
 					else if(part is ArrayPart arrayPart)
 					{
-						OperationList.Add(new ArrayAccessOperation());
+						var arrayAccessOperation=new ArrayAccessOperation();
+						arrayAccessOperation.exp=arrayPart.exp;
+						OperationList.Add(arrayAccessOperation);
 					}
 					else
 					{

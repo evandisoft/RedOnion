@@ -6,7 +6,7 @@ namespace KerbaluaNUnit {
 	public class LUA_ProcessedIncompleteVarTests {
 		public ProcessedIncompleteVar Parse(string source)
 		{
-			return LuaIntellisense.Parse(source);
+			return MoonSharpIntellisense.Parse(source);
 		}
 
 		[Test()]
@@ -52,7 +52,7 @@ namespace KerbaluaNUnit {
 		[Test()]
 		public void LUA_TestCase_4()
 		{
-			var parsed = LuaIntellisense.Parse("return asdf.qwer[1]().");
+			var parsed = Parse("return asdf.qwer[1]().");
 
 			Assert.AreEqual(3, parsed.Segments.Count);
 			Assert.AreEqual("", parsed.Segments[2].Name);

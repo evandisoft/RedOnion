@@ -1,20 +1,20 @@
 using System;
+using System.Collections.Generic;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
-using Kerbalua.Utility;
-using MoonSharp.Interpreter;
-using MoonSharp.Interpreter.REPL;
-using MoonSharp.Interpreter.Interop;
-using System.Collections.Generic;
+using Kerbalua.Completion.CompletionTypes;
 using Kerbalua.Parsing;
+using MoonSharp.Interpreter;
 using UnityEngine;
 
-namespace Kerbalua.Completion {
-	public static class LuaIntellisense {
+namespace Kerbalua.Completion
+{
+	public static class MoonSharpIntellisense
+	{
 		static public IList<string> GetCompletions(
 			Table globals,
-			string source,int cursorPos,out int replaceStart,out int replaceEnd
+			string source, int cursorPos, out int replaceStart, out int replaceEnd
 			)
 		{
 			string relevantText = source.Substring(0, cursorPos);
@@ -36,12 +36,12 @@ namespace Kerbalua.Completion {
 			var operations = new CompletionOperations(processedIncompleteVar.Segments);
 			CompletionQueue.Log("<operations>:"+operations);
 
-			object currentObject = globals;
+			CompletionObject completionObject=CompletionObject.GetCompletionObject(globals);
 
 			try
 			{
 				CompletionQueue.Log("<operations.LastOperation>:"+operations.LastOperation);
-				CompletionQueue.Log("<currentObject>:"+currentObject.GetType());
+				CompletionQueue.Log("<currentObject>:"+completionObject.GetType());
 				while (!operations.LastOperation)
 				{
 					if (operations.IsFinished)
@@ -49,16 +49,17 @@ namespace Kerbalua.Completion {
 						throw new LuaIntellisenseException("Operations should not have been finished ");
 					}
 
-					if (!OperationsProcessor.TryProcessOperation(currentObject, operations, out currentObject))
+					if (!completionObject.TryOperation(operations,out completionObject))
 					{
 						CompletionQueue.Log("<operations.LastOperation>:"+operations.LastOperation);
-						CompletionQueue.Log("<currentObject>:"+currentObject.GetType());
+						CompletionQueue.Log("<currentObject>:"+completionObject?.GetType());
 						CompletionQueue.Log("<returning empty list>");
 						replaceStart = replaceEnd = cursorPos;
 						return new List<string>();
 					}
+
 					CompletionQueue.Log("<operations.LastOperation>:"+operations.LastOperation);
-					CompletionQueue.Log("<currentObject>:"+currentObject.GetType());
+					CompletionQueue.Log("<currentObject>:"+completionObject.GetType());
 				}
 			}
 			catch (LuaIntellisenseException e)
@@ -69,12 +70,11 @@ namespace Kerbalua.Completion {
 			}
 
 			var lastOp = operations.Current;
-			if(lastOp is GetMemberOperation getMemberOperation)
+			if (lastOp is GetMemberOperation getMemberOperation)
 			{
 				string lowercasePartial = getMemberOperation.Name.ToLower();
 				List<string> completions = new List<string>();
-				foreach(var possibleCompletion in OperationsProcessor
-					.StaticGetPossibleCompletions(currentObject))
+				foreach (var possibleCompletion in completionObject.GetPossibleCompletions())
 				{
 					if (possibleCompletion.ToLower().Contains(lowercasePartial))
 					{
@@ -98,7 +98,8 @@ namespace Kerbalua.Completion {
 			ITokenSource lexer = new IncompleteLuaLexer(stream);
 			ITokenStream tokens = new CommonTokenStream(lexer);
 
-			var parser = new IncompleteLuaParser(tokens) {
+			var parser = new IncompleteLuaParser(tokens)
+			{
 				BuildParseTree = true
 			};
 			var errorListener = new AnyErrorsListener();
@@ -120,7 +121,8 @@ namespace Kerbalua.Completion {
 			return processedIncompleteVar;
 		}
 
-		class LastIncompleteVarExtractor : IncompleteLuaBaseListener {
+		class LastIncompleteVarExtractor : IncompleteLuaBaseListener
+		{
 			public IncompleteLuaParser.IncompleteVarContext LastIncompleteVar;
 
 			public override void EnterIncompleteVar([NotNull] IncompleteLuaParser.IncompleteVarContext context)

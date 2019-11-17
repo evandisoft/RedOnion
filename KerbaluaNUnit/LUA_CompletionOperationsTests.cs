@@ -50,7 +50,7 @@ namespace KerbaluaNUnit {
 		public void LUA_TestCase_Static()
 		{
 			var operations = new CompletionOperations(
-				LuaIntellisense.Parse(
+				OldLuaIntellisense.Parse(
 				@"Adf.asdfg."
 					).Segments);
 			var globals = script.Globals;
@@ -81,7 +81,7 @@ namespace KerbaluaNUnit {
 		public void LUA_TestCase_Instance()
 		{
 			var operations = new CompletionOperations(
-				LuaIntellisense.Parse(
+				OldLuaIntellisense.Parse(
 				@"Adf.asd."
 					).Segments);
 			var globals = script.Globals;

@@ -7,11 +7,12 @@ using RedOnion.KSP.MathUtil;
 using RedOnion.KSP.Utilities;
 using RedOnion.ROS;
 using RedOnion.KSP.UnsafeAPI;
+using RedOnion.KSP.Attributes;
 
 namespace RedOnion.KSP.Namespaces
 {
 	[DisplayName("KSP"), DocBuild("RedOnion.KSP/Namespaces/KSP")]
-	[Namespace,Unsafe, Description("Unsafe KSP API - see [CommonScriptApi](../../CommonScriptApi.md)")]
+	[SafeProps,Unsafe, Description("Unsafe KSP API - see [CommonScriptApi](../../CommonScriptApi.md)")]
 	public static class KSP_Namespace
 	{
 		[Description("UnityEngine.Time")]

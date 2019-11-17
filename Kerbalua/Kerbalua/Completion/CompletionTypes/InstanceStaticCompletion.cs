@@ -18,7 +18,7 @@ namespace Kerbalua.Completion.CompletionTypes
 
 		public override IList<string> GetPossibleCompletions()
 		{
-			throw new NotImplementedException();
+			return CompletionReflectionUtil.GetMemberNames(type, CompletionReflectionUtil.AllPublic);
 		}
 
 		public override bool TryArrayAccess(CompletionOperations operations, out CompletionObject completionObject)

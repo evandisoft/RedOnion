@@ -96,7 +96,7 @@
     <Compile Include="Kerbalua\Other\RedOnionReplEvaluator.cs" />
     <Compile Include="Kerbalua\MoonSharp\KerbaluaExecutionManager.cs" />
     <Compile Include="Kerbalua\MoonSharp\ExecutionLimitException.cs" />
-    <Compile Include="Kerbalua\Completion\LuaIntellisense.cs" />
+    <Compile Include="Kerbalua\Completion\OldLuaIntellisense.cs" />
     <Compile Include="Kerbalua\Utility\Misc.cs" />
     <Compile Include="Kerbalua\Completion\Grammar\IncompleteLuaBaseListener.cs" />
     <Compile Include="Kerbalua\Completion\Grammar\IncompleteLuaBaseVisitor.cs" />
@@ -124,7 +124,7 @@
     <Compile Include="Kerbalua\Completion\CompletionTypes\TableCompletion.cs" />
     <Compile Include="Kerbalua\Completion\CompletionTypes\CompletionObject.cs" />
     <Compile Include="Kerbalua\Completion\CompletionTypes\InstanceCompletion.cs" />
-    <Compile Include="Kerbalua\Completion\CompletionTypes\TypeCompletion.cs" />
+    <Compile Include="Kerbalua\Completion\CompletionTypes\RuntimeTypeCompletion.cs" />
     <Compile Include="Kerbalua\Completion\CompletionTypes\StaticCompletion.cs" />
     <Compile Include="Kerbalua\Completion\CompletionTypes\CompletableCompletion.cs" />
     <Compile Include="Kerbalua\Completion\CompletionTypes\HasProxyCompletion.cs" />
@@ -132,6 +132,7 @@
     <Compile Include="Kerbalua\Completion\CompletionTypes\InstanceStaticCompletion.cs" />
     <Compile Include="Kerbalua\Kerbnlua\KerbnluaScript.cs" />
     <Compile Include="Kerbalua\Kerbnlua\KerbnluaReplEvaluator.cs" />
+    <Compile Include="Kerbalua\Completion\MoonSharpIntellisense.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -146,6 +147,7 @@
     <None Include="Kerbalua\Completion\Grammar\FinalExpLua.g4" />
     <None Include="Kerbalua\Completion\CompletionNotes.md" />
     <None Include="Kerbalua\Kerbnlua\Kerbnlua.md" />
+    <None Include="Kerbalua\Completion\CompletionReadme.md" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

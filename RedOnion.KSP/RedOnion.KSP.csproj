@@ -156,6 +156,8 @@
     <Compile Include="Completion\ISafeMetatable.cs" />
     <Compile Include="Completion\Static.cs" />
     <Compile Include="Completion\StaticObject.cs" />
+    <Compile Include="Attributes\Attributes.cs" />
+    <Compile Include="Settings\ProjectSettings.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RedOnion.ROS\RedOnion.ROS.csproj">
@@ -173,6 +175,8 @@
   <ItemGroup />
   <ItemGroup>
     <Folder Include="MoonSharp\CommonAPI\" />
+    <Folder Include="New Folder\" />
+    <Folder Include="Attributes\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

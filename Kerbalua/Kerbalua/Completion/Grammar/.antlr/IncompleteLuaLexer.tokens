@@ -65,8 +65,8 @@ COMMENT=64
 LINE_COMMENT=65
 WS=66
 SHEBANG=67
-'='=1
-';'=2
+';'=1
+'='=2
 'break'=3
 'goto'=4
 'do'=5

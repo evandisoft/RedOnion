@@ -7,7 +7,7 @@ namespace Kerbalua.Completion
 	public static class CompletionQueue
 	{
 		public static Queue<string> completionQueue=new Queue<string>();
-		public static int size=10000;
+		public static int size=1000;
 
 		public static string Log(string str)
 		{

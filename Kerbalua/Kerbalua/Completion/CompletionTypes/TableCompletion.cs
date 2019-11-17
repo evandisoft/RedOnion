@@ -32,6 +32,7 @@ namespace Kerbalua.Completion.CompletionTypes
 				possibleCompletions.Add(key.String);
 			}
 
+			CompletionQueue.Log("TryResolveMetatable");
 			if (TryResolveMetatable(table.MetaTable, out CompletionObject completionObject))
 			{
 				IList<string> metatableCompletions=completionObject.GetPossibleCompletions();
@@ -45,28 +46,30 @@ namespace Kerbalua.Completion.CompletionTypes
 
 		bool TryResolveMetatable(Table metatable, out CompletionObject completionObject)
 		{
-			if (metatable == null)
+			if (metatable != null)
 			{
-				CompletionQueue.Log("MetaTable is not null");
-				completionObject=GetCompletionObject(table.MetaTable);
-				var index=table.MetaTable.RawGet("__index");
-				// If the index of the MetaTable is another table, we're safe
+				CompletionQueue.Log("This metatable is not null");
+				completionObject=GetCompletionObject(metatable);
+				var index=metatable.RawGet("__index");
 				if (completionObject is TableCompletion && index!=null && index.Table!=null)
 				{
+					CompletionQueue.Log("This metatable's index is safe.");
 					completionObject=new TableCompletion(index.Table);
 					return true;
 				}
-				// If it is not TableCompletion, its completion is handled another way
+
 				if (!(completionObject is TableCompletion))
 				{
+					CompletionQueue.Log("This metatable's completion is handled another way.");
 					return true;
 				}
+				CompletionQueue.Log("The metatable is not safe to use for completion");
 			}
 			completionObject=null;
 			return false;
 		}
 
-		public bool TryTableGet(string key, out CompletionObject completionObject)
+		public bool TryTableGet(object key, out CompletionObject completionObject)
 		{
 			DynValue dynValue = table.RawGet(key);
 
@@ -93,34 +96,55 @@ namespace Kerbalua.Completion.CompletionTypes
 				throw new LuaIntellisenseException("getMember was null in TryGetMember for "+GetType());
 			}
 
-			return TryTableGet(getMember.Name, out completionObject);
+			if(TryTableGet(getMember.Name, out completionObject))
+			{
+				operations.MoveNext();
+				return true;
+			}
+
+			return false;
 		}
 
 		public override bool TryCall(CompletionOperations operations, out CompletionObject completionObject)
 		{
-			throw new NotImplementedException();
+			throw new LuaIntellisenseException("TableCompletion does not implement TryCall");
 		}
 
 		public override bool TryArrayAccess(CompletionOperations operations, out CompletionObject completionObject)
 		{
-			throw new NotImplementedException();
-			//PotentialFeature: This will only be doable after we're parsing out the contents
-			// of the array access and discovering that it is a primitive.
-			// We can have the parser figure out whether it is a string, number.
-			// could also check if it was a global variable.
+			// PotentialFeature: We could potentially use variable names as well.
 
-			//if (table == null)
-			//{
-			//	throw new LuaIntellisenseException("Table was null in "+GetType());
-			//}
+			if (table == null)
+			{
+				throw new LuaIntellisenseException("Table was null in "+GetType());
+			}
 
-			//var getMember = operations.Current as GetMemberOperation;
-			//if (getMember == null)
-			//{
-			//	throw new LuaIntellisenseException("getMember was null in TryGetMember for "+GetType());
-			//}
+			var getArrayAccess = operations.Current as ArrayAccessOperation;
+			if (getArrayAccess == null)
+			{
+				throw new LuaIntellisenseException("getArrayAccess was null in TryArrayAccess for "+GetType());
+			}
 
-			//return TryTableGet(getMember.Name, out completionObject);
+			var str=getArrayAccess.exp.@string();
+			if (str!=null)
+			{
+				if(TryTableGet(str, out completionObject))
+				{
+					operations.MoveNext();
+					return true;
+				}
+			}
+			var num=getArrayAccess.exp.number();
+			if (num!=null)
+			{
+				if(TryTableGet(num, out completionObject))
+				{
+					operations.MoveNext();
+					return true;
+				}
+			}
+
+			throw new LuaIntellisenseException("ArraAccessCompletion for Tables is only implemented for num and str");
 		}
 	}
 }

@@ -7,6 +7,15 @@ namespace Kerbalua.Completion.CompletionTypes
 {
 	public abstract class CompletionObject
 	{
+		public override string ToString()
+		{
+			return GetType().Name;
+		}
+		/// <summary>
+		/// </summary>
+		/// <returns><c>true</c>, if operation was tryed, <c>false</c> otherwise.</returns>
+		/// <param name="operations">Operations.</param>
+		/// <param name="completionObject">Completion object.</param>
 		public virtual bool TryOperation(CompletionOperations operations, out CompletionObject completionObject)
 		{
 			CompletionQueue.Log("<Completion object is> "+GetType());
@@ -32,6 +41,11 @@ namespace Kerbalua.Completion.CompletionTypes
 		public abstract bool TryArrayAccess(CompletionOperations operations, out CompletionObject completionObject);
 		public abstract IList<string> GetPossibleCompletions();
 
+		/// <summary>
+		/// Get's the appropriate completion object from a DynValue
+		/// </summary>
+		/// <returns>The completion object.</returns>
+		/// <param name="dynValue">Dyn value.</param>
 		public static CompletionObject GetCompletionObject(DynValue dynValue)
 		{
 			CompletionQueue.Log("converting dynvalue "+dynValue);
@@ -58,14 +72,19 @@ namespace Kerbalua.Completion.CompletionTypes
 			return GetCompletionObject(obj);
 		}
 
+		/// <summary>
+		/// Get's the appropriate CompletionObject from an object
+		/// </summary>
+		/// <returns>The completion object.</returns>
+		/// <param name="obj">Object.</param>
 		public static CompletionObject GetCompletionObject(object obj)
 		{
 			CompletionQueue.Log("converting object "+obj);
 
 			if (obj.GetType().Name=="RuntimeType")
 			{
-				CompletionQueue.Log("obj is runtimetype -> Type");
-				return new TypeCompletion(obj as Type);
+				CompletionQueue.Log("obj is runtimetype -> RuntimeType");
+				return new RuntimeTypeCompletion(obj as Type);
 			}
 
 			if (obj is Static static1)

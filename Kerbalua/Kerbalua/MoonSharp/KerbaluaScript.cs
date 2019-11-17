@@ -117,7 +117,7 @@ namespace Kerbalua.MoonSharp
 			var coroutines=Globals["coroutine"] as Table;
 			var coroYield=coroutines["yield"];
 			Globals["globals"] = UserData.CreateStatic(typeof(Globals));
-
+			
 			Globals["sleep"] = new Action<double>((double waittimeSeconds) =>
 			{
 				//PrintErrorAction("start");

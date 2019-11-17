@@ -3,6 +3,7 @@ using Kerbalui.Controls;
 using Kerbalui.EventHandling;
 using Kerbalui.Layout;
 using Kerbalui.Types;
+using RedOnion.KSP.Settings;
 using UnityEngine;
 
 namespace LiveRepl.Parts
@@ -23,11 +24,14 @@ namespace LiveRepl.Parts
 			replButtons.AddWeighted(1, new Filler());
 			replButtons.AddFixed(ScriptWindow.centerGroupWidth, new Button("Clear Repl", uiparts.scriptWindow.ClearRepl));
 			replButtons.AddFixed(ScriptWindow.centerGroupWidth, new Button("Show Hotkeys", uiparts.scriptWindow.PrintKeyBindingsInOutputArea));
-			//replButtons.AddFixed(ScriptWindow.centerGroupWidth, new Button("Print Logs", () =>
-			//{
-			//	uiparts.replOutoutArea.Clear();
-			//	uiparts.replOutoutArea.AddText(CompletionQueue.String());
-			//}));
+
+#if DEBUG
+			replButtons.AddFixed(ScriptWindow.centerGroupWidth, new Button("Print Logs", () =>
+				{
+					uiparts.replOutoutArea.Clear();
+					uiparts.replOutoutArea.AddText(CompletionQueue.String());
+				}));
+#endif
 
 
 			AddMinSized(replButtons);

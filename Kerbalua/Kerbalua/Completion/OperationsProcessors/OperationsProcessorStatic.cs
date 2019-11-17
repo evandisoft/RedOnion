@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using MoonSharp.Interpreter;
+using RedOnion.KSP.Attributes;
 using RedOnion.ROS;
 
 namespace Kerbalua.Completion
@@ -51,7 +52,7 @@ namespace Kerbalua.Completion
 				return true;
 			}
 
-			if (t.GetCustomAttribute<NamespaceAttribute>()!=null)
+			if (t.GetCustomAttribute<SafeProps>()!=null)
 			{
 				if (CompletionReflectionUtil.TryGetProperty(t, getMember.Name, out PropertyInfo propertyInfo, CompletionReflectionUtil.StaticPublic))
 				{

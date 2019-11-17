@@ -11,10 +11,11 @@ using RedOnion.KSP.Namespaces;
 using System.Linq;
 using RedOnion.KSP.UnsafeAPI;
 using RedOnion.KSP.ReflectionUtil;
+using RedOnion.KSP.Attributes;
 
 namespace RedOnion.KSP.API
 {
-	[Namespace,Description("Global variables, objects and functions.")]
+	[SafeProps,Description("Global variables, objects and functions.")]
 	public static class Globals
 	{
 		[Description("An api for setting which scripts will be ran when an engine is reset.")]
@@ -27,7 +28,10 @@ namespace RedOnion.KSP.API
 		[Description("A collection of space/celestial bodies. (Safe API)")]
 		public static Bodies bodies => Bodies.Instance;
 
-
+		public static class GlobalsIn
+		{
+			public static int a;
+		}
 		//Not sure if I want to add this yet. It works, but not sure it will be
 		// structured this way.
 		//[Unsafe, Description("A map of kerbal names to kerbals for kerbals in the crew.")]

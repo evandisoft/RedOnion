@@ -1,21 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using RedOnion.KSP.Attributes;
+using RedOnion.ROS;
 
 namespace Kerbalua.Completion.CompletionTypes
 {
+	/// <summary>
+	/// Instance completion.
+	/// </summary>
     internal class InstanceCompletion : InstanceStaticCompletion
     {
-        private object v;
+        protected object obj;
 
-        public InstanceCompletion(object v):base(v.GetType())
+        public InstanceCompletion(object obj):base(obj.GetType())
         {
-            this.v = v;
+            this.obj = obj;
         }
 
 		public override IList<string> GetPossibleCompletions()
 		{
-			return CompletionReflectionUtil.GetMemberNames(v.GetType(), CompletionReflectionUtil.AllPublic);
+			return CompletionReflectionUtil.GetMemberNames(obj.GetType(), CompletionReflectionUtil.AllPublic);
 		}
 
 		public override bool TryArrayAccess(CompletionOperations operations, out CompletionObject completionObject)
@@ -30,7 +35,38 @@ namespace Kerbalua.Completion.CompletionTypes
 
 		public override bool TryGetMember(CompletionOperations operations, out CompletionObject completionObject)
 		{
-			throw new System.NotImplementedException();
+			//EvanPotential: This will be replaced by dynamically accessing actual field values
+			// and also dynamically accessing property values but only if the class indicates,
+			// with an attribute, that the properties are safe and fast and have no side effects. 
+
+			Type type=obj.GetType();
+			var getMember = operations.Current as GetMemberOperation;
+			CompletionQueue.Log("type is "+type+", member name is "+getMember.Name);
+			if (CompletionReflectionUtil.TryGetField(type, getMember.Name, out FieldInfo fieldInfo, CompletionReflectionUtil.AllPublic))
+			{
+				//Type newType = fieldInfo.FieldType;
+				//Static field access can be completed as an object.
+				var fieldObj = fieldInfo.GetValue(obj);
+				completionObject=GetCompletionObject(fieldObj);
+				CompletionQueue.Log("static field access");
+				operations.MoveNext();
+				return true;
+			}
+
+			// This can be active when we have agreed on an attribute to use.
+			if (type.GetCustomAttribute<SafeProps>()!=null)
+			{
+				if (CompletionReflectionUtil.TryGetProperty(type, getMember.Name, out PropertyInfo propertyInfo, CompletionReflectionUtil.AllPublic))
+				{
+					var propObj = propertyInfo.GetValue(obj);
+					completionObject=GetCompletionObject(propObj);
+					CompletionQueue.Log("static property access");
+					operations.MoveNext();
+					return true;
+				}
+			}
+
+			return CompletionReflectionUtil.TryGetNativeMember(obj.GetType(), operations, out completionObject, CompletionReflectionUtil.AllPublic);
 		}
 	}
 }

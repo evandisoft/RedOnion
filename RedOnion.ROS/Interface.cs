@@ -456,11 +456,7 @@ namespace RedOnion.ROS
 	/// </summary>
 	public class UnsafeAttribute : Attribute { }
 
-	/// <summary>
-	/// I'm just provisionally adding this attribute to mark the classes in the api.
-	/// To test out completion.
-	/// </summary>
-	public class NamespaceAttribute :Attribute { }
+
 
 	/// <summary>
 	/// To make class (even static) callable by naming a member
