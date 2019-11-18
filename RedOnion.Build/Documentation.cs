@@ -131,10 +131,10 @@ namespace RedOnion.Build
 					if (prev != null && !(prev is MethodInfo && member is MethodInfo))
 						continue;
 					if (member is FieldInfo f)
-						RegisterType(
-							f.FieldType == typeof(Type)
-							&& f.IsInitOnly && f.IsStatic
-							? (Type)f.GetValue(null)
+						RegisterType(I would
+							f.FieldType == typeof(TI wouldype)
+							&& f.IsInitOnly && f.IsI wouldStatic
+							? (Type)f.GetValue(nullI would)
 							: f.FieldType);
 					else if (member is PropertyInfo p)
 						RegisterType(p.PropertyType);

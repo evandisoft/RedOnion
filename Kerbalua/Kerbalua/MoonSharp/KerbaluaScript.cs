@@ -18,6 +18,7 @@ using System.Diagnostics;
 using RedOnion.KSP.API;
 using System.Linq.Expressions;
 using RedOnion.KSP.MoonSharp.CommonAPI;
+using System.ComponentModel;
 
 namespace Kerbalua.MoonSharp
 {
@@ -85,66 +86,23 @@ namespace Kerbalua.MoonSharp
 			
 			var defaultMappings = NamespaceMappings.DefaultAssemblies;
 			commonAPI["new"] = new DelegateTypeNew(@new);
-			commonAPI["getstatic"] = new Func<object, DynValue>((o) =>
-			{
-				if (o is Type t)
-				{
-					return UserData.CreateStatic(t);
-				}
-				return UserData.CreateStatic(o.GetType());
-			});
 
-			commonAPI["getclrtype"] = new Func<object, DynValue>((o) =>
-			{
-				if (o is DynValue d && d.Type==DataType.UserData)
-				{
-					return DynValue.FromObject(this,d.UserData.Descriptor.Type);
-				}
-				if (o is Type t)
-				{
-					return DynValue.FromObject(this,t);
-				}
-				return DynValue.FromObject(this,o.GetType());
-			});
-			//Globals["assemblies"] = new Func<List<Assembly>>(() =>
-			//{
-			//	return AppDomain.CurrentDomain.GetAssemblies().ToList();
-			//});
+			var reflection=new Table(this);
+			commonAPI["reflection"] = reflection;
 
-			//Globals["printall"] = DoString(
-			//@"
-			//return function(lst) for i=0,lst.Count-1 do print(i..' '..lst[i].ToString()) end end
-			//");
-			//Globals["Assembly"] = typeof(Assembly);
-			//Assembly blah;
-			//Globals["import"] = defaultMappings.GetNamespace("");
-			//Globals["Coll"] = allMappings.GetNamespace("System.Collections.Generic");
-			//Globals["reldir"] = new Func<double, double, RelativeDirection>((heading, pitch) => new RelativeDirection(heading, pitch));
-			//Globals["AppDomain"] = UserData.CreateStatic(typeof(AppDomain));
-			//Globals["AssemblyStatic"] = UserData.CreateStatic(typeof(Assembly));
-			//UserData.RegisterExtensionType(typeof(System.Linq.Enumerable));
-			//UserData.RegisterAssembly(Assembly.GetAssembly(typeof(System.Linq.Enumerable)),true);
-			//var coroutines=Globals["coroutine"] as Table;
-			//var coroYield=coroutines["yield"];
-			//Globals["globals"] = UserData.CreateStatic(typeof(Globals));
+			reflection["getstatic"] = new Func<DynValue, DynValue>(getstatic);
 
-			//Globals["globals"]=creator.Create(typeof(Globals));
-			commonAPI["sleep"] = new Action<double>((double waittimeSeconds) =>
-			{
-				//PrintErrorAction("start");
-				//UnityEngine.Debug.Log("start");
-				sleeptimeMillis=waittimeSeconds*1000;
-				sleepwatch.Start();
-				coroutine.Coroutine.AutoYieldCounter=0;
-				//UnityEngine.Debug.Log("end");
-				//PrintErrorAction("end");
-			});
+			reflection["isstatic"] = new Func<DynValue, DynValue>(isstatic);
 
+			reflection["isclrtype"] = new Func<DynValue, DynValue>(isclrtype);
 
-			//coroutines.Clear();
+			reflection["getclrtype"] = new Func<DynValue, DynValue>(getclrtype);
 
+			commonAPI["sleep"] = new Action<double>(sleep);
 
 		}
+
+
 
 		public int TestFunc(int a,double b,out string outstring)
 		{
@@ -216,8 +174,54 @@ namespace Kerbalua.MoonSharp
 			sleeptimeMillis=0;
 		}
 
+		[Description("Returns a static based on the given Type or object.")]
+		public DynValue getstatic(DynValue dynValue)
+		{
+			object o=dynValue.ToObject();
+			if (o is Type t)
+			{
+				return UserData.CreateStatic(t);
+			}
+			return UserData.CreateStatic(o.GetType());
+		}
+
+		[Description("Returns true if the argument is a static.")]
+		public DynValue isstatic(DynValue dynValue)
+		{
+			return DynValue.NewBoolean(dynValue.UserData!=null && dynValue.UserData.Object==null);
+		}
+
+		[Description("Returns true if the argument is a Type.")]
+		public DynValue isclrtype(DynValue dynValue)
+		{
+			return DynValue.NewBoolean(dynValue.UserData!=null && dynValue.UserData.Object!=null && dynValue.ToObject() is Type);
+		}
+
+		[Description("Returns the underyling clr type associated with this DynValue.")]
+		public DynValue getclrtype(DynValue dynValue)
+		{
+			if (dynValue.Type==DataType.UserData)
+			{
+				return DynValue.FromObject(this, dynValue.UserData.Descriptor.Type);
+			}
+			object o=dynValue.ToObject();
+			if (o is Type t)
+			{
+				return DynValue.FromObject(this, t);
+			}
+			return DynValue.FromObject(this, o.GetType());
+		}
+
+		[Description("Cause the script to sleep for waittimeSeconds seconds.")]
+		public void sleep(double waittimeSeconds)
+		{
+			sleeptimeMillis=waittimeSeconds*1000;
+			sleepwatch.Start();
+			coroutine.Coroutine.AutoYieldCounter=0;
+		}
+
 		delegate object DelegateTypeNew(object obj, params DynValue[] args);
-		//[Description("Function for creating new objects given a type or static in lua.")]
+		[Description("Create new objects given a type or static in lua followed by the arguments to the constructor.")]
 		public object @new(object obj, params DynValue[] dynArgs)
 		{
 			Type type=obj as Type;
