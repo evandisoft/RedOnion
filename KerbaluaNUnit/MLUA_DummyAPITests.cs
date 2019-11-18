@@ -25,7 +25,7 @@ namespace KerbaluaNUnit
 			globals = script.Globals;
 			//creator=new CommonAPICreator(script);
 			apiTable=new CommonAPITable(script);
-			apiTable.AddAll(typeof(DummyAPI));
+			apiTable.AddAPI(typeof(DummyAPI));
 			Table metatable=new Table(script);
 			metatable["__index"]=apiTable;
 			globals.MetaTable=metatable;

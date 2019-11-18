@@ -8,23 +8,11 @@ using System.ComponentModel;
 
 namespace RedOnion.KSP.API
 {
+	[Callable("activate")]
 	[Description("Used to activate next stage and/or get various information about stage(s)."
 	+ " Returns true on success, if used as function. False if stage was not ready.")]
-	public class Stage : ICallable
+	public static class Stage
 	{
-		[Browsable(false), MoonSharpHidden]
-		public static Stage Instance { get; } = new Stage();
-		protected Stage() { }
-
-		bool ICallable.Call(ref Value result, object self, Arguments args, bool create)
-		{
-			result = activate();
-			return true;
-		}
-		[MoonSharpUserDataMetamethod("__call"), Browsable(false)]
-		public DynValue Call(ScriptExecutionContext ctx, CallbackArguments args)
-			=> DynValue.NewBoolean(activate());
-
 		[Description("Stage number.")]
 		public static int number => StageManager.CurrentStage;
 		[Description("Whether ready for activating next stage or not.")]
@@ -70,22 +58,22 @@ namespace RedOnion.KSP.API
 		public static double fuel => solidfuel + liquidfuel;
 
 		[Description("Estimate burn time for given delta-v.")]
-		public static double burnTime(double deltaV) => engines.burnTime(deltaV);
+		public static double burntime(double deltaV) => engines.burnTime(deltaV);
 		// TODO: burnTime even if current stage cannot handle it
 
 
-		static protected internal bool Dirty { get; private set; } = true;
-		static protected internal void SetDirty(string reason = null)
+		static internal bool Dirty { get; private set; } = true;
+		static internal void SetDirty(string reason = null)
 		{
 			if (Dirty) return;
 			Value.DebugLog(reason == null ? "Stage Dirty" : "Stage Dirty: " + reason);
-			GameEvents.onEngineActiveChange.Remove(Instance.EngineChange);
-			GameEvents.onStageActivate.Remove(Instance.StageActivated);
-			GameEvents.onStageSeparation.Remove(Instance.StageSeparation);
-			GameEvents.StageManager.OnGUIStageSequenceModified.Remove(Instance.StageSequenceModified);
-			GameEvents.StageManager.OnStagingSeparationIndices.Remove(Instance.StagingSeparationIndices);
-			GameEvents.StageManager.OnGUIStageAdded.Remove(Instance.StagesChanged);
-			GameEvents.StageManager.OnGUIStageRemoved.Remove(Instance.StagesChanged);
+			GameEvents.onEngineActiveChange.Remove(EngineChange);
+			GameEvents.onStageActivate.Remove(StageActivated);
+			GameEvents.onStageSeparation.Remove(StageSeparation);
+			GameEvents.StageManager.OnGUIStageSequenceModified.Remove(StageSequenceModified);
+			GameEvents.StageManager.OnStagingSeparationIndices.Remove(StagingSeparationIndices);
+			GameEvents.StageManager.OnGUIStageAdded.Remove(StagesChanged);
+			GameEvents.StageManager.OnGUIStageRemoved.Remove(StagesChanged);
 			Dirty = true;
 			parts.SetDirty();
 			xparts.SetDirty();
@@ -95,20 +83,20 @@ namespace RedOnion.KSP.API
 			engines.Clear();
 
 		}
-		void EngineChange(ModuleEngines engine)
+		static void EngineChange(ModuleEngines engine)
 			=> SetDirty("EngineChange");
-		void StageActivated(int stage)
+		static void StageActivated(int stage)
 			=> SetDirty("StageActivated");
-		void StageSeparation(EventReport e)
+		static void StageSeparation(EventReport e)
 			=> SetDirty("StageSeparation");
-		void StageSequenceModified()
+		static void StageSequenceModified()
 			=> SetDirty("StageSequenceModified");
-		void StagingSeparationIndices()
+		static void StagingSeparationIndices()
 			=> SetDirty("StagingSeparationIndices");
-		void StagesChanged(int stage)
+		static void StagesChanged(int stage)
 			=> SetDirty("StagesChanged");
 
-		static protected void Refresh()
+		static void Refresh()
 		{
 			parts.Clear();
 			xparts.Clear();
@@ -152,13 +140,13 @@ namespace RedOnion.KSP.API
 			parts.Dirty = false;
 			xparts.Dirty = false;
 			engines.Dirty = false;
-			GameEvents.onEngineActiveChange.Add(Instance.EngineChange);
-			GameEvents.onStageActivate.Add(Instance.StageActivated);
-			GameEvents.onStageSeparation.Add(Instance.StageSeparation);
-			GameEvents.StageManager.OnGUIStageSequenceModified.Add(Instance.StageSequenceModified);
-			GameEvents.StageManager.OnStagingSeparationIndices.Add(Instance.StagingSeparationIndices);
-			GameEvents.StageManager.OnGUIStageAdded.Add(Instance.StagesChanged);
-			GameEvents.StageManager.OnGUIStageRemoved.Add(Instance.StagesChanged);
+			GameEvents.onEngineActiveChange.Add(EngineChange);
+			GameEvents.onStageActivate.Add(StageActivated);
+			GameEvents.onStageSeparation.Add(StageSeparation);
+			GameEvents.StageManager.OnGUIStageSequenceModified.Add(StageSequenceModified);
+			GameEvents.StageManager.OnStagingSeparationIndices.Add(StagingSeparationIndices);
+			GameEvents.StageManager.OnGUIStageAdded.Add(StagesChanged);
+			GameEvents.StageManager.OnGUIStageRemoved.Add(StagesChanged);
 			Value.DebugLog("Stage Refreshed (Decouple: {0}, Engines: {1})", nextDecoupler, engines.Count);
 		}
 	}
