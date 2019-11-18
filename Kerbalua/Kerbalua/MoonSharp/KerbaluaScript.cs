@@ -120,7 +120,7 @@ namespace Kerbalua.MoonSharp
 			var coroYield=coroutines["yield"];
 			//Globals["globals"] = UserData.CreateStatic(typeof(Globals));
 			var creator=new CommonAPICreator(this);
-			Globals["globals"]=creator.Create();
+			Globals["globals"]=creator.Create(typeof(Globals));
 			Globals["sleep"] = new Action<double>((double waittimeSeconds) =>
 			{
 				//PrintErrorAction("start");

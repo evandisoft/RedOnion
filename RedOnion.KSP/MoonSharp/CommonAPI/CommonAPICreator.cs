@@ -18,9 +18,9 @@ namespace RedOnion.KSP.MoonSharp.CommonAPI
 			this.script=script;
 		}
 
-		public Table Create()
+		public Table Create(Type type)
 		{
-			return CreateTableFromStaticType(typeof(Globals));
+			return CreateTableFromStaticType(type);
 		}
 
 		Table CreateTableFromStaticType(Type type)

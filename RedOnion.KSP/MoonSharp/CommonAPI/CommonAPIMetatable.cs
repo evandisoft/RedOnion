@@ -23,7 +23,13 @@ namespace RedOnion.KSP.MoonSharp.CommonAPI
 
 		public void SetProperty(PropertyInfo propertyInfo)
 		{
-			properties[propertyInfo.Name]=new Func<DynValue>(() => DynValue.FromObject(OwnerScript,propertyInfo.GetValue(null)));
+			properties[propertyInfo.Name]=new Func<DynValue>(() =>
+			{
+				var value=propertyInfo.GetValue(null);
+
+				return DynValue.FromObject(OwnerScript, value);
+			});
+				
 		}
 
 		public bool TryGetCompletion(string completionName, out object completion)
