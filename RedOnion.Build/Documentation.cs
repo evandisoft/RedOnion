@@ -83,6 +83,7 @@ namespace RedOnion.Build
 		{
 			Descriptor.Reflected.LowerFirstLetter = false;
 			RegisterType(typeof(Globals));
+			RegisterType(typeof(KSP.MoonSharp.MoonSharpAPI.MoonSharpGlobals));
 			var members = new Dictionary<string, MemberInfo>();
 			for (int i = 0; i < queue.size; i++)
 			{

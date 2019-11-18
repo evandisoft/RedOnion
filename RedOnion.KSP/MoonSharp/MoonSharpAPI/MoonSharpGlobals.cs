@@ -69,7 +69,7 @@ namespace RedOnion.KSP.MoonSharp.MoonSharpAPI
 		}
 
 		[Unsafe,Description("Unsafe, reflection stuff.")]
-		public static Type reflection=typeof(MoonSharpReflection);
+		public static readonly Type reflection=typeof(MoonSharpReflection);
 	}
 
 	[Description("List of functions that are specific to KerbaluaScript.")]
