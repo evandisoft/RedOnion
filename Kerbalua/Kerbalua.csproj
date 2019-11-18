@@ -124,6 +124,7 @@
     <Compile Include="Kerbalua\Kerbnlua\KerbnluaScript.cs" />
     <Compile Include="Kerbalua\Kerbnlua\KerbnluaReplEvaluator.cs" />
     <Compile Include="Kerbalua\Completion\MoonSharpIntellisense.cs" />
+    <Compile Include="Kerbalua\Completion\CompletionTypes\MoonSharpCompletable.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

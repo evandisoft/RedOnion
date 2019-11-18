@@ -12,9 +12,9 @@ using static KerbaluaNUnit.TestingUtil;
 namespace KerbaluaNUnit
 {
 	[TestFixture()]
-	public class IntellisenseTests
+	public class MLUA_IntellisenseTests
 	{
-		public IntellisenseTests()
+		public MLUA_IntellisenseTests()
 		{
 		}
 
@@ -49,66 +49,10 @@ namespace KerbaluaNUnit
 			globals = script.Globals;
 		}
 
-		//[Test()]
-		//public void LUA_IntellisenseTests_Static()
-		//{
-		//	var operations = new CompletionOperations(
-		//		MoonSharpIntellisense.Parse(
-		//		@"Adf.asdfg."
-		//			).Segments);
-		//	Setup();
-		//	globals["Adf"]=UserData.CreateStatic(typeof(Adf));
-		//	object currentObject = script.Globals;
-		//	IList<string> completions=new List<string>();
-		//	//Console.WriteLine(operations);
-		//	completions = OperationsProcessor.StaticGetPossibleCompletions(currentObject);
 
-		//	Assert.IsTrue(OperationsProcessor.TryProcessOperation(currentObject, operations, out currentObject));
-		//	//Console.WriteLine(operations);
-
-		//	completions = OperationsProcessor.StaticGetPossibleCompletions(currentObject);
-
-		//	//foreach (var c in OperationsProcessor.StaticGetPossibleCompletions(currentObject,operations))
-		//	//{
-		//	//	Console.WriteLine(c);
-		//	//}
-		//	Assert.IsTrue(OperationsProcessor.TryProcessOperation(currentObject, operations, out currentObject));
-		//	//Console.WriteLine(operations);
-		//	completions = OperationsProcessor.StaticGetPossibleCompletions(currentObject);
-		//	//PrintAll(completions);
-		//	Assert.AreEqual(11, completions.Count);
-		//	//Console.WriteLine(operations);
-		//}
-
-		//[Test()]
-		//public void LUA_IntellisenseTests_Instance()
-		//{
-		//	var operations = new CompletionOperations(
-		//		MoonSharpIntellisense.Parse(
-		//		@"Adf.asd."
-		//			).Segments);
-		//	Setup();
-		//	globals["Adf"] = new Adf();
-		//	object currentObject = script.Globals;
-		//	IList<string> completions = new List<string>();
-		//	//Console.WriteLine(operations);
-		//	Assert.IsTrue(OperationsProcessor.TryProcessOperation(currentObject, operations, out currentObject));
-		//	//Console.WriteLine(operations);
-		//	completions = OperationsProcessor.StaticGetPossibleCompletions(currentObject);
-		//	//foreach (var c in OperationsProcessor.StaticGetPossibleCompletions(currentObject,operations))
-		//	//{
-		//	//	Console.WriteLine(c);
-		//	//}
-		//	Assert.IsTrue(OperationsProcessor.TryProcessOperation(currentObject, operations, out currentObject));
-		//	//Console.WriteLine(operations);
-		//	completions = OperationsProcessor.StaticGetPossibleCompletions(currentObject);
-		//	//PrintAll(completions);
-
-		//	//Console.WriteLine(operations);
-		//}
 
 		[Test()]
-		public void LUA_IntellisenseTest_Basic()
+		public void MLUA_IntellisenseTest_Basic()
 		{
 			Setup();
 			string source =
@@ -119,7 +63,7 @@ namespace KerbaluaNUnit
 		}
 
 		[Test()]
-		public void LUA_IntellisenseTest_Static()
+		public void MLUA_IntellisenseTest_Static()
 		{
 			Setup();
 			globals["Adf"] = UserData.CreateStatic(typeof(Adf));
@@ -132,7 +76,7 @@ namespace KerbaluaNUnit
 		}
 
 		[Test()]
-		public void LUA_IntellisenseTest_Instance()
+		public void MLUA_IntellisenseTest_Instance()
 		{
 			Setup();
 			globals["Adf"] = new Adf();
@@ -149,7 +93,7 @@ namespace KerbaluaNUnit
 		}
 
 		[Test()]
-		public void LUA_IntellisenseTest_Namespace()
+		public void MLUA_IntellisenseTest_Namespace()
 		{
 			Setup();
 			var allMappings = NamespaceMappings.ForAllAssemblies;
@@ -167,24 +111,24 @@ namespace KerbaluaNUnit
 		}
 
 		[Test()]
-		public void LUA_IntellisenseTest_NamespaceStatic()
+		public void MLUA_IntellisenseTest_NamespaceStatic()
 		{
 			Setup();
 			var allMappings = NamespaceMappings.ForAllAssemblies;
 			globals["Import"] = allMappings.GetNamespace("");
 			//globals["Adf"] = new Adf();
 			string source =
-				@"Import.System.Collections.Generic.List.";
+				@"Import.System.Collections.Generic.List";
 
 			var completions = GetCompletions(source);
-			//PrintAll(completions);
+			PrintAll(completions);
 			Assert.Less(1, completions.Count);
 
 			//Assert.AreEqual(11, completions.Count);
 		}
 
 		[Test()]
-		public void LUA_IntellisenseTest_Action()
+		public void MLUA_IntellisenseTest_Action()
 		{
 			Setup();
 			var allMappings = NamespaceMappings.ForAllAssemblies;
@@ -204,7 +148,7 @@ namespace KerbaluaNUnit
 		}
 
 		[Test()]
-		public void LUA_IntellisenseTest_LuaGlobalsMetatableCompletion()
+		public void MLUA_IntellisenseTest_LuaGlobalsMetatableCompletion()
 		{
 			Setup();
 			globals.MetaTable = RedOnion.KSP.API.LuaGlobals.Instance;
@@ -214,7 +158,7 @@ namespace KerbaluaNUnit
 		}
 
 		[Test()]
-		public void LUA_IntellisenseTest_NestedTablesCompletion()
+		public void MLUA_IntellisenseTest_NestedTablesCompletion()
 		{
 			Setup();
 			string source = "os.";
@@ -223,7 +167,7 @@ namespace KerbaluaNUnit
 		}
 
 		[Test()]
-		public void LUA_IntellisenseTest_StringKeyedTableCompletion()
+		public void MLUA_IntellisenseTest_StringKeyedTableCompletion()
 		{
 			Setup();
 			string source = "_G['os'].";
@@ -232,7 +176,7 @@ namespace KerbaluaNUnit
 		}
 
 		[Test()]
-		public void LUA_IntellisenseTest_IntKeyedTableCompletion()
+		public void MLUA_IntellisenseTest_IntKeyedTableCompletion()
 		{
 			Setup();
 			script.DoString("b={} b.c=3 a={b}");
@@ -242,7 +186,7 @@ namespace KerbaluaNUnit
 		}
 
 		[Test()]
-		public void LUA_IntellisenseTest_CaseInsensitive()
+		public void MLUA_IntellisenseTest_CaseInsensitive()
 		{
 			Setup();
 			var allMappings = NamespaceMappings.ForAllAssemblies;
@@ -260,7 +204,7 @@ namespace KerbaluaNUnit
 		}
 
 		//[Test()]
-		//public void LUA_IntellisenseTest_Interop()
+		//public void MLUA_IntellisenseTest_Interop()
 		//{
 		//	Setup();
 		//	globals.MetaTable = RedOnion.KSP.API.LuaGlobals.Instance;
@@ -281,7 +225,7 @@ namespace KerbaluaNUnit
 
 
 		//[Test()]
-		//public void LUA_IntellisenseTest_Interop2()
+		//public void MLUA_IntellisenseTest_Interop2()
 		//{
 		//	Setup();
 		//	globals.MetaTable = RedOnion.KSP.API.LuaGlobals.Instance;
@@ -300,7 +244,7 @@ namespace KerbaluaNUnit
 		//}
 
 		[Test()]
-		public void LUA_IntellisenseTest_Bodies()
+		public void MLUA_IntellisenseTest_Bodies()
 		{
 			Setup();
 			globals.MetaTable = RedOnion.KSP.API.LuaGlobals.Instance;
@@ -310,7 +254,7 @@ namespace KerbaluaNUnit
 		}
 
 		//[Test()]
-		//public void LUA_IntellisenseTest_Bodies2()
+		//public void MLUA_IntellisenseTest_Bodies2()
 		//{
 		//	Setup();
 		//	globals.MetaTable = RedOnion.KSP.API.LuaGlobals.Instance;

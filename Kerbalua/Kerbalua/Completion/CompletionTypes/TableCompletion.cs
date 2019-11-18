@@ -135,13 +135,18 @@ namespace Kerbalua.Completion.CompletionTypes
 				throw new LuaIntellisenseException("getArrayAccess was null in TryArrayAccess for "+GetType());
 			}
 
+			CompletionQueue.Log("Trying array access");
+
+			CompletionQueue.Log("exp was {"+getArrayAccess.exp?.GetText()+"}");
 			var strNode=getArrayAccess.exp.@string();
 			if (strNode!=null)
 			{
 				var stringLiteral=strNode.NORMALSTRING() ?? strNode.LONGSTRING() ?? strNode.CHARSTRING();
 
 				string str=stringLiteral.ToString();
+
 				str=str.Substring(1, str.Length-2);
+
 				if (TryTableGet(str, out completionObject))
 				{
 					operations.MoveNext();

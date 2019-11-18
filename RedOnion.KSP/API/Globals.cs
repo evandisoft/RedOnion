@@ -15,7 +15,7 @@ using RedOnion.KSP.Attributes;
 
 namespace RedOnion.KSP.API
 {
-	[SafeProps,Description("Global variables, objects and functions.")]
+	[Description("Global variables, objects and functions.")]
 	public static class Globals
 	{
 		[Description("An api for setting which scripts will be ran when an engine is reset.")]
@@ -39,8 +39,6 @@ namespace RedOnion.KSP.API
 		[Unsafe, Description("Namespace Mappings")]
 		public static readonly NamespaceInstance native = NamespaceMappings.DefaultAssemblies.GetNamespace("");
 
-		[Unsafe, Description("All the reflection stuff and namespaces.")]
-		public static Reflect reflect => Reflect.Instance;
 		[Unsafe, Description("Reflected/imported stuff by assembly name.")]
 		public static readonly GetMappings assembly = new GetMappings();
 

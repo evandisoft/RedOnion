@@ -3,14 +3,14 @@ using Kerbalua.Completion;
 using System;
 namespace KerbaluaNUnit {
 	[TestFixture()]
-	public class LUA_ProcessedIncompleteVarTests {
+	public class MLUA_ProcessedIncompleteVarTests {
 		public ProcessedIncompleteVar Parse(string source)
 		{
 			return MoonSharpIntellisense.Parse(source);
 		}
 
 		[Test()]
-		public void LUA_TestCase_1()
+		public void MLUA_TestCase_1()
 		{
 			var parsed = Parse(
 				@"
@@ -24,7 +24,7 @@ namespace KerbaluaNUnit {
 		}
 
 		[Test()]
-		public void LUA_TestCase_2()
+		public void MLUA_TestCase_2()
 		{
 			var parsed = Parse(
 			@"
@@ -39,7 +39,7 @@ namespace KerbaluaNUnit {
 		}
 
 		[Test()]
-		public void LUA_TestCase_3()
+		public void MLUA_TestCase_3()
 		{
 			var parsed = Parse("return asdf");
 
@@ -50,7 +50,7 @@ namespace KerbaluaNUnit {
 		}
 
 		[Test()]
-		public void LUA_TestCase_4()
+		public void MLUA_TestCase_4()
 		{
 			var parsed = Parse("return asdf.qwer[1]().");
 
@@ -59,7 +59,7 @@ namespace KerbaluaNUnit {
 		}
 
 		[Test()]
-		public void LUA_TestCase_5()
+		public void MLUA_TestCase_5()
 		{
 			var parsed = Parse(
 			@"
@@ -78,7 +78,7 @@ namespace KerbaluaNUnit {
 		}
 
 		[Test()]
-		public void LUA_TestCase_6_IncompleteVarlist()
+		public void MLUA_TestCase_6_IncompleteVarlist()
 		{
 			var parsed = Parse(
 			@"
@@ -91,7 +91,7 @@ namespace KerbaluaNUnit {
 		}
 
 		[Test()]
-		public void LUA_TestCase_7_IncompleteExplist()
+		public void MLUA_TestCase_7_IncompleteExplist()
 		{
 			var parsed = Parse(
 			@"
@@ -104,7 +104,7 @@ namespace KerbaluaNUnit {
 		}
 
 		//[Test()]
-		//public void LUA_TestCase_8_KeywordTest()
+		//public void MLUA_TestCase_8_KeywordTest()
 		//{
 		//	var parsed = Parse(
 		//	@"
@@ -117,7 +117,7 @@ namespace KerbaluaNUnit {
 		//}
 
 		[Test()]
-		public void LUA_TestCase_9_GenericFor()
+		public void MLUA_TestCase_9_GenericFor()
 		{
 			var parsed = Parse(
 @"

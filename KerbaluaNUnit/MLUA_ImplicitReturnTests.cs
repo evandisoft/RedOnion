@@ -4,10 +4,10 @@ using System;
 namespace KerbaluaNUnit
 {
 	[TestFixture()]
-	public class LUA_ImplicitReturnTests
+	public class MLUA_ImplicitReturnTests
 	{
 		[Test()]
-		public void TestCase_1()
+		public void MLUA_TestCase_1()
 		{
 			var q=IncompleteLuaParsing.IsImplicitReturn(
 			@"
@@ -20,7 +20,7 @@ end
 		}
 
 		[Test()]
-		public void TestCase_2()
+		public void MLUA_TestCase_2()
 		{
 			var q = IncompleteLuaParsing.IsImplicitReturn(
 			@"
@@ -30,7 +30,7 @@ a=2
 		}
 
 		[Test()]
-		public void TestCase_3()
+		public void MLUA_TestCase_3()
 		{
 			var q = IncompleteLuaParsing.IsImplicitReturn(
 			@"

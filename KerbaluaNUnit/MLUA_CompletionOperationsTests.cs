@@ -15,7 +15,7 @@ using static KerbaluaNUnit.TestingUtil;
 
 namespace KerbaluaNUnit {
 	[TestFixture()]
-	public class LUA_CompletionOperationsTests
+	public class MLUA_CompletionOperationsTests
 	{
 		//public CompletionObject GetCompletionObject(Table globals, string source)
 		//{
@@ -25,7 +25,7 @@ namespace KerbaluaNUnit {
 		//}
 
 		Script script = new Script(CoreModules.Preset_Complete);
-		public LUA_CompletionOperationsTests()
+		public MLUA_CompletionOperationsTests()
 		{
 			UserData.RegistrationPolicy = InteropRegistrationPolicy.Automatic;
 		}
@@ -45,11 +45,67 @@ namespace KerbaluaNUnit {
 		}
 
 
+		//[Test()]
+		//public void MLUA_IntellisenseTests_Static()
+		//{
+		//	var operations = new CompletionOperations(
+		//		MoonSharpIntellisense.Parse(
+		//		@"Adf.asdfg."
+		//			).Segments);
+		//	Setup();
+		//	globals["Adf"]=UserData.CreateStatic(typeof(Adf));
+		//	object currentObject = script.Globals;
+		//	IList<string> completions=new List<string>();
+		//	//Console.WriteLine(operations);
+		//	completions = OperationsProcessor.StaticGetPossibleCompletions(currentObject);
 
+		//	Assert.IsTrue(OperationsProcessor.TryProcessOperation(currentObject, operations, out currentObject));
+		//	//Console.WriteLine(operations);
+
+		//	completions = OperationsProcessor.StaticGetPossibleCompletions(currentObject);
+
+		//	//foreach (var c in OperationsProcessor.StaticGetPossibleCompletions(currentObject,operations))
+		//	//{
+		//	//	Console.WriteLine(c);
+		//	//}
+		//	Assert.IsTrue(OperationsProcessor.TryProcessOperation(currentObject, operations, out currentObject));
+		//	//Console.WriteLine(operations);
+		//	completions = OperationsProcessor.StaticGetPossibleCompletions(currentObject);
+		//	//PrintAll(completions);
+		//	Assert.AreEqual(11, completions.Count);
+		//	//Console.WriteLine(operations);
+		//}
+
+		//[Test()]
+		//public void MLUA_IntellisenseTests_Instance()
+		//{
+		//	var operations = new CompletionOperations(
+		//		MoonSharpIntellisense.Parse(
+		//		@"Adf.asd."
+		//			).Segments);
+		//	Setup();
+		//	globals["Adf"] = new Adf();
+		//	object currentObject = script.Globals;
+		//	IList<string> completions = new List<string>();
+		//	//Console.WriteLine(operations);
+		//	Assert.IsTrue(OperationsProcessor.TryProcessOperation(currentObject, operations, out currentObject));
+		//	//Console.WriteLine(operations);
+		//	completions = OperationsProcessor.StaticGetPossibleCompletions(currentObject);
+		//	//foreach (var c in OperationsProcessor.StaticGetPossibleCompletions(currentObject,operations))
+		//	//{
+		//	//	Console.WriteLine(c);
+		//	//}
+		//	Assert.IsTrue(OperationsProcessor.TryProcessOperation(currentObject, operations, out currentObject));
+		//	//Console.WriteLine(operations);
+		//	completions = OperationsProcessor.StaticGetPossibleCompletions(currentObject);
+		//	//PrintAll(completions);
+
+		//	//Console.WriteLine(operations);
+		//}
 
 
 		//[Test()]
-		//public void LUA_TestCase_2()
+		//public void MLUA_TestCase_2()
 		//{
 		//	script = new Script(CoreModules.Preset_Complete);
 		//	script.Globals["ADF"] = new Adf();
@@ -69,7 +125,7 @@ namespace KerbaluaNUnit {
 		//}
 
 		//[Test()]
-		//public void LUA_TestCase_3()
+		//public void MLUA_TestCase_3()
 		//{
 		//	script = new Script(CoreModules.Preset_Complete);
 		//	script.Globals["ADF"] = new Adf();
@@ -94,7 +150,7 @@ namespace KerbaluaNUnit {
 
 
 		//[Test()]
-		//public void LUA_TestCase_4()
+		//public void MLUA_TestCase_4()
 		//{
 		//	script = new Script(CoreModules.Preset_Complete);
 		//	script.Globals["ADF"] = new Adf();
@@ -117,7 +173,7 @@ namespace KerbaluaNUnit {
 		//	Assert.AreEqual(10, completions.Count);
 		//}
 		//		[Test()]
-		//		public void LUA_TestCase_3_Interop()
+		//		public void MLUA_TestCase_3_Interop()
 		//		{
 		//			script = new KerbaluaScript();
 		//			//script.Globals["ship"] = new Adf();
@@ -137,7 +193,7 @@ namespace KerbaluaNUnit {
 		//		}
 
 		//		[Test()]
-		//		public void LUA_TestCase_4_Interop_2()
+		//		public void MLUA_TestCase_4_Interop_2()
 		//		{
 		//			script = new KerbaluaScript();
 		//			//script.Globals["ship"] = new Adf();
@@ -164,7 +220,7 @@ namespace KerbaluaNUnit {
 		//		}
 
 		//		[Test()]
-		//		public void LUA_TestCase_5_Static()
+		//		public void MLUA_TestCase_5_Static()
 		//		{
 		//			script = new KerbaluaScript();
 		//			//script.Globals["ship"] = new Adf();

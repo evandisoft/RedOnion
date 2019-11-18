@@ -105,7 +105,6 @@
     <Compile Include="Parts\Engine.cs" />
     <Compile Include="Parts\LaunchClamp.cs" />
     <Compile Include="Parts\PartBase.cs" />
-    <Compile Include="API\Reflect.cs" />
     <Compile Include="API\Ship.cs" />
     <Compile Include="Parts\PartSet.cs" />
     <Compile Include="API\Stage.cs" />
@@ -138,7 +137,7 @@
     <Compile Include="ReflectionUtil\NameTypeMap.cs" />
     <Compile Include="Completion\ICompletable.cs" />
     <Compile Include="Completion\IHasCompletionProxy.cs" />
-    <Compile Include="ReflectionUtil\NamespaceInstance.Lua.cs" />
+    <Compile Include="ReflectionUtil\NamespaceInstance.MoonSharp.cs" />
     <Compile Include="Autopilot\RelativeDirection.cs" />
     <Compile Include="ReflectionUtil\DualCaseSensitivityDict.cs" />
     <Compile Include="ReflectionUtil\GetMappings.cs" />
@@ -151,13 +150,14 @@
     <Compile Include="UnsafeAPI\UnsafeAPI.cs" />
     <Compile Include="Utilities\ReferenceEqualityComparer.cs" />
     <Compile Include="MoonSharp\CommonAPI\CommonAPITable.cs" />
-    <Compile Include="MoonSharp\CommonAPI\CreateCommonAPI.cs" />
-    <Compile Include="MoonSharp\CommonAPI\PropertyMetatable.cs" />
+    <Compile Include="MoonSharp\CommonAPI\CommonAPIMetatable.cs" />
     <Compile Include="Completion\ISafeMetatable.cs" />
     <Compile Include="Completion\Static.cs" />
     <Compile Include="Completion\StaticObject.cs" />
     <Compile Include="Attributes\Attributes.cs" />
     <Compile Include="Settings\ProjectSettings.cs" />
+    <Compile Include="MoonSharp\Interfaces\IMoonSharpCompletable.cs" />
+    <Compile Include="MoonSharp\MoonSharpAPI\MoonSharpGlobals.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RedOnion.ROS\RedOnion.ROS.csproj">
@@ -177,6 +177,8 @@
     <Folder Include="MoonSharp\CommonAPI\" />
     <Folder Include="New Folder\" />
     <Folder Include="Attributes\" />
+    <Folder Include="MoonSharp\Interfaces\" />
+    <Folder Include="MoonSharp\MoonSharpAPI\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

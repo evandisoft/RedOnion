@@ -1,11 +1,13 @@
 using System;
+using System.Collections.Generic;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
+using RedOnion.KSP.MoonSharp.Interfaces;
 using UnityEngine;
 
 namespace RedOnion.KSP.ReflectionUtil
 {
-	public partial class NamespaceInstance : IUserDataType
+	public partial class NamespaceInstance : IUserDataType, IMoonSharpCompletable
 	{
 		public DynValue Index(global::MoonSharp.Interpreter.Script script, DynValue index, bool isDirectIndexing)
 		{
@@ -50,6 +52,29 @@ namespace RedOnion.KSP.ReflectionUtil
 		bool IUserDataType.SetIndex(global::MoonSharp.Interpreter.Script script, DynValue index, DynValue value, bool isDirectIndexing)
 		{
 			throw new NotSupportedException("Cannot modify fields of "+nameof(NamespaceInstance));
+		}
+
+		IList<string> IMoonSharpCompletable.PossibleCompletions 
+		{ 
+			get 
+			{
+				return PossibleCompletions;
+			} 
+		}
+
+		bool IMoonSharpCompletable.TryGetCompletion(string completionName, out object completion)
+		{
+			if(TryGetCompletion(completionName,out completion))
+			{
+				if (completion is Type type)
+				{
+					completion=UserData.CreateStatic(type);
+				}
+				return true;
+			}
+
+			completion = null;
+			return false;
 		}
 	}
 }

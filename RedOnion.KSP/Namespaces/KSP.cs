@@ -37,7 +37,7 @@ namespace RedOnion.KSP.Namespaces
 		[Description("[KSP API](https://kerbalspaceprogram.com/api/class_flight_globals.html): Flight Globals (for autopilot).")]
 		public static FlightGlobals FlightGlobals => FlightGlobals.fetch;
 		[Description("Custom autopilot.")]
-		public static FlightControl FlightControl => FlightControl.GetInstance();
+		public static FlightControl FlightControl => FlightControl.Instance;
 		[Description("[KSP API](https://kerbalspaceprogram.com/api/class_flight_driver.html)")]
 		public static FlightDriver FlightDriver => FlightDriver.fetch;
 
