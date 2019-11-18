@@ -75,15 +75,17 @@ namespace Kerbalua.MoonSharp
 				}));
 			//Globals.MetaTable = API.LuaGlobals.Instance;
 			//Globals["Vessel"] = FlightGlobals.ActiveVessel;
-			var creator=new CommonAPICreator(this);
 			var metatable=new Table(this);
-			var commonAPI=creator.Create(typeof(Globals));
+			var commonAPI=new CommonAPITable(this);
+			commonAPI.AddAll(typeof(Globals));
+
 			metatable["__index"]=commonAPI;
 			Globals.MetaTable=metatable;
+			Globals["coroutine"]=null;
 			
 			var defaultMappings = NamespaceMappings.DefaultAssemblies;
-			Globals["new"] = new DelegateTypeNew(New);
-			Globals["static"] = new Func<object, DynValue>((o) =>
+			//commonAPI["new"] = new DelegateTypeNew(New);
+			commonAPI["static"] = new Func<object, DynValue>((o) =>
 			{
 				if (o is Type t)
 				{
@@ -92,7 +94,7 @@ namespace Kerbalua.MoonSharp
 				return UserData.CreateStatic(o.GetType());
 			});
 
-			Globals["gettype"] = new Func<object, DynValue>((o) =>
+			commonAPI["gettype"] = new Func<object, DynValue>((o) =>
 			{
 				if (o is DynValue d && d.Type==DataType.UserData)
 				{
@@ -111,8 +113,8 @@ namespace Kerbalua.MoonSharp
 
 			//Globals["printall"] = DoString(
 			//@"
-				//return function(lst) for i=0,lst.Count-1 do print(i..' '..lst[i].ToString()) end end
-				//");
+			//return function(lst) for i=0,lst.Count-1 do print(i..' '..lst[i].ToString()) end end
+			//");
 			//Globals["Assembly"] = typeof(Assembly);
 			//Assembly blah;
 			//Globals["import"] = defaultMappings.GetNamespace("");
@@ -127,7 +129,7 @@ namespace Kerbalua.MoonSharp
 			//Globals["globals"] = UserData.CreateStatic(typeof(Globals));
 
 			//Globals["globals"]=creator.Create(typeof(Globals));
-			Globals["sleep"] = new Action<double>((double waittimeSeconds) =>
+			commonAPI["sleep"] = new Action<double>((double waittimeSeconds) =>
 			{
 				//PrintErrorAction("start");
 				//UnityEngine.Debug.Log("start");
@@ -137,7 +139,7 @@ namespace Kerbalua.MoonSharp
 				//UnityEngine.Debug.Log("end");
 				//PrintErrorAction("end");
 			});
-			Globals["coroutine"]=null;
+
 
 			//coroutines.Clear();
 
@@ -212,62 +214,6 @@ namespace Kerbalua.MoonSharp
 			coroutine = null;
 			sleepwatch.Reset();
 			sleeptimeMillis=0;
-		}
-
-		delegate object DelegateTypeNew(object obj, params DynValue[] args);
-		object New(object obj, params DynValue[] dynArgs)
-		{
-			Type type=obj as Type;
-			var constructors = type.GetConstructors();
-			foreach (var constructor in constructors)
-			{
-				var parinfos = constructor.GetParameters();
-				if (parinfos.Length >= dynArgs.Length)
-				{
-					object[] args = new object[parinfos.Length];
-
-					for (int i = 0; i < args.Length; i++)
-					{
-						var parinfo = parinfos[i];
-						if (i>= dynArgs.Length)
-						{
-							if (!parinfo.IsOptional)
-							{
-								goto nextConstructor;
-							}
-							args[i] = parinfo.DefaultValue;
-						}
-						else
-						{
-							if (parinfo.ParameterType.IsValueType)
-							{
-								try
-								{
-									args[i] = System.Convert.ChangeType(dynArgs[i].ToObject(), parinfo.ParameterType);
-								}
-								catch (Exception)
-								{
-									goto nextConstructor;
-								}
-							}
-							else
-							{
-								args[i] = dynArgs[i].ToObject();
-							}
-						}
-
-					}
-
-					return constructor.Invoke(args);
-				}
-			nextConstructor:;
-			}
-
-			if (dynArgs.Length == 0)
-			{
-				return Activator.CreateInstance(type);
-			}
-			throw new Exception("Could not find constructor accepting given args for type " + type);
 		}
 	}
 }

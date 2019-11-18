@@ -15,7 +15,7 @@ using RedOnion.KSP.Attributes;
 
 namespace RedOnion.KSP.API
 {
-	[SafeProps,Description("Global variables, objects and functions.")]
+	[Description("Global variables, objects and functions.")]
 	public static class Globals
 	{
 		[Description("An api for setting which scripts will be ran when an engine is reset.")]

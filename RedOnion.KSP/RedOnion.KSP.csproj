@@ -150,7 +150,6 @@
     <Compile Include="UnsafeAPI\UnsafeAPI.cs" />
     <Compile Include="Utilities\ReferenceEqualityComparer.cs" />
     <Compile Include="MoonSharp\CommonAPI\CommonAPITable.cs" />
-    <Compile Include="MoonSharp\CommonAPI\CommonAPICreator.cs" />
     <Compile Include="MoonSharp\CommonAPI\CommonAPIMetatable.cs" />
     <Compile Include="Completion\ISafeMetatable.cs" />
     <Compile Include="Completion\Static.cs" />
@@ -158,6 +157,7 @@
     <Compile Include="Attributes\Attributes.cs" />
     <Compile Include="Settings\ProjectSettings.cs" />
     <Compile Include="MoonSharp\Interfaces\IMoonSharpCompletable.cs" />
+    <Compile Include="MoonSharp\MoonSharpAPI\MoonSharpGlobals.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RedOnion.ROS\RedOnion.ROS.csproj">
@@ -178,6 +178,7 @@
     <Folder Include="New Folder\" />
     <Folder Include="Attributes\" />
     <Folder Include="MoonSharp\Interfaces\" />
+    <Folder Include="MoonSharp\MoonSharpAPI\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
