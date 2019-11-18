@@ -18,9 +18,9 @@ namespace RedOnion.KSP.MoonSharp.CommonAPI
 			return type.IsAbstract && type.IsSealed;
 		}
 
-		public Table AddAll(Type type)
+		const BindingFlags publicStatic=BindingFlags.Public | BindingFlags.Static;
+		public Table AddAPI(Type type)
 		{
-			var publicStatic=BindingFlags.Public | BindingFlags.Static;
 			var fields=type.GetFields(publicStatic);
 			FillTableWithFields(fields);
 			var properties=type.GetProperties(publicStatic);
@@ -53,7 +53,7 @@ namespace RedOnion.KSP.MoonSharp.CommonAPI
 						{
 							newTable=this[fieldinfo.Name] as CommonAPITable;
 						}
-						newTable.AddAll(type);
+						newTable.AddAPI(type);
 					}
 					else
 					{

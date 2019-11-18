@@ -19,10 +19,10 @@ but our goal now is to:
  
 ## Differences between ROS and Lua
 
-[**Lua**](https://github.com/evandisoft/RedOnion/blob/master/Kerbalua/README.md)
+[**Lua**](Kerbalua/README.md)
 is well known scripting language
 and may offer more comfort and safety, while
-[**ROS** (Red Onion Script)](https://github.com/evandisoft/RedOnion/blob/master/RedOnion.ROS/README.md)
+[**ROS** (Red Onion Script)](RedOnion.ROS/README.md)
 aims to make coding easier.
 **ROS** was created anew and may contain bugs,
 **Lua** may lack some features but should be more stable.
@@ -34,19 +34,19 @@ and saving the modified version (which will become a file outside of the zip).
 
 ## Documentation
 
-[Common Globals](https://github.com/evandisoft/RedOnion/blob/master/RedOnion.KSP/API/Globals.md) - Objects and functions accessible by both Lua and ROS.
+[Common Globals](RedOnion.KSP/API/Globals.md) - Objects and functions accessible by both Lua and ROS.
 
-[Red Onion Script (ROS)](https://github.com/evandisoft/RedOnion/blob/master/RedOnion.ROS/README.md) - A powerful in-game scripting engine taking inspiration from several popular languages (Ruby,Python,Javascript,etc)
+[Red Onion Script (ROS)](RedOnion.ROS/README.md) - A powerful in-game scripting engine taking inspiration from several popular languages (Ruby,Python,Javascript,etc)
 
-[Lua Engine](https://github.com/evandisoft/RedOnion/blob/master/Kerbalua/README.md) - A Lua scripting engine.
+[Lua Engine](Kerbalua/README.md) - A Lua scripting engine.
 
-[Red Onion UI](https://github.com/evandisoft/RedOnion/blob/master/RedOnion.UI/README.md) - A WIP UI Library, intended to be used by modders, users, and ourselves.
+[Red Onion UI](RedOnion.UI/README.md) - A WIP UI Library, intended to be used by modders, users, and ourselves.
 
-[Troubleshooting](https://github.com/evandisoft/RedOnion/blob/master/TroubleShooting.md) - Some possible issues and solutions
+[Troubleshooting](TroubleShooting.md) - Some possible issues and solutions
 
 **Outdated:**
 
-[Common Script Api](https://github.com/evandisoft/RedOnion/blob/master/CommonScriptApi.md) - Previous documentation of the common features. Should soon become part of [Common Globals: KSP](https://github.com/evandisoft/RedOnion/blob/master/RedOnion.KSP/API/Globals.md)
+[Common Script Api](CommonScriptApi.md) - Previous documentation of the common features. Should soon become part of [Common Globals: KSP](RedOnion.KSP/API/Globals.md)
 
 ## Videos
 
@@ -58,9 +58,9 @@ Releases are hosted at [spacedock](https://spacedock.info/mod/2116/Red%20Onion) 
 
 ## Upcoming Features
 
-[Next Release](https://github.com/evandisoft/RedOnion/blob/master/ChangeLog.md#next-release)
+[Next Release](ChangeLog.md#next-release)
 
-[Planned](https://github.com/evandisoft/RedOnion/blob/master/ChangeLog.md#planned-features)
+[Planned](ChangeLog.md#planned-features)
 
 ## Feedback
 
@@ -70,4 +70,4 @@ Feedback can be left on our forum [thread](https://forum.kerbalspaceprogram.com/
 
 We welcome people of all skill levels to contribute or give feedback, ask questions, etc.
 
-Here is more information about [contributing](https://github.com/evandisoft/RedOnion/blob/master/Contributing.md).
+Here is more information about [contributing](Contributing.md).

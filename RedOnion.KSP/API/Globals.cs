@@ -28,10 +28,6 @@ namespace RedOnion.KSP.API
 		[Description("A collection of space/celestial bodies. (Safe API)")]
 		public static Bodies bodies => Bodies.Instance;
 
-		public static class GlobalsIn
-		{
-			public static int a;
-		}
 		//Not sure if I want to add this yet. It works, but not sure it will be
 		// structured this way.
 		//[Unsafe, Description("A map of kerbal names to kerbals for kerbals in the crew.")]
@@ -50,7 +46,7 @@ namespace RedOnion.KSP.API
 		[Description("Active vessel (in flight only, null otherwise).")]
 		public static Ship ship => Ship.Active;
 		[Description("Staging logic.")]
-		public static Stage stage => Stage.Instance;
+		public static Type stage=typeof(Stage);
 		[Description("Autopilot for active vessel. (`null` if no ship)")]
 		public static Autopilot autopilot => ship?.autopilot;
 		[Description("User/player controls.")]
@@ -70,9 +66,7 @@ namespace RedOnion.KSP.API
 		public static SpaceBody.Atmosphere atmosphere => body?.atmosphere ?? SpaceBody.Atmosphere.none;
 
 		[Description("PID regulator (alias to `system.pid` in ROS).")]
-		public static readonly Type pid = typeof(PID);
-		[Description("PID regulator (alias to `pid`).")]
-		public static readonly Type pidloop = typeof(PID);
+		public static readonly Type PID = typeof(PID);
 
 		[Description("User Interface.")]
 		public static readonly Type ui = typeof(UI_Namespace);

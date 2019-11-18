@@ -2,8 +2,6 @@ Our [Lua engine](https://www.lua.org/manual/5.2/) uses [MoonSharp](http://www.mo
 
 Since MoonSharp is a lua implementation that can interact with Mono/C# objects, and since KSP is implemented in C# Mono, our engine can interact with any aspect of the the [KSP Api](https://kerbalspaceprogram.com/api/annotated.html) ingame. We can provide, in in-game scripting, nearly any functionality a modmaker would normally have to access with C#.
 
-The Lua engine uses `UserData.RegistrationPolicy = InteropRegistrationPolicy.Automatic;` to automatically work with any C# class, and other global settings for various purposes. This may cause issues for other mods that use MoonSharp.
-
 Here is an example Lua script that can be [executed](https://github.com/evandisoft/RedOnion/blob/master/TroubleShooting.md#how-do-i-run-a-script) while you are in flight mode (make sure you have [the "Lua" engine selected](https://github.com/evandisoft/RedOnion/blob/master/TroubleShooting.md#script-wont-work)):
 ```
 vessel=import.FlightGlobals.ActiveVessel
