@@ -28,7 +28,7 @@ namespace Kerbalua.MoonSharp
 		public KerbaluaScript() : base(CoreModules.Preset_Complete)
 		{
 			UserData.RegistrationPolicy = InteropRegistrationPolicy.Automatic;
-			
+
 			GlobalOptions.CustomConverters
 				.SetClrToScriptCustomConversion(
 					(Script script, ModuleControlSurface m)
@@ -36,18 +36,18 @@ namespace Kerbalua.MoonSharp
 					);
 			GlobalOptions.CustomConverters
 				.SetScriptToClrCustomConversion(DataType.Function
-					, typeof(Func<object,object>), (f) => new Func<object, object>((item) =>
-					{
-						var co = CreateCoroutine(f);
-						co.Coroutine.AutoYieldCounter = 10000;
-						object retval=co.Coroutine.Resume(item);
-						if (co.Coroutine.State == CoroutineState.ForceSuspended)
-						{
-							PrintErrorAction?.Invoke("Action<object> callback unable to finish");
-							return null;
-						}
-						return retval;
-					}));
+					, typeof(Func<object, object>), (f) => new Func<object, object>((item) =>
+					 {
+						 var co = CreateCoroutine(f);
+						 co.Coroutine.AutoYieldCounter = 10000;
+						 object retval=co.Coroutine.Resume(item);
+						 if (co.Coroutine.State == CoroutineState.ForceSuspended)
+						 {
+							 PrintErrorAction?.Invoke("Action<object> callback unable to finish");
+							 return null;
+						 }
+						 return retval;
+					 }));
 			GlobalOptions.CustomConverters
 				.SetScriptToClrCustomConversion(DataType.Function
 					, typeof(System.Action<object>), (f) => new Action<object>((item) =>
@@ -73,8 +73,14 @@ namespace Kerbalua.MoonSharp
 						PrintErrorAction?.Invoke("UnityAction callback unable to finish");
 					}
 				}));
-			Globals.MetaTable = API.LuaGlobals.Instance;
+			//Globals.MetaTable = API.LuaGlobals.Instance;
 			//Globals["Vessel"] = FlightGlobals.ActiveVessel;
+			var creator=new CommonAPICreator(this);
+			var metatable=new Table(this);
+			var commonAPI=creator.Create(typeof(Globals));
+			metatable["__index"]=commonAPI;
+			Globals.MetaTable=metatable;
+			
 			var defaultMappings = NamespaceMappings.DefaultAssemblies;
 			Globals["new"] = new DelegateTypeNew(New);
 			Globals["static"] = new Func<object, DynValue>((o) =>
@@ -98,29 +104,29 @@ namespace Kerbalua.MoonSharp
 				}
 				return DynValue.FromObject(this,o.GetType());
 			});
-			Globals["assemblies"] = new Func<List<Assembly>>(() =>
-			{
-				return AppDomain.CurrentDomain.GetAssemblies().ToList();
-			});
+			//Globals["assemblies"] = new Func<List<Assembly>>(() =>
+			//{
+			//	return AppDomain.CurrentDomain.GetAssemblies().ToList();
+			//});
 
-			Globals["printall"] = DoString(
-			@"
-				return function(lst) for i=0,lst.Count-1 do print(i..' '..lst[i].ToString()) end end
-				");
+			//Globals["printall"] = DoString(
+			//@"
+				//return function(lst) for i=0,lst.Count-1 do print(i..' '..lst[i].ToString()) end end
+				//");
 			//Globals["Assembly"] = typeof(Assembly);
 			//Assembly blah;
-			Globals["import"] = defaultMappings.GetNamespace("");
+			//Globals["import"] = defaultMappings.GetNamespace("");
 			//Globals["Coll"] = allMappings.GetNamespace("System.Collections.Generic");
-			Globals["reldir"] = new Func<double, double, RelativeDirection>((heading, pitch) => new RelativeDirection(heading, pitch));
+			//Globals["reldir"] = new Func<double, double, RelativeDirection>((heading, pitch) => new RelativeDirection(heading, pitch));
 			//Globals["AppDomain"] = UserData.CreateStatic(typeof(AppDomain));
 			//Globals["AssemblyStatic"] = UserData.CreateStatic(typeof(Assembly));
 			//UserData.RegisterExtensionType(typeof(System.Linq.Enumerable));
 			//UserData.RegisterAssembly(Assembly.GetAssembly(typeof(System.Linq.Enumerable)),true);
-			var coroutines=Globals["coroutine"] as Table;
-			var coroYield=coroutines["yield"];
+			//var coroutines=Globals["coroutine"] as Table;
+			//var coroYield=coroutines["yield"];
 			//Globals["globals"] = UserData.CreateStatic(typeof(Globals));
-			var creator=new CommonAPICreator(this);
-			Globals["globals"]=creator.Create(typeof(Globals));
+
+			//Globals["globals"]=creator.Create(typeof(Globals));
 			Globals["sleep"] = new Action<double>((double waittimeSeconds) =>
 			{
 				//PrintErrorAction("start");
