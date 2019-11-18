@@ -26,7 +26,7 @@ namespace RedOnion.KSP.MoonSharp.CommonAPI
 		Table CreateTableFromStaticType(Type type)
 		{
 			var table=new CommonAPITable(script);
-			var metatable=new APIPropertyMetatable(script);
+			var metatable=new CommonAPIMetatable(script);
 			table.MetaTable=metatable;
 			var publicStatic=BindingFlags.Public | BindingFlags.Static;
 			var fields=type.GetFields(publicStatic);
@@ -65,7 +65,7 @@ namespace RedOnion.KSP.MoonSharp.CommonAPI
 			}
 		}
 
-		void FillTableWithProperties(PropertyInfo[] propertyInfos, APIPropertyMetatable metatable)
+		void FillTableWithProperties(PropertyInfo[] propertyInfos, CommonAPIMetatable metatable)
 		{
 			foreach (var propertyInfo in propertyInfos)
 			{
@@ -77,7 +77,10 @@ namespace RedOnion.KSP.MoonSharp.CommonAPI
 		{
 			foreach (var methodInfo in methodInfos)
 			{
-				table[methodInfo.Name]=GetDelegateFromMethodInfo(methodInfo);
+				if (!methodInfo.IsSpecialName)
+				{
+					table[methodInfo.Name]=GetDelegateFromMethodInfo(methodInfo);
+				}
 			}
 		}
 

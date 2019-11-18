@@ -17,6 +17,7 @@ using RedOnion.KSP.ReflectionUtil;
 using System.Diagnostics;
 using RedOnion.KSP.API;
 using System.Linq.Expressions;
+using RedOnion.KSP.MoonSharp.CommonAPI;
 
 namespace Kerbalua.MoonSharp
 {
@@ -117,8 +118,9 @@ namespace Kerbalua.MoonSharp
 			//UserData.RegisterAssembly(Assembly.GetAssembly(typeof(System.Linq.Enumerable)),true);
 			var coroutines=Globals["coroutine"] as Table;
 			var coroYield=coroutines["yield"];
-			Globals["globals"] = UserData.CreateStatic(typeof(Globals));
-			
+			//Globals["globals"] = UserData.CreateStatic(typeof(Globals));
+			var creator=new CommonAPICreator(this);
+			Globals["globals"]=creator.Create();
 			Globals["sleep"] = new Action<double>((double waittimeSeconds) =>
 			{
 				//PrintErrorAction("start");
