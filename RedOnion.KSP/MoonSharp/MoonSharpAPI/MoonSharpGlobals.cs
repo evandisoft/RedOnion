@@ -69,11 +69,11 @@ namespace RedOnion.KSP.MoonSharp.MoonSharpAPI
 		}
 
 		[Unsafe,Description("Unsafe, reflection stuff.")]
-		public static readonly Type reflection=typeof(MoonSharpReflection);
+		public static readonly Type reflection=typeof(Reflection);
 	}
 
-	[Description("List of functions that are specific to KerbaluaScript.")]
-	public static class MoonSharpReflection
+	[Description("Reflection functionality specific to Moonsharp.")]
+	public static class Reflection
 	{
 		[Description("Returns true if the argument is a static.")]
 		public static bool isstatic(DynValue dynValue)

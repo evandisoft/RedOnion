@@ -20,6 +20,7 @@ namespace RedOnion.KSP.MoonSharp.CommonAPI
 
 		public IList<string> PossibleCompletions => properties.Keys.ToList();
 		Dictionary<string,Func<DynValue>> properties=new Dictionary<string,Func<DynValue>>();
+		Dictionary<string,PropertyInfo> propertyInfos=new Dictionary<string,PropertyInfo>();
 
 		public void SetProperty(PropertyInfo propertyInfo)
 		{
@@ -29,12 +30,13 @@ namespace RedOnion.KSP.MoonSharp.CommonAPI
 
 				return DynValue.FromObject(OwnerScript, value);
 			});
-				
+			propertyInfos[propertyInfo.Name]=propertyInfo;
 		}
 
 		public bool TryGetCompletion(string completionName, out object completion)
 		{
 			completion=GetProperty(this, DynValue.NewString(completionName));
+
 			return completion!=null;
 		}
 
@@ -47,7 +49,15 @@ namespace RedOnion.KSP.MoonSharp.CommonAPI
 
 			var str=key.String;
 			var func=properties[str];
-			return func();
+			var value=func();
+
+			if (value.IsNil())
+			{
+				Type propertyType=propertyInfos[str].PropertyType;
+				return DynValue.FromObject(OwnerScript, new InstanceStatic(propertyType));
+			}
+			//func.GetMethodInfo().ReturnType
+			return value;
 		}
 	}
 }
