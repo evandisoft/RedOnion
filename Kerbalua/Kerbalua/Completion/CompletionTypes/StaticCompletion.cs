@@ -48,8 +48,8 @@ namespace Kerbalua.Completion.CompletionTypes
 				var obj = fieldInfo.GetValue(null);
 				if (obj==null)
 				{
-					completionObject=null;
-					return false;
+					completionObject=new InstanceStaticCompletion(type);
+					return true;
 				}
 				completionObject=GetCompletionObject(obj);
 				CompletionQueue.Log("static field access");
@@ -66,8 +66,8 @@ namespace Kerbalua.Completion.CompletionTypes
 					var obj = propertyInfo.GetValue(null);
 					if (obj==null)
 					{
-						completionObject=null;
-						return false;
+						completionObject=new InstanceStaticCompletion(type);
+						return true;
 					}
 					completionObject=GetCompletionObject(obj);
 					CompletionQueue.Log("static property access");

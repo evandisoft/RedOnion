@@ -54,8 +54,8 @@ namespace Kerbalua.Completion.CompletionTypes
 				var fieldObj = fieldInfo.GetValue(obj);
 				if (fieldObj==null)
 				{
-					completionObject=null;
-					return false;
+					completionObject=new InstanceStaticCompletion(type);
+					return true;
 				}
 				completionObject=GetCompletionObject(fieldObj);
 				CompletionQueue.Log("instance field access");
@@ -71,8 +71,8 @@ namespace Kerbalua.Completion.CompletionTypes
 					var propObj = propertyInfo.GetValue(obj);
 					if (propObj==null)
 					{
-						completionObject=null;
-						return false;
+						completionObject=new InstanceStaticCompletion(type);
+						return true;
 					}
 					completionObject=GetCompletionObject(propObj);
 					CompletionQueue.Log("instance safe property access");

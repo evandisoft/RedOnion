@@ -28,7 +28,7 @@ namespace LiveRepl.Parts
 #if DEBUG
 			replButtons.AddFixed(ScriptWindow.centerGroupWidth, new Button("Print Logs", () =>
 				{
-					uiparts.replOutoutArea.Clear();
+					//uiparts.replOutoutArea.Clear();
 					uiparts.replOutoutArea.AddText(CompletionQueue.String());
 				}));
 #endif
