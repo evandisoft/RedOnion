@@ -28,10 +28,6 @@ namespace RedOnion.KSP.API
 		[Description("A collection of space/celestial bodies. (Safe API)")]
 		public static Bodies bodies => Bodies.Instance;
 
-		public static class GlobalsIn
-		{
-			public static int a;
-		}
 		//Not sure if I want to add this yet. It works, but not sure it will be
 		// structured this way.
 		//[Unsafe, Description("A map of kerbal names to kerbals for kerbals in the crew.")]
