@@ -146,7 +146,7 @@ namespace Kerbalua.Other {
 		/// </summary>
 		public virtual void ResetEngine()
 		{
-			FlightControl.GetInstance().Shutdown();
+			FlightControl.Instance.Shutdown();
 			Ship.DisableAutopilot();
 		}
 	}

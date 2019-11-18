@@ -46,7 +46,17 @@ namespace RedOnion.KSP.MoonSharp.CommonAPI
 				var fieldValue=fieldinfo.GetValue(null);
 				if (fieldValue.GetType().Name=="RuntimeType")
 				{
-					table[fieldinfo.Name]=CreateTableFromStaticType(fieldValue as Type);
+					Type type=fieldValue as Type;
+					// Apparently this is how to check if a type is a static class
+					// https://stackoverflow.com/questions/1175888/determine-if-a-type-is-static
+					if (type.IsAbstract && type.IsSealed)
+					{
+						table[fieldinfo.Name]=CreateTableFromStaticType(fieldValue as Type);
+					}
+					else
+					{
+						table[fieldinfo.Name]=UserData.CreateStatic(type);
+					}
 				}
 				else
 				{

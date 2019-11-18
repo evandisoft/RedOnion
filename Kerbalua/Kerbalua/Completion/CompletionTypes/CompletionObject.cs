@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using MoonSharp.Interpreter;
 using RedOnion.KSP.Completion;
+using RedOnion.KSP.MoonSharp.Interfaces;
 
 namespace Kerbalua.Completion.CompletionTypes
 {
@@ -96,6 +97,12 @@ namespace Kerbalua.Completion.CompletionTypes
 			{
 				CompletionQueue.Log("obj is Static -> Static");
 				return new StaticCompletion(static1.type);
+			}
+
+			if (obj is IMoonSharpCompletable m)
+			{
+				CompletionQueue.Log("obj is IMoonSharpCompletable");
+				return new MoonSharpCompletable(m);
 			}
 
 			if (obj is ICompletable completable)

@@ -45,7 +45,63 @@ namespace KerbaluaNUnit {
 		}
 
 
+		//[Test()]
+		//public void LUA_IntellisenseTests_Static()
+		//{
+		//	var operations = new CompletionOperations(
+		//		MoonSharpIntellisense.Parse(
+		//		@"Adf.asdfg."
+		//			).Segments);
+		//	Setup();
+		//	globals["Adf"]=UserData.CreateStatic(typeof(Adf));
+		//	object currentObject = script.Globals;
+		//	IList<string> completions=new List<string>();
+		//	//Console.WriteLine(operations);
+		//	completions = OperationsProcessor.StaticGetPossibleCompletions(currentObject);
 
+		//	Assert.IsTrue(OperationsProcessor.TryProcessOperation(currentObject, operations, out currentObject));
+		//	//Console.WriteLine(operations);
+
+		//	completions = OperationsProcessor.StaticGetPossibleCompletions(currentObject);
+
+		//	//foreach (var c in OperationsProcessor.StaticGetPossibleCompletions(currentObject,operations))
+		//	//{
+		//	//	Console.WriteLine(c);
+		//	//}
+		//	Assert.IsTrue(OperationsProcessor.TryProcessOperation(currentObject, operations, out currentObject));
+		//	//Console.WriteLine(operations);
+		//	completions = OperationsProcessor.StaticGetPossibleCompletions(currentObject);
+		//	//PrintAll(completions);
+		//	Assert.AreEqual(11, completions.Count);
+		//	//Console.WriteLine(operations);
+		//}
+
+		//[Test()]
+		//public void LUA_IntellisenseTests_Instance()
+		//{
+		//	var operations = new CompletionOperations(
+		//		MoonSharpIntellisense.Parse(
+		//		@"Adf.asd."
+		//			).Segments);
+		//	Setup();
+		//	globals["Adf"] = new Adf();
+		//	object currentObject = script.Globals;
+		//	IList<string> completions = new List<string>();
+		//	//Console.WriteLine(operations);
+		//	Assert.IsTrue(OperationsProcessor.TryProcessOperation(currentObject, operations, out currentObject));
+		//	//Console.WriteLine(operations);
+		//	completions = OperationsProcessor.StaticGetPossibleCompletions(currentObject);
+		//	//foreach (var c in OperationsProcessor.StaticGetPossibleCompletions(currentObject,operations))
+		//	//{
+		//	//	Console.WriteLine(c);
+		//	//}
+		//	Assert.IsTrue(OperationsProcessor.TryProcessOperation(currentObject, operations, out currentObject));
+		//	//Console.WriteLine(operations);
+		//	completions = OperationsProcessor.StaticGetPossibleCompletions(currentObject);
+		//	//PrintAll(completions);
+
+		//	//Console.WriteLine(operations);
+		//}
 
 
 		//[Test()]

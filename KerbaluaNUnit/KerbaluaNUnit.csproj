@@ -62,6 +62,7 @@
     <Compile Include="TestingUtil.cs" />
     <Compile Include="LUA_IntellisenseTests.cs" />
     <Compile Include="LUA_ImplicitReturnTests.cs" />
+    <Compile Include="LUA_CommonAPIInstantiationTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Kerbalua\Kerbalua.csproj">
