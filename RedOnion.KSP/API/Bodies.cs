@@ -19,9 +19,11 @@ namespace RedOnion.KSP.API
 		Vector3d position { get; }
 		ISpaceObject body { get; }
 	} 
-	public class Bodies : Properties<SpaceBody>.WithMap<CelestialBody>
+	public class Bodies : Properties<SpaceBody>.WithMap<CelestialBody>, ICompletable
 	{
 		public static Bodies Instance { get; } = new Bodies();
+		// this is only temporary, `Properties` need some redesign
+		IList<string> ICompletable.PossibleCompletions => dict.Keys.ToList();
 
 		protected Bodies()
 		{

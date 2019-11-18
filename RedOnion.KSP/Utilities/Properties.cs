@@ -93,7 +93,7 @@ discovered assemblies, namespaces, classes etc.")]
 		IList<string> ICompletable.PossibleCompletions => strict.Keys.ToList();
 		bool ICompletable.TryGetCompletion(string completionName, out object completion)
 		{
-			if (strict.TryGetValue(completionName, out var at))
+			if (strict.TryGetValue(completionName, out var at) || dict.TryGetValue(completionName, out at))
 			{
 				completion = list[at].Value;
 				return true;
