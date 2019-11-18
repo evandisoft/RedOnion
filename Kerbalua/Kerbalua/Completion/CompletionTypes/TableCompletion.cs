@@ -137,8 +137,8 @@ namespace Kerbalua.Completion.CompletionTypes
 
 			CompletionQueue.Log("Trying array access");
 
+			CompletionQueue.Log("exp was {"+getArrayAccess.exp?.GetText()+"}");
 			var strNode=getArrayAccess.exp.@string();
-			CompletionQueue.Log("Exp was {"+strNode.GetText()+"}");
 			if (strNode!=null)
 			{
 				var stringLiteral=strNode.NORMALSTRING() ?? strNode.LONGSTRING() ?? strNode.CHARSTRING();

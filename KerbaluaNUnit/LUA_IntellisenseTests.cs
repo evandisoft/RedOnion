@@ -118,10 +118,10 @@ namespace KerbaluaNUnit
 			globals["Import"] = allMappings.GetNamespace("");
 			//globals["Adf"] = new Adf();
 			string source =
-				@"Import.System.Collections.Generic.List.";
+				@"Import.System.Collections.Generic.List";
 
 			var completions = GetCompletions(source);
-			//PrintAll(completions);
+			PrintAll(completions);
 			Assert.Less(1, completions.Count);
 
 			//Assert.AreEqual(11, completions.Count);
