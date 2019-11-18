@@ -2,6 +2,7 @@
 
 Used to get, set, or modify the current list of scripts that are to be autoran  whenever an engine is initialized or reset.
 
+- `clear()`: void - Clears the list and saves the empty list.
 - `scripts()`: IList`1 - Returns a list of the current autorun scripts
 - `save()`: void, scripts IList`1
   - Saves the given list of scripts as the new list of autorun scripts.
