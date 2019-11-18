@@ -1,5 +1,6 @@
 using System;
 using RedOnion.KSP.API;
+using RedOnion.KSP.Namespaces;
 
 namespace KerbaluaNUnit
 {
@@ -12,5 +13,8 @@ namespace KerbaluaNUnit
 			c=b+1;
 			return b;
 		}
+
+		public static readonly Type ui = typeof(UI_Namespace);
+		public static readonly Type autorun = typeof(AutoRun);
 	}
 }

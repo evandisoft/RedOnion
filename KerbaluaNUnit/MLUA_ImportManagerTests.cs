@@ -7,10 +7,10 @@ using MoonSharp.Interpreter;
 
 namespace KerbaluaNUnit {
 	[TestFixture()]
-	public class LUA_ImportManagerTests 
+	public class MLUA_ImportManagerTests 
 	{
 		[Test()]
-		public void LUA_ImportManager_1()
+		public void MLUA_ImportManager_1()
 		{
 			var mappings = NamespaceMappings.ForAllAssemblies;
 			var namespaceInstance = mappings.GetNamespace("System.Collections.Generic");
@@ -23,7 +23,7 @@ namespace KerbaluaNUnit {
 		}
 
 		[Test()]
-		public void LUA_ImportManager_2()
+		public void MLUA_ImportManager_2()
 		{
 			var mappings = NamespaceMappings.ForAllAssemblies;
 			var namespaceInstance = mappings.GetNamespace("")
@@ -40,7 +40,7 @@ namespace KerbaluaNUnit {
 		}
 
 		[Test()]
-		public void LUA_ImportManager_3()
+		public void MLUA_ImportManager_3()
 		{
 			var mappings = NamespaceMappings.ForAllAssemblies;
 			var namespaceInstance = mappings.GetNamespace("")
@@ -54,7 +54,7 @@ namespace KerbaluaNUnit {
 		}
 
 		[Test()]
-		public void LUA_ImportManager_4()
+		public void MLUA_ImportManager_4()
 		{
 			var mappings = NamespaceMappings.ForAllAssemblies;
 			var namespaceInstance = mappings.GetNamespace("")
@@ -69,7 +69,7 @@ namespace KerbaluaNUnit {
 		}
 
 		[Test()]
-		public void LUA_ImportManager_5()
+		public void MLUA_ImportManager_5()
 		{
 			var mappings = NamespaceMappings.ForAllAssemblies;
 			var namespaceInstance = mappings.GetNamespace("")
@@ -84,7 +84,7 @@ namespace KerbaluaNUnit {
 		}
 
 		[Test()]
-		public void LUA_ImportManager_6()
+		public void MLUA_ImportManager_6()
 		{
 			var mappings = NamespaceMappings.ForAllAssemblies;
 			var namespaceInstance = mappings.GetNamespace("")
@@ -98,7 +98,7 @@ namespace KerbaluaNUnit {
 		}
 
 		[Test()]
-		public void LUA_ImportManager_7()
+		public void MLUA_ImportManager_7()
 		{
 			var mappings = NamespaceMappings.ForAllAssemblies;
 			var namespaceInstance = mappings.GetNamespace("System");
@@ -111,7 +111,7 @@ namespace KerbaluaNUnit {
 		}
 
 		[Test()]
-		public void LUA_ImportManager_8()
+		public void MLUA_ImportManager_8()
 		{
 			var mappings = NamespaceMappings.ForAllAssemblies;
 			var namespaceInstance = mappings.GetNamespace("System");
@@ -124,7 +124,7 @@ namespace KerbaluaNUnit {
 		}
 
 		[Test()]
-		public void LUA_ImportManager_9_CaseInsensitivity()
+		public void MLUA_ImportManager_9_CaseInsensitivity()
 		{
 			var mappings = NamespaceMappings.ForAllAssemblies;
 			var namespaceInstance = mappings.GetNamespace("system");
@@ -138,7 +138,7 @@ namespace KerbaluaNUnit {
 
 		// this test doesn't work properly
 		[Test()]
-		public void LUA_ImportManager_10_LuaInterface()
+		public void MLUA_ImportManager_10_LuaInterface()
 		{
 			var mappings = NamespaceMappings.ForAllAssemblies;
 			var namespaceInstance = mappings.GetNamespace("system.collections.generic");

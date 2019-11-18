@@ -48,10 +48,34 @@ namespace KerbaluaNUnit
 			return d.Table;
 		}
 
-		void TypeCheck(DynValue d,Type type)
+		public DynValue[] CallCheck(DynValue f,object[] args,object[] expectedOutput)
+		{
+			script.Globals["fun"]=f;
+			script.Globals["args"]=new Table(script, ObjectsToDynValues(args));
+			DynValue result=script.DoString($"return fun(table.unpack(args))");
+			DynValue[] results=result.Tuple;
+			Assert.AreEqual(results.Length, expectedOutput.Length, "Return values number differs");
+			for(int i = 0; i<results.Length; i++)
+			{
+				Assert.AreEqual(results[i].ToObject(), expectedOutput[i], i.ToString()+"th return value is wrong");
+			}
+			return results;
+		}
+
+		public void TypeCheck(DynValue d,Type type)
 		{
 			object o=d.ToObject();
 			Assert.IsInstanceOf(type, o);
+		}
+
+		DynValue[] ObjectsToDynValues(object[] objs)
+		{
+			var ds=new DynValue[objs.Length];
+			for(int i = 0; i<ds.Length; i++)
+			{
+				ds[i]=DynValue.FromObject(script,objs[i]);
+			}
+			return ds;
 		}
 
 		public bool IsStatic(DynValue d)

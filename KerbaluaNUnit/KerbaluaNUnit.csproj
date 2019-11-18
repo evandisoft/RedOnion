@@ -56,13 +56,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="LUA_ProcessedIncompleteVarTests.cs" />
-    <Compile Include="LUA_ImportManagerTests.cs" />
-    <Compile Include="LUA_CompletionOperationsTests.cs" />
+    <Compile Include="MLUA_ProcessedIncompleteVarTests.cs" />
+    <Compile Include="MLUA_ImportManagerTests.cs" />
+    <Compile Include="MLUA_CompletionOperationsTests.cs" />
     <Compile Include="TestingUtil.cs" />
-    <Compile Include="LUA_IntellisenseTests.cs" />
-    <Compile Include="LUA_ImplicitReturnTests.cs" />
-    <Compile Include="LUA_DummyAPITests.cs" />
+    <Compile Include="MLUA_IntellisenseTests.cs" />
+    <Compile Include="MLUA_ImplicitReturnTests.cs" />
+    <Compile Include="MLUA_DummyAPITests.cs" />
     <Compile Include="CommonAPITestUtil.cs" />
     <Compile Include="ScriptTester.cs" />
     <Compile Include="DummyAPI.cs" />
