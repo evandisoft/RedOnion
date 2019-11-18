@@ -253,7 +253,7 @@ namespace RedOnion.KSP.API
 
 		[Convert(typeof(Vector)), Description("Vector pointing forward (from cockpit - in the direction of the 'nose').")]
 		public Vector3d forward => native.transform.up;
-		[Convert(typeof(Vector)), Description("Vector pointing backward (from cockpit - in the direction of the 'nose').")]
+		[Convert(typeof(Vector)), Description("Vector pointing backward (from cockpit - in the direction of the 'tail').")]
 		public Vector3d back => -native.transform.up;
 		[Convert(typeof(Vector)), Description("Vector pointing up (from cockpit).")]
 		public Vector3d up => -native.transform.forward;
@@ -261,7 +261,7 @@ namespace RedOnion.KSP.API
 		public Vector3d down => native.transform.forward;
 		[Convert(typeof(Vector)), Description("Vector pointing left (from cockpit).")]
 		public Vector3d left => -native.transform.right;
-		[Convert(typeof(Vector)), Description("Vector pointing left (from cockpit).")]
+		[Convert(typeof(Vector)), Description("Vector pointing right (from cockpit).")]
 		public Vector3d right => native.transform.right;
 
 		// see https://en.wikipedia.org/wiki/Axes_conventions#Ground_reference_frames_for_attitude_description

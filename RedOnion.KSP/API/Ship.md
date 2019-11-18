@@ -47,11 +47,11 @@ Active vessel
 - `srfVelocity`: Vector3d - Current surface velocity (Alias to `surfaceVelocity`).
 - `srfvel`: Vector3d - Current surface velocity (Alias to `surfaceVelocity`).
 - `forward`: Vector3d - Vector pointing forward (from cockpit - in the direction of the 'nose').
-- `back`: Vector3d - Vector pointing backward (from cockpit - in the direction of the 'nose').
+- `back`: Vector3d - Vector pointing backward (from cockpit - in the direction of the 'tail').
 - `up`: Vector3d - Vector pointing up (from cockpit).
 - `down`: Vector3d - Vector pointing down (from cockpit).
 - `left`: Vector3d - Vector pointing left (from cockpit).
-- `right`: Vector3d - Vector pointing left (from cockpit).
+- `right`: Vector3d - Vector pointing right (from cockpit).
 - `north`: Vector3d - Vector pointing north in the plane that is tangent to sphere centered in orbited body.
 - `east`: Vector3d - Vector pointing east (tangent to sphere centered in orbited body).
 - `away`: Vector3d - Vector pointing away from orbited body (aka *up*, but we use `up` for cockpit-up).
