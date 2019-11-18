@@ -19,6 +19,7 @@ using RedOnion.KSP.API;
 using System.Linq.Expressions;
 using RedOnion.KSP.MoonSharp.CommonAPI;
 using System.ComponentModel;
+using RedOnion.KSP.MoonSharp.MoonSharpAPI;
 
 namespace Kerbalua.MoonSharp
 {
@@ -79,24 +80,25 @@ namespace Kerbalua.MoonSharp
 			var metatable=new Table(this);
 			var commonAPI=new CommonAPITable(this);
 			commonAPI.AddAPI(typeof(Globals));
+			commonAPI.AddAPI(typeof(MoonSharpGlobals));
 
 			metatable["__index"]=commonAPI;
 			Globals.MetaTable=metatable;
 			Globals.Remove("coroutine");
 			
-			var defaultMappings = NamespaceMappings.DefaultAssemblies;
-			commonAPI["new"] = new DelegateTypeNew(@new);
+			//var defaultMappings = NamespaceMappings.DefaultAssemblies;
+			//commonAPI["new"] = new DelegateTypeNew(@new);
 
-			var reflection=new Table(this);
-			commonAPI["reflection"] = reflection;
+			//var reflection=new Table(this);
+			//commonAPI["reflection"] = reflection;
 
-			reflection["getstatic"] = new Func<DynValue, DynValue>(getstatic);
+			//reflection["getstatic"] = new Func<DynValue, DynValue>(getstatic);
 
-			reflection["isstatic"] = new Func<DynValue, DynValue>(isstatic);
+			//reflection["isstatic"] = new Func<DynValue, DynValue>(isstatic);
 
-			reflection["isclrtype"] = new Func<DynValue, DynValue>(isclrtype);
+			//reflection["isclrtype"] = new Func<DynValue, DynValue>(isclrtype);
 
-			reflection["getclrtype"] = new Func<DynValue, DynValue>(getclrtype);
+			//reflection["getclrtype"] = new Func<DynValue, DynValue>(getclrtype);
 
 			commonAPI["sleep"] = new Action<double>(sleep);
 
@@ -174,107 +176,12 @@ namespace Kerbalua.MoonSharp
 			sleeptimeMillis=0;
 		}
 
-		[Description("Returns a static based on the given Type or object.")]
-		public DynValue getstatic(DynValue dynValue)
-		{
-			object o=dynValue.ToObject();
-			if (o is Type t)
-			{
-				return UserData.CreateStatic(t);
-			}
-			return UserData.CreateStatic(o.GetType());
-		}
-
-		[Description("Returns true if the argument is a static.")]
-		public DynValue isstatic(DynValue dynValue)
-		{
-			return DynValue.NewBoolean(dynValue.UserData!=null && dynValue.UserData.Object==null);
-		}
-
-		[Description("Returns true if the argument is a Type.")]
-		public DynValue isclrtype(DynValue dynValue)
-		{
-			return DynValue.NewBoolean(dynValue.UserData!=null && dynValue.UserData.Object!=null && dynValue.ToObject() is Type);
-		}
-
-		[Description("Returns the underyling clr type associated with this DynValue.")]
-		public DynValue getclrtype(DynValue dynValue)
-		{
-			if (dynValue.Type==DataType.UserData)
-			{
-				return DynValue.FromObject(this, dynValue.UserData.Descriptor.Type);
-			}
-			object o=dynValue.ToObject();
-			if (o is Type t)
-			{
-				return DynValue.FromObject(this, t);
-			}
-			return DynValue.FromObject(this, o.GetType());
-		}
-
 		[Description("Cause the script to sleep for waittimeSeconds seconds.")]
 		public void sleep(double waittimeSeconds)
 		{
 			sleeptimeMillis=waittimeSeconds*1000;
 			sleepwatch.Start();
 			coroutine.Coroutine.AutoYieldCounter=0;
-		}
-
-		delegate object DelegateTypeNew(object obj, params DynValue[] args);
-		[Description("Create new objects given a type or static in lua followed by the arguments to the constructor.")]
-		public object @new(object obj, params DynValue[] dynArgs)
-		{
-			Type type=obj as Type;
-			var constructors = type.GetConstructors();
-			foreach (var constructor in constructors)
-			{
-				var parinfos = constructor.GetParameters();
-				if (parinfos.Length >= dynArgs.Length)
-				{
-					object[] args = new object[parinfos.Length];
-
-					for (int i = 0; i < args.Length; i++)
-					{
-						var parinfo = parinfos[i];
-						if (i>= dynArgs.Length)
-						{
-							if (!parinfo.IsOptional)
-							{
-								goto nextConstructor;
-							}
-							args[i] = parinfo.DefaultValue;
-						}
-						else
-						{
-							if (parinfo.ParameterType.IsValueType)
-							{
-								try
-								{
-									args[i] = System.Convert.ChangeType(dynArgs[i].ToObject(), parinfo.ParameterType);
-								}
-								catch (Exception)
-								{
-									goto nextConstructor;
-								}
-							}
-							else
-							{
-								args[i] = dynArgs[i].ToObject();
-							}
-						}
-
-					}
-
-					return constructor.Invoke(args);
-				}
-			nextConstructor:;
-			}
-
-			if (dynArgs.Length == 0)
-			{
-				return Activator.CreateInstance(type);
-			}
-			throw new Exception("Could not find constructor accepting given args for type " + type);
 		}
 	}
 }
