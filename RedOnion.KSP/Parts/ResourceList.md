@@ -2,7 +2,7 @@
 
 List of resources (read-only). Can either belong to single part or to list/set of parts.
 
-- `[index]`: [Resource](Resource.md) - Get resource by name. Returns null for non-existent resource.
+- `[name string]`: [Resource](Resource.md) - Get resource by name. Returns null for non-existent resource.
 - `count`: int - Number of elements in the list (or set).
 - `getAmountOf()`: double, name string
   - Get amount of resource (in part or set/list) by name. Returns zero for non-existent resources.

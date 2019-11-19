@@ -22,7 +22,7 @@ Engine of a ship (vehicle/vessel).
 - `resources`: [ResourceList](ResourceList.md) - Resources contained within this part.
 - `state`: PartStates - State of the part (IDLE, ACTIVE (e.g. engine), DEACTIVATED, DEAD, FAILED).
 - `istype()`: bool, name string
-  - Accepts `sensor`. (Case insensitive)
+  - Accepts `engine`. (Case insensitive)
 - `getIsp()`: double, atm double
   - Get specific impulse [kN] at atmospheric pressure (0 = vacuum, 1 = Kerbin sea-level pressure, NaN = current pressure).
 - `getThrust()`: double, atm double, throttle double

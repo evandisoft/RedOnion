@@ -14,7 +14,7 @@ NOTE: Subject to change - may revert to `Vector3d` with custom descriptor.
 - `normalized`: [Vector](Vector.md) - Get normalized vector (size 1).
 - `Vector3`: Vector3 - Native UnityEngine.Vector3 (`float x,y,z`).
 - `Vector2`: Vector2 - Native UnityEngine.Vector2 (`float x,y`).
-- `[index]`: double - Index the coordinates as double[3]
+- `[i int]`: double - Index the coordinates as double[3]
 - `dot()`: double, rhs ConstVector
   - Dot product of this vector and another vector.
 - `angle()`: double, rhs ConstVector
