@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Kerbalua.Kerbnlua;
 using Kerbalua.Other;
 using Kerbalui.Controls;
 using Kerbalui.Util;
@@ -93,13 +92,13 @@ namespace LiveRepl
 				PrintAction = uiparts.replOutoutArea.AddOutput,
 				PrintErrorAction = uiparts.replOutoutArea.AddError
 			};
-#if DEBUG
-			replEvaluators["nLua"] = new KerbnluaReplEvaluator()
-			{
-				PrintAction = uiparts.replOutoutArea.AddOutput,
-				PrintErrorAction = uiparts.replOutoutArea.AddError
-			};
-#endif
+//#if DEBUG
+//			replEvaluators["nLua"] = new KerbnluaReplEvaluator()
+//			{
+//				PrintAction = uiparts.replOutoutArea.AddOutput,
+//				PrintErrorAction = uiparts.replOutoutArea.AddError
+//			};
+//#endif
 			var scriptEngineSelector=uiparts.scriptEngineSelector;
 
 			string lastEngineName = SavedSettings.LoadSetting("lastEngine", "Lua");

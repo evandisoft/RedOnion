@@ -4,7 +4,7 @@ using System.Text;
 using System.IO;
 using System.Reflection;
 
-namespace Kerbalua.Utility {
+namespace RedOnion.KSP.Debugging {
     public class QueueLogger {
         static QueueLogger()
         {
