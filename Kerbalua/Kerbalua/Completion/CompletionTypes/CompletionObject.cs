@@ -93,6 +93,12 @@ namespace Kerbalua.Completion.CompletionTypes
 				return new RuntimeTypeCompletion(obj as Type);
 			}
 
+			if (obj is InstanceStatic instance1)
+			{
+				CompletionQueue.Log("obj is Instance -> Instance");
+				return new InstanceStaticCompletion(instance1.type);
+			}
+
 			if (obj is Static static1)
 			{
 				CompletionQueue.Log("obj is Static -> Static");

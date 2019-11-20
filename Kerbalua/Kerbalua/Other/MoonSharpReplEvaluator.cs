@@ -84,11 +84,30 @@ namespace Kerbalua.Other
 					else if (dynResult.Type == DataType.Nil || dynResult.Type== DataType.Void)
 					{
 						result = dynResult.ToString();
+						return isComplete;
 					}
-					else
+
+					result += dynResult.ToObject().ToString();
+
+					if (dynResult.UserData==null)
 					{
-						result += dynResult.ToObject().ToString();
+						return isComplete;
 					}
+
+					// This is a static.
+					if (dynResult.UserData.Object==null)
+					{
+						return isComplete;
+					}
+
+					// This is a type
+					if (dynResult.ToObject() is Type)
+					{
+						result += " (type)";
+						return isComplete;
+					}
+
+					return isComplete;
 				}
 				else
 				{

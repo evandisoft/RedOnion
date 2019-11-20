@@ -158,6 +158,8 @@
     <Compile Include="Settings\ProjectSettings.cs" />
     <Compile Include="MoonSharp\Interfaces\IMoonSharpCompletable.cs" />
     <Compile Include="MoonSharp\MoonSharpAPI\MoonSharpGlobals.cs" />
+    <Compile Include="Completion\Instance.cs" />
+    <Compile Include="Debugging\LogQueue.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RedOnion.ROS\RedOnion.ROS.csproj">
@@ -179,6 +181,7 @@
     <Folder Include="Attributes\" />
     <Folder Include="MoonSharp\Interfaces\" />
     <Folder Include="MoonSharp\MoonSharpAPI\" />
+    <Folder Include="Debugging\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
