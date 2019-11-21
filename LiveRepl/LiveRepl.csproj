@@ -99,7 +99,6 @@
     <Compile Include="LiveRepl\Interfaces\IFocusable.cs" />
     <Compile Include="LiveRepl\Completion\EditAreaCompletionAdapter.cs" />
     <Compile Include="LiveRepl\ScriptWindow.Layout.cs" />
-    <Compile Include="LiveRepl\Completion\CompletionManager.cs" />
     <Compile Include="LiveRepl\ScriptWindow.Evaluation.cs" />
     <Compile Include="LiveRepl\ScriptWindow.KeyBindings.cs" />
     <Compile Include="LiveRepl\LiveReplMain.cs" />
@@ -124,6 +123,7 @@
     <Compile Include="LiveRepl\Parts\ScriptDisabledButtonsGroup.cs" />
     <Compile Include="LiveRepl\Parts\PrintQueuesArea.cs" />
     <Compile Include="LiveRepl\Parts\QueueTagInputArea.cs" />
+    <Compile Include="LiveRepl\Completion\CompletionManager.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

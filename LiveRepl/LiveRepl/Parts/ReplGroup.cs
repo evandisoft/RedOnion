@@ -26,7 +26,7 @@ namespace LiveRepl.Parts
 			replControls.AddFixed(ScriptWindow.centerGroupWidth, new Button("Show Hotkeys", uiparts.scriptWindow.PrintKeyBindingsInOutputArea));
 
 #if DEBUG
-			replControls.AddFixed(ScriptWindow.centerGroupWidth*1.5f, new PrintQueuesArea(uiparts));
+			replControls.AddFixed(ScriptWindow.centerGroupWidth*2, new PrintQueuesArea(uiparts));
 #endif
 
 

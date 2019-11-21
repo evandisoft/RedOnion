@@ -47,7 +47,7 @@ namespace Kerbalua.Completion.CompletionTypes
 
 			Type type=obj.GetType();
 			var getMember = operations.Current as GetMemberOperation;
-			Compl.Log("type is "+type+", member name is "+getMember.Name);
+			Complogger.Log("type is "+type+", member name is "+getMember.Name);
 			if (CompletionReflectionUtil.TryGetField(type, getMember.Name, out FieldInfo fieldInfo, CompletionReflectionUtil.AllPublic))
 			{
 				//Type newType = fieldInfo.FieldType;
@@ -59,7 +59,7 @@ namespace Kerbalua.Completion.CompletionTypes
 					return true;
 				}
 				completionObject=GetCompletionObject(fieldObj);
-				Compl.Log("instance field access");
+				Complogger.Log("instance field access");
 				operations.MoveNext();
 				return true;
 			}
@@ -76,7 +76,7 @@ namespace Kerbalua.Completion.CompletionTypes
 						return true;
 					}
 					completionObject=GetCompletionObject(propObj);
-					Compl.Log("instance safe property access");
+					Complogger.Log("instance safe property access");
 					operations.MoveNext();
 					return true;
 				}

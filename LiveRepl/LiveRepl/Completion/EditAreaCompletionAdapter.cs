@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Kerbalui.Decorators;
 using LiveRepl.Interfaces;
+using static RedOnion.KSP.Debugging.QueueLogger;
 
 namespace LiveRepl.Completion {
 	/// <summary>
@@ -25,14 +26,22 @@ namespace LiveRepl.Completion {
 
 		public void Complete(int index)
 		{
+			UILogger.Log("In EditAreaCompletionAdapter Complete for index "+index);
 			var completions = scriptWindow.currentReplEvaluator.GetCompletions(editingArea.Text, editingArea.CursorIndex,out int replaceStart,out int replaceEnd);
+			UILogger.Log("CursorIndex",editingArea.CursorIndex,"replaceStart",replaceStart,"replaceEnd",replaceEnd);
 			if (completions.Count > index) {
 				int partialLength = replaceEnd - replaceStart;
+				UILogger.Log("PartialLength", partialLength);
 				int partialStart = replaceStart;
+				UILogger.Log("PartialStart", partialStart);
 				string textPriorToPartial = editingArea.Text.Substring(0, partialStart);
+				//UILogger.Log("TextPriorToPartial", textPriorToPartial);
 				string completion = completions[index];
+				UILogger.Log("completion", completion);
 				int cursorChange = completion.Length - partialLength;
+				UILogger.Log("cursorChange", cursorChange);
 				int newCursor = replaceEnd+cursorChange; //editingArea.cursorIndex + cursorChange;
+				UILogger.Log("newCursor", newCursor);
 				string textAfterPartial = editingArea.Text.Substring(partialStart + partialLength);
 				editingArea.Text = textPriorToPartial + completion + textAfterPartial;
 				editingArea.SelectIndex=editingArea.CursorIndex = newCursor;

@@ -20,11 +20,11 @@ namespace Kerbalua.Completion
 		{
 			string relevantText = source.Substring(0, cursorPos);
 
-			Compl.Clear();
+			Complogger.Clear();
 			ProcessedIncompleteVar processedIncompleteVar;
 			try
 			{
-				Compl.Log($"Source: \"{relevantText}\"");
+				Complogger.Log($"Source: \"{relevantText}\"");
 				processedIncompleteVar = Parse(relevantText);
 			}
 			catch (LuaIntellisenseException)
@@ -34,15 +34,15 @@ namespace Kerbalua.Completion
 			}
 
 			var operations = new CompletionOperations(processedIncompleteVar.Segments);
-			Compl.Log(""+operations);
+			Complogger.Log(""+operations);
 
 			CompletionObject completionObject=CompletionObject.GetCompletionObject(globals);
 
 			try
 			{
 				//Compl.Log("Last Operation:"+operations.LastOperation);
-				Compl.Log("Op is "+operations.Current);
-				Compl.Log("Object is "+completionObject);
+				Complogger.Log("Op is "+operations.Current);
+				Complogger.Log("Object is "+completionObject);
 				while (!operations.LastOperation)
 				{
 					if (operations.IsFinished)
@@ -52,15 +52,15 @@ namespace Kerbalua.Completion
 
 					if (!completionObject.TryOperation(operations,out completionObject))
 					{
-						Compl.Log("Last Operation:"+operations.LastOperation);
-						Compl.Log(""+completionObject);
-						Compl.Log("Operation failed");
+						Complogger.Log("Last Operation:"+operations.LastOperation);
+						Complogger.Log(""+completionObject);
+						Complogger.Log("Operation failed");
 						replaceStart = replaceEnd = cursorPos;
 						return new List<string>();
 					}
 
-					Compl.Log("Op is "+operations.Current);
-					Compl.Log("Object is "+completionObject);
+					Complogger.Log("Op is "+operations.Current);
+					Complogger.Log("Object is "+completionObject);
 				}
 			}
 			catch (LuaIntellisenseException e)

@@ -41,7 +41,7 @@ namespace Kerbalua.Completion.CompletionTypes
 			//EvanPotential: Could allow completion for nested types.
 
 			var getMember = operations.Current as GetMemberOperation;
-			Compl.Log("type is "+type+", member name is "+getMember.Name);
+			Complogger.Log("type is "+type+", member name is "+getMember.Name);
 			if (CompletionReflectionUtil.TryGetField(type, getMember.Name, out FieldInfo fieldInfo, CompletionReflectionUtil.StaticPublic))
 			{
 				//Type newType = fieldInfo.FieldType;
@@ -53,7 +53,7 @@ namespace Kerbalua.Completion.CompletionTypes
 					return true;
 				}
 				completionObject=GetCompletionObject(obj);
-				Compl.Log("static field access");
+				Complogger.Log("static field access");
 				operations.MoveNext();
 				return true;
 			}
@@ -71,7 +71,7 @@ namespace Kerbalua.Completion.CompletionTypes
 						return true;
 					}
 					completionObject=GetCompletionObject(obj);
-					Compl.Log("static property access");
+					Complogger.Log("static property access");
 					operations.MoveNext();
 					return true;
 				}

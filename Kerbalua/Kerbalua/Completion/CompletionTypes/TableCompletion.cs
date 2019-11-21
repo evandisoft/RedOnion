@@ -38,7 +38,7 @@ namespace Kerbalua.Completion.CompletionTypes
 				possibleCompletions.Add(key.String);
 			}
 
-			Compl.Log("TryResolveMetatable");
+			Complogger.Log("TryResolveMetatable");
 			if (TryResolveMetatable(table.MetaTable, out CompletionObject completionObject))
 			{
 				IList<string> metatableCompletions=completionObject.GetPossibleCompletions();
@@ -54,22 +54,22 @@ namespace Kerbalua.Completion.CompletionTypes
 		{
 			if (metatable != null)
 			{
-				Compl.Log("This metatable is not null");
+				Complogger.Log("This metatable is not null");
 				completionObject=GetCompletionObject(metatable);
 				var index=metatable.RawGet("__index");
 				if (completionObject is TableCompletion && index!=null && index.Table!=null)
 				{
-					Compl.Log("This metatable's index is safe.");
+					Complogger.Log("This metatable's index is safe.");
 					completionObject=new TableCompletion(index.Table);
 					return true;
 				}
 
 				if (!(completionObject is TableCompletion))
 				{
-					Compl.Log("This metatable's completion is handled another way.");
+					Complogger.Log("This metatable's completion is handled another way.");
 					return true;
 				}
-				Compl.Log("The metatable is not safe to use for completion");
+				Complogger.Log("The metatable is not safe to use for completion");
 			}
 			completionObject=null;
 			return false;
@@ -81,7 +81,7 @@ namespace Kerbalua.Completion.CompletionTypes
 
 			if (dynValue == null)
 			{
-				Compl.Log("dynvalue is null");
+				Complogger.Log("dynvalue is null");
 				TryResolveMetatable(table.MetaTable, out completionObject);
 				return false;
 			}
@@ -136,9 +136,9 @@ namespace Kerbalua.Completion.CompletionTypes
 				throw new LuaIntellisenseException("getArrayAccess was null in TryArrayAccess for "+GetType());
 			}
 
-			Compl.Log("Trying array access");
+			Complogger.Log("Trying array access");
 
-			Compl.Log("exp was {"+getArrayAccess.exp?.GetText()+"}");
+			Complogger.Log("exp was {"+getArrayAccess.exp?.GetText()+"}");
 			var strNode=getArrayAccess.exp.@string();
 			if (strNode!=null)
 			{

@@ -1,5 +1,6 @@
 using System;
 using Kerbalui.Util;
+using RedOnion.KSP.Debugging;
 using UnityEngine;
 
 namespace Kerbalui.Types
@@ -26,6 +27,7 @@ namespace Kerbalui.Types
 		/// </summary>
 		public void GrabFocus()
 		{
+			QueueLogger.UILogger.Log("Control ", ControlName, "is grabbing focus");
 			GUI.FocusControl(ControlName);
 		}
 

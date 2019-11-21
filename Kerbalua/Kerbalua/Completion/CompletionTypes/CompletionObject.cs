@@ -51,22 +51,22 @@ namespace Kerbalua.Completion.CompletionTypes
 		/// <param name="dynValue">Dyn value.</param>
 		public static CompletionObject GetCompletionObject(DynValue dynValue)
 		{
-			Compl.Log("Converting dynvalue "+dynValue);
+			Complogger.Log("Converting dynvalue "+dynValue);
 			if (dynValue==null)
 			{
-				Compl.Log("dynvalue is null -> null");
+				Complogger.Log("dynvalue is null -> null");
 				return null;
 			}
 
 			if (dynValue.UserData!=null && dynValue.UserData.Object==null)
 			{
-				Compl.Log("Object is null -> Static");
+				Complogger.Log("Object is null -> Static");
 				return new StaticCompletion(dynValue.ToObject() as Type);
 			}
 
 			if (dynValue.Table==null && dynValue.UserData==null)
 			{
-				Compl.Log("non-table lua type -> Instance");
+				Complogger.Log("non-table lua type -> Instance");
 				return new InstanceCompletion(dynValue.ToObject());
 			}
 
@@ -82,56 +82,56 @@ namespace Kerbalua.Completion.CompletionTypes
 		/// <param name="obj">Object.</param>
 		public static CompletionObject GetCompletionObject(object obj)
 		{
-			Compl.Log("Converting object "+obj);
+			Complogger.Log("Converting object "+obj);
 			if (obj is DynValue dynValue)
 			{
-				Compl.Log("obj is dynvalue, running dynvalue GetCompletionObject");
+				Complogger.Log("obj is dynvalue, running dynvalue GetCompletionObject");
 				return GetCompletionObject(dynValue);
 			}
 
 			if (obj.GetType().Name=="RuntimeType")
 			{
-				Compl.Log("obj is runtimetype -> RuntimeType");
+				Complogger.Log("obj is runtimetype -> RuntimeType");
 				return new RuntimeTypeCompletion(obj as Type);
 			}
 
 			if (obj is InstanceStatic instance1)
 			{
-				Compl.Log("obj is Instance -> Instance");
+				Complogger.Log("obj is Instance -> Instance");
 				return new InstanceStaticCompletion(instance1.type);
 			}
 
 			if (obj is Static static1)
 			{
-				Compl.Log("obj is Static -> Static");
+				Complogger.Log("obj is Static -> Static");
 				return new StaticCompletion(static1.type);
 			}
 
 			if (obj is IMoonSharpCompletable m)
 			{
-				Compl.Log("obj is IMoonSharpCompletable");
+				Complogger.Log("obj is IMoonSharpCompletable");
 				return new MoonSharpCompletable(m);
 			}
 
 			if (obj is ICompletable completable)
 			{
-				Compl.Log("obj is ICompletable");
+				Complogger.Log("obj is ICompletable");
 				return new CompletableCompletion(completable);
 			}
 
 			if (obj is IHasCompletionProxy hasProxy)
 			{
-				Compl.Log("obj is IHasCompletionProxy");
+				Complogger.Log("obj is IHasCompletionProxy");
 				return new HasProxyCompletion(hasProxy);
 			}
 
 			if (obj is Table table)
 			{
-				Compl.Log("obj is Table -> Table");
+				Complogger.Log("obj is Table -> Table");
 				return new TableCompletion(table);
 			}
 
-			Compl.Log("obj is Instance -> Instance");
+			Complogger.Log("obj is Instance -> Instance");
 			return new InstanceCompletion(obj);
 		}
 	}

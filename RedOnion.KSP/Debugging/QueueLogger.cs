@@ -5,15 +5,18 @@ using System.IO;
 using System.Reflection;
 
 namespace RedOnion.KSP.Debugging {
+	/// <summary>
+	/// For now, this is disabled when project is not built in debug mode.
+	/// </summary>
     public class QueueLogger {
         static QueueLogger()
         {
             RegisteredTags = new HashSet<string>();
-            Compl = new QueueLogger("completion", 1000);
+            Complogger = new QueueLogger("completion", 1000);
 			UILogger = new QueueLogger("ui", 1000);
 		}
 
-        static public QueueLogger Compl;
+        static public QueueLogger Complogger;
 		static public QueueLogger UILogger;
         static public HashSet<string> RegisteredTags;
 
@@ -47,6 +50,19 @@ namespace RedOnion.KSP.Debugging {
 				}
 			}
 			return sb.ToString();
+		}
+
+		static public void ClearLoggersByTag(string tag = "all")
+		{
+			FieldInfo[] fields = typeof(QueueLogger).GetFields(BindingFlags.Static | BindingFlags.Public);
+
+			foreach (var field in fields)
+			{
+				if (field.GetValue(null) is QueueLogger logger)
+				{
+					logger.Clear();
+				}
+			}
 		}
 
 		static public HashSet<string> Tags(params string[] strings)
@@ -108,11 +124,13 @@ namespace RedOnion.KSP.Debugging {
 
         public void Log(params object[] args)
         {
-            if (logQueue.Count >= queueSize) {
+#if DEBUG
+			if (logQueue.Count >= queueSize) {
                 logQueue.Dequeue();
             }
             logQueue.Enqueue(ObjectArrayToString(args));
-        }
+#endif
+		}
 
         string ObjectArrayToString(object[] args)
         {
