@@ -122,6 +122,8 @@
     <Compile Include="LiveRepl\ScriptWindow.Actions.cs" />
     <Compile Include="LiveRepl\Decorators\ScriptDisabledElement.cs" />
     <Compile Include="LiveRepl\Parts\ScriptDisabledButtonsGroup.cs" />
+    <Compile Include="LiveRepl\Parts\PrintQueuesArea.cs" />
+    <Compile Include="LiveRepl\Parts\QueueTagInputArea.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

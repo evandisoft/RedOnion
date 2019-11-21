@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using RedOnion.KSP.Attributes;
 using RedOnion.ROS;
+using static RedOnion.KSP.Debugging.QueueLogger;
 
 namespace Kerbalua.Completion.CompletionTypes
 {
@@ -40,7 +41,7 @@ namespace Kerbalua.Completion.CompletionTypes
 			//EvanPotential: Could allow completion for nested types.
 
 			var getMember = operations.Current as GetMemberOperation;
-			CompletionQueue.Log("type is "+type+", member name is "+getMember.Name);
+			Compl.Log("type is "+type+", member name is "+getMember.Name);
 			if (CompletionReflectionUtil.TryGetField(type, getMember.Name, out FieldInfo fieldInfo, CompletionReflectionUtil.StaticPublic))
 			{
 				//Type newType = fieldInfo.FieldType;
@@ -52,7 +53,7 @@ namespace Kerbalua.Completion.CompletionTypes
 					return true;
 				}
 				completionObject=GetCompletionObject(obj);
-				CompletionQueue.Log("static field access");
+				Compl.Log("static field access");
 				operations.MoveNext();
 				return true;
 			}
@@ -70,7 +71,7 @@ namespace Kerbalua.Completion.CompletionTypes
 						return true;
 					}
 					completionObject=GetCompletionObject(obj);
-					CompletionQueue.Log("static property access");
+					Compl.Log("static property access");
 					operations.MoveNext();
 					return true;
 				}

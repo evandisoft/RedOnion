@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using RedOnion.KSP.Attributes;
 using RedOnion.ROS;
+using static RedOnion.KSP.Debugging.QueueLogger;
 
 namespace Kerbalua.Completion.CompletionTypes
 {
@@ -46,7 +47,7 @@ namespace Kerbalua.Completion.CompletionTypes
 
 			Type type=obj.GetType();
 			var getMember = operations.Current as GetMemberOperation;
-			CompletionQueue.Log("type is "+type+", member name is "+getMember.Name);
+			Compl.Log("type is "+type+", member name is "+getMember.Name);
 			if (CompletionReflectionUtil.TryGetField(type, getMember.Name, out FieldInfo fieldInfo, CompletionReflectionUtil.AllPublic))
 			{
 				//Type newType = fieldInfo.FieldType;
@@ -58,7 +59,7 @@ namespace Kerbalua.Completion.CompletionTypes
 					return true;
 				}
 				completionObject=GetCompletionObject(fieldObj);
-				CompletionQueue.Log("instance field access");
+				Compl.Log("instance field access");
 				operations.MoveNext();
 				return true;
 			}
@@ -75,7 +76,7 @@ namespace Kerbalua.Completion.CompletionTypes
 						return true;
 					}
 					completionObject=GetCompletionObject(propObj);
-					CompletionQueue.Log("instance safe property access");
+					Compl.Log("instance safe property access");
 					operations.MoveNext();
 					return true;
 				}

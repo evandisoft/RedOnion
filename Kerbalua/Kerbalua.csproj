@@ -105,7 +105,6 @@
     <Compile Include="Kerbalua\Completion\CompletionOperations.cs" />
     <Compile Include="Kerbalua\Completion\CompletionReflectionUtil.cs" />
     <Compile Include="Kerbalua\Parsing\AnyErrorsListener.cs" />
-    <Compile Include="Kerbalua\Completion\CompletionQueue.cs" />
     <Compile Include="Kerbalua\Completion\CompletionTypes\TableCompletion.cs" />
     <Compile Include="Kerbalua\Completion\CompletionTypes\CompletionObject.cs" />
     <Compile Include="Kerbalua\Completion\CompletionTypes\InstanceCompletion.cs" />

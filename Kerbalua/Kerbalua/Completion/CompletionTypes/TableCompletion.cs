@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using MoonSharp.Interpreter;
 using RedOnion.KSP.Completion;
+using static RedOnion.KSP.Debugging.QueueLogger;
 
 namespace Kerbalua.Completion.CompletionTypes
 {
@@ -37,7 +38,7 @@ namespace Kerbalua.Completion.CompletionTypes
 				possibleCompletions.Add(key.String);
 			}
 
-			CompletionQueue.Log("TryResolveMetatable");
+			Compl.Log("TryResolveMetatable");
 			if (TryResolveMetatable(table.MetaTable, out CompletionObject completionObject))
 			{
 				IList<string> metatableCompletions=completionObject.GetPossibleCompletions();
@@ -53,22 +54,22 @@ namespace Kerbalua.Completion.CompletionTypes
 		{
 			if (metatable != null)
 			{
-				CompletionQueue.Log("This metatable is not null");
+				Compl.Log("This metatable is not null");
 				completionObject=GetCompletionObject(metatable);
 				var index=metatable.RawGet("__index");
 				if (completionObject is TableCompletion && index!=null && index.Table!=null)
 				{
-					CompletionQueue.Log("This metatable's index is safe.");
+					Compl.Log("This metatable's index is safe.");
 					completionObject=new TableCompletion(index.Table);
 					return true;
 				}
 
 				if (!(completionObject is TableCompletion))
 				{
-					CompletionQueue.Log("This metatable's completion is handled another way.");
+					Compl.Log("This metatable's completion is handled another way.");
 					return true;
 				}
-				CompletionQueue.Log("The metatable is not safe to use for completion");
+				Compl.Log("The metatable is not safe to use for completion");
 			}
 			completionObject=null;
 			return false;
@@ -80,7 +81,7 @@ namespace Kerbalua.Completion.CompletionTypes
 
 			if (dynValue == null)
 			{
-				CompletionQueue.Log("dynvalue is null");
+				Compl.Log("dynvalue is null");
 				TryResolveMetatable(table.MetaTable, out completionObject);
 				return false;
 			}
@@ -135,9 +136,9 @@ namespace Kerbalua.Completion.CompletionTypes
 				throw new LuaIntellisenseException("getArrayAccess was null in TryArrayAccess for "+GetType());
 			}
 
-			CompletionQueue.Log("Trying array access");
+			Compl.Log("Trying array access");
 
-			CompletionQueue.Log("exp was {"+getArrayAccess.exp?.GetText()+"}");
+			Compl.Log("exp was {"+getArrayAccess.exp?.GetText()+"}");
 			var strNode=getArrayAccess.exp.@string();
 			if (strNode!=null)
 			{
