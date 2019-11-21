@@ -46,6 +46,11 @@ namespace RedOnion.KSP.Parts
 		[Description("Explode the part.")]
 		public void explode() => native.explode();
 
+		public override string ToString()
+		{
+			return native.ToString();
+		}
+
 		protected internal PartBase(Ship ship, Part native, PartBase parent, Decoupler decoupler)
 		{
 			this.ship = ship;
