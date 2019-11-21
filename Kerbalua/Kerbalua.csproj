@@ -11,8 +11,8 @@
     <RootNamespace>Kerbalua</RootNamespace>
     <AssemblyName>Kerbalua</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
-    <ReleaseVersion>0.3.0</ReleaseVersion>
     <TargetFrameworkProfile />
+    <ReleaseVersion>0.3.0</ReleaseVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -80,18 +80,11 @@
     <Reference Include="KerbaluaMoonSharp">
       <HintPath>..\OtherDLLs\KerbaluaMoonSharp\KerbaluaMoonSharp.dll</HintPath>
     </Reference>
-    <Reference Include="KeraLua">
-      <HintPath>..\packages\KeraLua.1.0.22\lib\net45\KeraLua.dll</HintPath>
-    </Reference>
-    <Reference Include="NLua">
-      <HintPath>..\packages\NLua.1.4.25\lib\net45\NLua.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Kerbalua\Other\MoonSharpReplEvaluator.cs" />
     <Compile Include="Kerbalua\Utility\prin.cs" />
-    <Compile Include="Kerbalua\Utility\QueueLogger.cs" />
     <Compile Include="Kerbalua\Other\ReplEvaluator.cs" />
     <Compile Include="Kerbalua\Other\RedOnionReplEvaluator.cs" />
     <Compile Include="Kerbalua\MoonSharp\KerbaluaExecutionManager.cs" />
@@ -112,7 +105,6 @@
     <Compile Include="Kerbalua\Completion\CompletionOperations.cs" />
     <Compile Include="Kerbalua\Completion\CompletionReflectionUtil.cs" />
     <Compile Include="Kerbalua\Parsing\AnyErrorsListener.cs" />
-    <Compile Include="Kerbalua\Completion\CompletionQueue.cs" />
     <Compile Include="Kerbalua\Completion\CompletionTypes\TableCompletion.cs" />
     <Compile Include="Kerbalua\Completion\CompletionTypes\CompletionObject.cs" />
     <Compile Include="Kerbalua\Completion\CompletionTypes\InstanceCompletion.cs" />
@@ -121,8 +113,6 @@
     <Compile Include="Kerbalua\Completion\CompletionTypes\CompletableCompletion.cs" />
     <Compile Include="Kerbalua\Completion\CompletionTypes\HasProxyCompletion.cs" />
     <Compile Include="Kerbalua\Completion\CompletionTypes\InstanceStaticCompletion.cs" />
-    <Compile Include="Kerbalua\Kerbnlua\KerbnluaScript.cs" />
-    <Compile Include="Kerbalua\Kerbnlua\KerbnluaReplEvaluator.cs" />
     <Compile Include="Kerbalua\Completion\MoonSharpIntellisense.cs" />
     <Compile Include="Kerbalua\Completion\CompletionTypes\MoonSharpCompletable.cs" />
   </ItemGroup>
@@ -138,7 +128,6 @@
     <None Include="Kerbalua\Completion\Grammar\IncompleteLua.g4" />
     <None Include="Kerbalua\Completion\Grammar\FinalExpLua.g4" />
     <None Include="Kerbalua\Completion\CompletionNotes.md" />
-    <None Include="Kerbalua\Kerbnlua\Kerbnlua.md" />
     <None Include="Kerbalua\Completion\CompletionReadme.md" />
   </ItemGroup>
   <ItemGroup />
@@ -170,5 +159,4 @@
       </Properties>
     </MonoDevelop>
   </ProjectExtensions>
-  <Import Project="..\packages\KeraLua.1.0.22\build\net45\KeraLua.targets" Condition="Exists('..\packages\KeraLua.1.0.22\build\net45\KeraLua.targets')" />
 </Project>

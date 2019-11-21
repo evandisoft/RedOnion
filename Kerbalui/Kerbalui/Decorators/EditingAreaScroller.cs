@@ -3,6 +3,7 @@ using Kerbalui.EventHandling;
 using Kerbalui.Types;
 using Kerbalui.Util;
 using UnityEngine;
+using static RedOnion.KSP.Debugging.QueueLogger;
 
 namespace Kerbalui.Decorators
 {
@@ -55,6 +56,7 @@ namespace Kerbalui.Decorators
 
 			if ((Event.current.type==EventType.MouseDown || Event.current.type==EventType.ScrollWheel) && !HasFocus() && GUILibUtil.MouseInRect(rect))//.Contains(Event.current.mousePosition))
 			{
+				UILogger.Log("Grabbing focus for control",editingArea.editableText.ControlName,"Event was", Event.current.type);
 				//Debug.Log("edit area scroller grabbing mouse");
 				GrabFocus();
 			}
@@ -84,6 +86,7 @@ namespace Kerbalui.Decorators
 
 			if (editingArea.ReceivedInput)
 			{
+				//Complogger.Log("EditingAreaScroller",editingArea.editableText.ControlName," ReceivedInput");
 				AdjustScrollX();
 				AdjustScrollY();
 			}

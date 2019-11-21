@@ -3,6 +3,7 @@ using Kerbalui.Controls.Abstract;
 using Kerbalui.EventHandling;
 using Kerbalui.Types;
 using Kerbalui.Util;
+using RedOnion.KSP.Debugging;
 using UnityEngine;
 
 namespace Kerbalui.Decorators
@@ -11,7 +12,7 @@ namespace Kerbalui.Decorators
 	/// Editing area. Contains an EditableText (currently only either aTextArea or Text Field), 
 	/// and handles editing for them.
 	/// </summary>
-	public class EditingArea:Decorator
+	public class EditingArea : Decorator
 	{
 		//int inc = 0;
 		const int spacesPerTab = 4;
@@ -19,7 +20,17 @@ namespace Kerbalui.Decorators
 		public TextEditor backingEditor;
 		public int LineNumber { get; private set; } = 1;
 		public int ColumnNumber { get; private set; } = 1;
-		public int CursorIndex { get; set; }
+
+		private int _cursorIndex;
+		public int CursorIndex { get => _cursorIndex; set
+			{
+				if (value!=_cursorIndex)
+				{
+					QueueLogger.UILogger.Log("For control", editableText.ControlName);
+					QueueLogger.UILogger.Log("EditingArea SetCursorIndex","Value was ", value, " _cursorIndex is ", _cursorIndex);
+					_cursorIndex=value;
+				}
+			} }
 		public int SelectIndex { get; set; }
 
 		public string Text { get => editableText.content.text; set => editableText.content.text=value; }
@@ -78,12 +89,43 @@ namespace Kerbalui.Decorators
 				HandleInput();
 
 				editableText.content.text = backingEditor.text;
-				
-				//bool wasmousedown=Event.current.type==EventType.MouseDown;
-				editableText.Update();
 
-				LineNumber = CurrentLineNumber() + 1;
-				ColumnNumber = CharsFromLineStart() + 1;
+				// When the event is a KeyDown or MouseDown, at this point, we want the underlying control
+				// to be able to modify the cursor position using the key or new mouse click so we take the results
+				// of the controls automatic handling of those events and use it to update the CursorIndex and SelectIndex.
+				if (Event.current.type == EventType.KeyDown || Event.current.type == EventType.MouseDown ||
+					Event.current.type == EventType.MouseDrag)
+				{
+					editableText.Update();
+
+					CursorIndex = backingEditor.cursorIndex;
+					SelectIndex = backingEditor.selectIndex;
+
+					LineNumber = CurrentLineNumber() + 1;
+					ColumnNumber = CharsFromLineStart() + 1;
+				}
+				// Otherwise, we don't want the update on the base control to modify the CursorIndex and SelectIndex,
+				// as it seems to sometimes cause problems. Specifically it caused a problem when scrolling down
+				// the CompletionArea of LiveRepl and then clicking an entry to complete. It failed to update the
+				// CursorIndex of the Editor after the completion, leaving it at the beginning of the completion
+				// rather than it being at the end. The first editableText.Update() call for the editor that it
+				// received after the completion did not use the backingEditor's modified selectIndex but rather
+				// ignored it and then set the CursorIndex to the value it had had prior to the completion.
+				else
+				{
+					CursorIndex = backingEditor.cursorIndex;
+					SelectIndex = backingEditor.selectIndex;
+
+					LineNumber = CurrentLineNumber() + 1;
+					ColumnNumber = CharsFromLineStart() + 1;
+
+					editableText.Update();
+				}
+
+				//bool wasmousedown=Event.current.type==EventType.MouseDown;
+
+
+
 
 				//if (wasmousedown)
 				//{
@@ -92,8 +134,7 @@ namespace Kerbalui.Decorators
 				//	Debug.Log(ColumnNumber);
 				//}
 
-				CursorIndex = backingEditor.cursorIndex;
-				SelectIndex = backingEditor.selectIndex;
+				
 			}
 			else
 			{

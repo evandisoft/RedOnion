@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Kerbalua.Other;
 
-namespace Kerbalua.Kerbnlua
+namespace Kerbnlua
 {
 	public class KerbnluaReplEvaluator:ReplEvaluator
 	{

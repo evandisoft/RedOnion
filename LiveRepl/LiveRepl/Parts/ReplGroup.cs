@@ -19,22 +19,18 @@ namespace LiveRepl.Parts
 		{
 			this.uiparts=uiparts;
 
-			var replButtons=new HorizontalSpacer();
+			var replControls=new HorizontalSpacer();
 
-			replButtons.AddWeighted(1, new Filler());
-			replButtons.AddFixed(ScriptWindow.centerGroupWidth, new Button("Clear Repl", uiparts.scriptWindow.ClearRepl));
-			replButtons.AddFixed(ScriptWindow.centerGroupWidth, new Button("Show Hotkeys", uiparts.scriptWindow.PrintKeyBindingsInOutputArea));
+			replControls.AddWeighted(1, new Filler());
+			replControls.AddFixed(ScriptWindow.centerGroupWidth, new Button("Clear Repl", uiparts.scriptWindow.ClearRepl));
+			replControls.AddFixed(ScriptWindow.centerGroupWidth, new Button("Show Hotkeys", uiparts.scriptWindow.PrintKeyBindingsInOutputArea));
 
 #if DEBUG
-			replButtons.AddFixed(ScriptWindow.centerGroupWidth, new Button("Print Logs", () =>
-				{
-					//uiparts.replOutoutArea.Clear();
-					uiparts.replOutoutArea.AddText(CompletionQueue.String());
-				}));
+			replControls.AddFixed(ScriptWindow.centerGroupWidth*2, new PrintQueuesArea(uiparts));
 #endif
 
 
-			AddMinSized(replButtons);
+			AddMinSized(replControls);
 			AddWeighted(1, uiparts.repl=new Repl(uiparts));
 
 			uiparts.replInputArea.keybindings.Add(new EventKey(KeyCode.E, true), uiparts.scriptWindow.EvaluateReplText);

@@ -36,6 +36,23 @@ namespace Kerbalua.MoonSharp
 					(Script script, ModuleControlSurface m)
 						=> DynValue.FromObject(script, new LuaProxy(m)) //DynValue.NewTable(new ModuleControlSurfaceProxyTable(this, m))
 					);
+			
+
+			GlobalOptions.CustomConverters
+				.SetClrToScriptCustomConversion(
+					(Script script, Vector3d vector3d)
+						=> DynValue.FromObject(script, new Vector(vector3d)) //DynValue.NewTable(new ModuleControlSurfaceProxyTable(this, m))
+					);
+			//GlobalOptions.CustomConverters
+				//.SetScriptToClrCustomConversion(DataType.UserData, typeof(Vector3d), (v) =>
+				//{
+				//	object obj=v.ToObject();
+				//	if (obj is Vector vector)
+				//	{
+				//		return new Vector3d(vector.x, vector.y, vector.z);
+				//	}
+				//	throw new Exception("Can't convert from "+obj.GetType()+", to "+typeof(Vector3d));
+				//});
 			GlobalOptions.CustomConverters
 				.SetScriptToClrCustomConversion(DataType.Function
 					, typeof(Func<object, object>), (f) => new Func<object, object>((item) =>

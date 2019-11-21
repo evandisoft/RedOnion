@@ -11,8 +11,8 @@
     <RootNamespace>LiveRepl</RootNamespace>
     <AssemblyName>LiveRepl</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
-    <ReleaseVersion>0.3.0</ReleaseVersion>
     <TargetFrameworkProfile />
+    <ReleaseVersion>0.3.0</ReleaseVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -99,7 +99,6 @@
     <Compile Include="LiveRepl\Interfaces\IFocusable.cs" />
     <Compile Include="LiveRepl\Completion\EditAreaCompletionAdapter.cs" />
     <Compile Include="LiveRepl\ScriptWindow.Layout.cs" />
-    <Compile Include="LiveRepl\Completion\CompletionManager.cs" />
     <Compile Include="LiveRepl\ScriptWindow.Evaluation.cs" />
     <Compile Include="LiveRepl\ScriptWindow.KeyBindings.cs" />
     <Compile Include="LiveRepl\LiveReplMain.cs" />
@@ -122,6 +121,9 @@
     <Compile Include="LiveRepl\ScriptWindow.Actions.cs" />
     <Compile Include="LiveRepl\Decorators\ScriptDisabledElement.cs" />
     <Compile Include="LiveRepl\Parts\ScriptDisabledButtonsGroup.cs" />
+    <Compile Include="LiveRepl\Parts\PrintQueuesArea.cs" />
+    <Compile Include="LiveRepl\Parts\QueueTagInputArea.cs" />
+    <Compile Include="LiveRepl\Completion\CompletionManager.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

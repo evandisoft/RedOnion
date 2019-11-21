@@ -2,7 +2,7 @@ using System;
 using NLua;
 using UnityEngine;
 
-namespace Kerbalua.Kerbnlua
+namespace Kerbnlua
 {
 	public class KerbnluaScript
 	{

@@ -50,6 +50,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedOnion.OS", "RedOnion.OS\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kerbalui", "Kerbalui\Kerbalui.csproj", "{7A943166-A67E-420A-BCA0-5231D57A18BD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kerbnlua", "Kerbnlua\Kerbnlua.csproj", "{7E1B33D1-400D-42E5-9719-A0FCBB333898}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -112,6 +114,10 @@ Global
 		{7A943166-A67E-420A-BCA0-5231D57A18BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7A943166-A67E-420A-BCA0-5231D57A18BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7A943166-A67E-420A-BCA0-5231D57A18BD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7E1B33D1-400D-42E5-9719-A0FCBB333898}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E1B33D1-400D-42E5-9719-A0FCBB333898}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E1B33D1-400D-42E5-9719-A0FCBB333898}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E1B33D1-400D-42E5-9719-A0FCBB333898}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

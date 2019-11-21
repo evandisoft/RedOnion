@@ -7,6 +7,7 @@ using Kerbalua.Completion.CompletionTypes;
 using Kerbalua.Parsing;
 using MoonSharp.Interpreter;
 using UnityEngine;
+using static RedOnion.KSP.Debugging.QueueLogger;
 
 namespace Kerbalua.Completion
 {
@@ -19,11 +20,11 @@ namespace Kerbalua.Completion
 		{
 			string relevantText = source.Substring(0, cursorPos);
 
-			CompletionQueue.completionQueue.Clear();
+			Complogger.Clear();
 			ProcessedIncompleteVar processedIncompleteVar;
 			try
 			{
-				CompletionQueue.Log($"Source: \"{relevantText}\"");
+				Complogger.Log($"Source: \"{relevantText}\"");
 				processedIncompleteVar = Parse(relevantText);
 			}
 			catch (LuaIntellisenseException)
@@ -33,15 +34,15 @@ namespace Kerbalua.Completion
 			}
 
 			var operations = new CompletionOperations(processedIncompleteVar.Segments);
-			CompletionQueue.Log(""+operations);
+			Complogger.Log(""+operations);
 
 			CompletionObject completionObject=CompletionObject.GetCompletionObject(globals);
 
 			try
 			{
-				//CompletionQueue.Log("Last Operation:"+operations.LastOperation);
-				CompletionQueue.Log("Op is "+operations.Current);
-				CompletionQueue.Log("Object is "+completionObject);
+				//Compl.Log("Last Operation:"+operations.LastOperation);
+				Complogger.Log("Op is "+operations.Current);
+				Complogger.Log("Object is "+completionObject);
 				while (!operations.LastOperation)
 				{
 					if (operations.IsFinished)
@@ -51,15 +52,15 @@ namespace Kerbalua.Completion
 
 					if (!completionObject.TryOperation(operations,out completionObject))
 					{
-						CompletionQueue.Log("Last Operation:"+operations.LastOperation);
-						CompletionQueue.Log(""+completionObject);
-						CompletionQueue.Log("Operation failed");
+						Complogger.Log("Last Operation:"+operations.LastOperation);
+						Complogger.Log(""+completionObject);
+						Complogger.Log("Operation failed");
 						replaceStart = replaceEnd = cursorPos;
 						return new List<string>();
 					}
 
-					CompletionQueue.Log("Op is "+operations.Current);
-					CompletionQueue.Log("Object is "+completionObject);
+					Complogger.Log("Op is "+operations.Current);
+					Complogger.Log("Object is "+completionObject);
 				}
 			}
 			catch (LuaIntellisenseException e)

@@ -1,5 +1,4 @@
-vessel=import.FlightGlobals.ActiveVessel
-Random=import.UnityEngine.Random
+Random=native.UnityEngine.Random
 
 function selfDestruct(part)
     local childParts=part.children
@@ -7,9 +6,7 @@ function selfDestruct(part)
         selfDestruct(childParts[i])
     end
     part.explode()
-    for i=0, Random.Range(20*1,20*2) do
-        coroutine.yield()
-    end
+    sleep(Random.RandomRange(0,10))
 end
 
-selfDestruct(vessel.parts[0])
+selfDestruct(ship.parts[0].native)
