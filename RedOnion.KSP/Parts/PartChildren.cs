@@ -9,7 +9,7 @@ using RedOnion.ROS;
 namespace RedOnion.KSP.Parts
 {
 	[Description("List of parts attached to parent part.")]
-	public class PartChildren : ICollection<PartBase>
+	public class PartChildren : IList<PartBase>
 	{
 		[Description("The parent part owning this list.")]
 		public PartBase parent { get; }
@@ -28,8 +28,16 @@ namespace RedOnion.KSP.Parts
 				yield return parts[part];
 		}
 
+		public PartBase this[int index] => parent.ship.parts[parent.native.children[index]];
+
 		int ICollection<PartBase>.Count => count;
 		bool ICollection<PartBase>.IsReadOnly => true;
+
+		PartBase IList<PartBase>.this[int index]
+		{
+			get => this[index];
+			set => throw new InvalidOperationException();
+		}
 
 		bool ICollection<PartBase>.Contains(PartBase item)
 			=> parent.native.children.Contains(item.native);
@@ -38,9 +46,13 @@ namespace RedOnion.KSP.Parts
 			foreach (var part in this)
 				array[arrayIndex++] = part;
 		}
+		int IList<PartBase>.IndexOf(PartBase item)
+			=> parent.native.children.IndexOf(item.native);
 
-		void ICollection<PartBase>.Add(PartBase item) => throw new NotImplementedException();
-		void ICollection<PartBase>.Clear() => throw new NotImplementedException();
-		bool ICollection<PartBase>.Remove(PartBase item) => throw new NotImplementedException();
+		void ICollection<PartBase>.Add(PartBase item) => throw new InvalidOperationException();
+		void ICollection<PartBase>.Clear() => throw new InvalidOperationException();
+		bool ICollection<PartBase>.Remove(PartBase item) => throw new InvalidOperationException();
+		void IList<PartBase>.Insert(int index, PartBase item) => throw new InvalidOperationException();
+		void IList<PartBase>.RemoveAt(int index) => throw new InvalidOperationException();
 	}
 }

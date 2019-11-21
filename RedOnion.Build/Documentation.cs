@@ -44,16 +44,40 @@ namespace RedOnion.Build
 			{ typeof(bool), "bool" },
 		};
 
+		// Compare by RID (record ID)
+		class MetaCmp : IComparer<MemberInfo>
+		{
+			public static readonly IComparer<MemberInfo> It = new MetaCmp();
+			static bool ByType<T>(MemberInfo x, MemberInfo y, ref int cmp) where T : MemberInfo
+			{
+				cmp = x is T ? y is T
+					? x.MetadataToken.CompareTo(y.MetadataToken)
+					: -1 : y is T ? +1 : 0;
+				return cmp == 0;
+			}
+			public int Compare(MemberInfo x, MemberInfo y)
+			{
+				int cmp = 0;
+				return ByType<ConstructorInfo>(x, y, ref cmp)
+				&& ByType<FieldInfo>(x, y, ref cmp)
+				&& ByType<EventInfo>(x, y, ref cmp)
+				&& ByType<PropertyInfo>(x, y, ref cmp)
+				&& ByType<MethodInfo>(x, y, ref cmp)
+				? x.MetadataToken.CompareTo(y.MetadataToken)
+				: cmp;
+			}
+		}
+
 		static IEnumerable<MemberInfo> GetMembers(Type type)
 		{
 			var members = type.GetMembers(BindingFlags.Public|BindingFlags.Instance);
 			if (members.Length > 1)
-				Array.Sort(members, Descriptor.Reflected.MemberComparer.Instance);
+				Array.Sort(members, MetaCmp.It);
 			foreach (var member in members)
 				yield return member;
 			members = type.GetMembers(BindingFlags.Public|BindingFlags.Static|BindingFlags.FlattenHierarchy);
 			if (members.Length > 1)
-				Array.Sort(members, Descriptor.Reflected.MemberComparer.Instance);
+				Array.Sort(members, MetaCmp.It);
 			foreach (var member in members)
 				yield return member;
 		}
@@ -181,13 +205,6 @@ namespace RedOnion.Build
 			}
 		}
 
-		// Compare by RID (record ID)
-		class MetaCmp : IComparer<MemberInfo>
-		{
-			public static readonly MetaCmp It = new MetaCmp();
-			public int Compare(MemberInfo x, MemberInfo y)
-				=> (x.MetadataToken & 0xffffff).CompareTo(y.MetadataToken & 0xffffff);
-		}
 		static void Print(StreamWriter wr, Document doc, string name)
 		{
 			wr.WriteLine();
