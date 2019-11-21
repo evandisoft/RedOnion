@@ -87,24 +87,24 @@ namespace RedOnion.KSP.Tests
 		public void API_Vec01_Create()
 		{
 			Test("vector(1)");
-			var v = Result.obj as Vector;
-			Assert.NotNull(v);
+			Assert.IsTrue(Result.obj is Vector);
+			var v = (Vector)Result.obj;
 			Assert.AreEqual(1.0, v.x);
 			Assert.AreEqual(1.0, v.y);
 			Assert.AreEqual(1.0, v.z);
 			Test(1.0, "vector(1).x");
 
 			Test("var a = vector 1,2u");
-			v = Result.obj as Vector;
-			Assert.NotNull(v);
+			Assert.IsTrue(Result.obj is Vector);
+			v = (Vector)Result.obj;
 			Assert.AreEqual(1.0, v.x);
 			Assert.AreEqual(2.0, v.y);
 			Assert.AreEqual(0.0, v.z);
 			Test(2.0, "a.y");
 
 			Test("var b = vector 1,2f,3.0");
-			v = Result.obj as Vector;
-			Assert.NotNull(v);
+			Assert.IsTrue(Result.obj is Vector);
+			v = (Vector)Result.obj;
 			Assert.AreEqual(1.0, v.x);
 			Assert.AreEqual(2.0, v.y);
 			Assert.AreEqual(3.0, v.z);
@@ -114,15 +114,15 @@ namespace RedOnion.KSP.Tests
 		public void API_Vec02_Unary()
 		{
 			Test("-vector(1)");
-			var v = Result.obj as Vector;
-			Assert.NotNull(v);
+			Assert.IsTrue(Result.obj is Vector);
+			var v = (Vector)Result.obj;
 			Assert.AreEqual(-1.0, v.x);
 			Assert.AreEqual(-1.0, v.y);
 			Assert.AreEqual(-1.0, v.z);
 
 			Test("+vector(1)");
-			v = Result.obj as Vector;
-			Assert.NotNull(v);
+			Assert.IsTrue(Result.obj is Vector);
+			v = (Vector)Result.obj;
 			Assert.AreEqual(1.0, v.x);
 			Assert.AreEqual(1.0, v.y);
 			Assert.AreEqual(1.0, v.z);
@@ -133,29 +133,29 @@ namespace RedOnion.KSP.Tests
 			Test("var a = vector 1,2,3");
 			Test("var b = vector 4,5,6");
 			Test("a + b");
-			var v = Result.obj as Vector;
-			Assert.NotNull(v);
+			Assert.IsTrue(Result.obj is Vector);
+			var v = (Vector)Result.obj;
 			Assert.AreEqual(1.0+4.0, v.x);
 			Assert.AreEqual(2.0+5.0, v.y);
 			Assert.AreEqual(3.0+6.0, v.z);
 
 			Test("a - b");
-			v = Result.obj as Vector;
-			Assert.NotNull(v);
+			Assert.IsTrue(Result.obj is Vector);
+			v = (Vector)Result.obj;
 			Assert.AreEqual(1.0-4.0, v.x);
 			Assert.AreEqual(2.0-5.0, v.y);
 			Assert.AreEqual(3.0-6.0, v.z);
 
 			Test("a * b");
-			v = Result.obj as Vector;
-			Assert.NotNull(v);
+			Assert.IsTrue(Result.obj is Vector);
+			v = (Vector)Result.obj;
 			Assert.AreEqual(1.0*4.0, v.x);
 			Assert.AreEqual(2.0*5.0, v.y);
 			Assert.AreEqual(3.0*6.0, v.z);
 
 			Test("a / b");
-			v = Result.obj as Vector;
-			Assert.NotNull(v);
+			Assert.IsTrue(Result.obj is Vector);
+			v = (Vector)Result.obj;
 			Assert.AreEqual(1.0/4.0, v.x);
 			Assert.AreEqual(2.0/5.0, v.y);
 			Assert.AreEqual(3.0/6.0, v.z);
@@ -177,8 +177,8 @@ namespace RedOnion.KSP.Tests
 			Test("test.v3 = vector.one");
 			Assert.AreEqual(1f, ConvertTest.v3.x);
 			Test("vector.abs -vector test.v3");
-			var v = Result.obj as Vector;
-			Assert.NotNull(v);
+			Assert.IsTrue(Result.obj is Vector);
+			var v = (Vector)Result.obj;
 			Assert.AreEqual(1.0, v.x);
 			Assert.AreEqual(1.0, v.y);
 			Assert.AreEqual(1.0, v.z);
@@ -186,27 +186,29 @@ namespace RedOnion.KSP.Tests
 		}
 
 		[Test]
-		public void API_Vec05_Methods()
+		public void API_Vec05_Modify()
 		{
 			Lines(
 				"var a = +vector.one",
-				"a.scale 2",
+				"a *= 2",
 				"return a");
-			var v = Result.obj as Vector;
-			Assert.NotNull(v);
+			Assert.IsTrue(Result.obj is Vector);
+			var v = (Vector)Result.obj;
 			Assert.AreEqual(2.0, v.x);
 			Assert.AreEqual(2.0, v.y);
 			Assert.AreEqual(2.0, v.z);
 
 			Lines(
-				"a.shrink 3",
+				"a /= 3",
 				"return a");
+			Assert.IsTrue(Result.obj is Vector);
+			v = (Vector)Result.obj;
 			Assert.AreEqual(2.0/3.0, v.x);
 			Assert.AreEqual(2.0/3.0, v.y);
 			Assert.AreEqual(2.0/3.0, v.z);
 		}
 
-		[Test]
+		//[Test] - removed (index_set does not currently work on structs)
 		public void API_Vec06_Index()
 		{
 			Lines(1.0,

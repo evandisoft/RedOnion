@@ -4,14 +4,14 @@ Unsafe KSP API - see [CommonScriptApi](../../CommonScriptApi.md)
 
 - `FlightGlobals`: FlightGlobals - [KSP API](https://kerbalspaceprogram.com/api/class_flight_globals.html): Flight Globals (for autopilot).
 - `FlightControl`: FlightControl - Custom autopilot.
-- `Time`: Time - UnityEngine.Time
 - `FlightDriver`: FlightDriver - [KSP API](https://kerbalspaceprogram.com/api/class_flight_driver.html)
 - `bodies`: [BodiesDictionary](../UnsafeAPI/BodiesDictionary.md) - A map of planet names to planet bodies. (Unsafe API)
+- `HighLogic`: HighLogic - [KSP API](https://kerbalspaceprogram.com/api/class_high_logic.html): LoadedScene indicator and other global state.
+- `PartResourceLibrary`: PartResourceLibrary - [KSP API](https://kerbalspaceprogram.com/api/class_part_resource_library.html)
+- `Time`: Time - UnityEngine.Time
 - `Random`: Random - UnityEngine.Random
 - `Mathf`: Mathf - UnityEngine.Mathf
-- `HighLogic`: HighLogic - [KSP API](https://kerbalspaceprogram.com/api/class_high_logic.html): LoadedScene indicator and other global state.
 - `Scalar`: Scalar - Math utilities.
-- `PartResourceLibrary`: PartResourceLibrary - [KSP API](https://kerbalspaceprogram.com/api/class_part_resource_library.html)
 - `Vec`: Vec - Vector utilities.
 - `Vessel`: Vessel - [KSP API](https://kerbalspaceprogram.com/api/class_vessel.html): Vessel (class).
 - `VesselType`: VesselType - [KSP API](https://kerbalspaceprogram.com/api/_vessel_8cs.html#afa39c7ec7cc0926b332fcd2d77425edb): Vessel Type (enum).

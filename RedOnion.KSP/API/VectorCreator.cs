@@ -23,46 +23,46 @@ namespace RedOnion.KSP.API
 			: type is Type t ? t.IsAssignableFrom(typeof(Vector)) : false;
 
 		[Description("Vector(0, 0, 0).")]
-		public static readonly ConstVector zero = new ConstVector(Vector3d.zero);
+		public static readonly Vector zero = new Vector(Vector3d.zero);
 		[Description("Vector(1, 1, 1).")]
-		public static readonly ConstVector one = new ConstVector(Vector3d.one);
+		public static readonly Vector one = new Vector(Vector3d.one);
 		[Description("Vector(0, 0, 1).")]
-		public static readonly ConstVector forward = new ConstVector(Vector3d.forward);
+		public static readonly Vector forward = new Vector(Vector3d.forward);
 		[Description("Alias to forward - Vector(0, 0, 1).")]
-		public static readonly ConstVector fwd = forward;
+		public static readonly Vector fwd = forward;
 		[Description("Vector(0, 0, -1).")]
-		public static readonly ConstVector back = new ConstVector(Vector3d.back);
+		public static readonly Vector back = new Vector(Vector3d.back);
 		[Description("Vector(0, 1, 0).")]
-		public static readonly ConstVector up = new ConstVector(Vector3d.up);
+		public static readonly Vector up = new Vector(Vector3d.up);
 		[Description("Vector(0, -1, 0).")]
-		public static readonly ConstVector down = new ConstVector(Vector3d.down);
+		public static readonly Vector down = new Vector(Vector3d.down);
 		[Description("Vector(-1, 0, 0).")]
-		public static readonly ConstVector left = new ConstVector(Vector3d.left);
+		public static readonly Vector left = new Vector(Vector3d.left);
 		[Description("Vector(1, 0, 0).")]
-		public static readonly ConstVector right = new ConstVector(Vector3d.right);
+		public static readonly Vector right = new Vector(Vector3d.right);
 		[Description("Vector(nan, nan, nan).")]
-		public static readonly ConstVector none = new ConstVector(new Vector3d(double.NaN, double.NaN, double.NaN));
+		public static readonly Vector none = new Vector(new Vector3d(double.NaN, double.NaN, double.NaN));
 
 		[Description("Cross product.")]
-		public static Vector cross(ConstVector a, ConstVector b)
+		public static Vector cross(Vector a, Vector b)
 			=> new Vector(Vector3d.Cross(a.native, b.native));
 		[Description("Cross product. (Alias to cross)")]
-		public static Vector crs(ConstVector a, ConstVector b)
+		public static Vector crs(Vector a, Vector b)
 			=> new Vector(Vector3d.Cross(a.native, b.native));
 		[Description("Scale vector by vector. Per axis. Multiplication does the same.")]
-		public static Vector scale(ConstVector a, ConstVector b)
+		public static Vector scale(Vector a, Vector b)
 			=> a * b;
 		[Description("Shrink vector by vector. Per axis. Division does the same.")]
-		public static Vector shrink(ConstVector a, ConstVector b)
+		public static Vector shrink(Vector a, Vector b)
 			=> a / b;
 		[Description("Vector with coordinates changed to non-negative.")]
-		public static Vector abs(ConstVector v)
+		public static Vector abs(Vector v)
 			=> new Vector(Math.Abs(v.x), Math.Abs(v.y), Math.Abs(v.z));
 		[Description("Dot product.")]
-		public static double dot(ConstVector a, ConstVector b)
+		public static double dot(Vector a, Vector b)
 			=> Vector3d.Dot(a.native, b.native);
 		[Description("Angle between vectors (0..180).")]
-		public static double angle(ConstVector a, ConstVector b)
+		public static double angle(Vector a, Vector b)
 			=> Vector3d.Angle(a.native, b.native);
 
 		public static Vector3d scale(Vector3d a, Vector3d b)
@@ -107,21 +107,21 @@ namespace RedOnion.KSP.API
 			return Call(ref result, self, ros, false) ? result.ToLua() : DynValue.Void;
 		}
 
-		public static Vector ToVector(object value)
-			=> ToVector3d(value, out var v) ? new Vector(v) : null;
-		public static Vector ToVector(Value value)
-			=> ToVector3d(value, out var v) ? new Vector(v) : null;
+		public static Vector? ToVector(object value)
+			=> ToVector3d(value, out var v) ? new Vector(v) : (Vector?)null;
+		public static Vector? ToVector(Value value)
+			=> ToVector3d(value, out var v) ? new Vector(v) : (Vector?)null;
 		[Browsable(false), MoonSharpHidden]
-		public static ConstVector ToConstVector(object value)
-			=> ToVector3d(value, out var v) ? new ConstVector(v) : null;
+		public static Vector? ToConstVector(object value)
+			=> ToVector3d(value, out var v) ? new Vector(v) : (Vector?)null;
 		[Browsable(false), MoonSharpHidden]
-		public static ConstVector ToConstVector(Value value)
-			=> ToVector3d(value, out var v) ? new ConstVector(v) : null;
+		public static Vector? ToConstVector(Value value)
+			=> ToVector3d(value, out var v) ? new Vector(v) : (Vector?)null;
 		public static bool ToVector3d(object value, out Vector3d result)
 		{
 			if (value != null)
 			{
-				if (value is ConstVector v)
+				if (value is Vector v)
 				{
 					result = v.native;
 					return true;

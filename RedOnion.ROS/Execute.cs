@@ -353,10 +353,8 @@ namespace RedOnion.ROS
 
 					case OpCode.Index:
 					{
-						Dereference(1);
+						Dereference(2);
 						ref var lhs = ref vals.Top(-2);
-						if (lhs.IsReference && !lhs.desc.Get(ref lhs, lhs.num.Int))
-							throw CouldNotGet(ref lhs);
 						var idx = lhs.desc.IndexFind(ref lhs, new Arguments(Arguments, 1));
 						if (idx < 0)
 							throw InvalidOperation("'{0}' cannot be indexed by '{1}'", lhs.Name, vals.Top().ToString());
@@ -367,10 +365,8 @@ namespace RedOnion.ROS
 					case OpCode.IndexN:
 					{
 						var n = code[at++];
-						Dereference(n-1);
+						Dereference(n);
 						ref var it = ref vals.Top(-n);
-						if (it.IsReference && !it.desc.Get(ref it, it.num.Int))
-							throw CouldNotGet(ref it);
 						var idx = it.desc.IndexFind(ref it, new Arguments(Arguments, n - 1));
 						if (idx < 0)
 							throw InvalidOperation("'{0}' cannot be indexed by '{1}'", it.Name, vals.Top().ToString());

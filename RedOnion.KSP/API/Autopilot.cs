@@ -19,7 +19,7 @@ namespace RedOnion.KSP.API
 		// inputs
 		protected float _throttle, _rawPitch, _rawYaw, _rawRoll;
 		protected double _pitch, _heading, _roll;
-		protected Vector3d _direction;
+		protected Vector _direction;
 		protected bool _killRot;
 
 		protected internal Autopilot(Ship ship)
@@ -39,7 +39,7 @@ namespace RedOnion.KSP.API
 			_pitch = double.NaN;
 			_heading = double.NaN;
 			_roll = double.NaN;
-			_direction = new Vector3d(double.NaN, double.NaN, double.NaN);
+			_direction = new Vector(double.NaN, double.NaN, double.NaN);
 			Unhook();
 		}
 
@@ -86,9 +86,9 @@ namespace RedOnion.KSP.API
 			set => Check(_rawRoll = RosMath.Clamp(value, -1f, +1f));
 		}
 
-		[Convert(typeof(Vector)), Description("Target direction vector."
+		[Description("Target direction vector."
 			+ " NaN/vector.none for releasing the control.")]
-		public Vector3d direction
+		public Vector direction
 		{
 			get
 			{
@@ -102,14 +102,13 @@ namespace RedOnion.KSP.API
 					var heading = _heading;
 					if (double.IsNaN(heading))
 						heading = _ship.heading;
-					return QuaternionD.AngleAxis(heading, _ship.away) *
-						(QuaternionD.AngleAxis(-pitch, _ship.east) * _ship.north);
+					return _ship.north.rotate(-pitch, _ship.east).rotate(heading, _ship.away);
 				}
 				return _direction;
 			}
 			set => Check((_direction = double.IsNaN(value.x)
 				|| double.IsNaN(value.y) || double.IsNaN(value.z)
-				? new Vector3d(double.NaN, double.NaN, double.NaN)
+				? new Vector(double.NaN, double.NaN, double.NaN)
 				: value).x);
 		}
 

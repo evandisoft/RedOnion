@@ -16,7 +16,7 @@ namespace RedOnion.KSP.API
 {
 	public interface ISpaceObject
 	{
-		Vector3d position { get; }
+		Vector position { get; }
 		ISpaceObject body { get; }
 	} 
 	public class Bodies : Properties<SpaceBody>.WithMap<CelestialBody>, ICompletable
@@ -65,8 +65,8 @@ namespace RedOnion.KSP.API
 
 		[Description("Name of the body.")]
 		public string name => native.bodyName;
-		[Convert(typeof(Vector)), Description("Position of the body (relative to active ship).")]
-		public Vector3d position => native.position;
+		[Description("Position of the body (relative to active ship).")]
+		public Vector position => new Vector(native.position);
 		[Description("Celestial body this body is orbiting.")]
 		public SpaceBody body => Bodies.Instance[native.referenceBody];
 		ISpaceObject ISpaceObject.body => body;
