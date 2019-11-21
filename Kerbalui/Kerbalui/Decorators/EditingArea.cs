@@ -93,7 +93,8 @@ namespace Kerbalui.Decorators
 				// When the event is a KeyDown or MouseDown, at this point, we want the underlying control
 				// to be able to modify the cursor position using the key or new mouse click so we take the results
 				// of the controls automatic handling of those events and use it to update the CursorIndex and SelectIndex.
-				if (Event.current.type == EventType.KeyDown || Event.current.type == EventType.MouseDown)
+				if (Event.current.type == EventType.KeyDown || Event.current.type == EventType.MouseDown ||
+					Event.current.type == EventType.MouseDrag)
 				{
 					editableText.Update();
 
@@ -103,7 +104,7 @@ namespace Kerbalui.Decorators
 					LineNumber = CurrentLineNumber() + 1;
 					ColumnNumber = CharsFromLineStart() + 1;
 				}
-				// Else, we don't want the update on the base control to modify the CursorIndex and SelectIndex,
+				// Otherwise, we don't want the update on the base control to modify the CursorIndex and SelectIndex,
 				// as it seems to sometimes cause problems. Specifically it caused a problem when scrolling down
 				// the CompletionArea of LiveRepl and then clicking an entry to complete. It failed to update the
 				// CursorIndex of the Editor after the completion, leaving it at the beginning of the completion
