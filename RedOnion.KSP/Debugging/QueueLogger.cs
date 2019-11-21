@@ -102,6 +102,8 @@ namespace RedOnion.KSP.Debugging {
             return sb.ToString();
         }
 
+
+
         public void Log()
         {
             StringBuilder sb = new StringBuilder();

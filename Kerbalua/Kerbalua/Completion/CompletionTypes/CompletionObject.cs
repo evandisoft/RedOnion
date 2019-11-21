@@ -12,6 +12,7 @@ namespace Kerbalua.Completion.CompletionTypes
 		{
 			return GetType().Name;
 		}
+
 		/// <summary>
 		/// </summary>
 		/// <returns><c>true</c>, if operation was tryed, <c>false</c> otherwise.</returns>
