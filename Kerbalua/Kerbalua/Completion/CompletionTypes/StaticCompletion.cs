@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using MoonSharp.Interpreter;
 using RedOnion.KSP.Attributes;
 using RedOnion.ROS;
 using static RedOnion.KSP.Debugging.QueueLogger;
@@ -44,6 +45,11 @@ namespace Kerbalua.Completion.CompletionTypes
 			Complogger.Log("type is "+type+", member name is "+getMember.Name);
 			if (CompletionReflectionUtil.TryGetField(type, getMember.Name, out FieldInfo fieldInfo, CompletionReflectionUtil.StaticPublic))
 			{
+				if (fieldInfo.GetCustomAttribute<MoonSharpHiddenAttribute>()!=null)
+				{
+					completionObject=null;
+					return false;
+				}
 				//Type newType = fieldInfo.FieldType;
 				//Static field access can be completed as an object.
 				var obj = fieldInfo.GetValue(null);
@@ -64,6 +70,11 @@ namespace Kerbalua.Completion.CompletionTypes
 			{
 				if (CompletionReflectionUtil.TryGetProperty(type, getMember.Name, out PropertyInfo propertyInfo, CompletionReflectionUtil.StaticPublic))
 				{
+					if (propertyInfo.GetCustomAttribute<MoonSharpHiddenAttribute>()!=null)
+					{
+						completionObject=null;
+						return false;
+					}
 					var obj = propertyInfo.GetValue(null);
 					if (obj==null)
 					{
