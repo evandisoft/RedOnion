@@ -1,6 +1,6 @@
-## MoonSharpReflection
+## Reflection
 
-List of functions that are specific to KerbaluaScript.
+Reflection functionality specific to Moonsharp.
 
 - `isstatic()`: bool, dynValue DynValue
   - Returns true if the argument is a static.

@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Reflection;
+using System.Text;
 
 namespace RedOnion.Build
 {
@@ -71,6 +72,7 @@ namespace RedOnion.Build
 			if (type.Assembly != typeof(Globals).Assembly
 				&& type.Assembly != typeof(RedOnion.UI.Element).Assembly)
 				return;
+			var fullType = type;
 			if (type.IsGenericType)
 				type = type.GetGenericTypeDefinition();
 			if (type.IsGenericParameter || type.FullName == null)
@@ -78,6 +80,11 @@ namespace RedOnion.Build
 			var desc = type.GetCustomAttribute<DescriptionAttribute>()?.Description;
 			if (desc != null && discovered.Add(type))
 				queue.Add(type);
+			if (fullType != type)
+			{
+				foreach (var gen in fullType.GetGenericArguments())
+					RegisterType(gen);
+			}
 		}
 		internal static void Exec()
 		{
@@ -215,6 +222,9 @@ namespace RedOnion.Build
 		static string ResolveType(Document doc, Type type, out string name)
 		{
 			string path = null;
+			var fullType = type;
+			if (type.IsGenericType)
+				type = type.GetGenericTypeDefinition();
 			if (redirects.TryGetValue(type, out var redir))
 				type = redir;
 			if (!typeNames.TryGetValue(type, out name))
@@ -232,36 +242,66 @@ namespace RedOnion.Build
 					path = GetRelativePath(doc.path, tdoc.path) + ".md";
 				}
 			}
-			return path;
+			if (type == fullType)
+				return path == null ? name : string.Format("[{0}]({1})", name, path);
+			var sb = new StringBuilder();
+			name = name.Substring(0, name.LastIndexOfAny(new char[] { '.', '`' }));
+			if (path == null) sb.Append(name);
+			else sb.AppendFormat("[{0}]({1})", name, path);
+			sb.Append("\\[");
+			var first = true;
+			foreach (var gen in fullType.GetGenericArguments())
+			{
+				if (!first)
+					sb.Append(", ");
+				first = false;
+				sb.Append(ResolveType(doc, gen, out _));
+			}
+			sb.Append("\\]");
+			return sb.ToString();
 		}
+
 		static void PrintSimpleMember(StreamWriter wr, Document doc, string name, MemberInfo member, Type type)
 		{
 			var desc = member.GetCustomAttribute<DescriptionAttribute>().Description;
-			var typePath = ResolveType(doc, type, out var typeName);
+			var typeMd = ResolveType(doc, type, out var typeName);
 			if (member is MethodInfo || typeof(ICallable).IsAssignableFrom(type))
 				name += "()";
-			else if (member is PropertyInfo p && p.GetIndexParameters().Length > 0)
-				name = "[index]";
-			wr.WriteLine(typePath == null
-				? "- `{0}`: {1} - {3}"
-				: "- `{0}`: [{1}]({2}) - {3}",
-				name, typeName, typePath, desc);
+			else if (member is PropertyInfo p)
+			{
+				var pars = p.GetIndexParameters();
+				if (pars.Length > 0)
+				{
+					var sb = new StringBuilder();
+					sb.Append("[");
+					for (int i = 0; i < pars.Length; i++)
+					{
+						if (i > 0)
+							sb.Append(", ");
+						sb.Append(pars[i].Name);
+						sb.Append(" ");
+						var pmd = ResolveType(doc, pars[i].ParameterType, out _);
+						sb.Append(pmd);
+					}
+					sb.Append("]");
+					name = sb.ToString();
+				}
+			}
+			wr.WriteLine("- `{0}`: {1} - {2}", name, typeMd, desc);
 		}
 
 		static void PrintMethod(StreamWriter wr, Document doc, string name, MethodInfo method)
 		{
 			var desc = method.GetCustomAttribute<DescriptionAttribute>().Description;
 			var type = method.ReturnType;
-			var typePath = ResolveType(doc, type, out var typeName);
+			var typeMd = ResolveType(doc, type, out _);
 			var pars = method.GetParameters();
-			wr.Write("- `{0}()`: ", name);
-			wr.Write(typePath == null ? "{0}" : "[{0}]({1})", typeName, typePath);
+			wr.Write("- `{0}()`: {1}", name, typeMd);
 			foreach (var par in pars)
 			{
 				type = par.ParameterType;
-				typePath = ResolveType(doc, type, out typeName);
-				wr.Write(typePath == null ? ", {0} {1}" : ", {0} [{1}]({2})",
-					par.Name, typeName, typePath);
+				typeMd = ResolveType(doc, type, out _);
+				wr.Write(", {0} {1}", par.Name, typeMd);
 			}
 			if (pars.Length > 0)
 				wr.WriteLine();

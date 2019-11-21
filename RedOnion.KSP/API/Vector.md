@@ -45,7 +45,7 @@ NOTE: Subject to change - may revert to `Vector3d` with custom descriptor.
 - `squareSize`: double - Square size of the vector - `x*x+y*y+z*z`. Scale if setting.
 - `Vector3`: Vector3 - Native UnityEngine.Vector3 (`float x,y,z`).
 - `Vector2`: Vector2 - Native UnityEngine.Vector2 (`float x,y`).
-- `[index]`: double - Index the coordinates as double[3]
+- `[i int]`: double - Index the coordinates as double[3]
 - `dot()`: double, rhs [ConstVector](ConstVector.md)
   - Dot product of this vector and another vector.
 - `angle()`: double, rhs [ConstVector](ConstVector.md)

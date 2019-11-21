@@ -9,7 +9,7 @@ Read-only set of engines.
 - `thrust`: double - Current thrust [kN] (at current pressure, with current `thrustPercentage` and current throttle).
 - `ship`: [Ship](../API/Ship.md) - Ship (vessel/vehicle) this list of parts belongs to.
 - `count`: int - Number of elements in the list (or set).
-- `[index]`: [Engine](Engine.md) - Get element by index. Will throw exception if index is out of range.
+- `[index int]`: [Engine](Engine.md) - Get element by index. Will throw exception if index is out of range.
 - `getThrust()`: double, atm float, throttle float
   - Get thrust [kN] of all operational engines at atmospheric pressure (0 = vacuum, 1 = Kerbin sea-level pressure, NaN = current pressure) and throttle (default 1 = full throttle).
 - `getIsp()`: double, atm double

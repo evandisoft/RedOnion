@@ -16,6 +16,8 @@ namespace RedOnion.KSP.Tests
 		}
 		public static void LogListener(string msg)
 			=> System.Diagnostics.Debug.WriteLine(msg);
+		public override void Log(string msg)
+			=> System.Diagnostics.Debug.WriteLine(msg);
 		public static Descriptor CustomCreateDescriptor(Type type)
 		{
 			if (type.IsSubclassOf(typeof(Delegate)))
@@ -84,15 +86,15 @@ namespace RedOnion.KSP.Tests
 		[Test]
 		public void API_Vec01_Create()
 		{
-			Test("v(1)");
+			Test("vector(1)");
 			var v = Result.obj as Vector;
 			Assert.NotNull(v);
 			Assert.AreEqual(1.0, v.x);
 			Assert.AreEqual(1.0, v.y);
 			Assert.AreEqual(1.0, v.z);
-			Test(1.0, "v(1).x");
+			Test(1.0, "vector(1).x");
 
-			Test("var a = v 1,2u");
+			Test("var a = vector 1,2u");
 			v = Result.obj as Vector;
 			Assert.NotNull(v);
 			Assert.AreEqual(1.0, v.x);
@@ -100,7 +102,7 @@ namespace RedOnion.KSP.Tests
 			Assert.AreEqual(0.0, v.z);
 			Test(2.0, "a.y");
 
-			Test("var b = v 1,2f,3.0");
+			Test("var b = vector 1,2f,3.0");
 			v = Result.obj as Vector;
 			Assert.NotNull(v);
 			Assert.AreEqual(1.0, v.x);
@@ -111,14 +113,14 @@ namespace RedOnion.KSP.Tests
 		[Test]
 		public void API_Vec02_Unary()
 		{
-			Test("-v(1)");
+			Test("-vector(1)");
 			var v = Result.obj as Vector;
 			Assert.NotNull(v);
 			Assert.AreEqual(-1.0, v.x);
 			Assert.AreEqual(-1.0, v.y);
 			Assert.AreEqual(-1.0, v.z);
 
-			Test("+v(1)");
+			Test("+vector(1)");
 			v = Result.obj as Vector;
 			Assert.NotNull(v);
 			Assert.AreEqual(1.0, v.x);
@@ -128,8 +130,8 @@ namespace RedOnion.KSP.Tests
 		[Test]
 		public void API_Vec03_Binary()
 		{
-			Test("var a = v 1,2,3");
-			Test("var b = v 4,5,6");
+			Test("var a = vector 1,2,3");
+			Test("var b = vector 4,5,6");
 			Test("a + b");
 			var v = Result.obj as Vector;
 			Assert.NotNull(v);
@@ -169,12 +171,12 @@ namespace RedOnion.KSP.Tests
 		{
 			Globals.Add("test", typeof(ConvertTest));
 			ConvertTest.v3d = Vector3d.zero;
-			Test("test.v3d = v.one");
+			Test("test.v3d = vector.one");
 			Assert.AreEqual(1.0, ConvertTest.v3d.x);
 			ConvertTest.v3 = UnityEngine.Vector3.zero;
-			Test("test.v3 = v.one");
+			Test("test.v3 = vector.one");
 			Assert.AreEqual(1f, ConvertTest.v3.x);
-			Test("v.abs -v test.v3");
+			Test("vector.abs -vector test.v3");
 			var v = Result.obj as Vector;
 			Assert.NotNull(v);
 			Assert.AreEqual(1.0, v.x);
@@ -187,7 +189,7 @@ namespace RedOnion.KSP.Tests
 		public void API_Vec05_Methods()
 		{
 			Lines(
-				"var a = +v.one",
+				"var a = +vector.one",
 				"a.scale 2",
 				"return a");
 			var v = Result.obj as Vector;
@@ -208,7 +210,7 @@ namespace RedOnion.KSP.Tests
 		public void API_Vec06_Index()
 		{
 			Lines(1.0,
-				"var a = v 1,2",
+				"var a = vector 1,2",
 				"return a[0]");
 			Test(2.0, "a[1]");
 			Test(0.0, "a[2]");
