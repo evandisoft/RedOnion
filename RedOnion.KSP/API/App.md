@@ -1,6 +1,6 @@
 ## App
 
-Safe API for KSP Application Launcher (toolbar/buttons).
+Safe API for KSP Application Launcher (toolbar/buttons). WIP
 
 - `ready`: bool - Application launcher is ready for use.
 - `defaultIcon`: Texture2D - Default Red Onion Icon.

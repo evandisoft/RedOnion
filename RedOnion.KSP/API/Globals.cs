@@ -19,23 +19,18 @@ namespace RedOnion.KSP.API
 	public static class Globals
 	{
 		[Description("An api for setting which scripts will be ran when an engine is reset.")]
-		//public static AutoRun autorun => AutoRun.Instance;
-
 		public static readonly Type autorun = typeof(AutoRun);
-		[Description("Safe API for KSP Application Launcher (toolbar/buttons).")]
-		public static readonly Type app = typeof(App);
 
-		[Description("A collection of space/celestial bodies. (Safe API)")]
-		public static Bodies bodies => Bodies.Instance;
+		[Description("User Interface.")]
+		public static readonly Type ui = typeof(UI_Namespace);
+		[Unsafe, Description("Shortcuts to (unsafe) KSP API + some tools.")]
+		public static readonly Type ksp = typeof(KSP_Namespace);
+		[Unsafe, Description("Shortcuts to (unsafe) Unity API.")]
+		public static readonly Type unity = typeof(Unity_Namespace);
 
-		//Not sure if I want to add this yet. It works, but not sure it will be
-		// structured this way.
-		//[Unsafe, Description("A map of kerbal names to kerbals for kerbals in the crew.")]
-		//public static KerbalsDictionary kerbals => KerbalsDictionary.Instance;
-		[Unsafe, Description("Namespace Mappings")]
+		[Unsafe, Description("Namespace Mappings (import of native types by namespace).")]
 		public static readonly NamespaceInstance native = NamespaceMappings.DefaultAssemblies.GetNamespace("");
-
-		[Unsafe, Description("Reflected/imported stuff by assembly name.")]
+		[Unsafe, Description("Assembly Mappings (import of native types by assembly.")]
 		public static readonly GetMappings assembly = new GetMappings();
 
 		[Description("Function for creating 3D vector / coordinate.")]
@@ -54,6 +49,14 @@ namespace RedOnion.KSP.API
 		[Description("User/player controls.")]
 		public static Player user => Player.Instance;
 
+		[Description("A collection of space/celestial bodies. (Safe API)")]
+		public static Bodies bodies => Bodies.Instance;
+
+		//Not sure if I want to add this yet. It works, but not sure it will be
+		// structured this way.
+		//[Unsafe, Description("A map of kerbal names to kerbals for kerbals in the crew.")]
+		//public static KerbalsDictionary kerbals => KerbalsDictionary.Instance;
+
 		[Description("Alias to `ship.altitude`. (`NaN` if no ship.)")]
 		public static double altitude => ship?.altitude ?? double.NaN;
 		[Description("Alias to `ship.apoapsis`. (`NaN` if no ship.)")]
@@ -68,12 +71,8 @@ namespace RedOnion.KSP.API
 		[Description("PID regulator (alias to `system.pid` in ROS).")]
 		public static readonly Type PID = typeof(PID);
 
-		[Description("User Interface.")]
-		public static readonly Type ui = typeof(UI_Namespace);
-		[Unsafe, Description("Shortcuts to (unsafe) KSP API + some tools.")]
-		public static readonly Type ksp = typeof(KSP_Namespace);
-		[Unsafe, Description("Shortcuts to (unsafe) Unity API.")]
-		public static readonly Type unity = typeof(Unity_Namespace);
+		[Description("Safe API for KSP Application Launcher (toolbar/buttons). WIP")]
+		public static readonly Type app = typeof(App);
 	}
 
 	public class RosGlobals : RedOnion.ROS.Objects.Globals

@@ -81,6 +81,7 @@
     <Compile Include="API\Autopilot.cs" />
     <Compile Include="API\ConstVector.cs" />
     <Compile Include="API\Globals.cs" />
+    <Compile Include="Parts\PartChildren.cs" />
     <Compile Include="Utilities\DocBuildAttribute.cs" />
     <Compile Include="Utilities\InteropUtilities.cs" />
     <Compile Include="API\VectorUtils.cs" />
@@ -171,17 +172,12 @@
       <Name>RedOnion.UI</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
-  <ItemGroup />
-  <ItemGroup />
-  <ItemGroup />
   <ItemGroup>
-    <Folder Include="MoonSharp\CommonAPI\" />
     <Folder Include="New Folder\" />
-    <Folder Include="Attributes\" />
-    <Folder Include="MoonSharp\Interfaces\" />
-    <Folder Include="MoonSharp\MoonSharpAPI\" />
-    <Folder Include="Debugging\" />
   </ItemGroup>
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
