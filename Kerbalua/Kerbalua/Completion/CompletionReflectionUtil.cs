@@ -10,6 +10,7 @@ namespace Kerbalua.Completion
 {
 	public class CompletionReflectionUtil
 	{
+		static HashSet<string> HiddenMethodNames=new HashSet<string>{"Equals","GetHashCode","GetType","ToString"};
 		static public IList<string> GetMemberNames(Type t,BindingFlags flags=BindingFlags.Default)
 		{
 			var strs = new HashSet<string>();
@@ -36,6 +37,10 @@ namespace Kerbalua.Completion
 			}
 			foreach (var method in t.GetMethods(flags))
 			{
+				if (HiddenMethodNames.Contains(method.Name))
+				{
+					continue;
+				}
 				if (method.GetCustomAttribute<MoonSharpHiddenAttribute>()!=null)
 				{
 					continue;
