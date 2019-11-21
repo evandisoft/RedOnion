@@ -9,4 +9,4 @@ function selfDestruct(part)
     sleep(Random.RandomRange(0,10))
 end
 
-selfDestruct(ship.parts[0].native)
+selfDestruct(ship.parts[0])

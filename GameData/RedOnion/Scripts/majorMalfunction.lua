@@ -7,6 +7,6 @@ for j=1,8 do
     
     local num=Random.Range(0,ship.parts.count)
     print(ship.parts[num].ToString().."is malfunctioning!")
-    ship.parts[num].native.explode()
+    ship.parts[num].explode()
 end
 print("Done!")

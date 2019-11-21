@@ -66,7 +66,7 @@ namespace Kerbalui.Decorators
 				int id = GUIUtility.keyboardControl;
 				backingEditor = (TextEditor)GUIUtility.GetStateObject(typeof(TextEditor), id);
 			}
-
+			
 			if (editableText.style == null)
 			{
 				editableText.style = new GUIStyle(GUI.skin.textArea);
@@ -93,8 +93,7 @@ namespace Kerbalui.Decorators
 				// When the event is a KeyDown or MouseDown, at this point, we want the underlying control
 				// to be able to modify the cursor position using the key or new mouse click so we take the results
 				// of the controls automatic handling of those events and use it to update the CursorIndex and SelectIndex.
-				if (Event.current.type == EventType.KeyDown || Event.current.type == EventType.MouseDown ||
-					Event.current.type == EventType.MouseDrag)
+				if (Event.current.type == EventType.KeyDown || Event.current.isMouse)
 				{
 					editableText.Update();
 
