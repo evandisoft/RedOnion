@@ -14,18 +14,11 @@ but our goal now is to:
 - Allow users to do whatever they wish to do to the game environment to have fun.
 - Help modders develop and debug their mods using this mod.
 - Help anybody to explore KSP API, their own or other's mods
-  (read the license of each mod, we expose only `public` members).
+  (read the license of each mod, we expose only `public` members directly).
 
- 
-## Differences between ROS and Lua
 
-[**Lua**](Kerbalua/README.md)
-is well known scripting language
-and may offer more comfort and safety, while
-[**ROS** (Red Onion Script)](RedOnion.ROS/README.md)
-aims to make coding easier.
-**ROS** was created anew and may contain bugs,
-**Lua** may lack some features but should be more stable.
+## Scripting Languages
+We have two scripting languages, [**Kerbalua**](Kerbalua/README.md), and [**ROS** (Red Onion Script)](RedOnion.ROS/README.md). **Kerbalua** is a Lua implementation, while **ROS** is a custom new language designed to make programming easier by requiring very little syntax (examples: python-like indentation to mark program structure, and function calls/definitions without parenthesis).
 
 Scripts are currently stored in GameData/RedOnion/Scripts,
 our own scripts are packed inside GameData/RedOnion/Scripts.zip.
