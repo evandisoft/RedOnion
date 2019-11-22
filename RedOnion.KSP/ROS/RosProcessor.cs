@@ -16,6 +16,20 @@ namespace RedOnion.KSP.ROS
 {
 	public class RosProcessor : Processor, IProcessor
 	{
+		protected OS.Process _process;
+		public OS.Process Process
+		{
+			get
+			{
+				if (_process == null)
+				{
+					_process = new OS.Process();
+					_process.shutdown += Reset;
+				}
+				return _process;
+			}
+		}
+
 		public RosProcessor()
 			=> Globals = new RosGlobals();
 		protected RosProcessor(RedOnion.ROS.Objects.Globals globals)
@@ -24,9 +38,21 @@ namespace RedOnion.KSP.ROS
 		{
 			base.Reset();
 			Globals = new RosGlobals();
+			if (_process != null)
+			{
+				_process.shutdown -= Reset;
+				_process.terminate();
+				_process = null;
+			}
 		}
 		protected void ProcessorReset()
 			=> base.Reset();
+
+		public override bool Execute(int countdown = 1000)
+		{
+			OS.Process.current = Process;
+			return base.Execute(countdown);
+		}
 
 		public override void Log(string msg)
 			=> UE.Debug.Log("[RedOnion] " + msg);

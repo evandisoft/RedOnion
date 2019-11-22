@@ -4,9 +4,8 @@ using System.Linq;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
 using RedOnion.KSP.Completion;
-using RedOnion.ROS;
 
-namespace RedOnion.KSP.CommonAPIHelpers
+namespace RedOnion.KSP.Utilities
 {
 	/// <summary>
 	/// The purpose of this is to provide functionality like

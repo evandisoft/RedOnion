@@ -364,9 +364,9 @@ for
   wait
 maxThrottle = 1.0
 
-var choked = null
-var warned = false
 var almost = null
+var choked = null
+var warned = 0
 var maxHeight = ship.apoapsis*1.01+1000
 var prevReport = 0
 print "Burn!"
@@ -390,10 +390,10 @@ until (ship.eccentricity < 0.00001 // perfect
   if ship.engines.getThrust() == 0
     if choked == null
       choked = time()
-    if time()-choked > 3
-      warned = true
+    if time.since(choked) >= 3 and time.since(warned) >= 1
+      warned = time()
       print "No acceleration!"
-    if time()-choked > 30
+    if time()-choked >= 30
       print "No acceleration!!"
       break
     continue

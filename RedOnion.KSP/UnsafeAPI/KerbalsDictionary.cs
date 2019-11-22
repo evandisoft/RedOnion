@@ -1,6 +1,6 @@
 using System;
 using System.ComponentModel;
-using RedOnion.KSP.CommonAPIHelpers;
+using RedOnion.KSP.Utilities;
 
 namespace RedOnion.KSP.UnsafeAPI
 {

@@ -14,7 +14,7 @@ namespace RedOnion.ROS
 		/// when returning false).
 		/// </summary>
 		/// <param name="countdown">Countdown until auto-yield</param>
-		public bool Execute(int countdown = 1000)
+		public virtual bool Execute(int countdown = 1000)
 		{
 			if (Exit == ExitCode.Exception)
 				return true;

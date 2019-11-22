@@ -9,6 +9,7 @@ using RedOnion.KSP.API;
 using RedOnion.KSP.MoonSharp.CommonAPI;
 using System.ComponentModel;
 using RedOnion.KSP.MoonSharp.MoonSharpAPI;
+using Process = RedOnion.KSP.OS.Process;
 
 namespace Kerbalua.Scripting
 {
@@ -98,6 +99,7 @@ namespace Kerbalua.Scripting
 		Stopwatch sleepwatch=new Stopwatch();
 		delegate Table Importer(string name);
 		DynValue coroutine;
+		Process process;
 
 		public bool Evaluate(out DynValue result)
 		{
@@ -142,11 +144,16 @@ namespace Kerbalua.Scripting
 			DynValue mainFunction = base.DoString("return function () " + source + " end");
 
 			coroutine = CreateCoroutine(mainFunction);
+			process = new Process();
+			process.shutdown += Terminate;
 		}
 
 		public void Terminate()
 		{
 			coroutine = null;
+			process.shutdown -= Terminate;
+			process.terminate();
+			process = null;
 			sleepwatch.Reset();
 			sleeptimeMillis=0;
 		}
