@@ -154,6 +154,7 @@
     <Folder Include="LiveRepl\Interfaces\" />
     <Folder Include="LiveRepl\Completion\" />
     <Folder Include="LiveRepl\Decorators\" />
+    <Folder Include="LiveRepl\Execution\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Target Name="AfterBuild">

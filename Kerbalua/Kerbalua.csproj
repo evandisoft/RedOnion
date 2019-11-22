@@ -86,8 +86,6 @@
     <Compile Include="Kerbalua\Other\MoonSharpReplEvaluator.cs" />
     <Compile Include="Kerbalua\Other\ReplEvaluator.cs" />
     <Compile Include="Kerbalua\Other\RedOnionReplEvaluator.cs" />
-    <Compile Include="Kerbalua\MoonSharp\KerbaluaExecutionManager.cs" />
-    <Compile Include="Kerbalua\MoonSharp\ExecutionLimitException.cs" />
     <Compile Include="Kerbalua\Completion\Grammar\IncompleteLuaBaseListener.cs" />
     <Compile Include="Kerbalua\Completion\Grammar\IncompleteLuaBaseVisitor.cs" />
     <Compile Include="Kerbalua\Completion\Grammar\IncompleteLuaLexer.cs" />

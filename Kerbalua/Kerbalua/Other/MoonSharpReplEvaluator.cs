@@ -16,8 +16,6 @@ namespace Kerbalua.Other
     {
 		KerbaluaScript scriptEngine;
 
-		KerbaluaExecutionManager kem = new KerbaluaExecutionManager();
-
 		public override string Extension => ".lua";
 
 		public MoonSharpReplEvaluator()
