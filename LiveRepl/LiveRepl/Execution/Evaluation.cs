@@ -1,6 +1,8 @@
 using System;
-namespace Kerbalua.Other {
-	public class Evaluation {
+namespace LiveRepl.Evaluation 
+{
+	public class Evaluation 
+	{
 		public string Source { get; private set; }
 		public string Path { get; private set; }
 		public string Result { get; private set; }

@@ -72,6 +72,10 @@
       <Project>{F590B1DB-8F33-4986-8383-180952D63CDA}</Project>
       <Name>Kerbalua</Name>
     </ProjectReference>
+    <ProjectReference Include="..\LiveRepl\LiveRepl.csproj">
+      <Project>{9A325200-04F2-42D2-994E-06E7711EF9AA}</Project>
+      <Name>LiveRepl</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>

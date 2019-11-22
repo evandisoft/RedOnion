@@ -124,6 +124,10 @@
     <Compile Include="LiveRepl\Parts\PrintQueuesArea.cs" />
     <Compile Include="LiveRepl\Parts\QueueTagInputArea.cs" />
     <Compile Include="LiveRepl\Completion\CompletionManager.cs" />
+    <Compile Include="LiveRepl\Execution\Evaluation.cs" />
+    <Compile Include="LiveRepl\Execution\MoonSharpReplEvaluator.cs" />
+    <Compile Include="LiveRepl\Execution\RedOnionReplEvaluator.cs" />
+    <Compile Include="LiveRepl\Execution\ReplEvaluator.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

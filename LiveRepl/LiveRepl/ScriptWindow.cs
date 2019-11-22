@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using Kerbalua.Other;
-using Kerbalui.Controls;
-using Kerbalui.Types;
 using Kerbalui.Util;
 using LiveRepl.Completion;
 using RedOnion.KSP.Settings;

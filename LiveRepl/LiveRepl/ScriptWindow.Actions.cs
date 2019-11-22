@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using Kerbalua.Other;
+using LiveRepl.Evaluation;
 using RedOnion.KSP.API;
 using UnityEngine;
 
@@ -84,7 +84,7 @@ namespace LiveRepl
 		public System.Diagnostics.Stopwatch disableClock=new System.Diagnostics.Stopwatch();
 		public void Evaluate(string source, string path, bool withHistory = false)
 		{
-			evaluationList.Add(new Evaluation(source, path, currentReplEvaluator, withHistory));
+			evaluationList.Add(new xecuation(source, path, currentReplEvaluator, withHistory));
 		}
 
 		public void ResetEngine()
@@ -133,7 +133,7 @@ namespace LiveRepl
 				ReplEvaluator replEvaluator=GetReplEvaluatorByFilename(scriptname);
 				if (replEvaluator==null) continue;
 				uiparts.replOutoutArea.AddFileContent("loading "+scriptname+"...");
-				Evaluation newEvaluation=new Evaluation(replEvaluator.GetImportString(scriptname),scriptname,replEvaluator);
+				Evaluation.Evaluation newEvalxecun=new Evaluation.Evaluation(replEvaluator.GetImportString(scriptname), scriptname, replEvaluator);
 				evaluationList.Add(newEvaluation);
 			}
 		}

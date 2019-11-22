@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Kerbalua.Other;
 using Kerbalui.Controls;
-using Kerbalui.Util;
-using RedOnion.KSP.API;
+using LiveRepl.Evaluation;
 using RedOnion.KSP.Settings;
 using UnityEngine;
 
@@ -14,7 +12,7 @@ namespace LiveRepl
 	{
 		public bool ScriptRunning => evaluationList.Count!=0;
 
-		List<Evaluation> evaluationList = new List<Evaluation>();
+		List<Evaluation.Evaluation> evaluationList xecu List<Evaluation.Evaluation>();
 
 		public void SetCurrentEvaluator(string evaluatorName)
 		{

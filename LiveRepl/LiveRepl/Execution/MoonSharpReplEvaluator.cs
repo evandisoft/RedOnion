@@ -10,7 +10,7 @@ using RedOnion.KSP.Autopilot;
 using RedOnion.KSP.Settings;
 using System.IO;
 
-namespace Kerbalua.Other
+namespace LiveRepl.Execution
 {
     public class MoonSharpReplEvaluator:ReplEvaluator
     {

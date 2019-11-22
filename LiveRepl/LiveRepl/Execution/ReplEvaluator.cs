@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Kerbalua.Other {
+namespace LiveRepl.Evaluation {
 	/// <summary>
 	/// Subclasses of this class implement a function, ProtectedEvaluate, that evaluates
 	/// a string (source) and returns a toString of the result of evaluating

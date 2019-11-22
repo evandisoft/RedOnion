@@ -7,7 +7,7 @@ using RedOnion.KSP.Autopilot;
 using RedOnion.KSP.ROS;
 using RedOnion.ROS.Objects;
 
-namespace Kerbalua.Other
+namespace LiveRepl.Execution
 {
 	public class RedOnionReplEvaluator : ReplEvaluator
 	{
