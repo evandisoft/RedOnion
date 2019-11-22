@@ -39,4 +39,4 @@ There are some pitfalls of imgui. Some have been fixed with the new version of U
 
 One remaining one is that different sets of events are sent in Windows, as opposed to Linux (haven't tested on OSX).
 
-So I have a special system for dealing with these events which I won't describe, but is the purpose of the `ConsumeAndMarkNextCharEvent` and `ConsumeMarkedCharEvent` calls in `Kerbalui.Util.GUILibUtil.cs`
+So I have a special system for dealing with these events which I won't describe for now, but is the purpose of the `ConsumeAndMarkNextCharEvent` and `ConsumeMarkedCharEvent` calls in `Kerbalui.Util.GUILibUtil.cs`
