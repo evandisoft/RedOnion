@@ -125,8 +125,10 @@ namespace Kerbalua.Scripting
 				}
 			}
 
+			Process.current = process;
 			coroutine.Coroutine.AutoYieldCounter = 1000;
 			result = coroutine.Coroutine.Resume();
+			Process.current = null;
 
 			bool isComplete = false;
 			if (coroutine.Coroutine.State == CoroutineState.Dead)

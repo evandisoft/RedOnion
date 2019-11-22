@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Kerbalua")]
+
 namespace RedOnion.KSP.OS
 {
 	/// <summary>

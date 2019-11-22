@@ -51,7 +51,9 @@ namespace RedOnion.KSP.ROS
 		public override bool Execute(int countdown = 1000)
 		{
 			OS.Process.current = Process;
-			return base.Execute(countdown);
+			var result = base.Execute(countdown);
+			OS.Process.current = null;
+			return result;
 		}
 
 		public override void Log(string msg)
