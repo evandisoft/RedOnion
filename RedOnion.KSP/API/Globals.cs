@@ -18,6 +18,8 @@ namespace RedOnion.KSP.API
 	[Description("Global variables, objects and functions.")]
 	public static class Globals
 	{
+		#region Fields: Type references - Namespaces and singletons (static classes)
+
 		[Description("An api for setting which scripts will be ran when an engine is reset.")]
 		public static readonly Type autorun = typeof(AutoRun);
 
@@ -33,15 +35,25 @@ namespace RedOnion.KSP.API
 		[Unsafe, Description("Assembly Mappings (import of native types by assembly.")]
 		public static readonly GetMappings assembly = new GetMappings();
 
-		[Description("Function for creating 3D vector / coordinate.")]
-		public static VectorCreator vector => VectorCreator.Instance;
+		[Description("Staging logic.")]
+		public static readonly Type stage = typeof(Stage);
 		[Description("Current time and related functions.")]
 		public static readonly Type time = typeof(Time);
 
+		[Description("PID regulator (alias to `system.pid` in ROS).")]
+		public static readonly Type PID = typeof(PID);
+		[Description("Safe API for KSP Application Launcher (toolbar/buttons). WIP")]
+		public static readonly Type app = typeof(App);
+
+		#endregion
+
+		#region Props: Main objects and singletons (that cannot be static classes)
+
+		[Description("Function for creating 3D vector / coordinate.")]
+		public static VectorCreator vector => VectorCreator.Instance;
+
 		[Description("Active vessel (in flight only, null otherwise).")]
 		public static Ship ship => Ship.Active;
-		[Description("Staging logic.")]
-		public static Type stage=typeof(Stage);
 		[Description("Autopilot for active vessel. (`null` if no ship)")]
 		public static Autopilot autopilot => ship?.autopilot;
 		[Description("User/player controls.")]
@@ -57,6 +69,10 @@ namespace RedOnion.KSP.API
 		//[Unsafe, Description("A map of kerbal names to kerbals for kerbals in the crew.")]
 		//public static KerbalsDictionary kerbals => KerbalsDictionary.Instance;
 
+		#endregion
+
+		#region Props: shortcuts
+
 		[Description("Alias to `ship.altitude`. (`NaN` if no ship.)")]
 		public static double altitude => ship?.altitude ?? double.NaN;
 		[Description("Alias to `ship.apoapsis`. (`NaN` if no ship.)")]
@@ -68,11 +84,7 @@ namespace RedOnion.KSP.API
 		[Description("Atmosphere parameters of orbited body (redirects to `ship.body.atmosphere`, `atmosphere.none` if no ship).")]
 		public static SpaceBody.Atmosphere atmosphere => body?.atmosphere ?? SpaceBody.Atmosphere.none;
 
-		[Description("PID regulator (alias to `system.pid` in ROS).")]
-		public static readonly Type PID = typeof(PID);
-
-		[Description("Safe API for KSP Application Launcher (toolbar/buttons). WIP")]
-		public static readonly Type app = typeof(App);
+		#endregion
 	}
 
 	public class RosGlobals : RedOnion.ROS.Objects.Globals

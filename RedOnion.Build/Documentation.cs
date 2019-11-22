@@ -243,7 +243,11 @@ namespace RedOnion.Build
 			if (type.IsGenericType)
 				type = type.GetGenericTypeDefinition();
 			if (redirects.TryGetValue(type, out var redir))
-				type = redir;
+			{
+				fullType = type = redir;
+				if (type.IsGenericType)
+					type = type.GetGenericTypeDefinition();
+			}
 			if (!typeNames.TryGetValue(type, out name))
 				name = type.Name;
 			if (types.TryGetValue(type, out var tdoc))
