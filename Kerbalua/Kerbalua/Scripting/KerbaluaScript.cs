@@ -142,7 +142,7 @@ namespace Kerbalua.Scripting
 			{
 				source = "return " + source;
 			}
-			DynValue mainFunction = base.DoString("return function () " + source + " end");
+			DynValue mainFunction = base.DoString("return function () " + source + "\n end");
 
 			coroutine = CreateCoroutine(mainFunction);
 		}

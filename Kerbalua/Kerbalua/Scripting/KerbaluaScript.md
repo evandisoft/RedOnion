@@ -24,8 +24,9 @@ Normally entering a simple expresssion in lua would require one to also add that
 
 The next step is that the code needs to be a function in order for a coroutine to be created from it. So we create a string that will build and return a function from that source, and execute that string (`base.DoString`)
 
+(The "\n" is to prevent a line comment from commenting out the `end`)
 ```
-DynValue mainFunction = base.DoString("return function () " + source + " end");
+DynValue mainFunction = base.DoString("return function () " + source + "\n end");
 ```
 
 And then we have the coroutine.

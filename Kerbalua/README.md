@@ -10,4 +10,5 @@ Since MoonSharp is a lua implementation that can interact with CLR/C# objects, a
 ### API
 In addition to the [Common API](../RedOnion.KSP/Globals.md), Kerbalua has some functionality [specific to it](../RedOnion.KSP/MoonSharp/MoonSharpAPI/MoonSharpGlobals.md).
 
-Here is a [Tutorial](Tutorial.md) showing a working script in Lua that shows some of the features of our API.
+### Totorials/Guides
+- [MajorMalfunction](MajorMalfunction.md) - A script that causes 8 random parts to "malfunction".

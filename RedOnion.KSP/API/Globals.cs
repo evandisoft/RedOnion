@@ -15,7 +15,7 @@ using RedOnion.KSP.Attributes;
 
 namespace RedOnion.KSP.API
 {
-	[Description("Global variables, objects and functions.")]
+	[Description("Global variables, objects and functions common to all scripting languages.")]
 	public static class Globals
 	{
 		#region Fields: Type references - Namespaces and singletons (static classes)
