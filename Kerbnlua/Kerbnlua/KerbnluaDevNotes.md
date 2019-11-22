@@ -1,4 +1,5 @@
-﻿
+﻿## WIP Dev notes:
+
    https://stackoverflow.com/questions/26347022/meaning-of-the-from-parameter-of-lua-resume
 
 Seems that the NLua.Lua instance is a thread and if you mess it up you cannot resume.

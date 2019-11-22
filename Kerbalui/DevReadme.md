@@ -4,7 +4,7 @@ IT WAS NOT DESIGNED FOR OTHER PROJECTS. Many decisions were made for easy implem
 
 Part of the reason LiveRepl and Kerbalui are in different projects is because LiveRepl will probably someday be switched to use a different UI lib. 
 
-Kerbalui was designed specifically to provide functionality for use with LiveRepl and I have not spent time to make it a general UI Lib. This philosophy applies: http://c2.com/xp/YouArentGonnaNeedIt.html
+Kerbalui was designed specifically to provide functionality for use with LiveRepl and I have not spent time to make it a general UI Lib. This philosophy applies somewhat: http://c2.com/xp/YouArentGonnaNeedIt.html
 
 Part of the reason I have not tried to make it perfect is that [imgui](https://docs.unity3d.com/Manual/GUIScriptingGuide.html) is hard for me to work with.
 
