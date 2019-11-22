@@ -31,6 +31,8 @@ namespace LiveRepl.Parts
 		}
 
 		public override bool HorizontalScrollBarPresent { get => rect.width<editingArea.MinSize.x; }
+		public override bool VerticalScrollBarPresent { get => false; }
+
 
 		bool firstUse=false;
 		public override Vector2 MinSize
