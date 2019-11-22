@@ -1,7 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
 using MoonSharp.Interpreter;
+using RedOnion.KSP.API;
+using RedOnion.ROS;
 
 namespace RedOnion.KSP.MoonSharp.CommonAPI
 {

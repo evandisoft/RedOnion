@@ -18,7 +18,7 @@ namespace RedOnion.KSP.API
 		[Description("Whether ready for activating next stage or not.")]
 		public static bool ready => StageManager.CanSeparate;
 
-		[Description("Activate next stage (can simply call stage() instead)")]
+		[Description("Activate next stage (can call the stage object as a function in ROS)")]
 		public static bool activate()
 		{
 			if (!HighLogic.LoadedSceneIsFlight)

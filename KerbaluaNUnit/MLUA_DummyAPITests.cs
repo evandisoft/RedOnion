@@ -82,6 +82,13 @@ namespace KerbaluaNUnit
 			st.MemberCheck(t1, "save", typeof(CallbackFunction));
 		}
 
+		[Test()]
+		public void MLUA_DummyAPITests51_Callable()
+		{
+			Setup();
+			var t1=st.NamespaceCheck(globals,"stage"); ;
+		}
+
 		public IList<string> GetCompletions(string source,Table table)
 		{
 			return MoonSharpIntellisense.GetCompletions(table, source, source.Length, out int replaceStart, out int replaceEnd);
@@ -95,5 +102,7 @@ namespace KerbaluaNUnit
 			var completions=GetCompletions(source,apiTable);
 			Assert.AreEqual(5, completions.Count);
 		}
+
+
 	}
 }

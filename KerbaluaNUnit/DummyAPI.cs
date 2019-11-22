@@ -14,6 +14,7 @@ namespace KerbaluaNUnit
 			return b;
 		}
 
+		public static readonly Type stage = typeof(Stage);
 		public static readonly Type ui = typeof(UI_Namespace);
 		public static readonly Type autorun = typeof(AutoRun);
 	}
