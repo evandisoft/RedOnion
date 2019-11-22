@@ -83,10 +83,33 @@ namespace KerbaluaNUnit
 		}
 
 		[Test()]
-		public void MLUA_DummyAPITests51_Callable()
+		public void MLUA_DummyAPITests51_CallableProp()
 		{
 			Setup();
-			var t1=st.NamespaceCheck(globals,"stage"); ;
+			var t1=st.NamespaceCheck(globals,"callableprop"); ;
+			object[] args={};
+			object[] returns={CallableProperty_Namespace.callableprop};
+			var f=st.GetCheck(globals,"callableprop");
+			st.CallCheck(f,args, returns);
+		}
+
+		[Test()]
+		public void MLUA_DummyAPITests52_CallableMethod()
+		{
+			Setup();
+			var t1=st.NamespaceCheck(globals,"callablemethod");
+			object[] args={3};
+			object[] returns={CallableMethod_Namespace.callablemethod(3)};
+			var f=st.GetCheck(globals,"callablemethod");
+			st.CallCheck(f, args, returns);
+		}
+
+		[Test()]
+		public void MLUA_DummyAPITests51_CallableMethod()
+		{
+			Setup();
+			var t1=st.NamespaceCheck(globals,"callablemethod"); ;
+
 		}
 
 		public IList<string> GetCompletions(string source,Table table)
@@ -100,9 +123,7 @@ namespace KerbaluaNUnit
 			Setup();
 			string source="";
 			var completions=GetCompletions(source,apiTable);
-			Assert.AreEqual(5, completions.Count);
+			Assert.AreEqual(9, completions.Count);
 		}
-
-
 	}
 }

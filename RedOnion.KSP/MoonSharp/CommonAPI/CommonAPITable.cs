@@ -31,6 +31,31 @@ namespace RedOnion.KSP.MoonSharp.CommonAPI
 			var methods=type.GetMethods(publicStatic);
 			FillTableWithMethods(methods);
 
+			var callable=type.GetCustomAttribute<CallableAttribute>();
+			if (callable!=null)
+			{
+				var methodInfo=type.GetMethod(callable.Name,publicStatic);
+				if (methodInfo==null)
+				{
+					methodInfo=type.GetMethod("get_"+callable.Name);
+				}
+				Delegate dele=GetDelegateFromMethodInfo(methodInfo);
+
+				// createInvoker is a script that takes a function, f, and returns
+				// a new function, g, that, when called, will call f with
+				// its arguments after the first argument.
+				DynValue createInvoker = OwnerScript.DoString(
+				@"
+					return function(callFunc)
+						return function(table,...)
+							return callFunc({...})
+						end
+					end
+				");
+				DynValue invoker = OwnerScript.Call(createInvoker,dele);
+				MetaTable["__call"]=invoker;
+			}
+
 			return this;
 		}
 

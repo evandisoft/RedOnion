@@ -66,6 +66,8 @@
     <Compile Include="CommonAPITestUtil.cs" />
     <Compile Include="ScriptTester.cs" />
     <Compile Include="DummyAPI.cs" />
+    <Compile Include="CallableProperty_Namespace.cs" />
+    <Compile Include="CallableMethod_Namespace.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Kerbalua\Kerbalua.csproj">
