@@ -1,3 +1,5 @@
+## Project Structure
+
 The **RedOnion** project is divided into multiple projects:
 - [Kerbalua](Kerbalua/Development.md) - A MoonSharp-based [Lua scripting engine](Kerbalua/README.md).
 - **KerbaluaNUnit** - Tests for the **Kerbalua** project.
@@ -13,3 +15,21 @@ The **RedOnion** project is divided into multiple projects:
 - **RedOnion.Shell** - A shell where RedOnionScript can be ran independently of KSP.
 - **RedOnion.UI** - A ui lib that uses [Unity UI](https://docs.unity3d.com/2019.3/Documentation/Manual/UISystem.html). Intended to be used in scripting.
 
+## Project Reference Structure
+Since C# doesn't allow cyclic dependencies, this structure is important.
+
+```
+LiveRepl
+    RedOnion.KSP
+        RedOnion.ROS
+        RedOnion.UI
+    RedOnion.ROS
+    RedOnion.UI
+    Kerbalua
+        RedOnion.KSP
+        RedOnion.ROS
+        RedOnion.UI
+    Kerbalui
+        RedOnion.KSP
+        RedOnion.ROS
+```
