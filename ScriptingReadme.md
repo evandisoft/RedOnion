@@ -1,4 +1,17 @@
-## Scripting Topics
+## Scripting Languages
+We have two scripting languages, [**Kerbalua**](Kerbalua/README.md), and [**ROS** (Red Onion Script)](RedOnion.ROS/README.md). **Kerbalua** is a Lua implementation, while **ROS** is a custom language. **ROS** is designed to make programming easier by requiring very little syntax (examples: python-like indentation to mark program structure, and function calls/definitions without parenthesis).
+
+Scripts are currently stored in GameData/RedOnion/Scripts,
+our own scripts are packed inside GameData/RedOnion/Scripts.zip.
+You can override our scripts simply by opening them in REPL
+and saving the modified version (which will become a file outside of the zip).
+
+## Limitations
+- Calls to long running clr code is not interruptible.
+- You cannot safely pass a function to something like
+`List.Foreach(fn)` because we cannot interrupt the `Foreach` call. So the entire iteration would have to occur in one KSP FixedUpdate and it would pause the game to complete. Our scripting languages have functionality for iterating over CLR collections which IS interruptible, so it's safe to use that.
+
+## Scripting Links
 
 [Common API](RedOnion.KSP/API/Globals.md) - Objects and functions accessible by both Lua and ROS.
 

@@ -10,8 +10,6 @@ The **RedOnion** project is divided into multiple projects:
 - **RedOnion.OS** - Where we may implement a possible replacement for the current execution system.
 - **RedOnion.ROS** - The Red Onion Script custom language.
 - **RedOnion.ROS.Tests** - Tests for **RedOnion.ROS**
-- **RedOnion.Script** - Old version of Red Onion Sccript
-- **RedOnion.ScriptNUnit** - Tests for project **RedOnion.Script**
 - **RedOnion.Shell** - A shell where RedOnionScript can be ran independently of KSP.
 - **RedOnion.UI** - A ui lib that uses [Unity UI](https://docs.unity3d.com/2019.3/Documentation/Manual/UISystem.html). Intended to be used in scripting.
 

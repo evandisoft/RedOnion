@@ -2,8 +2,7 @@ The **Kerbalua** project is implemented using [MoonSharp](http://www.moonsharp.o
 
 The assembly name for our packaged MoonSharp dll has been renamed to `KerbaluaMoonSharp` for the reason explained [here](KerbaluaMoonSharp.md).
 
-# Implementation
-[KerbaluaScript](Kerbalua/Scripting/KerbaluaScript.md) is the class that implements the script engine itself.
+## Implementation
+[Kerbalua/Scripting/KerbaluaScript](Kerbalua/Scripting/KerbaluaScript.md) is the class that implements the script engine itself.
 
-Intellisense (Completion) is handled in the [Kerbalua/Completion](Kerbalua/Completion/CompletionReadme.md).
-
+Intellisense (Completion) is handled in [Kerbalua/Completion](Kerbalua/Completion/CompletionReadme.md).
