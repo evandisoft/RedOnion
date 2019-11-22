@@ -33,6 +33,9 @@ namespace Kerbalua.Scripting
 						=> DynValue.FromObject(script, new Vector(vector3d)) //DynValue.NewTable(new ModuleControlSurfaceProxyTable(this, m))
 					);
 
+			// This stuff is unsafe. User could pass a callback to List.Foreach and think it would run normally
+			// but the overall execution of the callback on every item of the list would have to complete before
+			// the game could return from fixed-update.
 			//GlobalOptions.CustomConverters
 			//	.SetScriptToClrCustomConversion(DataType.Function
 			//		, typeof(Func<object, object>), (f) => new Func<object, object>((item) =>
@@ -141,7 +144,7 @@ namespace Kerbalua.Scripting
 			{
 				source = "return " + source;
 			}
-			DynValue mainFunction = base.DoString("return function () " + source + " end");
+			DynValue mainFunction = base.DoString("return function () " + source + "\n end");
 
 			coroutine = CreateCoroutine(mainFunction);
 			process = new Process();

@@ -16,20 +16,11 @@ but our goal now is to:
 - Help anybody to explore KSP API, their own or other's mods
   (read the license of each mod, we expose only `public` members directly).
 
-
-## Scripting Languages
-We have two scripting languages, [**Kerbalua**](Kerbalua/README.md), and [**ROS** (Red Onion Script)](RedOnion.ROS/README.md). **Kerbalua** is a Lua implementation, while **ROS** is a custom language. **ROS** is designed to make programming easier by requiring very little syntax (examples: python-like indentation to mark program structure, and function calls/definitions without parenthesis).
-
-Scripts are currently stored in GameData/RedOnion/Scripts,
-our own scripts are packed inside GameData/RedOnion/Scripts.zip.
-You can override our scripts simply by opening them in REPL
-and saving the modified version (which will become a file outside of the zip).
-
 ## Documentation
 
-[Scripting](ScriptingReadme.md) - Documentation related to writing scripts.
+[Scripting](ScriptingReadme.md) - Documentation related to scripting.
 
-[Troubleshooting](TroubleShooting.md) - Some possible issues and solutions
+[Troubleshooting](TroubleShooting.md) - Some possible issues and solutions.
 
 [Development](DevelopmentReadme.md) - Main page for development documentation (project structure, implementation explanations, etc).
 

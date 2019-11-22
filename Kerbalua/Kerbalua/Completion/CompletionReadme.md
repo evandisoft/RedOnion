@@ -1,12 +1,29 @@
-﻿The design here is that a `CompletionObject` holds a reference to the object it is completing
-for and knows how to do completion for it. 
- 
-For methods of the form 
-`TryX(CompletionOperations operations, out CompletionObject completionObject)`,
-the subclass either performs the operation and moves the `operations` object forward, 
-or decides to merely return some other `CompletionObject` that the system should use for the 
-operation. If it performs the operation, it also returns the next `CompletionObject` based 
-on the outcome of the operation.
- 
-The `CompletionObject` may also consume more than one operation, as in the case with named method
-calls, which consist of two operations: a `getmember` operation followed by a `call` operation.
+﻿(This may be confusing and poorly written. Maybe better than nothing. Maybe not. Ask if you have any questions.)
+
+## Parsing
+Kerbalua uses [ANTLR](https://www.antlr.org/) to parse through code in order to find the context of what it is being asked to find completions for.
+
+It does this using a special grammar that finds the last variable name prior to the cursor position and stores a list of operations that were chained from that variable.
+
+For example, in the following code
+```
+native.System.Collections.Generic.
+```
+the operation list is 
+
+`Get(native), Get(System), Get(Collections), Get(Generic), Get()`
+
+The first operation is `Get(native)`, and the completion system is going to interpret it as a global variable acceout of the table, and uses it to look up the first operation.
+
+## Completion
+After the `CompletionOperations` object has been created, completion is started with the script's Global variables Table and the first operation.
+
+The Global variables Tables becomes the first [CompletionObject](CompletionTypes/CompletionObjectReadme.md).
+
+`Get(native)` is looked up in the table, and returned to become the new `CompletionObject`
+
+Then that is searched for `Get(System)` and so on.
+
+Once it gets to the end, the final `Get()` represents that the completion system should display all possibilities.
+
+If the final operation was `Get(ab)` it would only return possiblities containing the string "ab".

@@ -1,6 +1,6 @@
 ## Globals
 
-Global variables, objects and functions.
+Global variables, objects and functions common to all scripting languages.
 
 - `autorun`: [AutoRun](AutoRun.md) - An api for setting which scripts will be ran when an engine is reset.
 - `ui`: [UI](../Namespaces/UI.md) - User Interface.
