@@ -23,7 +23,6 @@ namespace RedOnion.KSP.Namespaces
 		public static readonly Type Layout = typeof(UI.Layout);
 		[Description("LayoutPadding - Padding + Spacing")]
 		public static readonly Type LayoutPadding = typeof(UI.LayoutPadding);
-		[Description("LayoutPadding - Padding + Spacing")]
 
 		// unused for now
 		public static readonly Type SizeConstraint = typeof(UI.SizeConstraint);
