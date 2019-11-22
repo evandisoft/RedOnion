@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using MoonSharp.Interpreter;
 using UnityEngine;
-using Kerbalua.MoonSharp;
+using Kerbalua.Scripting;
 using Kerbalua.Completion;
 using MoonSharp.Interpreter.Loaders;
 using RedOnion.KSP.MoonSharp;

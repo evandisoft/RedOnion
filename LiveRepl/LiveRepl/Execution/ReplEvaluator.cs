@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace LiveRepl.Evaluation {
+namespace LiveRepl.Execution {
 	/// <summary>
 	/// Subclasses of this class implement a function, ProtectedEvaluate, that evaluates
 	/// a string (source) and returns a toString of the result of evaluating
