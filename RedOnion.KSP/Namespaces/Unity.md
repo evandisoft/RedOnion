@@ -1,0 +1,47 @@
+## Unity
+
+Shortcuts to (unsafe) Unity API.
+
+- `Debug`: Type - UnityEngine.Debug - debug tools, logging.
+- `Color`: Type - UnityEngine.Color - color (also in `ui.color`).
+- `Rect`: Type - UnityEngine.Rect - bounds of a rectangle (int).
+- `Screen`: Type - UnityEngine.Screen - screen bounds eetc.
+- `Sprite`: Type - UnityEngine.Sprite - sprite/image.
+- `Texture`: Type - UnityEngine.Texture - texture base class.
+- `Texture2D`: Type - UnityEngine.Texture2D - 2D texture (e.g. for icons).
+- `UIMaster`: Type - KSP UIMasterController.
+- `UISkinDef`: Type - KSP UISkinDef.
+- `UISkinManager`: Type - KSP UISkinManager.
+- `UIStyle`: Type - KSP UIStyle.
+- `UIStyleState`: Type - KSP UIStyleState.
+- `Vector2`: Type - UnityEngine.Vector2
+- `Vector3`: Type - UnityEngine.Vector3
+- `Vector4`: Type - UnityEngine.Vector4
+- `Quaternion`: Type - UnityEngine.Quaternion
+- `Vector2d`: Type - UnityEngine.Vector2d
+- `Vector3d`: Type - Vector3d
+- `Vector4d`: Type - UnityEngine.Vector4d
+- `QuaternionD`: Type - UnityEngine.QuaternionD
+- `Object`: Type - UnityEngine.Object
+- `GameObject`: Type - UnityEngine.GameObject
+- `Canvas`: Type - UnityEngine.Canvas
+- `CanvasGroup`: Type - UnityEngine.CanvasGroup
+- `RectTransform`: Type - UnityEngine.RectTransform
+- `LayerMask`: Type - UnityEngine.LayerMask
+- `DefaultControls`: Type - UnityEngine.UI.DefaultControls
+- `GridLayout`: Type - UnityEngine.UI.GridLayoutGroup
+- `HorizontalLayout`: Type - UnityEngine.UI.HorizontalLayoutGroup
+- `VerticalLayout`: Type - UnityEngine.UI.VerticalLayoutGroup
+- `LayoutRebuilder`: Type - UnityEngine.UI.LayoutRebuilder
+- `LayoutUtility`: Type - UnityEngine.UI.LayoutUtility
+- `ContentSizeFitter`: Type - UnityEngine.UI.ContentSizeFitter
+- `AspectRatioFitter`: Type - UnityEngine.UI.AspectRatioFitter
+- `SizeFitter`: Type - UnityEngine.UI.ContentSizeFitter
+- `RatioFitter`: Type - UnityEngine.UI.AspectRatioFitter
+- `Text`: Type - UnityEngine.UI.Text
+- `Button`: Type - UnityEngine.UI.Button
+- `Image`: Type - UnityEngine.UI.Image
+- `RawImage`: Type - UnityEngine.UI.RawImage
+- `BackgroundImage`: Type - RedOnion.UI.Components.BackgroundImage
+- `DragHandler`: Type - RedOnion.UI.Components.DragHandler
+- `LayoutComponent`: Type - RedOnion.UI.Components.LayoutComponent

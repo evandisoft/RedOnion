@@ -3,13 +3,13 @@
 Global variables, objects and functions.
 
 - `autorun`: [AutoRun](AutoRun.md) - An api for setting which scripts will be ran when an engine is reset.
-- `ui`: UI_Namespace - User Interface.
+- `ui`: [UI](../Namespaces/UI.md) - User Interface.
 - `ksp`: [KSP](../Namespaces/KSP.md) - Shortcuts to (unsafe) KSP API + some tools.
-- `unity`: Unity_Namespace - Shortcuts to (unsafe) Unity API.
+- `unity`: [Unity](../Namespaces/Unity.md) - Shortcuts to (unsafe) Unity API.
 - `native`: NamespaceInstance - Namespace Mappings (import of native types by namespace).
 - `assembly`: GetMappings - Assembly Mappings (import of native types by assembly.
+- `stage`: [Stage](Stage.md) - Staging logic.
 - `time`: [Time](Time.md) - Current time and related functions.
-- `stage`: Type - Staging logic.
 - `PID`: [PID](PID.md) - PID regulator (alias to `system.pid` in ROS).
 - `app`: [App](App.md) - Safe API for KSP Application Launcher (toolbar/buttons). WIP
 - `vector()`: [Vector](Vector.md) - Function for creating 3D vector / coordinate.
