@@ -44,7 +44,7 @@ sleep(Random.Range(0,10))
 
 Then it will select a random part index.
 ```
-local num= Random.Range(0,vessel.parts.Count)
+local num=Random.Range(0,vessel.parts.Count)
 ```
 
 Display which part will be exploding:

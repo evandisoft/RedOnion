@@ -27,19 +27,17 @@ and saving the modified version (which will become a file outside of the zip).
 
 ## Documentation
 
-[Common Globals](RedOnion.KSP/API/Globals.md) - Objects and functions accessible by both Lua and ROS.
+[Common API](RedOnion.KSP/API/Globals.md) - Objects and functions accessible by both Lua and ROS.
 
 [Red Onion Script (ROS)](RedOnion.ROS/README.md) - A powerful in-game scripting engine taking inspiration from several popular languages (Ruby,Python,Javascript,etc)
 
-[Lua Engine](Kerbalua/README.md) - A Lua scripting engine.
+[Kerbalua](Kerbalua/README.md) - A Lua scripting engine implemented using MoonSharp.
 
 [Red Onion UI](RedOnion.UI/README.md) - A WIP UI Library, intended to be used by modders, users, and ourselves.
 
 [Troubleshooting](TroubleShooting.md) - Some possible issues and solutions
 
-**Outdated:**
-
-[Common Script Api](CommonScriptApi.md) - Previous documentation of the common features. Should soon become part of [Common Globals: KSP](RedOnion.KSP/API/Globals.md)
+[RedOnion Project Documentation](RedOnionProjectDocumentation.md) - Main page for documentation of the project itself (project structure, etc).
 
 ## Videos
 
