@@ -26,6 +26,7 @@
     <NoWarn>3021</NoWarn>
     <Prefer32Bit>false</Prefer32Bit>
     <NoStdLib>true</NoStdLib>
+    <LangVersion>7.3</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
@@ -131,7 +132,9 @@
     <None Include="Kerbalua\Completion\CompletionNotes.md" />
     <None Include="Kerbalua\Completion\CompletionReadme.md" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Kerbalua\Kerbnlua\" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RedOnion.KSP\RedOnion.KSP.csproj">
       <Project>{DEC12E09-29AD-4666-9954-8C8A1D7BF454}</Project>
@@ -146,10 +149,7 @@
       <Name>RedOnion.UI</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Kerbalua\Completion\CompletionTypes\" />
-    <Folder Include="Kerbalua\Kerbnlua\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
     <MonoDevelop>

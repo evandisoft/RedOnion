@@ -28,6 +28,7 @@
     <WarningLevel>4</WarningLevel>
     <NoWarn>IDE1006</NoWarn>
     <Prefer32Bit>false</Prefer32Bit>
+    <LangVersion>7.3</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -37,6 +38,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System">
@@ -171,17 +175,12 @@
       <Name>RedOnion.UI</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
-  <ItemGroup />
-  <ItemGroup />
-  <ItemGroup />
   <ItemGroup>
-    <Folder Include="MoonSharp\CommonAPI\" />
     <Folder Include="New Folder\" />
-    <Folder Include="Attributes\" />
-    <Folder Include="MoonSharp\Interfaces\" />
-    <Folder Include="MoonSharp\MoonSharpAPI\" />
-    <Folder Include="Debugging\" />
   </ItemGroup>
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
