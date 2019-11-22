@@ -26,7 +26,6 @@
     <NoWarn>3021</NoWarn>
     <Prefer32Bit>false</Prefer32Bit>
     <NoStdLib>true</NoStdLib>
-    <LangVersion>7.3</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
@@ -84,13 +83,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Kerbalua\Other\MoonSharpReplEvaluator.cs" />
-    <Compile Include="Kerbalua\Utility\prin.cs" />
-    <Compile Include="Kerbalua\Other\ReplEvaluator.cs" />
-    <Compile Include="Kerbalua\Other\RedOnionReplEvaluator.cs" />
-    <Compile Include="Kerbalua\MoonSharp\KerbaluaExecutionManager.cs" />
-    <Compile Include="Kerbalua\MoonSharp\ExecutionLimitException.cs" />
-    <Compile Include="Kerbalua\Utility\Misc.cs" />
     <Compile Include="Kerbalua\Completion\Grammar\IncompleteLuaBaseListener.cs" />
     <Compile Include="Kerbalua\Completion\Grammar\IncompleteLuaBaseVisitor.cs" />
     <Compile Include="Kerbalua\Completion\Grammar\IncompleteLuaLexer.cs" />
@@ -99,14 +91,12 @@
     <Compile Include="Kerbalua\Completion\Grammar\IncompleteLuaVisitor.cs" />
     <Compile Include="Kerbalua\Completion\ProcessedIncompleteVar.cs" />
     <Compile Include="Kerbalua\Completion\LuaIntellisenseException.cs" />
-    <Compile Include="Kerbalua\Other\Evaluation.cs" />
     <Compile Include="Kerbalua\Parsing\IncompleteLuaParsing.cs" />
-    <Compile Include="Kerbalua\MoonSharp\KerbaluaScript.cs" />
+    <Compile Include="Kerbalua\Scripting\KerbaluaScript.cs" />
     <Compile Include="Kerbalua\Completion\CompletionOperation.cs" />
     <Compile Include="Kerbalua\Completion\CompletionOperations.cs" />
     <Compile Include="Kerbalua\Completion\CompletionReflectionUtil.cs" />
     <Compile Include="Kerbalua\Parsing\AnyErrorsListener.cs" />
-    <Compile Include="Kerbalua\Completion\CompletionQueue.cs" />
     <Compile Include="Kerbalua\Completion\CompletionTypes\TableCompletion.cs" />
     <Compile Include="Kerbalua\Completion\CompletionTypes\CompletionObject.cs" />
     <Compile Include="Kerbalua\Completion\CompletionTypes\InstanceCompletion.cs" />
@@ -131,10 +121,11 @@
     <None Include="Kerbalua\Completion\Grammar\FinalExpLua.g4" />
     <None Include="Kerbalua\Completion\CompletionNotes.md" />
     <None Include="Kerbalua\Completion\CompletionReadme.md" />
+    <None Include="Development.md" />
+    <None Include="KerbaluaMoonSharp.md" />
+    <None Include="README.md" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Kerbalua\Kerbnlua\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\RedOnion.KSP\RedOnion.KSP.csproj">
       <Project>{DEC12E09-29AD-4666-9954-8C8A1D7BF454}</Project>
@@ -149,7 +140,9 @@
       <Name>RedOnion.UI</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Kerbalua\Completion\CompletionTypes\" />
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
     <MonoDevelop>

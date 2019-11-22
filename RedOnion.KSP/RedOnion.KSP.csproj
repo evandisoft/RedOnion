@@ -83,8 +83,8 @@
   <ItemGroup>
     <Compile Include="API\App.cs" />
     <Compile Include="API\Autopilot.cs" />
-    <Compile Include="API\ConstVector.cs" />
     <Compile Include="API\Globals.cs" />
+    <Compile Include="Parts\PartChildren.cs" />
     <Compile Include="Utilities\DocBuildAttribute.cs" />
     <Compile Include="Utilities\InteropUtilities.cs" />
     <Compile Include="API\VectorUtils.cs" />

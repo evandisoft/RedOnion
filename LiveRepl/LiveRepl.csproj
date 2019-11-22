@@ -24,7 +24,6 @@
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
     <Prefer32Bit>false</Prefer32Bit>
-    <LangVersion>7.3</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
@@ -100,7 +99,6 @@
     <Compile Include="LiveRepl\Interfaces\IFocusable.cs" />
     <Compile Include="LiveRepl\Completion\EditAreaCompletionAdapter.cs" />
     <Compile Include="LiveRepl\ScriptWindow.Layout.cs" />
-    <Compile Include="LiveRepl\Completion\CompletionManager.cs" />
     <Compile Include="LiveRepl\ScriptWindow.Evaluation.cs" />
     <Compile Include="LiveRepl\ScriptWindow.KeyBindings.cs" />
     <Compile Include="LiveRepl\LiveReplMain.cs" />
@@ -123,6 +121,13 @@
     <Compile Include="LiveRepl\ScriptWindow.Actions.cs" />
     <Compile Include="LiveRepl\Decorators\ScriptDisabledElement.cs" />
     <Compile Include="LiveRepl\Parts\ScriptDisabledButtonsGroup.cs" />
+    <Compile Include="LiveRepl\Parts\PrintQueuesArea.cs" />
+    <Compile Include="LiveRepl\Parts\QueueTagInputArea.cs" />
+    <Compile Include="LiveRepl\Completion\CompletionManager.cs" />
+    <Compile Include="LiveRepl\Execution\Evaluation.cs" />
+    <Compile Include="LiveRepl\Execution\MoonSharpReplEvaluator.cs" />
+    <Compile Include="LiveRepl\Execution\RedOnionReplEvaluator.cs" />
+    <Compile Include="LiveRepl\Execution\ReplEvaluator.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
@@ -147,7 +152,14 @@
       <Name>Kerbalui</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="LiveRepl\" />
+    <Folder Include="LiveRepl\Parts\" />
+    <Folder Include="LiveRepl\Interfaces\" />
+    <Folder Include="LiveRepl\Completion\" />
+    <Folder Include="LiveRepl\Decorators\" />
+    <Folder Include="LiveRepl\Execution\" />
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Target Name="AfterBuild">
     <ZipDirectory SourceDirectory="..\GameData\RedOnion\Resources" Overwrite="True" DestinationFile="..\GameData\RedOnion\Resources.zip" />

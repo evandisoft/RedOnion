@@ -46,6 +46,7 @@ namespace Kerbalui.Util
 			if (monoSpaceFont == null)
 			{
 				string[] fonts = Font.GetOSInstalledFontNames();
+
 				foreach (var fontName in fonts)
 				{
 					// Accept Courier New if available
@@ -55,11 +56,34 @@ namespace Kerbalui.Util
 						return monoSpaceFont;
 					}
 					// Accept the last listed Mono font if Courier New is not available
-					else if (fontName.Contains("Mono"))
+					else if (fontName.EndsWith("Mono", StringComparison.CurrentCulture))
+					{
+						//Debug.Log("fontName is "+fontName);
+						monoSpaceFont = Font.CreateDynamicFontFromOSFont(fontName, 12);
+					}
+				}
+				if (monoSpaceFont==null)
+				{
+					foreach (var fontName in fonts)
+					{
+						if (fontName.Contains("Mono"))
+						{
+							//Debug.Log("fontName is "+fontName);
+							monoSpaceFont = Font.CreateDynamicFontFromOSFont(fontName, 12);
+						}
+					}
+				}
+				if (monoSpaceFont==null)
+				{
+					foreach (var fontName in fonts)
 					{
 						monoSpaceFont = Font.CreateDynamicFontFromOSFont(fontName, 12);
 					}
 				}
+			}
+			if (monoSpaceFont==null)
+			{
+				throw new Exception("Could not find a font");
 			}
 			return monoSpaceFont;
 		}

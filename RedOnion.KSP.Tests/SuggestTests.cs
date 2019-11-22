@@ -35,7 +35,7 @@ namespace RedOnion.KSP.Tests
 			var list = GetCompletions("a.", 2, out var at, out var to);
 			AssertContains("length", list);
 
-			list = GetCompletions("V.", 2, out at, out to);
+			list = GetCompletions("vector.", 7, out at, out to);
 			AssertContains("zero", list);
 		}
 	}

@@ -54,6 +54,11 @@ namespace KerbaluaNUnit
 			script.Globals["args"]=new Table(script, ObjectsToDynValues(args));
 			DynValue result=script.DoString($"return fun(table.unpack(args))");
 			DynValue[] results=result.Tuple;
+			if (results==null)
+			{
+				results=new DynValue[1];
+				results[0]=result;
+			}
 			Assert.AreEqual(results.Length, expectedOutput.Length, "Return values number differs");
 			for(int i = 0; i<results.Length; i++)
 			{

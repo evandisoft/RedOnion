@@ -5,29 +5,67 @@ using System.IO;
 using System.Reflection;
 
 namespace RedOnion.KSP.Debugging {
+	/// <summary>
+	/// For now, this is disabled when project is not built in debug mode.
+	/// </summary>
     public class QueueLogger {
         static QueueLogger()
         {
             RegisteredTags = new HashSet<string>();
-            Completion = new QueueLogger("completion", 1000);
-        }
+            Complogger = new QueueLogger("completion", 1000);
+			UILogger = new QueueLogger("ui", 1000);
+		}
 
-        static public QueueLogger Completion;
+        static public QueueLogger Complogger;
+		static public QueueLogger UILogger;
         static public HashSet<string> RegisteredTags;
 
-        static public void LogTagged(string tag = "all")
-        {
-            FieldInfo[] fields = typeof(QueueLogger).GetFields(BindingFlags.Static | BindingFlags.Public);
-            foreach (var field in fields) {
-                if (field.GetValue(null) is QueueLogger logger) {
-                    if (logger.HasTag(tag)) {
-                        logger.Log();
-                    }
-                }
-            }
-        }
+        //static public void WriteTaggedToDisk(string tag = "all")
+        //{
+        //    FieldInfo[] fields = typeof(QueueLogger).GetFields(BindingFlags.Static | BindingFlags.Public);
+        //    foreach (var field in fields) {
+        //        if (field.GetValue(null) is QueueLogger logger) {
+        //            if (logger.HasTag(tag)) {
+        //                logger.WriteToDisk();
+        //            }
+        //        }
+        //    }
+        //}
 
-        static public HashSet<string> Tags(params string[] strings)
+		static public string GetContentsByTag(string tag = "all")
+		{
+			FieldInfo[] fields = typeof(QueueLogger).GetFields(BindingFlags.Static | BindingFlags.Public);
+			StringBuilder sb=new StringBuilder();
+			foreach (var field in fields)
+			{
+				if (field.GetValue(null) is QueueLogger logger)
+				{
+					if (logger.HasTag(tag))
+					{
+						foreach (var str in logger.logQueue)
+						{
+							sb.Append(str);
+						}
+					}
+				}
+			}
+			return sb.ToString();
+		}
+
+		static public void ClearLoggersByTag(string tag = "all")
+		{
+			FieldInfo[] fields = typeof(QueueLogger).GetFields(BindingFlags.Static | BindingFlags.Public);
+
+			foreach (var field in fields)
+			{
+				if (field.GetValue(null) is QueueLogger logger)
+				{
+					logger.Clear();
+				}
+			}
+		}
+
+		static public HashSet<string> Tags(params string[] strings)
         {
             var tags = new HashSet<string>();
             foreach (var str in strings) {
@@ -36,7 +74,12 @@ namespace RedOnion.KSP.Debugging {
             return tags;
         }
 
-        const int defaultQueueSize = 10000;
+		public void Clear()
+		{
+			logQueue.Clear();
+		}
+
+		const int defaultQueueSize = 1000;
         const string basePath = "Logs/Kerbalua/";
 
         Queue<string> logQueue = new Queue<string>();
@@ -79,13 +122,15 @@ namespace RedOnion.KSP.Debugging {
             return tags.Contains(tag.ToLower());
         }
 
-        public void Enqueue(params object[] args)
+        public void Log(params object[] args)
         {
-            if (logQueue.Count >= queueSize) {
+#if DEBUG
+			if (logQueue.Count >= queueSize) {
                 logQueue.Dequeue();
             }
             logQueue.Enqueue(ObjectArrayToString(args));
-        }
+#endif
+		}
 
         string ObjectArrayToString(object[] args)
         {
@@ -102,13 +147,25 @@ namespace RedOnion.KSP.Debugging {
             return sb.ToString();
         }
 
-        public void Log()
-        {
-            StringBuilder sb = new StringBuilder();
-            foreach(var str in logQueue) {
-                sb.Append(str);
-            }
-            File.WriteAllText(logpath, sb.ToString());
-        }
-    }
+
+
+        //public void WriteToDisk()
+        //{
+        //    StringBuilder sb = new StringBuilder();
+        //    foreach(var str in logQueue) {
+        //        sb.Append(str);
+        //    }
+        //    File.WriteAllText(logpath, sb.ToString());
+        //}
+
+		public string GetContents()
+		{
+			StringBuilder sb = new StringBuilder();
+			foreach (var str in logQueue)
+			{
+				sb.Append(str);
+			}
+			return sb.ToString();
+		}
+	}
 }

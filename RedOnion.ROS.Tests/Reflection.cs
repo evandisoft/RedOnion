@@ -381,6 +381,14 @@ namespace RedOnion.ROS.Tests
 				this.y = y;
 				this.z = z;
 			}
+			public void scale(double f)
+			{
+				x *= f;
+				y *= f;
+				z *= f;
+			}
+			public void scale2x()
+				=> scale(2.0);
 		}
 		public class CVect
 		{
@@ -393,6 +401,8 @@ namespace RedOnion.ROS.Tests
 			public double X => native.x;
 			public double Y => native.y;
 			public double Z => native.z;
+			public void scale(double f) => native.scale(f);
+			public void scale2x() => native.scale2x();
 
 			[Convert(typeof(CVect))]
 			public static SVect Test { get; set; }
@@ -415,6 +425,18 @@ namespace RedOnion.ROS.Tests
 			Globals.Add(typeof(CVect));
 			Test("cvect.test = cvect 1,2,3");
 			Test(1.0, "cvect.test.x");
+		}
+
+		//[Test] - does not currently work
+		public void ROS_Refl11_StructModifyingMethod()
+		{
+			Globals = new Globals();
+			Globals.Add(typeof(SVect));
+			Test("var v = new SVect");
+			Test(1, "v.x = 1");
+			Test(1.0, "v.x");
+			Test("v.scale2x");
+			Test(2.0, "v.x");
 		}
 	}
 }

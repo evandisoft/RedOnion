@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using Kerbalua.Other;
-using Kerbalui.Controls;
-using Kerbalui.Types;
 using Kerbalui.Util;
 using LiveRepl.Completion;
 using RedOnion.KSP.Settings;
@@ -102,6 +97,7 @@ namespace LiveRepl
 			SavedSettings.SaveSetting("WindowPositionY", rect.y.ToString());
 			SavedSettings.SaveSetting("editorVisible", editorVisible.ToString());
 			SavedSettings.SaveSetting("replVisible", replVisible.ToString());
+			SavedSettings.SaveSetting("lastQueueTag", uiparts.queueTagInputArea.Text);
 		}
 	}
 }

@@ -2,6 +2,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using LiveRepl.Interfaces;
+using static RedOnion.KSP.Debugging.QueueLogger;
 
 namespace LiveRepl.Completion
 {
@@ -54,7 +55,9 @@ namespace LiveRepl.Completion
 				focusChanged |= true;
 			}
 
-			if ((focusChanged || newInput)&& stopwatch.ElapsedMilliseconds>CompletionDelay) {
+			bool timeout=stopwatch.ElapsedMilliseconds>CompletionDelay;
+			if ((focusChanged || newInput)&& timeout) {
+				UILogger.Log("CompletionManager Update","focuschanged", focusChanged, "newInput", newInput);
 				//Debug.Log("GUI/foc: " + newInput + "," + focusChanged + "," + mostRecentlyFocusedCompletable + "," + inc++);
 				focusChanged = false;
 				newInput = false;
@@ -63,10 +66,12 @@ namespace LiveRepl.Completion
 				//Debug.Log("Changed");
 				ICompletableElement currentCompletable;
 				if (completableMap.TryGetValue(mostRecentlyFocusedCompletable, out currentCompletable)) {
+					UILogger.Log("mostRecentlyFocusedCompletable", mostRecentlyFocusedCompletable);
 					//Debug.Log("Displaying completions");
 					DisplayCurrentCompletions(currentCompletable);
 					return true;
 				}
+				UILogger.Log("Couldn't get mostRecentlyFocusedCompletable", mostRecentlyFocusedCompletable);
 			}
 			return false;
 		}
@@ -92,12 +97,19 @@ namespace LiveRepl.Completion
 
 		public void Complete()
 		{
+			UILogger.Log("Completing");
 			//Debug.Log("completing");
 			ICompletableElement completable;
 			if (completableMap.TryGetValue(mostRecentlyFocusedCompletable,out completable)) {
+				UILogger.Log("mostRecentlyFocusedCompletable", mostRecentlyFocusedCompletable);
 				completable.GrabFocus();
 				completable.Complete(completionSelector.SelectionIndex);
-			} 
+			}
+			else
+			{
+				UILogger.Log("Couldn't get mostRecentlyFocusedCompletable", mostRecentlyFocusedCompletable);
+			}
+
 		}
 	}
 }

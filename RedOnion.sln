@@ -5,10 +5,6 @@ VisualStudioVersion = 16.0.29009.5
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedOnion.UI", "RedOnion.UI\RedOnion.UI.csproj", "{034C16AB-D16E-4AFE-9837-812499EE2F3D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedOnion.Script", "RedOnion.Script\RedOnion.Script.csproj", "{0D0A04F3-0A82-49CD-8178-7640ACE88BFF}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedOnion.ScriptNUnit", "RedOnion.ScriptNUnit\RedOnion.ScriptNUnit.csproj", "{B705F43E-2E55-4309-9399-22608AB4F4B3}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedOnion.KSP", "RedOnion.KSP\RedOnion.KSP.csproj", "{DEC12E09-29AD-4666-9954-8C8A1D7BF454}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kerbalua", "Kerbalua\Kerbalua.csproj", "{F590B1DB-8F33-4986-8383-180952D63CDA}"

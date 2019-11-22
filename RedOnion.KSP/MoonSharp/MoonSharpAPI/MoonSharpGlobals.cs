@@ -9,31 +9,35 @@ namespace RedOnion.KSP.MoonSharp.MoonSharpAPI
 	/// These implementations are just dummies as the real implementations are tied
 	/// to KerbaluaScript
 	/// </summary>
-	[Description("List of functions that are specific to KerbaluaScript.")]
+	[Description("Functionality that is specific to Kerbalua.")]
 	public static class MoonSharpGlobals
 	{
-		[Unsafe, Description("Create new objects given a type or static in lua followed by the arguments to the constructor.")]
-		public static object @new(object obj, params DynValue[] dynArgs)
+		[Unsafe, Description("Create new objects given a type, static, or object, in lua followed by the arguments to the constructor.")]
+		public static object @new(object typeStaticOrObject, params DynValue[] constructorArgs)
 		{
-			Type type=obj as Type;
+			Type type=typeStaticOrObject as Type;
+			if (type==null)
+			{
+				type=typeStaticOrObject.GetType();
+			}
 			var constructors = type.GetConstructors();
 			foreach (var constructor in constructors)
 			{
 				var parinfos = constructor.GetParameters();
-				if (parinfos.Length >= dynArgs.Length)
+				if (parinfos.Length >= constructorArgs.Length)
 				{
-					object[] args = new object[parinfos.Length];
+					object[] objArgs = new object[parinfos.Length];
 
-					for (int i = 0; i < args.Length; i++)
+					for (int i = 0; i < objArgs.Length; i++)
 					{
 						var parinfo = parinfos[i];
-						if (i>= dynArgs.Length)
+						if (i>= constructorArgs.Length)
 						{
 							if (!parinfo.IsOptional)
 							{
 								goto nextConstructor;
 							}
-							args[i] = parinfo.DefaultValue;
+							objArgs[i] = parinfo.DefaultValue;
 						}
 						else
 						{
@@ -41,7 +45,7 @@ namespace RedOnion.KSP.MoonSharp.MoonSharpAPI
 							{
 								try
 								{
-									args[i] = System.Convert.ChangeType(dynArgs[i].ToObject(), parinfo.ParameterType);
+									objArgs[i] = System.Convert.ChangeType(constructorArgs[i].ToObject(), parinfo.ParameterType);
 								}
 								catch (Exception)
 								{
@@ -50,25 +54,34 @@ namespace RedOnion.KSP.MoonSharp.MoonSharpAPI
 							}
 							else
 							{
-								args[i] = dynArgs[i].ToObject();
+								objArgs[i] = constructorArgs[i].ToObject();
 							}
 						}
 
 					}
 
-					return constructor.Invoke(args);
+					return constructor.Invoke(objArgs);
 				}
 			nextConstructor:;
 			}
 
-			if (dynArgs.Length == 0)
+			if (constructorArgs.Length == 0)
 			{
 				return Activator.CreateInstance(type);
 			}
 			throw new Exception("Could not find constructor accepting given args for type " + type);
 		}
 
-		[Unsafe,Description("Unsafe, reflection stuff.")]
+		//This will be overriden in KerbaluaScript.cs
+		[Description("Causes the script to sleep for the given number of seconds. "
+		+"This is not a precise timing mechanism. Sleeping for 0 seconds will cause the script "
+			+"to wait until the next unity FixedUpdate")]
+		public static void sleep(double seconds)
+		{
+
+		}
+
+		[Unsafe,Description("Unsafe, Kerbalua specific reflection stuff.")]
 		public static readonly Type reflection=typeof(Reflection);
 	}
 
@@ -76,21 +89,21 @@ namespace RedOnion.KSP.MoonSharp.MoonSharpAPI
 	public static class Reflection
 	{
 		[Description("Returns true if the argument is a static.")]
-		public static bool isstatic(DynValue dynValue)
+		public static bool isstatic(DynValue possbileStatic)
 		{
-			return dynValue.UserData!=null && dynValue.UserData.Object==null;
+			return possbileStatic.UserData!=null && possbileStatic.UserData.Object==null;
 		}
 
 		[Description("Returns true if the argument is a Type.")]
-		public static bool isclrtype(DynValue dynValue)
+		public static bool isclrtype(DynValue possibleType)
 		{
-			return dynValue.UserData!=null && dynValue.UserData.Object!=null && dynValue.ToObject() is Type;
+			return possibleType.UserData!=null && possibleType.UserData.Object!=null && possibleType.ToObject() is Type;
 		}
 
 		[Description("Returns a static based on the given Type or object.")]
-		public static DynValue getstatic(DynValue dynValue)
+		public static DynValue getstatic(DynValue typeOrObject)
 		{
-			object o=dynValue.ToObject();
+			object o=typeOrObject.ToObject();
 			if (o is Type t)
 			{
 				return UserData.CreateStatic(t);
@@ -98,14 +111,14 @@ namespace RedOnion.KSP.MoonSharp.MoonSharpAPI
 			return UserData.CreateStatic(o.GetType());
 		}
 
-		[Description("Returns the underyling clr type associated with this DynValue.")]
-		public static object getclrtype(DynValue dynValue)
+		[Description("Returns the underyling clr type associated with this object.")]
+		public static object getclrtype(DynValue @object)
 		{
 			//if (dynValue.Type==DataType.UserData)
 			//{
 			//	return DynValue.FromObject(this, dynValue.UserData.Descriptor.Type);
 			//}
-			object o=dynValue.ToObject();
+			object o=@object.ToObject();
 			if (o is Type t)
 			{
 				return t; //DynValue.FromObject(this, t);

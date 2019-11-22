@@ -68,7 +68,7 @@ namespace RedOnion.KSP.MoonSharp.Proxies
 					throw new Exception("MethodInfo null in ProxyCallTable for type " + ProxiedObject.GetType() + " method " + MemberName);
 				}
 			}
-			UnityEngine.Debug.Log("args");
+			//UnityEngine.Debug.Log("args");
 			int i = 0;
 			object[] args = new object[mi.GetParameters().Length];
 			foreach(var value in argTable.Values)

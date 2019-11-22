@@ -82,6 +82,36 @@ namespace KerbaluaNUnit
 			st.MemberCheck(t1, "save", typeof(CallbackFunction));
 		}
 
+		[Test()]
+		public void MLUA_DummyAPITests51_CallableProp()
+		{
+			Setup();
+			var t1=st.NamespaceCheck(globals,"callableprop"); ;
+			object[] args={};
+			object[] returns={CallableProperty_Namespace.callableprop};
+			var f=st.GetCheck(globals,"callableprop");
+			st.CallCheck(f,args, returns);
+		}
+
+		[Test()]
+		public void MLUA_DummyAPITests52_CallableMethod()
+		{
+			Setup();
+			var t1=st.NamespaceCheck(globals,"callablemethod");
+			object[] args={3};
+			object[] returns={CallableMethod_Namespace.callablemethod(3)};
+			var f=st.GetCheck(globals,"callablemethod");
+			st.CallCheck(f, args, returns);
+		}
+
+		[Test()]
+		public void MLUA_DummyAPITests51_CallableMethod()
+		{
+			Setup();
+			var t1=st.NamespaceCheck(globals,"callablemethod"); ;
+
+		}
+
 		public IList<string> GetCompletions(string source,Table table)
 		{
 			return MoonSharpIntellisense.GetCompletions(table, source, source.Length, out int replaceStart, out int replaceEnd);
@@ -93,7 +123,7 @@ namespace KerbaluaNUnit
 			Setup();
 			string source="";
 			var completions=GetCompletions(source,apiTable);
-			Assert.AreEqual(5, completions.Count);
+			Assert.AreEqual(9, completions.Count);
 		}
 	}
 }

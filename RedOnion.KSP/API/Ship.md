@@ -10,10 +10,10 @@ Active vessel
 - `root`: [Part](../Parts/PartBase.md) - Root part (same as `parts.root`).
 - `nextDecoupler`: [Decoupler](../Parts/Decoupler.md) - One of the decouplers that will get activated by nearest stage. (Same as `Parts.NextDecoupler`.)
 - `nextDecouplerStage`: int - Stage number of the nearest decoupler or -1. (Same as `Parts.NextDecouplerStage`.)
-- `decouplers`: ReadOnlyList`1 - List of all decouplers, separators, launch clamps and docks with staging. (Docking ports without staging enabled not included.)
-- `dockingports`: ReadOnlyList`1 - List of all docking ports (regardless of staging).
+- `decouplers`: [ReadOnlyList](ReadOnlyList.1.md)\[[Decoupler](../Parts/Decoupler.md)\] - List of all decouplers, separators, launch clamps and docks with staging. (Docking ports without staging enabled not included.)
+- `dockingports`: [ReadOnlyList](ReadOnlyList.1.md)\[[DockingPort](../Parts/DockingPort.md)\] - List of all docking ports (regardless of staging).
 - `engines`: [EngineSet](../Parts/EngineSet.md) - All engines (regardless of state).
-- `sensors`: ReadOnlyList`1 - All sensors.
+- `sensors`: [ReadOnlyList](ReadOnlyList.1.md)\[[Sensor](../Parts/Sensor.md)\] - All sensors.
 - `ID`: Guid - Unique identifier of the ship (vehicle/vessel). Can change when docking/undocking.
 - `PersistentID`: uint - Unique identifier of the ship (vehicle/vessel). Should be same as it was before docking (after undocking).
 - `vesseltype`: VesselType - KSP API. Vessel type as selected by user (or automatically).
@@ -41,35 +41,35 @@ Active vessel
 - `period`: double - Period of current orbit in seconds.
 - `trueAnomaly`: double - Angle in degrees between the direction of periapsis and the current position.
 - `meanAnomaly`: double - Angle in degrees between the direction of periapsis and the current position extrapolated on circular orbit.
-- `position`: Vector3d - Current position relative to active ship (so `ship.position` always reads zero).
-- `velocity`: Vector3d - Current orbital velocity.
-- `surfaceVelocity`: Vector3d - Current surface velocity.
-- `srfVelocity`: Vector3d - Current surface velocity (Alias to `surfaceVelocity`).
-- `srfvel`: Vector3d - Current surface velocity (Alias to `surfaceVelocity`).
-- `forward`: Vector3d - Vector pointing forward (from cockpit - in the direction of the 'nose').
-- `back`: Vector3d - Vector pointing backward (from cockpit - in the direction of the 'tail').
-- `up`: Vector3d - Vector pointing up (from cockpit).
-- `down`: Vector3d - Vector pointing down (from cockpit).
-- `left`: Vector3d - Vector pointing left (from cockpit).
-- `right`: Vector3d - Vector pointing right (from cockpit).
-- `north`: Vector3d - Vector pointing north in the plane that is tangent to sphere centered in orbited body.
-- `east`: Vector3d - Vector pointing east (tangent to sphere centered in orbited body).
-- `away`: Vector3d - Vector pointing away from orbited body (aka *up*, but we use `up` for cockpit-up).
+- `position`: [Vector](Vector.md) - Current position relative to active ship (so `ship.position` always reads zero).
+- `velocity`: [Vector](Vector.md) - Current orbital velocity.
+- `surfaceVelocity`: [Vector](Vector.md) - Current surface velocity.
+- `srfVelocity`: [Vector](Vector.md) - Current surface velocity (Alias to `surfaceVelocity`).
+- `srfvel`: [Vector](Vector.md) - Current surface velocity (Alias to `surfaceVelocity`).
+- `forward`: [Vector](Vector.md) - Vector pointing forward (from cockpit - in the direction of the 'nose').
+- `back`: [Vector](Vector.md) - Vector pointing backward (from cockpit - in the direction of the 'tail').
+- `up`: [Vector](Vector.md) - Vector pointing up (from cockpit).
+- `down`: [Vector](Vector.md) - Vector pointing down (from cockpit).
+- `left`: [Vector](Vector.md) - Vector pointing left (from cockpit).
+- `right`: [Vector](Vector.md) - Vector pointing right (from cockpit).
+- `north`: [Vector](Vector.md) - Vector pointing north in the plane that is tangent to sphere centered in orbited body.
+- `east`: [Vector](Vector.md) - Vector pointing east (tangent to sphere centered in orbited body).
+- `away`: [Vector](Vector.md) - Vector pointing away from orbited body (aka *up*, but we use `up` for cockpit-up).
 - `pitch`: double - Current pitch / elevation (the angle between forward vector and tangent plane) [-90..+90]
 - `heading`: double - Current heading / yaw (the angle between forward and north vectors in tangent plane) [0..360]. Note that it can change violently around the poles.
 - `roll`: double - Current roll / bank (the angle between up and away vectors in the plane perpendicular to forward vector) [-180..+180]. 
 Note that it can change violently when facing up or down.
-- `centerOfMass`: Vector3d - Center of mass.
-- `angularVelocity`: Vector3d - Angular velocity (ω, deg/s), how fast the ship rotates
-- `angularMomentum`: Vector3d - Angular momentum (L = Iω, kg⋅m²⋅deg/s=N⋅m⋅s⋅deg) aka moment of momentum or rotational momentum.
+- `centerOfMass`: [Vector](Vector.md) - Center of mass.
+- `angularVelocity`: [Vector](Vector.md) - Angular velocity (ω, deg/s), how fast the ship rotates
+- `angularMomentum`: [Vector](Vector.md) - Angular momentum (L = Iω, kg⋅m²⋅deg/s=N⋅m⋅s⋅deg) aka moment of momentum or rotational momentum.
 - `momentOfInertia`: Vector3d - Moment of inertia (I, kg⋅m²=N⋅m⋅s²) aka angular mass or rotational inertia.
-- `maxTorque`: Vector3d - Maximal ship torque [N⋅m⋅deg=deg⋅kg⋅m²/s²] (aka moment of force or turning effect, maximum of positive and negative).
-- `maxVacuumTorque`: Vector3d - Maximal ship torque in vacuum [N⋅m⋅deg=deg⋅kg⋅m²/s²] (ignoring control surfaces).
-- `maxAngular`: Vector3d - Maximal angular acceleration (deg/s²)
-- `maxVacuumAngular`: Vector3d - Maximal angular acceleration in vacuum (ignoring control surfaces).
-- `positionAt()`: Vector3d, time double
+- `maxTorque`: [Vector](Vector.md) - Maximal ship torque [N⋅m⋅deg=deg⋅kg⋅m²/s²] (aka moment of force or turning effect, maximum of positive and negative).
+- `maxVacuumTorque`: [Vector](Vector.md) - Maximal ship torque in vacuum [N⋅m⋅deg=deg⋅kg⋅m²/s²] (ignoring control surfaces).
+- `maxAngular`: [Vector](Vector.md) - Maximal angular acceleration (deg/s²)
+- `maxVacuumAngular`: [Vector](Vector.md) - Maximal angular acceleration in vacuum (ignoring control surfaces).
+- `positionAt()`: [Vector](Vector.md), time double
   - Predicted position at specified time.
-- `velocityAt()`: Vector3d, time double
+- `velocityAt()`: [Vector](Vector.md), time double
   - Predicted velocity at specified time.
-- `local()`: [Vector](Vector.md), v [ConstVector](ConstVector.md)
+- `local()`: [Vector](Vector.md), v [Vector](Vector.md)
   - Translate vector/direction into local coordinates.

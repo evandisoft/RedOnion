@@ -234,43 +234,41 @@ namespace RedOnion.KSP.API
 
 		#region Orbit - vectors
 
-		[Convert(typeof(Vector)), Description("Current position relative to active ship (so `ship.position` always reads zero).")]
-		public Vector3d position => native.transform.position;
-		[Convert(typeof(Vector)), Description("Current orbital velocity.")]
-		public Vector3d velocity => native.obt_velocity;
-		[Convert(typeof(Vector)), Description("Current surface velocity.")]
-		public Vector3d surfaceVelocity => native.srf_velocity;
-		[Convert(typeof(Vector)), Description("Current surface velocity (Alias to `surfaceVelocity`).")]
-		public Vector3d srfVelocity => native.srf_velocity;
-		[Convert(typeof(Vector)), Description("Current surface velocity (Alias to `surfaceVelocity`).")]
-		public Vector3d srfvel => native.srf_velocity;
+		[Description("Current position relative to active ship (so `ship.position` always reads zero).")]
+		public Vector position => new Vector(native.transform.position);
+		[Description("Current orbital velocity.")]
+		public Vector velocity => new Vector(native.obt_velocity);
+		[Description("Current surface velocity.")]
+		public Vector surfaceVelocity => new Vector(native.srf_velocity);
+		[Description("Current surface velocity (Alias to `surfaceVelocity`).")]
+		public Vector srfVelocity => new Vector(native.srf_velocity);
+		[Description("Current surface velocity (Alias to `surfaceVelocity`).")]
+		public Vector srfvel => new Vector(native.srf_velocity);
 		[Description("Predicted position at specified time.")]
-		[return: Convert(typeof(Vector))]
-		public Vector3d positionAt(double time) => native.orbit.getPositionAtUT(time);
+		public Vector positionAt(double time) => new Vector(native.orbit.getPositionAtUT(time));
 		[Description("Predicted velocity at specified time.")]
-		[return: Convert(typeof(Vector))]
-		public Vector3d velocityAt(double time) => native.orbit.getOrbitalVelocityAtUT(time);
+		public Vector velocityAt(double time) => new Vector(native.orbit.getOrbitalVelocityAtUT(time));
 
-		[Convert(typeof(Vector)), Description("Vector pointing forward (from cockpit - in the direction of the 'nose').")]
-		public Vector3d forward => native.transform.up;
-		[Convert(typeof(Vector)), Description("Vector pointing backward (from cockpit - in the direction of the 'tail').")]
-		public Vector3d back => -native.transform.up;
-		[Convert(typeof(Vector)), Description("Vector pointing up (from cockpit).")]
-		public Vector3d up => -native.transform.forward;
-		[Convert(typeof(Vector)), Description("Vector pointing down (from cockpit).")]
-		public Vector3d down => native.transform.forward;
-		[Convert(typeof(Vector)), Description("Vector pointing left (from cockpit).")]
-		public Vector3d left => -native.transform.right;
-		[Convert(typeof(Vector)), Description("Vector pointing right (from cockpit).")]
-		public Vector3d right => native.transform.right;
+		[Description("Vector pointing forward (from cockpit - in the direction of the 'nose').")]
+		public Vector forward => new Vector(native.transform.up);
+		[Description("Vector pointing backward (from cockpit - in the direction of the 'tail').")]
+		public Vector back => new Vector(-native.transform.up);
+		[Description("Vector pointing up (from cockpit).")]
+		public Vector up => new Vector(-native.transform.forward);
+		[Description("Vector pointing down (from cockpit).")]
+		public Vector down => new Vector(native.transform.forward);
+		[Description("Vector pointing left (from cockpit).")]
+		public Vector left => new Vector(-native.transform.right);
+		[Description("Vector pointing right (from cockpit).")]
+		public Vector right => new Vector(native.transform.right);
 
 		// see https://en.wikipedia.org/wiki/Axes_conventions#Ground_reference_frames_for_attitude_description
-		[Convert(typeof(Vector)), Description("Vector pointing north in the plane that is tangent to sphere centered in orbited body.")]
-		public Vector3d north => native.north;
-		[Convert(typeof(Vector)), Description("Vector pointing east (tangent to sphere centered in orbited body).")]
-		public Vector3d east => native.east;
-		[Convert(typeof(Vector)), Description("Vector pointing away from orbited body (aka *up*, but we use `up` for cockpit-up).")]
-		public Vector3d away => native.up;
+		[Description("Vector pointing north in the plane that is tangent to sphere centered in orbited body.")]
+		public Vector north => new Vector(native.north);
+		[Description("Vector pointing east (tangent to sphere centered in orbited body).")]
+		public Vector east => new Vector(native.east);
+		[Description("Vector pointing away from orbited body (aka *up*, but we use `up` for cockpit-up).")]
+		public Vector away => new Vector(native.up);
 
 		#endregion
 
@@ -339,23 +337,23 @@ namespace RedOnion.KSP.API
 
 		#region Properties for autopilot
 
-		[Convert(typeof(Vector)), Description("Center of mass.")]
-		public Vector3d centerOfMass => native.CoMD;
-		Vector3d ISpaceObject.position => centerOfMass;
-		[Convert(typeof(Vector)), Description("Angular velocity (ω, deg/s), how fast the ship rotates")]
-		public Vector3d angularVelocity => native.angularVelocityD * RosMath.Rad2Deg;
-		[Convert(typeof(Vector)), Description("Angular momentum (L = Iω, kg⋅m²⋅deg/s=N⋅m⋅s⋅deg) aka moment of momentum or rotational momentum.")]
-		public Vector3d angularMomentum => (Vector3d)native.angularMomentum * RosMath.Rad2Deg;
-		[Convert(typeof(Vector)), Description("Moment of inertia (I, kg⋅m²=N⋅m⋅s²) aka angular mass or rotational inertia.")]
-		public Vector3d momentOfInertia => native.MOI;
+		[Description("Center of mass.")]
+		public Vector centerOfMass => new Vector(native.CoMD);
+		Vector ISpaceObject.position => centerOfMass;
+		[Description("Angular velocity (ω, deg/s), how fast the ship rotates")]
+		public Vector angularVelocity => new Vector(native.angularVelocityD * RosMath.Rad2Deg);
+		[Description("Angular momentum (L = Iω, kg⋅m²⋅deg/s=N⋅m⋅s⋅deg) aka moment of momentum or rotational momentum.")]
+		public Vector angularMomentum => new Vector((Vector3d)native.angularMomentum * RosMath.Rad2Deg);
+		[Description("Moment of inertia (I, kg⋅m²=N⋅m⋅s²) aka angular mass or rotational inertia.")]
+		public Vector3d momentOfInertia => new Vector(native.MOI);
 
 		protected double _torqueStamp;
-		protected Vector3d _maxTorque, _maxVacuumTorque;
-		protected Vector3d _maxAngular, _maxVacuumAngular;
+		protected Vector _maxTorque, _maxVacuumTorque;
+		protected Vector _maxAngular, _maxVacuumAngular;
 		protected void UpdateTorque()
 		{
-			var torque = Vector3d.zero;
-			var vacuum = Vector3d.zero;
+			var torque = Vector.zero;
+			var vacuum = Vector.zero;
 			foreach (var part in native.parts)
 			{
 				foreach (var module in part.Modules)
@@ -377,12 +375,12 @@ namespace RedOnion.KSP.API
 			_torqueStamp = Time.now;
 			_maxTorque = torque * RosMath.Rad2Deg;
 			_maxVacuumTorque = vacuum * RosMath.Rad2Deg;
-			_maxAngular = VectorCreator.shrink(_maxTorque, momentOfInertia);
-			_maxVacuumAngular = VectorCreator.shrink(_maxVacuumTorque, momentOfInertia);
+			_maxAngular = new Vector(VectorCreator.shrink(_maxTorque, momentOfInertia));
+			_maxVacuumAngular = new Vector(VectorCreator.shrink(_maxVacuumTorque, momentOfInertia));
 		}
 
-		[Convert(typeof(Vector)), Description("Maximal ship torque [N⋅m⋅deg=deg⋅kg⋅m²/s²] (aka moment of force or turning effect, maximum of positive and negative).")]
-		public Vector3d maxTorque
+		[Description("Maximal ship torque [N⋅m⋅deg=deg⋅kg⋅m²/s²] (aka moment of force or turning effect, maximum of positive and negative).")]
+		public Vector maxTorque
 		{
 			get
 			{
@@ -391,8 +389,8 @@ namespace RedOnion.KSP.API
 				return _maxTorque;
 			}
 		}
-		[Convert(typeof(Vector)), Description("Maximal ship torque in vacuum [N⋅m⋅deg=deg⋅kg⋅m²/s²] (ignoring control surfaces).")]
-		public Vector3d maxVacuumTorque
+		[Description("Maximal ship torque in vacuum [N⋅m⋅deg=deg⋅kg⋅m²/s²] (ignoring control surfaces).")]
+		public Vector maxVacuumTorque
 		{
 			get
 			{
@@ -401,8 +399,8 @@ namespace RedOnion.KSP.API
 				return _maxVacuumTorque;
 			}
 		}
-		[Convert(typeof(Vector)), Description("Maximal angular acceleration (deg/s²)")]
-		public Vector3d maxAngular
+		[Description("Maximal angular acceleration (deg/s²)")]
+		public Vector maxAngular
 		{
 			get
 			{
@@ -411,8 +409,8 @@ namespace RedOnion.KSP.API
 				return _maxAngular;
 			}
 		}
-		[Convert(typeof(Vector)), Description("Maximal angular acceleration in vacuum (ignoring control surfaces).")]
-		public Vector3d maxVacuumAngular
+		[Description("Maximal angular acceleration in vacuum (ignoring control surfaces).")]
+		public Vector maxVacuumAngular
 		{
 			get
 			{
@@ -427,7 +425,7 @@ namespace RedOnion.KSP.API
 		#region Tools
 
 		[Description("Translate vector/direction into local coordinates.")]
-		public Vector local(ConstVector v)
+		public Vector local(Vector v)
 			=> new Vector(native.transform.InverseTransformDirection(v));
 		public Vector3d local(Vector3d v)
 			=> native.transform.InverseTransformDirection(v);

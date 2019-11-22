@@ -14,39 +14,15 @@ but our goal now is to:
 - Allow users to do whatever they wish to do to the game environment to have fun.
 - Help modders develop and debug their mods using this mod.
 - Help anybody to explore KSP API, their own or other's mods
-  (read the license of each mod, we expose only `public` members).
-
- 
-## Differences between ROS and Lua
-
-[**Lua**](Kerbalua/README.md)
-is well known scripting language
-and may offer more comfort and safety, while
-[**ROS** (Red Onion Script)](RedOnion.ROS/README.md)
-aims to make coding easier.
-**ROS** was created anew and may contain bugs,
-**Lua** may lack some features but should be more stable.
-
-Scripts are currently stored in GameData/RedOnion/Scripts,
-our own scripts are packed inside GameData/RedOnion/Scripts.zip.
-You can override our scripts simply by opening them in REPL
-and saving the modified version (which will become a file outside of the zip).
+  (read the license of each mod, we expose only `public` members directly).
 
 ## Documentation
 
-[Common Globals](RedOnion.KSP/API/Globals.md) - Objects and functions accessible by both Lua and ROS.
+[Scripting](ScriptingReadme.md) - Documentation related to scripting.
 
-[Red Onion Script (ROS)](RedOnion.ROS/README.md) - A powerful in-game scripting engine taking inspiration from several popular languages (Ruby,Python,Javascript,etc)
+[Troubleshooting](TroubleShooting.md) - Some possible issues and solutions.
 
-[Lua Engine](Kerbalua/README.md) - A Lua scripting engine.
-
-[Red Onion UI](RedOnion.UI/README.md) - A WIP UI Library, intended to be used by modders, users, and ourselves.
-
-[Troubleshooting](TroubleShooting.md) - Some possible issues and solutions
-
-**Outdated:**
-
-[Common Script Api](CommonScriptApi.md) - Previous documentation of the common features. Should soon become part of [Common Globals: KSP](RedOnion.KSP/API/Globals.md)
+[Development](DevelopmentReadme.md) - Main page for development documentation (project structure, implementation explanations, etc).
 
 ## Videos
 

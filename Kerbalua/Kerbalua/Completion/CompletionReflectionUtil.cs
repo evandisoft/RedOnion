@@ -4,21 +4,31 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using Kerbalua.Completion.CompletionTypes;
+using MoonSharp.Interpreter;
 
 namespace Kerbalua.Completion
 {
 	public class CompletionReflectionUtil
 	{
+		static HashSet<string> HiddenMethodNames=new HashSet<string>{"Equals","GetHashCode","GetType","ToString"};
 		static public IList<string> GetMemberNames(Type t,BindingFlags flags=BindingFlags.Default)
 		{
 			var strs = new HashSet<string>();
 			foreach (var field in t.GetFields(flags))
 			{
+				if (field.GetCustomAttribute<MoonSharpHiddenAttribute>()!=null)
+				{
+					continue;
+				}
 				//strs.Add("field "+field.Name+" "+field.IsSpecialName);
 				strs.Add(field.Name);
 			}
 			foreach (var property in t.GetProperties(flags))
 			{
+				if (property.GetCustomAttribute<MoonSharpHiddenAttribute>()!=null)
+				{
+					continue;
+				}
 				if (property.Name != "Item")
 				{
 					//strs.Add("property " + property.Name + " " + property.IsSpecialName);
@@ -27,6 +37,14 @@ namespace Kerbalua.Completion
 			}
 			foreach (var method in t.GetMethods(flags))
 			{
+				if (HiddenMethodNames.Contains(method.Name))
+				{
+					continue;
+				}
+				if (method.GetCustomAttribute<MoonSharpHiddenAttribute>()!=null)
+				{
+					continue;
+				}
 				if (!method.IsSpecialName)
 				{
 					//strs.Add("method " + method.Name + " " + method.IsSpecialName);
@@ -88,6 +106,11 @@ namespace Kerbalua.Completion
 			var getMember = operations.Current as GetMemberOperation;
 			if (TryGetMethod(type, getMember.Name, out MethodInfo methodInfo, flags))
 			{
+				if (methodInfo.GetCustomAttribute<MoonSharpHiddenAttribute>()!=null)
+				{
+					completionObject=null;
+					return false;
+				}
 				Type newType = methodInfo.ReturnType;
 				var nextOp = operations.Peek(1);
 				if (nextOp is CallOperation)
@@ -102,6 +125,11 @@ namespace Kerbalua.Completion
 
 			if (TryGetProperty(type, getMember.Name, out PropertyInfo propertyInfo, flags))
 			{
+				if (propertyInfo.GetCustomAttribute<MoonSharpHiddenAttribute>()!=null)
+				{
+					completionObject=null;
+					return false;
+				}
 				Type newType = propertyInfo.PropertyType;
 				completionObject = new InstanceStaticCompletion(newType);
 				operations.MoveNext();
@@ -110,6 +138,11 @@ namespace Kerbalua.Completion
 
 			if (TryGetField(type, getMember.Name, out FieldInfo fieldInfo, flags))
 			{
+				if (fieldInfo.GetCustomAttribute<MoonSharpHiddenAttribute>()!=null)
+				{
+					completionObject=null;
+					return false;
+				}
 				Type newType = fieldInfo.FieldType;
 				completionObject = new InstanceStaticCompletion(newType);
 				operations.MoveNext();
