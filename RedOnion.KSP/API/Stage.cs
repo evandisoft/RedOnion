@@ -5,6 +5,7 @@ using MoonSharp.Interpreter;
 using RedOnion.KSP.Parts;
 using System.Collections.Generic;
 using System.ComponentModel;
+using RedOnion.KSP.Utilities;
 
 namespace RedOnion.KSP.API
 {

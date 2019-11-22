@@ -37,7 +37,7 @@ and saving the modified version (which will become a file outside of the zip).
 
 [Troubleshooting](TroubleShooting.md) - Some possible issues and solutions
 
-[RedOnion Project Documentation](RedOnionProjectDocumentation.md) - Main page for documentation of the project itself (project structure, etc).
+[RedOnion Development Documentation](RedOnionDevelopmentDocumentation.md) - Main page for development documentation (project structure, implementation details, etc).
 
 ## Videos
 
