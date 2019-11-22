@@ -30,12 +30,14 @@ namespace LiveRepl.Parts
 			}
 		}
 
+		public override bool HorizontalScrollBarPresent { get => rect.width<editingArea.MinSize.x; }
+
 		bool firstUse=false;
 		public override Vector2 MinSize
 		{
 			get
 			{
-				float minHeight=editingArea.MinSize.y+extraBottomSpace;
+				float minHeight=editingArea.MinSize.y; //+extraBottomSpace;
 				if (HorizontalScrollBarPresent)
 				{
 					minHeight+=ScrollbarWidth;

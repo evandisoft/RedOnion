@@ -15,7 +15,6 @@ namespace LiveRepl.Parts
 		public CompletionGroup(ScriptWindowParts uiparts)
 		{
 			this.uiparts=uiparts;
-
 			AddMinSized(uiparts.scriptNameInputArea=new ScriptNameInputArea(uiparts));
 			AddWeighted(1, uiparts.completionArea=new CompletionArea(uiparts));
 		}
