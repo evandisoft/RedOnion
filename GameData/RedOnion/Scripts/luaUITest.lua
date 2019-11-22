@@ -1,4 +1,4 @@
-w=new(native.RedOnion.UI.Window,"Window",ui.Layout.None)
+w=new(ui.Window,"Window",ui.Layout.None)
 
 p=new(ui.Panel)
 w.Add(p)

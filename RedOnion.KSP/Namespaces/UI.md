@@ -9,7 +9,6 @@ User interface, see [RedOnion.UI](../../RedOnion.UI/README.md)
 - `Padding`: Padding - Padding - empty space inside an element / around contained elements.
 - `Layout`: Layout - Layout - horizontal/vertical
 - `LayoutPadding`: LayoutPadding - LayoutPadding - Padding + Spacing
-- `SizeConstraint`: SizeConstraint - LayoutPadding - Padding + Spacing
 - `Element`: Element - Element - base class for all elements/controls.
 - `Panel`: Panel - Content panel (a box to hold other elements, manages layout).
 - `Label`: Label - Line of text
