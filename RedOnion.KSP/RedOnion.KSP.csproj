@@ -80,7 +80,6 @@
     <Compile Include="API\App.cs" />
     <Compile Include="API\Autopilot.cs" />
     <Compile Include="API\Globals.cs" />
-    <Compile Include="OS\Process.cs" />
     <Compile Include="Parts\PartChildren.cs" />
     <Compile Include="Utilities\DocBuildAttribute.cs" />
     <Compile Include="Utilities\InteropUtilities.cs" />
@@ -125,6 +124,7 @@
     <Compile Include="Autopilot\FlightControl.cs" />
     <Compile Include="MathUtil\Vec.cs" />
     <Compile Include="MathUtil\Scalar.cs" />
+    <Compile Include="PartsAPI\PartsExploration.cs" />
     <Compile Include="MoonSharp\Proxies\ModuleControlSurfaceProxyTable.cs" />
     <Compile Include="MoonSharp\Proxies\ExperimentalProxy.cs" />
     <Compile Include="MoonSharp\Proxies\ProxyTable.cs" />
@@ -144,7 +144,7 @@
     <Compile Include="ReflectionUtil\GetMappings.Lua.cs" />
     <Compile Include="API\AutoRun.cs" />
     <Compile Include="Settings\SavedSettings.cs" />
-    <Compile Include="Utilities\ScriptStringKeyedConstDictionary.cs" />
+    <Compile Include="CommonAPIHelpers\ScriptStringKeyedConstDictionary.cs" />
     <Compile Include="UnsafeAPI\BodiesDictionary.cs" />
     <Compile Include="UnsafeAPI\KerbalsDictionary.cs" />
     <Compile Include="UnsafeAPI\UnsafeAPI.cs" />
@@ -171,7 +171,9 @@
       <Name>RedOnion.UI</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="New Folder\" />
+  </ItemGroup>
   <ItemGroup />
   <ItemGroup />
   <ItemGroup />
