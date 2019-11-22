@@ -124,7 +124,6 @@
     <Compile Include="Autopilot\FlightControl.cs" />
     <Compile Include="MathUtil\Vec.cs" />
     <Compile Include="MathUtil\Scalar.cs" />
-    <Compile Include="PartsAPI\PartsExploration.cs" />
     <Compile Include="MoonSharp\Proxies\ModuleControlSurfaceProxyTable.cs" />
     <Compile Include="MoonSharp\Proxies\ExperimentalProxy.cs" />
     <Compile Include="MoonSharp\Proxies\ProxyTable.cs" />
@@ -144,7 +143,6 @@
     <Compile Include="ReflectionUtil\GetMappings.Lua.cs" />
     <Compile Include="API\AutoRun.cs" />
     <Compile Include="Settings\SavedSettings.cs" />
-    <Compile Include="CommonAPIHelpers\ScriptStringKeyedConstDictionary.cs" />
     <Compile Include="UnsafeAPI\BodiesDictionary.cs" />
     <Compile Include="UnsafeAPI\KerbalsDictionary.cs" />
     <Compile Include="UnsafeAPI\UnsafeAPI.cs" />
@@ -160,6 +158,8 @@
     <Compile Include="MoonSharp\MoonSharpAPI\MoonSharpGlobals.cs" />
     <Compile Include="Completion\Instance.cs" />
     <Compile Include="Debugging\QueueLogger.cs" />
+    <Compile Include="OS\Process.cs" />
+    <Compile Include="Utilities\ScriptStringKeyedConstDictionary.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RedOnion.ROS\RedOnion.ROS.csproj">
@@ -170,9 +170,6 @@
       <Project>{034C16AB-D16E-4AFE-9837-812499EE2F3D}</Project>
       <Name>RedOnion.UI</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="New Folder\" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup />
