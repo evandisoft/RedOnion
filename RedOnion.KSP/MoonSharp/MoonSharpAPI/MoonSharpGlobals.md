@@ -1,6 +1,6 @@
 ## MoonSharpGlobals
 
-List of functions that are specific to KerbaluaScript.
+List of functiontionality that is specific to KerbaluaScript.
 
 - `reflection`: [Reflection](Reflection.md) - Unsafe, reflection stuff.
 - `new()`: Object, obj Object, dynArgs DynValue[]
