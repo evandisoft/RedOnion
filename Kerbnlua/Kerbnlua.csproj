@@ -64,7 +64,7 @@
     <Folder Include="Kerbnlua\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Kerbnlua\Kerbnlua.md" />
+    <None Include="Kerbnlua\KerbnluaDevNotes.md" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
