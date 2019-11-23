@@ -65,7 +65,9 @@ namespace RedOnion.KSP.API
 			set => setIndex(value);
 		}
 
-		private static float[] rates => low ? KSPTW.fetch.physicsWarpRates : KSPTW.fetch.warpRates;
+		private static float[] rates
+			=> low ? KSPTW.fetch.physicsWarpRates : KSPTW.fetch.warpRates;
+		[Description("Set rate index. Returns false if not possible now.")]
 		public static bool setIndex(int value)
 		{
 			if (!ready)
@@ -75,6 +77,7 @@ namespace RedOnion.KSP.API
 			KSPTW.SetRate(value, false);
 			return true;
 		}
+		[Description("Set rate. Returns false if not possible now.")]
 		public static bool setRate(float value)
 		{
 			if (!ready)
@@ -100,6 +103,15 @@ namespace RedOnion.KSP.API
 				return false;
 			KSPTW.fetch.WarpTo(time);
 			return KSPTW.fetch.setAutoWarp;
+		}
+
+		[Description("Cancel any warp-to in progress. Returns true if it was canceled, false if no warp was in progress.")]
+		public static bool cancel()
+		{
+			if (KSPTW.fetch == null)
+				return false;
+			KSPTW.fetch.setAutoWarp = false;
+			return KSPTW.fetch.CancelAutoWarp();
 		}
 	}
 }

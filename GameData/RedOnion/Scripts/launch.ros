@@ -354,6 +354,7 @@ def circle
 
 var prevEtaReport = -10
 var switched = false
+var warped = false
 for
   var bt = stage.burnTime dv().size
   if bt != bt; bt = 120 // bt != bt is test for nan
@@ -361,9 +362,12 @@ for
   if time.since(prevEtaReport) >= (eta > 10 ? 10 : eta > 5 ? 2 : 1)
     prevEtaReport = time.now
     print "ETA: {0:F1}s", eta
+    if eta > 20 and !warped
+      warped = true
+      time.warp.to prevEtaReport + eta - 10
   if eta <= 5 and not switched
-  //TODO: warp to this point
     switched = true
+    time.warp.cancel()
     ctlsub.remove
     ctlsub = system.update circle
   if eta <= 1; break
