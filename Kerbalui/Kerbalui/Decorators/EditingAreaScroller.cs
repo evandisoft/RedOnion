@@ -99,13 +99,13 @@ namespace Kerbalui.Decorators
 			float diff = lastContentVector2.x - lastScrollViewVector2.x;
 			float contentStartX = scrollPos.x;
 			float contentEndX = contentStartX + lastScrollViewVector2.x;
-			if (Math.Max(cursorX - editingArea.editableText.style.lineHeight, 0) < contentStartX)
+			if (Math.Max(cursorX - editingArea.editableText.Style.lineHeight, 0) < contentStartX)
 			{
-				scrollPos.x = Math.Max(cursorX - editingArea.editableText.style.lineHeight, 0);
+				scrollPos.x = Math.Max(cursorX - editingArea.editableText.Style.lineHeight, 0);
 			}
-			else if (cursorX + editingArea.editableText.style.lineHeight > contentEndX)
+			else if (cursorX + editingArea.editableText.Style.lineHeight > contentEndX)
 			{
-				scrollPos.x = cursorX - lastContentVector2.x + editingArea.editableText.style.lineHeight;
+				scrollPos.x = cursorX - lastContentVector2.x + editingArea.editableText.Style.lineHeight;
 			}
 		}
 
@@ -120,14 +120,14 @@ namespace Kerbalui.Decorators
 			//Debug.Log("contentStartY " + contentStartY);
 			float contentEndY = contentStartY + lastScrollViewVector2.y;
 			//Debug.Log("contentEndY " + contentEndY);
-			if (cursorY - editingArea.editableText.style.lineHeight < contentStartY)
+			if (cursorY - editingArea.editableText.Style.lineHeight < contentStartY)
 			{
-				scrollPos.y = cursorY - editingArea.editableText.style.lineHeight;
+				scrollPos.y = cursorY - editingArea.editableText.Style.lineHeight;
 				//Debug.Log("reducing to " + scrollPos.y);
 			}
-			else if (cursorY + editingArea.editableText.style.lineHeight > contentEndY)
+			else if (cursorY + editingArea.editableText.Style.lineHeight > contentEndY)
 			{
-				scrollPos.y = cursorY - lastContentVector2.y + editingArea.editableText.style.lineHeight;
+				scrollPos.y = cursorY - lastContentVector2.y + editingArea.editableText.Style.lineHeight;
 				//Debug.Log("expanding to " + scrollPos.y);
 			}
 		}

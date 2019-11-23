@@ -7,25 +7,19 @@ namespace Kerbalui.Controls
 {
 	public class Label : ContentControl
 	{
-		public Label(string text)
+		public Label(string text):base(GUI.skin.label)
 		{
-			content.text=text;
-
+			Content.text=text;
 		}
 
-		public Label()
+		public Label() : base(GUI.skin.label)
 		{
-			content.text="";
-		}
-
-		public override GUIStyle DefaultStyle()
-		{
-			return Window.defaultSkin.label;
+			Content.text="";
 		}
 
 		protected override void ControlUpdate()
 		{
-			GUI.Label(rect, content, StyleOrDefault);
+			GUI.Label(rect, Content, Style);
 		}
 	}
 }

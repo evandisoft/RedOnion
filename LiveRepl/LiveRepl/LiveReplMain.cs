@@ -43,7 +43,7 @@ namespace LiveRepl
 
 		public void Start()
 		{
-			scriptWindow=new ScriptWindow(title);
+
 		}
 
 		void LocalToggleGui()
@@ -63,11 +63,16 @@ namespace LiveRepl
 
 		void FixedUpdate()
 		{
-			scriptWindow.FixedUpdate();
+			scriptWindow?.FixedUpdate();
 		}
 
 		void OnGUI()
         {
+
+			if (scriptWindow==null)
+			{
+				scriptWindow=new ScriptWindow(title);
+			}
 
 			if (!guiActive) return;
 

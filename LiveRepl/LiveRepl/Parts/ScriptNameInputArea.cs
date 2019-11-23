@@ -42,6 +42,8 @@ namespace LiveRepl.Parts {
 			};
 
 			keybindings.Clear();
+
+			//uiparts.FontChange+=editableText.FontChangeEventHandler;
 		}
 
 		protected override void DecoratorUpdate()

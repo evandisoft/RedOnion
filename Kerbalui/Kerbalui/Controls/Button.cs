@@ -7,22 +7,17 @@ namespace Kerbalui.Controls {
 	public class Button:ContentControl {
 		protected Action action;
 
-		public Button(string text, Action action)
+		public Button(string text, Action action):base(GUI.skin.button)
 		{
-			content.text = text;
+			Content.text = text;
 			this.action = action;
 		}
 
 		public virtual Action Action { get => action; set => action=value; }
 
-		public override GUIStyle DefaultStyle()
-		{
-			return Window.defaultSkin.button;
-		}
-
 		protected override void ControlUpdate()
 		{
-			if (GUI.Button(rect, content, StyleOrDefault))
+			if (GUI.Button(rect, Content, Style))
 			{
 				action.Invoke();
 			}

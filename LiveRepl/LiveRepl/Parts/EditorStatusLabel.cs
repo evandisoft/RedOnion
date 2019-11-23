@@ -12,7 +12,7 @@ namespace LiveRepl.Parts
 
 		public void UpdateCursorInfo(int row,int column)
 		{
-			content.text=" Line: "+row+", Column: "+column;
+			Content.text=" Line: "+row+", Column: "+column;
 		}
 	}
 }

@@ -9,53 +9,32 @@ namespace Kerbalui.Controls.Abstract
 	/// </summary>
 	public abstract class ContentControl:Control
 	{
-		public GUIContent content=new GUIContent("");
-		public GUIStyle style;
+		public GUIContent Content { get; set; }=new GUIContent("");
+		public GUIStyle Style { get; set; }
+
+		protected ContentControl(GUIStyle style)
+		{
+			Style=new GUIStyle(style);
+		}
+
+		public void FontChangeEventHandler(Font font)
+		{
+			Style.font=font;
+		}
 
 		public override Vector2 MinSize
 		{
 			get
 			{
-				Vector2 minSize=StyleOrDefault.CalcSize(content);
-				if (content.text=="")
+				Vector2 minSize=Style.CalcSize(Content);
+				if (Content.text=="")
 				{
-					content.text="a";
-					minSize.y=StyleOrDefault.CalcSize(content).y;
-					content.text="";
+					Content.text="a";
+					minSize.y=Style.CalcSize(Content).y;
+					Content.text="";
 				}
-				minSize.y+=5;
+				//minSize.y+=5;
 				return minSize;
-			}
-		}
-
-		/// <summary>
-		/// Returns default style if style is null
-		/// </summary>
-		/// <value>The style.</value>
-		public GUIStyle StyleOrDefault
-		{
-			get
-			{
-				if (style==null)
-				{
-					return DefaultStyle();
-				}
-				return style;
-			}
-		}
-
-		/// <summary>
-		/// Subclasses implement this to return the default style they want to be returned from 
-		/// StyleOrDefault when style is null.
-		/// </summary>
-		/// <returns>The style.</returns>
-		public abstract GUIStyle DefaultStyle();
-
-		public void InitStyle()
-		{
-			if (style==null)
-			{
-				DefaultStyle();
 			}
 		}
 	}

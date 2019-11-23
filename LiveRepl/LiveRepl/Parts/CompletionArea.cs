@@ -28,12 +28,19 @@ namespace LiveRepl.Parts
 			HorizontalScrollBarPresent=true;
 
 			InitializeKeyBindings();
+
+			//uiparts.FontChange+=editingArea.editableText.FontChangeEventHandler;
 		}
 
 		protected override void DecoratorUpdate()
 		{
 			bool lastEventWasMouseDown = Event.current.type == EventType.MouseDown && GUILibUtil.MouseInRect(rect);// ContentRect.Contains(Event.current.mousePosition); //GUILibUtil.MouseInRect(rect);
 			string lastControlname = GUI.GetNameOfFocusedControl();
+
+			//if (editingArea.TrySetFont(uiparts.fontSelector.CurrentFont))
+			//{
+			//	uiparts.scriptWindow.needsResize=true;
+			//}
 
 			base.DecoratorUpdate();
 
@@ -57,11 +64,6 @@ namespace LiveRepl.Parts
 
 		void UpdateCursorPosition()
 		{
-			if (editingArea.backingEditor==null)
-			{
-				return;
-			}
-
 			editingArea.backingEditor.MoveTextStart();
 			for (int i = 0; i < SelectionIndex; i++)
 			{

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using RedOnion.KSP.Settings;
 using UnityEngine;
@@ -42,54 +43,66 @@ namespace Kerbalui.Util
 			return relativeMousePos;
 		}
 
+		static public string[] windowsMonotypeFonts={"Courier New", "Consolas" };
+		static public string[] linuxMonotypeFonts={"Ubuntu Mono", "Noto Mono", "FreeMono", "DejaVu Sans Mono"};
 		static Font monoSpaceFont = null;
 		static public Font GetMonoSpaceFont()
 		{
 			if (monoSpaceFont == null)
 			{
-				monoSpaceFont=(Font)Resources.Load(Path.Combine(ProjectSettings.BaseProjectDir, "Resources", "UbuntuMono-R.ttf"));
-				return monoSpaceFont;
-				string[] fonts = Font.GetOSInstalledFontNames();
-
-				foreach (var fontName in fonts)
-				{
-					// Accept Courier New if available
-					if (fontName == "Courier New")
-					{
-						monoSpaceFont = Font.CreateDynamicFontFromOSFont(fontName, 12);
-						return monoSpaceFont;
-					}
-					// Accept the last listed Mono font if Courier New is not available
-					else if (fontName.EndsWith("Mono", StringComparison.CurrentCulture))
-					{
-						//Debug.Log("fontName is "+fontName);
-						monoSpaceFont = Font.CreateDynamicFontFromOSFont(fontName, 12);
-					}
-				}
-				if (monoSpaceFont==null)
-				{
-					foreach (var fontName in fonts)
-					{
-						if (fontName.Contains("Mono"))
-						{
-							//Debug.Log("fontName is "+fontName);
-							monoSpaceFont = Font.CreateDynamicFontFromOSFont(fontName, 12);
-						}
-					}
-				}
-				if (monoSpaceFont==null)
-				{
-					foreach (var fontName in fonts)
-					{
-						monoSpaceFont = Font.CreateDynamicFontFromOSFont(fontName, 12);
-					}
-				}
+				string fontName=GetMonoSpaceFontName();
+				monoSpaceFont=Font.CreateDynamicFontFromOSFont(fontName, 14);
 			}
 			if (monoSpaceFont==null)
 			{
 				throw new Exception("Could not find a font");
 			}
 			return monoSpaceFont;
+		}
+
+		static public string GetMonoSpaceFontName()
+		{
+			HashSet<string> fontNames=new HashSet<string>(Font.GetOSInstalledFontNames());
+
+			foreach (var fontName in windowsMonotypeFonts)
+			{
+
+				if (fontNames.Contains(fontName))
+				{
+					return fontName;
+				}
+			}
+
+			foreach (var fontName in linuxMonotypeFonts)
+			{
+				if (fontNames.Contains(fontName))
+				{
+					//Debug.Log("returning "+fontName);
+					return fontName;
+				}
+			}
+
+			foreach (var fontName in fontNames)
+			{
+				if (fontName.EndsWith("Mono", StringComparison.CurrentCulture))
+				{
+					return fontName;
+				}
+			}
+
+			foreach (var fontName in fontNames)
+			{
+				if (fontName.Contains("Mono"))
+				{
+					return fontName;
+				}
+			}
+			foreach (var fontName in fontNames)
+			{
+				return fontName;
+			}
+
+			return "";
 		}
 
 		static bool consumeNextCharEvent;

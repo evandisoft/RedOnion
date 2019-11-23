@@ -84,6 +84,7 @@ namespace RedOnion.UI.Components
 					Toggle(action);
 				return;
 			}
+			
 			if (action)
 				Click?.Invoke(Button);
 			if (transition && IsActive() && IsInteractable() && colors.fadeDuration > 0f)

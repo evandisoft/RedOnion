@@ -1,6 +1,7 @@
 using System;
 using LiveRepl.Decorators;
 using LiveRepl.Parts;
+using UnityEngine;
 
 namespace LiveRepl
 {
@@ -32,5 +33,17 @@ namespace LiveRepl
 	       internal ScriptDisabledElement scriptDisabledEditorGroup;
         internal ScriptDisabledElement ScriptDisabledCompletionGroup;
         internal QueueTagInputArea queueTagInputArea;
-    }
+		public FontSelector fontSelector;
+
+		public event Action<Font> FontChange;
+		/// <summary>
+		/// Called by the FontSelector. Changes fonts for all ContentControl's that have subscribed to FontChange
+		/// </summary>
+		/// <param name="font">Font.</param>
+		public void ChangeFont(Font font)
+		{
+			FontChange(font);
+			scriptWindow.needsResize=true;
+		}
+	}
 }

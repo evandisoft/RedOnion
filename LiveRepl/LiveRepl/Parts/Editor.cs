@@ -5,6 +5,8 @@ using Kerbalui.EventHandling;
 using Kerbalui.Controls.Abstract;
 using Kerbalui.Decorators;
 using Kerbalui.Controls;
+using Kerbalui.Util;
+using RedOnion.KSP.Settings;
 
 namespace LiveRepl.Parts
 {
@@ -15,11 +17,15 @@ namespace LiveRepl.Parts
 		/// <summary>
 		/// These bindings intentionally shadow the base class bindings.
 		/// </summary>
+		/// 
 
 		public Editor(ScriptWindowParts uiparts) : base(new EditingArea(new TextArea()))
 		{
 			this.uiparts=uiparts;
-			HorizontalScrollBarPresent=true;
+
+			uiparts.FontChange+=editingArea.editableText.FontChangeEventHandler;
+
+			HorizontalScrollBarPresent=false;
 			VerticalScrollBarPresent=true;
 		}
 
@@ -29,6 +35,11 @@ namespace LiveRepl.Parts
 			{
 				keybindings.ExecuteAndConsumeIfMatched(Event.current);
 			} 
+
+			//if (editingArea.TrySetFont(uiparts.fontSelector.CurrentFont))
+			//{
+			//	uiparts.scriptWindow.needsResize=true;
+			//}
 
 			base.DecoratorUpdate();
 
