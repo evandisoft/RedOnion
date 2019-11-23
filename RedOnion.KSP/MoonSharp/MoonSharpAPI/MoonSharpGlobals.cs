@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel;
 using MoonSharp.Interpreter;
+using MoonSharp.Interpreter.Interop;
 using RedOnion.KSP.Attributes;
 
 namespace RedOnion.KSP.MoonSharp.MoonSharpAPI
@@ -124,6 +125,12 @@ namespace RedOnion.KSP.MoonSharp.MoonSharpAPI
 				return t; //DynValue.FromObject(this, t);
 			}
 			return o.GetType();//DynValue.FromObject(this, o.GetType());
+		}
+
+		[Description("Returns the descriptor of the given object, null if one is not avaialble.")]
+		public static IUserDataDescriptor getdescriptor(DynValue @object)
+		{
+			return @object.UserData?.Descriptor;
 		}
 	}
 }

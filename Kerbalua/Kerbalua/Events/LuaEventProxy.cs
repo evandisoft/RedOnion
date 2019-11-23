@@ -1,12 +1,11 @@
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
-using RedOnion.KSP.MoonSharp.Descriptors;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace RedOnion.KSP.MoonSharp.Proxies
+namespace Kerbalua.Events
 {
 	public class LuaEventProxy : IUserDataType
 	{

@@ -40,7 +40,7 @@ namespace LiveRepl.Execution
 
 		void InternalResetEngine()
 		{
-			scriptEngine = new KerbaluaScript();
+			scriptEngine = KerbaluaScript.Instance;
 			scriptEngine.Options.DebugPrint = (string str) => {
 				PrintAction?.Invoke(str);
 			};
