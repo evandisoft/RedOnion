@@ -20,6 +20,8 @@ but our goal now is to:
 
 [Scripting](ScriptingReadme.md) - Documentation related to scripting.
 
+[LiveRepl](LiveRepl/Readme.md) - The main user interface for the project. Where scripts can be loaded, written, and evaluated.
+
 [Troubleshooting](TroubleShooting.md) - Some possible issues and solutions.
 
 [Development](DevelopmentReadme.md) - Main page for development documentation (project structure, implementation explanations, etc).
