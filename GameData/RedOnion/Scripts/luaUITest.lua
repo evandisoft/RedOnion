@@ -8,4 +8,4 @@ b=new(ui.Button)
 b.text="buttontext"
 p.Add(b)
 
-b.click.add(function() while true do print(1) end end)
+b.click.add(function() print(1) end)

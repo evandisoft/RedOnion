@@ -26,7 +26,7 @@ namespace RedOnion.KSP.MoonSharp.Proxies
 				var name = index.String;
 				if (name.Equals("add", StringComparison.OrdinalIgnoreCase))
 					return DynValue.NewCallback((c, a) => Descriptor.AddCallback(Object, c, a));
-				if (name.Equals("remove, StringComparison.OrdinalIgnoreCase"))
+				if (name.Equals("remove", StringComparison.OrdinalIgnoreCase))
 					return DynValue.NewCallback((c, a) => Descriptor.RemoveCallback(Object, c, a));
 			}
 
