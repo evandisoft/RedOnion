@@ -10,6 +10,7 @@ namespace Kerbalui.Controls
 		public Label(string text)
 		{
 			content.text=text;
+
 		}
 
 		public Label()

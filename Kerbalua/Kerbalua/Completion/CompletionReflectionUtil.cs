@@ -14,6 +14,14 @@ namespace Kerbalua.Completion
 		static public IList<string> GetMemberNames(Type t,BindingFlags flags=BindingFlags.Default)
 		{
 			var strs = new HashSet<string>();
+
+			foreach (var ev in t.GetEvents())
+			{
+				if (ev.IsSpecialName)
+					continue;
+				strs.Add(ev.Name);
+			}
+
 			foreach (var field in t.GetFields(flags))
 			{
 				if (field.GetCustomAttribute<MoonSharpHiddenAttribute>()!=null)
@@ -64,6 +72,12 @@ namespace Kerbalua.Completion
 			//	}
 			//}
 			return strs.ToList();
+		}
+
+		static public bool TryGetEvent(Type t, string name, out EventInfo eventInfo, BindingFlags flags = AllPublic)
+		{
+			eventInfo= t.GetEvent(name, flags);
+			return eventInfo != null;
 		}
 
 		static public bool TryGetField(Type t, string name, out FieldInfo fieldInfo, BindingFlags flags = AllPublic)

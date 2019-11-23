@@ -1,5 +1,6 @@
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
+using RedOnion.KSP.Completion;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Text;
 
 namespace Kerbalua.Events
 {
-	public class LuaEventProxy : IUserDataType
+	public class LuaEventProxy : IUserDataType, ICompletable
 	{
 		public LuaEventDescriptor Descriptor { get; }
 		public object Object { get; }
@@ -36,5 +37,14 @@ namespace Kerbalua.Events
 			=> throw new ScriptRuntimeException("Events do not have settable fields");
 		public DynValue MetaIndex(Script script, string metaname)
 			=> null;
+
+
+		string[] possibleCompletions={ "add", "remove" };
+		public IList<string> PossibleCompletions => possibleCompletions;
+		public bool TryGetCompletion(string completionName, out object completion)
+		{
+			completion=null;
+			return false;
+		}
 	}
 }
