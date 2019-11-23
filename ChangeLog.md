@@ -31,6 +31,7 @@ Just had a release!
 - Clicking script name area now empties it so you can easily click on completion area to load a file
 - Loading a file automatically selects the appropriate engine based on the extension
 - Saving when script name area is empty, now creates an "untitled.X" where X is the current engines proper extension.
+- You can now set the font for Repl and Editor. All other text uses the default font.
 
 ### ROS Changes
 - ROS redesign. Allowing pause and continue features (something similar to the way the Lua example code uses coroutine.yield())
