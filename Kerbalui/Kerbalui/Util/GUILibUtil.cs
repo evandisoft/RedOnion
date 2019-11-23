@@ -47,7 +47,6 @@ namespace Kerbalui.Util
 		{
 			if (monoSpaceFont == null)
 			{
-
 				string[] fonts = Font.GetOSInstalledFontNames();
 
 				foreach (var fontName in fonts)
