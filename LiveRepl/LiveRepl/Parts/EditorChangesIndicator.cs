@@ -14,13 +14,13 @@ namespace LiveRepl.Parts
 
 		public void Changed()
 		{
-			content.text="*";
+			Content.text="*";
 			uiparts.scriptWindow.needsResize=true;
 		}
 
 		public void Unchanged()
 		{
-			content.text="";
+			Content.text="";
 			uiparts.scriptWindow.needsResize=true;
 		}
 	}

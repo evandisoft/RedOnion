@@ -33,9 +33,9 @@ namespace Kerbalui.Decorators
 			} }
 		public int SelectIndex { get; set; }
 
-		public string Text { get => editableText.content.text; set => editableText.content.text=value; }
+		public string Text { get => editableText.Content.text; set => editableText.Content.text=value; }
 		public override Vector2 MinSize => editableText.MinSize;
-		public GUIStyle StyleOrDefault => editableText.StyleOrDefault;
+		public GUIStyle Style { get => editableText.Style; set => editableText.Style=Style; }
 		public bool HasFocus() => editableText.HasFocus();
 		public void GrabFocus() => editableText.GrabFocus();
 
@@ -51,9 +51,9 @@ namespace Kerbalui.Decorators
 
 		public bool TrySetFont(Font font)
 		{
-			if (editableText.style!=null && editableText.style.font!=font)
+			if (editableText.Style!=null && editableText.Style.font!=font)
 			{
-				editableText.style.font=font;
+				editableText.Style.font=font;
 				return true;
 			}
 			return false;
@@ -63,6 +63,11 @@ namespace Kerbalui.Decorators
 		{
 			this.editableText = editableText;
 			InitializeDefaultKeyBindings();
+			Style.font = GUILibUtil.GetMonoSpaceFont();
+			Style.hover.textColor
+					= editableText.Style.normal.textColor
+					= editableText.Style.active.textColor
+					= Color.white;
 		}
 
 		protected override void SetChildRect() => editableText.SetRect(rect);
@@ -76,29 +81,19 @@ namespace Kerbalui.Decorators
 				int id = GUIUtility.keyboardControl;
 				backingEditor = (TextEditor)GUIUtility.GetStateObject(typeof(TextEditor), id);
 			}
-			
-			if (editableText.style == null)
-			{
-				editableText.style = new GUIStyle(GUI.skin.textArea);
-				editableText.style.font = GUILibUtil.GetMonoSpaceFont();
-				editableText.style.hover.textColor
-					= editableText.style.normal.textColor
-					= editableText.style.active.textColor
-					= Color.white;
-			}
 
 			if (editableText.HasFocus())
 			{
 				ReceivedInput = Event.current.type == EventType.KeyDown;
 				int id = GUIUtility.keyboardControl;
 				backingEditor = (TextEditor)GUIUtility.GetStateObject(typeof(TextEditor), id);
-				backingEditor.text = editableText.content.text;
+				backingEditor.text = editableText.Content.text;
 				backingEditor.cursorIndex = CursorIndex;
 				backingEditor.selectIndex = SelectIndex;
 
 				HandleInput();
 
-				editableText.content.text = backingEditor.text;
+				editableText.Content.text = backingEditor.text;
 
 				// When the event is a KeyDown or MouseDown, at this point, we want the underlying control
 				// to be able to modify the cursor position using the key or new mouse click so we take the results
@@ -196,14 +191,14 @@ namespace Kerbalui.Decorators
 			int c = CharsFromLineStart();
 			string startOfLineToCursor = CurrentLine().Substring(0, c);
 			GUIContent tempContent = new GUIContent(startOfLineToCursor);
-			return editableText.style.CalcSize(tempContent).x;
+			return editableText.Style.CalcSize(tempContent).x;
 		}
 
 		public float CursorY()
 		{
-			string contentToCursor = editableText.content.text.Substring(0, CursorIndex);
+			string contentToCursor = editableText.Content.text.Substring(0, CursorIndex);
 			GUIContent tempContent = new GUIContent(contentToCursor);
-			return editableText.style.CalcSize(tempContent).y;
+			return editableText.Style.CalcSize(tempContent).y;
 		}
 
 		void HandleInput()

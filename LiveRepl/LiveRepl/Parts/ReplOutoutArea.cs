@@ -66,9 +66,9 @@ namespace LiveRepl.Parts
 
 		protected override void DecoratorUpdate()
 		{
-			if (editingArea.editableText.style==null)
+			if (editingArea.editableText.Style==null)
 			{
-				editingArea.editableText.style = new GUIStyle(GUI.skin.textArea)
+				editingArea.editableText.Style = new GUIStyle(GUI.skin.textArea)
 				{
 					alignment = TextAnchor.LowerLeft,
 					font = GUILibUtil.GetMonoSpaceFont()

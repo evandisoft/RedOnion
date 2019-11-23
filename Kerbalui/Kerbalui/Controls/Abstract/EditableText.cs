@@ -1,4 +1,6 @@
 using System;
+using UnityEngine;
+
 namespace Kerbalui.Controls.Abstract
 {
 	/// <summary>
@@ -6,6 +8,10 @@ namespace Kerbalui.Controls.Abstract
 	/// </summary>
 	public abstract class EditableText:ContentControl
 	{
-		public virtual string Text { get => content.text; set => content.text=value; }
+		protected EditableText(GUIStyle style) : base(style)
+		{
+		}
+
+		public virtual string Text { get => Content.text; set => Content.text=value; }
 	}
 }

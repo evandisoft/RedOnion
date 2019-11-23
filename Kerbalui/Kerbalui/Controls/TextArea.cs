@@ -7,14 +7,13 @@ namespace Kerbalui.Controls
 {
 	public class TextArea:EditableText
 	{
-		public override GUIStyle DefaultStyle()
+		public TextArea() : base(GUI.skin.textArea)
 		{
-			return Window.defaultSkin.textArea;
 		}
 
 		protected override void ControlUpdate()
 		{
-			content.text=GUI.TextArea(rect, content.text, StyleOrDefault);
+			Content.text=GUI.TextArea(rect, Content.text, Style);
 		}
 	}
 }
