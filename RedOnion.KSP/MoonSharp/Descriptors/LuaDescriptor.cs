@@ -102,7 +102,8 @@ namespace RedOnion.KSP.MoonSharp.Descriptors
 				if (ei.IsSpecialName || membersToIgnore.Contains(ei.Name))
 					continue;
 
-				AddMember(ei.Name, EventMemberDescriptor.TryCreateIfVisible(ei, accessMode));
+				//AddMember(ei.Name, EventMemberDescriptor.TryCreateIfVisible(ei, accessMode));
+				AddMember(ei.Name, LuaEventDescriptor.TryCreateIfVisible(ei, accessMode));
 			}
 
 			// get nested types and create statics
