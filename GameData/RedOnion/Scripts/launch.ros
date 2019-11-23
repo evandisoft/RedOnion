@@ -100,7 +100,7 @@ def gui
   evan  = xevan.pressed
   cust  = xcust.pressed
   return selected == 3
-if !gui()
+if not gui()
   return
 
 targetAltitude *= 1000
@@ -121,7 +121,7 @@ def setPitchEvan pitch
 var setPitch = evan ? setPitchEvan : setPitchFirda
 
 var customSteering = null
-if !evan
+if not evan
   autopilot.killRot = true
   if cust
     def steerPID
@@ -229,7 +229,7 @@ def throttle
 //: STAGING
 
 def staging
-  if !stage.ready
+  if not stage.ready
     return
   var nextDecoupler = ship.parts.nextDecoupler
   if nextDecoupler == null
@@ -244,7 +244,7 @@ def staging
     print "Releasing launch clamps"
     stage
     return
-  if !stage.engines.anyOperational
+  if not stage.engines.anyOperational
     print "No operational engine"
     stage
     return
@@ -285,7 +285,7 @@ for var d in vd
 
 ship.throttle = 0
 user.throttle = 1
-if !evan
+if not evan
   ship.heading = ascentHeading
   ship.roll = ascentRoll
 var ctlsub = system.update def
@@ -323,7 +323,7 @@ def dv
   var v2 = math.sqrt(body.mu/p.size) * (p.cross v1.cross p).normalized
   return v2-v1
 
-if !evan
+if not evan
   autopilot.roll = circleRoll
 ctlsub = system.update def
   autopilot.direction = ship.away.cross ship.velocity.cross ship.away
@@ -361,7 +361,7 @@ for
   if time.since(prevEtaReport) >= (eta > 10 ? 10 : eta > 5 ? 2 : 1)
     prevEtaReport = time.now
     print "ETA: {0:F1}s", eta
-  if eta <= 5 and !switched
+  if eta <= 5 and not switched
   //TODO: warp to this point
     switched = true
     ctlsub.remove

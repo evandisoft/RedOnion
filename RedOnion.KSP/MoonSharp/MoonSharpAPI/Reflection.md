@@ -10,3 +10,5 @@ Reflection functionality specific to Moonsharp.
   - Returns a static based on the given Type or object.
 - `getclrtype()`: Object, object DynValue
   - Returns the underyling clr type associated with this object.
+- `getdescriptor()`: IUserDataDescriptor, object DynValue
+  - Returns the descriptor of the given object, null if one is not avaialble.

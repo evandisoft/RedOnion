@@ -161,13 +161,18 @@ namespace RedOnion.Build
 				types.Add(type, doc);
 				foreach (var member in GetMembers(type))
 				{
-					if (member.GetCustomAttribute<DescriptionAttribute>() == null)
+					FieldInfo f = member as FieldInfo;
+					bool typeRef = f != null
+						&& f.IsStatic && f.IsInitOnly	// static readonly
+						&& f.FieldType == typeof(Type);	// Type name = ...
+					if (member.GetCustomAttribute<DescriptionAttribute>() == null && (!typeRef ||
+						((Type)f.GetValue(null)).GetCustomAttribute<DescriptionAttribute>() == null))
 						continue;
 					var mname = GetName(member);
 					members.TryGetValue(mname, out var prev);
 					if (prev != null && !(prev is MethodInfo && member is MethodInfo))
 						continue;
-					if (member is FieldInfo f)
+					if (f != null)
 						RegisterType(
 							f.FieldType == typeof(Type)
 							&& f.IsInitOnly && f.IsStatic
@@ -289,7 +294,8 @@ namespace RedOnion.Build
 
 		static void PrintSimpleMember(StreamWriter wr, Document doc, string name, MemberInfo member, Type type)
 		{
-			var desc = member.GetCustomAttribute<DescriptionAttribute>().Description;
+			var desc = member.GetCustomAttribute<DescriptionAttribute>()?.Description
+				?? type.GetCustomAttribute<DescriptionAttribute>()?.Description;
 			var typeMd = ResolveType(doc, type, out var typeName);
 			if (member is MethodInfo || typeof(ICallable).IsAssignableFrom(type))
 				name += "()";

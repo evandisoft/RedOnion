@@ -171,6 +171,10 @@ namespace RedOnion.ROS.Tests
 			Test(false,		"false ?? true");
 			Test(1,			"0 or 1");
 			Test(1,			"1 || 2");
+			Test(false,		"not true");
+			Test(true,		"not false");
+			Test(true,		"not 0");
+			Test(false,		"not 1");
 
 			// this was causing some problems (fixed)
 			Test("var s = \"hello\"");

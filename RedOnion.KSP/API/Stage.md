@@ -4,6 +4,7 @@ Used to activate next stage and/or get various information about stage(s). Retur
 
 - `number`: int - Stage number.
 - `ready`: bool - Whether ready for activating next stage or not.
+- `pending`: bool - True when current stage number is the same as number of stages (LED is flashing).
 - `parts`: [PartSet](../Parts/PartSet.1.md)\[[Part](../Parts/PartBase.md)\] - Parts that will be separated by next decoupler
 - `engines`: [EngineSet](../Parts/EngineSet.md) - Active engines (regardless of decouplers). `Engines.Resources` reflect total amounts of fuels inside boosters with fuel that cannot flow (like solid fuel).
 - `xparts`: [PartSet](../Parts/PartSet.1.md)\[[Part](../Parts/PartBase.md)\] - Active engines and all accessible tanks upto next decoupler. `xparts.resources` reflect total amounts of fuels accessible to active engines, but only in parts that will be separated by next decoupler. This includes liquid fuel and oxidizer and can be used for automated staging, Especially so called Asparagus and any design throwing off tanks (with or without engiens).
