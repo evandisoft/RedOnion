@@ -24,6 +24,8 @@ namespace LiveRepl.Parts
 		public CompletionArea(ScriptWindowParts uiparts) : base(new EditingArea(new TextArea()))
 		{
 			this.uiparts=uiparts;
+			VerticalScrollBarPresent=true;
+			HorizontalScrollBarPresent=true;
 
 			InitializeKeyBindings();
 		}
@@ -36,13 +38,13 @@ namespace LiveRepl.Parts
 			base.DecoratorUpdate();
 
 			var scrollbarlessrect=new Rect(rect); //new Rect(ContentRect);
-			if (VerticalScrollBarPresent)
+			//if (VerticalScrollBarPresent)
 				scrollbarlessrect.width-=ScrollbarWidth;
-			if (HorizontalScrollBarPresent)
+			//if (HorizontalScrollBarPresent)
 				scrollbarlessrect.height-=ScrollbarWidth;
 			if (lastEventWasMouseDown && Event.current.type == EventType.Used && GUILibUtil.MouseInRect(scrollbarlessrect)) //ContentRect.Contains(Event.current.mousePosition))
 			{
-				UILogger.Log("CompletionArea was clicked");
+				UILogger.Log("CompletionArea was clicked",Event.current.mousePosition,scrollbarlessrect);
 				//Debug.Log("This was clicked");
 				SelectionIndex = editingArea.LineNumber-1;
 				UILogger.Log("SelectionIndex is ",SelectionIndex);

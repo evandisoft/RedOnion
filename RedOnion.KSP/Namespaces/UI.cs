@@ -12,7 +12,7 @@ namespace RedOnion.KSP.Namespaces
 		[Description("Color.")]
 		public static readonly Type Color = typeof(UnityEngine.Color);
 		[Description("Window - all elements must belong to some window.")]
-		public static readonly Type Window = typeof(Window);
+		public static readonly Type Window = typeof(UI_Window);
 		[Description("Scene flags for limiting life-span of windows when switching scenes.")]
 		public static readonly Type SceneFlags = typeof(UI.SceneFlags);
 		[Description("Anchors for specifying where to place elements (fill, center, ...)")]
@@ -23,7 +23,6 @@ namespace RedOnion.KSP.Namespaces
 		public static readonly Type Layout = typeof(UI.Layout);
 		[Description("LayoutPadding - Padding + Spacing")]
 		public static readonly Type LayoutPadding = typeof(UI.LayoutPadding);
-		[Description("LayoutPadding - Padding + Spacing")]
 
 		// unused for now
 		public static readonly Type SizeConstraint = typeof(UI.SizeConstraint);

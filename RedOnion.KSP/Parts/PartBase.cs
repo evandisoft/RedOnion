@@ -2,11 +2,13 @@ using System;
 using System.ComponentModel;
 using RedOnion.KSP.API;
 using RedOnion.KSP.Attributes;
+using RedOnion.KSP.Utilities;
 using RedOnion.ROS;
 
 namespace RedOnion.KSP.Parts
 {
 	[DisplayName("Part"), Description("Part of the ship (vehicle/vessel).")]
+	[DocBuild(typeof(Decoupler), typeof(DockingPort), typeof(LaunchClamp), typeof(Engine), typeof(Sensor))]
 	public class PartBase
 	{
 		[Unsafe, Description("Native `Part` - KSP API.")]

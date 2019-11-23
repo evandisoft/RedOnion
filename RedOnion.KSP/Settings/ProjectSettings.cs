@@ -1,9 +1,15 @@
 using System;
+using System.IO;
+
 namespace RedOnion.KSP.Settings
 {
 	public static class ProjectSettings
 	{
-		public const bool NLuaEnabled=false;
-		public const bool ShowLogsButtonEnabled=false;
+		public static readonly string BaseProjectDir;
+
+		static ProjectSettings()
+		{
+			BaseProjectDir=Path.Combine(KSPUtil.ApplicationRootPath, "GameData", "RedOnion");
+		}
 	}
 }

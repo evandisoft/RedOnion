@@ -109,6 +109,11 @@ namespace RedOnion.Build
 				foreach (var gen in fullType.GetGenericArguments())
 					RegisterType(gen);
 			}
+			if (docb != null && docb.RegisterTypes?.Length > 0)
+			{
+				foreach (var rtype in docb.RegisterTypes)
+					RegisterType(rtype);
+			}
 		}
 		internal static void Exec()
 		{

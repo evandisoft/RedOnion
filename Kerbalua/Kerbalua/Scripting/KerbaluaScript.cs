@@ -9,6 +9,10 @@ using RedOnion.KSP.API;
 using RedOnion.KSP.MoonSharp.CommonAPI;
 using System.ComponentModel;
 using RedOnion.KSP.MoonSharp.MoonSharpAPI;
+using Process = RedOnion.KSP.OS.Process;
+using MoonSharp.Interpreter.Compatibility;
+using RedOnion.UI;
+using Kerbalua.Events;
 
 namespace Kerbalua.Scripting
 {
@@ -16,8 +20,23 @@ namespace Kerbalua.Scripting
 	{
 		public Action<string> PrintErrorAction { get; set; }
 
-		public KerbaluaScript() : base(CoreModules.Preset_Complete)
+		static KerbaluaScript _instance;
+		public static KerbaluaScript Instance
 		{
+			get
+			{
+				if (_instance==null)
+				{
+					_instance=new KerbaluaScript();
+				}
+				return _instance;
+			}
+		}
+
+		private KerbaluaScript() : base(CoreModules.Preset_Complete)
+		{
+			UserData.RegisterType<Button>(new LuaDescriptor(typeof(Button)));
+
 			UserData.RegistrationPolicy = InteropRegistrationPolicy.Automatic;
 
 			GlobalOptions.CustomConverters
@@ -31,51 +50,6 @@ namespace Kerbalua.Scripting
 					(Script script, Vector3d vector3d)
 						=> DynValue.FromObject(script, new Vector(vector3d)) //DynValue.NewTable(new ModuleControlSurfaceProxyTable(this, m))
 					);
-
-			// This stuff is unsafe. User could pass a callback to List.Foreach and think it would run normally
-			// but the overall execution of the callback on every item of the list would have to complete before
-			// the game could return from fixed-update.
-			//GlobalOptions.CustomConverters
-			//	.SetScriptToClrCustomConversion(DataType.Function
-			//		, typeof(Func<object, object>), (f) => new Func<object, object>((item) =>
-			//		 {
-			//			 var co = CreateCoroutine(f);
-			//			 co.Coroutine.AutoYieldCounter = 10000;
-			//			 object retval=co.Coroutine.Resume(item);
-			//			 if (co.Coroutine.State == CoroutineState.ForceSuspended)
-			//			 {
-			//				 PrintErrorAction?.Invoke("Action<object> callback unable to finish");
-			//				 return null;
-			//			 }
-			//			 return retval;
-			//		 }));
-
-			//GlobalOptions.CustomConverters
-			//	.SetScriptToClrCustomConversion(DataType.Function
-			//		, typeof(System.Action<object>), (f) => new Action<object>((item) =>
-			//	{
-
-			//		var co = CreateCoroutine(f);
-			//		co.Coroutine.AutoYieldCounter = 10000;
-			//		co.Coroutine.Resume(item);
-			//		if (co.Coroutine.State == CoroutineState.ForceSuspended)
-			//		{
-			//			PrintErrorAction?.Invoke("Action<object> callback unable to finish");
-			//		}
-			//	}));
-
-			//GlobalOptions.CustomConverters
-				//.SetScriptToClrCustomConversion(DataType.Function
-				//	, typeof(UnityAction), (f) => new UnityAction(() =>
-				//{
-				//	var co = CreateCoroutine(f);
-				//	co.Coroutine.AutoYieldCounter = 10000;
-				//	co.Coroutine.Resume();
-				//	if (co.Coroutine.State == CoroutineState.ForceSuspended)
-				//	{
-				//		PrintErrorAction?.Invoke("UnityAction callback unable to finish");
-				//	}
-				//}));
 
 			var metatable=new Table(this);
 			var commonAPI=new CommonAPITable(this);
@@ -101,6 +75,7 @@ namespace Kerbalua.Scripting
 		Stopwatch sleepwatch=new Stopwatch();
 		delegate Table Importer(string name);
 		DynValue coroutine;
+		Process process;
 
 		public bool Evaluate(out DynValue result)
 		{
@@ -123,8 +98,10 @@ namespace Kerbalua.Scripting
 				}
 			}
 
+			Process.current = process;
 			coroutine.Coroutine.AutoYieldCounter = 1000;
 			result = coroutine.Coroutine.Resume();
+			Process.current = null;
 
 			bool isComplete = false;
 			if (coroutine.Coroutine.State == CoroutineState.Dead)
@@ -145,11 +122,16 @@ namespace Kerbalua.Scripting
 			DynValue mainFunction = base.DoString("return function () " + source + "\n end");
 
 			coroutine = CreateCoroutine(mainFunction);
+			process = new Process();
+			process.shutdown += Terminate;
 		}
 
 		public void Terminate()
 		{
 			coroutine = null;
+			process.shutdown -= Terminate;
+			process.terminate();
+			process = null;
 			sleepwatch.Reset();
 			sleeptimeMillis=0;
 		}

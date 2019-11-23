@@ -26,9 +26,9 @@ namespace Kerbalui.Decorators
 		protected Vector2 lastScrollViewVector2 = new Vector2();
 		protected Vector2 lastContentVector2 = new Vector2();
 
-		public bool HorizontalScrollBarPresent => rect.width<editingArea.rect.width;
+		public virtual bool HorizontalScrollBarPresent { get; set; } = false;// rect.width<editingArea.rect.width;
 
-		public bool VerticalScrollBarPresent => rect.height<editingArea.rect.height;
+		public virtual bool VerticalScrollBarPresent { get; set; } = false;//rect.height<editingArea.rect.height;
 
 		public const int ScrollbarWidth=20;
 
@@ -48,7 +48,7 @@ namespace Kerbalui.Decorators
 
 		protected override void DecoratorUpdate()
 		{
-			bool receivedInput=false;
+			//bool receivedInput=false;
 			if (HasFocus())
 			{
 				keybindings.ExecuteAndConsumeIfMatched(Event.current);
@@ -60,7 +60,7 @@ namespace Kerbalui.Decorators
 				//Debug.Log("edit area scroller grabbing mouse");
 				GrabFocus();
 			}
-			scrollPos = GUI.BeginScrollView(rect, scrollPos, editingArea.rect);
+			scrollPos = GUI.BeginScrollView(rect, scrollPos, editingArea.rect, HorizontalScrollBarPresent, VerticalScrollBarPresent);
 			{
 				//var scrollbarlessrect=new Rect(ContentRect);
 				//if(VerticalScrollBarPresent)

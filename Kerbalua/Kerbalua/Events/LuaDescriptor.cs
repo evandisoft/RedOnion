@@ -7,7 +7,7 @@ using MoonSharp.Interpreter.Compatibility;
 using MoonSharp.Interpreter.Interop;
 using MoonSharp.Interpreter.Interop.BasicDescriptors;
 
-namespace RedOnion.KSP.MoonSharp.Descriptors
+namespace Kerbalua.Events
 {
 	public class LuaDescriptor : DispatchingUserDataDescriptor
 	{
@@ -102,7 +102,8 @@ namespace RedOnion.KSP.MoonSharp.Descriptors
 				if (ei.IsSpecialName || membersToIgnore.Contains(ei.Name))
 					continue;
 
-				AddMember(ei.Name, EventMemberDescriptor.TryCreateIfVisible(ei, accessMode));
+				//AddMember(ei.Name, EventMemberDescriptor.TryCreateIfVisible(ei, accessMode));
+				AddMember(ei.Name, LuaEventDescriptor.TryCreateIfVisible(ei, accessMode));
 			}
 
 			// get nested types and create statics

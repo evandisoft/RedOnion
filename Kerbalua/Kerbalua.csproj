@@ -107,6 +107,9 @@
     <Compile Include="Kerbalua\Completion\CompletionTypes\InstanceStaticCompletion.cs" />
     <Compile Include="Kerbalua\Completion\MoonSharpIntellisense.cs" />
     <Compile Include="Kerbalua\Completion\CompletionTypes\MoonSharpCompletable.cs" />
+    <Compile Include="Kerbalua\Events\LuaDescriptor.cs" />
+    <Compile Include="Kerbalua\Events\LuaEventDescriptor.cs" />
+    <Compile Include="Kerbalua\Events\LuaEventProxy.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -142,6 +145,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Kerbalua\Completion\CompletionTypes\" />
+    <Folder Include="Kerbalua\Events\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>

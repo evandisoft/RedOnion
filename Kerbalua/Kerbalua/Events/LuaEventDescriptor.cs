@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Kerbalua.Scripting;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Compatibility;
 using MoonSharp.Interpreter.DataStructs;
@@ -10,8 +11,9 @@ using MoonSharp.Interpreter.Interop.BasicDescriptors;
 using MoonSharp.Interpreter.Interop.StandardDescriptors;
 using RedOnion.KSP.MoonSharp.Proxies;
 using RedOnion.KSP.Utilities;
+using UnityEngine;
 
-namespace RedOnion.KSP.MoonSharp.Descriptors
+namespace Kerbalua.Events
 {
 	/// <summary>
 	/// Class providing easier marshalling of CLR events. Handling is limited to a narrow range of handler signatures, which,
@@ -228,7 +230,6 @@ namespace RedOnion.KSP.MoonSharp.Descriptors
 			m_Remove.Invoke(o, new object[] { handler });
 		}
 
-
 		private Delegate CreateDelegate(object sender)
 		{
 			switch (Framework.Do.GetMethod(EventInfo.EventHandlerType, "Invoke").GetParameters().Length)
@@ -286,7 +287,14 @@ namespace RedOnion.KSP.MoonSharp.Descriptors
 
 			foreach (Closure c in closures)
 			{
-				c.Call(o01, o02, o03, o04, o05, o06, o07, o08, o09, o10, o11, o12, o13, o14, o15, o16);
+				var script=KerbaluaScript.Instance;
+				var co = script.CreateCoroutine(c);
+				co.Coroutine.AutoYieldCounter = 1000;
+				co.Coroutine.Resume(o01, o02, o03, o04, o05, o06, o07, o08, o09, o10, o11, o12, o13, o14, o15, o16);
+				if (co.Coroutine.State == CoroutineState.ForceSuspended)
+				{
+					script.PrintErrorAction?.Invoke("UnityAction callback unable to finish");
+				}
 			}
 		}
 

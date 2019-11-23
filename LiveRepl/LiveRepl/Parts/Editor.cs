@@ -19,6 +19,8 @@ namespace LiveRepl.Parts
 		public Editor(ScriptWindowParts uiparts) : base(new EditingArea(new TextArea()))
 		{
 			this.uiparts=uiparts;
+			HorizontalScrollBarPresent=true;
+			VerticalScrollBarPresent=true;
 		}
 
 		protected override void DecoratorUpdate()

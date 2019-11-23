@@ -1,4 +1,4 @@
-w=new(native.RedOnion.UI.Window,"Window",ui.Layout.None)
+w=new(ui.Window,"Window",ui.Layout.None)
 
 p=new(ui.Panel)
 w.Add(p)
@@ -8,4 +8,4 @@ b=new(ui.Button)
 b.text="buttontext"
 p.Add(b)
 
-b.click.add(function() print(1) end)
+b.click.add(function() while true do end end)
