@@ -47,41 +47,8 @@ namespace Kerbalui.Util
 		{
 			if (monoSpaceFont == null)
 			{
-				string[] fonts = Font.GetOSInstalledFontNames();
-
-				foreach (var fontName in fonts)
-				{
-					// Accept Courier New if available
-					if (fontName == "Courier New")
-					{
-						monoSpaceFont = Font.CreateDynamicFontFromOSFont(fontName, 12);
-						return monoSpaceFont;
-					}
-					// Accept the last listed Mono font if Courier New is not available
-					else if (fontName.EndsWith("Mono", StringComparison.CurrentCulture))
-					{
-						//Debug.Log("fontName is "+fontName);
-						monoSpaceFont = Font.CreateDynamicFontFromOSFont(fontName, 12);
-					}
-				}
-				if (monoSpaceFont==null)
-				{
-					foreach (var fontName in fonts)
-					{
-						if (fontName.Contains("Mono"))
-						{
-							//Debug.Log("fontName is "+fontName);
-							monoSpaceFont = Font.CreateDynamicFontFromOSFont(fontName, 12);
-						}
-					}
-				}
-				if (monoSpaceFont==null)
-				{
-					foreach (var fontName in fonts)
-					{
-						monoSpaceFont = Font.CreateDynamicFontFromOSFont(fontName, 12);
-					}
-				}
+				string fontName=GetMonoSpaceFontName();
+				monoSpaceFont=Font.CreateDynamicFontFromOSFont(fontName, 14);
 			}
 			if (monoSpaceFont==null)
 			{
@@ -94,7 +61,7 @@ namespace Kerbalui.Util
 		{
 
 			string[] fonts = Font.GetOSInstalledFontNames();
-
+			
 			foreach (var fontName in fonts)
 			{
 				// Accept Courier New if available
@@ -102,6 +69,11 @@ namespace Kerbalui.Util
 				{
 					return fontName;
 				}
+
+			}
+
+			foreach (var fontName in fonts)
+			{
 				// Accept the last listed Mono font if Courier New is not available
 				if (fontName.EndsWith("Mono", StringComparison.CurrentCulture))
 				{
@@ -109,6 +81,7 @@ namespace Kerbalui.Util
 					return fontName;
 				}
 			}
+
 			foreach (var fontName in fonts)
 			{
 				if (fontName.Contains("Mono"))

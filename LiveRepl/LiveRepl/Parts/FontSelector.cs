@@ -10,9 +10,13 @@ using UnityEngine;
 
 namespace LiveRepl.Parts
 {
+	/// <summary>
+	///  For windows, Consolas, and "Courier New"
+	/// </summary>
 	public class FontSelector : EditingArea, ICompletableElement
 	{
 		public Font CurrentFont { get; private set; } = null;
+		public event Action<Font> FontChange;
 
 		public FontSelector() : base(new TextField())
 		{
@@ -26,6 +30,7 @@ namespace LiveRepl.Parts
 				CurrentFont=Font.CreateDynamicFontFromOSFont(currentFontName, 14);
 			}
 
+			FontChange(CurrentFont);
 			//Text=CurrentFont.
 			keybindings.Clear();
 			onlyUseKeyBindings=true;
@@ -45,6 +50,7 @@ namespace LiveRepl.Parts
 			if (newFont!=null)
 			{
 				CurrentFont=newFont;
+				FontChange(CurrentFont);
 			}
 		}
 
