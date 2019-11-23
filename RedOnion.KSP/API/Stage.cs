@@ -18,6 +18,8 @@ namespace RedOnion.KSP.API
 		public static int number => StageManager.CurrentStage;
 		[Description("Whether ready for activating next stage or not.")]
 		public static bool ready => StageManager.CanSeparate;
+		[Description("True when current stage number is the same as number of stages (LED is flashing).")]
+		public static bool pending => StageManager.CurrentStage == StageManager.StageCount;
 
 		[Description("Activate next stage (can call the stage object as a function as well (stage() instead of stage.activate())")]
 		public static bool activate()
