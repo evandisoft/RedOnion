@@ -63,7 +63,7 @@ namespace Kerbalua.Completion
 					Complogger.Log("Object is "+completionObject);
 				}
 			}
-			catch (LuaIntellisenseException e)
+			catch (LuaIntellisenseException)
 			{
 				//Debug.Log(e);
 				replaceStart = replaceEnd = cursorPos;

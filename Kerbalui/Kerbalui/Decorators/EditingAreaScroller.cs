@@ -48,7 +48,7 @@ namespace Kerbalui.Decorators
 
 		protected override void DecoratorUpdate()
 		{
-			bool receivedInput=false;
+			//bool receivedInput=false;
 			if (HasFocus())
 			{
 				keybindings.ExecuteAndConsumeIfMatched(Event.current);
