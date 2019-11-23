@@ -20,6 +20,7 @@ namespace RedOnion.KSP.OS
 		/// </summary>
 		/// <remarks>
 		/// All scripting engines are to update this property at the start of their Execute method.
+		/// (And set it to null when finished with current execute/update.)
 		/// </remarks>
 		public static Process current { get; internal set; }
 
@@ -84,7 +85,7 @@ namespace RedOnion.KSP.OS
 			public ShutdownHook(IDisposable target) : base(target) { }
 		}
 		/// <summary>
-		/// Used to subscribe to Shutdown but avoid direct hard-link
+		/// Used to subscribe to <see cref="shutdown"/> but avoid direct hard-link
 		/// so that the target/subscriber can be garbage-collected.
 		/// </summary>
 		/// <remarks>

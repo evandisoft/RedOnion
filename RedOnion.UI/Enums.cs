@@ -6,12 +6,13 @@ namespace RedOnion.UI
 {
 	public enum Layout
 	{
-		None,
-		Stack,
-		Horizontal,
-		Vertical,
-		FlowHorizontal,
-		FlowVertical
+		None = 0,
+	//	Stack = 1,
+		Horizontal = 2,
+		Vertical = 3,
+	//	FlowHorizontal = 4,
+	//	FlowVertical = 5,
+	//	Table = 6
 	}
 
 	[Flags]
