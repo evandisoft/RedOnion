@@ -10,6 +10,7 @@ using MoonSharp.Interpreter.Interop.BasicDescriptors;
 using MoonSharp.Interpreter.Interop.StandardDescriptors;
 using RedOnion.KSP.MoonSharp.Proxies;
 using RedOnion.KSP.Utilities;
+using UnityEngine;
 
 namespace RedOnion.KSP.MoonSharp.Descriptors
 {
@@ -287,6 +288,7 @@ namespace RedOnion.KSP.MoonSharp.Descriptors
 			foreach (Closure c in closures)
 			{
 				c.Call(o01, o02, o03, o04, o05, o06, o07, o08, o09, o10, o11, o12, o13, o14, o15, o16);
+				Debug.Log("closures");
 			}
 		}
 

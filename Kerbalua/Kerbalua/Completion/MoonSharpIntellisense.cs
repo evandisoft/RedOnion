@@ -65,7 +65,7 @@ namespace Kerbalua.Completion
 			}
 			catch (LuaIntellisenseException e)
 			{
-				Debug.Log(e);
+				//Debug.Log(e);
 				replaceStart = replaceEnd = cursorPos;
 				return new List<string>();
 			}

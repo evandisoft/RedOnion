@@ -10,7 +10,9 @@ using RedOnion.KSP.MoonSharp.CommonAPI;
 using System.ComponentModel;
 using RedOnion.KSP.MoonSharp.MoonSharpAPI;
 using Process = RedOnion.KSP.OS.Process;
+using MoonSharp.Interpreter.Compatibility;
 using RedOnion.KSP.MoonSharp.Descriptors;
+using RedOnion.UI;
 
 namespace Kerbalua.Scripting
 {
@@ -20,6 +22,8 @@ namespace Kerbalua.Scripting
 
 		public KerbaluaScript() : base(CoreModules.Preset_Complete)
 		{
+			UserData.RegisterType<Button>(new LuaDescriptor(typeof(Button)));
+
 			UserData.RegistrationPolicy = InteropRegistrationPolicy.Automatic;
 
 			GlobalOptions.CustomConverters
@@ -33,6 +37,8 @@ namespace Kerbalua.Scripting
 					(Script script, Vector3d vector3d)
 						=> DynValue.FromObject(script, new Vector(vector3d)) //DynValue.NewTable(new ModuleControlSurfaceProxyTable(this, m))
 					);
+
+
 
 			// This stuff is unsafe. User could pass a callback to List.Foreach and think it would run normally
 			// but the overall execution of the callback on every item of the list would have to complete before
@@ -52,19 +58,6 @@ namespace Kerbalua.Scripting
 			//			 return retval;
 			//		 }));
 
-			//GlobalOptions.CustomConverters
-			//	.SetScriptToClrCustomConversion(DataType.Function
-			//		, typeof(System.Action<object>), (f) => new Action<object>((item) =>
-			//	{
-
-			//		var co = CreateCoroutine(f);
-			//		co.Coroutine.AutoYieldCounter = 10000;
-			//		co.Coroutine.Resume(item);
-			//		if (co.Coroutine.State == CoroutineState.ForceSuspended)
-			//		{
-			//			PrintErrorAction?.Invoke("Action<object> callback unable to finish");
-			//		}
-			//	}));
 
 			//GlobalOptions.CustomConverters
 			//.SetScriptToClrCustomConversion(DataType.Function
@@ -72,6 +65,22 @@ namespace Kerbalua.Scripting
 			//{
 			//	var co = CreateCoroutine(f);
 			//	co.Coroutine.AutoYieldCounter = 10000;
+			//	co.Coroutine.Resume();
+			//	if (co.Coroutine.State == CoroutineState.ForceSuspended)
+			//	{
+			//		PrintErrorAction?.Invoke("UnityAction callback unable to finish");
+			//	}
+			//}));
+
+
+
+			//GlobalOptions.CustomConverters
+			//.SetScriptToClrCustomConversion(DataType.Function
+			//	, typeof(Action<Button>), (f) => new Action<Button>((b) =>
+			//{
+			//	PrintErrorAction?.Invoke("in conversion");
+			//	var co = CreateCoroutine(f);
+			//	co.Coroutine.AutoYieldCounter = 1000;
 			//	co.Coroutine.Resume();
 			//	if (co.Coroutine.State == CoroutineState.ForceSuspended)
 			//	{
@@ -89,6 +98,12 @@ namespace Kerbalua.Scripting
 			Globals.Remove("coroutine");
 
 			commonAPI["sleep"] = new Action<double>(sleep);
+			commonAPI["getdescriptor"] = new Func<DynValue,IUserDataDescriptor>(getdescriptor);
+		}
+
+		public IUserDataDescriptor getdescriptor(DynValue dyn)
+		{
+			return dyn.UserData?.Descriptor;
 		}
 
 		[Description("Cause the script to sleep for waittimeSeconds seconds.")]
