@@ -1,8 +1,6 @@
 **LiveRepl** is the main user interface for the project. It is used to write, load, and evaluate scripts that interact with KSP.
 
-**LiveRepl** is shown or hidden by clicking the LiveRepl Icon.
-
-![LiveRepl Icon](../GameObjects/RedOnion/Resources/LiveRepl.png)
+**LiveRepl** is shown or hidden by clicking the LiveRepl Icon: ![LiveRepl Icon](../GameData/RedOnion/Resources/LiveRepl.png)
 
 It consists of:
 - An **Editor** for saving, loading, writing, and executing whole files.
