@@ -75,10 +75,9 @@ namespace Kerbalui.Util
 
 			foreach (var fontName in linuxMonotypeFonts)
 			{
-
 				if (fontNames.Contains(fontName))
 				{
-					Debug.Log("returning "+fontName);
+					//Debug.Log("returning "+fontName);
 					return fontName;
 				}
 			}

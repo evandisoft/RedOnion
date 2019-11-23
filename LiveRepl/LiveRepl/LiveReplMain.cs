@@ -63,7 +63,7 @@ namespace LiveRepl
 
 		void FixedUpdate()
 		{
-			scriptWindow.FixedUpdate();
+			scriptWindow?.FixedUpdate();
 		}
 
 		void OnGUI()

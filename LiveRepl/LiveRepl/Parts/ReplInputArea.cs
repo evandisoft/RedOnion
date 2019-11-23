@@ -15,14 +15,6 @@ namespace LiveRepl.Parts
 		{
 			this.uiparts=uiparts;
 
-			var defaultFont=GUILibUtil.GetMonoSpaceFont();
-			var fontname=SavedSettings.LoadSetting("fontname", "");
-			var font=Font.CreateDynamicFontFromOSFont(fontname,14);
-			if (font=null)
-			{
-				editingArea.Style.font=defaultFont;
-			}
-
 			uiparts.FontChange+=editingArea.editableText.FontChangeEventHandler;
 		}
 

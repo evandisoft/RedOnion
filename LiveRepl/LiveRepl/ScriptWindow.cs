@@ -18,6 +18,20 @@ namespace LiveRepl
 			InitializeGlobalKeyBindings();
 
 			LoadEditorText();
+
+			InitFont();
+		}
+
+		public void InitFont()
+		{
+			var defaultFont=GUILibUtil.GetMonoSpaceFont();
+			var fontname=SavedSettings.LoadSetting("fontname", "");
+			var font=Font.CreateDynamicFontFromOSFont(fontname,14);
+			if (font==null)
+			{
+				font=defaultFont;
+			}
+			uiparts.ChangeFont(font);
 		}
 
 		public void SetOrReleaseInputLock()
@@ -99,6 +113,7 @@ namespace LiveRepl
 			SavedSettings.SaveSetting("editorVisible", editorVisible.ToString());
 			SavedSettings.SaveSetting("replVisible", replVisible.ToString());
 			SavedSettings.SaveSetting("lastQueueTag", uiparts.queueTagInputArea.Text);
+			SavedSettings.SaveToDisk();
 		}
 	}
 }

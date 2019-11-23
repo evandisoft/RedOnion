@@ -25,15 +25,6 @@ namespace LiveRepl.Parts
 
 			uiparts.FontChange+=editingArea.editableText.FontChangeEventHandler;
 
-			var defaultFont=GUILibUtil.GetMonoSpaceFont();
-			var fontname=SavedSettings.LoadSetting("fontname", "");
-			var font=Font.CreateDynamicFontFromOSFont(fontname,14);
-			if (font=null)
-			{
-				editingArea.Style.font=defaultFont;
-			}
-
-
 			HorizontalScrollBarPresent=false;
 			VerticalScrollBarPresent=true;
 		}

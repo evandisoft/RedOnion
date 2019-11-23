@@ -25,9 +25,9 @@ namespace LiveRepl.Parts
 			this.uiparts=uiparts;
 
 			var defaultFontName=GUILibUtil.GetMonoSpaceFontName();
-			Debug.Log("defaultFontName is "+defaultFontName);
+			//Debug.Log("defaultFontName is "+defaultFontName);
 			var currentFontName=SavedSettings.LoadSetting("fontname",defaultFontName);
-			Debug.Log("currentFontName is "+currentFontName);
+			//Debug.Log("currentFontName is "+currentFontName);
 			if (currentFontName=="")
 			{
 				CurrentFont=GUI.skin.font;
