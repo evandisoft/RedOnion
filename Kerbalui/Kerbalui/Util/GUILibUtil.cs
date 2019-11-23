@@ -47,8 +47,7 @@ namespace Kerbalui.Util
 		{
 			if (monoSpaceFont == null)
 			{
-				monoSpaceFont=(Font)Resources.Load(Path.Combine(ProjectSettings.BaseProjectDir, "Resources", "UbuntuMono-R.ttf"));
-				return monoSpaceFont;
+
 				string[] fonts = Font.GetOSInstalledFontNames();
 
 				foreach (var fontName in fonts)
