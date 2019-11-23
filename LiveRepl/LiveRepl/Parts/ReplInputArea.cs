@@ -16,6 +16,11 @@ namespace LiveRepl.Parts
 
 		protected override void DecoratorUpdate()
 		{
+			//if (editingArea.TrySetFont(uiparts.fontSelector.CurrentFont))
+			//{
+			//	uiparts.scriptWindow.needsResize=true;
+			//}
+
 			bool receivedInput=false;
 			if (HasFocus())
 			{

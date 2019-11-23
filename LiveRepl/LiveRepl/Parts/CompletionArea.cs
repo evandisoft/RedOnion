@@ -35,6 +35,11 @@ namespace LiveRepl.Parts
 			bool lastEventWasMouseDown = Event.current.type == EventType.MouseDown && GUILibUtil.MouseInRect(rect);// ContentRect.Contains(Event.current.mousePosition); //GUILibUtil.MouseInRect(rect);
 			string lastControlname = GUI.GetNameOfFocusedControl();
 
+			//if (editingArea.TrySetFont(uiparts.fontSelector.CurrentFont))
+			//{
+			//	uiparts.scriptWindow.needsResize=true;
+			//}
+
 			base.DecoratorUpdate();
 
 			var scrollbarlessrect=new Rect(rect); //new Rect(ContentRect);

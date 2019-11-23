@@ -30,6 +30,11 @@ namespace LiveRepl.Parts
 				keybindings.ExecuteAndConsumeIfMatched(Event.current);
 			} 
 
+			//if (editingArea.TrySetFont(uiparts.fontSelector.CurrentFont))
+			//{
+			//	uiparts.scriptWindow.needsResize=true;
+			//}
+
 			base.DecoratorUpdate();
 
 			uiparts.editorStatusLabel.UpdateCursorInfo(editingArea.LineNumber, editingArea.ColumnNumber);

@@ -75,6 +75,11 @@ namespace LiveRepl.Parts
 				};
 			}
 
+			//if (editingArea.TrySetFont(uiparts.fontSelector.CurrentFont))
+			//{
+			//	uiparts.scriptWindow.needsResize=true;
+			//}
+
 			InterceptMostInput();
 
 			bool hadKeyDownThisUpdate=Event.current.type==EventType.KeyDown;
