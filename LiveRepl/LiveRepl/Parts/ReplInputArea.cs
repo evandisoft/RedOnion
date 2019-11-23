@@ -1,5 +1,7 @@
 ﻿using Kerbalui.Controls;
 using Kerbalui.Decorators;
+using Kerbalui.Util;
+using RedOnion.KSP.Settings;
 using UnityEngine;
 
 namespace LiveRepl.Parts
@@ -7,11 +9,21 @@ namespace LiveRepl.Parts
 	public class ReplInputArea:EditingAreaScroller
 	{
 		public ScriptWindowParts uiparts;
-		const float extraBottomSpace=5;
+		const float extraBottomSpace=3;
 
 		public ReplInputArea(ScriptWindowParts uiparts):base(new EditingArea(new TextArea()))
 		{
 			this.uiparts=uiparts;
+
+			var defaultFont=GUILibUtil.GetMonoSpaceFont();
+			var fontname=SavedSettings.LoadSetting("fontname", "");
+			var font=Font.CreateDynamicFontFromOSFont(fontname,14);
+			if (font=null)
+			{
+				editingArea.Style.font=defaultFont;
+			}
+
+			uiparts.FontChange+=editingArea.editableText.FontChangeEventHandler;
 		}
 
 		protected override void DecoratorUpdate()
@@ -44,7 +56,7 @@ namespace LiveRepl.Parts
 		{
 			get
 			{
-				float minHeight=editingArea.MinSize.y; //+extraBottomSpace;
+				float minHeight=editingArea.MinSize.y+extraBottomSpace;
 				if (HorizontalScrollBarPresent)
 				{
 					minHeight+=ScrollbarWidth;

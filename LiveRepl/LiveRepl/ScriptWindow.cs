@@ -49,6 +49,7 @@ namespace LiveRepl
 			completionManager.AddCompletable(new EditingAreaCompletionAdapter(uiparts.replInputArea.editingArea, this));
 			completionManager.AddCompletable(uiparts.scriptNameInputArea);
 			completionManager.AddCompletable(uiparts.scriptNameInputArea);
+			completionManager.AddCompletable(uiparts.fontSelector);
 		}
 
 		bool hadMouseDownLastUpdate;

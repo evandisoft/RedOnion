@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using RedOnion.KSP.Settings;
 using UnityEngine;
@@ -42,6 +43,8 @@ namespace Kerbalui.Util
 			return relativeMousePos;
 		}
 
+		static public string[] windowsMonotypeFonts={"Courier New", "Consolas" };
+		static public string[] linuxMonotypeFonts={"Ubuntu Mono", "Noto Mono", "FreeMono", "DejaVu Sans Mono"};
 		static Font monoSpaceFont = null;
 		static public Font GetMonoSpaceFont()
 		{
@@ -59,37 +62,43 @@ namespace Kerbalui.Util
 
 		static public string GetMonoSpaceFontName()
 		{
+			HashSet<string> fontNames=new HashSet<string>(Font.GetOSInstalledFontNames());
 
-			string[] fonts = Font.GetOSInstalledFontNames();
-			
-			foreach (var fontName in fonts)
+			foreach (var fontName in windowsMonotypeFonts)
 			{
-				// Accept Courier New if available
-				if (fontName == "Courier New")
+
+				if (fontNames.Contains(fontName))
 				{
 					return fontName;
 				}
-
 			}
 
-			foreach (var fontName in fonts)
+			foreach (var fontName in linuxMonotypeFonts)
 			{
-				// Accept the last listed Mono font if Courier New is not available
+
+				if (fontNames.Contains(fontName))
+				{
+					Debug.Log("returning "+fontName);
+					return fontName;
+				}
+			}
+
+			foreach (var fontName in fontNames)
+			{
 				if (fontName.EndsWith("Mono", StringComparison.CurrentCulture))
 				{
-					//Debug.Log("fontName is "+fontName);
 					return fontName;
 				}
 			}
 
-			foreach (var fontName in fonts)
+			foreach (var fontName in fontNames)
 			{
 				if (fontName.Contains("Mono"))
 				{
 					return fontName;
 				}
 			}
-			foreach (var fontName in fonts)
+			foreach (var fontName in fontNames)
 			{
 				return fontName;
 			}

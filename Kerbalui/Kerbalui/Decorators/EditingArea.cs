@@ -49,39 +49,25 @@ namespace Kerbalui.Decorators
 		/// </summary>
 		public bool onlyUseKeyBindings;
 
-		public bool TrySetFont(Font font)
-		{
-			if (editableText.Style!=null && editableText.Style.font!=font)
-			{
-				editableText.Style.font=font;
-				return true;
-			}
-			return false;
-		}
-
 		public EditingArea(EditableText editableText)
 		{
 			this.editableText = editableText;
 			InitializeDefaultKeyBindings();
-			Style.font = GUILibUtil.GetMonoSpaceFont();
+			//Style.font = GUILibUtil.GetMonoSpaceFont();
 			Style.hover.textColor
 					= editableText.Style.normal.textColor
 					= editableText.Style.active.textColor
 					= Color.white;
+
+			GrabFocus();
+			int id = GUIUtility.keyboardControl;
+			backingEditor = (TextEditor)GUIUtility.GetStateObject(typeof(TextEditor), id);
 		}
 
 		protected override void SetChildRect() => editableText.SetRect(rect);
 
 		protected override void DecoratorUpdate()
 		{
-			// Initialize editor
-			if (backingEditor == null)
-			{
-				editableText.GrabFocus();
-				int id = GUIUtility.keyboardControl;
-				backingEditor = (TextEditor)GUIUtility.GetStateObject(typeof(TextEditor), id);
-			}
-
 			if (editableText.HasFocus())
 			{
 				ReceivedInput = Event.current.type == EventType.KeyDown;

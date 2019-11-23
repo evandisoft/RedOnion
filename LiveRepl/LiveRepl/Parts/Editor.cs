@@ -5,6 +5,8 @@ using Kerbalui.EventHandling;
 using Kerbalui.Controls.Abstract;
 using Kerbalui.Decorators;
 using Kerbalui.Controls;
+using Kerbalui.Util;
+using RedOnion.KSP.Settings;
 
 namespace LiveRepl.Parts
 {
@@ -15,11 +17,24 @@ namespace LiveRepl.Parts
 		/// <summary>
 		/// These bindings intentionally shadow the base class bindings.
 		/// </summary>
+		/// 
 
 		public Editor(ScriptWindowParts uiparts) : base(new EditingArea(new TextArea()))
 		{
 			this.uiparts=uiparts;
-			HorizontalScrollBarPresent=true;
+
+			uiparts.FontChange+=editingArea.editableText.FontChangeEventHandler;
+
+			var defaultFont=GUILibUtil.GetMonoSpaceFont();
+			var fontname=SavedSettings.LoadSetting("fontname", "");
+			var font=Font.CreateDynamicFontFromOSFont(fontname,14);
+			if (font=null)
+			{
+				editingArea.Style.font=defaultFont;
+			}
+
+
+			HorizontalScrollBarPresent=false;
 			VerticalScrollBarPresent=true;
 		}
 

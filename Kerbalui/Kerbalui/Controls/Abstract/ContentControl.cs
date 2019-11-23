@@ -33,7 +33,7 @@ namespace Kerbalui.Controls.Abstract
 					minSize.y=Style.CalcSize(Content).y;
 					Content.text="";
 				}
-				minSize.y+=5;
+				//minSize.y+=5;
 				return minSize;
 			}
 		}

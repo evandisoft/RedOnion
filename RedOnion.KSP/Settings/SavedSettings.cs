@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace RedOnion.KSP.Settings {
 	static public class SavedSettings {
@@ -31,12 +32,17 @@ namespace RedOnion.KSP.Settings {
 		static public string LoadSetting(string settingName,string defaultValue)
 		{
 			ConfigNode config = LoadConfig();
-			if (config.HasValue(settingName)) {
+			if (config.HasValue(settingName))
+			{
+				Debug.Log("settingName is "+settingName);
+				Debug.Log("config is "+config.ToString());
 				return config.GetValue(settingName);
 			}
-
+			Debug.Log("settingName outside is "+settingName);
 			config.SetValue(settingName, defaultValue, true);
+
 			config.Save(SettingsFile);
+
 			return defaultValue;
 		}
 
