@@ -156,12 +156,14 @@ namespace RedOnion.UI.Components
 			case Layout.Vertical:
 				PrepareLine(RT, false, true);
 				return;
+			/*
 			case Layout.FlowHorizontal:
 				PrepareFlow(RT, false, false);
 				return;
 			case Layout.FlowVertical:
 				PrepareFlow(RT, false, true);
 				return;
+			*/
 			}
 		}
 		void ILayoutElement.CalculateLayoutInputVertical()
@@ -177,12 +179,14 @@ namespace RedOnion.UI.Components
 			case Layout.Vertical:
 				PrepareLine(RT, true, true);
 				return;
+			/*
 			case Layout.FlowHorizontal:
 				PrepareFlow(RT, true, false);
 				return;
 			case Layout.FlowVertical:
 				PrepareFlow(RT, true, true);
 				return;
+			*/
 			}
 		}
 		void ILayoutController.SetLayoutHorizontal()
