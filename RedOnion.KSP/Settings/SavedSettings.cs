@@ -1,12 +1,40 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace RedOnion.KSP.Settings {
 	static public class SavedSettings {
 		// will need some changes about loading scripts if that gets changed!
 		public static readonly string SettingsFile;
 		public static readonly string BaseScriptsPath;
+		static ConfigNode config;
+		static ConfigNode Config
+		{
+			get
+			{
+				if (config==null)
+				{
+					if (!File.Exists(SettingsFile))
+					{
+						Directory.CreateDirectory(BaseScriptsPath);
+						config = new ConfigNode();
+						config.SetValue("settingsFileExists", true, true);
+					}
+					else
+					{
+						config=ConfigNode.Load(SettingsFile);
+					}
+				}
+				//config.Save(SettingsFile);
+				return config;
+			}
+		}
+
+		public static void SaveToDisk()
+		{
+			Config.Save(SettingsFile);
+		}
 
 		static SavedSettings()
 		{
@@ -14,45 +42,40 @@ namespace RedOnion.KSP.Settings {
 			SettingsFile = Path.Combine(BaseScriptsPath, ".settings");
 		}
 
-		static ConfigNode LoadConfig()
-		{
-			//UnityEngine.Debug.Log("load config");
-			ConfigNode configNode;
-			if (!File.Exists(SettingsFile)) {
-				Directory.CreateDirectory(BaseScriptsPath);
-				configNode = new ConfigNode();
-				configNode.SetValue("settingsFileExists", true,true);
-				configNode.Save(SettingsFile);
-				return configNode;
-			}
-			return ConfigNode.Load(SettingsFile);
-		}
+		//static ConfigNode LoadConfig()
+		//{
+		//	//UnityEngine.Debug.Log("load config");
+		//	ConfigNode configNode;
+		//	if (!File.Exists(SettingsFile)) {
+		//		Directory.CreateDirectory(BaseScriptsPath);
+		//		configNode = new ConfigNode();
+		//		configNode.SetValue("settingsFileExists", true,true);
+
+		//		return configNode;
+		//	}
+		//	return ConfigNode.Load(SettingsFile);
+		//}
 
 		static public string LoadSetting(string settingName,string defaultValue)
 		{
-			ConfigNode config = LoadConfig();
-			if (config.HasValue(settingName)) {
-				return config.GetValue(settingName);
+			if (Config.HasValue(settingName))
+			{
+				return Config.GetValue(settingName);
 			}
 
-			config.SetValue(settingName, defaultValue, true);
-			config.Save(SettingsFile);
 			return defaultValue;
 		}
 
 		static public void SaveSetting(string settingName,string settingValue)
 		{
-			ConfigNode config = LoadConfig();
-			config.SetValue(settingName, settingValue, true);
-			config.Save(SettingsFile);
+			Config.SetValue(settingName, settingValue, true);
+			//Config.Save(SettingsFile);
 		}
 
 		static public IList<string> LoadListSetting(string settingName)
-		{
-			ConfigNode config = LoadConfig();
-
-			if (config.HasNode(settingName)) {
-				IList<string> values = config.GetNode(settingName).GetValues();
+		{;
+			if (Config.HasNode(settingName)) {
+				IList<string> values = Config.GetNode(settingName).GetValues();
 				return values;
 			}
 
@@ -61,15 +84,14 @@ namespace RedOnion.KSP.Settings {
 
 		static public void SaveListSetting(string settingName,IList<string> values)
 		{
-			ConfigNode config = LoadConfig();
 			ConfigNode valuesNode = new ConfigNode();
 
 			foreach(var value in values) {
 				valuesNode.AddValue(settingName, value);
 			}
 
-			config.SetNode(settingName, valuesNode,true);
-			config.Save(SettingsFile);
+			Config.SetNode(settingName, valuesNode,true);
+			//Config.Save(SettingsFile);
 		}
 	}
 }

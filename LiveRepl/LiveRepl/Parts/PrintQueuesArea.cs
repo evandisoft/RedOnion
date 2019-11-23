@@ -23,6 +23,7 @@ namespace LiveRepl.Parts
 				QueueLogger.ClearLoggersByTag(uiparts.queueTagInputArea.Text);
 			}));
 			AddWeighted(2, uiparts.queueTagInputArea=new QueueTagInputArea());
+			//uiparts.FontChange+=uiparts.queueTagInputArea.editableText.FontChangeEventHandler;
 			uiparts.queueTagInputArea.Text=SavedSettings.LoadSetting("lastQueueTag", "ui");
 		}
 	}

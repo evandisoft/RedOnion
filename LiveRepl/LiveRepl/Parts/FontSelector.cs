@@ -6,29 +6,43 @@ using Kerbalui.Decorators;
 using Kerbalui.Types;
 using Kerbalui.Util;
 using LiveRepl.Interfaces;
+using RedOnion.KSP.Settings;
 using UnityEngine;
 
 namespace LiveRepl.Parts
 {
+	/// <summary>
+	///  For windows, Consolas, and "Courier New"
+	/// </summary>
 	public class FontSelector : EditingArea, ICompletableElement
 	{
 		public Font CurrentFont { get; private set; } = null;
 
-		public FontSelector() : base(new TextField())
+		ScriptWindowParts uiparts;
+
+		public FontSelector(ScriptWindowParts uiparts) : base(new TextField())
 		{
-			var currentFontName=GUILibUtil.GetMonoSpaceFontName();
+			this.uiparts=uiparts;
+
+			var defaultFontName=GUILibUtil.GetMonoSpaceFontName();
+			//Debug.Log("defaultFontName is "+defaultFontName);
+			var currentFontName=SavedSettings.LoadSetting("fontname",defaultFontName);
+			//Debug.Log("currentFontName is "+currentFontName);
 			if (currentFontName=="")
 			{
-				CurrentFont=Window.defaultSkin.font;
+				CurrentFont=GUI.skin.font;
+				currentFontName="Default Font";
 			}
 			else
 			{
 				CurrentFont=Font.CreateDynamicFontFromOSFont(currentFontName, 14);
 			}
 
-			//Text=CurrentFont.
+			Text=currentFontName;
 			keybindings.Clear();
 			onlyUseKeyBindings=true;
+
+			//uiparts.FontChange+=editableText.FontChangeEventHandler;
 		}
 
 		public string ControlName => editableText.ControlName;
@@ -45,7 +59,9 @@ namespace LiveRepl.Parts
 			if (newFont!=null)
 			{
 				CurrentFont=newFont;
+				uiparts.ChangeFont(CurrentFont);
 			}
+			SavedSettings.SaveSetting("fontname",Text);
 		}
 
 		public IList<string> GetCompletionContent(out int replaceStart, out int replaceEnd)

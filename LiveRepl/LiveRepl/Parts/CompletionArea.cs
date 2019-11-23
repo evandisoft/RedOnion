@@ -28,6 +28,8 @@ namespace LiveRepl.Parts
 			HorizontalScrollBarPresent=true;
 
 			InitializeKeyBindings();
+
+			//uiparts.FontChange+=editingArea.editableText.FontChangeEventHandler;
 		}
 
 		protected override void DecoratorUpdate()
@@ -62,11 +64,6 @@ namespace LiveRepl.Parts
 
 		void UpdateCursorPosition()
 		{
-			if (editingArea.backingEditor==null)
-			{
-				return;
-			}
-
 			editingArea.backingEditor.MoveTextStart();
 			for (int i = 0; i < SelectionIndex; i++)
 			{

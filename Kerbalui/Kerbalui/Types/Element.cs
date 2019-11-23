@@ -10,8 +10,6 @@ namespace Kerbalui.Types
 
 		public bool Active { get; set; } = true;
 
-		//public bool Enabled { get; set; } = true;
-
 		/// <summary>
 		/// needsRecalculation triggers an recalculation of rects after the first update.
 		/// I'm setting it to true by default because before the first update the defaultSkin is not set.

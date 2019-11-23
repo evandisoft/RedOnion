@@ -12,6 +12,10 @@ namespace LiveRepl.Parts
 		public ReplOutoutArea(ScriptWindowParts uiparts) : base(new EditingArea(new TextArea()))
 		{
 			this.uiparts=uiparts;
+			editingArea.Style.alignment = TextAnchor.LowerLeft;
+			editingArea.Style.font = GUILibUtil.GetMonoSpaceFont();
+
+			uiparts.FontChange+=editingArea.editableText.FontChangeEventHandler;
 		}
 
 		public const int OUTPUT_LENGTH_LIMIT = 10000;
@@ -66,20 +70,6 @@ namespace LiveRepl.Parts
 
 		protected override void DecoratorUpdate()
 		{
-			if (editingArea.editableText.style==null)
-			{
-				editingArea.editableText.style = new GUIStyle(GUI.skin.textArea)
-				{
-					alignment = TextAnchor.LowerLeft,
-					font = GUILibUtil.GetMonoSpaceFont()
-				};
-			}
-
-			//if (editingArea.TrySetFont(uiparts.fontSelector.CurrentFont))
-			//{
-			//	uiparts.scriptWindow.needsResize=true;
-			//}
-
 			InterceptMostInput();
 
 			bool hadKeyDownThisUpdate=Event.current.type==EventType.KeyDown;

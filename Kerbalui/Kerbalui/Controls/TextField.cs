@@ -7,14 +7,13 @@ namespace Kerbalui.Controls
 {
 	public class TextField : EditableText
 	{
-		public override GUIStyle DefaultStyle()
+		public TextField():base(GUI.skin.textField)
 		{
-			return Window.defaultSkin.textField;
 		}
 
 		protected override void ControlUpdate()
 		{
-			content.text=GUI.TextField(rect, content.text, StyleOrDefault);
+			Content.text=GUI.TextField(rect, Content.text, Style);
 		}
 	}
 }

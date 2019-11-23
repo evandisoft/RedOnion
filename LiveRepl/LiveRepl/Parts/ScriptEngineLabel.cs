@@ -9,22 +9,12 @@ namespace LiveRepl.Parts
 		public ScriptEngineLabel()
 		{
 			SetEngine("None");
+			Style.alignment=TextAnchor.MiddleCenter;
 		}
 
 		public void SetEngine(string engineName)
 		{
-			content.text="Engine: "+engineName;
-		}
-
-		protected override void ControlUpdate()
-		{
-			if (style==null)
-			{
-				style=new GUIStyle(DefaultStyle());
-				style.alignment=TextAnchor.MiddleCenter;
-			}
-
-			base.ControlUpdate();
+			Content.text="Engine: "+engineName;
 		}
 	}
 }

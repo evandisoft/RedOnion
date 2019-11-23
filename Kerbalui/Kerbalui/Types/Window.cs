@@ -12,27 +12,16 @@ namespace Kerbalui.Types
 		static int nextID = 0;
 		public readonly int windowID=nextID++;
 
-		static public GUISkin defaultSkin=new GUISkin();
 		public GUIContent titleContent=new GUIContent("");
 		public GUIStyle titleStyle;
 		Rect titleRect;
 		Element content;
 
-		public GUIStyle TitleStyleOrDefault
-		{
-			get
-			{
-				if (titleStyle==null)
-				{
-					return defaultSkin.textField;
-				}
-				return titleStyle;
-			}
-		}
 
 		public Window(string title)
 		{
 			titleContent.text=title;
+			titleStyle=GUI.skin.label;
 		}
 
 		protected void AssignContent(Element content)
@@ -40,21 +29,20 @@ namespace Kerbalui.Types
 			this.content=content;
 		}
 
-		bool firstRunPassed=false;
-		bool secondRunPassed=false;
+		//bool firstRunPassed=false;
+		//bool secondRunPassed=false;
 		protected override void TypeSpecificUpdate()
 		{
-			if (!firstRunPassed)
-			{
-				defaultSkin=GUI.skin;
-				firstRunPassed=true;
-				needsResize=true;
-			}
-			if (!secondRunPassed)
-			{
-				secondRunPassed=true;
-				needsResize=true;
-			}
+			//if (!firstRunPassed)
+			//{
+			//	firstRunPassed=true;
+			//	needsResize=true;
+			//}
+			//if (!secondRunPassed)
+			//{
+			//	secondRunPassed=true;
+			//	needsResize=true;
+			//}
 
 
 			rect=GUI.Window(windowID, rect, PointlessFunc, titleContent);
@@ -75,7 +63,7 @@ namespace Kerbalui.Types
 		{
 			base.SetRect(rect);
 
-			titleRect=new Rect(0, 0, rect.width, Math.Max(TitleStyleOrDefault.CalcSize(titleContent).y, 10));
+			titleRect=new Rect(0, 0, rect.width, Math.Max(titleStyle.CalcSize(titleContent).y, 10));
 			content.SetRect(new Rect(0, titleRect.height, rect.width, rect.height-titleRect.height));
 		}
 	}
