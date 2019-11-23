@@ -122,8 +122,11 @@ namespace Kerbalua.Scripting
 			DynValue mainFunction = base.DoString("return function () " + source + "\n end");
 
 			coroutine = CreateCoroutine(mainFunction);
-			process = new Process();
-			process.shutdown += Terminate;
+			if (process == null)
+			{
+				process = new Process();
+				process.shutdown += Terminate;
+			}
 		}
 
 		public void Terminate()
