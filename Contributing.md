@@ -2,7 +2,7 @@
 
 (This is a work in progress. I imagine these instructions are not amazing. Any feedback or questions are welcome as "issues" on the github.)
 
-We welcome people of all skill levels to participate in the project.
+We welcome people of all skill levels to participate in the project. However please talk to us first if you want to make a contribution. Either make make an issue [here on github](https://github.com/evandisoft/RedOnion/issues), or talk about it in [this thread](https://forum.kerbalspaceprogram.com/index.php?/topic/183050-redonion-033-unrestricted-in-game-scripting-has-repl-editor-and-intellisense-lua-and-a-custom-jsruby-like-language-implemented-tested-on-ksp-17/&tab=comments#comment-3566618).
 
 We are developing this on linux and windows. Here is some information about getting started:
 

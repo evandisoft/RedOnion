@@ -135,7 +135,7 @@
     <Folder Include="Kerbalui\Layout\Abstract\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Kerbalui\DevReadme.md" />
+    <None Include="DevReadme.md" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>

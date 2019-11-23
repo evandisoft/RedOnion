@@ -80,14 +80,10 @@
     <Compile Include="API\App.cs" />
     <Compile Include="API\Autopilot.cs" />
     <Compile Include="API\Globals.cs" />
-    <Compile Include="OS\Process.cs" />
     <Compile Include="Parts\PartChildren.cs" />
     <Compile Include="Utilities\DocBuildAttribute.cs" />
     <Compile Include="Utilities\InteropUtilities.cs" />
     <Compile Include="API\VectorUtils.cs" />
-    <Compile Include="MoonSharp\Descriptors\LuaDescriptor.cs" />
-    <Compile Include="MoonSharp\Descriptors\LuaEventDescriptor.cs" />
-    <Compile Include="MoonSharp\Proxies\LuaEventProxy.cs" />
     <Compile Include="ROS\RosExecutor.cs" />
     <Compile Include="Utilities\Extensions.cs" />
     <Compile Include="Utilities\MultiValueDictionary.cs" />
@@ -144,7 +140,6 @@
     <Compile Include="ReflectionUtil\GetMappings.Lua.cs" />
     <Compile Include="API\AutoRun.cs" />
     <Compile Include="Settings\SavedSettings.cs" />
-    <Compile Include="Utilities\ScriptStringKeyedConstDictionary.cs" />
     <Compile Include="UnsafeAPI\BodiesDictionary.cs" />
     <Compile Include="UnsafeAPI\KerbalsDictionary.cs" />
     <Compile Include="UnsafeAPI\UnsafeAPI.cs" />
@@ -160,6 +155,8 @@
     <Compile Include="MoonSharp\MoonSharpAPI\MoonSharpGlobals.cs" />
     <Compile Include="Completion\Instance.cs" />
     <Compile Include="Debugging\QueueLogger.cs" />
+    <Compile Include="OS\Process.cs" />
+    <Compile Include="Utilities\ScriptStringKeyedConstDictionary.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RedOnion.ROS\RedOnion.ROS.csproj">
@@ -171,7 +168,6 @@
       <Name>RedOnion.UI</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup />
   <ItemGroup />
   <ItemGroup />

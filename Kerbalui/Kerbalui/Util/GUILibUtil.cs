@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using RedOnion.KSP.Settings;
 using UnityEngine;
 
 namespace Kerbalui.Util
@@ -86,6 +88,40 @@ namespace Kerbalui.Util
 				throw new Exception("Could not find a font");
 			}
 			return monoSpaceFont;
+		}
+
+		static public string GetMonoSpaceFontName()
+		{
+
+			string[] fonts = Font.GetOSInstalledFontNames();
+
+			foreach (var fontName in fonts)
+			{
+				// Accept Courier New if available
+				if (fontName == "Courier New")
+				{
+					return fontName;
+				}
+				// Accept the last listed Mono font if Courier New is not available
+				if (fontName.EndsWith("Mono", StringComparison.CurrentCulture))
+				{
+					//Debug.Log("fontName is "+fontName);
+					return fontName;
+				}
+			}
+			foreach (var fontName in fonts)
+			{
+				if (fontName.Contains("Mono"))
+				{
+					return fontName;
+				}
+			}
+			foreach (var fontName in fonts)
+			{
+				return fontName;
+			}
+
+			return "";
 		}
 
 		static bool consumeNextCharEvent;

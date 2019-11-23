@@ -19,6 +19,8 @@ namespace LiveRepl.Parts
 		public Editor(ScriptWindowParts uiparts) : base(new EditingArea(new TextArea()))
 		{
 			this.uiparts=uiparts;
+			HorizontalScrollBarPresent=true;
+			VerticalScrollBarPresent=true;
 		}
 
 		protected override void DecoratorUpdate()
@@ -27,6 +29,11 @@ namespace LiveRepl.Parts
 			{
 				keybindings.ExecuteAndConsumeIfMatched(Event.current);
 			} 
+
+			//if (editingArea.TrySetFont(uiparts.fontSelector.CurrentFont))
+			//{
+			//	uiparts.scriptWindow.needsResize=true;
+			//}
 
 			base.DecoratorUpdate();
 

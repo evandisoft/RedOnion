@@ -16,6 +16,11 @@ namespace LiveRepl.Parts
 
 		protected override void DecoratorUpdate()
 		{
+			//if (editingArea.TrySetFont(uiparts.fontSelector.CurrentFont))
+			//{
+			//	uiparts.scriptWindow.needsResize=true;
+			//}
+
 			bool receivedInput=false;
 			if (HasFocus())
 			{
@@ -30,12 +35,16 @@ namespace LiveRepl.Parts
 			}
 		}
 
+		public override bool HorizontalScrollBarPresent { get => rect.width<editingArea.MinSize.x; }
+		public override bool VerticalScrollBarPresent { get => false; }
+
+
 		bool firstUse=false;
 		public override Vector2 MinSize
 		{
 			get
 			{
-				float minHeight=editingArea.MinSize.y+extraBottomSpace;
+				float minHeight=editingArea.MinSize.y; //+extraBottomSpace;
 				if (HorizontalScrollBarPresent)
 				{
 					minHeight+=ScrollbarWidth;

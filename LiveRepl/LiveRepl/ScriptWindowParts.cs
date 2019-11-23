@@ -32,5 +32,6 @@ namespace LiveRepl
 	       internal ScriptDisabledElement scriptDisabledEditorGroup;
         internal ScriptDisabledElement ScriptDisabledCompletionGroup;
         internal QueueTagInputArea queueTagInputArea;
+		public FontSelector fontSelector;
     }
 }

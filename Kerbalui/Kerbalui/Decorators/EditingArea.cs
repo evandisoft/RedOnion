@@ -49,6 +49,16 @@ namespace Kerbalui.Decorators
 		/// </summary>
 		public bool onlyUseKeyBindings;
 
+		public bool TrySetFont(Font font)
+		{
+			if (editableText.style!=null && editableText.style.font!=font)
+			{
+				editableText.style.font=font;
+				return true;
+			}
+			return false;
+		}
+
 		public EditingArea(EditableText editableText)
 		{
 			this.editableText = editableText;

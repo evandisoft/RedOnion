@@ -21,6 +21,9 @@ namespace LiveRepl.Parts
 			AddFixed(ScriptWindow.centerGroupWidth, new Button("Load", uiparts.scriptWindow.LoadEditorText));
 			AddMinSized(uiparts.editorChangesIndicator=new EditorChangesIndicator(uiparts));
 			AddWeighted(1,uiparts.editorStatusLabel=new EditorStatusLabel());
+			//AddMinSized(new Label("Font:"));
+			//AddWeighted(1, uiparts.fontSelector=new FontSelector());
+			//AddMinSized(uiparts.editorStatusLabel=new EditorStatusLabel());
 			//AddWeighted(1, new Filler());
 			//AddWeighted(3, uiparts.scriptNameInputArea=new ScriptNameInputArea(uiparts));
 		}

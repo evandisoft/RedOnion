@@ -27,7 +27,7 @@ namespace LiveRepl.Parts
 
 		protected override void GroupUpdate()
 		{
-			if (Event.current.type==EventType.KeyDown)
+			if (Event.current.type==EventType.KeyDown || Event.current.isMouse)
 			{
 				uiparts.editorStatusGroup.needsResize=true;
 			}
