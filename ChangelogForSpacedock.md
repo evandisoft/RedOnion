@@ -25,9 +25,9 @@ Just had a release!
 - Better Autopilot.
 
 ### LiveRepl Changes:
-- Completing the Scriptname Input Area with a file name now loads the related file automatically
+- Completing the filename text area with a file name now loads the related file automatically
 - LiveRepl can be dragged while executing a file.
-- LiveRepl Overhaul: Much simpler UI code.
+- LiveRepl Overhaul: Much simpler UI code. Still not perfect in order to finish it quickly
 - Scriptname Input Area now uses a TextField instead of TextArea so that newlines are automatically disallowed.
 - Tabs removed. They were kinda clunky. The new way the Scriptname Input Area works makes it less necessary.
 - Clicking Scriptname Input Area now empties it so you can easily click on completion area to select the scriptname you want. And it automatically loads that script into the editor when you select it.
@@ -159,8 +159,8 @@ Lua Intellisense now knows whether a reference is static or an instance variable
 
 ### Documentation:
 - Added [CommonScriptApi.md](https://github.com/evandisoft/RedOnion/blob/master/CommonScriptApi.md): Documents some of the API for interacting with the game that is available to both Lua and ROS.
-- Updated [README.md](README.md)
-- Updated Docs for [ROS](https://github.com/evandisoft/RedOnion/blob/master/RedOnion.Script/README.md) and [UI lib](RedOnion.UI/README.md)
+- Updated [README.md](https://github.com/evandisoft/RedOnion/README.md)
+- Updated Docs for [ROS](https://github.com/evandisoft/RedOnion/blob/master/RedOnion.Script/README.md) and [UI lib](https://github.com/evandisoft/RedOnion/RedOnion.UI/README.md)
 
 ### Lua:
 - Wrapper table class called, ProxyTable, created. Can be used to act in place of classes that MoonSharp cannot properly reflect.

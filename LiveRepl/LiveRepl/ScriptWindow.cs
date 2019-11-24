@@ -26,11 +26,16 @@ namespace LiveRepl
 		{
 			var defaultFont=GUILibUtil.GetMonoSpaceFont();
 			var fontname=SavedSettings.LoadSetting("fontname", "");
-			var font=Font.CreateDynamicFontFromOSFont(fontname,14);
-			if (font==null)
+			Font font=null;
+			if (fontname=="")
 			{
 				font=defaultFont;
 			}
+			else
+			{
+				font=Font.CreateDynamicFontFromOSFont(fontname, 14);
+			}
+
 			uiparts.ChangeFont(font);
 		}
 
@@ -112,7 +117,9 @@ namespace LiveRepl
 			SavedSettings.SaveSetting("WindowPositionY", rect.y.ToString());
 			SavedSettings.SaveSetting("editorVisible", editorVisible.ToString());
 			SavedSettings.SaveSetting("replVisible", replVisible.ToString());
+#if DEBUG
 			SavedSettings.SaveSetting("lastQueueTag", uiparts.queueTagInputArea.Text);
+#endif
 			SavedSettings.SaveToDisk();
 		}
 	}

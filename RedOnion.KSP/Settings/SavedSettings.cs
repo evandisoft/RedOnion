@@ -34,6 +34,7 @@ namespace RedOnion.KSP.Settings {
 		public static void SaveToDisk()
 		{
 			Config.Save(SettingsFile);
+			Debug.Log("Saving to disk "+Config);
 		}
 
 		static SavedSettings()

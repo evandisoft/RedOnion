@@ -1,3 +1,5 @@
+[![Dynawing-Malfunction.jpg](https://i.postimg.cc/5ygzNTdn/Dynawing-Malfunction.jpg)](https://postimg.cc/WqDz594k)
+
 Here is an example Lua script that can be [executed](https://github.com/evandisoft/RedOnion/blob/master/TroubleShooting.md#how-do-i-run-a-script) while you are in flight mode (assuming you don't mind your ship exploding). 
 ```
 Random=native.UnityEngine.Random

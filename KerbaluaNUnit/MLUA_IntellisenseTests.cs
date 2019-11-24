@@ -32,7 +32,7 @@ namespace KerbaluaNUnit
 			public static int asdfg = 4;
 		}
 
-		private const int ADF_RUNTIME_MEMBERS = 11;
+		private const int ADF_RUNTIME_MEMBERS = 7;
 		private const int OS_DEFAULT_ENTRIES = 11;
 		Script script;
 		Table globals;
@@ -87,7 +87,7 @@ namespace KerbaluaNUnit
 			// since blah is null and we now are testing
 			// dynamicly when possible, we do not get to the call
 			// type.
-			Assert.AreEqual(0, completions.Count);
+			Assert.AreEqual(6, completions.Count);
 
 			//Assert.AreEqual(11, completions.Count);
 		}

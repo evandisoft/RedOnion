@@ -98,8 +98,8 @@ namespace KerbaluaNUnit
 		{
 			Setup();
 			var t1=st.NamespaceCheck(globals,"callablemethod");
-			object[] args={3};
-			object[] returns={CallableMethod_Namespace.callablemethod(3)};
+			object[] args={3.0};
+			object[] returns={CallableMethod_Namespace.callablemethod(3.0)};
 			var f=st.GetCheck(globals,"callablemethod");
 			st.CallCheck(f, args, returns);
 		}
