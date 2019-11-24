@@ -25,7 +25,7 @@ namespace LiveRepl.Parts
 			AddMinSized(new Button(">>", uiparts.scriptWindow.ToggleEditor));
 			AddMinSized(new ScriptDisabledElement(uiparts, 
 				new Button("Run", uiparts.scriptWindow.RunEditorScript)));
-			AddMinSized(new Button("Terminate", Globals.ship.));
+			AddMinSized(new Button("Terminate", uiparts.scriptWindow.Terminate));
 			disableableStuff.AddMinSized(new Button("Reset Engine", uiparts.scriptWindow.ResetEngine));
 			disableableStuff.AddMinSized(new Button("Reset Autopilot", ()=>Globals.ship?.autopilot.reset()));
 			disableableStuff.AddMinSized(uiparts.scriptEngineSelector=new ScriptEngineSelector(uiparts));

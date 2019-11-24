@@ -52,7 +52,7 @@ namespace KerbaluaNUnit
 		{
 			script.Globals["fun"]=f;
 			script.Globals["args"]=new Table(script, ObjectsToDynValues(args));
-			DynValue result=script.DoString($"return fun(table.unpack(args))");
+			DynValue result=script.DoString($"return fun(unpack(args))");
 			DynValue[] results=result.Tuple;
 			if (results==null)
 			{

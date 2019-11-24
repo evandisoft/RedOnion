@@ -48,7 +48,7 @@ namespace RedOnion.KSP.MoonSharp.CommonAPI
 				@"
 					return function(callFunc)
 						return function(table,...)
-							return callFunc({...})
+							return callFunc(...)
 						end
 					end
 				");
