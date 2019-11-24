@@ -32,7 +32,7 @@ namespace KerbaluaNUnit
 			public static int asdfg = 4;
 		}
 
-		private const int ADF_RUNTIME_MEMBERS = 11;
+		private const int ADF_RUNTIME_MEMBERS = 7;
 		private const int OS_DEFAULT_ENTRIES = 11;
 		Script script;
 		Table globals;

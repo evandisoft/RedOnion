@@ -5,6 +5,8 @@ using System.Text.RegularExpressions;
 namespace RedOnion.Build
 {
 	/// <summary>
+	/// Produces AbsoluteLinkVersions for the ChangeLog.md and README.md
+	/// 
 	/// Takes the Readme and produces a version with absolute links for spacedock.
 	/// 
 	/// Changelog is not meant to be copied in whole to spacedock, just the individual part of the changelog that

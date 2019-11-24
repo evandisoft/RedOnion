@@ -39,7 +39,7 @@ but our goal now is to:
 
 ## Releases
 
-Your scripts are in GameData/RedOnion/Scripts. Save them somewhere else before updating to a new version, to be safe. Then copy back in the ones you want to use. (If the example programs don't run check out that section in [TroubleShooting](TroubleShooting.md))
+Your scripts are in GameData/RedOnion/Scripts. **I'm not sure whether CKAN deletes and replaces the entire RedOnion directory. Save your scripts somewhere else before updating to a new version, to be safe**. Then copy back in the ones you want to use. (If the example programs don't run, check out that section in [TroubleShooting](TroubleShooting.md))
 
 Latest Release (0.4.0), available on:
 - [CKAN](https://github.com/KSP-CKAN/CKAN)
@@ -50,7 +50,7 @@ Latest Release (0.4.0), available on:
 
 - [Scripting](ScriptingReadme.md) - Documentation related to scripting.
 
-- [LiveRepl](LiveRepl/Readme.md) - The main user interface for the project. Where scripts can be loaded, written, and evaluated.
+- [LiveRepl](LiveRepl/Readme.md) - The main user interface for the project. Where scripts can be loaded, written, and executed.
 
 - [Troubleshooting](TroubleShooting.md) - Some possible issues and solutions.
 
@@ -66,7 +66,7 @@ Latest Release (0.4.0), available on:
 
 ## Feedback
 
-Feedback can be left on our forum [thread](https://forum.kerbalspaceprogram.com/index.php?/topic/183050-wip-redonion-020-unrestricted-in-game-scripting-has-repl-editor-and-intellisense-lua-and-a-custom-jsruby-like-language-implemented-tested-on-ksp-161/), as a new [issue](https://github.com/evandisoft/RedOnion/issues), or as a comment on any of our [videos](Videos.md).
+All feedback is appreciated. Feedback can be left on our forum [thread](https://forum.kerbalspaceprogram.com/index.php?/topic/183050-wip-redonion-020-unrestricted-in-game-scripting-has-repl-editor-and-intellisense-lua-and-a-custom-jsruby-like-language-implemented-tested-on-ksp-161/), as a new [issue](https://github.com/evandisoft/RedOnion/issues), or as a comment on any of our [videos](Videos.md).
 
 ## Contributing
 

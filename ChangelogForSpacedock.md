@@ -27,19 +27,19 @@ Just had a release!
 ### LiveRepl Changes:
 - Completing the filename text area with a file name now loads the related file automatically
 - LiveRepl can be dragged while executing a file.
-- LiveReplOverhaul: Much simpler UI code. Still not perfect in order to finish it quickly
-- Script Name Input Area now uses a TextField instead of TextArea so that newlines are automatically disallowed.
-- Tabs removed.
-- Clicking script name area now empties it so you can easily click on completion area to load a file
+- LiveRepl Overhaul: Much simpler UI code. Still not perfect in order to finish it quickly
+- Scriptname Input Area now uses a TextField instead of TextArea so that newlines are automatically disallowed.
+- Tabs removed. They were kinda clunky. The new way the Scriptname Input Area works makes it less necessary.
+- Clicking Scriptname Input Area now empties it so you can easily click on completion area to select the scriptname you want. And it automatically loads that script into the editor when you select it.
 - Loading a file automatically selects the appropriate engine based on the extension
-- Saving when script name area is empty, now creates an "untitled.X" where X is the current engines proper extension.
-- You can now set the font for Repl and Editor. All other text uses the default font.
+- Saving when  Scriptname Input Area is empty, now creates an "untitled.X" where X is the current engines proper extension.
+- You can now set the font that will be used for the Repl, Output Area, and Editor. All other text uses the default font.
 
 ### ROS Changes
 - ROS redesign. Allowing pause and continue features (something similar to the way the Lua example code uses coroutine.yield())
 
 ### Kerbalua Changes
-- Removed auto conversions from function to CLR Actions and CLR Funcs. Reason is that the execution system doesn't allow script code sent into the CLR to yield in the normal way. This affects attempts to use functions like foreach. Using foreach on a large collection is not interruptible. Any calls to CLR code are not interruptible so they must finish quickly, and in general foreach will not.
+- Removed auto conversions from function to CLR Actions and CLR Funcs. Reason is that the execution system doesn't allow script code sent into the CLR to yield in the normal way. This affects attempts to use functions like CLR's `List.Foreach`. Using foreach on a large collection is not interruptible. Any calls to CLR code are not interruptible so they must finish quickly, and in general `List.Foreach` will not.
 
 # 0.3 
 <details><summary>Show/Hide</summary>
