@@ -21,6 +21,7 @@ vessels, anything, with own script.
 1. Provide ability to interact with live game objects in a repl.
 1. Provide powerful general editing capabilities inside KSP
 1. Provide powerful API for modmakers/Users
+1. Help document the KSP API for modmakers.
 
 License: [MIT](LICENSE)
 
