@@ -25,7 +25,7 @@ vessels, anything, with own script.
 
 License: [MIT](LICENSE)
 
-Github: [here](README.md)
+Github: [here](https://github.com/evandisoft/RedOnion)
 
 **Warning: Do not use scripts from untrusted sources!**
 This is not a sandbox, any script has the power to do almost anything a modder could do in C#.
