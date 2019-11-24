@@ -22,6 +22,7 @@ Just had a release!
 ### General Changes:
 - Updated for KSP 1.8.1
 - Automatic documentation for our Common API
+- In general much better documentation.
 - Better Autopilot.
 
 ### LiveRepl Changes:
