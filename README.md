@@ -7,9 +7,9 @@ unrestricted scripted environment inside Kerbal Space Program
 for all players and even modders wishing to control the game,
 vessels, anything, with own script.
 
-## Features:
+## Current Features:
 1. Repl/Editor with intellisense.
-1. Scripting engines that can interact with any loaded CLR object
+1. Scripting engines that can interact with Classes from any loaded CLR assembly. 
 1. Lua scripting language called Kerbalua built on MoonSharp.
 1. Powerful custom language/engine (RedOnionScript) built by Lukáš Fireš.
 1. API's for doing things more easily or more safely, including Autopilot API, UI api, and more.
