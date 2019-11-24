@@ -30,9 +30,9 @@ namespace RedOnion.KSP.API
 		[Unsafe, Description("Shortcuts to Unity API.")]
 		public static readonly Type unity = typeof(Unity_Namespace);
 
-		[Unsafe, Description("Namespace Mappings (import of native types by namespace).")]
+		[Unsafe, Description("Namespace Mappings (import of native types by namespace). More info [here](../ReflectionUtil/NamespaceInstance.md)")]
 		public static readonly NamespaceInstance native = NamespaceMappings.DefaultAssemblies.GetNamespace("");
-		[Unsafe, Description("Assembly Mappings (import of native types by assembly.")]
+		[Unsafe, Description("Assembly Mappings (import of native types by assembly). More info [here](../ReflectionUtil/GetMappings.md)")]
 		public static readonly GetMappings assembly = new GetMappings();
 
 		[Description("Staging logic.")]
