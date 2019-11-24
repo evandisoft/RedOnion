@@ -117,7 +117,9 @@ namespace LiveRepl
 			SavedSettings.SaveSetting("WindowPositionY", rect.y.ToString());
 			SavedSettings.SaveSetting("editorVisible", editorVisible.ToString());
 			SavedSettings.SaveSetting("replVisible", replVisible.ToString());
+#if DEBUG
 			SavedSettings.SaveSetting("lastQueueTag", uiparts.queueTagInputArea.Text);
+#endif
 			SavedSettings.SaveToDisk();
 		}
 	}

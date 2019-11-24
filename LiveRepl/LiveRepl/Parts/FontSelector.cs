@@ -75,7 +75,7 @@ namespace LiveRepl.Parts
 		{
 			if (Event.current.type == EventType.MouseDown && rect.Contains(Event.current.mousePosition))
 			{
-				Text="";
+				//Text="";
 				GrabFocus();
 			}
 			base.DecoratorUpdate();
