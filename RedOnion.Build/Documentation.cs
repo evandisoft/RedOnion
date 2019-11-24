@@ -1,4 +1,5 @@
 using RedOnion.KSP.API;
+using RedOnion.KSP.Attributes;
 using RedOnion.KSP.Utilities;
 using RedOnion.ROS;
 using RedOnion.ROS.Utilities;
@@ -13,6 +14,8 @@ namespace RedOnion.Build
 {
 	static class Documentation
 	{
+		static string unsafeMark = "(Unsafe) {0}";
+
 		class Document
 		{
 			public Type type;
@@ -319,7 +322,9 @@ namespace RedOnion.Build
 					name = sb.ToString();
 				}
 			}
-			wr.WriteLine("- `{0}`: {1} - {2}", name, typeMd, desc);
+			wr.WriteLine("- `{0}`: {1} - {2}", name, typeMd,
+				member.IsDefined(typeof(UnsafeAttribute)) ?
+				string.Format(unsafeMark, desc) : desc);
 		}
 
 		static void PrintMethod(StreamWriter wr, Document doc, string name, MethodInfo method)
@@ -337,7 +342,9 @@ namespace RedOnion.Build
 			}
 			if (pars.Length > 0)
 				wr.WriteLine();
-			wr.WriteLine(pars.Length == 0 ? " - {0}" : "  - {0}", desc);
+			wr.WriteLine(pars.Length == 0 ? " - {0}" : "  - {0}",
+				method.IsDefined(typeof(UnsafeAttribute)) ?
+				string.Format(unsafeMark, desc) : desc);
 		}
 
 		static string GetRelativePath(string fromPath, string toPath)

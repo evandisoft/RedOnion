@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Kerbalui.Controls;
 using Kerbalui.Layout;
 using Kerbalui.Types;
@@ -28,7 +28,10 @@ namespace LiveRepl.Parts
 				new Button("Run", uiparts.scriptWindow.RunEditorScript)));
 			AddMinSized(new Button("Terminate", uiparts.scriptWindow.Terminate));
 			disableableStuff.AddMinSized(new Button("Reset Engine", uiparts.scriptWindow.ResetEngine));
-			disableableStuff.AddMinSized(new Button("Reset Autopilot", ()=>Globals.autopilot?.disable()));
+			disableableStuff.AddMinSized(new Button("Reset Autopilot", () => {
+				FlightControl.Instance.Shutdown();
+				Ship.DisableAutopilot();
+			}));
 			disableableStuff.AddMinSized(uiparts.scriptEngineSelector=new ScriptEngineSelector(uiparts));
 			AddMinSized(new ScriptDisabledElement(uiparts, disableableStuff));
 		}

@@ -2,7 +2,7 @@
 
 Decoupler, separator, launch clamp or docking port.
 
-- `native`: Part - Native `Part` - KSP API.
+- `native`: Part - (Unsafe) Native `Part` - KSP API.
 - `ship`: [Ship](../API/Ship.md) - Ship (vehicle/vessel) this part belongs to.
 - `parent`: [Part](PartBase.md) - Parent part (this part is attached to).
 - `children`: [PartChildren](PartChildren.md) - Parts attached to this part.

@@ -2,18 +2,18 @@
 
 Engine of a ship (vehicle/vessel).
 
-- `multiModule`: MultiModeEngine - KSP API. Module of multi-mode engine, if present (null otherwise).
-- `firstModule`: ModuleEngines - KSP API. Module of first engine.
-- `secondModule`: ModuleEngines - KSP API. Module of second engine, if present (null otherwise).
+- `multiModule`: MultiModeEngine - (Unsafe) KSP API. Module of multi-mode engine, if present (null otherwise).
+- `firstModule`: ModuleEngines - (Unsafe) KSP API. Module of first engine.
+- `secondModule`: ModuleEngines - (Unsafe) KSP API. Module of second engine, if present (null otherwise).
 - `firstIsActive`: bool - Running primary engine (or the only one).
 - `secondIsActive`: bool - Running secondary engine.
-- `activeModule`: ModuleEngines - KSP API. Active engine module.
-- `gimbalModule`: ModuleGimbal - KSP API. Gimbal module, if present (null otherwise).
+- `activeModule`: ModuleEngines - (Unsafe) KSP API. Active engine module.
+- `gimbalModule`: ModuleGimbal - (Unsafe) KSP API. Gimbal module, if present (null otherwise).
 - `multiMode`: bool - Is multi-mode engine (or not).
 - `hasGimbal`: bool - Has gimbal module.
 - `thrust`: double - Current thrust [kN] (at current pressure, with current `thrustPercentage` and current throttle).
 - `thrustPercentage`: double - Thrust limiter in percents.
-- `native`: Part - Native `Part` - KSP API.
+- `native`: Part - (Unsafe) Native `Part` - KSP API.
 - `ship`: [Ship](../API/Ship.md) - Ship (vehicle/vessel) this part belongs to.
 - `parent`: [Part](PartBase.md) - Parent part (this part is attached to).
 - `children`: [PartChildren](PartChildren.md) - Parts attached to this part.
