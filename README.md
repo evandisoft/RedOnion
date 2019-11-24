@@ -1,3 +1,5 @@
+[![Dynawing-Launch.jpg](https://i.postimg.cc/CMskNBBk/Dynawing-Launch.jpg)](https://postimg.cc/HjjrWLtk)
+
 # RedOnion and Kerbalua
 
 A joint effort of Evan Dickinson and Lukáš Fireš to create

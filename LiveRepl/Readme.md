@@ -1,3 +1,5 @@
+[![Dynawing-Launch-Labelled.jpg](https://i.postimg.cc/656R1WnS/Dynawing-Launch-Labelled.jpg)](https://postimg.cc/yW5kDzfX)
+
 **LiveRepl** is the main user interface for the project. It is used to write, load, and evaluate scripts that interact with KSP.
 
 **LiveRepl** is shown or hidden by clicking the LiveRepl Icon on the toolbar (which is just a small icon with the words "Live Repl")
