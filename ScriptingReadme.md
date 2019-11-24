@@ -1,5 +1,10 @@
 All scripting is managed in our main user interface, called [LiveRepl](../LiveRepl/Readm.md).
 
+## Managing Scripts
+Scripts are currently stored in GameData/RedOnion/Scripts. 
+
+Scripts that we bundle as example scripts appear in a zipfile, GameData/RedOnion/Scripts.zip, and will appear in the list of scripts in-game, but any scripts in Scripts.zip will be hidden by any scripts you create of the same name. If you modified an example script and want to access the unmodified version, you can rename the modified version or delete it.
+
 ## Scripting Languages
 We have two scripting languages, [**Kerbalua**](Kerbalua/README.md), and [**ROS** (Red Onion Script)](RedOnion.ROS/README.md). **Kerbalua** is a Lua implementation, while **ROS** is a custom language. **ROS** is designed to make programming easier by requiring very little syntax (examples: python-like indentation to mark program structure, and function calls/definitions without parenthesis).
 

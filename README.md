@@ -39,6 +39,8 @@ but our goal now is to:
 
 ## Releases
 
+Your scripts are in GameData/RedOnion/Scripts. Save them somewhere else before updating to a new version, to be safe. Then copy back in the ones you want to use. (If the example programs don't run check out that section in [TroubleShooting](TroubleShooting.md))
+
 Latest Release (0.4.0), available on:
 - [CKAN](https://github.com/KSP-CKAN/CKAN)
 - [Spacedock](https://spacedock.info/mod/2116/Red%20Onion)
