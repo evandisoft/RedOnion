@@ -25,9 +25,9 @@ namespace RedOnion.KSP.API
 
 		[Description("User Interface.")]
 		public static readonly Type ui = typeof(UI_Namespace);
-		[Unsafe, Description("Shortcuts to (unsafe) KSP API + some tools.")]
+		[Unsafe, Description("Shortcuts to KSP API + some tools.")]
 		public static readonly Type ksp = typeof(KSP_Namespace);
-		[Unsafe, Description("Shortcuts to (unsafe) Unity API.")]
+		[Unsafe, Description("Shortcuts to Unity API.")]
 		public static readonly Type unity = typeof(Unity_Namespace);
 
 		[Unsafe, Description("Namespace Mappings (import of native types by namespace).")]

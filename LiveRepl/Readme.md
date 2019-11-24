@@ -30,7 +30,7 @@
 - `Load` will load, into the editor, the file with the filename that is written in the **Scriptname Input Area**.
 
 ## Hotkeys
-There are a number of hotkeys for using **LiveRepl** without taking your hands off the keyboard. These can be shown by clicking the `Show Hotkeys` button. You can navigate between the Input Area, Editor, Scriptname Input Area, and Completion Area and also move around within these parts using hotkeys.
+There are a number of hotkeys for using **LiveRepl** without taking your hands off the keyboard. These can be shown by clicking the `Show Hotkeys` button. You can navigate between the Repl Input Area, Editor, Scriptname Input Area, and Completion Area and also move around within these parts using hotkeys.
 
 ## Limitations
 There are some limitations with **LiveRepl** which may be fixed over time.

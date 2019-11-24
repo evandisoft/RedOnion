@@ -1,4 +1,4 @@
-All scripting is managed in our main user interface, called [LiveRepl](../LiveRepl/Readm.md).
+All scripting is managed in our main user interface, called [LiveRepl](LiveRepl/Readme.md).
 
 ## Managing Scripts
 Scripts are currently stored in GameData/RedOnion/Scripts. 
