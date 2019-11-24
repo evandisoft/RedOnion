@@ -28,3 +28,9 @@
 
 ## Hotkeys
 There are a number of hotkeys for using **LiveRepl** without taking your hands off the keyboard. These can be shown by clicking the `Show Hotkeys` button. You can navigate between the Input Area, Editor, Script Selector, and Completion Area and also move around within these parts using hotkeys.
+
+## Limitations
+There are some limitations with **LiveRepl** which may be fixed over time.
+- There is currently no undo/redo functionality, so be careful. This may come in a future release.
+- Only one **LiveRepl** can be open at a time. We are intending to eventually in create a more flexible system that allows multiple **LiveRepl**'s and multiple scripts running at a time.
+- All scripts are in one big directory. We are planning on eventually having some sort of file navigation mode and also allowing this editor to be used for general editing of files inside the KSP directory, not just user scripts.

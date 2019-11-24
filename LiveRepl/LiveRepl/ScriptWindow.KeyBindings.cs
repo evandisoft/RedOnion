@@ -27,7 +27,6 @@ namespace LiveRepl
 @"CURRENT KEYBINDINGS(partially inspired by vim):
 
 Common to Editor and Repl input area:
-			shift + space: Intellisense completion. 
 ctrl + e: evaluate content. For editor this also saves to the file in the filename input area
 tab: indent
 shift + tab: unindent
@@ -47,10 +46,6 @@ ctrl + End: move cursor to end
 Shift plus movement commands selects text.
 ctrl + insert: copy selected text
 shift + insert: paste selected text
-ctrl + u: focus repl input area
-ctrl + i: focus editor
-ctrl + o: focus scriptNameTextArea
-ctrl + p: focus completion/ intellisense box
 ctrl + n: insert and move to new line after current line
 ctrl + h: insert and move to new line before current line
   When creating a new line, its indentation starts matched with the indentation of the line above it.
@@ -77,6 +72,14 @@ Only allows the following.
 ctrl + c: copy selected area.
 ctrl + insert: copy selected area.
 Any other key gives focus to input box.
+
+Global Keys:
+ctrl + u: focus repl input area
+ctrl + i: focus editor
+ctrl + o: focus scriptNameTextArea
+ctrl + p: focus completion/ intellisense box
+shift + space: Intellisense completion.
+ctrl + enter: Intellisense completion.
 ";
 
 			uiparts.replOutoutArea.AddText(hotkeyText);
