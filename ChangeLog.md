@@ -1,5 +1,6 @@
 # Planned Features
 <details><summary>Show/Hide</summary>
+
 - New user-centric system for managing scripts. Will be a file-selection dialog or the completion area will do this.
 - Editor/Repl reimplementation in new library. Hopefully allowing multiple editors/repls open at a time.
 - Ability to run multiple scripts at a time and a gui to manage them.
@@ -8,6 +9,7 @@
 - Ingame debugging.
 - Provide editors that can be used for editing files in contexts unrelated to our scripting engines.
 - More UI library features.
+
 </details>
 
 # Next Release
@@ -41,6 +43,7 @@ Just had a release!
 
 # 0.3 
 <details><summary>Show/Hide</summary>
+
 ## 0.3.3
 ROS implements assembly (as described in 0.3.1 changelog). Same caveats apply.
 

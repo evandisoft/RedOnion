@@ -16,7 +16,7 @@
 ## Buttons:
 - `Clear Repl` for clearing the contents of the output area which is right below the button.
 - `Show Hotkeys` will print all the hotkeys that are available into the **Output Area**.
-- `<<` will hide the repl section of **LiveRepl**.
+- `<<` will hide the output section of **LiveRepl**.
 - `>>` will hide the editor section of **LiveRepl**.
 - `Run` will execute the code that is in the editor, and save it to the filename shown in the **Script Filename Selector**. If the filename is blank, it will save it to a new file named `untitled.X` where `X` is either `lua` or `ros`, depending on which script engine is selected.
 - `Terminate` will cancel execution of a currently running script. Most buttons and functionality are disabled when scripts are running, but the `Terminate` button is still functional.
