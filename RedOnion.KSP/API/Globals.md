@@ -7,7 +7,7 @@ Global variables, objects and functions common to all scripting languages.
 - `ksp`: [KSP](../Namespaces/KSP.md) - \[`Unsafe`\] Shortcuts to KSP API + some tools.
 - `unity`: [Unity](../Namespaces/Unity.md) - \[`Unsafe`\] Shortcuts to Unity API.
 - `native`: [NamespaceInstance](../ReflectionUtil/NamespaceInstance.md) - \[`Unsafe`\] Namespace Mappings (import of native types by namespace). More info [here](../ReflectionUtil/NamespaceInstance.md)
-- `assembly`: [GetMappings](../ReflectionUtil/GetMappings.md) - \[`Unsafe`\] Assembly Mappings (import of native types by assembly. More info [here](../ReflectionUtil/GetMappings.md)
+- `assembly`: [GetMappings](../ReflectionUtil/GetMappings.md) - \[`Unsafe`\] Assembly Mappings (import of native types by assembly). More info [here](../ReflectionUtil/GetMappings.md)
 - `stage`: [Stage](Stage.md) - Staging logic.
 - `time`: [Time](Time.md) - Current time and related functions.
 - `PID`: [PID](PID.md) - PID regulator (alias to `system.pid` in ROS).
