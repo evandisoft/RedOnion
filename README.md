@@ -7,6 +7,25 @@ unrestricted scripted environment inside Kerbal Space Program
 for all players and even modders wishing to control the game,
 vessels, anything, with own script.
 
+## Features:
+1. Repl/Editor with intellisense.
+1. Scripting engines that can interact with any loaded CLR object
+1. Lua scripting language called Kerbalua built on MoonSharp.
+1. Powerful custom language/engine (RedOnionScript) built by Lukáš Fireš.
+1. API's for doing things more easily or more safely, including Autopilot API, UI api, and more.
+
+## Goals:
+1. Provide ability to produce mods in Kerbalua/RedOnionScript and modify them without restarting the game.
+1. Provide ability to debug mod code/scripts without restarting the game.
+1. Provide ability to write user scripts, like automatic control of your ship.
+1. Provide ability to interact with live game objects in a repl.
+1. Provide powerful general editing capabilities inside KSP
+1. Provide powerful API for modmakers/Users
+
+License: [MIT](LICENSE)
+
+Github: [here](.)
+
 **Warning: Do not use scripts from untrusted sources!**
 This is not a sandbox, any script has the power to do almost anything.
 We plan to eventually implement a switch to limit the power
@@ -28,9 +47,7 @@ but our goal now is to:
 
 [Development](DevelopmentReadme.md) - Main page for development documentation (project structure, implementation explanations, etc).
 
-## Videos
-
-Demonstration videos for this mod are on [this channel](https://www.youtube.com/channel/UChduoYTVOtAH0NA-Lj8EiKA).
+## [Videos](Videos.md)
 
 ## Releases
 
