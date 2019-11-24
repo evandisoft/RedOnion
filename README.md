@@ -1,3 +1,5 @@
+[![Dynawing-Launch.jpg](https://i.postimg.cc/CMskNBBk/Dynawing-Launch.jpg)](https://postimg.cc/HjjrWLtk)
+
 # RedOnion and Kerbalua
 
 A joint effort of Evan Dickinson and Lukáš Fireš to create
@@ -5,8 +7,28 @@ unrestricted scripted environment inside Kerbal Space Program
 for all players and even modders wishing to control the game,
 vessels, anything, with own script.
 
+## Features:
+1. Repl/Editor with intellisense.
+1. Scripting engines that can interact with any loaded CLR object
+1. Lua scripting language called Kerbalua built on MoonSharp.
+1. Powerful custom language/engine (RedOnionScript) built by Lukáš Fireš.
+1. API's for doing things more easily or more safely, including Autopilot API, UI api, and more.
+
+## Goals:
+1. Provide ability to produce mods in Kerbalua/RedOnionScript and modify them without restarting the game.
+1. Provide ability to debug mod code/scripts without restarting the game.
+1. Provide ability to write user scripts, like automatic control of your ship.
+1. Provide ability to interact with live game objects in a repl.
+1. Provide powerful general editing capabilities inside KSP
+1. Provide powerful API for modmakers/Users
+1. Help document the KSP API for modmakers.
+
+License: [MIT](LICENSE)
+
+Github: [here](.)
+
 **Warning: Do not use scripts from untrusted sources!**
-This is not a sandbox, any script has the power to do almost anything.
+This is not a sandbox, any script has the power to do almost anything a modder could do in C#.
 We plan to eventually implement a switch to limit the power
 (disable what is marked `[Unsafe]` in the code),
 but our goal now is to:
@@ -14,60 +36,43 @@ but our goal now is to:
 - Allow users to do whatever they wish to do to the game environment to have fun.
 - Help modders develop and debug their mods using this mod.
 - Help anybody to explore KSP API, their own or other's mods
-  (read the license of each mod, we expose only `public` members).
-
- 
-## Differences between ROS and Lua
-
-[**Lua**](https://github.com/evandisoft/RedOnion/blob/master/Kerbalua/README.md)
-is well known scripting language
-and may offer more comfort and safety, while
-[**ROS** (Red Onion Script)](https://github.com/evandisoft/RedOnion/blob/master/RedOnion.ROS/README.md)
-aims to make coding easier.
-**ROS** was created anew and may contain bugs,
-**Lua** may lack some features but should be more stable.
-
-Scripts are currently stored in GameData/RedOnion/Scripts,
-our own scripts are packed inside GameData/RedOnion/Scripts.zip.
-You can override our scripts simply by opening them in REPL
-and saving the modified version (which will become a file outside of the zip).
-
-## Documentation
-
-[Common Globals](https://github.com/evandisoft/RedOnion/blob/master/RedOnion.KSP/API/Globals.md) - Objects and functions accessible by both Lua and ROS.
-
-[Red Onion Script (ROS)](https://github.com/evandisoft/RedOnion/blob/master/RedOnion.ROS/README.md) - A powerful in-game scripting engine taking inspiration from several popular languages (Ruby,Python,Javascript,etc)
-
-[Lua Engine](https://github.com/evandisoft/RedOnion/blob/master/Kerbalua/README.md) - A Lua scripting engine.
-
-[Red Onion UI](https://github.com/evandisoft/RedOnion/blob/master/RedOnion.UI/README.md) - A WIP UI Library, intended to be used by modders, users, and ourselves.
-
-[Troubleshooting](https://github.com/evandisoft/RedOnion/blob/master/TroubleShooting.md) - Some possible issues and solutions
-
-**Outdated:**
-
-[Common Script Api](https://github.com/evandisoft/RedOnion/blob/master/CommonScriptApi.md) - Previous documentation of the common features. Should soon become part of [Common Globals: KSP](https://github.com/evandisoft/RedOnion/blob/master/RedOnion.KSP/API/Globals.md)
-
-## Videos
-
-Demonstration videos for this mod are on [this channel](https://www.youtube.com/channel/UChduoYTVOtAH0NA-Lj8EiKA).
+  (read the license of each mod, we expose only `public` members directly).
 
 ## Releases
 
-Releases are hosted at [spacedock](https://spacedock.info/mod/2116/Red%20Onion) and [curseforge](https://kerbal.curseforge.com/projects/redonion).
+Your scripts are in GameData/RedOnion/Scripts. **I'm not sure whether CKAN deletes and replaces the entire RedOnion directory. Save your scripts somewhere else before updating to a new version, to be safe**. Then copy back in the ones you want to use. (If the example programs don't run, check out that section in [TroubleShooting](TroubleShooting.md))
+
+Latest Release (0.4.0), available on:
+- [CKAN](https://github.com/KSP-CKAN/CKAN)
+- [Spacedock](https://spacedock.info/mod/2116/Red%20Onion)
+- [CurseForge](https://www.curseforge.com/kerbal/ksp-mods/redonion)
+
+ChangeLog: [here](ChangeLog.md)
+
+## Documentation
+
+- [Scripting](ScriptingReadme.md) - Documentation related to scripting.
+
+- [LiveRepl](LiveRepl/Readme.md) - The main user interface for the project. Where scripts can be loaded, written, and executed.
+
+- [Troubleshooting](TroubleShooting.md) - Some possible issues and solutions.
+
+- [Development](DevelopmentReadme.md) - Main page for development documentation (project structure, implementation explanations, etc).
+
+## Videos are listed [here](Videos.md)
 
 ## Upcoming Features
 
-[Next Release](https://github.com/evandisoft/RedOnion/blob/master/ChangeLog.md#next-release)
+- [Next Release](ChangeLog.md#next-release)
 
-[Planned](https://github.com/evandisoft/RedOnion/blob/master/ChangeLog.md#planned-features)
+- [Planned](ChangeLog.md#planned-features)
 
 ## Feedback
 
-Feedback can be left on our forum [thread](https://forum.kerbalspaceprogram.com/index.php?/topic/183050-wip-redonion-020-unrestricted-in-game-scripting-has-repl-editor-and-intellisense-lua-and-a-custom-jsruby-like-language-implemented-tested-on-ksp-161/), on this repository as a new issue, or as a comment on any of our videos.
+All feedback is appreciated. Feedback can be left on our forum [thread](https://forum.kerbalspaceprogram.com/index.php?/topic/183050-wip-redonion-020-unrestricted-in-game-scripting-has-repl-editor-and-intellisense-lua-and-a-custom-jsruby-like-language-implemented-tested-on-ksp-161/), as a new [issue](https://github.com/evandisoft/RedOnion/issues), or as a comment on any of our [videos](Videos.md).
 
 ## Contributing
 
 We welcome people of all skill levels to contribute or give feedback, ask questions, etc.
 
-Here is more information about [contributing](https://github.com/evandisoft/RedOnion/blob/master/Contributing.md).
+Here is more information about [contributing](Contributing.md).

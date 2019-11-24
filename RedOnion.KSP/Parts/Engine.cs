@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel;
 using RedOnion.KSP.API;
+using RedOnion.KSP.Attributes;
 using RedOnion.ROS;
 using RedOnion.ROS.Utilities;
 
@@ -167,7 +168,7 @@ namespace RedOnion.KSP.Parts
 		[Description("Has gimbal module.")]
 		public bool hasGimbal => gimbalModule != null;
 
-		[Description("Accepts `sensor`. (Case insensitive)")]
+		[Description("Accepts `engine`. (Case insensitive)")]
 		public override bool istype(string name)
 			=> name.Equals("engine", StringComparison.OrdinalIgnoreCase);
 

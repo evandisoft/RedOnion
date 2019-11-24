@@ -1,4 +1,5 @@
 using RedOnion.KSP.API;
+using RedOnion.KSP.Attributes;
 using RedOnion.KSP.Utilities;
 using RedOnion.ROS;
 using RedOnion.ROS.Utilities;
@@ -7,11 +8,14 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Reflection;
+using System.Text;
 
 namespace RedOnion.Build
 {
 	static class Documentation
 	{
+		static string unsafeMark = "\\[`Unsafe`\\] {0}";
+
 		class Document
 		{
 			public Type type;
@@ -43,16 +47,40 @@ namespace RedOnion.Build
 			{ typeof(bool), "bool" },
 		};
 
+		// Compare by RID (record ID)
+		class MetaCmp : IComparer<MemberInfo>
+		{
+			public static readonly IComparer<MemberInfo> It = new MetaCmp();
+			static bool ByType<T>(MemberInfo x, MemberInfo y, ref int cmp) where T : MemberInfo
+			{
+				cmp = x is T ? y is T
+					? x.MetadataToken.CompareTo(y.MetadataToken)
+					: -1 : y is T ? +1 : 0;
+				return cmp == 0;
+			}
+			public int Compare(MemberInfo x, MemberInfo y)
+			{
+				int cmp = 0;
+				return ByType<ConstructorInfo>(x, y, ref cmp)
+				&& ByType<FieldInfo>(x, y, ref cmp)
+				&& ByType<EventInfo>(x, y, ref cmp)
+				&& ByType<PropertyInfo>(x, y, ref cmp)
+				&& ByType<MethodInfo>(x, y, ref cmp)
+				? x.MetadataToken.CompareTo(y.MetadataToken)
+				: cmp;
+			}
+		}
+
 		static IEnumerable<MemberInfo> GetMembers(Type type)
 		{
 			var members = type.GetMembers(BindingFlags.Public|BindingFlags.Instance);
 			if (members.Length > 1)
-				Array.Sort(members, Descriptor.Reflected.MemberComparer.Instance);
+				Array.Sort(members, MetaCmp.It);
 			foreach (var member in members)
 				yield return member;
 			members = type.GetMembers(BindingFlags.Public|BindingFlags.Static|BindingFlags.FlattenHierarchy);
 			if (members.Length > 1)
-				Array.Sort(members, Descriptor.Reflected.MemberComparer.Instance);
+				Array.Sort(members, MetaCmp.It);
 			foreach (var member in members)
 				yield return member;
 		}
@@ -71,6 +99,7 @@ namespace RedOnion.Build
 			if (type.Assembly != typeof(Globals).Assembly
 				&& type.Assembly != typeof(RedOnion.UI.Element).Assembly)
 				return;
+			var fullType = type;
 			if (type.IsGenericType)
 				type = type.GetGenericTypeDefinition();
 			if (type.IsGenericParameter || type.FullName == null)
@@ -78,11 +107,22 @@ namespace RedOnion.Build
 			var desc = type.GetCustomAttribute<DescriptionAttribute>()?.Description;
 			if (desc != null && discovered.Add(type))
 				queue.Add(type);
+			if (fullType != type)
+			{
+				foreach (var gen in fullType.GetGenericArguments())
+					RegisterType(gen);
+			}
+			if (docb != null && docb.RegisterTypes?.Length > 0)
+			{
+				foreach (var rtype in docb.RegisterTypes)
+					RegisterType(rtype);
+			}
 		}
 		internal static void Exec()
 		{
 			Descriptor.Reflected.LowerFirstLetter = false;
 			RegisterType(typeof(Globals));
+			RegisterType(typeof(KSP.MoonSharp.MoonSharpAPI.MoonSharpGlobals));
 			var members = new Dictionary<string, MemberInfo>();
 			for (int i = 0; i < queue.size; i++)
 			{
@@ -124,13 +164,18 @@ namespace RedOnion.Build
 				types.Add(type, doc);
 				foreach (var member in GetMembers(type))
 				{
-					if (member.GetCustomAttribute<DescriptionAttribute>() == null)
+					FieldInfo f = member as FieldInfo;
+					bool typeRef = f != null
+						&& f.IsStatic && f.IsInitOnly	// static readonly
+						&& f.FieldType == typeof(Type);	// Type name = ...
+					if (member.GetCustomAttribute<DescriptionAttribute>() == null && (!typeRef ||
+						((Type)f.GetValue(null)).GetCustomAttribute<DescriptionAttribute>() == null))
 						continue;
 					var mname = GetName(member);
 					members.TryGetValue(mname, out var prev);
 					if (prev != null && !(prev is MethodInfo && member is MethodInfo))
 						continue;
-					if (member is FieldInfo f)
+					if (f != null)
 						RegisterType(
 							f.FieldType == typeof(Type)
 							&& f.IsInitOnly && f.IsStatic
@@ -173,13 +218,6 @@ namespace RedOnion.Build
 			}
 		}
 
-		// Compare by RID (record ID)
-		class MetaCmp : IComparer<MemberInfo>
-		{
-			public static readonly MetaCmp It = new MetaCmp();
-			public int Compare(MemberInfo x, MemberInfo y)
-				=> (x.MetadataToken & 0xffffff).CompareTo(y.MetadataToken & 0xffffff);
-		}
 		static void Print(StreamWriter wr, Document doc, string name)
 		{
 			wr.WriteLine();
@@ -214,8 +252,15 @@ namespace RedOnion.Build
 		static string ResolveType(Document doc, Type type, out string name)
 		{
 			string path = null;
+			var fullType = type;
+			if (type.IsGenericType)
+				type = type.GetGenericTypeDefinition();
 			if (redirects.TryGetValue(type, out var redir))
-				type = redir;
+			{
+				fullType = type = redir;
+				if (type.IsGenericType)
+					type = type.GetGenericTypeDefinition();
+			}
 			if (!typeNames.TryGetValue(type, out name))
 				name = type.Name;
 			if (types.TryGetValue(type, out var tdoc))
@@ -231,47 +276,75 @@ namespace RedOnion.Build
 					path = GetRelativePath(doc.path, tdoc.path) + ".md";
 				}
 			}
-			return path;
+			if (type == fullType)
+				return path == null ? name : string.Format("[{0}]({1})", name, path);
+			var sb = new StringBuilder();
+			name = name.Substring(0, name.LastIndexOfAny(new char[] { '.', '`' }));
+			if (path == null) sb.Append(name);
+			else sb.AppendFormat("[{0}]({1})", name, path);
+			sb.Append("\\[");
+			var first = true;
+			foreach (var gen in fullType.GetGenericArguments())
+			{
+				if (!first)
+					sb.Append(", ");
+				first = false;
+				sb.Append(ResolveType(doc, gen, out _));
+			}
+			sb.Append("\\]");
+			return sb.ToString();
 		}
+
 		static void PrintSimpleMember(StreamWriter wr, Document doc, string name, MemberInfo member, Type type)
 		{
-			var desc = member.GetCustomAttribute<DescriptionAttribute>().Description;
-			var alias = member.GetCustomAttribute<AliasAttribute>();
-			if (alias != null && alias.Name == null)
-			{
-				//TODO link to the alias
-				wr.WriteLine("- `{0}` - {1}", name, desc);
-				return;
-			}
-			var typePath = ResolveType(doc, type, out var typeName);
+			var desc = member.GetCustomAttribute<DescriptionAttribute>()?.Description
+				?? type.GetCustomAttribute<DescriptionAttribute>()?.Description;
+			var typeMd = ResolveType(doc, type, out var typeName);
 			if (member is MethodInfo || typeof(ICallable).IsAssignableFrom(type))
 				name += "()";
-			else if (member is PropertyInfo p && p.GetIndexParameters().Length > 0)
-				name = "[index]";
-			wr.WriteLine(typePath == null
-				? "- `{0}`: {1} - {3}"
-				: "- `{0}`: [{1}]({2}) - {3}",
-				name, typeName, typePath, desc);
+			else if (member is PropertyInfo p)
+			{
+				var pars = p.GetIndexParameters();
+				if (pars.Length > 0)
+				{
+					var sb = new StringBuilder();
+					sb.Append("[");
+					for (int i = 0; i < pars.Length; i++)
+					{
+						if (i > 0)
+							sb.Append(", ");
+						sb.Append(pars[i].Name);
+						sb.Append(" ");
+						var pmd = ResolveType(doc, pars[i].ParameterType, out _);
+						sb.Append(pmd);
+					}
+					sb.Append("]");
+					name = sb.ToString();
+				}
+			}
+			wr.WriteLine("- `{0}`: {1} - {2}", name, typeMd,
+				member.IsDefined(typeof(UnsafeAttribute)) ?
+				string.Format(unsafeMark, desc) : desc);
 		}
 
 		static void PrintMethod(StreamWriter wr, Document doc, string name, MethodInfo method)
 		{
 			var desc = method.GetCustomAttribute<DescriptionAttribute>().Description;
 			var type = method.ReturnType;
-			var typePath = ResolveType(doc, type, out var typeName);
+			var typeMd = ResolveType(doc, type, out _);
 			var pars = method.GetParameters();
-			wr.Write("- `{0}()`: ", name);
-			wr.Write(typePath == null ? "{0}" : "[{0}]({1})", typeName, typePath);
+			wr.Write("- `{0}()`: {1}", name, typeMd);
 			foreach (var par in pars)
 			{
 				type = par.ParameterType;
-				typePath = ResolveType(doc, type, out typeName);
-				wr.Write(typePath == null ? ", {0} {1}" : ", {0} [{1}]({2})",
-					par.Name, typeName, typePath);
+				typeMd = ResolveType(doc, type, out _);
+				wr.Write(", {0} {1}", par.Name, typeMd);
 			}
 			if (pars.Length > 0)
 				wr.WriteLine();
-			wr.WriteLine(pars.Length == 0 ? " - {0}" : "  - {0}", desc);
+			wr.WriteLine(pars.Length == 0 ? " - {0}" : "  - {0}",
+				method.IsDefined(typeof(UnsafeAttribute)) ?
+				string.Format(unsafeMark, desc) : desc);
 		}
 
 		static string GetRelativePath(string fromPath, string toPath)

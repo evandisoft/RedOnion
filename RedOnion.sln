@@ -5,10 +5,6 @@ VisualStudioVersion = 16.0.29009.5
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedOnion.UI", "RedOnion.UI\RedOnion.UI.csproj", "{034C16AB-D16E-4AFE-9837-812499EE2F3D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedOnion.Script", "RedOnion.Script\RedOnion.Script.csproj", "{0D0A04F3-0A82-49CD-8178-7640ACE88BFF}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedOnion.ScriptNUnit", "RedOnion.ScriptNUnit\RedOnion.ScriptNUnit.csproj", "{B705F43E-2E55-4309-9399-22608AB4F4B3}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedOnion.KSP", "RedOnion.KSP\RedOnion.KSP.csproj", "{DEC12E09-29AD-4666-9954-8C8A1D7BF454}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kerbalua", "Kerbalua\Kerbalua.csproj", "{F590B1DB-8F33-4986-8383-180952D63CDA}"
@@ -46,9 +42,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedOnion.ROS.Tests", "RedOn
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LiveRepl", "LiveRepl\LiveRepl.csproj", "{9A325200-04F2-42D2-994E-06E7711EF9AA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedOnion.OS", "RedOnion.OS\RedOnion.OS.csproj", "{3B9ED14D-ED22-4F94-91BF-951BF9B01552}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kerbalui", "Kerbalui\Kerbalui.csproj", "{7A943166-A67E-420A-BCA0-5231D57A18BD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kerbnlua", "Kerbnlua\Kerbnlua.csproj", "{7E1B33D1-400D-42E5-9719-A0FCBB333898}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -60,14 +56,6 @@ Global
 		{034C16AB-D16E-4AFE-9837-812499EE2F3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{034C16AB-D16E-4AFE-9837-812499EE2F3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{034C16AB-D16E-4AFE-9837-812499EE2F3D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0D0A04F3-0A82-49CD-8178-7640ACE88BFF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0D0A04F3-0A82-49CD-8178-7640ACE88BFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0D0A04F3-0A82-49CD-8178-7640ACE88BFF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0D0A04F3-0A82-49CD-8178-7640ACE88BFF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B705F43E-2E55-4309-9399-22608AB4F4B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B705F43E-2E55-4309-9399-22608AB4F4B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B705F43E-2E55-4309-9399-22608AB4F4B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B705F43E-2E55-4309-9399-22608AB4F4B3}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DEC12E09-29AD-4666-9954-8C8A1D7BF454}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DEC12E09-29AD-4666-9954-8C8A1D7BF454}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DEC12E09-29AD-4666-9954-8C8A1D7BF454}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -104,14 +92,14 @@ Global
 		{9A325200-04F2-42D2-994E-06E7711EF9AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9A325200-04F2-42D2-994E-06E7711EF9AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9A325200-04F2-42D2-994E-06E7711EF9AA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3B9ED14D-ED22-4F94-91BF-951BF9B01552}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3B9ED14D-ED22-4F94-91BF-951BF9B01552}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3B9ED14D-ED22-4F94-91BF-951BF9B01552}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3B9ED14D-ED22-4F94-91BF-951BF9B01552}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7A943166-A67E-420A-BCA0-5231D57A18BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7A943166-A67E-420A-BCA0-5231D57A18BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7A943166-A67E-420A-BCA0-5231D57A18BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7A943166-A67E-420A-BCA0-5231D57A18BD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7E1B33D1-400D-42E5-9719-A0FCBB333898}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E1B33D1-400D-42E5-9719-A0FCBB333898}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E1B33D1-400D-42E5-9719-A0FCBB333898}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E1B33D1-400D-42E5-9719-A0FCBB333898}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -120,6 +108,6 @@ Global
 		SolutionGuid = {DC4A6940-6D30-489A-8A9E-D0057E2BD3A7}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		version = 0.3.0
+		version = 0.4.0
 	EndGlobalSection
 EndGlobal

@@ -57,7 +57,7 @@ discovered assemblies, namespaces, classes etc.")]
 
 		// ROS requires every property to have some integer index
 		// therefore every property (or string-keyed value) gets added to this list
-		protected readonly ListCore<KeyValuePair<string, T>> list;
+		protected ListCore<KeyValuePair<string, T>> list;
 		protected readonly Dictionary<string, int> dict = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 		protected readonly Dictionary<string, int> strict = new Dictionary<string, int>();
 
@@ -93,7 +93,7 @@ discovered assemblies, namespaces, classes etc.")]
 		IList<string> ICompletable.PossibleCompletions => strict.Keys.ToList();
 		bool ICompletable.TryGetCompletion(string completionName, out object completion)
 		{
-			if (strict.TryGetValue(completionName, out var at))
+			if (strict.TryGetValue(completionName, out var at) || dict.TryGetValue(completionName, out at))
 			{
 				completion = list[at].Value;
 				return true;

@@ -6,7 +6,7 @@ namespace RedOnion.KSP.ReflectionUtil
 {
 	public partial class GetMappings : IUserDataType
 	{
-		public DynValue Index(MoonSharp.Interpreter.Script script, DynValue index, bool isDirectIndexing)
+		public DynValue Index(global::MoonSharp.Interpreter.Script script, DynValue index, bool isDirectIndexing)
 		{
 			if (index.Type != DataType.String)
 			{
@@ -21,12 +21,12 @@ namespace RedOnion.KSP.ReflectionUtil
 			throw new Exception("index not found");
 		}
 
-		public DynValue MetaIndex(MoonSharp.Interpreter.Script script, string metaname)
+		public DynValue MetaIndex(global::MoonSharp.Interpreter.Script script, string metaname)
 		{
 			throw new NotImplementedException();
 		}
 
-		public bool SetIndex(MoonSharp.Interpreter.Script script, DynValue index, DynValue value, bool isDirectIndexing)
+		public bool SetIndex(global::MoonSharp.Interpreter.Script script, DynValue index, DynValue value, bool isDirectIndexing)
 		{
 			throw new NotImplementedException();
 		}

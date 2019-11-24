@@ -11,11 +11,11 @@
     <OutputType>Library</OutputType>
     <RootNamespace>KerbaluaNUnit</RootNamespace>
     <AssemblyName>KerbaluaNUnit</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <ReleaseVersion>0.3.0</ReleaseVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <TargetFrameworkProfile />
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <ReleaseVersion>0.4.0</ReleaseVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -39,6 +39,12 @@
       <HintPath>..\packages\NUnit.3.12.0\lib\net45\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="UnityEngine">
+      <HintPath>$(KerbalLibs)\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>$(KerbalLibs)\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
     <Reference Include="Assembly-CSharp">
       <HintPath>$(KerbalLibs)\Assembly-CSharp.dll</HintPath>
     </Reference>
@@ -50,12 +56,18 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="LUA_ProcessedIncompleteVarTests.cs" />
-    <Compile Include="LUA_ImportManagerTests.cs" />
-    <Compile Include="LUA_CompletionOperationsTests.cs" />
+    <Compile Include="MLUA_ProcessedIncompleteVarTests.cs" />
+    <Compile Include="MLUA_ImportManagerTests.cs" />
+    <Compile Include="MLUA_CompletionOperationsTests.cs" />
     <Compile Include="TestingUtil.cs" />
-    <Compile Include="LUA_IntellisenseTests.cs" />
-    <Compile Include="LUA_ImplicitReturnTests.cs" />
+    <Compile Include="MLUA_IntellisenseTests.cs" />
+    <Compile Include="MLUA_ImplicitReturnTests.cs" />
+    <Compile Include="MLUA_DummyAPITests.cs" />
+    <Compile Include="CommonAPITestUtil.cs" />
+    <Compile Include="ScriptTester.cs" />
+    <Compile Include="DummyAPI.cs" />
+    <Compile Include="CallableProperty_Namespace.cs" />
+    <Compile Include="CallableMethod_Namespace.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Kerbalua\Kerbalua.csproj">

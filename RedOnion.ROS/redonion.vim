@@ -50,7 +50,7 @@ syn match	rosLabel			display ";\s*\I\i*:$"
 syn match	rosLabel			display "^\s*\I\i*:[^:]"me=e-1
 syn match	rosLabel			display ";\s*\I\i*:[^:]"me=e-1
 syn match	rosRepeat			display "\<\(while\|until\|do\|for\|foreach\)\>"
-syn keyword rosOperator			and or xor
+syn keyword rosOperator			and or not
 syn keyword rosConstant			true false null this base super
 
 syn match	rosStructure		display "\<\(class\|namespace\|interface\|struct\|union\|enum\)\>"

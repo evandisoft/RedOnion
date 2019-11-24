@@ -1,17 +1,12 @@
-vessel=import.FlightGlobals.ActiveVessel
+Random=native.UnityEngine.Random
 
-Random=import.UnityEngine.Random
-
-for i=0,20*60 do
-    coroutine.yield()
-end
+sleep(10)
 
 for j=1,8 do
-    for i=0,Random.Range(0,20*60) do
-        coroutine.yield()
-    end
-    local num=Random.Range(0,vessel.parts.Count)
-    print(vessel.parts[num].ToString().."is malfunctioning!")
-    vessel.parts[num].explode()
+    sleep(Random.Range(0,10))
+    
+    local num=Random.Range(0,ship.parts.count)
+    print(ship.parts[num].ToString().." is malfunctioning!")
+    ship.parts[num].explode()
 end
 print("Done!")

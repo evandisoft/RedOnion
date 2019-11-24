@@ -353,8 +353,8 @@ namespace RedOnion.ROS
 		ShiftRight		= 0x114B, // >>		!! changed priority from C#/C++ !!
 
 	//	logic + casts
-		LogicOr			= 0x0350, // ||
-		LogicAnd		= 0x0451, // &&
+		LogicOr			= 0x0350, // ||		or
+		LogicAnd		= 0x0451, // &&		and
 	//	priority 5..8 reserved for C# binary or, xor, and, <<, >>
 		Equals			= 0x0952, // ==
 		Differ			= 0x0953, // !=
@@ -376,7 +376,7 @@ namespace RedOnion.ROS
 		Plus			= 0x5260, // +x
 		Neg				= 0x5261, // -x
 		Flip			= 0x5262, // ~x
-		Not				= 0x5263, // !x
+		Not				= 0x5263, // !x		not x
 		AddrOf			= 0xD264, // &x		(reserved)
 		Deref			= 0xD265, // *x		(reserved)
 

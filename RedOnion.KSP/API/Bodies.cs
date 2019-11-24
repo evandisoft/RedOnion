@@ -1,5 +1,6 @@
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
+using RedOnion.KSP.Attributes;
 using RedOnion.KSP.Completion;
 using RedOnion.KSP.Utilities;
 using RedOnion.ROS;
@@ -15,12 +16,14 @@ namespace RedOnion.KSP.API
 {
 	public interface ISpaceObject
 	{
-		Vector3d position { get; }
+		Vector position { get; }
 		ISpaceObject body { get; }
 	} 
-	public class Bodies : Properties<SpaceBody>.WithMap<CelestialBody>
+	public class Bodies : Properties<SpaceBody>.WithMap<CelestialBody>, ICompletable
 	{
 		public static Bodies Instance { get; } = new Bodies();
+		// this is only temporary, `Properties` need some redesign
+		IList<string> ICompletable.PossibleCompletions => dict.Keys.ToList();
 
 		protected Bodies()
 		{
@@ -62,8 +65,8 @@ namespace RedOnion.KSP.API
 
 		[Description("Name of the body.")]
 		public string name => native.bodyName;
-		[Convert(typeof(Vector)), Description("Position of the body (relative to active ship).")]
-		public Vector3d position => native.position;
+		[Description("Position of the body (relative to active ship).")]
+		public Vector position => new Vector(native.position);
 		[Description("Celestial body this body is orbiting.")]
 		public SpaceBody body => Bodies.Instance[native.referenceBody];
 		ISpaceObject ISpaceObject.body => body;
@@ -91,6 +94,7 @@ namespace RedOnion.KSP.API
 		[Description("Atmosphere parameters of the body. (Alias to `atmosphere`)")]
 		public Atmosphere atm => new Atmosphere(native);
 
+		[Description("Atmosphere parameters of a body.")]
 		public struct Atmosphere
 		{
 			readonly CelestialBody native;
@@ -98,13 +102,16 @@ namespace RedOnion.KSP.API
 				=> this.native = native;
 
 			[Description("Is there any atmosphere (true on Kerbin, false on Moon).")]
-			public bool exists => native.atmosphere;
+			public bool exists => native?.atmosphere ?? false;
 			[Description("Is there oxygen in the atmosphere.")]
-			public bool oxygen => native.atmosphereContainsOxygen;
+			public bool oxygen => native?.atmosphereContainsOxygen ?? false;
 			[Description("Depth/height of the atmosphere.")]
-			public double depth => native.atmosphereDepth;
+			public double depth => native?.atmosphereDepth ?? double.NaN;
 			[Description("Depth/height of the atmosphere.")]
-			public double height => native.atmosphereDepth;
+			public double height => native?.atmosphereDepth ?? double.NaN;
+
+			[Description("Used when there is no body/ship. Returns false/NaN in properties.")]
+			public static readonly Atmosphere none = new Atmosphere();
 		}
 	}
 }

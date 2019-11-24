@@ -25,11 +25,6 @@ namespace RedOnion.KSP.Autopilot
 				}
 			}
 		}
-		
-		static public FlightControl GetInstance()
-		{
-			return Instance;
-		}
 
 		public enum SpinMode
 		{
@@ -425,6 +420,7 @@ namespace RedOnion.KSP.Autopilot
 				Shutdown();
 				return;
 			}
+
 
 			Vector3 angularVelocity = GetAngularVelocity(vessel);
 			GetMaxAcceleration(vessel,out Vector3 posAccel,out Vector3 negAccel);

@@ -19,20 +19,20 @@ namespace RedOnion.KSP.API
 
 			[Description("Reference for coordinate system (origin at zero if null).")]
 			public ISpaceObject reference { get; set; }
-			[Convert(typeof(Vector)), Description("Starting point of the vector (relative to reference).")]
-			public Vector3d origin { get; set; }
-			[Convert(typeof(Vector)), Description("Direction of the vector (from starting point).")]
-			public Vector3d direction { get; set; }
+			[Description("Starting point of the vector (relative to reference).")]
+			public Vector origin { get; set; }
+			[Description("Direction of the vector (from starting point).")]
+			public Vector direction { get; set; }
 
-			[Convert(typeof(Vector)), Description("Alias to `origin`.")]
-			public Vector3d from { get; set; }
-			[Convert(typeof(Vector)), Description("End point (relative to reference, not starting point).")]
-			public Vector3d to { get => origin + direction; set => direction = value - origin; }
+			[Description("Alias to `origin`.")]
+			public Vector from { get; set; }
+			[Description("End point (relative to reference, not starting point).")]
+			public Vector to { get => origin + direction; set => direction = value - origin; }
 
-			[Convert(typeof(Vector)), Description("Alias to `origin`.")]
-			public Vector3d start { get => origin; set => origin = value; }
-			[Convert(typeof(Vector)), Description("Alias to `direction`.")]
-			public Vector3d vector { get => direction; set => direction = value; }
+			[Description("Alias to `origin`.")]
+			public Vector start { get => origin; set => origin = value; }
+			[Description("Alias to `direction`.")]
+			public Vector vector { get => direction; set => direction = value; }
 
 			[Description("Color of the arrow.")]
 			public Color color { get; set; } = Color.white;

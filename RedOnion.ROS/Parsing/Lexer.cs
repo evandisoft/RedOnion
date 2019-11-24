@@ -297,6 +297,7 @@ namespace RedOnion.ROS.Parsing
 			{ "as",         ExCode.As },
 			{ "and",        ExCode.LogicAnd },
 			{ "or",         ExCode.LogicOr },
+			{ "not",		ExCode.Not },
 			{ "typeof",     ExCode.TypeOf },
 			{ "nameof",     ExCode.NameOf },
 			{ "var",        ExCode.Var },

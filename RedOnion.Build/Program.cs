@@ -18,6 +18,8 @@ namespace RedOnion.Build
 			}
 			if (args.Length == 0)
 			{
+				AbsoluteLinks.Exec();
+
 				Release.Exec();
 				Documentation.Exec();
 				return;
