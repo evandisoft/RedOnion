@@ -25,9 +25,9 @@ Just had a release!
 - Better Autopilot.
 
 ### LiveRepl Changes:
-- Completing the filename text area with a file name now loads the related file automatically
+- Completing the Scriptname Input Area with a file name now loads the related file automatically
 - LiveRepl can be dragged while executing a file.
-- LiveRepl Overhaul: Much simpler UI code. Still not perfect in order to finish it quickly
+- LiveRepl Overhaul: Much simpler UI code.
 - Scriptname Input Area now uses a TextField instead of TextArea so that newlines are automatically disallowed.
 - Tabs removed. They were kinda clunky. The new way the Scriptname Input Area works makes it less necessary.
 - Clicking Scriptname Input Area now empties it so you can easily click on completion area to select the scriptname you want. And it automatically loads that script into the editor when you select it.
