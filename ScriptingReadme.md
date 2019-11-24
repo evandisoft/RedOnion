@@ -9,7 +9,7 @@ You can override our scripts simply by opening them in REPL
 and saving the modified version (which will become a file outside of the zip).
 
 ## Limitations
-- Calls to long running clr code is not interruptible.
+- Calls to long running CLR code is not interruptible.
 - You cannot safely pass a function to something like
 `List.Foreach(fn)` because we cannot interrupt the `Foreach` call. So the entire iteration would have to occur in one KSP FixedUpdate and it would pause the game to complete. Our scripting languages have functionality for iterating over CLR collections which is interruptible, so you will have to use that instead.
 

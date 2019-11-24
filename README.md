@@ -27,7 +27,7 @@ License: [MIT](LICENSE)
 Github: [here](.)
 
 **Warning: Do not use scripts from untrusted sources!**
-This is not a sandbox, any script has the power to do almost anything.
+This is not a sandbox, any script has the power to do almost anything a modder could do in C#.
 We plan to eventually implement a switch to limit the power
 (disable what is marked `[Unsafe]` in the code),
 but our goal now is to:
@@ -37,31 +37,34 @@ but our goal now is to:
 - Help anybody to explore KSP API, their own or other's mods
   (read the license of each mod, we expose only `public` members directly).
 
-## Documentation
-
-[Scripting](ScriptingReadme.md) - Documentation related to scripting.
-
-[LiveRepl](LiveRepl/Readme.md) - The main user interface for the project. Where scripts can be loaded, written, and evaluated.
-
-[Troubleshooting](TroubleShooting.md) - Some possible issues and solutions.
-
-[Development](DevelopmentReadme.md) - Main page for development documentation (project structure, implementation explanations, etc).
-
-## [Videos](Videos.md)
-
 ## Releases
 
-Releases are hosted at [spacedock](https://spacedock.info/mod/2116/Red%20Onion) and [curseforge](https://kerbal.curseforge.com/projects/redonion).
+Latest Release (0.4.0), available on:
+- [CKAN](https://github.com/KSP-CKAN/CKAN)
+- [Spacedock](https://spacedock.info/mod/2116/Red%20Onion)
+- [CurseForge](https://www.curseforge.com/kerbal/ksp-mods/redonion)
+
+## Documentation
+
+- [Scripting](ScriptingReadme.md) - Documentation related to scripting.
+
+- [LiveRepl](LiveRepl/Readme.md) - The main user interface for the project. Where scripts can be loaded, written, and evaluated.
+
+- [Troubleshooting](TroubleShooting.md) - Some possible issues and solutions.
+
+- [Development](DevelopmentReadme.md) - Main page for development documentation (project structure, implementation explanations, etc).
+
+## Videos are listed [here](Videos.md)
 
 ## Upcoming Features
 
-[Next Release](ChangeLog.md#next-release)
+- [Next Release](ChangeLog.md#next-release)
 
-[Planned](ChangeLog.md#planned-features)
+- [Planned](ChangeLog.md#planned-features)
 
 ## Feedback
 
-Feedback can be left on our forum [thread](https://forum.kerbalspaceprogram.com/index.php?/topic/183050-wip-redonion-020-unrestricted-in-game-scripting-has-repl-editor-and-intellisense-lua-and-a-custom-jsruby-like-language-implemented-tested-on-ksp-161/), as a new [issue](https://github.com/evandisoft/RedOnion/issues), or as a comment on any of our videos.
+Feedback can be left on our forum [thread](https://forum.kerbalspaceprogram.com/index.php?/topic/183050-wip-redonion-020-unrestricted-in-game-scripting-has-repl-editor-and-intellisense-lua-and-a-custom-jsruby-like-language-implemented-tested-on-ksp-161/), as a new [issue](https://github.com/evandisoft/RedOnion/issues), or as a comment on any of our [videos](Videos.md).
 
 ## Contributing
 
