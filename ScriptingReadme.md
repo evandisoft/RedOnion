@@ -21,7 +21,7 @@ and saving the modified version (which will become a file outside of the zip).
 
 ## Scripting Links
 
-[Common API](RedOnion.KSP/API/Globals.md) - An API of useful functionality that is consistent between Lua and ROS. Entries marked with (Unsafe) lead to objects from KSP, Unity, or just general CLR objects that one should be careful with.
+[Common API](RedOnion.KSP/API/Globals.md) - An API of useful functionality that is consistent between Lua and ROS. Entries marked with \[Unsafe\] lead to objects from KSP, Unity, or just general CLR objects that one should be careful with.
 
 [Red Onion Script (ROS)](RedOnion.ROS/README.md) - A powerful in-game scripting engine taking inspiration from several popular languages (Ruby,Python,Javascript,etc)
 
