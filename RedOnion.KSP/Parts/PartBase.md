@@ -2,7 +2,7 @@
 
 Part of the ship (vehicle/vessel).
 
-- `native`: Part - (Unsafe) Native `Part` - KSP API.
+- `native`: Part - \[`Unsafe`\] Native `Part` - KSP API.
 - `ship`: [Ship](../API/Ship.md) - Ship (vehicle/vessel) this part belongs to.
 - `parent`: Part - Parent part (this part is attached to).
 - `children`: [PartChildren](PartChildren.md) - Parts attached to this part.

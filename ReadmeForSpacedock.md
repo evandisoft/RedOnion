@@ -21,6 +21,7 @@ vessels, anything, with own script.
 1. Provide ability to interact with live game objects in a repl.
 1. Provide powerful general editing capabilities inside KSP
 1. Provide powerful API for modmakers/Users
+1. Help document the KSP API for modmakers.
 
 License: [MIT](https://github.com/evandisoft/RedOnion/LICENSE)
 
@@ -45,6 +46,8 @@ Latest Release (0.4.0), available on:
 - [CKAN](https://github.com/KSP-CKAN/CKAN)
 - [Spacedock](https://spacedock.info/mod/2116/Red%20Onion)
 - [CurseForge](https://www.curseforge.com/kerbal/ksp-mods/redonion)
+
+ChangeLog: [here](https://github.com/evandisoft/RedOnion/ChangeLog.md)
 
 ## Documentation
 

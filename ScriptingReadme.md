@@ -17,11 +17,11 @@ and saving the modified version (which will become a file outside of the zip).
 - Calls to long running CLR code is not interruptible.
 - You cannot safely pass a function to something like
 `List.Foreach(fn)` because we cannot interrupt the `Foreach` call. So the entire iteration would have to occur in one KSP FixedUpdate and it would pause the game to complete. Our scripting languages have functionality for iterating over CLR collections which is interruptible, so you will have to use that instead.
-- The CLR objects in the [KSP API](https://kerbalspaceprogram.com/api/annotated.html) that you might access using `ksp.` or `native.`, may be poorly documented. Modders had to expend a lot of effort to figure out how they work. 
+- The CLR objects in the [KSP API](https://kerbalspaceprogram.com/api/annotated.html) that you might access using `ksp.` or `native.`, may be poorly documented. Modders had to expend a lot of effort to figure out how they work and how to avoid problems.
 
 ## Scripting Links
 
-[Common API](RedOnion.KSP/API/Globals.md) - An API of useful functionality that is consistent between Lua and ROS.
+[Common API](RedOnion.KSP/API/Globals.md) - An API of useful functionality that is consistent between Lua and ROS. Entries marked with (Unsafe) lead to objects from KSP, Unity, or just general CLR objects that one should be careful with.
 
 [Red Onion Script (ROS)](RedOnion.ROS/README.md) - A powerful in-game scripting engine taking inspiration from several popular languages (Ruby,Python,Javascript,etc)
 

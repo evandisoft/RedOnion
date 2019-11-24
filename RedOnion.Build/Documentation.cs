@@ -14,7 +14,7 @@ namespace RedOnion.Build
 {
 	static class Documentation
 	{
-		static string unsafeMark = "(Unsafe) {0}";
+		static string unsafeMark = "\\[`Unsafe`\\] {0}";
 
 		class Document
 		{

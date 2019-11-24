@@ -4,10 +4,10 @@ Global variables, objects and functions common to all scripting languages.
 
 - `autorun`: [AutoRun](AutoRun.md) - An api for setting which scripts will be ran when an engine is reset.
 - `ui`: [UI](../Namespaces/UI.md) - User Interface.
-- `ksp`: [KSP](../Namespaces/KSP.md) - (Unsafe) Shortcuts to (unsafe) KSP API + some tools.
-- `unity`: [Unity](../Namespaces/Unity.md) - (Unsafe) Shortcuts to (unsafe) Unity API.
-- `native`: NamespaceInstance - (Unsafe) Namespace Mappings (import of native types by namespace).
-- `assembly`: GetMappings - (Unsafe) Assembly Mappings (import of native types by assembly.
+- `ksp`: [KSP](../Namespaces/KSP.md) - \[`Unsafe`\] Shortcuts to KSP API + some tools.
+- `unity`: [Unity](../Namespaces/Unity.md) - \[`Unsafe`\] Shortcuts to Unity API.
+- `native`: [NamespaceInstance](../ReflectionUtil/NamespaceInstance.md) - \[`Unsafe`\] Namespace Mappings (import of native types by namespace).
+- `assembly`: [GetMappings](../ReflectionUtil/GetMappings.md) - \[`Unsafe`\] Assembly Mappings (import of native types by assembly.
 - `stage`: [Stage](Stage.md) - Staging logic.
 - `time`: [Time](Time.md) - Current time and related functions.
 - `PID`: [PID](PID.md) - PID regulator (alias to `system.pid` in ROS).
