@@ -22,9 +22,9 @@ source = "return " + source;
 
 Normally entering a simple expresssion in lua would require one to also add that "return ", but for convenience, **Kerbalua** adds it to allow people to easily check simple expressions at the repl.
 
-The next step is that the code needs to be a function in order for a coroutine to be created from it. So we create a string that will build and return a function from that source, and execute that string (`base.DoString`)
+The next step is that the code needs to be a function in order for a coroutine to be created from it. So we create a string that will build and return a function from that source, and we execute that string with (`base.DoString`)
 
-(The "\n" is to prevent a line comment from commenting out the `end`)
+(The "\n" is to prevent a line comment in the source from commenting out the `end`)
 ```
 DynValue mainFunction = base.DoString("return function () " + source + "\n end");
 ```

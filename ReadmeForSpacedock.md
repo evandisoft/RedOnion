@@ -27,8 +27,6 @@ License: [MIT](https://github.com/evandisoft/RedOnion/blob/master/LICENSE)
 
 Github: [here](https://github.com/evandisoft/RedOnion)
 
-Docs: [here](https://evandisoft.github.io/RedOnion)
-
 **Warning: Do not use scripts from untrusted sources!**
 This is not a sandbox, any script has the power to do almost anything a modder could do in C#.
 We plan to eventually implement a switch to limit the power
@@ -47,7 +45,7 @@ Your scripts are in GameData/RedOnion/Scripts. **I'm not sure whether CKAN delet
 Latest Release (0.4.0), available on:
 - [CKAN](https://github.com/KSP-CKAN/CKAN)
 - [Spacedock](https://spacedock.info/mod/2116/Red%20Onion)
-- [CurseForge](https://www.curseforge.com/kerbal/ksp-mods/redonion)
+- [CurseForge](https://www.curseforge.com/kerbal/ksp-mods/redonion) (May take a while to be approved)
 
 ChangeLog: [here](https://evandisoft.github.io/RedOnion/ChangeLog)
 
@@ -55,7 +53,7 @@ ChangeLog: [here](https://evandisoft.github.io/RedOnion/ChangeLog)
 
 - [Scripting](https://evandisoft.github.io/RedOnion/ScriptingReadme) - Documentation related to scripting.
 
-- [LiveRepl](https://evandisoft.github.io/RedOnion/LiveRepl/Readme) - The main user interface for the project. Where scripts can be loaded, written, and executed.
+- [LiveRepl](https://evandisoft.github.io/RedOnion/LiveRepl) - The main user interface for the project. Where scripts can be loaded, written, and executed.
 
 - [Troubleshooting](https://evandisoft.github.io/RedOnion/TroubleShooting) - Some possible issues and solutions.
 
@@ -77,4 +75,4 @@ All feedback is appreciated. Feedback can be left on our forum [thread](https://
 
 We welcome people of all skill levels to contribute or give feedback, ask questions, etc.
 
-Here is more information about [contributing](https://evandisoft.github.io/RedOnion/Contributing).
+Here is more information about [contributing](https://github.com/evandisoft/RedOnion/blob/gh-pages/Contributing.md).

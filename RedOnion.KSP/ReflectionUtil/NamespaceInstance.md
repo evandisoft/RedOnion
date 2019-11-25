@@ -1,7 +1,7 @@
 ## NamespaceInstance
 
 
-You can use `native` to access a type in the default list of assemblies.
+You can use the global `native` to access a type in the default list of assemblies.
 
 `native` allows you to browse through all the namespaces and classes that are available
 like you can in C# for C#'s `using` functionality, with the completion area showing you the
