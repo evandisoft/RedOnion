@@ -15,6 +15,7 @@ var narrowAltitude = 100  // altitude (in m) upto which to go straight up
 if startAngle > 89
   startAngle = 90
 
+
 //: PARAM GUI
 
 var firda = true
@@ -23,8 +24,9 @@ var cust = false
 def gui
   var lblWidth = 120
   var boxWidth = 60
-  var uniWidth = 40
+  var uniWidth = 46
   var wnd = new ui.window "Launch " + ship.name
+//move the window to the left side
   wnd.x -= (unity.screen.width - 200) / 3
   var hintLabel = new ui.label
   def boxEnter box
@@ -33,6 +35,7 @@ def gui
     var row = wnd.addHorizontal()
     var lbl = row.addLabel text
     lbl.minWidth = lblWidth
+  //string(value) performs to-string conversion:
     var box = row.addTextBox string value
     box.tag = hint
     box.enter.add boxEnter
@@ -73,6 +76,7 @@ def gui
   brow.addButton("Control", def => selected = 2).flexWidth = 1
   brow.addButton("Launch",  def => selected = 3).flexWidth = 1
   
+//wait until user selects what to do (or closes the window)
   while selected == 0
     wait
   
@@ -101,6 +105,7 @@ def gui
   cust  = xcust.pressed
   return selected == 3
 if not gui()
+//user selected "Cancel" or closed the window
   return
 
 targetAltitude *= 1000
@@ -124,6 +129,8 @@ var customSteering = null
 if not evan
   autopilot.killRot = true
   if cust
+  //this is the same logic as in the autopilot
+  //using autopilot.rawXXX = ... overrides it
     def steerPID
       var reg = PID 1.0, 0.5, 0.01, 0.4
       reg.maxInput = 1
@@ -173,7 +180,7 @@ def steer
   if ship.periapsis >= safeAltitude
     setPitch 0
     return
-//limit AoA when Q is high
+//limit AoA when Q is high (TODO: limit around staging in atmosphere)
   var srfA = 90 - ship.away.angle ship.surfaceVelocity
   var curr = srfA
   var maxA = 3.0/math.clamp(ship.q, 0.1, 0.75) - 3.0
@@ -375,20 +382,33 @@ for
 maxThrottle = 1.0
 
 var almost = null
+var almost2 = null
 var choked = null
 var warned = 0
-var maxHeight = ship.apoapsis*1.01+1000
+var maxHeight = ship.apoapsis*1.1+1000
 var prevReport = 0
 print "Burn!"
-until (ship.eccentricity < 0.00001 // perfect
-  or ship.timeToPe < ship.period*0.3 // happens with good accuracy
-  or ship.apoapsis > maxHeight and ship.periapsis > math.max(atmosphere.depth,1000)+1000 // something went wrong?
-  or ship.apoapsis > maxHeight*1.5+5000) // something went really really wrong
+until ship.eccentricity < 0.00001 // perfect
+  if ship.timeToPe < ship.period*0.3
+  //happens with good accuracy, not a failure
+    print "Apoapsis too far"
+    break
+  if ship.apoapsis > maxHeight and ship.periapsis > math.max(atmosphere.depth,1000)+1000
+    print "Overshot apoapsis"
+    break
+  if ship.apoapsis > maxHeight*1.5+5000
+    print "Something went wrong!"
+    break
 
-  if ship.eccentricity < 0.01
+//time limit for fine-tuning
+  if ship.eccentricity < 0.01 and ship.periapsis > safeAltitude
     if almost == null; almost = time()
-    else if time.since(almost) > 10; break
-  
+    else if time.since(almost) > 60; break
+    if ship.eccentricity < 0.001
+      if almost2 == null; almost2 = time()
+      else if time.since(almost2) > 20; break
+
+//progress printout
   if time.since(prevReport) >= 1
     prevReport = time()
     var delta = dv().size
@@ -397,6 +417,7 @@ until (ship.eccentricity < 0.00001 // perfect
       tta -= ship.period
     print "TTA: {0,6:F1} DV: {1,6:F1} BT: {2,6:F1}", tta, delta, stage.burnTime delta
     
+//check that staging is working (and we have fuel)
   if ship.engines.getThrust() == 0
     if choked == null
       choked = time()
