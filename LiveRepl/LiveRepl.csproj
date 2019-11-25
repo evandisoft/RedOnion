@@ -129,6 +129,7 @@
     <Compile Include="LiveRepl\Execution\RedOnionReplEvaluator.cs" />
     <Compile Include="LiveRepl\Execution\ReplEvaluator.cs" />
     <Compile Include="LiveRepl\Parts\FontSelector.cs" />
+    <Compile Include="LiveRepl\Execution\KerbnluaReplEvaluator.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

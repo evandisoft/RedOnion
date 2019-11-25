@@ -18,7 +18,7 @@ namespace RedOnion.Build
 			}
 			if (args.Length == 0)
 			{
-				AbsoluteLinks.Exec();
+				GithubIOLinks.Exec();
 
 				Release.Exec();
 				Documentation.Exec();

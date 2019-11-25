@@ -89,24 +89,33 @@ namespace Kerbalua.Completion.CompletionTypes
 				return GetCompletionObject(dynValue);
 			}
 
-			if (obj.GetType().Name=="RuntimeType")
+
+			if (obj is Type type)
 			{
+				Complogger.Log("obj's a type and it's name is ", type.Name);
+				if (type.IsEnum)
+				{
+					Complogger.Log("obj is an enum -> EnumCompletion ");
+					return new InstanceStaticCompletion(type);
+				}
 				Complogger.Log("obj is runtimetype -> RuntimeType");
 				return new RuntimeTypeCompletion(obj as Type);
 			}
 
+
 			if (obj is InstanceStatic instance1)
 			{
-				Complogger.Log("obj is Instance -> Instance");
+				Complogger.Log("obj is Instance -> Instance",instance1.type.Name);
 				return new InstanceStaticCompletion(instance1.type);
 			}
 
 			if (obj is Static static1)
 			{
-				Complogger.Log("obj is Static -> Static");
+				Complogger.Log("obj is Static -> Static",static1.type.Name);
 				return new StaticCompletion(static1.type);
 			}
 
+			Complogger.Log("obj has a type of", obj.GetType().Name);
 			if (obj is IMoonSharpCompletable m)
 			{
 				Complogger.Log("obj is IMoonSharpCompletable");

@@ -45,6 +45,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Exceptions.cs" />
     <Compile Include="Expressions.cs" />
     <Compile Include="OpCode.cs" />
     <Compile Include="ParseExpression.cs" />

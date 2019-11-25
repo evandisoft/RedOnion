@@ -107,6 +107,24 @@ namespace RedOnion.KSP.API
 		}
 		#endregion
 
+		#region Native and name
+
+		[Unsafe, Description("Native `Vessel` for unrestricted access to KSP API."
+			+ " Same as `FlightGlobals.ActiveVessel` if accessed through global `ship`.")]
+		public Vessel native { get; private set; }
+
+		[Description("Name of the ship (vehicle/vessel).")]
+		public string name
+		{
+			get
+			{
+				var name = native.vesselName;
+				return name.StartsWith(autoLocMarker) ? Localizer.Format(name) : name;
+			}
+		}
+		internal readonly static string autoLocMarker = "#autoLOC_";
+		#endregion
+
 		#region Autopilot
 
 		[Description("Autopilot of this ship (vehicle/vessel).")]
@@ -124,24 +142,6 @@ namespace RedOnion.KSP.API
 				autopilot.throttle = value;
 			}
 		}
-		#endregion
-
-		#region Native and name
-
-		[Unsafe, Description("Native `Vessel` for unrestricted access to KSP API."
-			+ " Same as `FlightGlobals.ActiveVessel` if accessed through global `ship`.")]
-		public Vessel native { get; private set; }
-
-		[Description("Name of the ship (vehicle/vessel).")]
-		public string name
-		{
-			get
-			{
-				var name = native.vesselName;
-				return name.StartsWith(autoLocMarker) ? Localizer.Format(name) : name;
-			}
-		}
-		internal readonly static string autoLocMarker = "#autoLOC_";
 		#endregion
 
 		#region Parts

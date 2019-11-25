@@ -27,8 +27,9 @@ namespace Kerbalua.Completion
 				Complogger.Log($"Source: \"{relevantText}\"");
 				processedIncompleteVar = Parse(relevantText);
 			}
-			catch (LuaIntellisenseException)
+			catch (LuaIntellisenseException e)
 			{
+				Complogger.Log(e.Message);
 				replaceStart = replaceEnd = cursorPos;
 				return new List<string>();
 			}
@@ -63,9 +64,10 @@ namespace Kerbalua.Completion
 					Complogger.Log("Object is "+completionObject);
 				}
 			}
-			catch (LuaIntellisenseException)
+			catch (LuaIntellisenseException e)
 			{
 				//Debug.Log(e);
+				Complogger.Log(e.Message);
 				replaceStart = replaceEnd = cursorPos;
 				return new List<string>();
 			}
@@ -73,6 +75,7 @@ namespace Kerbalua.Completion
 			var lastOp = operations.Current;
 			if (lastOp is GetMemberOperation getMemberOperation)
 			{
+				//Complogger.Log("Getting Completions...");
 				string lowercasePartial = getMemberOperation.Name.ToLower();
 				List<string> completions = new List<string>();
 				foreach (var possibleCompletion in completionObject.GetPossibleCompletions())

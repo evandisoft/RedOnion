@@ -60,6 +60,14 @@ namespace RedOnion.Build
 			}
 			public int Compare(MemberInfo x, MemberInfo y)
 			{
+				var idx1 = x.GetCustomAttribute<DocIndexAttribute>()?.Index ?? -1;
+				var idx2 = y.GetCustomAttribute<DocIndexAttribute>()?.Index ?? -1;
+				if (idx1 >= 0)
+				{
+					if (idx1 != idx2)
+						return idx2 < 0 ? -1 : idx2 - idx1;
+				}
+				else if (idx2 >= 0) return +1;
 				int cmp = 0;
 				return ByType<ConstructorInfo>(x, y, ref cmp)
 				&& ByType<FieldInfo>(x, y, ref cmp)

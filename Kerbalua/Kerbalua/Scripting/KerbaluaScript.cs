@@ -20,6 +20,10 @@ namespace Kerbalua.Scripting
 	{
 		public Action<string> PrintErrorAction { get; set; }
 
+		private int execlimit = defaultExecLimit;
+		private const int defaultExecLimit=1000;
+		private const int execLimitMin=100;
+		private const int execLimitMax=5000;
 		static KerbaluaScript _instance;
 		public static KerbaluaScript Instance
 		{
@@ -61,6 +65,19 @@ namespace Kerbalua.Scripting
 			Globals.Remove("coroutine");
 
 			commonAPI["sleep"] = new Action<double>(sleep);
+			//commonAPI["setexeclimit"] = new Action<double>(setexeclimit);
+		}
+
+		public void setexeclimit(double counterlimit)
+		{
+			try
+			{
+				execlimit=(int)Math.Max(execLimitMin, Math.Min(execLimitMax, counterlimit));
+			}
+			catch (Exception e)
+			{
+				PrintErrorAction?.Invoke(e.Message);
+			}
 		}
 
 		[Description("Cause the script to sleep for waittimeSeconds seconds.")]
@@ -99,7 +116,7 @@ namespace Kerbalua.Scripting
 			}
 
 			Process.current = process;
-			coroutine.Coroutine.AutoYieldCounter = 1000;
+			coroutine.Coroutine.AutoYieldCounter = execlimit;
 			result = coroutine.Coroutine.Resume();
 			Process.current = null;
 
@@ -132,9 +149,15 @@ namespace Kerbalua.Scripting
 		public void Terminate()
 		{
 			coroutine = null;
-			process.shutdown -= Terminate;
-			process.terminate();
-			process = null;
+
+			// If SetCoroutine has an error, it is caught in MoonSharpReplEvaluator, which
+			// calls Terminate, and this means that process could, in that situation be null.
+			if (process!=null) 
+			{
+				process.shutdown -= Terminate;
+				process.terminate();
+				process = null;
+			}
 			sleepwatch.Reset();
 			sleeptimeMillis=0;
 		}

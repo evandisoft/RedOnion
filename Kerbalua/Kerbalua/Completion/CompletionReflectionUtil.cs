@@ -15,6 +15,14 @@ namespace Kerbalua.Completion
 		{
 			var strs = new HashSet<string>();
 
+			foreach (var type in t.GetNestedTypes())
+			{
+				//Complogger.Log("getting type "+type);
+				if (type.IsSpecialName)
+					continue;
+				strs.Add(type.Name);
+			}
+
 			foreach (var ev in t.GetEvents())
 			{
 				if (ev.IsSpecialName)
@@ -74,6 +82,12 @@ namespace Kerbalua.Completion
 			return strs.ToList();
 		}
 
+		static public bool TryGetNestedType(Type t, string name, out Type type, BindingFlags flags = AllPublic)
+		{
+			type = t.GetNestedType(name, flags);
+			return type != null;
+		}
+
 		static public bool TryGetEvent(Type t, string name, out EventInfo eventInfo, BindingFlags flags = AllPublic)
 		{
 			eventInfo= t.GetEvent(name, flags);
@@ -118,6 +132,18 @@ namespace Kerbalua.Completion
 		public static bool TryGetNativeMember(Type type, CompletionOperations operations, out CompletionObject completionObject, BindingFlags flags)
 		{
 			var getMember = operations.Current as GetMemberOperation;
+			if (TryGetNestedType(type, getMember.Name, out Type nestedType, flags))
+			{
+				operations.MoveNext();
+				if (nestedType.IsEnum)
+				{
+					completionObject=new EnumCompletion(nestedType);
+					return true;
+				}
+				completionObject=new StaticCompletion(nestedType);
+				return true;
+			}
+
 			if (TryGetMethod(type, getMember.Name, out MethodInfo methodInfo, flags))
 			{
 				if (methodInfo.GetCustomAttribute<MoonSharpHiddenAttribute>()!=null)
