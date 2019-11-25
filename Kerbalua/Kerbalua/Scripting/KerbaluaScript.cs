@@ -20,6 +20,10 @@ namespace Kerbalua.Scripting
 	{
 		public Action<string> PrintErrorAction { get; set; }
 
+		private int execlimit = defaultExecLimit;
+		private const int defaultExecLimit=500;
+		private const int execLimitMin=100;
+		private const int execLimitMax=1000;
 		static KerbaluaScript _instance;
 		public static KerbaluaScript Instance
 		{
@@ -61,6 +65,19 @@ namespace Kerbalua.Scripting
 			Globals.Remove("coroutine");
 
 			commonAPI["sleep"] = new Action<double>(sleep);
+			commonAPI["setexeclimit"] = new Action<double>(setexeclimit);
+		}
+
+		public void setexeclimit(double counterlimit)
+		{
+			try
+			{
+				execlimit=(int)Math.Max(execLimitMin, Math.Min(execLimitMax, counterlimit));
+			}
+			catch (Exception e)
+			{
+				PrintErrorAction?.Invoke(e.Message);
+			}
 		}
 
 		[Description("Cause the script to sleep for waittimeSeconds seconds.")]
@@ -99,7 +116,7 @@ namespace Kerbalua.Scripting
 			}
 
 			Process.current = process;
-			coroutine.Coroutine.AutoYieldCounter = 500;
+			coroutine.Coroutine.AutoYieldCounter = execlimit;
 			result = coroutine.Coroutine.Resume();
 			Process.current = null;
 
