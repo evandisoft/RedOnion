@@ -35,6 +35,7 @@ Just had a release!
 - ROS redesign. Allowing pause and continue features (something similar to the way the Lua example code uses coroutine.yield())
 
 ### Kerbalua Changes
+- Removed Kerbalua specific global `import`. It is now available as the global `native` to be consistent with ROS.
 - Removed auto conversions from function to CLR Actions and CLR Funcs. Reason is that the execution system doesn't allow script code sent into the CLR to yield in the normal way. This affects attempts to use functions like CLR's `List.Foreach`. Using foreach on a large collection is not interruptible. Any calls to CLR code are not interruptible so they must finish quickly, and in general `List.Foreach` will not.
 
 [Old Versions (0.3.3 and older)](OldChangeLog.md)
