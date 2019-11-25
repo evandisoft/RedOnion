@@ -1,4 +1,5 @@
-﻿using Kerbalui.Controls;
+﻿using System.Text;
+using Kerbalui.Controls;
 using Kerbalui.Decorators;
 using Kerbalui.Util;
 using UnityEngine;
@@ -18,72 +19,100 @@ namespace LiveRepl.Parts
 			uiparts.FontChange+=editingArea.editableText.FontChangeEventHandler;
 		}
 
+		public StringBuilder outputBuffer=new StringBuilder();
+
 		public const int OUTPUT_LENGTH_LIMIT = 10000;
 
 		void CommonOutputProcessing()
 		{
 			ResetScroll();
-			needsResize=true;
+			if(outputBuffer.Length > OUTPUT_LENGTH_LIMIT)
+			{
+				editingArea.Text=outputBuffer.ToString();
+				outputBuffer.Clear();
+			}
+		}
+
+		protected void AppendString(string text)
+		{
+			outputBuffer.Append(text);
+			CommonOutputProcessing();
 		}
 
 		public void Clear()
 		{
 			editingArea.Text = "";
+			outputBuffer.Clear();
 			CommonOutputProcessing();
+			needsResize=true;
 		}
 
 		public void AddText(string str)
 		{
-			editingArea.Text += "\n" + str;
-			CommonOutputProcessing();
+			AppendString("\n" + str);
 		}
 
 		public void AddReturnValue(string str)
 		{
-			editingArea.Text += "\nr> " + str;
-			CommonOutputProcessing();
+			AppendString("\nr> " + str);
 		}
 
 		public void AddOutput(string str)
 		{
-			editingArea.Text += "\no> " + str;
-			CommonOutputProcessing();
+			AppendString("\no> " + str);
 		}
 
 		public void AddError(string str)
 		{
-			editingArea.Text += "\ne> " + str;
-			CommonOutputProcessing();
+			AppendString("\ne> " + str);
 		}
 
 		public void AddSourceString(string str)
 		{
-			editingArea.Text += "\ni> " + str;
-			CommonOutputProcessing();
+			AppendString("\ni> " + str);
 		}
 
 		public void AddFileContent(string str)
 		{
-			editingArea.Text += "\nf> " + str;
-			CommonOutputProcessing();
+			AppendString("\nf> " + str);
 		}
 
 		protected override void DecoratorUpdate()
 		{
 			InterceptMostInput();
 
-			bool hadKeyDownThisUpdate=Event.current.type==EventType.KeyDown;
+			//bool hadKeyDownThisUpdate=Event.current.type==EventType.KeyDown;
+			if (outputBuffer.Length>0)
+			{
+				if (outputBuffer.Length>OUTPUT_LENGTH_LIMIT)
+				{
+					editingArea.Text=outputBuffer.ToString();
+					outputBuffer.Clear();
+				}
+
+				int diff=editingArea.Text.Length+outputBuffer.Length-OUTPUT_LENGTH_LIMIT;
+				if (diff>=0 && diff<editingArea.Text.Length)
+				{
+					editingArea.Text=editingArea.Text.Substring(diff, editingArea.Text.Length-diff)+outputBuffer;
+				}
+				else
+				{
+					editingArea.Text=editingArea.Text+outputBuffer;
+				}
+				outputBuffer.Clear();
+				SetChildRect();
+			}
 
 			base.DecoratorUpdate();
 
-			if (hadKeyDownThisUpdate && Event.current.type==EventType.Used)
-			{
-				if (editingArea.Text.Length > OUTPUT_LENGTH_LIMIT)
-				{
-					editingArea.Text = editingArea.Text.Substring(editingArea.Text.Length - OUTPUT_LENGTH_LIMIT, OUTPUT_LENGTH_LIMIT);
-				}
-				needsResize=true;
-			}
+			//if (hadKeyDownThisUpdate && Event.current.type==EventType.Used)
+			//{
+			//	if (editingArea.Text.Length > OUTPUT_LENGTH_LIMIT)
+			//	{
+			//		editingArea.Text = editingArea.Text.Substring(editingArea.Text.Length - OUTPUT_LENGTH_LIMIT, OUTPUT_LENGTH_LIMIT);
+			//	}
+			//	needsResize=true;
+			//}
 		}
 
 		void InterceptMostInput()
