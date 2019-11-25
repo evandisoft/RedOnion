@@ -27,8 +27,6 @@ License: [MIT](https://github.com/evandisoft/RedOnion/blob/master/LICENSE)
 
 Github: [here](https://github.com/evandisoft/RedOnion)
 
-Docs: [here](https://evandisoft.github.io/RedOnion)
-
 **Warning: Do not use scripts from untrusted sources!**
 This is not a sandbox, any script has the power to do almost anything a modder could do in C#.
 We plan to eventually implement a switch to limit the power
@@ -42,14 +40,14 @@ but our goal now is to:
 
 ## Releases
 
-Your scripts are in GameData/RedOnion/Scripts. **I'm not sure whether CKAN deletes and replaces the entire RedOnion directory. Save your scripts somewhere else before updating to a new version, to be safe**. Then copy back in the ones you want to use. (If the example programs don't run, check out that section in [TroubleShooting](TroubleShooting.md))
+Your scripts are in GameData/RedOnion/Scripts. I believe that CKAN does not delete them when uninstalling the mod or updating it, but you might want to make a copy of the folder just in case. We provide example scripts in a zip file, which will appear in the list of scripts in-game but wont be in the Scripts folder. If the example programs don't run, check out that section in [TroubleShooting](TroubleShooting.md))
 
 Latest Release (0.4.0), available on:
 - [CKAN](https://github.com/KSP-CKAN/CKAN)
 - [Spacedock](https://spacedock.info/mod/2116/Red%20Onion)
-- [CurseForge](https://www.curseforge.com/kerbal/ksp-mods/redonion)
+- [CurseForge](https://www.curseforge.com/kerbal/ksp-mods/redonion) (May take a while to be approved)
 
-ChangeLog: [here](ChangeLog.md)
+ChangeLog: [here](ChangeLog.md#current)
 
 ## Documentation
 
@@ -77,4 +75,4 @@ All feedback is appreciated. Feedback can be left on our forum [thread](https://
 
 We welcome people of all skill levels to contribute or give feedback, ask questions, etc.
 
-Here is more information about [contributing](Contributing.md).
+Here is more information about [contributing](https://github.com/evandisoft/RedOnion/blob/gh-pages/Contributing.md).

@@ -42,17 +42,15 @@ sleep(Random.Range(0,10))
 
 Then it will select a random part index.
 ```
-local num=Random.Range(0,vessel.parts.Count)
+local num=Random.Range(0,ship.parts.count)
 ```
 
 Display which part will be exploding:
 ```
-print(vessel.parts[num].ToString().."is malfunctioning!")
+print(ship.parts[num].ToString().."is malfunctioning!")
 ```
 
 And finally call the part's explode functionality:
 ```
-vessel.parts[num].explode()
+ship.parts[num].explode()
 ```
-
-If you have any questions, problems, or requests for new functionality please feel free to make an issue on this repository, or respond in our [KSP forum thread](https://forum.kerbalspaceprogram.com/index.php?/topic/183050-wipalpha-release-020-redonion-unrestricted-in-game-scripting-with-repl-and-live-editing-with-intellisense-lua-and-a-custom-jsruby-like-language-implemented/)

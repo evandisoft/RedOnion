@@ -36,6 +36,9 @@ namespace RedOnion.Build
 					string matchString=match.ToString();
 					string firstPart=matchString.Substring(0,2);
 					string lastPart=matchString.Substring(2);
+
+					lastPart=Regex.Replace(lastPart, "/Readme\\.md", (str) => "",RegexOptions.IgnoreCase);
+
 					lastPart=Regex.Replace(lastPart, "\\.md", (str)=>"");
 					//Console.WriteLine(lastPart);
 					return firstPart+BaseURL+lastPart;
