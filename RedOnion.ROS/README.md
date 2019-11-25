@@ -1,35 +1,33 @@
 ﻿## Basics
 
-ROS (Red Onion Script) is based on
-[ECMAScript/JavaScript](https://www.ecma-international.org/publications/standards/Ecma-262.htm)
-/ [ActionScript](https://en.wikipedia.org/wiki/ActionScript)
-and inspired by
-[Ruby](https://www.ruby-lang.org/)
-/ [Python](https://www.python.org/)
-/ [Boo](http://boo-lang.org/).
+ROS (Red Onion Script) is inspired by C#,
+[Ruby](https://www.ruby-lang.org/),
+[Python](https://www.python.org/) and
+[ActionScript](https://en.wikipedia.org/wiki/ActionScript).
+The syntax is mostly Ruby/Python-like,
+most features and operators come from C#,
+some ideas were taken from ActionScript (and Pascal) and first design was based on JavaScript,
+but ROS is on its own path now.
 
 ```
-var wnd = new window
-function shutdown
-    wnd.dispose
+var wnd = new window "Hello"    // variable declaration
+wnd.close += wnd.dispose        // events
 
-var btn = wnd.add new button
+var btn = wnd.add new button    // parentheses are optional
 btn.text = "Click Me!"
 var lbl = wnd.add new label
 lbl.text = "Clicked 0x"
 
 var counter = 0
-btn.click += def
-  counter++
+btn.click += def                // lambda / inline function
+  counter++                     // shared outer scope
   lbl.text = "Clicked " + counter + "x"
 
-// def and function are the same
-function abs x
-  return x < 0 ? -x : x
-def sum x,y
+function abs x                  // custom functions
+  return x < 0 ? -x : x         // ternary operator
+def sum x,y                     // def and function work the same
   return x+y
-// lambda
-var sum3 = def a,b,c => a+b+c
+var sum3 = def a,b,c => a+b+c   // lambda shortcut (inline body)
 ```
 
 
@@ -299,7 +297,7 @@ is automatically included in the scope) can execute other scripts.
 * `run.replace path` - terminates current script and replaces it with the one referenced.
   This is good for big switch in logic (e.g. launch - circularize - gen. control).
 
-* `run.source string` - like `run path`, but parses the input string directly
+* `run.source string` - like `run path`, but parses the input string directly.
   This can be used to evaluate expressions or whole scripts created as text.
 * `run.library.source` and `run.replace.source` - like the respective *`run.xxx path`*
   but accepting text.

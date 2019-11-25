@@ -34,7 +34,7 @@ namespace RedOnion.ROS.Parsing
 		/// </summary>
 		/// <param name="state">Stored state of values from StartExpression()</param>
 		/// <returns>True if there was any expression</returns>
-		protected OpCode FinishExpression(ValuesState state)
+		protected OpCode FinishExpression(ValuesState state, bool type = false)
 		{
 			if (state.values >= values.size)
 			{
@@ -43,7 +43,7 @@ namespace RedOnion.ROS.Parsing
 				Write(OpCode.Void);
 				return OpCode.Void;
 			}
-			var op = Rewrite(values.size);
+			var op = Rewrite(values.size, type);
 			values.size = state.values;
 			stringValues.size = state.strings;
 			return op;
