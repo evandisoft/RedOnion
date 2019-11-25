@@ -19,7 +19,7 @@ namespace RedOnion.Build
 		public const string ChangelogFilename="ChangeLog.md";
 		public const string ReadmeForSpacedockFilename="ReadmeForSpacedock.md";
 		public const string ChangelogForSpacedockFilename="ChangelogForSpacedock.md";
-		public const string BaseURL="https://github.com/evandisoft/RedOnion/blob/master/";
+		public const string BaseURL="https://evandisoft.github.io/RedOnion/";
 
 		public static string GetAbsoluteLinksString(string readmeText,string absoluteBaseURL)
 		{
