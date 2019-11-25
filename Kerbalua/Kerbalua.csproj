@@ -110,6 +110,7 @@
     <Compile Include="Kerbalua\Events\LuaDescriptor.cs" />
     <Compile Include="Kerbalua\Events\LuaEventDescriptor.cs" />
     <Compile Include="Kerbalua\Events\LuaEventProxy.cs" />
+    <Compile Include="Kerbalua\Completion\CompletionTypes\EnumCompletion.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

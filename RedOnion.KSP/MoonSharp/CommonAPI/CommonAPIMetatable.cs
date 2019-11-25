@@ -35,9 +35,23 @@ namespace RedOnion.KSP.MoonSharp.CommonAPI
 
 		public bool TryGetCompletion(string completionName, out object completion)
 		{
-			completion=GetProperty(this, DynValue.NewString(completionName));
+			var dynValue=GetProperty(this, DynValue.NewString(completionName));
 
-			return completion!=null;
+			if (dynValue.IsNil())
+			{
+				PropertyInfo propertyInfo=propertyInfos[completionName];
+				if (propertyInfo==null)
+				{
+					completion=null;
+					return false;
+				}
+				Type propertyType=propertyInfo.PropertyType;
+				completion=new InstanceStatic(propertyType);
+				return true;
+			}
+
+			completion=dynValue.ToObject();
+			return true;
 		}
 
 		private DynValue GetProperty(Table table, DynValue key)
@@ -51,11 +65,6 @@ namespace RedOnion.KSP.MoonSharp.CommonAPI
 			var func=properties[str];
 			var value=func();
 
-			if (value.IsNil())
-			{
-				Type propertyType=propertyInfos[str].PropertyType;
-				return DynValue.FromObject(OwnerScript, new InstanceStatic(propertyType));
-			}
 			//func.GetMethodInfo().ReturnType
 			return value;
 		}

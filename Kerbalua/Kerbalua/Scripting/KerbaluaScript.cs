@@ -149,9 +149,15 @@ namespace Kerbalua.Scripting
 		public void Terminate()
 		{
 			coroutine = null;
-			process.shutdown -= Terminate;
-			process.terminate();
-			process = null;
+
+			// If SetCoroutine has an error, it is caught in MoonSharpReplEvaluator, which
+			// calls Terminate, and this means that process could, in that situation be null.
+			if (process!=null) 
+			{
+				process.shutdown -= Terminate;
+				process.terminate();
+				process = null;
+			}
 			sleepwatch.Reset();
 			sleeptimeMillis=0;
 		}
