@@ -1,6 +1,6 @@
 [![Dynawing-Malfunction.jpg](https://i.postimg.cc/5ygzNTdn/Dynawing-Malfunction.jpg)](https://postimg.cc/WqDz594k)
 
-**There is a bug in the current implementation of explode with the wrapper object ship.parts, but the script still somewhat works.**
+**There is a bug in the current implementation of explode with the wrapper object ship.parts, but the script still somewhat works. But I suppose it's ironic that there's a bug in this given the name of it. This bug also will effect selfDestruct.lua.**
 
 Here is an example Lua script that can be [executed](https://github.com/evandisoft/RedOnion/blob/master/TroubleShooting.md#how-do-i-run-a-script) while you are in flight mode (assuming you don't mind your ship exploding). 
 ```
