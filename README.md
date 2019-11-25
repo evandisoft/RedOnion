@@ -40,7 +40,7 @@ but our goal now is to:
 
 ## Releases
 
-Your scripts are in GameData/RedOnion/Scripts. **I'm not sure whether CKAN deletes and replaces the entire RedOnion directory. Save your scripts somewhere else before updating to a new version, to be safe**. Then copy back in the ones you want to use. (If the example programs don't run, check out that section in [TroubleShooting](TroubleShooting.md))
+Your scripts are in GameData/RedOnion/Scripts. I believe that CKAN does not delete them when uninstalling the mod or updating it, but you might want to make a copy of the folder just in case. We provide example scripts in a zip file, which will appear in the list of scripts in-game but wont be in the Scripts folder. If the example programs don't run, check out that section in [TroubleShooting](TroubleShooting.md))
 
 Latest Release (0.4.0), available on:
 - [CKAN](https://github.com/KSP-CKAN/CKAN)
