@@ -65,7 +65,7 @@ namespace Kerbalua.Scripting
 			Globals.Remove("coroutine");
 
 			commonAPI["sleep"] = new Action<double>(sleep);
-			commonAPI["setexeclimit"] = new Action<double>(setexeclimit);
+			//commonAPI["setexeclimit"] = new Action<double>(setexeclimit);
 		}
 
 		public void setexeclimit(double counterlimit)
