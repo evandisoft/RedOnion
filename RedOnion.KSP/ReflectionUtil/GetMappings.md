@@ -11,7 +11,7 @@ types therein.
 
 When the assemblyname has a space in it or another special character that would not work
 well with `assembly.assemblyname`, like `assembly.abc def`, you have to use
-`assembly\['abc def'\]` instead, since the interpreter sees `assembly.abc` and `def` as two
+`assembly['abc def']` instead, since the interpreter sees `assembly.abc` and `def` as two
 different tokens.
 
 
