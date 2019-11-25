@@ -45,7 +45,7 @@ Your scripts are in GameData/RedOnion/Scripts. **I'm not sure whether CKAN delet
 Latest Release (0.4.0), available on:
 - [CKAN](https://github.com/KSP-CKAN/CKAN)
 - [Spacedock](https://spacedock.info/mod/2116/Red%20Onion)
-- [CurseForge](https://www.curseforge.com/kerbal/ksp-mods/redonion)
+- [CurseForge](https://www.curseforge.com/kerbal/ksp-mods/redonion) (May take a while to be approved)
 
 ChangeLog: [here](https://evandisoft.github.io/RedOnion/ChangeLog)
 
@@ -75,4 +75,4 @@ All feedback is appreciated. Feedback can be left on our forum [thread](https://
 
 We welcome people of all skill levels to contribute or give feedback, ask questions, etc.
 
-Here is more information about [contributing](https://evandisoft.github.io/RedOnion/Contributing).
+Here is more information about [contributing](https://github.com/evandisoft/RedOnion/blob/gh-pages/Contributing.md).
