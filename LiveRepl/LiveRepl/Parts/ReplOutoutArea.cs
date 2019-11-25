@@ -23,7 +23,7 @@ namespace LiveRepl.Parts
 		void CommonOutputProcessing()
 		{
 			ResetScroll();
-			uiparts.scriptWindow.needsResize=true;
+			needsResize=true;
 		}
 
 		public void Clear()
