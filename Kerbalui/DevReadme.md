@@ -8,6 +8,10 @@ Kerbalui was designed specifically to provide functionality for use with LiveRep
 
 Part of the reason I have not tried to make it perfect is that [imgui](https://docs.unity3d.com/Manual/GUIScriptingGuide.html) is hard for me to work with.
 
+
+**All elements must be constructed within the execution of the MonoBehaviour OnGUI update**. The reason is that certain objects that need to be initialized, like style, make calls to `GUI.`, which must be called within the execution of OnGUI.
+
+
 ## Types
 All the following GUI classes are Elements.
 
@@ -15,7 +19,7 @@ All the following GUI classes are Elements.
 
 - Decorators represent an object which contains a control and acts as a proxy for it.
 
-- Groups contain multiple controls and execute all of their Update's in an imgui `GUI.BeginGroup`
+- Groups contain multiple controls and execute all of their Update's in an imgui `GUI.BeginGroup`...`GUI.EndGroup`
 
 - Windows represent a top-level window in the ui system. They contain a title and a content area, which can be a Control, Decorator, or Group.
 
@@ -40,3 +44,4 @@ There are some pitfalls of imgui. Some have been fixed with the new version of U
 One remaining one is that different sets of events are sent in Windows, as opposed to Linux (haven't tested on OSX).
 
 So I have a special system for dealing with these events which I won't describe for now, but is the purpose of the `ConsumeAndMarkNextCharEvent` and `ConsumeMarkedCharEvent` calls in `Kerbalui.Util.GUILibUtil.cs`
+
