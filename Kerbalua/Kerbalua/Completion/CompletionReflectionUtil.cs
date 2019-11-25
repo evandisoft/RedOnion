@@ -100,6 +100,21 @@ namespace Kerbalua.Completion
 			return fieldInfo != null;
 		}
 
+		static public bool TryGetArrayAccess(Type t, out Type outType, BindingFlags flags = AllPublic)
+		{
+			foreach(var methodInfo in t.GetMethods())
+			{
+				if (methodInfo.Name=="get_Item")
+				{
+					outType=methodInfo.ReturnType;
+					return true;
+				}
+			}
+
+			outType=null;
+			return false;
+		}
+
 		static public bool TryGetProperty(Type t, string name, out PropertyInfo propertyInfo, BindingFlags flags = AllPublic)
 		{
 			propertyInfo = t.GetProperty(name, flags);
