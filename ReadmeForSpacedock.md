@@ -27,8 +27,6 @@ License: [MIT](https://github.com/evandisoft/RedOnion/blob/master/LICENSE)
 
 Github: [here](https://github.com/evandisoft/RedOnion)
 
-Docs: [here](https://evandisoft.github.io/RedOnion)
-
 **Warning: Do not use scripts from untrusted sources!**
 This is not a sandbox, any script has the power to do almost anything a modder could do in C#.
 We plan to eventually implement a switch to limit the power
@@ -53,13 +51,13 @@ ChangeLog: [here](https://evandisoft.github.io/RedOnion/ChangeLog)
 
 ## Documentation
 
-- [Scripting](https://evandisoft.github.io/RedOnion/Scripting) - Documentation related to scripting.
+- [Scripting](https://evandisoft.github.io/RedOnion/ScriptingReadme) - Documentation related to scripting.
 
-- [LiveRepl](https://evandisoft.github.io/RedOnion/LiveRepl/) - The main user interface for the project. Where scripts can be loaded, written, and executed.
+- [LiveRepl](https://evandisoft.github.io/RedOnion/LiveRepl) - The main user interface for the project. Where scripts can be loaded, written, and executed.
 
 - [Troubleshooting](https://evandisoft.github.io/RedOnion/TroubleShooting) - Some possible issues and solutions.
 
-- [Development](https://evandisoft.github.io/RedOnion/Development) - Main page for development documentation (project structure, implementation explanations, etc).
+- [Development](https://evandisoft.github.io/RedOnion/DevelopmentReadme) - Main page for development documentation (project structure, implementation explanations, etc).
 
 ## Videos are listed [here](https://evandisoft.github.io/RedOnion/Videos)
 
