@@ -1,6 +1,4 @@
 # Planned Features
-<details><summary>Show/Hide</summary>
-
 - New user-centric system for managing scripts. Will be a file-selection dialog or the completion area will do this.
 - Editor/Repl reimplementation in new library. Hopefully allowing multiple editors/repls open at a time.
 - Ability to run multiple scripts at a time and a gui to manage them.
@@ -10,12 +8,8 @@
 - Provide editors that can be used for editing files in contexts unrelated to our scripting engines.
 - More UI library features.
 
-</details>
-
 # Next Release
-<details><summary>Show/Hide</summary>
 Just had a release!
-</details>
 
 # 0.4
 ## 0.4.0
@@ -43,8 +37,6 @@ Just had a release!
 - Removed auto conversions from function to CLR Actions and CLR Funcs. Reason is that the execution system doesn't allow script code sent into the CLR to yield in the normal way. This affects attempts to use functions like CLR's `List.Foreach`. Using foreach on a large collection is not interruptible. Any calls to CLR code are not interruptible so they must finish quickly, and in general `List.Foreach` will not.
 
 # 0.3 
-<details><summary>Show/Hide</summary>
-
 ## 0.3.3
 ROS implements assembly (as described in 0.3.1 changelog). Same caveats apply.
 
@@ -142,11 +134,8 @@ r> 1
 
 ### Better Lua intellisense
 Lua Intellisense now knows whether a reference is static or an instance variable, so it no longer lists all the instance members of a class in the context of a static class reference.
-</details>
 
-# 0.2:
-<details><summary>Show/Hide</summary>
-  
+# 0.2:  
 ## 0.2.1:
 - Misc Changes
 
@@ -174,5 +163,3 @@ Lua Intellisense now knows whether a reference is static or an instance variable
 ### Videos:
 - Demo of majorMalfunction.lua and selfDestruct.lua: https://www.youtube.com/watch?v=xzAghlB2NLw
 - ROS, Autopilot and UI using testFlightGui.ros: https://www.youtube.com/watch?v=CDBNb6jR_Cc 
-
-</details>
