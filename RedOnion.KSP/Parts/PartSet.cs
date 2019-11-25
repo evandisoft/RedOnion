@@ -176,7 +176,6 @@ namespace RedOnion.KSP.Parts
 			if (cache == null)
 				return;
 			GameEvents.onVesselWasModified.Remove(VesselModified);
-			GameEvents.onVesselPartCountChanged.Remove(VesselModified);
 			cache = null;
 			_ship = null;
 			protectedRoot = null;
@@ -204,13 +203,14 @@ namespace RedOnion.KSP.Parts
 			dockingports.Clear();
 			engines.Clear();
 			sensors.Clear();
+			list.Clear();
+			cache?.Clear();
 			Construct(_ship.native.rootPart, null, null);
 			base.DoRefresh();
 			decouplers.Dirty = false;
 			dockingports.Dirty = false;
 			engines.Dirty = false;
 			GameEvents.onVesselWasModified.Add(VesselModified);
-			GameEvents.onVesselPartCountChanged.Add(VesselModified);
 			RedOnion.ROS.Value.DebugLog("Ship Parts Refreshed (Parts: {0}, Engines: {1})", list.Count, engines.Count);
 		}
 		protected void Construct(Part part, PartBase parent, Decoupler decoupler)
