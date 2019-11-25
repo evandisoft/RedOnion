@@ -13,6 +13,13 @@ Just had a release!
 
 # Current
 # 0.4
+
+## 0.4.1
+- Fixed bug where outputting a lot of things quickly (with something like `while true do print(1) end` takes more and more memory and is very slow.
+- Fixed a bug where misformatted lua code would run anyway and just repeat an error message.
+- Intellisense works for enums.
+- Fixed a bug where completion on CommonAPI properties (like the globals `body`) wasn't working properly.
+
 ## 0.4.0
 ### General Changes:
 - Updated for KSP 1.8.1
