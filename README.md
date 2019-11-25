@@ -75,4 +75,4 @@ All feedback is appreciated. Feedback can be left on our forum [thread](https://
 
 We welcome people of all skill levels to contribute or give feedback, ask questions, etc.
 
-Here is more information about [contributing](https://evandisoft.github.io/RedOnion/Contributing).
+Here is more information about [contributing](https://github.com/evandisoft/RedOnion/blob/gh-pages/Contributing.md).
