@@ -69,7 +69,7 @@ ChangeLog: [here](ChangeLog.md)
 
 ## Feedback
 
-All feedback is appreciated. Feedback can be left on our forum [thread](https://forum.kerbalspaceprogram.com/index.php?/topic/183050-wip-redonion-020-unrestricted-in-game-scripting-has-repl-editor-and-intellisense-lua-and-a-custom-jsruby-like-language-implemented-tested-on-ksp-161/), as a new [issue](https://github.com/evandisoft/RedOnion/issues), or as a comment on any of our [videos](Videos.md).
+All feedback is appreciated. Feedback can be left on our forum [thread](https://forum.kerbalspaceprogram.com/index.php?/topic/189983-18x-redonion-unrestricted-in-game-scripting-v-040/), as a new [issue](https://github.com/evandisoft/RedOnion/issues), or as a comment on any of our [videos](Videos.md).
 
 ## Contributing
 
