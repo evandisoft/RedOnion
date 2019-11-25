@@ -23,9 +23,11 @@ vessels, anything, with own script.
 1. Provide powerful API for modmakers/Users
 1. Help document the KSP API for modmakers.
 
-License: [MIT](LICENSE)
+License: [MIT](https://github.com/evandisoft/RedOnion/blob/master/LICENSE)
 
 Github: [here](https://github.com/evandisoft/RedOnion)
+
+Docs: [here](https://evandisoft.github.io/RedOnion)
 
 **Warning: Do not use scripts from untrusted sources!**
 This is not a sandbox, any script has the power to do almost anything a modder could do in C#.

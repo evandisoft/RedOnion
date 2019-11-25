@@ -13,7 +13,7 @@ namespace RedOnion.Build
 	/// is associated with the new version.
 	/// So links in older versions being outdated is irrelevant because they should not be copied in anymore.
 	/// </summary>
-	public static class AbsoluteLinks
+	public static class GithubIOLinks
 	{
 		public const string ReadmeFilename="README.md";
 		public const string ChangelogFilename="ChangeLog.md";
@@ -23,7 +23,7 @@ namespace RedOnion.Build
 
 		public static string GetAbsoluteLinksString(string readmeText,string absoluteBaseURL)
 		{
-			return Regex.Replace(readmeText, "\\]\\(", (match) =>
+			return Regex.Replace(readmeText, "\\]\\(.*\\)?", (match) =>
 			{
 				try
 				{
@@ -32,7 +32,15 @@ namespace RedOnion.Build
 						return match.ToString();
 					}
 
-					return match+BaseURL;
+					//Console.WriteLine(match);
+					string matchString=match.ToString();
+					string firstPart=matchString.Substring(0,2);
+					string lastPart=matchString.Substring(2);
+					lastPart=Regex.Replace(lastPart, "\\.md", (str)=>"");
+					//Console.WriteLine(lastPart);
+					return firstPart+BaseURL+lastPart;
+
+					//return match.ToString();
 				}
 				catch(Exception)
 				{
