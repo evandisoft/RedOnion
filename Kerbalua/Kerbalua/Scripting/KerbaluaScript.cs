@@ -21,9 +21,9 @@ namespace Kerbalua.Scripting
 		public Action<string> PrintErrorAction { get; set; }
 
 		private int execlimit = defaultExecLimit;
-		private const int defaultExecLimit=500;
+		private const int defaultExecLimit=1000;
 		private const int execLimitMin=100;
-		private const int execLimitMax=1000;
+		private const int execLimitMax=5000;
 		static KerbaluaScript _instance;
 		public static KerbaluaScript Instance
 		{
