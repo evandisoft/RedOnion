@@ -89,12 +89,6 @@
     <Reference Include="KerbaluaMoonSharp">
       <HintPath>..\OtherDLLs\KerbaluaMoonSharp\KerbaluaMoonSharp.dll</HintPath>
     </Reference>
-    <Reference Include="KeraLua">
-      <HintPath>..\packages\KeraLua.1.0.22\lib\net45\KeraLua.dll</HintPath>
-    </Reference>
-    <Reference Include="NLua">
-      <HintPath>..\packages\NLua.1.4.25\lib\net45\NLua.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -159,10 +153,6 @@
       <Project>{7A943166-A67E-420A-BCA0-5231D57A18BD}</Project>
       <Name>Kerbalui</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Kerbnlua\Kerbnlua.csproj">
-      <Project>{7E1B33D1-400D-42E5-9719-A0FCBB333898}</Project>
-      <Name>Kerbnlua</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="LiveRepl\" />
@@ -171,9 +161,6 @@
     <Folder Include="LiveRepl\Completion\" />
     <Folder Include="LiveRepl\Decorators\" />
     <Folder Include="LiveRepl\Execution\" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Target Name="AfterBuild">
@@ -193,5 +180,4 @@
       </Properties>
     </MonoDevelop>
   </ProjectExtensions>
-  <Import Project="..\packages\KeraLua.1.0.22\build\net45\KeraLua.targets" Condition="Exists('..\packages\KeraLua.1.0.22\build\net45\KeraLua.targets')" />
 </Project>

@@ -8,10 +8,16 @@ namespace Kerbnlua
 	{
 		public Lua state = new Lua();
 		public KeraLua.Lua runningThread;
+		public Action<string> PrintAction;
+		public Action<string> PrintErrorAction;
 
 		public KerbnluaScript()
 		{
 			state.LoadCLRPackage();
+			state["print"]=new Action<object>((obj) => PrintAction?.Invoke(obj.ToString()));
+			state["os"]=null;
+			state["debug"]=null;
+			state["io"]=null;
 		}
 
 		private void AutoyieldHook(IntPtr luaState, IntPtr ar)
@@ -24,7 +30,7 @@ namespace Kerbnlua
 			}
 		}
 
-		public KeraLua.LuaStatus Evaluate(out object[] retvals)
+		public bool Evaluate(out string result)
 		{
 			//Debug.Log("top is "+state.State.GetTop());
 			//int prevtop = state.State.GetTop();
@@ -41,14 +47,36 @@ namespace Kerbnlua
 			var nretvals=runningThread.GetTop();
 			runningThread.XMove(state.State, nretvals);
 
-			retvals = new object[nretvals];
+			var retvals = new object[nretvals];
 			for (int i = 0; i < retvals.Length; i++)
 			{
 				retvals[retvals.Length-i-1] = state.Pop();
 			}
 			//Console.WriteLine(kstate)
+
+			result="";
+			foreach (var retval in retvals)
+			{
+				result+=", "+retval;
+			}
+			if (result!="")
+			{
+				result=result.Substring(2);
+			}
+
 			//kstate.Type
-			return status;
+			if (status==KeraLua.LuaStatus.OK)
+			{
+				return true;
+			}
+			if (status!=KeraLua.LuaStatus.Yield)
+			{
+				PrintErrorAction?.Invoke(result);
+				result="";
+				return true;
+			}
+
+			return false;
 		}
 		public void SetSource(string source)
 		{
