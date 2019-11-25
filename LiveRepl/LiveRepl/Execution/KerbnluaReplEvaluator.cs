@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using Kerbalua.Scripting;
+using Kerbnlua;
 using LiveRepl.Execution;
 
-namespace Kerbnlua
+namespace LiveRepl.Execution
 {
 	public class KerbnluaReplEvaluator:ReplEvaluator
 	{

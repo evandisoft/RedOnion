@@ -90,13 +90,13 @@ namespace LiveRepl
 				PrintAction = uiparts.replOutoutArea.AddOutput,
 				PrintErrorAction = uiparts.replOutoutArea.AddError
 			};
-//#if DEBUG
-//			replEvaluators["nLua"] = new KerbnluaReplEvaluator()
-//			{
-//				PrintAction = uiparts.replOutoutArea.AddOutput,
-//				PrintErrorAction = uiparts.replOutoutArea.AddError
-//			};
-//#endif
+#if DEBUG
+			replEvaluators["nLua"] = new KerbnluaReplEvaluator()
+			{
+				PrintAction = uiparts.replOutoutArea.AddOutput,
+				PrintErrorAction = uiparts.replOutoutArea.AddError
+			};
+#endif
 			var scriptEngineSelector=uiparts.scriptEngineSelector;
 
 			string lastEngineName = SavedSettings.LoadSetting("lastEngine", "Lua");
