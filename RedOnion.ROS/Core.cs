@@ -24,10 +24,12 @@ namespace RedOnion.ROS
 		protected Context ctx;
 		protected Value self; // `this` for current code
 		protected Value result;
+		protected Value error;
 		protected struct SavedContext
 		{
 			public Context context;
 			public Value prevSelf;
+			public Value prevError;
 			public CompiledCode code;
 			public int at, vtop;
 			public bool create;
@@ -73,6 +75,7 @@ namespace RedOnion.ROS
 			self = Value.Null;
 			Exit = ExitCode.None;
 			result = Value.Void;
+			error = Value.Void;
 			compiled = value;
 			if (ctx == null || reset)
 				ctx = new Context();
@@ -164,6 +167,7 @@ namespace RedOnion.ROS
 				}
 			}
 			result = Value.Void;
+			error = Value.Void;
 			return Execute(countdown);
 		}
 
@@ -299,6 +303,7 @@ namespace RedOnion.ROS
 				ref var ret = ref stack.Add();
 				ret.context = ctx;
 				ret.prevSelf = this.self;
+				ret.prevError = error;
 				ret.code = compiled;
 				ret.at = at;
 				ret.vtop = vals.Size - argc;
@@ -330,6 +335,7 @@ namespace RedOnion.ROS
 					else ctx.Add(fn.ArgumentName(i), Value.Null);
 				}
 				result = Value.Void;
+				error = Value.Void;
 				return;
 			}
 #if DEBUG
@@ -358,7 +364,8 @@ namespace RedOnion.ROS
 		{
 			ref var ret = ref stack.Add();
 			ret.context = ctx;
-			ret.prevSelf = this.self;
+			ret.prevSelf = self;
+			ret.prevError = error;
 			ret.code = compiled;
 			ret.at = at;
 			ret.vtop = vals.Size - 1;
@@ -377,6 +384,7 @@ namespace RedOnion.ROS
 			}
 			else ctx = new Context() { RootEnd = code.Length };
 			result = Value.Void;
+			error = Value.Void;
 			vals.GetRef(2, 0) = Value.Void;
 		}
 

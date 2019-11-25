@@ -36,5 +36,21 @@ namespace RedOnion.ROS.Tests
 				"finally",
 				"  return ok");
 		}
+
+		[Test]
+		public void ROS_Catch02_Throw()
+		{
+			Lines(ExitCode.Exception, "thrown",
+				"throw \"thrown\"");
+			/* TBD
+			Lines(ExitCode.Exception, "catch",
+				"try",
+				"  throw \"catch\"",
+				"  return false",
+				"finally",
+				"  return true", // must not override active exception
+				"return false");
+			*/
+		}
 	}
 }
