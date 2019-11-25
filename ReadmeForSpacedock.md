@@ -7,9 +7,9 @@ unrestricted scripted environment inside Kerbal Space Program
 for all players and even modders wishing to control the game,
 vessels, anything, with own script.
 
-## Features:
+## Current Features:
 1. Repl/Editor with intellisense.
-1. Scripting engines that can interact with any loaded CLR object
+1. Scripting engines that can interact with Classes from any loaded CLR assembly. 
 1. Lua scripting language called Kerbalua built on MoonSharp.
 1. Powerful custom language/engine (RedOnionScript) built by Lukáš Fireš.
 1. API's for doing things more easily or more safely, including Autopilot API, UI api, and more.
@@ -25,7 +25,7 @@ vessels, anything, with own script.
 
 License: [MIT](https://evandisoft.github.io/RedOnion/LICENSE)
 
-Github: [here](https://evandisoft.github.io/RedOnion/README.md)
+Github: [here](https://github.com/evandisoft/RedOnion)
 
 **Warning: Do not use scripts from untrusted sources!**
 This is not a sandbox, any script has the power to do almost anything a modder could do in C#.
@@ -69,7 +69,7 @@ ChangeLog: [here](https://evandisoft.github.io/RedOnion/ChangeLog.md)
 
 ## Feedback
 
-All feedback is appreciated. Feedback can be left on our forum [thread](https://forum.kerbalspaceprogram.com/index.php?/topic/183050-wip-redonion-020-unrestricted-in-game-scripting-has-repl-editor-and-intellisense-lua-and-a-custom-jsruby-like-language-implemented-tested-on-ksp-161/), as a new [issue](https://github.com/evandisoft/RedOnion/issues), or as a comment on any of our [videos](https://evandisoft.github.io/RedOnion/Videos.md).
+All feedback is appreciated. Feedback can be left on our forum [thread](https://forum.kerbalspaceprogram.com/index.php?/topic/189983-18x-redonion-unrestricted-in-game-scripting-v-040/), as a new [issue](https://github.com/evandisoft/RedOnion/issues), or as a comment on any of our [videos](https://evandisoft.github.io/RedOnion/Videos.md).
 
 ## Contributing
 
