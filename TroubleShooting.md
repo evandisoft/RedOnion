@@ -1,3 +1,5 @@
+Here are some things that might not work. You can also check our [issues](https://github.com/evandisoft/RedOnion/issues) page on github.
+
 ## Script Won't work:
 Make sure that if you are trying to execute Lua code, the Lua engine is selected. Click the "Lua" button to select that engine.
 If you are trying to execute ROS code, ensure RedOnionScript engine is selected. Click the "ROS" button to select that engine.
