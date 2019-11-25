@@ -11,7 +11,7 @@
 # Next Release
 Just had a release!
 
-# 0.4
+# Current: 0.4
 ## 0.4.0
 ### General Changes:
 - Updated for KSP 1.8.1
