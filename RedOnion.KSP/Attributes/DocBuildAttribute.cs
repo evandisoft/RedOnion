@@ -1,16 +1,18 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RedOnion.KSP.Utilities
+namespace RedOnion.KSP.Attributes
 {
 	/// <summary>
 	/// Markers for documentation builder.
 	/// </summary>
 	[AttributeUsage(
-		AttributeTargets.Class|AttributeTargets.Struct,
+		AttributeTargets.Class|AttributeTargets.Struct|
+		AttributeTargets.Enum|AttributeTargets.Delegate,
 		AllowMultiple = false, Inherited = false)]
 	public class DocBuildAttribute : Attribute
 	{
@@ -33,5 +35,22 @@ namespace RedOnion.KSP.Utilities
 		public DocBuildAttribute() { }
 		public DocBuildAttribute(string path) => Path = path;
 		public DocBuildAttribute(params Type[] registerTypes) => RegisterTypes = registerTypes;
+	}
+
+	/// <summary>
+	/// Ordering marker for documentation builder.
+	/// Automatically provides line number if index not specified.
+	/// </summary>
+	[AttributeUsage(
+		AttributeTargets.Field|AttributeTargets.Event|
+		AttributeTargets.Property|AttributeTargets.Method,
+		AllowMultiple = false, Inherited = false)]
+	public class DocIndexAttribute : Attribute
+	{
+		public int Index { get; set; }
+
+		public DocIndexAttribute(int index) => Index = index;
+		public DocIndexAttribute(int baseIndex = 1000, [CallerLineNumber] int index = 0)
+			=> Index = baseIndex + index;
 	}
 }

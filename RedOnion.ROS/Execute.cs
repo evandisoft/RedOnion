@@ -136,6 +136,14 @@ namespace RedOnion.ROS
 							stack.Pop();
 							continue;
 						}
+						case OpCode.Catch:
+							at = ctx.BlockAt1;
+							if (at == ctx.BlockAt2)
+								goto default;
+							ctx.BlockCode = OpCode.Block;
+							ctx.BlockStart = at;
+							blockEnd = ctx.BlockEnd = ctx.BlockAt2;
+							continue;
 						}
 					}
 					if (countdown <= 0)
@@ -617,8 +625,6 @@ namespace RedOnion.ROS
 
 					#region Simple statements (return, break, continue)
 
-					case OpCode.Raise:
-					//TODO: try..catch..finally
 					case OpCode.Return:
 						if (stack.size > 0)
 						{
@@ -653,7 +659,7 @@ namespace RedOnion.ROS
 							stack.Pop();
 							continue;
 						}
-						Exit = op == OpCode.Return ? ExitCode.Return : ExitCode.Exception;
+						Exit = ExitCode.Return;
 						goto finish;
 
 					case OpCode.Break:
@@ -824,6 +830,59 @@ namespace RedOnion.ROS
 						at = ctx.BlockStart;
 						continue;
 					}
+					#endregion
+
+					#region Exceptions (throw/raise, try, catch, finally)
+
+					case OpCode.Raise:
+						if (stack.size > 0)
+						{
+							ref var top = ref stack.Top();
+							var vtop = top.vtop;
+							ref var result = ref vals.GetRef(vals.Count, vtop - 1);
+							if (top.create)
+								result = self;
+							else
+							{
+								result = vals.Top();
+								if (result.IsReference && !result.desc.Get(ref result, result.num.Int))
+									throw CouldNotGet(ref result);
+							}
+							this.at = at = top.at;
+							compiled = top.code;
+							this.code = code = compiled.Code;
+							this.str = str = compiled.Strings;
+							self = top.prevSelf;
+							if (ctx != top.context)
+							{
+								vals.Pop(vals.Count - top.vtop);
+								ctx.PopAll();
+								ctx = top.context;
+							}
+							else
+							{
+								ctx.BlockCode = top.blockCode;
+								ctx.BlockEnd = top.blockEnd;
+							}
+							blockEnd = ctx.BlockEnd;
+							stack.Pop();
+							continue;
+						}
+						Exit = ExitCode.Exception;
+						goto finish;
+
+					case OpCode.Catch:
+					{
+						int trysz = Int(code, at); at += 4;
+						int errsz = Int(code, at); at += 4;
+						int finsz = Int(code, at); at += 4;
+						ctx.Push(at, blockEnd = at + trysz,
+							OpCode.Catch,
+							at + trysz + errsz,
+							at + trysz + errsz + finsz);
+						continue;
+					}
+
 					#endregion
 
 					#region Various statements (pop, yield)
