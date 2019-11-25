@@ -99,7 +99,7 @@ namespace Kerbalua.Scripting
 			}
 
 			Process.current = process;
-			coroutine.Coroutine.AutoYieldCounter = 1000;
+			coroutine.Coroutine.AutoYieldCounter = 500;
 			result = coroutine.Coroutine.Resume();
 			Process.current = null;
 
