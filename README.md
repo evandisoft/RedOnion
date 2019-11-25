@@ -47,7 +47,7 @@ Latest Release (0.4.0), available on:
 - [Spacedock](https://spacedock.info/mod/2116/Red%20Onion)
 - [CurseForge](https://www.curseforge.com/kerbal/ksp-mods/redonion) (May take a while to be approved)
 
-ChangeLog: [here](ChangeLog.md)
+ChangeLog: [here](ChangeLog.md#current)
 
 ## Documentation
 
