@@ -27,8 +27,6 @@ License: [MIT](https://github.com/evandisoft/RedOnion/blob/master/LICENSE)
 
 Github: [here](https://github.com/evandisoft/RedOnion)
 
-Docs: [here](https://evandisoft.github.io/RedOnion)
-
 **Warning: Do not use scripts from untrusted sources!**
 This is not a sandbox, any script has the power to do almost anything a modder could do in C#.
 We plan to eventually implement a switch to limit the power

@@ -160,7 +160,7 @@ Lua Intellisense now knows whether a reference is static or an instance variable
 
 ### Documentation:
 - Added [CommonScriptApi.md](https://github.com/evandisoft/RedOnion/blob/master/CommonScriptApi.md): Documents some of the API for interacting with the game that is available to both Lua and ROS.
-- Updated [README.md](https://evandisoft.github.io/RedOnion/README)
+- Updated [README.md](https://evandisoft.github.io/RedOnion/)
 - Updated Docs for [ROS](https://github.com/evandisoft/RedOnion/blob/master/RedOnion.Script/README.md) and [UI lib](RedOnion.UI/README.md)
 
 ### Lua:
