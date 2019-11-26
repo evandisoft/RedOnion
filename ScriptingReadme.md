@@ -21,7 +21,7 @@ and saving the modified version (which will become a file outside of the zip).
 
 ## Scripting Links
 
-[Common API](RedOnion.KSP/API/Globals.md) - An API of useful functionality that is consistent between Lua and ROS. Entries marked with \[Unsafe\] lead to objects from KSP, Unity, or just general CLR objects that one should be careful with. Some objects in this API, like ship, have been created to act as safe versions of native objects. In this case, ship is a safe version of KSP's Vessel. The corresponding native Vessel object can be accessed using ship's `native` field.
+[Common API](RedOnion.KSP/API/Globals.md) - An API of useful functionality that is consistent between Lua and ROS. Entries marked with \[Unsafe\] lead to objects from KSP, Unity, or just general CLR objects that one should be careful with. Some objects in this API, like the global [ship](RedOnion.KSP/API/Ship.md), have been created to act as safe versions of native objects. In this case, ship is a safe version of KSP's [Vessel](https://kerbalspaceprogram.com/api/class_vessel.html). The corresponding native Vessel object can be accessed using ship's `native` field.
 
 [Red Onion Script (ROS)](RedOnion.ROS/README.md) - A powerful in-game scripting engine taking inspiration from several popular languages (Ruby,Python,Javascript,etc)
 
