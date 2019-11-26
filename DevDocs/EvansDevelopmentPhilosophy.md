@@ -24,9 +24,9 @@ So some things I write will be done in ways that were easy to initially write in
 
 I may, for example, write some small redundant code that could be hypothetically replaced by a loop, but where I consider at the time that writing it in the loop version requires way more effort than it is worth.
 
-To some extent I agree with [You aren't going to need it](https://www.martinfowler.com/bliki/Yagni.html).
+To some extent it is like [You aren't going to need it](https://www.martinfowler.com/bliki/Yagni.html).
 
-But I think that you should not go to one extreme or another but should try to figure out when it is a good time to restructure things for future maintainability, or when it is a good time to write something quickly.
+I think that you should not go to one extreme or another but should try to figure out when it is a good time to restructure things for future maintainability, or when it is a good time to write something quickly.
 
 A lot of stuff in in this project was produced initially as a prototype, then later improved to something more maintainable WHEN these two criteria were met:
 

@@ -32,4 +32,4 @@ Anyway, back to the code. All the code does is fall back to native functionality
 
 All the code works the same as in the non-native [example](MajorMalfunction.md), just using the native "parts", (List\<Part\>), and native Part instead of the safe versions.
 
-If an object in the api exposes a "native" field, you can return that native value and see which type it is (the repl will show you), and then you can look up that type in the [KSP API](https://kerbalspaceprogram.com/api/index.html) by typing the classname in the little search box on the right.
+If an object in the api exposes a "native" field, you can return that native value and see which type it is (the repl will show you), and then you can look up that type (in this case, `Vessel`) in the [KSP API](https://kerbalspaceprogram.com/api/index.html) by typing the classname in the little search box on the right.
