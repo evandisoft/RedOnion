@@ -1,7 +1,7 @@
 ## Development Philosophy:
 The two orignal developers on this project, Evan and Firda (Lukáš Fireš), have different approaches to development.
 
-Generally we are responsible for different subprojects. For example, Firda is responsible for most of the "RedOnion.X" projects. The exception is "RedOnion.KSP", which is our subproject for things that bring all our subprojects together.
+Generally we are responsible for different sub-projects. For example, Firda is responsible for most of the "RedOnion.X" projects. The exception is "RedOnion.KSP", which is our sub-project for things that bring our scripting language sub-projects together.
 
 Some of my (Evan) code may appear a bit sloppy at times. Here is why I do [this](DevDocs/EvansDevelopmentPhilosophy.md).
 
@@ -9,7 +9,7 @@ We are not extremely picky about multiple approaches coexisting in the same over
 
 ## Project Structure
 
-The **RedOnion** project is divided into multiple projects:
+The **RedOnion** project is divided into multiple sub-projects:
 - [Kerbalua](Kerbalua/Development.md) - A MoonSharp-based [Lua scripting engine](Kerbalua/README.md).
 - **KerbaluaNUnit** - Tests for the **Kerbalua** project.
 - [Kerbalui](Kerbalui/DevReadme.md) - An [imgui](https://docs.unity3d.com/2019.3/Documentation/Manual/GUIScriptingGuide.html)-based ui lib used to create **LiveRepl**
@@ -21,7 +21,7 @@ The **RedOnion** project is divided into multiple projects:
 - **RedOnion.ROS** - The Red Onion Script custom language.
 - **RedOnion.ROS.Tests** - Tests for **RedOnion.ROS**
 - **RedOnion.Shell** - A shell where RedOnionScript can be ran independently of KSP.
-- **RedOnion.UI** - A ui lib that uses [Unity UI](https://docs.unity3d.com/2019.3/Documentation/Manual/UISystem.html). Intended to be used in scripting.
+- **RedOnion.UI** - A ui lib that uses [Unity UI](https://docs.unity3d.com/2019.3/Documentation/Manual/UISystem.html). Can be used in scripting.
 
 ## Project Reference Structure
 Since C# doesn't allow cyclic dependencies, this structure is important.

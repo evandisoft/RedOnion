@@ -47,7 +47,7 @@ Your scripts are in GameData/RedOnion/Scripts. I believe that CKAN does not dele
 Latest Release: (0.4.1). Releases are available at:
 - [CKAN](https://github.com/KSP-CKAN/CKAN)
 - [Spacedock](https://spacedock.info/mod/2116/Red%20Onion)
-- [CurseForge](https://www.curseforge.com/kerbal/ksp-mods/redonion) 
+- [CurseForge](https://www.curseforge.com/kerbal/ksp-mods/redonion) ([Note about Twitch Client Install](TwitchClientInstallsNote.md))
 
 ChangeLog: [here](ChangeLog.md#current)
 
