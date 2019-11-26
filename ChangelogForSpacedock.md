@@ -15,14 +15,14 @@ Just had a release!
 # 0.4
 
 ## 0.4.2
-0.4.2
 - Bug in ship.parts relating to explode functionality fixed.
 - [Tutorial](https://evandisoft.github.io/RedOnion/Kerbalua/MajorMalfunctionNative) of how to fallback to native functionality.
 - [Tutorial](https://evandisoft.github.io/RedOnion/Kerbalua/SelfDestruct) for selfDestruct.lua (include a link)
-- [Tutorial](https://evandisoft.github.io/RedOnion/Kerbalua/UIBasics) for using the ui in Lua code(uibasics.lua)
+- [Tutorial](https://evandisoft.github.io/RedOnion/Kerbalua/UIBasics) for using the ui in Lua code (uibasics.lua)
 - More docs.
-- Fixed problem with new(ui.Button,"buttontext",function() end) where the `new` function  wasn't properly converting the lua function to the Action\<Button\> that the ui.Button constructor needs.
+- Fixed a problem with `new(ui.Button,"buttontext",function() end)` where the `new` function  wasn't properly converting a lua function to the Action\<Button\> that the ui.Button constructor requires.
 - Removed randomPartDestruct.ros as its code was outdated.
+- Fixed bug with autoloading the last scriptname.
 
 ## 0.4.1
 - Fixed bug where outputting a lot of things quickly (with something like `while true do print(1) end` takes more and more memory and is very slow.

@@ -23,7 +23,7 @@ namespace RedOnion.Build
 
 		public static string GetAbsoluteLinksString(string readmeText,string absoluteBaseURL)
 		{
-			return Regex.Replace(readmeText, "\\]\\(.*\\)?", (match) =>
+			return Regex.Replace(readmeText, "\\]\\(.*?\\)", (match) =>
 			{
 				try
 				{

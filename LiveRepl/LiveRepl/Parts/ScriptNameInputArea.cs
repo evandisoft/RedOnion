@@ -32,14 +32,14 @@ namespace LiveRepl.Parts {
 			this.uiparts=uiparts;
 
 			Text = SavedSettings.LoadSetting("lastScriptName",DefaultScriptFilename);
-			if (!File.Exists(Path.Combine(SavedSettings.BaseScriptsPath, Text))) {
-				IList<string> recentFiles = SavedSettings.LoadListSetting("recentFiles");
-				if (recentFiles.Count > 0) {
-					Text = recentFiles[0];
-				} else {
-					Text = DefaultScriptFilename;
-				}
-			};
+			//if (!File.Exists(Path.Combine(SavedSettings.BaseScriptsPath, Text))) {
+			//	IList<string> recentFiles = SavedSettings.LoadListSetting("recentFiles");
+			//	if (recentFiles.Count > 0) {
+			//		Text = recentFiles[0];
+			//	} else {
+			//		Text = DefaultScriptFilename;
+			//	}
+			//};
 
 			keybindings.Clear();
 

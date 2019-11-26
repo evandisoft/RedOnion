@@ -48,7 +48,7 @@ but our goal now is to:
 Latest Releases are available at:
 - [CKAN](https://github.com/KSP-CKAN/CKAN)
 - [Spacedock](https://spacedock.info/mod/2116/Red%20Onion)
-- [CurseForge](https://www.curseforge.com/kerbal/ksp-mods/redonion) ([Note about using Twitch Client "Install" button](TwitchClientInstallsNote.md))
+- [CurseForge](https://www.curseforge.com/kerbal/ksp-mods/redonion) [Note about using Twitch Client "Install" button](TwitchClientInstallsNote.md)
 
 ChangeLog: [here](ChangeLog.md#current)
 

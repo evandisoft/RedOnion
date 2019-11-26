@@ -48,7 +48,7 @@ but our goal now is to:
 Latest Releases are available at:
 - [CKAN](https://github.com/KSP-CKAN/CKAN)
 - [Spacedock](https://spacedock.info/mod/2116/Red%20Onion)
-- [CurseForge](https://www.curseforge.com/kerbal/ksp-mods/redonion) ([Note about using Twitch Client "Install" button](TwitchClientInstallsNote.md))
+- [CurseForge](https://www.curseforge.com/kerbal/ksp-mods/redonion) [Note about using Twitch Client "Install" button](https://evandisoft.github.io/RedOnion/TwitchClientInstallsNote)
 
 ChangeLog: [here](https://evandisoft.github.io/RedOnion/ChangeLog#current)
 
@@ -72,7 +72,7 @@ ChangeLog: [here](https://evandisoft.github.io/RedOnion/ChangeLog#current)
 
 ## Feedback
 
-All feedback is appreciated. Feedback can be left on our forum [thread](https://forum.kerbalspaceprogram.com/index.php?/topic/189983-18x-redonion-unrestricted-in-game-scripting-v-040/), as a new [issue](https://github.com/evandisoft/RedOnion/issues), or as a comment on any of our [videos](Videos.md).
+All feedback is appreciated. Feedback can be left on our forum [thread](https://forum.kerbalspaceprogram.com/index.php?/topic/189983-18x-redonion-unrestricted-in-game-scripting-v-040/), as a new [issue](https://github.com/evandisoft/RedOnion/issues), or as a comment on any of our [videos](https://evandisoft.github.io/RedOnion/Videos).
 
 ## Contributing
 
