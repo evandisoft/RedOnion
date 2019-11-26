@@ -39,4 +39,4 @@ It took me a while to switch to this type of programming, but it works much bett
 
 However, it may bug some people, so this is my defense of some of the code I have written that looks sloppy.
 
-This project would not have been feasible if was not comfortable with writing some sloppy code.
+This project would not have been feasible for me if was not comfortable with writing some sloppy code.
