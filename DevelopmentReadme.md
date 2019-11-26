@@ -13,7 +13,7 @@ The **RedOnion** project is divided into multiple projects:
 - [Kerbalua](Kerbalua/Development.md) - A MoonSharp-based [Lua scripting engine](Kerbalua/README.md).
 - **KerbaluaNUnit** - Tests for the **Kerbalua** project.
 - [Kerbalui](Kerbalui/DevReadme.md) - An [imgui](https://docs.unity3d.com/2019.3/Documentation/Manual/GUIScriptingGuide.html)-based ui lib used to create **LiveRepl**
-- [Kerbnlua](Kerbnlua/Kerbnlua/KerbnluaDevNotes.md) - An experimental Lua scripting engine based on [NLua](https://github.com/NLua). Only active in DEBUG builds.
+- [Kerbnlua](Kerbnlua/Kerbnlua/KerbnluaDevNotes.md) - An experimental Lua scripting engine based on [NLua](https://github.com/NLua). I'm developing this in a different branch, `nlua-experiments`. It is disabled in the main development branches.
 - [LiveRepl](LiveRepl/DevReadme.md) - The main GUI.
 - **RedOnion.Build** - The project that builds releases and documentation.
 - **RedOnion.KSP** - Contains features used by both **ROS** and **Kerbalua**, including the [Common API](RedOnion.KSP/API/Globals.md)
