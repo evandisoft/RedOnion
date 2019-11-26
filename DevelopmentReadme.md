@@ -3,7 +3,7 @@ The two orignal developers on this project, Evan and Firda (Lukáš Fireš), hav
 
 Generally we are responsible for different subprojects. For example, Firda is responsible for most of the "RedOnion.X" projects. The exception is "RedOnion.KSP", which is our subproject for things that bring all our subprojects together.
 
-We approach development in different ways. Some of my (Evan) code may appear a bit sloppy at times. Here is why I do [this](DevDocs/EvansDevelopmentPhilosophy.md).
+Some of my (Evan) code may appear a bit sloppy at times. Here is why I do [this](DevDocs/EvansDevelopmentPhilosophy.md).
 
 We are not extremely picky about multiple approaches coexisting in the same overall project.
 
