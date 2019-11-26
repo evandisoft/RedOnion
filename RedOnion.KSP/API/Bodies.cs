@@ -18,7 +18,13 @@ namespace RedOnion.KSP.API
 	{
 		Vector position { get; }
 		ISpaceObject body { get; }
-	} 
+	}
+	[Description(@"
+A collection of space/celestial bodies.
+Acess them by `bodies.bodyname`. 
+For example bodies.mun will return a reference to the mun.
+"
+		)]
 	public class Bodies : Properties<SpaceBody>.WithMap<CelestialBody>, ICompletable
 	{
 		public static Bodies Instance { get; } = new Bodies();
