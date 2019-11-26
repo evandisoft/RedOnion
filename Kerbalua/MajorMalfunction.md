@@ -1,6 +1,6 @@
 [![Dynawing-Malfunction.jpg](https://i.postimg.cc/5ygzNTdn/Dynawing-Malfunction.jpg)](https://postimg.cc/WqDz594k)
 
-**There is a bug in the current implementation of explode with the wrapper object ship.parts, but the script still somewhat works. But I suppose it's ironic that there's a bug in this given the name of it. This bug also will effect selfDestruct.lua.**
+**There is a bug in the current implementation of explode that effects the wrapper object ship.parts, but the script still somewhat works. But I suppose it's ironic that there's a bug in this given the name of it. This bug also will effect selfDestruct.lua.**
 
 **It will be fixed in v0.4.2**
 
