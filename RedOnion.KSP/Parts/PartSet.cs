@@ -203,6 +203,8 @@ namespace RedOnion.KSP.Parts
 			dockingports.Clear();
 			engines.Clear();
 			sensors.Clear();
+			list.Clear();
+			cache?.Clear();
 			Construct(_ship.native.rootPart, null, null);
 			base.DoRefresh();
 			decouplers.Dirty = false;

@@ -12,3 +12,6 @@ In addition to the [Common API](../RedOnion.KSP/Globals.md), Kerbalua has some f
 
 ### Totorials/Guides
 - [MajorMalfunction](MajorMalfunction.md) - A script that causes 8 random parts to "malfunction".
+- [MajorMalfunctionNative](MajorMalfunctionNative.md) - A version of MajorMalfunction that falls back to the native KSP API.
+- [SelfDestruct](SelfDestruct.md) - A script that calls `explode` on all of the parts of the ship, starting from the parts furthest from the root.
+- [UIBasics](UIBasics.md) - A script that adds a few buttons that print out the buttons text when clicked.

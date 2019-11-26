@@ -107,6 +107,7 @@ namespace RedOnion.ROS
 							this.code = code = compiled.Code;
 							this.str = str = compiled.Strings;
 							self = top.prevSelf;
+							error = top.prevError;
 							if (ctx != top.context)
 							{
 								ctx.PopAll();
@@ -130,6 +131,7 @@ namespace RedOnion.ROS
 							this.code = code = compiled.Code;
 							this.str = str = compiled.Strings;
 							self = top.prevSelf;
+							error = top.prevError;
 							ctx.BlockCode = top.blockCode;
 							ctx.BlockEnd = top.blockEnd;
 							blockEnd = ctx.BlockEnd;
@@ -137,6 +139,7 @@ namespace RedOnion.ROS
 							continue;
 						}
 						case OpCode.Catch:
+							ctx.CatchBlocks--;
 							at = ctx.BlockAt1;
 							if (at == ctx.BlockAt2)
 								goto default;
@@ -644,6 +647,7 @@ namespace RedOnion.ROS
 							this.code = code = compiled.Code;
 							this.str = str = compiled.Strings;
 							self = top.prevSelf;
+							error = top.prevError;
 							if (ctx != top.context)
 							{
 								vals.Pop(vals.Count - top.vtop);
@@ -853,6 +857,7 @@ namespace RedOnion.ROS
 							this.code = code = compiled.Code;
 							this.str = str = compiled.Strings;
 							self = top.prevSelf;
+							// error = top.prevError;
 							if (ctx != top.context)
 							{
 								vals.Pop(vals.Count - top.vtop);
@@ -876,6 +881,7 @@ namespace RedOnion.ROS
 						int trysz = Int(code, at); at += 4;
 						int errsz = Int(code, at); at += 4;
 						int finsz = Int(code, at); at += 4;
+						ctx.CatchBlocks++;
 						ctx.Push(at, blockEnd = at + trysz,
 							OpCode.Catch,
 							at + trysz + errsz,

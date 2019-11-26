@@ -84,6 +84,10 @@ namespace RedOnion.ROS.Objects
 		/// Code/type of current block
 		/// </summary>
 		public OpCode BlockCode { get; set; }
+		/// <summary>
+		/// Number of try..catch..finally blocks in current context
+		/// </summary>
+		public int CatchBlocks { get; set; }
 
 		/// <summary>
 		/// Indicator of closure (fully or partially separated from live context)
@@ -259,6 +263,7 @@ namespace RedOnion.ROS.Objects
 			BlockEnd = RootEnd;
 			BlockAt1 = 0;
 			BlockAt2 = 0;
+			CatchBlocks = 0;
 			var propSize = prop.size;
 			while (blockStack.size > 0)
 			{

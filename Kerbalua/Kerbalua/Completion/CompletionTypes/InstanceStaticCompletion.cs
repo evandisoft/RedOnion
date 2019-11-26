@@ -28,9 +28,9 @@ namespace Kerbalua.Completion.CompletionTypes
 
 		public override bool TryArrayAccess(CompletionOperations operations, out CompletionObject completionObject)
 		{
-			if (CompletionReflectionUtil.TryGetProperty(type, "Item", out PropertyInfo propertyInfo))
+			if (CompletionReflectionUtil.TryGetArrayAccess(type, out Type outType))
 			{
-				completionObject=new InstanceStaticCompletion(propertyInfo.PropertyType);
+				completionObject=new InstanceStaticCompletion(outType);
 				operations.MoveNext();
 				return true;
 			}

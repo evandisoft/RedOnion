@@ -13,6 +13,23 @@ Just had a release!
 
 # Current
 # 0.4
+
+## 0.4.2
+0.4.2
+- Bug in ship.parts relating to explode functionality fixed.
+- [Tutorial](Kerbalua/MajorMalfunctionNative.md) of how to fallback to native functionality.
+- [Tutorial](Kerbalua/SelfDestruct.md) for selfDestruct.lua (include a link)
+- [Tutorial](Kerbalua/UIBasics.md) for using the ui in Lua code(uibasics.lua)
+- More docs.
+- Fixed problem with new(ui.Button,"buttontext",function() end) where the `new` function  wasn't properly converting the lua function to the Action\<Button\> that the ui.Button constructor needs.
+- Removed randomPartDestruct.ros as its code was outdated.
+
+## 0.4.1
+- Fixed bug where outputting a lot of things quickly (with something like `while true do print(1) end` takes more and more memory and is very slow.
+- Fixed a bug where misformatted lua code would run anyway and just repeat an error message.
+- Intellisense works for enums.
+- Fixed a bug where completion on CommonAPI properties (like the globals `body`) wasn't working properly.
+
 ## 0.4.0
 ### General Changes:
 - Updated for KSP 1.8.1

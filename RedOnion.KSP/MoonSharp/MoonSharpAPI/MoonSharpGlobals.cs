@@ -3,6 +3,7 @@ using System.ComponentModel;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
 using RedOnion.KSP.Attributes;
+using UnityEngine;
 
 namespace RedOnion.KSP.MoonSharp.MoonSharpAPI
 {
@@ -42,7 +43,14 @@ namespace RedOnion.KSP.MoonSharp.MoonSharpAPI
 						}
 						else
 						{
-							if (parinfo.ParameterType.IsValueType)
+							// If there is a converter set in the global options, we want to use that.
+							var converter=Script.GlobalOptions.CustomConverters
+								.GetScriptToClrCustomConversion(constructorArgs[i].Type, parinfo.ParameterType);
+							if (converter!=null)
+							{
+								objArgs[i]=converter(constructorArgs[i]);
+							}
+							else if (parinfo.ParameterType.IsValueType)
 							{
 								try
 								{
