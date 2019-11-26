@@ -4,6 +4,8 @@
 
 **It will be fixed in v0.4.2**
 
+**However, this provides an [opportunity](MajorMalfunctionNative.md) to show how to fall back to native API features if the Wrapper objects don't work!**
+
 Here is an example Lua script that can be [executed](https://github.com/evandisoft/RedOnion/blob/master/TroubleShooting.md#how-do-i-run-a-script) while you are in flight mode (assuming you don't mind your ship exploding). 
 ```
 Random=native.UnityEngine.Random
