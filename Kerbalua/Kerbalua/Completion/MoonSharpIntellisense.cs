@@ -48,6 +48,7 @@ namespace Kerbalua.Completion
 				{
 					if (operations.IsFinished)
 					{
+						Complogger.Log("Operations should not have finished.");
 						throw new LuaIntellisenseException("Operations should not have been finished ");
 					}
 

@@ -8,6 +8,11 @@ namespace Kerbalui.Types
 	{
 		public Rect rect;
 
+		/// <summary>
+		/// Active determines whether this element's update will be ran and whether it takes up
+		/// space in a Spacer.
+		/// </summary>
+		/// <value><c>true</c> if active; otherwise, <c>false</c>.</value>
 		public bool Active { get; set; } = true;
 
 		/// <summary>

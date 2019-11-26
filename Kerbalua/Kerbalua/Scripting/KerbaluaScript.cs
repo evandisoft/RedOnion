@@ -37,6 +37,7 @@ namespace Kerbalua.Scripting
 			}
 		}
 
+
 		private KerbaluaScript() : base(CoreModules.Preset_Complete)
 		{
 			UserData.RegisterType<Button>(new LuaDescriptor(typeof(Button)));
@@ -55,6 +56,24 @@ namespace Kerbalua.Scripting
 						=> DynValue.FromObject(script, new Vector(vector3d)) //DynValue.NewTable(new ModuleControlSurfaceProxyTable(this, m))
 					);
 
+			GlobalOptions.CustomConverters
+				.SetScriptToClrCustomConversion(DataType.Function, typeof(Action<Button>), (f) =>
+				  {
+
+					  return new Action<Button>((button) =>
+					  {
+						  var script=Instance;
+						  var co = script.CreateCoroutine(f);
+						  co.Coroutine.AutoYieldCounter = 1000;
+						  co.Coroutine.Resume();
+						  if (co.Coroutine.State == CoroutineState.ForceSuspended)
+						  {
+							  script.PrintErrorAction?.Invoke("functions called in buttons cannot be long");
+						  }
+					  });
+				  });
+
+			//UnityEngine.Debug.Log("sanity check");
 			var metatable=new Table(this);
 			var commonAPI=new CommonAPITable(this);
 			commonAPI.AddAPI(typeof(Globals));

@@ -87,7 +87,7 @@ namespace KerbaluaNUnit
 			// since blah is null and we now are testing
 			// dynamicly when possible, we do not get to the call
 			// type.
-			Assert.AreEqual(6, completions.Count);
+			Assert.AreEqual(7, completions.Count);
 
 			//Assert.AreEqual(11, completions.Count);
 		}

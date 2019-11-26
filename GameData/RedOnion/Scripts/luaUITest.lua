@@ -1,11 +1,26 @@
-w=new(ui.Window,"Window",ui.Layout.None)
+window=new(ui.Window,"Window",ui.Layout.Horizontal)
 
-p=new(ui.Panel)
-w.Add(p)
-p.Layout=ui.Layout.FlowVertical
-p.ChildAnchors=ui.Anchors.Fill
-b=new(ui.Button)
-b.text="buttontext"
-p.Add(b)
+panel=new(ui.Panel,ui.Layout.Vertical)
+window.Add(panel)
+panel.ChildAnchors=ui.Anchors.Fill
 
-b.click.add(function() print("button pressed!") end)
+
+function addbutton(text)
+    local button=new(ui.Button)
+    button.Text=text
+    local f=function() print(text.." pressed!") end
+    button.click.Add(f)
+    panel.Add(button)
+end
+
+f=function(b) end
+panel.Add(new(ui.Button,"test",f))
+
+---[[
+addbutton("blah")
+addbutton("blah2")
+addbutton("blah3")
+--]]
+
+
+    
