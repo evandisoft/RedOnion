@@ -14,7 +14,7 @@ So instead of having a bunch of useful programs that will exist forever, I wrote
 
 There is a big [opportunity cost](https://en.wikipedia.org/wiki/Opportunity_cost) associated with trying to make everything perfect and maintainable **FOREVER** at the start.
 
-My approach is to build prototypes. Build useful functionality, then change things later when and if I have a good idea on how I should restructure things to be more maintainable and when such things are necessary.
+My approach is to build prototypes. Build useful functionality, then change things later when and if I have a good idea on how I should restructure things to be more maintainable, and when I feel the restructuring is appropriate.
 
 Exploration and prototypes help give you real essential information about the actual use-cases of your project, which will dramatically influence any attemps to restructure it into some nice, easy-to-maintain version.
 
