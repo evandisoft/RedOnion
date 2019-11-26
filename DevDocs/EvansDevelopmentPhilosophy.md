@@ -31,7 +31,7 @@ But I think that you should not go to one extreme or another but should try to f
 A lot of stuff in in this project was produced initially as a prototype, then later improved to something more maintainable WHEN these two criteria were met:
 
 1. Adding new features became difficult because the structure of the code was not condusive to easily adding features of the types that were found to be needed to be added.
-1. I had enough information to get a feel for what types of features would be added, and so could produce a simplified version of the code that is customized for adding new features of that type.
+1. I had enough information to get a feel for what types of features would be added, and so could produce a simplified version of the code that is customized for adding new features of those types.
 
 So generally I start out with some simple code. Later find I need more features or it needs to handle more cases, then I add some if statements to handle some alternative possibilities or features, but then after there are so many exceptions and if-then's that the code becomes confusing, I try to switch to a design that uses object oriented principles and other code reuse strategies to simplify the code.
 
