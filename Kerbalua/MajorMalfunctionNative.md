@@ -28,7 +28,7 @@ In any case, ship.native returns the current active Vessel. You can also get acc
 
 `FlightGlobals` is a ksp object that provides access to many useful live objects, including the "ActiveVessel". Also has a list of the planetary bodies in the system in its `Bodies` field.
 
-Anyway, back to the code. All the code does is fall back to native functionality. Of note, in the native version of ship.parts (`ship.native.parts`) `count` is capitalized. In the native version, Vessel.parts is just a CLR List<Part>, and the `Count` property of a CLR generic List<T> is capitalized.
+Anyway, back to the code. All the code does is fall back to native functionality. Of note, in the native version of ship.parts (`ship.native.parts`) `count` is capitalized. In the native version, Vessel.parts is just a CLR List\<Part\>, and the `Count` property of a CLR generic List\<T\> is capitalized.
 
 All the code works the same as in the non-native [example](MajorMalfunction.md), just using the native "parts", (List\<Part\>), and native Part instead of the safe versions.
 

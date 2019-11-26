@@ -22,6 +22,7 @@ vessels, anything, with own script.
 1. Provide powerful general editing capabilities inside KSP
 1. Provide powerful API for modmakers/Users
 1. Help document the KSP API for modmakers.
+1. Help people learn to program in a fun way.
 
 License: [MIT](https://github.com/evandisoft/RedOnion/blob/master/LICENSE)
 
@@ -42,12 +43,12 @@ but our goal now is to:
 
 ## Releases
 
-Your scripts are in GameData/RedOnion/Scripts. I believe that CKAN does not delete them when uninstalling the mod or updating it, but you might want to make a copy of the folder just in case. We provide example scripts in a zip file, which will appear in the list of scripts in-game but wont be in the Scripts folder. If the example programs don't run, check out that section in [TroubleShooting](TroubleShooting.md))
+**Your scripts are in GameData/RedOnion/Scripts. If you delete this folder to update to a new version, it will destroy your scripts.** I believe that CKAN does not delete them when uninstalling the mod or updating it, but you might want to make a copy of the folder just in case. We provide example scripts in a zip file, which will appear in the list of scripts in-game but wont be in the Scripts folder. If the example programs don't run, check out that section in [TroubleShooting](TroubleShooting.md)
 
-Latest Release: (0.4.1). Releases are available at:
+Latest Releases are available at:
 - [CKAN](https://github.com/KSP-CKAN/CKAN)
 - [Spacedock](https://spacedock.info/mod/2116/Red%20Onion)
-- [CurseForge](https://www.curseforge.com/kerbal/ksp-mods/redonion) ([Note about Twitch Client Install](TwitchClientInstallsNote.md))
+- [CurseForge](https://www.curseforge.com/kerbal/ksp-mods/redonion) ([Note about using Twitch Client "Install" button](TwitchClientInstallsNote.md))
 
 ChangeLog: [here](ChangeLog.md#current)
 

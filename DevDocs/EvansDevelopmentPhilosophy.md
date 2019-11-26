@@ -18,7 +18,7 @@ My approach is to build prototypes. Build useful functionality, then change thin
 
 Exploration and prototypes help give you real essential information about the actual use-cases of your project, which will dramatically influence any attemps to restructure it into some nice, easy-to-maintain version.
 
-If you try to produce the perfect version without practical experience about use cases, in my experience, you often end up having to do way more work restructuring **The Perfect Program** into another **The Perfect Program** to provide just one additional type of feature.
+If you try to produce the perfect version without practical experience about use cases, in my experience, you often end up having to do way too much work restructuring **The Perfect Program** into another **The Perfect Program** to provide just one additional type of feature.
 
 So some things I write will be done in ways that were easy to initially write instead of being a nice maintainable structure that is nice and safe and doesn't expose fields as public and can be maintained "FOREVER".
 
@@ -35,8 +35,10 @@ A lot of stuff in in this project was produced initially as a prototype, then la
 
 So generally I start out with some simple code. Later find I need more features or it needs to handle more cases, then I add some if statements to handle some alternative possibilities or features, but then after there are so many exceptions and if-then's that the code becomes confusing, I try to switch to a design that uses object oriented principles and other code reuse strategies to simplify the code.
 
-It took me a while to switch to this type of programming, but it works much better than what I was doing.
+It took me a while to switch to this type of programming, but it works much better than what I was doing. However, it may bug some people, so this is my defense of some of the code I have written that looks sloppy. This project would not have been feasible for me if was not comfortable with writing some sloppy code.
 
-However, it may bug some people, so this is my defense of some of the code I have written that looks sloppy.
+Now, if your actual purpose is to write a library for use by others, you kinda do have to plan for maintainability at the start. And try to design an interface that allows you flexibility underneath it without changing that interface. But don't fall into the pit of "every library I make for my own use must also be designed for others" because it may be the case that only a small fraction of your own libraries would ever be used as libraries by others, and as such you may be wasting lots of time.
 
-This project would not have been feasible for me if was not comfortable with writing some sloppy code.
+And if you do want to take a library that you designed for yourself and change it to be used by others, you can. And when you do that you will know, if you have used it for a while, what features it needs and you'll be able to provide a nice interface for others to use. And in my opinion it will probably be a better interface than if you had just tried to figure out, at the start, how the interface should be structured with no practical experience guiding you.
+
+An additional problem, and perhaps the biggest problem is that if you spend too much time making some things be implemented perfectly, you may lose inspiration and kill the moment for the thing you were actually producing the library for.
