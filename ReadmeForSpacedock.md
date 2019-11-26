@@ -42,7 +42,7 @@ but our goal now is to:
 
 Your scripts are in GameData/RedOnion/Scripts. I believe that CKAN does not delete them when uninstalling the mod or updating it, but you might want to make a copy of the folder just in case. We provide example scripts in a zip file, which will appear in the list of scripts in-game but wont be in the Scripts folder. If the example programs don't run, check out that section in [TroubleShooting](https://evandisoft.github.io/RedOnion/TroubleShooting))
 
-Latest Release (0.4.0), available on:
+Latest Release (0.4.1), available on:
 - [CKAN](https://github.com/KSP-CKAN/CKAN)
 - [Spacedock](https://spacedock.info/mod/2116/Red%20Onion)
 - [CurseForge](https://www.curseforge.com/kerbal/ksp-mods/redonion) (May take a while to be approved)
@@ -53,7 +53,7 @@ ChangeLog: [here](https://evandisoft.github.io/RedOnion/ChangeLog#current)
 
 - [Scripting](https://evandisoft.github.io/RedOnion/ScriptingReadme) - Documentation related to scripting.
 
-- [LiveRepl](https://evandisoft.github.io/RedOnion/LiveRepl/Readme) - The main user interface for the project. Where scripts can be loaded, written, and executed.
+- [LiveRepl](https://evandisoft.github.io/RedOnion/LiveRepl) - The main user interface for the project. Where scripts can be loaded, written, and executed.
 
 - [Troubleshooting](https://evandisoft.github.io/RedOnion/TroubleShooting) - Some possible issues and solutions.
 
