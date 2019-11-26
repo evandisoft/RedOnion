@@ -38,7 +38,8 @@ namespace RedOnion.ROS
 
 			public static string GetName(ICustomAttributeProvider provider)
 			{
-				string name = provider is MemberInfo member ? member.Name
+				string name = provider is MemberInfo member ? member is ConstructorInfo ci
+					? ci.DeclaringType.Name : member.Name
 					: provider is Type type ? type.Name : null;
 				var displayName = provider.GetCustomAttributes(typeof(DisplayNameAttribute), !(provider is Type));
 				if (displayName.Length == 1)
@@ -76,26 +77,26 @@ namespace RedOnion.ROS
 					return;
 				}
 
-				if (dict == null || !dict.TryGetValue(member.Name, out var idx))
+				if (dict == null || !dict.TryGetValue(name, out var idx))
 					idx = -1;
 
 				if (member is FieldInfo f)
 				{
 					if (idx >= 0)
-						Value.DebugLog("Conflicting name: {0}.{1} [instace: {2}; field]", Type.Name, member.Name, instance);
-					else ProcessField(f, instance, ref dict);
+						Value.DebugLog("Conflicting name: {0}.{1} [instace: {2}; field]", Type.Name, name, instance);
+					else ProcessField(name, f, instance, ref dict);
 				}
 				else if (member is PropertyInfo p)
 				{
 					if (idx >= 0)
-						Value.DebugLog("Conflicting name: {0}.{1} [instace: {2}; property]", Type.Name, member.Name, instance);
-					else ProcessProperty(p, instance, ref dict);
+						Value.DebugLog("Conflicting name: {0}.{1} [instace: {2}; property]", Type.Name, name, instance);
+					else ProcessProperty(name, p, instance, ref dict);
 				}
 				else if (member is EventInfo e)
 				{
 					if (idx >= 0)
-						Value.DebugLog("Conflicting name: {0}.{1} [instace: {2}; event]", Type.Name, member.Name, instance);
-					else ProcessEvent(e, instance, ref dict);
+						Value.DebugLog("Conflicting name: {0}.{1} [instace: {2}; event]", Type.Name, name, instance);
+					else ProcessEvent(name, e, instance, ref dict);
 				}
 				else if (member is MethodInfo m)
 				{
@@ -103,7 +104,7 @@ namespace RedOnion.ROS
 					{
 						ref var slot = ref prop.items[idx];
 						if (slot.kind != Prop.Kind.Method && slot.kind != Prop.Kind.MethodGroup)
-							Value.DebugLog("Conflicting name: {0}.{1} [instace: {2}; method]", Type.Name, member.Name, instance);
+							Value.DebugLog("Conflicting name: {0}.{1} [instace: {2}; method]", Type.Name, name, instance);
 						else if (slot.kind == Prop.Kind.Method)
 						{
 							var call = slot.read(null);
@@ -115,7 +116,7 @@ namespace RedOnion.ROS
 							slot.kind = Prop.Kind.MethodGroup;
 						}
 					}
-					ProcessMethod(m, instance, ref dict, idx);
+					ProcessMethod(name, m, instance, ref dict, idx);
 				}
 			}
 
@@ -141,7 +142,7 @@ namespace RedOnion.ROS
 			}
 
 			protected virtual void ProcessField(
-				FieldInfo f, bool instance, ref Dictionary<string, int> dict)
+				string name, FieldInfo f, bool instance, ref Dictionary<string, int> dict)
 			{
 				Type convert = null;
 				var convertAttrs = f.GetCustomAttributes(typeof(ConvertAttribute), true);
@@ -153,9 +154,9 @@ namespace RedOnion.ROS
 
 				if (dict == null)
 					dict = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-				dict[f.Name] = prop.size;
+				dict[name] = prop.size;
 				ref var it = ref prop.Add();
-				it.name = f.Name;
+				it.name = name;
 				it.kind = Prop.Kind.Field;
 				var type = f.FieldType;
 				it.read = Expression.Lambda<Func<object, Value>>(
@@ -204,7 +205,7 @@ namespace RedOnion.ROS
 			}
 
 			protected virtual void ProcessProperty(
-				PropertyInfo p, bool instance, ref Dictionary<string, int> dict)
+				string name, PropertyInfo p, bool instance, ref Dictionary<string, int> dict)
 			{
 				Type convert = null;
 				var convertAttrs = p.GetCustomAttributes(typeof(ConvertAttribute), true);
@@ -290,9 +291,9 @@ namespace RedOnion.ROS
 				//-------------------------------------------------------------- normal property
 				if (dict == null)
 					dict = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-				dict[p.Name] = prop.size;
+				dict[name] = prop.size;
 				ref var it = ref prop.Add();
-				it.name = p.Name;
+				it.name = name;
 				it.kind = Prop.Kind.Property;
 				var type = p.PropertyType;
 				if (p.CanRead)
@@ -325,13 +326,13 @@ namespace RedOnion.ROS
 			}
 
 			protected virtual void ProcessEvent(
-				EventInfo e, bool instance, ref Dictionary<string, int> dict)
+				string name, EventInfo e, bool instance, ref Dictionary<string, int> dict)
 			{
 				if (dict == null)
 					dict = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-				dict[e.Name] = prop.size;
+				dict[name] = prop.size;
 				ref var it = ref prop.Add();
-				it.name = e.Name;
+				it.name = name;
 				it.kind = Prop.Kind.Event;
 				it.read = instance
 					// self => new Value(new EventProxy<T,E>(self, e))
@@ -355,7 +356,7 @@ namespace RedOnion.ROS
 
 
 			protected virtual void ProcessMethod(
-				MethodInfo m, bool instance, ref Dictionary<string, int> dict, int idx)
+				string name, MethodInfo m, bool instance, ref Dictionary<string, int> dict, int idx)
 			{
 #if DEBUG
 				if (!m.IsSpecialName && !m.IsGenericMethod && !m.ReturnType.IsByRef)
@@ -371,9 +372,9 @@ namespace RedOnion.ROS
 					((MethodGroup)prop.items[idx].read(null).desc).list.Add(ref value);
 				else
 				{
-					dict[m.Name] = prop.size;
+					dict[name] = prop.size;
 					ref var it = ref prop.Add();
-					it.name = m.Name;
+					it.name = name;
 					it.kind = Prop.Kind.Method;
 					it.read = obj => value;
 				}

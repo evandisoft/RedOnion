@@ -10,7 +10,7 @@ User interface, see [RedOnion.UI](../../RedOnion.UI/README.md)
 - `Layout`: Layout - Layout - horizontal/vertical
 - `LayoutPadding`: LayoutPadding - LayoutPadding - Padding + Spacing
 - `Element`: [Element](../../RedOnion.UI/Element.md) - Element - base class for all elements/controls.
-- `Panel`: Panel - Content panel (a box to hold other elements, manages layout).
+- `Panel`: [Panel](../../RedOnion.UI/Panel.md) - Content panel (a box to hold other elements, manages layout).
 - `Label`: Label - Line of text
 - `Button`: Button - Clickable button (or toggle-button).
 - `Toggle`: Toggle - Toggle - experimental. WIP
