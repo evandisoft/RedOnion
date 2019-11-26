@@ -22,10 +22,13 @@ vessels, anything, with own script.
 1. Provide powerful general editing capabilities inside KSP
 1. Provide powerful API for modmakers/Users
 1. Help document the KSP API for modmakers.
+1. Help people learn to program in a fun way.
 
 License: [MIT](https://github.com/evandisoft/RedOnion/blob/master/LICENSE)
 
 Github: [here](https://github.com/evandisoft/RedOnion)
+
+[Github Pages](https://evandisoft.github.io/RedOnion) is where the most up-to-date information is.
 
 **Warning: Do not use scripts from untrusted sources!**
 This is not a sandbox, any script has the power to do almost anything a modder could do in C#.
@@ -40,12 +43,12 @@ but our goal now is to:
 
 ## Releases
 
-Your scripts are in GameData/RedOnion/Scripts. I believe that CKAN does not delete them when uninstalling the mod or updating it, but you might want to make a copy of the folder just in case. We provide example scripts in a zip file, which will appear in the list of scripts in-game but wont be in the Scripts folder. If the example programs don't run, check out that section in [TroubleShooting](https://evandisoft.github.io/RedOnion/TroubleShooting))
+**Your scripts are in GameData/RedOnion/Scripts. If you delete this folder to update to a new version, it will destroy your scripts.** I believe that CKAN does not delete them when uninstalling the mod or updating it, but you might want to make a copy of the folder just in case. We provide example scripts in a zip file, which will appear in the list of scripts in-game but wont be in the Scripts folder. If the example programs don't run, check out that section in [TroubleShooting](https://evandisoft.github.io/RedOnion/TroubleShooting)
 
-Latest Release (0.4.1), available on:
+Latest Releases are available at:
 - [CKAN](https://github.com/KSP-CKAN/CKAN)
 - [Spacedock](https://spacedock.info/mod/2116/Red%20Onion)
-- [CurseForge](https://www.curseforge.com/kerbal/ksp-mods/redonion) (May take a while to be approved)
+- [CurseForge](https://www.curseforge.com/kerbal/ksp-mods/redonion) ([Note about using Twitch Client "Install" button](TwitchClientInstallsNote.md))
 
 ChangeLog: [here](https://evandisoft.github.io/RedOnion/ChangeLog#current)
 
