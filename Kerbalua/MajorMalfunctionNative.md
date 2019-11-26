@@ -19,7 +19,7 @@ end
 print("Done!")
 ```
 
-All that was changed was to use a "native" version of "ship" and capitalize "Count". Ship is a safe object that acts in place of [KSP's Vessel class](https://kerbalspaceprogram.com/api/class_vessel.html). Safe versions may have some member names changed to lowercase, to match the feel of lua's preference for lowercase. Safe versions of native objects may also have additional useful functionality not seen in the native version.
+All that was changed was to use the "native" version of "ship" and capitalize "Count". Ship is a safe object that acts in place of [KSP's Vessel class](https://kerbalspaceprogram.com/api/class_vessel.html). Safe versions may have some member names changed to lowercase to match the feel of Lua's preference for lowercase. Safe versions of native objects may also have additional useful functionality not seen in the native version.
 
 Here we are using our global `ship` to get access to the safe Ship object, but then accessing its "unsafe" native field that, in this case, has a working feature to replace a non-working one, but in general native versions will have some functionality that the "safe" version doesn't have, including stuff that is useful, stuff that is not well documented, and stuff that may cause problems.
 
@@ -30,6 +30,6 @@ In any case, ship.native returns the current active Vessel. You can also get acc
 
 Anyway, back to the code. All the code does is fall back to native functionality. Of note, in the native version of ship.parts (`ship.native.parts`) `count` is capitalized. In the native version, Vessel.parts is just a CLR List<Part>, and the `Count` property of a CLR generic List<T> is capitalized.
 
-All the code works the same as in the non-native [example](MajorMalfunction.md), just using the native parts, (List\<Part\>) and native Part instead of the safe versions.
+All the code works the same as in the non-native [example](MajorMalfunction.md), just using the native "parts", (List\<Part\>), and native Part instead of the safe versions.
 
 If an object in the api exposes a "native" field, you can return that native value and see which type it is (the repl will show you), and then you can look up that type in the [KSP API](https://kerbalspaceprogram.com/api/index.html) by typing the classname in the little search box on the right.
