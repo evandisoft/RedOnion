@@ -8,7 +8,6 @@ Kerbalui was designed specifically to provide functionality for use with LiveRep
 
 Part of the reason I have not tried to make it perfect is that [imgui](https://docs.unity3d.com/Manual/GUIScriptingGuide.html) is hard for me to work with.
 
-
 **All elements must be constructed within the execution of the MonoBehaviour OnGUI update**. The reason is that certain objects that need to be initialized, like style, AFAIK require calls to `GUI.`, which must be called within the execution of OnGUI.
 
 So, for example, `ScriptWindow`, the class implementing the window that shows up in **LiveRepl**, is constructed like this:
