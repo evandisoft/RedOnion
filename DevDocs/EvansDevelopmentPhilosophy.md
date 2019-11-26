@@ -18,7 +18,7 @@ My approach is to build prototypes. Build useful functionality, then change thin
 
 Exploration and prototypes help give you real essential information about the actual use-cases of your project, which will dramatically influence any attemps to restructure it into some nice, easy-to-maintain version.
 
-If you try to produce the perfect version without practical experience about use cases, in my experience, you often end up having to do way more work restructuring the Perfect Program into another Perfect Program that provides just one additional feature.
+If you try to produce the perfect version without practical experience about use cases, in my experience, you often end up having to do way more work restructuring the Perfect Program into another Perfect Program that provides just one additional type of feature.
 
 So some things I write will be done in ways that were easy to initially write instead of being a nice maintainable structure that is nice and safe and doesn't expose fields as public and can be maintained "FOREVER".
 
