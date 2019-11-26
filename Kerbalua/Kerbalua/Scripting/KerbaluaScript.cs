@@ -59,7 +59,6 @@ namespace Kerbalua.Scripting
 			GlobalOptions.CustomConverters
 				.SetScriptToClrCustomConversion(DataType.Function, typeof(Action<Button>), (f) =>
 				  {
-
 					  return new Action<Button>((button) =>
 					  {
 						  var script=Instance;
