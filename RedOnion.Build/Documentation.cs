@@ -112,7 +112,7 @@ namespace RedOnion.Build
 				type = type.GetGenericTypeDefinition();
 			if (type.IsGenericParameter || type.FullName == null)
 				return;
-			var desc = type.GetCustomAttribute<DescriptionAttribute>()?.Description;
+			var desc = type.GetCustomAttribute<DescriptionAttribute>(false)?.Description;
 			if (desc != null && discovered.Add(type))
 				queue.Add(type);
 			if (fullType != type)
@@ -135,9 +135,11 @@ namespace RedOnion.Build
 			for (int i = 0; i < queue.size; i++)
 			{
 				var type = queue[i];
-				var desc = type.GetCustomAttribute<DescriptionAttribute>()?.Description;
+				var desc = type.GetCustomAttribute<DescriptionAttribute>(false)?.Description;
 				var name = type.GetCustomAttribute<DisplayNameAttribute>(false)?.DisplayName
-					?? type.Name.Replace('`', '.');
+					?? (type.DeclaringType == null ? type.Name :
+					type.FullName.Substring(type.Namespace.Length + 1).Replace('+', '.') // nested type
+					).Replace('`', '.');
 				var path = "";
 				var full = type.FullName;
 				if (full.StartsWith("RedOnion.KSP."))
@@ -150,7 +152,7 @@ namespace RedOnion.Build
 					full = full.Substring("RedOnion.UI.".Length);
 					path = "RedOnion.UI/";
 				}
-				path += string.Join("/", full.Split('.')).Replace('`', '.');
+				path += string.Join("/", full.Split('.')).Replace('`', '.').Replace('+', '.');
 				var docb = type.GetCustomAttribute<DocBuildAttribute>();
 				if (docb != null && !string.IsNullOrEmpty(docb.Path))
 					path = docb.Path;
@@ -177,7 +179,7 @@ namespace RedOnion.Build
 						&& f.IsStatic && f.IsInitOnly	// static readonly
 						&& f.FieldType == typeof(Type);	// Type name = ...
 					if (member.GetCustomAttribute<DescriptionAttribute>() == null && (!typeRef ||
-						((Type)f.GetValue(null)).GetCustomAttribute<DescriptionAttribute>() == null))
+						((Type)f.GetValue(null)).GetCustomAttribute<DescriptionAttribute>(false) == null))
 						continue;
 					var mname = GetName(member);
 					members.TryGetValue(mname, out var prev);

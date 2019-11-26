@@ -1,5 +1,6 @@
 using RedOnion.UI.Components;
 using System;
+using System.ComponentModel;
 using UnityEngine;
 using UUI = UnityEngine.UI;
 
@@ -10,6 +11,8 @@ namespace RedOnion.UI
 	/// Many methods and properties are protected,
 	/// use Panel if not subclassing.
 	/// </summary>
+	[Description("`UI.Element` is the base class for all UI elements / controls. It manages `UnityEngine.GameObject`"
+		+ "and its `RectTransform`, provides layout settings and basic `AddElement` to add child elements.")]
 	public abstract partial class Element : IDisposable
 	{
 #if DEBUG
@@ -19,8 +22,10 @@ namespace RedOnion.UI
 #endif
 		protected internal RectTransform RectTransform { get; private set; }
 
-		public object Tag { get; set; }
+		[Description("Parent element (inside which this element is).")]
 		public Element Parent { get; internal set; }
+		[Description("Tag for general usage.")]
+		public object Tag { get; set; }
 
 		protected Element()
 		{
@@ -31,16 +36,23 @@ namespace RedOnion.UI
 			RectTransform.anchorMax = new Vector2(.5f, .5f);
 		}
 
+		[Description("Optional name of the element/control. Returns type name if not assigned (null).")]
 		public string Name
 		{
 			get => GameObject.name ?? GetType().FullName;
 			set => GameObject.name = value;
 		}
+		[Description("Element is set to be visible/active."
+			+ " [`GameObject.activeSelf`](https://docs.unity3d.com/ScriptReference/GameObject-activeSelf.html),"
+			+ " [`GameObject.SetActive`](https://docs.unity3d.com/ScriptReference/GameObject.SetActive.html)")]
 		public bool Active
 		{
 			get => GameObject.activeSelf;
 			set => GameObject.SetActive(value);
 		}
+		[Description("Element is visible (and all parents are)."
+			+ " [`GameObject.activeInHierarchy`](https://docs.unity3d.com/ScriptReference/GameObject-activeInHierarchy.html),"
+			+ " [`GameObject.SetActive`](https://docs.unity3d.com/ScriptReference/GameObject.SetActive.html)")]
 		public bool Visible
 		{
 			get => GameObject.activeInHierarchy;
@@ -142,45 +154,55 @@ namespace RedOnion.UI
 		}
 		private float ConvertLayoutElementValue(float? value)
 			=> value.HasValue && value.Value >= 0f ? value.Value : float.NaN;
-		public float MinWidth
-		{
-			get => ConvertLayoutElementValue(layoutElement?.minWidth);
-			set => LayoutElement.minWidth = value >= 0f ? value : -1f;
-		}
-		public float MinHeight
-		{
-			get => ConvertLayoutElementValue(layoutElement?.minHeight);
-			set => LayoutElement.minHeight = value >= 0f ? value : -1f;
-		}
-		public float PreferWidth
-		{
-			get => ConvertLayoutElementValue(layoutElement?.preferredWidth);
-			set => LayoutElement.preferredWidth = value >= 0f ? value : -1f;
-		}
-		public float PreferHeight
-		{
-			get => ConvertLayoutElementValue(layoutElement?.preferredHeight);
-			set => LayoutElement.preferredHeight = value >= 0f ? value : -1f;
-		}
-		public float FlexWidth
-		{
-			get => ConvertLayoutElementValue(layoutElement?.flexibleWidth);
-			set => LayoutElement.flexibleWidth = value >= 0f ? value : -1f;
-		}
-		public float FlexHeight
-		{
-			get => ConvertLayoutElementValue(layoutElement?.flexibleHeight);
-			set => LayoutElement.flexibleHeight = value >= 0f ? value : -1f;
-		}
+
+		[Description("Current width, redirects to PreferWidth when assigning.")]
 		public float Width
 		{
 			get => RectTransform.rect.width;
 			set => PreferWidth = value;
 		}
+		[Description("Current height, redirects to PreferWidth when assigning.")]
 		public float Height
 		{
 			get => RectTransform.rect.height;
 			set => PreferHeight = value;
+		}
+		[Description("Minimal width if set to non-negative number (reads `float.NaN` otherwise,"
+			+ " which means that the minimal width is not set - assigning negative number will have same result).")]
+		public float MinWidth
+		{
+			get => ConvertLayoutElementValue(layoutElement?.minWidth);
+			set => LayoutElement.minWidth = value >= 0f ? value : -1f;
+		}
+		[Description("Minimal height (same negative/`float.NaN` logic as above and for many below).")]
+		public float MinHeight
+		{
+			get => ConvertLayoutElementValue(layoutElement?.minHeight);
+			set => LayoutElement.minHeight = value >= 0f ? value : -1f;
+		}
+		[Description("Preferred width if set (the layout will use this if possible).")]
+		public float PreferWidth
+		{
+			get => ConvertLayoutElementValue(layoutElement?.preferredWidth);
+			set => LayoutElement.preferredWidth = value >= 0f ? value : -1f;
+		}
+		[Description("Preferred height if set (the layout will use this if possible).")]
+		public float PreferHeight
+		{
+			get => ConvertLayoutElementValue(layoutElement?.preferredHeight);
+			set => LayoutElement.preferredHeight = value >= 0f ? value : -1f;
+		}
+		[Description("Flexible width if inside horizontal/vertical layout.")]
+		public float FlexWidth
+		{
+			get => ConvertLayoutElementValue(layoutElement?.flexibleWidth);
+			set => LayoutElement.flexibleWidth = value >= 0f ? value : -1f;
+		}
+		[Description("Flexible height if inside horizontal/vertical layout.")]
+		public float FlexHeight
+		{
+			get => ConvertLayoutElementValue(layoutElement?.flexibleHeight);
+			set => LayoutElement.flexibleHeight = value >= 0f ? value : -1f;
 		}
 
 		// TODO: Use our LayoutComponent

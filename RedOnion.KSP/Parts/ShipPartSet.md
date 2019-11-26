@@ -1,7 +1,6 @@
 ## ShipPartSet
 
-Read-only list (or set). Enumerable (can be used in `foreach`).
-Used e.g. for parts and all lists and sets you are not allowed to modify.
+Collection of all the parts in one ship/vessel.
 
 - `ship`: [Ship](../API/Ship.md) - Ship (vessel/vehicle) this list of parts belongs to.
 - `root`: [Part](PartBase.md) - Root part.

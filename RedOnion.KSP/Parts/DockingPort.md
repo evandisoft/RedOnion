@@ -1,6 +1,7 @@
 ## DockingPort
 
-Decoupler, separator, launch clamp or docking port.
+Docking port. Used to dock a ship in a station or to join various parts together.
+Can also function as separator when staging is enabled.
 
 - `native`: Part - \[`Unsafe`\] Native `Part` - KSP API.
 - `ship`: [Ship](../API/Ship.md) - Ship (vehicle/vessel) this part belongs to.
@@ -14,5 +15,5 @@ Decoupler, separator, launch clamp or docking port.
 - `name`: string - Name of the part (assigned by KSP).
 - `title`: string - Title of the part (assigned by KSP).
 - `istype()`: bool, name string
-  - Accepts `decoupler` and `separator`. (Case insensitive)
+  - Accepts `port` and `dockingPort`. (Case insensitive)
 - `explode()`: void - Explode the part.
