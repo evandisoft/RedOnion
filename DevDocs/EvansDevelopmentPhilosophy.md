@@ -1,6 +1,6 @@
 Here are some notes about how I approach development, in case some of the things I do seem sloppy or messy.
 
-I believe there is sometimes too big of a cost to spending too much time trying to figure out how to do things **The Right Way** at the start of implementing some project or feature.
+I believe there is sometimes too big of a cost to spending too much time trying to figure out how to do things **The Right Way**.
 
 I used to spend gargantuan amounts of time trying to figure out the perfect way of doing everything. I would read lots of blogs about how to do programming in **The Right Way**. And I would generally get nothing done for fear of it not being done in the **Best Way Possible**.
 
@@ -38,3 +38,5 @@ So generally I start out with some simple code. Later find I need more features 
 It took me a while to switch to this type of programming, but it works much better than what I was doing.
 
 However, it may bug some people, so this is my defense of some of the code I have written that looks sloppy.
+
+This project would not have been feasible if was not comfortable with writing some sloppy code.
