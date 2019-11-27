@@ -59,8 +59,8 @@ ctrl + shift + z: Redo
 REPL input area only:
 enter: evaluate content and clear repl input area.
 shift + enter: add newline
-ctrl +[or ctrl + UpArrow: go to previous history
-ctrl + ' or ctrl+DownArrow: go to next history
+ctrl + [ or ctrl + UpArrow: go to previous history
+ctrl + ' or ctrl + DownArrow: go to next history
 
 Completion area only:
 ctrl + k: select next line down
