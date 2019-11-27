@@ -62,7 +62,7 @@ namespace LiveRepl
 
 		public void SaveEditorText()
 		{
-			uiparts.scriptNameInputArea.SaveText(uiparts.editor.editingArea.Text);
+			uiparts.scriptNameInputArea.SaveText(uiparts.editor.Text);
 			uiparts.editorChangesIndicator.Unchanged();
 			SetReplEvaluatorByFilename(uiparts.scriptNameInputArea.Text);
 		}
@@ -70,7 +70,7 @@ namespace LiveRepl
 		public void LoadEditorText()
 		{
 			string text=uiparts.scriptNameInputArea.LoadText();
-			uiparts.editor.editingArea.Text=text;
+			uiparts.editor.Text=text;
 			uiparts.editorChangesIndicator.Unchanged();
 			SetReplEvaluatorByFilename(uiparts.scriptNameInputArea.Text);
 		}
@@ -106,13 +106,13 @@ namespace LiveRepl
 		public void RunEditorScript()
 		{
 			SaveEditorText();
-			Evaluate(uiparts.editor.editingArea.Text, uiparts.scriptNameInputArea.Text);
+			Evaluate(uiparts.editor.Text, uiparts.scriptNameInputArea.Text);
 			uiparts.replOutoutArea.AddFileContent(uiparts.scriptNameInputArea.Text);
 		}
 
 		public void EvaluateReplText()
 		{
-			string text=uiparts.replInputArea.editingArea.Text;
+			string text=uiparts.replInputArea.Text;
 			uiparts.replOutoutArea.AddSourceString(text);
 			uiparts.scriptWindow.Evaluate(text, null, true);
 		}
@@ -120,7 +120,7 @@ namespace LiveRepl
 		public void SubmitReplText()
 		{
 			EvaluateReplText();
-			uiparts.replInputArea.editingArea.Text = "";
+			uiparts.replInputArea.Text = "";
 
 			needsResize=true;
 		}

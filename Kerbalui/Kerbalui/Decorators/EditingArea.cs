@@ -52,10 +52,12 @@ namespace Kerbalui.Decorators
 		public bool HasFocus() => editableText.HasFocus();
 		public void GrabFocus() => editableText.GrabFocus();
 
-		public EditableText editableText;
+		protected EditableText editableText;
 		public bool EditorAssigned { get => backingEditor!=null; }
 
 		public bool ReceivedInput { get; set; }
+		public string ControlName => editableText.ControlName;
+
 		/// <summary>
 		/// Setting this to true will not allow any key-down input events
 		/// to reach the control's default handling of events.
@@ -626,6 +628,9 @@ namespace Kerbalui.Decorators
 			return lineNum;
 		}
 
-
+		public void FontChangeEventHandler(Font obj)
+		{
+			editableText.FontChangeEventHandler(obj);
+		}
 	}
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Kerbalui.Decorators;
+using Kerbalui.Interfaces;
 using LiveRepl.Interfaces;
 using static RedOnion.KSP.Debugging.QueueLogger;
 
@@ -11,16 +12,16 @@ namespace LiveRepl.Completion {
 	/// currentReplEvaluator.
 	/// </summary>
 	public class EditingAreaCompletionAdapter:ICompletableElement {
-		public EditingArea editingArea;
+		public IEditingArea editingArea;
 		public ScriptWindow scriptWindow;
 
-		public EditingAreaCompletionAdapter(EditingArea editingArea, ScriptWindow scriptWindow)
+		public EditingAreaCompletionAdapter(IEditingArea editingArea, ScriptWindow scriptWindow)
 		{
 			this.editingArea = editingArea;
 			this.scriptWindow = scriptWindow;
 		}
 
-		public string ControlName => editingArea.editableText.ControlName;
+		public string ControlName => editingArea.ControlName;
 
 		public bool ReceivedInput => editingArea.ReceivedInput;
 

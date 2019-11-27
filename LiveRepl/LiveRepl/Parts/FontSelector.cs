@@ -45,8 +45,6 @@ namespace LiveRepl.Parts
 			//uiparts.FontChange+=editableText.FontChangeEventHandler;
 		}
 
-		public string ControlName => editableText.ControlName;
-
 		public void Complete(int index)
 		{
 			var completionContent = GetCompletionContent(out int replaceStart,out int replaceEnd);

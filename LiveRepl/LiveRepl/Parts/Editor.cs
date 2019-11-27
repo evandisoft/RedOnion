@@ -7,6 +7,7 @@ using Kerbalui.Decorators;
 using Kerbalui.Controls;
 using Kerbalui.Util;
 using RedOnion.KSP.Settings;
+using LiveRepl.Interfaces;
 
 namespace LiveRepl.Parts
 {
@@ -23,11 +24,12 @@ namespace LiveRepl.Parts
 		{
 			this.uiparts=uiparts;
 
-			uiparts.FontChange+=editingArea.editableText.FontChangeEventHandler;
+			uiparts.FontChange+=editingArea.FontChangeEventHandler;
 
 			HorizontalScrollBarPresent=false;
 			VerticalScrollBarPresent=true;
 		}
+
 
 		protected override void DecoratorUpdate()
 		{

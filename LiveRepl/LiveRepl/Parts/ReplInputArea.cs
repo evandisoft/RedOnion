@@ -1,6 +1,7 @@
 ﻿using Kerbalui.Controls;
 using Kerbalui.Decorators;
 using Kerbalui.Util;
+using LiveRepl.Interfaces;
 using RedOnion.KSP.Settings;
 using UnityEngine;
 
@@ -15,7 +16,7 @@ namespace LiveRepl.Parts
 		{
 			this.uiparts=uiparts;
 
-			uiparts.FontChange+=editingArea.editableText.FontChangeEventHandler;
+			uiparts.FontChange+=editingArea.FontChangeEventHandler;
 		}
 
 		protected override void DecoratorUpdate()
@@ -62,5 +63,5 @@ namespace LiveRepl.Parts
 				return new Vector2(0, minHeight);
 			}
 		}
-	}
+   	}
 }
