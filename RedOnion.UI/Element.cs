@@ -15,11 +15,7 @@ namespace RedOnion.UI
 		+ "and its `RectTransform`, provides layout settings and basic `AddElement` to add child elements.")]
 	public abstract partial class Element : IDisposable
 	{
-#if DEBUG
-		public GameObject GameObject { get; private set; }
-#else
 		protected internal GameObject GameObject { get; private set; }
-#endif
 		protected internal RectTransform RectTransform { get; private set; }
 
 		[Description("Parent element (inside which this element is).")]

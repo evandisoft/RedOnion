@@ -7,6 +7,9 @@ using UUI = UnityEngine.UI;
 
 namespace RedOnion.UI
 {
+	[Description(
+@"`UI.Simple` is the base class for [`UI.Panel`](Panel.md) without the child tracking and enumerating functionality.
+It is meant mainly for internal usage, for implementation of other composite controls, not for direct user/script usage.")]
 	public class Simple : Element
 	{
 		public Simple() : base() { }

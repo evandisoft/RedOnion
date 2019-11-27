@@ -5,7 +5,7 @@
 it is set to `Layout.None` when the panel is created).
 
 - `Panel()` - Create new panel with layout set to `Layout.None`.
-- `Panel()`, layout Layout
+- `Panel()`, layout [Layout](Layout.md)
   - Create new panel with specified layout.
 - `Parent`: [Element](Element.md) - Parent element (inside which this element is).
 - `Tag`: Object - Tag for general usage.
@@ -21,7 +21,7 @@ it is set to `Layout.None` when the panel is created).
 - `FlexWidth`: float - Flexible width if inside horizontal/vertical layout.
 - `FlexHeight`: float - Flexible height if inside horizontal/vertical layout.
 - `Color`: Color - Background color.
-- `Layout`: Layout - Layout (how child elements are placed).
+- `Layout`: [Layout](Layout.md) - Layout (how child elements are placed).
 - `LayoutPadding`: LayoutPadding - The combined inner padding and spacing (6 floats in total, all set to `3f` by default).
 - `ChildAnchors`: Anchors - This currently controls layout's `childAlignment` and
 `childForceExpandWidth/Height`, but plan is to use custom `LayoutComponent`.
@@ -37,7 +37,7 @@ or `Anchors.MiddleLeft/MiddleCenter/UpperLeft...`
   - Add new element onto this panel.
 - `Remove()`: [Element](Element.md), element [Element](Element.md)
   - Remove element from this panel.
-- `AddPanel()`: Panel, layout Layout
+- `AddPanel()`: Panel, layout [Layout](Layout.md)
   - Add new panel with specified layout.
 - `AddHorizontal()`: Panel - Add new panel with horizontal layout.
 - `AddVertical()`: Panel - Add new panel with vertical layout.
