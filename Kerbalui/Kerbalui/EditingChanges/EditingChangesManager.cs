@@ -10,52 +10,46 @@ namespace Kerbalui.EditingChanges
 		private List<EditingChange> changesList=new List<EditingChange>();
 		public int CurrentIndex { get; private set; } = -1;
 
-		public bool Undo(EditingState editorState,
-			out EditingState newEditorState)
+		public EditingState Undo(EditingState editorState)
 		{
 			if (CurrentIndex==-1)
 			{
-				newEditorState=editorState;
-				return false;
+				return editorState;
 			}
 			var change=changesList[CurrentIndex--];
-			ApplyUndoChange(change, editorState, out newEditorState);
-			return true;
+			return ApplyUndoChange(change, editorState);
 		}
 
-		public bool Redo(string currentText, EditingState editorState,
-			out EditingState newEditorState)
+		public EditingState Redo(EditingState editorState)
 		{
+			CurrentIndex++;
 			if (CurrentIndex==changesList.Count)
 			{
-				newEditorState=editorState;
-				return false;
+				return editorState;
 			}
-			var change=changesList[CurrentIndex++];
-			ApplyRedoChange(change, editorState, out newEditorState);
-			return true;
+			var change=changesList[CurrentIndex];
+			return ApplyRedoChange(change, editorState);
 		}
 
-		public static void ApplyUndoChange(EditingChange change, EditingState editorState,
-			out EditingState newEditorState)
+		public static EditingState ApplyUndoChange(EditingChange change, EditingState editorState)
 		{
 			string firstPart=editorState.text.Substring(0,change.textChange.startIndex);
 			string replacePart=change.textChange.originalString;
 			string lastPart=editorState.text.Substring(firstPart.Length+change.textChange.replacementString.Length);
-			newEditorState.text=firstPart+replacePart+lastPart;
-			newEditorState.cursorIndex=change.indexChange.originalCursor;
-			newEditorState.selectionIndex=change.indexChange.originalSelection;
+			return new EditingState(firstPart+replacePart+lastPart,
+				change.indexChange.originalCursor,
+				change.indexChange.originalSelection);
 		}
 
-		public static void ApplyRedoChange(EditingChange change, EditingState editorState,
-			out EditingState newEditorState)
+		public static EditingState ApplyRedoChange(EditingChange change, EditingState editorState)
 		{
 			string firstPart=editorState.text.Substring(0,change.textChange.startIndex);
 			string replacePart=change.textChange.replacementString;
 			string lastPart=editorState.text.Substring(firstPart.Length+change.textChange.originalString.Length);
-			newEditorState.text=firstPart+replacePart+lastPart;
-			newEditorState.cursorIndex=change.indexChange.replacementCursor;
-			newEditorState.selectionIndex=change.indexChange.replacementSelection;
+			return new EditingState(firstPart+replacePart+lastPart,
+				change.indexChange.replacementCursor,
+				change.indexChange.replacementSelection
+				);
 		}
 
 		public void AddChange(EditingState startState, EditingState endState)
