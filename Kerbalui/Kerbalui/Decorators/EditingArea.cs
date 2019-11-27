@@ -24,16 +24,27 @@ namespace Kerbalui.Decorators
 		private int _cursorIndex;
 		public int CursorIndex { get => _cursorIndex; set
 			{
-				if (value!=_cursorIndex)
-				{
-					QueueLogger.UILogger.Log("For control", editableText.ControlName);
-					QueueLogger.UILogger.Log("EditingArea SetCursorIndex","Value was ", value, " _cursorIndex is ", _cursorIndex);
-					_cursorIndex=value;
-				}
+				_cursorIndex=value;
+				//if (value!=_cursorIndex)
+				//{
+				//	//QueueLogger.UILogger.Log("For control", editableText.ControlName);
+				//	//QueueLogger.UILogger.Log("EditingArea SetCursorIndex","Value was ", value, " _cursorIndex is ", _cursorIndex);
+
+				//}
 			} }
 		public int SelectIndex { get; set; }
 
-		public string Text { get => editableText.Content.text; set => editableText.Content.text=value; }
+		public string Text 
+		{
+			get
+			{
+				return editableText.Content.text;
+			}
+			set
+			{
+				editableText.Content.text=value;
+			}
+		}
 		public override Vector2 MinSize => editableText.MinSize;
 		public GUIStyle Style { get => editableText.Style; set => editableText.Style=Style; }
 		public bool HasFocus() => editableText.HasFocus();
