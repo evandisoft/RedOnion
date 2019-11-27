@@ -83,8 +83,6 @@ namespace Kerbalui.Decorators
 
 		protected override void DecoratorUpdate()
 		{
-
-
 			if (editableText.HasFocus())
 			{
 				ReceivedInput = Event.current.type == EventType.KeyDown;

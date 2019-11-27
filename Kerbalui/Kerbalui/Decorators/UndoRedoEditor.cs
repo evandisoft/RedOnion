@@ -21,6 +21,7 @@ namespace Kerbalui.Decorators
 				var initialState=new EditingState(Text,CursorIndex,SelectIndex);
 				var newState=changesManager.Undo(initialState);
 				Text=newState.text; CursorIndex=newState.cursorIndex; SelectIndex=newState.selectionIndex;
+				UndoLogger.Log("CursorIndex", CursorIndex, "SelectIndex", SelectIndex);
 			});
 			keybindings.Add(new EventKey(KeyCode.Z, true, true), () =>
 			{

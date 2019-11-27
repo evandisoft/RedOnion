@@ -97,8 +97,10 @@ namespace Kerbalui.EditingChanges
 
 			if (CurrentIndex>HistorySoftLimit*2)
 			{
-				changesList=changesList.GetRange(0, HistorySoftLimit);
-				CurrentIndex=changesList.Count-1;
+				// If we are above twice the HistorySoftLimit resize back
+				// down to the limit.
+				changesList=changesList.GetRange(ChangesLength-HistorySoftLimit, HistorySoftLimit);
+				CurrentIndex=changesList.Count;
 			}
 			changesList.Add(editingChange);
 		}

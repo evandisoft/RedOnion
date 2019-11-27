@@ -144,5 +144,32 @@ namespace KerbaluaNUnit
 			Assert.AreEqual(3, changesManager.ChangesLength);
 			//Assert.AreEqual(state1, changesManager.Undo(state1));
 		}
+
+		[Test()]
+		public void KLUI_EditChangesM09_DeleteAndUndo()
+		{
+			Setup();
+			changesManager.HistorySoftLimit=2;
+
+			var state1=new EditingState("asdfefg",0,0);
+			var state2=new EditingState("asdfef",0,0);
+			var state3=new EditingState("asdfe",0,0);
+			var state4=new EditingState("asdf",0,0);
+			var state5=new EditingState("asd",0,0);
+			var state6=new EditingState("as",0,0);
+
+			var state=changesManager.Undo(state6);
+			state=changesManager.Undo(state);
+			state=changesManager.Undo(state);
+			state=changesManager.Undo(state);
+			state=changesManager.Undo(state);
+			state=changesManager.Undo(state);
+			state=changesManager.Undo(state);
+			state=changesManager.Undo(state);
+			state=changesManager.Undo(state);
+
+			Assert.AreEqual(0, changesManager.ChangesLength);
+			//Assert.AreEqual(state1, changesManager.Undo(state1));
+		}
 	}
 }

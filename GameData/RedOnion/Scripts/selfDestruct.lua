@@ -10,3 +10,8 @@ function selfDestruct(part)
 end
 
 selfDestruct(ship.parts[0])
+
+
+
+
+
