@@ -14,11 +14,13 @@ namespace RedOnion.KSP.Debugging {
             RegisteredTags = new HashSet<string>();
             Complogger = new QueueLogger("completion", 1000);
 			UILogger = new QueueLogger("ui", 1000);
+			UndoLogger = new QueueLogger("undoredo", 1000);
 		}
 
         static public QueueLogger Complogger;
 		static public QueueLogger UILogger;
-        static public HashSet<string> RegisteredTags;
+		static public QueueLogger UndoLogger;
+		static public HashSet<string> RegisteredTags;
 
         //static public void WriteTaggedToDisk(string tag = "all")
         //{

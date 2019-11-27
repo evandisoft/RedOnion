@@ -1,12 +1,16 @@
-﻿using Kerbalui.Controls;
+﻿using System.Collections.Generic;
+using Kerbalui.Controls;
 using Kerbalui.Decorators;
+using Kerbalui.EditingChanges;
 using Kerbalui.Util;
+using LiveRepl.Completion;
+using LiveRepl.Interfaces;
 using RedOnion.KSP.Settings;
 using UnityEngine;
 
 namespace LiveRepl.Parts
 {
-	public class ReplInputArea:EditingAreaScroller
+	public class ReplInputArea:EditingAreaScroller,ICompletableElement
 	{
 		public ScriptWindowParts uiparts;
 		const float extraBottomSpace=3;
@@ -15,7 +19,15 @@ namespace LiveRepl.Parts
 		{
 			this.uiparts=uiparts;
 
-			uiparts.FontChange+=editingArea.editableText.FontChangeEventHandler;
+			uiparts.FontChange+=editingArea.FontChangeEventHandler;
+		}
+
+		public EditingState EditingState
+		{
+			get
+			{
+				return new EditingState(editingArea.Text, editingArea.CursorIndex, editingArea.SelectIndex);
+			}
 		}
 
 		protected override void DecoratorUpdate()
@@ -37,6 +49,17 @@ namespace LiveRepl.Parts
 				editingArea.ReceivedInput=true;
 				uiparts.scriptWindow.needsResize=true;
 			}
+		}
+
+		public void Complete(int index)
+		{
+			EditingState newEditingState=CompletionHelper.Complete(index,uiparts,EditingState);
+			Text=newEditingState.text; CursorIndex=newEditingState.cursorIndex; SelectIndex=newEditingState.selectionIndex;
+		}
+
+		public IList<string> GetCompletionContent(out int replaceStart, out int replaceEnd)
+		{
+			return uiparts.scriptWindow.currentReplEvaluator.GetDisplayableCompletions(Text, CursorIndex, out replaceStart, out replaceEnd);
 		}
 
 		public override bool HorizontalScrollBarPresent { get => rect.width<editingArea.MinSize.x; }

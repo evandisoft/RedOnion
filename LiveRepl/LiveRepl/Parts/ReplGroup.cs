@@ -39,30 +39,30 @@ namespace LiveRepl.Parts
 			uiparts.replInputArea.keybindings.Add(new EventKey(KeyCode.LeftBracket, true), () =>
 			{
 				//Debug.Log("history up");
-				uiparts.replInputArea.editingArea.Text = uiparts.scriptWindow.currentReplEvaluator.HistoryUp();
-				uiparts.replInputArea.editingArea.SelectIndex = uiparts.replInputArea.editingArea.Text.Length;
-				uiparts.replInputArea.editingArea.CursorIndex = uiparts.replInputArea.editingArea.Text.Length;
+				uiparts.replInputArea.Text = uiparts.scriptWindow.currentReplEvaluator.HistoryUp();
+				uiparts.replInputArea.SelectIndex = uiparts.replInputArea.Text.Length;
+				uiparts.replInputArea.CursorIndex = uiparts.replInputArea.Text.Length;
 			});
 			uiparts.replInputArea.keybindings.Add(new EventKey(KeyCode.Quote, true), () =>
 			{
 				//Debug.Log("history down");
-				uiparts.replInputArea.editingArea.Text = uiparts.scriptWindow.currentReplEvaluator.HistoryDown();
-				uiparts.replInputArea.editingArea.SelectIndex = uiparts.replInputArea.editingArea.Text.Length;
-				uiparts.replInputArea.editingArea.CursorIndex = uiparts.replInputArea.editingArea.Text.Length;
+				uiparts.replInputArea.Text = uiparts.scriptWindow.currentReplEvaluator.HistoryDown();
+				uiparts.replInputArea.SelectIndex = uiparts.replInputArea.Text.Length;
+				uiparts.replInputArea.CursorIndex = uiparts.replInputArea.Text.Length;
 			});
 			uiparts.replInputArea.keybindings.Add(new EventKey(KeyCode.UpArrow, true), () =>
 			{
 				//Debug.Log("history up");
-				uiparts.replInputArea.editingArea.Text = uiparts.scriptWindow.currentReplEvaluator.HistoryUp();
-				uiparts.replInputArea.editingArea.SelectIndex = uiparts.replInputArea.editingArea.Text.Length;
-				uiparts.replInputArea.editingArea.CursorIndex = uiparts.replInputArea.editingArea.Text.Length;
+				uiparts.replInputArea.Text = uiparts.scriptWindow.currentReplEvaluator.HistoryUp();
+				uiparts.replInputArea.SelectIndex = uiparts.replInputArea.Text.Length;
+				uiparts.replInputArea.CursorIndex = uiparts.replInputArea.Text.Length;
 			});
 			uiparts.replInputArea.keybindings.Add(new EventKey(KeyCode.DownArrow, true), () =>
 			{
 				//Debug.Log("history down");
-				uiparts.replInputArea.editingArea.Text = uiparts.scriptWindow.currentReplEvaluator.HistoryDown();
-				uiparts.replInputArea.editingArea.SelectIndex = uiparts.replInputArea.editingArea.Text.Length;
-				uiparts.replInputArea.editingArea.CursorIndex = uiparts.replInputArea.editingArea.Text.Length;
+				uiparts.replInputArea.Text = uiparts.scriptWindow.currentReplEvaluator.HistoryDown();
+				uiparts.replInputArea.SelectIndex = uiparts.replInputArea.Text.Length;
+				uiparts.replInputArea.CursorIndex = uiparts.replInputArea.Text.Length;
 			});
 		}
 	}
