@@ -17,8 +17,6 @@ namespace LiveRepl.Parts
 		ScriptWindowParts uiparts;
 		int partialLength;
 
-		public string ControlName => editingArea.editableText.ControlName;
-
 		public int SelectionIndex { get; private set; } = 0;
 
 		public CompletionArea(ScriptWindowParts uiparts) : base(new EditingArea(new TextArea()))
