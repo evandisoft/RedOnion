@@ -70,7 +70,7 @@ namespace LiveRepl
 		public void LoadEditorText()
 		{
 			string text=uiparts.scriptNameInputArea.LoadText();
-			uiparts.editor.Text=text;
+			uiparts.editor.ModifyAndResetUndo(text);
 			uiparts.editorChangesIndicator.Unchanged();
 			SetReplEvaluatorByFilename(uiparts.scriptNameInputArea.Text);
 		}

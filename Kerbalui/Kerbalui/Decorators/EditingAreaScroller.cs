@@ -1,4 +1,5 @@
 using System;
+using Kerbalui.EditingChanges;
 using Kerbalui.EventHandling;
 using Kerbalui.Interfaces;
 using Kerbalui.Types;
@@ -12,17 +13,17 @@ namespace Kerbalui.Decorators
 	{
 		protected EditingArea editingArea;
 
-		public int CursorIndex { get => editingArea.CursorIndex; set => editingArea.CursorIndex=value; }
-		public int SelectIndex { get => editingArea.SelectIndex; set => editingArea.SelectIndex=value; }
-		public string Text { get => editingArea.Text; set => editingArea.Text=value; }
-
-
 		public KeyBindings keybindings= new KeyBindings();
 
 		public EditingAreaScroller(EditingArea editingArea)
 		{
 			this.editingArea=editingArea;
 		}
+
+		public string Text { get => editingArea.Text; set => editingArea.Text=value; }
+		public int CursorIndex { get => editingArea.CursorIndex; set => editingArea.CursorIndex=value; }
+		public int SelectIndex { get => editingArea.SelectIndex; set => editingArea.SelectIndex=value; }
+
 
 		public bool HasFocus() => editingArea.HasFocus();
 		public void GrabFocus() => editingArea.GrabFocus();
@@ -39,6 +40,9 @@ namespace Kerbalui.Decorators
 		public string ControlName => editingArea.ControlName;
 
 		public bool ReceivedInput => editingArea.ReceivedInput;
+
+
+
 
 		public const int ScrollbarWidth=20;
 

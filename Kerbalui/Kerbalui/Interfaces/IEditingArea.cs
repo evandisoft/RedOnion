@@ -1,13 +1,15 @@
 using System;
+using Kerbalui.EditingChanges;
+
 namespace Kerbalui.Interfaces
 {
 	public interface IEditingArea
 	{
 		string ControlName { get; }
 		bool ReceivedInput { get; }
-		int CursorIndex { get; set; }
+
 		string Text { get; set; }
-		int SelectIndex { get; set; }
+		int CursorIndex { get; set; }
 
 		void GrabFocus();
 		bool HasFocus();

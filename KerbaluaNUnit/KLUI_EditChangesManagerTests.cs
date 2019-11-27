@@ -28,6 +28,7 @@ namespace KerbaluaNUnit
 			changesManager.AddChange(state1, state2);
 
 			Assert.AreEqual(0, changesManager.ChangesLength);
+			Assert.AreEqual(state1, changesManager.Undo(state1));
 		}
 
 		[Test()]
@@ -109,6 +110,39 @@ namespace KerbaluaNUnit
 			Assert.AreEqual(state1, changesManager.Undo(state1));
 			changesManager.AddChange(state1, state3);
 			Assert.AreEqual(1, changesManager.ChangesLength);
+		}
+
+		[Test()]
+		public void KLUI_EditChangesM07_IndexChange()
+		{
+			Setup();
+
+			var state1=new EditingState("asdf",0,0);
+			var state2=new EditingState("asdf",1,0);
+
+			changesManager.AddChange(state1, state2);
+
+			Assert.AreEqual(1, changesManager.ChangesLength);
+			Assert.AreEqual(state1, changesManager.Undo(state1));
+		}
+
+		[Test()]
+		public void KLUI_EditChangesM08_HistoryTest()
+		{
+			Setup();
+			changesManager.HistorySoftLimit=2;
+
+			var state1=new EditingState("asdf",0,0);
+			var state2=new EditingState("asdfa",1,0);
+			changesManager.AddChange(state1, state2);
+			changesManager.AddChange(state1, state2);
+			changesManager.AddChange(state1, state2);
+			changesManager.AddChange(state1, state2);
+			changesManager.AddChange(state1, state2);
+			changesManager.AddChange(state1, state2);
+
+			Assert.AreEqual(3, changesManager.ChangesLength);
+			//Assert.AreEqual(state1, changesManager.Undo(state1));
 		}
 	}
 }
