@@ -112,6 +112,13 @@
     <Compile Include="Kerbalui\Layout\Filler.cs" />
     <Compile Include="Kerbalui\Decorators\EditingArea.cs" />
     <Compile Include="Kerbalui\Decorators\EditingAreaScroller.cs" />
+    <Compile Include="Kerbalui\EditingChanges\EditingChangesManager.cs" />
+    <Compile Include="Kerbalui\EditingChanges\TextChange.cs" />
+    <Compile Include="Kerbalui\EditingChanges\IndexChange.cs" />
+    <Compile Include="Kerbalui\EditingChanges\EditingState.cs" />
+    <Compile Include="Kerbalui\EditingChanges\EditingChange.cs" />
+    <Compile Include="Kerbalui\Decorators\UndoRedoEditor.cs" />
+    <Compile Include="Kerbalui\Interfaces\IEditingArea.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
@@ -133,6 +140,8 @@
     <Folder Include="Kerbalui\EventHandling\" />
     <Folder Include="Kerbalui\Util\" />
     <Folder Include="Kerbalui\Layout\Abstract\" />
+    <Folder Include="Kerbalui\EditingChanges\" />
+    <Folder Include="Kerbalui\Interfaces\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="DevReadme.md" />

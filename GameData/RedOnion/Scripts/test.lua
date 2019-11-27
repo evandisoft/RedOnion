@@ -13,5 +13,3 @@ selfDestruct(ship.parts[0])
 
 
 
-
-

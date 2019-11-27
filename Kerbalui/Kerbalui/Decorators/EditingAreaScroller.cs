@@ -1,5 +1,7 @@
 using System;
+using Kerbalui.EditingChanges;
 using Kerbalui.EventHandling;
+using Kerbalui.Interfaces;
 using Kerbalui.Types;
 using Kerbalui.Util;
 using UnityEngine;
@@ -7,9 +9,9 @@ using static RedOnion.KSP.Debugging.QueueLogger;
 
 namespace Kerbalui.Decorators
 {
-	public class EditingAreaScroller:Decorator
+	public class EditingAreaScroller:Decorator, IEditingArea
 	{
-		public EditingArea editingArea;
+		protected EditingArea editingArea;
 
 		public KeyBindings keybindings= new KeyBindings();
 
@@ -17,6 +19,11 @@ namespace Kerbalui.Decorators
 		{
 			this.editingArea=editingArea;
 		}
+
+		public string Text { get => editingArea.Text; set => editingArea.Text=value; }
+		public int CursorIndex { get => editingArea.CursorIndex; set => editingArea.CursorIndex=value; }
+		public int SelectIndex { get => editingArea.SelectIndex; set => editingArea.SelectIndex=value; }
+
 
 		public bool HasFocus() => editingArea.HasFocus();
 		public void GrabFocus() => editingArea.GrabFocus();
@@ -29,6 +36,13 @@ namespace Kerbalui.Decorators
 		public virtual bool HorizontalScrollBarPresent { get; set; } = false;// rect.width<editingArea.rect.width;
 
 		public virtual bool VerticalScrollBarPresent { get; set; } = false;//rect.height<editingArea.rect.height;
+
+		public string ControlName => editingArea.ControlName;
+
+		public bool ReceivedInput => editingArea.ReceivedInput;
+
+
+
 
 		public const int ScrollbarWidth=20;
 
@@ -56,7 +70,7 @@ namespace Kerbalui.Decorators
 
 			if ((Event.current.type==EventType.MouseDown || Event.current.type==EventType.ScrollWheel) && !HasFocus() && GUILibUtil.MouseInRect(rect))//.Contains(Event.current.mousePosition))
 			{
-				UILogger.Log("Grabbing focus for control",editingArea.editableText.ControlName,"Event was", Event.current.type);
+				UILogger.Log("Grabbing focus for control",editingArea.ControlName,"Event was", Event.current.type);
 				//Debug.Log("edit area scroller grabbing mouse");
 				GrabFocus();
 			}
@@ -99,13 +113,13 @@ namespace Kerbalui.Decorators
 			float diff = lastContentVector2.x - lastScrollViewVector2.x;
 			float contentStartX = scrollPos.x;
 			float contentEndX = contentStartX + lastScrollViewVector2.x;
-			if (Math.Max(cursorX - editingArea.editableText.Style.lineHeight, 0) < contentStartX)
+			if (Math.Max(cursorX - editingArea.Style.lineHeight, 0) < contentStartX)
 			{
-				scrollPos.x = Math.Max(cursorX - editingArea.editableText.Style.lineHeight, 0);
+				scrollPos.x = Math.Max(cursorX - editingArea.Style.lineHeight, 0);
 			}
-			else if (cursorX + editingArea.editableText.Style.lineHeight > contentEndX)
+			else if (cursorX + editingArea.Style.lineHeight > contentEndX)
 			{
-				scrollPos.x = cursorX - lastContentVector2.x + editingArea.editableText.Style.lineHeight;
+				scrollPos.x = cursorX - lastContentVector2.x + editingArea.Style.lineHeight;
 			}
 		}
 
@@ -120,14 +134,14 @@ namespace Kerbalui.Decorators
 			//Debug.Log("contentStartY " + contentStartY);
 			float contentEndY = contentStartY + lastScrollViewVector2.y;
 			//Debug.Log("contentEndY " + contentEndY);
-			if (cursorY - editingArea.editableText.Style.lineHeight < contentStartY)
+			if (cursorY - editingArea.Style.lineHeight < contentStartY)
 			{
-				scrollPos.y = cursorY - editingArea.editableText.Style.lineHeight;
+				scrollPos.y = cursorY - editingArea.Style.lineHeight;
 				//Debug.Log("reducing to " + scrollPos.y);
 			}
-			else if (cursorY + editingArea.editableText.Style.lineHeight > contentEndY)
+			else if (cursorY + editingArea.Style.lineHeight > contentEndY)
 			{
-				scrollPos.y = cursorY - lastContentVector2.y + editingArea.editableText.Style.lineHeight;
+				scrollPos.y = cursorY - lastContentVector2.y + editingArea.Style.lineHeight;
 				//Debug.Log("expanding to " + scrollPos.y);
 			}
 		}

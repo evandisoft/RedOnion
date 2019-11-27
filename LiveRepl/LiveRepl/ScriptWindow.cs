@@ -64,8 +64,8 @@ namespace LiveRepl
 		void InitCompletion()
 		{
 			completionManager=new CompletionManager(uiparts.completionArea);
-			completionManager.AddCompletable(new EditingAreaCompletionAdapter(uiparts.editor.editingArea, this));
-			completionManager.AddCompletable(new EditingAreaCompletionAdapter(uiparts.replInputArea.editingArea, this));
+			completionManager.AddCompletable(uiparts.editor);
+			completionManager.AddCompletable(uiparts.replInputArea);
 			completionManager.AddCompletable(uiparts.scriptNameInputArea);
 			completionManager.AddCompletable(uiparts.scriptNameInputArea);
 			completionManager.AddCompletable(uiparts.fontSelector);
