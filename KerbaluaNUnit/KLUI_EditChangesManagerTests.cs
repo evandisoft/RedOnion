@@ -56,6 +56,8 @@ namespace KerbaluaNUnit
 
 			Assert.AreEqual(state1, changesManager.Undo(state2));
 			Assert.AreEqual(state2, changesManager.Redo(state1));
+			Assert.AreEqual(state1, changesManager.Undo(state2));
+			Assert.AreEqual(state1, changesManager.Undo(state1));
 		}
 
 		[Test()]
@@ -71,10 +73,28 @@ namespace KerbaluaNUnit
 			Assert.AreEqual(state1, changesManager.Undo(state2));
 			Assert.AreEqual(state2, changesManager.Redo(state1));
 			Assert.AreEqual(state2, changesManager.Redo(state2));
+			Assert.AreEqual(state1, changesManager.Undo(state2));
+			Assert.AreEqual(state1, changesManager.Undo(state1));
 		}
 
 		[Test()]
-		public void KLUI_EditChangesM04_AddChangeAfterUndo()
+		public void KLUI_EditChangesM05_DeleteFromMiddle()
+		{
+			Setup();
+
+			var state1=new EditingState("asabcdf",3,1);
+			var state2=new EditingState("asdf",34,8);
+
+			changesManager.AddChange(state1, state2);
+
+			Assert.AreEqual(state1, changesManager.Undo(state2));
+			Assert.AreEqual(state1, changesManager.Undo(state1));
+			Assert.AreEqual(state1, changesManager.Undo(state1));
+			Assert.AreEqual(state1, changesManager.Undo(state1));
+		}
+
+		[Test()]
+		public void KLUI_EditChangesM06_AddChangeAfterUndo()
 		{
 			Setup();
 

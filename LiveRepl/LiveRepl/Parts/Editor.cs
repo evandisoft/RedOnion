@@ -19,7 +19,7 @@ namespace LiveRepl.Parts
 		/// </summary>
 		/// 
 
-		public Editor(ScriptWindowParts uiparts) : base(new EditingArea(new TextArea()))
+		public Editor(ScriptWindowParts uiparts) : base(new UndoRedoEditor(new TextArea()))
 		{
 			this.uiparts=uiparts;
 

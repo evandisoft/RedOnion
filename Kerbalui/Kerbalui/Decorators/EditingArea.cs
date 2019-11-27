@@ -1,5 +1,6 @@
 using System;
 using Kerbalui.Controls.Abstract;
+using Kerbalui.EditingChanges;
 using Kerbalui.EventHandling;
 using Kerbalui.Types;
 using Kerbalui.Util;
@@ -20,6 +21,7 @@ namespace Kerbalui.Decorators
 		public TextEditor backingEditor;
 		public int LineNumber { get; private set; } = 1;
 		public int ColumnNumber { get; private set; } = 1;
+
 
 		private int _cursorIndex;
 		public int CursorIndex { get => _cursorIndex; set
@@ -79,6 +81,8 @@ namespace Kerbalui.Decorators
 
 		protected override void DecoratorUpdate()
 		{
+
+
 			if (editableText.HasFocus())
 			{
 				ReceivedInput = Event.current.type == EventType.KeyDown;
@@ -122,19 +126,6 @@ namespace Kerbalui.Decorators
 
 					editableText.Update();
 				}
-
-				//bool wasmousedown=Event.current.type==EventType.MouseDown;
-
-
-
-
-				//if (wasmousedown)
-				//{
-				//	Debug.Log("was");
-				//	Debug.Log(LineNumber);
-				//	Debug.Log(ColumnNumber);
-				//}
-
 				
 			}
 			else
