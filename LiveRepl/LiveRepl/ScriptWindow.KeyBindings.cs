@@ -53,6 +53,8 @@ ctrl + h: insert and move to new line before current line
 Editor only:
 ctrl + s: Saves the file in `Scripts` folder within KSP folder based on the name specified in the textarea that is dedicated to this.
 ctrl + d: Loads the file from `Scripts` folder within KSP folder based on the name specified in the textarea that is dedicated to this.
+ctrl + z: Undo
+ctrl + shift + z: Redo
 
 REPL input area only:
 enter: evaluate content and clear repl input area.
