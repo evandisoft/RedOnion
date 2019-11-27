@@ -9,7 +9,7 @@
 - More UI library features.
 
 # Next Release
-Just had a release!
+- Undo/Redo for liverepl editor
 
 # Current
 # 0.4
