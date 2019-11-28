@@ -13,7 +13,7 @@
 - Fixed bug where Lua was outputting strings twice
 - Renamed KerbaluaMoonSharp assembly ([our modified version of MoonSharp](Kerbalua/MunSharp.md)) to MunSharp.
 - Fixed MoonSharp issue where some classes could not be automatically registered because of having members that hide base class members without overriding them.
-- [CommonAPI](RedOnion.KSP/API/Globals.md) docs much improved.
+- Improved format for [CommonAPI](RedOnion.KSP/API/Globals.md) docs.
 
 # Current
 # 0.4
