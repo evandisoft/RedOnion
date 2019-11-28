@@ -66,6 +66,7 @@ namespace Kerbalui.Decorators
 
 		public EditingArea(EditableText editableText)
 		{
+			//backingEditor.
 			this.editableText = editableText;
 			InitializeDefaultKeyBindings();
 			//Style.font = GUILibUtil.GetMonoSpaceFont();
