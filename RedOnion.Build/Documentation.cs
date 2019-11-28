@@ -273,7 +273,7 @@ namespace RedOnion.Build
 			if (doc.baseClass != null)
 			{
 				wr.WriteLine();
-				wr.WriteLine("**Base Class:** " + ResolveType(doc, doc.baseClass.type, out _));
+				wr.WriteLine("**Base Class:** " + ResolveType(doc, doc.type.BaseType, out _));
 			}
 			if (doc.derived.Count > 0)
 			{

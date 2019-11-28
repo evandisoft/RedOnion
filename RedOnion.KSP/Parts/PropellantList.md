@@ -1,6 +1,6 @@
 ## PropellantList
 
-**Base Class:** [ReadOnlyList.1](../API/ReadOnlyList.1.md)
+**Base Class:** [ReadOnlyList](../API/ReadOnlyList.1.md)\[Propellant\]
 
 List/set of propellants of single engine or list/set of engines.
 

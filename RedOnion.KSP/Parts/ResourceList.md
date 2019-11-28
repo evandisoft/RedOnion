@@ -1,6 +1,6 @@
 ## ResourceList
 
-**Base Class:** [ReadOnlyList.1](../API/ReadOnlyList.1.md)
+**Base Class:** [ReadOnlyList](../API/ReadOnlyList.1.md)\[[Resource](Resource.md)\]
 
 List of resources (read-only). Can either belong to single part or to list/set of parts.
 

@@ -1,6 +1,6 @@
 ## PID
 
-**Base Class:** [PID.1](PID.1.md)
+**Base Class:** [PID](PID.1.md)\[[PidParams](PidParams.md)\]
 
 PID(R) regulator.
 
