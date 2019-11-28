@@ -1,4 +1,6 @@
 using System;
+using Grammar.IncompleteLuaParsing;
+
 namespace Kerbalua.Completion
 {
 	public abstract class CompletionOperation

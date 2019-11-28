@@ -2,6 +2,7 @@ using System;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
+using Grammar.IncompleteLuaParsing;
 using UnityEngine;
 
 namespace Kerbalua.Parsing

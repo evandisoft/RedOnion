@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
+using Grammar.IncompleteLuaParsing;
 using Kerbalua.Completion.CompletionTypes;
 using Kerbalua.Parsing;
 using MoonSharp.Interpreter;
