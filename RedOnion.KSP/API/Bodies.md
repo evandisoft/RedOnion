@@ -1,8 +1,5 @@
 ## Bodies
 
-
-A collection of space/celestial bodies.
-Acess them by `bodies.bodyname`. 
-For example bodies.mun will return a reference to the mun.
-
+Collection of [celestial bodies](SpaceBody.md). Can be indexed (`bodies["kerbin"]`)
+and elements are also properties (`bodies.kerbin`, `bodies.mun`).
 

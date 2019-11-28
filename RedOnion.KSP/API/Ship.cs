@@ -203,7 +203,7 @@ namespace RedOnion.KSP.API
 		[Description("KSP API. Orbited body.")]
 		public SpaceBody body => Bodies.Instance[native.mainBody];
 		ISpaceObject ISpaceObject.body => body;
-		[Unsafe, Description("KSP API. Orbit parameters.")]
+		[Unsafe, Description("KSP API. Orbit parameters. May get replaced by safe wrapper in the future.")]
 		public Orbit orbit => native.orbit;
 		[Description("Eccentricity of current orbit.")]
 		public double eccentricity => native.orbit.eccentricity;

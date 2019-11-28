@@ -149,8 +149,6 @@ namespace LiveRepl.Parts {
 		List<string> scriptList;
 		const int ioDelayMillis = 1000;
 
-		public string ControlName => editableText.ControlName;
-
 		/// <summary>
 		/// This is used to update the script list at most every ioDelayMillis milliseconds.
 		/// </summary>

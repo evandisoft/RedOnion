@@ -19,12 +19,9 @@ namespace RedOnion.KSP.API
 		Vector position { get; }
 		ISpaceObject body { get; }
 	}
-	[Description(@"
-A collection of space/celestial bodies.
-Acess them by `bodies.bodyname`. 
-For example bodies.mun will return a reference to the mun.
-"
-		)]
+	[DocBuild(typeof(SpaceBody)), Description(
+@"Collection of [celestial bodies](SpaceBody.md). Can be indexed (`bodies[""kerbin""]`)
+and elements are also properties (`bodies.kerbin`, `bodies.mun`).")]
 	public class Bodies : Properties<SpaceBody>.WithMap<CelestialBody>, ICompletable
 	{
 		public static Bodies Instance { get; } = new Bodies();
@@ -59,6 +56,7 @@ For example bodies.mun will return a reference to the mun.
 			}
 		}
 	}
+	[Description("Celestial body. (`SpaceBody` selected not to conflict with KSP `CelestialBody`.)")]
 	public class SpaceBody : ISpaceObject
 	{
 		[Unsafe, Description("KSP API. Native `CelestialBody`.")]

@@ -13,7 +13,7 @@ Safe API for KSP Application Launcher (toolbar/buttons). WIP
 - `auto`: AppScenes - The button should only be visible in current scene (flight|map or VAB|SPH used if appropriate).
 - `ready`: bool - Application launcher is ready for use.
 - `defaultIcon`: Texture2D - Default Red Onion Icon.
-- `add()`: [Button](App+Button.md), scenes AppScenes, iconPath string, onTrue Callback, onFalse Callback, onHover Callback, onHoverOut Callback, onEnable Callback, onDisable Callback
+- `add()`: [App.Button](App.Button.md), scenes AppScenes, iconPath string, onTrue Callback, onFalse Callback, onHover Callback, onHoverOut Callback, onEnable Callback, onDisable Callback
   - Add new app launcher button. Keep the returned object in a variable, the button would eventually be removed otherwise.
-- `add()`: [Button](App+Button.md), onTrue Callback, onFalse Callback, onHover Callback, onHoverOut Callback, onEnable Callback, onDisable Callback, scenes AppScenes, texture Texture
+- `add()`: [App.Button](App.Button.md), onTrue Callback, onFalse Callback, onHover Callback, onHoverOut Callback, onEnable Callback, onDisable Callback, scenes AppScenes, texture Texture
   - Add new app launcher button. Keep the returned object in a variable, the button would eventually be removed otherwise.

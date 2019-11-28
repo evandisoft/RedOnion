@@ -92,8 +92,16 @@ namespace RedOnion.Build
 			foreach (var member in members)
 				yield return member;
 		}
-		static string GetName(ICustomAttributeProvider member)
-			=> Descriptor.Reflected.GetName(member);
+		static string GetName(ICustomAttributeProvider provider)
+		{
+			string name = provider is MemberInfo member ? member is ConstructorInfo ci
+					? ci.DeclaringType.Name : member.Name
+					: provider is Type type ? type.Name : null;
+			var displayName = provider.GetCustomAttributes(typeof(DisplayNameAttribute), !(provider is Type));
+			if (displayName.Length == 1)
+				return ((DisplayNameAttribute)displayName[0]).DisplayName;
+			return name;
+		}
 
 		static ListCore<Type> queue = new ListCore<Type>();
 		static void RegisterType(Type type)
@@ -112,7 +120,7 @@ namespace RedOnion.Build
 				type = type.GetGenericTypeDefinition();
 			if (type.IsGenericParameter || type.FullName == null)
 				return;
-			var desc = type.GetCustomAttribute<DescriptionAttribute>()?.Description;
+			var desc = type.GetCustomAttribute<DescriptionAttribute>(false)?.Description;
 			if (desc != null && discovered.Add(type))
 				queue.Add(type);
 			if (fullType != type)
@@ -135,9 +143,11 @@ namespace RedOnion.Build
 			for (int i = 0; i < queue.size; i++)
 			{
 				var type = queue[i];
-				var desc = type.GetCustomAttribute<DescriptionAttribute>()?.Description;
+				var desc = type.GetCustomAttribute<DescriptionAttribute>(false)?.Description;
 				var name = type.GetCustomAttribute<DisplayNameAttribute>(false)?.DisplayName
-					?? type.Name.Replace('`', '.');
+					?? (type.DeclaringType == null ? type.Name :
+					type.FullName.Substring(type.Namespace.Length + 1).Replace('+', '.') // nested type
+					).Replace('`', '.');
 				var path = "";
 				var full = type.FullName;
 				if (full.StartsWith("RedOnion.KSP."))
@@ -150,7 +160,7 @@ namespace RedOnion.Build
 					full = full.Substring("RedOnion.UI.".Length);
 					path = "RedOnion.UI/";
 				}
-				path += string.Join("/", full.Split('.')).Replace('`', '.');
+				path += string.Join("/", full.Split('.')).Replace('`', '.').Replace('+', '.');
 				var docb = type.GetCustomAttribute<DocBuildAttribute>();
 				if (docb != null && !string.IsNullOrEmpty(docb.Path))
 					path = docb.Path;
@@ -172,16 +182,16 @@ namespace RedOnion.Build
 				types.Add(type, doc);
 				foreach (var member in GetMembers(type))
 				{
-					FieldInfo f = member as FieldInfo;
+					var f = member as FieldInfo;
 					bool typeRef = f != null
 						&& f.IsStatic && f.IsInitOnly	// static readonly
 						&& f.FieldType == typeof(Type);	// Type name = ...
 					if (member.GetCustomAttribute<DescriptionAttribute>() == null && (!typeRef ||
-						((Type)f.GetValue(null)).GetCustomAttribute<DescriptionAttribute>() == null))
+						((Type)f.GetValue(null)).GetCustomAttribute<DescriptionAttribute>(false) == null))
 						continue;
 					var mname = GetName(member);
 					members.TryGetValue(mname, out var prev);
-					if (prev != null && !(prev is MethodInfo && member is MethodInfo))
+					if (prev != null && !(prev is MethodBase && member is MethodBase))
 						continue;
 					if (f != null)
 						RegisterType(
@@ -191,9 +201,10 @@ namespace RedOnion.Build
 							: f.FieldType);
 					else if (member is PropertyInfo p)
 						RegisterType(p.PropertyType);
-					else if (member is MethodInfo m)
+					else if (member is MethodBase m)
 					{
-						RegisterType(m.ReturnType);
+						if (m is MethodInfo mi)
+							RegisterType(mi.ReturnType);
 						foreach (var mp in m.GetParameters())
 							RegisterType(mp.ParameterType);
 					}
@@ -249,7 +260,7 @@ namespace RedOnion.Build
 					PrintSimpleMember(wr, doc, mname, member, p.PropertyType);
 					continue;
 				}
-				if (member is MethodInfo m)
+				if (member is MethodBase m)
 				{
 					PrintMethod(wr, doc, mname, m);
 					continue;
@@ -335,13 +346,14 @@ namespace RedOnion.Build
 				string.Format(unsafeMark, desc) : desc);
 		}
 
-		static void PrintMethod(StreamWriter wr, Document doc, string name, MethodInfo method)
+		static void PrintMethod(StreamWriter wr, Document doc, string name, MethodBase mbase)
 		{
-			var desc = method.GetCustomAttribute<DescriptionAttribute>().Description;
-			var type = method.ReturnType;
-			var typeMd = ResolveType(doc, type, out _);
-			var pars = method.GetParameters();
-			wr.Write("- `{0}()`: {1}", name, typeMd);
+			var desc = mbase.GetCustomAttribute<DescriptionAttribute>().Description;
+			var method = mbase as MethodInfo;
+			var type = method?.ReturnType;
+			var typeMd = type != null ? ResolveType(doc, type, out _) : null;
+			wr.Write(typeMd == null ? "- `{0}()`" : "- `{0}()`: {1}", name, typeMd);
+			var pars = mbase.GetParameters();
 			foreach (var par in pars)
 			{
 				type = par.ParameterType;
@@ -351,7 +363,7 @@ namespace RedOnion.Build
 			if (pars.Length > 0)
 				wr.WriteLine();
 			wr.WriteLine(pars.Length == 0 ? " - {0}" : "  - {0}",
-				method.IsDefined(typeof(UnsafeAttribute)) ?
+				mbase.IsDefined(typeof(UnsafeAttribute)) ?
 				string.Format(unsafeMark, desc) : desc);
 		}
 

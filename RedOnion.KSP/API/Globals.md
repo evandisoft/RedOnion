@@ -21,5 +21,5 @@ Global variables, objects and functions common to all scripting languages.
 - `altitude`: double - Alias to `ship.altitude`. (`NaN` if no ship.)
 - `apoapsis`: double - Alias to `ship.apoapsis`. (`NaN` if no ship.)
 - `periapsis`: double - Alias to `ship.periapsis`. (`NaN` if no ship.)
-- `body`: SpaceBody - Orbited body (redirects to `ship.body`, `null` if no ship).
-- `atmosphere`: [Atmosphere](SpaceBody+Atmosphere.md) - Atmosphere parameters of orbited body (redirects to `ship.body.atmosphere`, `atmosphere.none` if no ship).
+- `body`: [SpaceBody](SpaceBody.md) - Orbited body (redirects to `ship.body`, `null` if no ship).
+- `atmosphere`: [SpaceBody.Atmosphere](SpaceBody.Atmosphere.md) - Atmosphere parameters of orbited body (redirects to `ship.body.atmosphere`, `atmosphere.none` if no ship).

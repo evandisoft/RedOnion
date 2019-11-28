@@ -16,7 +16,7 @@ namespace LiveRepl.Parts
 			editingArea.Style.alignment = TextAnchor.LowerLeft;
 			editingArea.Style.font = GUILibUtil.GetMonoSpaceFont();
 
-			uiparts.FontChange+=editingArea.editableText.FontChangeEventHandler;
+			uiparts.FontChange+=editingArea.FontChangeEventHandler;
 		}
 
 		public StringBuilder outputBuffer=new StringBuilder();

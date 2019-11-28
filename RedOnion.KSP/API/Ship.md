@@ -27,8 +27,8 @@ Active vessel
 - `radarAltitude`: double - True height above ground in meters.
 - `dynamicPressure`: double - Dynamic pressure [atm = 101.325kPa]
 - `q`: double - Dynamic pressure [atm = 101.325kPa]
-- `body`: SpaceBody - KSP API. Orbited body.
-- `orbit`: Orbit - \[`Unsafe`\] KSP API. Orbit parameters.
+- `body`: [SpaceBody](SpaceBody.md) - KSP API. Orbited body.
+- `orbit`: Orbit - \[`Unsafe`\] KSP API. Orbit parameters. May get replaced by safe wrapper in the future.
 - `eccentricity`: double - Eccentricity of current orbit.
 - `semiMajorAxis`: double - Semi-major axis of current orbit.
 - `semiMinorAxis`: double - Semi-minor axis of current orbit.

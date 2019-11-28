@@ -9,12 +9,14 @@ namespace RedOnion.KSP.Namespaces
 	[Description("User interface, see [RedOnion.UI](../../RedOnion.UI/README.md)")]
 	public static class UI_Namespace
 	{
-		[Description("Color.")]
+		[Description("UnityEngine.Color")]
 		public static readonly Type Color = typeof(UnityEngine.Color);
+
 		[Description("Window - all elements must belong to some window.")]
 		public static readonly Type Window = typeof(UI_Window);
 		[Description("Scene flags for limiting life-span of windows when switching scenes.")]
 		public static readonly Type SceneFlags = typeof(UI.SceneFlags);
+
 		[Description("Anchors for specifying where to place elements (fill, center, ...)")]
 		public static readonly Type Anchors = typeof(UI.Anchors);
 		[Description("Padding - empty space inside an element / around contained elements.")]
