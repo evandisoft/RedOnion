@@ -16,7 +16,7 @@ and saving the modified version (which will become a file outside of the zip).
 ## Limitations
 - Calls to long running CLR code is not interruptible.
 - You cannot safely pass a function to something like
-`List.Foreach(fn)` because we cannot interrupt the `Foreach` call. So the entire iteration would have to occur in one KSP FixedUpdate and it would pause the game to complete. Our scripting languages have functionality for iterating over CLR collections which is interruptible, so you will have to use that instead. There's a convenient way to iterate over dotnet collections in both Kerbalua
+`List.Foreach(fn)` because we cannot interrupt the `Foreach` call. So the entire iteration would have to occur in one KSP FixedUpdate and it would pause the game to complete. Our scripting languages have functionality for iterating over CLR collections which is interruptible, so you will have to use that instead. There's a convenient way to iterate over dotnet collections in both [Kerbalua](Kerbalua/BasicParts.md) and [ROS](RedOnion.ROS/README.md#statements)
 - The CLR objects in the [KSP API](https://kerbalspaceprogram.com/api/annotated.html) that you might access using `ksp.` or `native.`, may be poorly documented. Modders had to expend a lot of effort to figure out how they work and how to avoid problems.
 
 ## Scripting Links
