@@ -2,11 +2,15 @@
 
 Time warping utilities
 
+
+**Static Properties:**
 - `ready`: bool - Indicator that warping utilities are ready for commands. (`to` will return false otherwise.)
 - `low`: bool - Warp mode set to low aka physics warp. Note that it can only be changed on zero rate-index (and when `ready`).
 - `high`: bool - Warp mode set to high aka on-rails warp. Note that it can only be changed on zero rate-index (and when `ready`).
 - `rate`: float - Current rate.
 - `index`: int - Current rate index.
+
+**Static Methods:**
 - `setIndex()`: bool, value int
   - Set rate index. Returns false if not possible now.
 - `setRate()`: bool, value float

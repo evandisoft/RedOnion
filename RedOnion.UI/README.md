@@ -3,6 +3,8 @@
 This is an attempt to create real Unity UI library (not IMGUI) that is relatively easy to use.
 It should be similar to WinForms with top-down coordinate system (unlike Unity where Y is up).
 
+[Generated documentation here](../RedOnion.KSP/Namespaces/UI.md)
+
 ## Element
 
 `UI.Element` is the base class for all UI elements / controls. It manages `UnityEngine.GameObject`

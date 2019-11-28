@@ -61,7 +61,7 @@ namespace RedOnion.KSP.API
 					return;
 				if (disposing)
 				{
-					Hide();
+					hide();
 					_processor = null;
 				}
 				// see UI.Window for another example of this
@@ -103,7 +103,7 @@ namespace RedOnion.KSP.API
 			}
 
 			[Description("Show the vector. It is created hidden so that you can subscribe to `system.update` first.")]
-			public void Show()
+			public void show()
 			{
 				if (_processor == null)
 					throw new ObjectDisposedException("Vector.Draw");
@@ -111,7 +111,7 @@ namespace RedOnion.KSP.API
 					_hooks = new Hooks(this);
 			}
 			[Description("Hide the vector.")]
-			public void Hide()
+			public void hide()
 			{
 				if (_hooks == null)
 					return;
@@ -132,14 +132,14 @@ namespace RedOnion.KSP.API
 					return;
 				if (!HighLogic.LoadedSceneIsFlight)
 				{
-					Hide();
+					hide();
 					return;
 				}
 
 				var ship = Ship.Active;
 				if (ship == null)
 				{
-					Hide();
+					hide();
 					return;
 				}
 				if (_bodyObject == null)

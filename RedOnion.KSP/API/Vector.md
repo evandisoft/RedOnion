@@ -2,6 +2,11 @@
 
 Function to create 3D vector / coordinate, also aliased as simple `V`. Receives either three arguments (x,y,z), two (x,y - z=0), or one (x=y=z). Can also convert array / list of numbers (`V([1,2,3])` becomes `V(1,2,3)`).
 
+
+**Types:**
+- `Draw`: [VectorCreator.Draw](VectorCreator.Draw.md)
+
+**Static Fields:**
 - `zero`: [Vector](Vector.md) - Vector(0, 0, 0).
 - `one`: [Vector](Vector.md) - Vector(1, 1, 1).
 - `forward`: [Vector](Vector.md) - Vector(0, 0, 1).
@@ -12,6 +17,8 @@ Function to create 3D vector / coordinate, also aliased as simple `V`. Receives 
 - `left`: [Vector](Vector.md) - Vector(-1, 0, 0).
 - `right`: [Vector](Vector.md) - Vector(1, 0, 0).
 - `none`: [Vector](Vector.md) - Vector(nan, nan, nan).
+
+**Static Methods:**
 - `cross()`: [Vector](Vector.md), a [Vector](Vector.md), b [Vector](Vector.md)
   - Cross product.
 - `crs()`: [Vector](Vector.md), a [Vector](Vector.md), b [Vector](Vector.md)
@@ -33,6 +40,8 @@ Function to create 3D vector / coordinate, also aliased as simple `V`. Receives 
 multiplication and division can use both vector (per-axis) and number (all-axes).
 Beware that multiplication is scaling, not cross product or dot - use appropriate function for these.
 
+
+**Instance Properties:**
 - `native`: Vector3d - Native KSP `Vector3d` (`double x, y, z`).
 - `x`: double - The X-coordinate
 - `y`: double - The Y-coordinate
@@ -43,6 +52,8 @@ Beware that multiplication is scaling, not cross product or dot - use appropriat
 - `normalized`: Vector - Get normalized vector (size 1).
 - `Vector3`: Vector3 - UnityEngine.Vector3 (`float x,y,z`).
 - `Vector2`: Vector2 - UnityEngine.Vector2 (`float x,y`).
+
+**Instance Methods:**
 - `dot()`: double, rhs Vector
   - Dot product of this vector and another vector.
 - `angle()`: double, rhs Vector
