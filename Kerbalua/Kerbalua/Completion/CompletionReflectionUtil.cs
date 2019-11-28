@@ -36,6 +36,8 @@ namespace Kerbalua.Completion
 				{
 					continue;
 				}
+				if (field.IsSpecialName)
+					continue;
 				//strs.Add("field "+field.Name+" "+field.IsSpecialName);
 				strs.Add(field.Name);
 			}

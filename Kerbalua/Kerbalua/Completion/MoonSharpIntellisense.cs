@@ -76,13 +76,15 @@ namespace Kerbalua.Completion
 			var lastOp = operations.Current;
 			if (lastOp is GetMemberOperation getMemberOperation)
 			{
-				//Complogger.Log("Getting Completions...");
+				Complogger.Log("Getting Completions...");
 				string lowercasePartial = getMemberOperation.Name.ToLower();
 				List<string> completions = new List<string>();
 				foreach (var possibleCompletion in completionObject.GetPossibleCompletions())
 				{
+					//Complogger.Log("trying to add completion",possibleCompletion);
 					if (possibleCompletion.ToLower().Contains(lowercasePartial))
 					{
+						//Complogger.Log("ading completion", possibleCompletion);
 						completions.Add(possibleCompletion);
 					}
 				}

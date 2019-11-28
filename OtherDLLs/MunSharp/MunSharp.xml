@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <doc>
     <assembly>
-        <name>KerbaluaMoonSharp</name>
+        <name>MunSharp</name>
     </assembly>
     <members>
         <member name="T:MoonSharp.Interpreter.CoreLib.CoroutineModule">

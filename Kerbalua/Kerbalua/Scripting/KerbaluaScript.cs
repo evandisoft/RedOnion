@@ -44,11 +44,11 @@ namespace Kerbalua.Scripting
 
 			UserData.RegistrationPolicy = InteropRegistrationPolicy.Automatic;
 
-			GlobalOptions.CustomConverters
-				.SetClrToScriptCustomConversion(
-					(Script script, ModuleControlSurface m)
-						=> DynValue.FromObject(script, new LuaProxy(m)) //DynValue.NewTable(new ModuleControlSurfaceProxyTable(this, m))
-					);
+			//GlobalOptions.CustomConverters
+				//.SetClrToScriptCustomConversion(
+					//(Script script, ModuleControlSurface m)
+					//	=> DynValue.FromObject(script, new LuaProxy(m)) //DynValue.NewTable(new ModuleControlSurfaceProxyTable(this, m))
+					//);
 
 			GlobalOptions.CustomConverters
 				.SetClrToScriptCustomConversion(
