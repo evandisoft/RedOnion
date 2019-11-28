@@ -2,6 +2,8 @@
 
 User interface, see [RedOnion.UI](../../RedOnion.UI/README.md)
 
+
+**Types:**
 - `Color`: Color - UnityEngine.Color
 - `Window`: [Window](../../RedOnion.UI/Window.md) - Window - all elements must belong to some window.
 - `SceneFlags`: [SceneFlags](../../RedOnion.UI/SceneFlags.md) - Scene flags for limiting life-span of windows when switching scenes.

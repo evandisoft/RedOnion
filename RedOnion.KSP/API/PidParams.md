@@ -2,6 +2,8 @@
 
 PID(R) regulator parameters.
 
+
+**Instance Fields:**
 - `P`: double - Proportional factor (strength of direct control)
 - `I`: double - Integral factor (dynamic error-correction, causes oscillation as side-effect)
 - `D`: double - Derivative factor (dumpening - applied to output, reduces the oscillation)

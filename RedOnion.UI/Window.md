@@ -4,6 +4,8 @@ Window is the root of all UI elements.
 Make sure to keep reference to it and dispose it when you are done with it.
 It may get garbage-collected otherwise, but that can take time and is rather backup measure.
 
+
+**Instance Properties:**
 - `Active`: bool - Window is set to be visible/active. [`GameObject.activeSelf`](https://docs.unity3d.com/ScriptReference/GameObject-activeSelf.html), [`GameObject.SetActive`](https://docs.unity3d.com/ScriptReference/GameObject.SetActive.html)
 - `Visible`: bool - Window is visible (and all parents are). [`GameObject.activeInHierarchy`](https://docs.unity3d.com/ScriptReference/GameObject-activeInHierarchy.html), [`GameObject.SetActive`](https://docs.unity3d.com/ScriptReference/GameObject.SetActive.html)
 - `Title`: string - Text in the title of the window.
@@ -30,7 +32,12 @@ or `Anchors.MiddleLeft/MiddleCenter/UpperLeft...`
 - `InnerSpacing`: Vector2 - Inner spacing (between elements).
 - `Padding`: float - `InnerPadding.All` - one number if all are the same, or NaN.
 - `Spacing`: float - Spacing - one number if both are the same, or NaN.
-- `Dispose()`: void - Dispose the window (and destroy its game object). Call this when you no longer need the window (e.g. from `Close` event).
+
+**Instance Events:**
+- `Closed`: Action\[Window\] - The window was closed (by the 'X' button or by call to `Close`).
+
+**Instance Methods:**
+- `Dispose()`: void - Dispose the window (and destroy its game object). Call this when you no longer need the window (e.g. from `Closed` event).
 - `Show()`: void - Show the window (`Visible = true`).
 - `Hide()`: void - Hide the window (`Visible = false`).
 - `Close()`: void - Hide and close the window (invokes `Closed` event).

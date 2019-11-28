@@ -2,6 +2,8 @@
 
 Used to activate next stage and/or get various information about stage(s). Returns true on success, if used as function. False if stage was not ready.
 
+
+**Static Properties:**
 - `number`: int - Stage number.
 - `ready`: bool - Whether ready for activating next stage or not.
 - `pending`: bool - True when current stage number is the same as number of stages (LED is flashing).
@@ -11,6 +13,8 @@ Used to activate next stage and/or get various information about stage(s). Retur
 - `solidfuel`: double - Amount of solid fuel available in active engines. Shortcut to `engines.resources.getAmountOf("SolidFuel")`.
 - `liquidfuel`: double - Amount of liquid fuel available in tanks of current stage to active engines. Shortcut to `xparts.resources.getAmountOf("LiquidFuel")`.
 - `fuel`: double - Total amount of fuel avialable for active engines in current stage.
+
+**Static Methods:**
 - `activate()`: bool - Activate next stage (can call the stage object as a function as well (stage() instead of stage.activate())
 - `burntime()`: double, deltaV double
   - Estimate burn time for given delta-v.
