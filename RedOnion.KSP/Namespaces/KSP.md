@@ -2,11 +2,11 @@
 
 Unsafe KSP API - see [CommonScriptApi](../../CommonScriptApi.md)
 
+
+**Types:**
 - `Time`: Time - UnityEngine.Time
 - `Random`: Random - UnityEngine.Random
 - `Mathf`: Mathf - UnityEngine.Mathf
-- `Scalar`: Scalar - Math utilities.
-- `Vec`: Vec - Vector utilities.
 - `Vessel`: Vessel - [KSP API](https://kerbalspaceprogram.com/api/class_vessel.html): Vessel (class).
 - `VesselType`: VesselType - [KSP API](https://kerbalspaceprogram.com/api/_vessel_8cs.html#afa39c7ec7cc0926b332fcd2d77425edb): Vessel Type (enum).
 - `FlightCtrlState`: FlightCtrlState - [KSP API](https://kerbalspaceprogram.com/api/class_flight_ctrl_state.html): Flight Control State (class for fly-by-wire/autopilot).
@@ -18,6 +18,12 @@ Unsafe KSP API - see [CommonScriptApi](../../CommonScriptApi.md)
 - `PartLoader`: PartLoader - [KSP API](https://kerbalspaceprogram.com/api/class_part_loader.html)
 - `InputLockManager`: InputLockManager - [KSP API](https://kerbalspaceprogram.com/api/class_input_lock_manager.html): For locking input.
 - `InputLock`: InputLockManager - Alias to `InputLockManager`.
+
+**Static Fields:**
+- `Scalar`: Scalar - Math utilities.
+- `Vec`: Vec - Vector utilities.
+
+**Static Properties:**
 - `FlightGlobals`: FlightGlobals - [KSP API](https://kerbalspaceprogram.com/api/class_flight_globals.html): Flight Globals (for autopilot).
 - `FlightControl`: FlightControl - Custom autopilot.
 - `FlightDriver`: FlightDriver - [KSP API](https://kerbalspaceprogram.com/api/class_flight_driver.html)

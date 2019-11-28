@@ -122,7 +122,7 @@ It may get garbage-collected otherwise, but that can take time and is rather bac
 			Content = frame.Content;
 		}
 
-		[Description("Dispose the window (and destroy its game object). Call this when you no longer need the window (e.g. from `Close` event).")]
+		[Description("Dispose the window (and destroy its game object). Call this when you no longer need the window (e.g. from `Closed` event).")]
 		public void Dispose()
 		{
 			GC.SuppressFinalize(this);

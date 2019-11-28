@@ -157,7 +157,7 @@ namespace RedOnion.UI
 			get => RectTransform.rect.width;
 			set => PreferWidth = value;
 		}
-		[Description("Current height, redirects to PreferWidth when assigning.")]
+		[Description("Current height, redirects to PreferHeight when assigning.")]
 		public float Height
 		{
 			get => RectTransform.rect.height;

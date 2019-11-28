@@ -2,6 +2,8 @@
 
 Flags for KSP scenes.
 
+
+**Static Fields:**
 - `None`: SceneFlags - No scene enabled.
 - `MainMenu`: SceneFlags - Main menu - `1 << GameScenes.MAINMENU`.
 - `Settings`: SceneFlags - Game settings - `1 << GameScenes.SETTINGS`.
