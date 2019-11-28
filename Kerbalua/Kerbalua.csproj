@@ -126,7 +126,6 @@
     <None Include="Kerbalua\Completion\CompletionNotes.md" />
     <None Include="Kerbalua\Completion\CompletionReadme.md" />
     <None Include="Development.md" />
-    <None Include="KerbaluaMoonSharp.md" />
     <None Include="README.md" />
   </ItemGroup>
   <ItemGroup />
