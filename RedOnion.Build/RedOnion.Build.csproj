@@ -78,6 +78,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\RedOnion.Common\RedOnion.Common.csproj">
+      <Project>{2d34d879-1a21-4f8f-bf49-38ced2b40406}</Project>
+      <Name>RedOnion.Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\RedOnion.KSP\RedOnion.KSP.csproj">
       <Project>{dec12e09-29ad-4666-9954-8c8a1d7bf454}</Project>
       <Name>RedOnion.KSP</Name>

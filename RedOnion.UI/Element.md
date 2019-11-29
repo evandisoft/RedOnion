@@ -1,8 +1,8 @@
 ## Element
 
-**Derived:** [Simple](Simple.md)
+**Derived:** [Simple](Simple.md), [Label](Label.md)
 
-`UI.Element` is the base class for all UI elements / controls. It manages `UnityEngine.GameObject`and its `RectTransform`, provides layout settings and basic `AddElement` to add child elements.
+`UI.Element` is the base class for all UI elements / controls. It manages `UnityEngine.GameObject` and its `RectTransform`, provides layout settings and basic `AddElement` to add child elements. All elements must ultimately be hosted inside [`UI.Window`](Window.md).
 
 
 **Instance Properties:**
@@ -19,3 +19,7 @@
 - `PreferHeight`: float - Preferred height if set (the layout will use this if possible).
 - `FlexWidth`: float - Flexible width if inside horizontal/vertical layout.
 - `FlexHeight`: float - Flexible height if inside horizontal/vertical layout.
+
+**Static Methods:**
+- `LoadIcon()`: Texture2D, width int, height int, path string
+  - Load icon of specified dimensions as `Texture2D` from a file (from `Resources` directory or `Resources.zip` ).

@@ -3,11 +3,9 @@ using RedOnion.KSP.Autopilot;
 using KSP.UI.Screens;
 using UE = UnityEngine;
 using System.ComponentModel;
+using RedOnion.Attributes;
 using RedOnion.KSP.MathUtil;
-using RedOnion.KSP.Utilities;
-using RedOnion.ROS;
 using RedOnion.KSP.UnsafeAPI;
-using RedOnion.KSP.Attributes;
 
 namespace RedOnion.KSP.Namespaces
 {

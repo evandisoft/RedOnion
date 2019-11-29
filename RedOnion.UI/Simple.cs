@@ -169,7 +169,7 @@ It is meant mainly for internal usage, for implementation of other composite con
 			get => base.Layout;
 			set => base.Layout = value;
 		}
-		[Description("The combined inner padding and spacing (6 floats in total, all set to `3f` by default).")]
+		[Description("The combined inner padding and spacing (6 floats in total, set `0f, 3f, 0f, 0f, 3f, 0f` by default).")]
 		public new LayoutPadding LayoutPadding
 		{
 			get => base.LayoutPadding;

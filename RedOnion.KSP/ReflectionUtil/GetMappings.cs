@@ -4,7 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using RedOnion.KSP.Completion;
-using RedOnion.KSP.Attributes;
+using RedOnion.Attributes;
 
 namespace RedOnion.KSP.ReflectionUtil
 {
