@@ -23,12 +23,12 @@ It may get garbage-collected otherwise, but that can take time and is rather bac
 - `TitleColor`: Color - Foreground color of the title.
 - `ContentColor`: Color - Background color of the content panel.
 - `Layout`: [Layout](Layout.md) - Layout (how child elements of content panel are placed).
-- `LayoutPadding`: LayoutPadding - The combined inner padding and spacing (6 floats in total, all set to `3f` by default).
-- `ChildAnchors`: Anchors - This currently controls layout's `childAlignment` and
+- `LayoutPadding`: [LayoutPadding](LayoutPadding.md) - The combined inner padding and spacing (6 floats in total, all set to `3f` by default).
+- `ChildAnchors`: [Anchors](Anchors.md) - This currently controls layout's `childAlignment` and
 `childForceExpandWidth/Height`, but plan is to use custom `LayoutComponent`.
 You can try `Anchors.Fill` (to make all inner elements fill their cell)
 or `Anchors.MiddleLeft/MiddleCenter/UpperLeft...`
-- `InnerPadding`: Padding - Inner padding (border left empty inside this panel).
+- `InnerPadding`: [Padding](Padding.md) - Inner padding (border left empty inside this panel).
 - `InnerSpacing`: Vector2 - Inner spacing (between elements).
 - `Padding`: float - `InnerPadding.All` - one number if all are the same, or NaN.
 - `Spacing`: float - Spacing - one number if both are the same, or NaN.
@@ -49,7 +49,7 @@ or `Anchors.MiddleLeft/MiddleCenter/UpperLeft...`
   - Add new panel with specified layout.
 - `AddHorizontal()`: [Panel](Panel.md) - Add new panel with horizontal layout.
 - `AddVertical()`: [Panel](Panel.md) - Add new panel with vertical layout.
-- `AddLabel()`: Label, text string
+- `AddLabel()`: [Label](Label.md), text string
   - Add new label with specified text.
 - `AddTextBox()`: TextBox, text string
   - Add new label with specified text.

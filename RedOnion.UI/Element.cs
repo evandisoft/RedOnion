@@ -12,7 +12,8 @@ namespace RedOnion.UI
 	/// use Panel if not subclassing.
 	/// </summary>
 	[Description("`UI.Element` is the base class for all UI elements / controls. It manages `UnityEngine.GameObject`"
-		+ "and its `RectTransform`, provides layout settings and basic `AddElement` to add child elements.")]
+		+ " and its `RectTransform`, provides layout settings and basic `AddElement` to add child elements."
+		+ " All elements must ultimately be hosted inside [`UI.Window`](Window.md).")]
 	public abstract partial class Element : IDisposable
 	{
 		protected internal GameObject GameObject { get; private set; }

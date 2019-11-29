@@ -5,13 +5,11 @@ using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
 using RedOnion.KSP.Completion;
 using System.ComponentModel;
-using System.Reflection;
-using RedOnion.KSP.Autopilot;
-using RedOnion.KSP.Namespaces;
 using System.Linq;
-using RedOnion.KSP.UnsafeAPI;
+using System.Reflection;
+using RedOnion.Attributes;
+using RedOnion.KSP.Namespaces;
 using RedOnion.KSP.ReflectionUtil;
-using RedOnion.KSP.Attributes;
 
 namespace RedOnion.KSP.API
 {

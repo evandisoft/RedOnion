@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using MoonSharp.Interpreter.Interop;
 using RedOnion.KSP.Completion;
-using RedOnion.KSP.Attributes;
+using RedOnion.Attributes;
 
 namespace RedOnion.KSP.ReflectionUtil
 {

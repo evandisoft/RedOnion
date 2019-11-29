@@ -1,22 +1,20 @@
 using System;
+using System.ComponentModel;
 using System.Globalization;
 using UnityEngine;
 
 namespace RedOnion.UI
 {
-	/// <summary>
-	/// Element's inner padding (4 values)
-	/// </summary>
-	[Serializable]
+	[Serializable, Description("Element's inner padding (4 values).")]
 	public struct Padding : IEquatable<Padding>
 	{
-		[SerializeField]
+		[SerializeField, Description("Padding on the left side.")]
 		public float left;
-		[SerializeField]
+		[SerializeField, Description("Padding on the right side.")]
 		public float right;
-		[SerializeField]
+		[SerializeField, Description("Padding above the content.")]
 		public float top;
-		[SerializeField]
+		[SerializeField, Description("Padding below the content.")]
 		public float bottom;
 
 		public static bool operator ==(Padding lhs, Padding rhs)
@@ -32,6 +30,7 @@ namespace RedOnion.UI
 			=> unchecked(left.GetHashCode() * 37 + right.GetHashCode() * 101
 			+ top.GetHashCode() * 277 + bottom.GetHashCode() * 613);
 
+		[Description("Set all values to the one specified.")]
 		public Padding(float all)
 		{
 			left    = all;
@@ -39,6 +38,7 @@ namespace RedOnion.UI
 			top     = all;
 			bottom  = all;
 		}
+		[Description("Set `left = right = horizontal` and `top = bottom = vertical`.")]
 		public Padding(float horizontal, float vertical)
 		{
 			left    = horizontal;
@@ -46,6 +46,7 @@ namespace RedOnion.UI
 			top     = vertical;
 			bottom  = vertical;
 		}
+		[Description("Specify all the values.")]
 		public Padding(float left, float right, float top, float bottom)
 		{
 			this.left   = left;
@@ -54,6 +55,7 @@ namespace RedOnion.UI
 			this.bottom = bottom;
 		}
 
+		[Description("One value for all (if same or setting), `NaN` if not.")]
 		public float All
 		{
 			get => left == right && right == top && top == bottom
@@ -66,6 +68,7 @@ namespace RedOnion.UI
 				bottom  = value;
 			}
 		}
+		[Description("Value of `left` and `right` if same, `NaN` if not.")]
 		public float Horizontal
 		{
 			get => left == right ? left : float.NaN;
@@ -75,6 +78,7 @@ namespace RedOnion.UI
 				right   = value;
 			}
 		}
+		[Description("value of `top` and `bottom` if same, `NaN` if not.")]
 		public float Vertical
 		{
 			get => top == bottom ? top : float.NaN;
@@ -83,27 +87,6 @@ namespace RedOnion.UI
 				top     = value;
 				bottom  = value;
 			}
-		}
-
-		public float Left
-		{
-			get => left;
-			set => left = value;
-		}
-		public float Right
-		{
-			get => right;
-			set => right = value;
-		}
-		public float Top
-		{
-			get => top;
-			set => top = value;
-		}
-		public float Bottom
-		{
-			get => bottom;
-			set => bottom = value;
 		}
 
 		public override string ToString()
