@@ -19,6 +19,7 @@
 // Ambiguous reference in cref attribute
 #pragma warning disable 419
 
+namespace Grammar.IncompleteLuaParsing {
 using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
 using IToken = Antlr4.Runtime.IToken;
@@ -664,3 +665,4 @@ public partial class IncompleteLuaBaseVisitor<Result> : AbstractParseTreeVisitor
 	/// <return>The visitor result.</return>
 	public virtual Result VisitKeyword([NotNull] IncompleteLuaParser.KeywordContext context) { return VisitChildren(context); }
 }
+} // namespace Grammar.IncompleteLuaParsing

@@ -78,6 +78,7 @@ namespace LiveRepl.Execution
 					if (dynResult.Type==DataType.String)
 					{
 						result = "\"" + dynResult.ToObject() + "\"";
+						return isComplete;
 					}
 					else if (dynResult.Type == DataType.Nil || dynResult.Type== DataType.Void)
 					{

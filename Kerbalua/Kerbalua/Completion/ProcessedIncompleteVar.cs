@@ -5,6 +5,7 @@ using Antlr4.Runtime.Tree;
 using Kerbalua.Parsing;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
+using Grammar.IncompleteLuaParsing;
 
 namespace Kerbalua.Completion {
 	public class ProcessedIncompleteVar {

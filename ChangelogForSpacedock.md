@@ -9,7 +9,10 @@
 - More UI library features.
 
 # Next Release
-Just had a release!
+- Undo/Redo for LiveRepl Editor. Stores between 50 to 100 of the last operations. (When history size reaches 100 it is resized to 50).
+- Fixed bug where Lua was outputting strings twice
+- Renamed KerbaluaMoonSharp assembly ([our modified version of MoonSharp](https://evandisoft.github.io/RedOnion/Kerbalua/MunSharp)) to MunSharp.
+- Fixed MoonSharp issue where some classes where not automatically registered because of having members that hid other members.
 
 # Current
 # 0.4

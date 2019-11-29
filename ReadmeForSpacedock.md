@@ -10,8 +10,8 @@ vessels, anything, with own script.
 ## Current Features:
 1. Repl/Editor with intellisense.
 1. Scripting engines that can interact with Classes from any loaded CLR assembly. 
-1. Lua scripting language called Kerbalua built on MoonSharp.
-1. Powerful custom language/engine (RedOnionScript) built by Lukáš Fireš.
+1. Lua scripting engine called Kerbalua uses MoonSharp to interact with the CLR.
+1. Powerful custom language/engine (RedOnionScript) built by Lukáš Fireš also interacts with CLR.
 1. API's for doing things more easily or more safely, including Autopilot API, UI api, and more.
 
 ## Goals:
@@ -39,7 +39,7 @@ but our goal now is to:
 - Allow users to do whatever they wish to do to the game environment to have fun.
 - Help modders develop and debug their mods using this mod.
 - Help anybody to explore KSP API, their own or other's mods
-  (read the license of each mod, we expose only `public` members directly).
+  (read the license of other mods you decide to use this tool to interact with, we expose only `public` members directly).
 
 ## Releases
 
