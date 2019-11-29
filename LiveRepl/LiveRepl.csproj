@@ -86,9 +86,6 @@
       <HintPath>$(KerbalLibs)\UnityEngine.IMGUIModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="KerbaluaMoonSharp">
-      <HintPath>..\OtherDLLs\KerbaluaMoonSharp\KerbaluaMoonSharp.dll</HintPath>
-    </Reference>
     <Reference Include="MunSharp">
       <HintPath>..\OtherDLLs\MunSharp\MunSharp.dll</HintPath>
     </Reference>

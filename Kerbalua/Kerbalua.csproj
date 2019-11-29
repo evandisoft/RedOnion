@@ -77,9 +77,6 @@
       <HintPath>$(KerbalLibs)\System.Xml.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="KerbaluaMoonSharp">
-      <HintPath>..\OtherDLLs\KerbaluaMoonSharp\KerbaluaMoonSharp.dll</HintPath>
-    </Reference>
     <Reference Include="MunSharp">
       <HintPath>..\OtherDLLs\MunSharp\MunSharp.dll</HintPath>
     </Reference>

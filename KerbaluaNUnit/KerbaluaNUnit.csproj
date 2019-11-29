@@ -51,9 +51,6 @@
     <Reference Include="Assembly-CSharp-firstpass">
       <HintPath>$(KerbalLibs)\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
-    <Reference Include="KerbaluaMoonSharp">
-      <HintPath>..\OtherDLLs\KerbaluaMoonSharp\KerbaluaMoonSharp.dll</HintPath>
-    </Reference>
     <Reference Include="MunSharp">
       <HintPath>..\OtherDLLs\MunSharp\MunSharp.dll</HintPath>
     </Reference>

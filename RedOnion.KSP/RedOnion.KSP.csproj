@@ -75,9 +75,6 @@
       <HintPath>$(KerbalLibs)\Ionic.Zip.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="KerbaluaMoonSharp">
-      <HintPath>..\OtherDLLs\KerbaluaMoonSharp\KerbaluaMoonSharp.dll</HintPath>
-    </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="MunSharp">
       <HintPath>..\OtherDLLs\MunSharp\MunSharp.dll</HintPath>
