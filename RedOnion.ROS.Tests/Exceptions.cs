@@ -42,7 +42,6 @@ namespace RedOnion.ROS.Tests
 		{
 			Lines(ExitCode.Exception, "thrown",
 				"throw \"thrown\"");
-			/* TBD
 			Lines(ExitCode.Exception, "catch",
 				"global.done = false",
 				"try",
@@ -53,7 +52,6 @@ namespace RedOnion.ROS.Tests
 				"  return true", // must not override active exception
 				"return false");
 			Assert.IsTrue(Globals["done"].ToBool());
-			*/
 		}
 	}
 }

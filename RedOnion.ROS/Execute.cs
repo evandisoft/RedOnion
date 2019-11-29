@@ -147,6 +147,21 @@ namespace RedOnion.ROS
 							ctx.BlockStart = at;
 							blockEnd = ctx.BlockEnd = ctx.BlockAt2;
 							continue;
+						case BlockCode.Finally:
+							result = error;
+							if (--ctx.CatchBlocks > 0)
+							{
+								while (ctx.BlockCode != BlockCode.TryCatch)
+									ctx.Pop();
+								if (ctx.BlockEnd != ctx.BlockAt1)
+									throw InvalidOperation("TODO: catch");
+								at = ctx.BlockStart = ctx.BlockAt1;
+								blockEnd = ctx.BlockEnd = ctx.BlockAt2;
+								ctx.BlockCode = BlockCode.Finally;
+								continue;
+							}
+							Exit = ExitCode.Exception;
+							goto finishWithResult;
 						}
 					}
 					if (countdown <= 0)
@@ -630,7 +645,14 @@ namespace RedOnion.ROS
 
 					case OpCode.Return:
 						if (ctx.CatchBlocks > 0)
+						{
+							if (ctx.BlockCode == BlockCode.Finally)
+							{//	we have pending exception, continue as if we reached and of the finally block
+								at = blockEnd;
+								continue;
+							}
 							throw InvalidOperation("TODO: return from try..catch..finally");
+						}
 						if (stack.size > 0)
 						{
 							ref var top = ref stack.Top();
@@ -853,7 +875,12 @@ namespace RedOnion.ROS
 						{
 							while (ctx.BlockCode != BlockCode.TryCatch)
 								ctx.Pop();
-							throw InvalidOperation("TODO: throw/raise in try..catch..finally");
+							if (ctx.BlockEnd != ctx.BlockAt1)
+								throw InvalidOperation("TODO: catch");
+							at = ctx.BlockStart = ctx.BlockAt1;
+							blockEnd = ctx.BlockEnd = ctx.BlockAt2;
+							ctx.BlockCode = BlockCode.Finally;
+							continue;
 						}
 						Exit = ExitCode.Exception;
 						goto finishWithResult;

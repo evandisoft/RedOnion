@@ -73,11 +73,12 @@ namespace RedOnion.ROS.Objects
 		/// </summary>
 		public int BlockEnd { get; set; }
 		/// <summary>
-		/// First important position in the block (usualy condition of the loop)
+		/// First important position in the block.
+		/// Usualy condition of the loop, also used for finally-block start.
 		/// </summary>
 		public int BlockAt1 { get; protected set; }
 		/// <summary>
-		/// Second important position (final expression of for-loop)
+		/// Second important position. Final expression of for-loop or finally-block end.
 		/// </summary>
 		public int BlockAt2 { get; protected set; }
 		/// <summary>
