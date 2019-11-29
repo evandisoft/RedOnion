@@ -11,7 +11,7 @@ It is meant mainly for internal usage, for implementation of other composite con
 **Instance Properties:**
 - `Color`: Color - Background color.
 - `Layout`: [Layout](Layout.md) - Layout (how child elements are placed).
-- `LayoutPadding`: [LayoutPadding](LayoutPadding.md) - The combined inner padding and spacing (6 floats in total, set `0f, 3f, 0f, 0f, 3f, 0f` by default).
+- `LayoutPadding`: [LayoutPadding](LayoutPadding.md) - The combined inner padding and spacing (6 floats in total, set to `0f, 3f, 0f, 0f, 3f, 0f` by default).
 - `ChildAnchors`: [Anchors](Anchors.md) - This currently controls layout's `childAlignment` and
 `childForceExpandWidth/Height`, but plan is to use custom `LayoutComponent`.
 You can try `Anchors.Fill` (to make all inner elements fill their cell)
@@ -34,19 +34,19 @@ or `Anchors.MiddleLeft/MiddleCenter/UpperLeft...`
   - Add new label with specified text.
 - `AddTextBox()`: TextBox, text string
   - Add new label with specified text.
-- `AddButton()`: Button, text string
+- `AddButton()`: [Button](Button.md), text string
   - Add new button with specified text.
-- `AddButton()`: Button, text string, click Action\[Button\]
+- `AddButton()`: [Button](Button.md), text string, click Action\[[Button](Button.md)\]
   - Add new button with specified text and click-action.
-- `AddToggle()`: Button, text string
+- `AddToggle()`: [Button](Button.md), text string
   - Add new toggle-button with specified text.
-- `AddToggle()`: Button, text string, click Action\[Button\]
+- `AddToggle()`: [Button](Button.md), text string, click Action\[[Button](Button.md)\]
   - Add new toggle-button with specified text and click-action.
-- `AddExclusive()`: Button, text string
+- `AddExclusive()`: [Button](Button.md), text string
   - Add new exclusive toggle-button (radio button) with specified text.
-- `AddExclusive()`: Button, text string, click Action\[Button\]
+- `AddExclusive()`: [Button](Button.md), text string, click Action\[[Button](Button.md)\]
   - Add new exclusive toggle-button with specified text and click-action.
-- `AddExclusive2()`: Button, text string
+- `AddExclusive2()`: [Button](Button.md), text string
   - Add new toggle-button exclusive in parent of this panel with specified text.
-- `AddExclusive2()`: Button, text string, click Action\[Button\]
+- `AddExclusive2()`: [Button](Button.md), text string, click Action\[[Button](Button.md)\]
   - Add new toggle-button exclusive in parent of this panel with specified text and click-action.

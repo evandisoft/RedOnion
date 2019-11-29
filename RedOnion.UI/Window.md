@@ -53,15 +53,15 @@ or `Anchors.MiddleLeft/MiddleCenter/UpperLeft...`
   - Add new label with specified text.
 - `AddTextBox()`: TextBox, text string
   - Add new label with specified text.
-- `AddButton()`: Button, text string
+- `AddButton()`: [Button](Button.md), text string
   - Add new button with specified text.
-- `AddButton()`: Button, text string, click Action\[Button\]
+- `AddButton()`: [Button](Button.md), text string, click Action\[[Button](Button.md)\]
   - Add new button with specified text and click-action.
-- `AddToggle()`: Button, text string
+- `AddToggle()`: [Button](Button.md), text string
   - Add new toggle-button with specified text.
-- `AddToggle()`: Button, text string, click Action\[Button\]
+- `AddToggle()`: [Button](Button.md), text string, click Action\[[Button](Button.md)\]
   - Add new toggle-button with specified text and click-action.
-- `AddExclusive()`: Button, text string
+- `AddExclusive()`: [Button](Button.md), text string
   - Add new exclusive toggle-button (radio button) with specified text.
-- `AddExclusive()`: Button, text string, click Action\[Button\]
+- `AddExclusive()`: [Button](Button.md), text string, click Action\[[Button](Button.md)\]
   - Add new exclusive toggle-button with specified text and click-action.

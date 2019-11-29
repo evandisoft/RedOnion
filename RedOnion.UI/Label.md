@@ -14,3 +14,5 @@
 - `Text`: string - The text on the label.
 - `TextColor`: Color - Foreground color of the text.
 - `TextAlign`: TextAnchor - How to align text within the label.
+- `FontSize`: int - Size of the font used for the text.
+- `FontStyle`: FontStyle - Style of the font used for the text.
