@@ -15,16 +15,28 @@ namespace RedOnion.ROS
 			vals = new ArgumentList(this);
 		}
 
+		/// <summary>Instruction pointer (index to `code`).</summary>
 		protected int at;
+		/// <summary>Currently executing code.</summary>
 		protected byte[] code;
+		/// <summary>String table of current code.</summary>
 		protected string[] str;
+
+		/// <summary>Processor we belong to (can as well be `this`).</summary>
 		protected Processor processor;
+		/// <summary>Global variables.</summary>
 		protected Globals globals;
+		/// <summary>Value stack.</summary>
 		protected ArgumentList vals;
+		/// <summary>Active context (current function or script).</summary>
 		protected Context ctx;
-		protected Value self; // `this` for current code
+		/// <summary>Value of `this` for current code.</summary>
+		protected Value self;
+		/// <summary>Result when exiting.</summary>
 		protected Value result;
+		/// <summary>Pending exception (or Value.Void).</summary>
 		protected Value error;
+
 		protected struct SavedContext
 		{
 			public Context context;
@@ -34,7 +46,7 @@ namespace RedOnion.ROS
 			public int at, vtop;
 			public bool create;
 			// run.library (context unchanged)
-			public OpCode blockCode;
+			public BlockCode blockCode;
 			public int blockEnd;
 		}
 		protected ListCore<SavedContext> stack;
@@ -151,7 +163,7 @@ namespace RedOnion.ROS
 			ctx.RootStart = at = fn.CodeAt;
 			ctx.RootEnd = at + fn.CodeSize;
 			ctx.PopAll();
-			ctx.Push(at, at + fn.CodeSize, OpCode.Function);
+			ctx.Push(at, at + fn.CodeSize, BlockCode.Function);
 			if (fn.BoundArguments == null)
 				ctx.Add("arguments", new Value[0]);
 			else
@@ -380,7 +392,7 @@ namespace RedOnion.ROS
 				ret.blockEnd = ctx.BlockEnd;
 				ctx.BlockEnd = code.Length;
 				// see Execute(int): `while (at == blockEnd)` at the top
-				ctx.BlockCode = OpCode.Import;
+				ctx.BlockCode = BlockCode.Library;
 			}
 			else ctx = new Context() { RootEnd = code.Length };
 			result = Value.Void;

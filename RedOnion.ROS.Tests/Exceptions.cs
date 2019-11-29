@@ -44,12 +44,15 @@ namespace RedOnion.ROS.Tests
 				"throw \"thrown\"");
 			/* TBD
 			Lines(ExitCode.Exception, "catch",
+				"global.done = false",
 				"try",
 				"  throw \"catch\"",
 				"  return false",
 				"finally",
+				"  global.done = true",
 				"  return true", // must not override active exception
 				"return false");
+			Assert.IsTrue(Globals["done"].ToBool());
 			*/
 		}
 	}

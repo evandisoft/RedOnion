@@ -53,7 +53,7 @@ namespace RedOnion.ROS.Objects
 			/// <summary>
 			/// Code/type of the block
 			/// </summary>
-			public OpCode op;
+			public BlockCode op;
 		}
 		/// <summary>
 		/// Stack of blocks
@@ -83,7 +83,7 @@ namespace RedOnion.ROS.Objects
 		/// <summary>
 		/// Code/type of current block
 		/// </summary>
-		public OpCode BlockCode { get; set; }
+		public BlockCode BlockCode { get; set; }
 		/// <summary>
 		/// Number of try..catch..finally blocks in current context
 		/// </summary>
@@ -137,7 +137,7 @@ namespace RedOnion.ROS.Objects
 		public Context(Function fn, Context parent, HashSet<string> cvars)
 			: base("Context of " + fn.Name, typeof(Context))
 		{
-			BlockCode = OpCode.Function;
+			BlockCode = BlockCode.Function;
 			RootStart = fn.CodeAt;
 			RootEnd = fn.CodeAt + fn.CodeSize;
 			this.parent = parent;
@@ -164,7 +164,7 @@ namespace RedOnion.ROS.Objects
 			base.Reset();
 		}
 
-		public void Push(int start, int end, OpCode op = OpCode.Block, int at1 = 0, int at2 = 0)
+		public void Push(int start, int end, BlockCode op = BlockCode.Block, int at1 = 0, int at2 = 0)
 		{
 			ref var block = ref blockStack.Add();
 			block.op = BlockCode;
