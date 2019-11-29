@@ -80,6 +80,9 @@
     <Reference Include="KerbaluaMoonSharp">
       <HintPath>..\OtherDLLs\KerbaluaMoonSharp\KerbaluaMoonSharp.dll</HintPath>
     </Reference>
+    <Reference Include="MunSharp">
+      <HintPath>..\OtherDLLs\MunSharp\MunSharp.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />

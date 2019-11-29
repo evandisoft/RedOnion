@@ -79,6 +79,9 @@
       <HintPath>..\OtherDLLs\KerbaluaMoonSharp\KerbaluaMoonSharp.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib" />
+    <Reference Include="MunSharp">
+      <HintPath>..\OtherDLLs\MunSharp\MunSharp.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="API\App.cs" />

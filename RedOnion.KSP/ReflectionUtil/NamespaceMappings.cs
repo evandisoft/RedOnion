@@ -41,7 +41,7 @@ namespace RedOnion.KSP.ReflectionUtil
 			"RedOnion.Script",
 			"RedOnion.UI",
 			"RedOnion.KSP",
-			"KerbaluaMoonSharp",
+			"MunSharp",
 			"Kerbalua",
 			"System.Core",
 			"System",
