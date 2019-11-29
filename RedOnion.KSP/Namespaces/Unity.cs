@@ -4,8 +4,7 @@ using UUI = UnityEngine.UI;
 using UIC = RedOnion.UI.Components;
 using KSP.UI;
 using System.ComponentModel;
-using RedOnion.KSP.Utilities;
-using RedOnion.KSP.Attributes;
+using RedOnion.Attributes;
 
 namespace RedOnion.KSP.Namespaces
 {

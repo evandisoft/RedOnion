@@ -55,6 +55,10 @@
       <HintPath>$(KerbalLibs)\UnityEngine.CoreModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="UnityEngine.TextRenderingModule">
+      <HintPath>$(KerbalLibs)\UnityEngine.TextRenderingModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>$(KerbalLibs)\UnityEngine.UI.dll</HintPath>
       <Private>False</Private>
@@ -77,7 +81,7 @@
     </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="MunSharp">
-      <HintPath>..\OtherDLLs\MunSharp\MunSharp.dll</HintPath>
+      <HintPath>..\packages\MunSharp.2.0.0\lib\net35\MunSharp.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -85,7 +89,6 @@
     <Compile Include="API\Autopilot.cs" />
     <Compile Include="API\Globals.cs" />
     <Compile Include="Parts\PartChildren.cs" />
-    <Compile Include="Attributes\DocBuildAttribute.cs" />
     <Compile Include="Utilities\InteropUtilities.cs" />
     <Compile Include="API\VectorUtils.cs" />
     <Compile Include="ROS\RosExecutor.cs" />
@@ -153,7 +156,6 @@
     <Compile Include="Completion\ISafeMetatable.cs" />
     <Compile Include="Completion\Static.cs" />
     <Compile Include="Completion\StaticObject.cs" />
-    <Compile Include="Attributes\Attributes.cs" />
     <Compile Include="Settings\ProjectSettings.cs" />
     <Compile Include="MoonSharp\Interfaces\IMoonSharpCompletable.cs" />
     <Compile Include="MoonSharp\MoonSharpAPI\MoonSharpGlobals.cs" />
@@ -163,6 +165,10 @@
     <Compile Include="Utilities\ScriptStringKeyedConstDictionary.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\RedOnion.Common\RedOnion.Common.csproj">
+      <Project>{2d34d879-1a21-4f8f-bf49-38ced2b40406}</Project>
+      <Name>RedOnion.Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\RedOnion.ROS\RedOnion.ROS.csproj">
       <Project>{59399c9e-ebac-4d7c-b2cb-6ece22fe8d6e}</Project>
       <Name>RedOnion.ROS</Name>
@@ -176,5 +182,8 @@
   <ItemGroup />
   <ItemGroup />
   <ItemGroup />
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

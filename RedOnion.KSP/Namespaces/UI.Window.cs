@@ -1,9 +1,7 @@
 using System;
-using RedOnion.KSP.API;
-using RedOnion.KSP.OS;
-using RedOnion.KSP.ROS;
-using RedOnion.KSP.Attributes;
+using RedOnion.Attributes;
 using RedOnion.ROS;
+using RedOnion.KSP.OS;
 
 namespace RedOnion.KSP
 {

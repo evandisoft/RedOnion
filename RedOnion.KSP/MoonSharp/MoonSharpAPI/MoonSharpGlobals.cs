@@ -2,7 +2,7 @@ using System;
 using System.ComponentModel;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
-using RedOnion.KSP.Attributes;
+using RedOnion.Attributes;
 
 namespace RedOnion.KSP.MoonSharp.MoonSharpAPI
 {

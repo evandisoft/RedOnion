@@ -1,12 +1,11 @@
 using System;
 using System.ComponentModel;
 using MoonSharp.Interpreter;
-using RedOnion.ROS;
+using RedOnion.Attributes;
 using RedOnion.ROS.Utilities;
 using RedOnion.KSP.Parts;
 using UnityEngine;
 using KSP.Localization;
-using RedOnion.KSP.Attributes;
 
 namespace RedOnion.KSP.API
 {

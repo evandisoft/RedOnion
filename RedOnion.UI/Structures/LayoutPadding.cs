@@ -1,27 +1,25 @@
 using System;
+using System.ComponentModel;
 using System.Globalization;
 using UnityEngine;
 
 namespace RedOnion.UI
 {
-	/// <summary>
-	/// Inner padding and spacing (6 values)
-	/// </summary>
-	[Serializable]
+	[Serializable, Description("Inner padding and spacing (6 values).")]
 	public struct LayoutPadding : IEquatable<LayoutPadding>
 	{
-		[SerializeField]
+		[SerializeField, Description("Padding on the left side.")]
 		public float left;
-		[SerializeField]
+		[SerializeField, Description("Horizontal spacing between elements.")]
 		public float xgap;
-		[SerializeField]
+		[SerializeField, Description("Padding on the right side.")]
 		public float right;
 
-		[SerializeField]
+		[SerializeField, Description("Padding above the content.")]
 		public float top;
-		[SerializeField]
+		[SerializeField, Description("Vertical spacing between elements.")]
 		public float ygap;
-		[SerializeField]
+		[SerializeField, Description("Padding below the content.")]
 		public float bottom;
 
 		public static bool operator ==(LayoutPadding lhs, LayoutPadding rhs)
@@ -37,6 +35,7 @@ namespace RedOnion.UI
 			=> unchecked(left.GetHashCode() * 41 + xgap.GetHashCode() * 107 + right.GetHashCode() * 173
 			+ top.GetHashCode() * 239 + ygap.GetHashCode() * 433 + bottom.GetHashCode() * 587);
 
+		[Description("Set all values to the one specified.")]
 		public LayoutPadding(float all)
 		{
 			left	= all;
@@ -46,6 +45,7 @@ namespace RedOnion.UI
 			ygap    = all;
 			bottom  = all;
 		}
+		[Description("Set `left = xgap = right = horizontal` and `top = ygap = bottom = vertical`.")]
 		public LayoutPadding(float horizontal, float vertical)
 		{
 			left    = horizontal;
@@ -55,6 +55,7 @@ namespace RedOnion.UI
 			ygap    = vertical;
 			bottom  = vertical;
 		}
+		[Description("Specify all the values.")]
 		public LayoutPadding(float left, float xgap, float right, float top, float ygap, float bottom)
 		{
 			this.left	= left;
@@ -64,6 +65,7 @@ namespace RedOnion.UI
 			this.ygap   = ygap;
 			this.bottom = bottom;
 		}
+		[Description("Combine `padding` (4 floats - around the content) and `spacing` (2D vector, between elements).")]
 		public LayoutPadding(Padding padding, Vector2 spacing)
 		{
 			left    = padding.left;
@@ -74,6 +76,7 @@ namespace RedOnion.UI
 			bottom  = padding.bottom;
 		}
 
+		[Description("One value for all (if same or setting), `NaN` if not.")]
 		public float All
 		{
 			get => left == xgap && xgap == right && right == top && top == ygap && ygap == bottom
@@ -88,6 +91,7 @@ namespace RedOnion.UI
 				bottom  = value;
 			}
 		}
+		[Description("Value of `left`, `xgap` and `right` if same, `NaN` if not.")]
 		public float Horizontal
 		{
 			get => left == xgap && xgap == right ? left : float.NaN;
@@ -98,6 +102,7 @@ namespace RedOnion.UI
 				right   = value;
 			}
 		}
+		[Description("value of `top`, `ygap` and `bottom` if same, `NaN` if not.")]
 		public float Vertical
 		{
 			get => top == ygap && ygap == bottom ? top : float.NaN;
@@ -106,89 +111,6 @@ namespace RedOnion.UI
 				top     = value;
 				ygap    = value;
 				bottom  = value;
-			}
-		}
-
-		public float Left
-		{
-			get => left;
-			set => left = value;
-		}
-		public float XGap
-		{
-			get => xgap;
-			set => xgap = value;
-		}
-		public float Right
-		{
-			get => right;
-			set => right = value;
-		}
-		public float Top
-		{
-			get => top;
-			set => top = value;
-		}
-		public float YGap
-		{
-			get => ygap;
-			set => ygap = value;
-		}
-		public float Bottom
-		{
-			get => bottom;
-			set => bottom = value;
-		}
-
-		public float X0
-		{
-			get => left;
-			set => left = value;
-		}
-		public float X1
-		{
-			get => xgap;
-			set => xgap = value;
-		}
-		public float X2
-		{
-			get => right;
-			set => right = value;
-		}
-		public float Y0
-		{
-			get => top;
-			set => top = value;
-		}
-		public float Y1
-		{
-			get => ygap;
-			set => ygap = value;
-		}
-		public float Y2
-		{
-			get => bottom;
-			set => bottom = value;
-		}
-
-		public Vector3 X3
-		{
-			get => new Vector3(left, right, xgap);
-			set
-			{
-				left	= value.x;
-				xgap    = value.y;
-				right   = value.z;
-			}
-		}
-		public Vector3 Y3
-		{
-			get => new Vector3(top, bottom, ygap);
-			set
-			{
-				top     = value.x;
-				ygap    = value.y;
-				bottom  = value.z;
 			}
 		}
 
@@ -223,6 +145,8 @@ namespace RedOnion.UI
 				Mathf.RoundToInt(right),
 				Mathf.RoundToInt(top),
 				Mathf.RoundToInt(bottom));
+
+		[Description("The padding (`left, right, top, bottom`).")]
 		public Padding Padding
 		{
 			get => new Padding(left, right, top, bottom);
@@ -234,6 +158,7 @@ namespace RedOnion.UI
 				bottom	= value.bottom;
 			}
 		}
+		[Description("The spacing (`xgap, ygap`).")]
 		public Vector2 Spacing
 		{
 			get => new Vector2(xgap, ygap);

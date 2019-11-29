@@ -1,11 +1,11 @@
 using System;
 
-namespace RedOnion.KSP.Attributes
+namespace RedOnion.Attributes
 {
-	public class SafeProps : Attribute { }
-
 	/// <summary>
 	/// Marker for potentially dangerous API.
 	/// </summary>
 	public class UnsafeAttribute : Attribute { }
+
+	public class SafeProps : Attribute { }
 }

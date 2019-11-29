@@ -87,7 +87,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="MunSharp">
-      <HintPath>..\OtherDLLs\MunSharp\MunSharp.dll</HintPath>
+      <HintPath>..\packages\MunSharp.2.0.0\lib\net35\MunSharp.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -161,6 +161,9 @@
     <Folder Include="LiveRepl\Completion\" />
     <Folder Include="LiveRepl\Decorators\" />
     <Folder Include="LiveRepl\Execution\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Target Name="AfterBuild">

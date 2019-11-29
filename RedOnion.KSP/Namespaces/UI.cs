@@ -1,5 +1,4 @@
-using RedOnion.KSP.Attributes;
-using RedOnion.KSP.Utilities;
+using RedOnion.Attributes;
 using System;
 using System.ComponentModel;
 
@@ -19,6 +18,8 @@ namespace RedOnion.KSP.Namespaces
 
 		[Description("Anchors for specifying where to place elements (fill, center, ...)")]
 		public static readonly Type Anchors = typeof(UI.Anchors);
+		[Description("Text anchors/positioning for e.g. `UI.Label`.")]
+		public static readonly Type TextAnchor = typeof(UnityEngine.TextAnchor);
 		[Description("Padding - empty space inside an element / around contained elements.")]
 		public static readonly Type Padding = typeof(UI.Padding);
 		[Description("Layout - horizontal/vertical")]

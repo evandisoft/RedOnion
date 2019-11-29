@@ -103,5 +103,11 @@
   <ItemGroup>
     <None Include="README.md" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\RedOnion.Common\RedOnion.Common.csproj">
+      <Project>{2d34d879-1a21-4f8f-bf49-38ced2b40406}</Project>
+      <Name>RedOnion.Common</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -52,7 +52,7 @@
       <HintPath>$(KerbalLibs)\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
     <Reference Include="MunSharp">
-      <HintPath>..\OtherDLLs\MunSharp\MunSharp.dll</HintPath>
+      <HintPath>..\packages\MunSharp.2.0.0\lib\net35\MunSharp.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
