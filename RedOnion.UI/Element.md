@@ -1,6 +1,6 @@
 ## Element
 
-**Derived:** [Simple](Simple.md), [Label](Label.md)
+**Derived:** [Simple](Simple.md), [Label](Label.md), [Button](Button.md)
 
 `UI.Element` is the base class for all UI elements / controls. It manages `UnityEngine.GameObject` and its `RectTransform`, provides layout settings and basic `AddElement` to add child elements. All elements must ultimately be hosted inside [`UI.Window`](Window.md).
 
@@ -22,4 +22,4 @@
 
 **Static Methods:**
 - `LoadIcon()`: Texture2D, width int, height int, path string
-  - Load icon of specified dimensions as `Texture2D` from a file (from `Resources` directory or `Resources.zip` ).
+  - \[`Unsafe`\] Load icon of specified dimensions as `Texture2D` from a file (from `Resources` directory or `Resources.zip` ).

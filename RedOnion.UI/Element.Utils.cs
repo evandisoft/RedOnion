@@ -7,6 +7,7 @@ using System.Globalization;
 using System.Diagnostics;
 using Debug = UnityEngine.Debug;
 using System.ComponentModel;
+using RedOnion.Attributes;
 
 [assembly: InternalsVisibleTo("RedOnion.KSP")]
 
@@ -68,7 +69,7 @@ namespace RedOnion.UI
 		protected internal static byte[] ResourceData(Assembly asm, string path)
 			=> ResourceFileData(asm, "Resources", ref ResourcesZip, path);
 
-		[Description("Load icon of specified dimensions as `Texture2D` from a file (from `Resources` directory or `Resources.zip` ).")]
+		[Unsafe, Description("Load icon of specified dimensions as `Texture2D` from a file (from `Resources` directory or `Resources.zip` ).")]
 		public static Texture2D LoadIcon(int width, int height, string path)
 		{
 			var data = ResourceData(Assembly.GetCallingAssembly(), path);
