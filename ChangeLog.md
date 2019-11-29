@@ -14,6 +14,8 @@
 - Renamed KerbaluaMoonSharp assembly ([our modified version of MoonSharp](Kerbalua/MunSharp.md)) to MunSharp.
 - Fixed MoonSharp issue where some classes could not be automatically registered because of having members that hide base class members without overriding them.
 - Improved format for [CommonAPI](RedOnion.KSP/API/Globals.md) docs.
+- Removed OtherDLLs folder and switched to using nuget for the MunSharp.dll, so we can potentially make more changes in the future.
+- [Tutorial](Kerbalua/BasicParts.md) showing how to iterate over the parts and modules of a ship.
 
 # Current
 # 0.4

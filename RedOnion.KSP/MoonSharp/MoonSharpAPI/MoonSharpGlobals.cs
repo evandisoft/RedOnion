@@ -3,7 +3,6 @@ using System.ComponentModel;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
 using RedOnion.Attributes;
-using UnityEngine;
 
 namespace RedOnion.KSP.MoonSharp.MoonSharpAPI
 {
@@ -37,7 +36,7 @@ namespace RedOnion.KSP.MoonSharp.MoonSharpAPI
 						{
 							if (!parinfo.IsOptional)
 							{
-								goto nextConstructor;
+								break;
 							}
 							objArgs[i] = parinfo.DefaultValue;
 						}
@@ -58,7 +57,7 @@ namespace RedOnion.KSP.MoonSharp.MoonSharpAPI
 								}
 								catch (Exception)
 								{
-									goto nextConstructor;
+									break;
 								}
 							}
 							else
@@ -71,7 +70,6 @@ namespace RedOnion.KSP.MoonSharp.MoonSharpAPI
 
 					return constructor.Invoke(objArgs);
 				}
-			nextConstructor:;
 			}
 
 			if (constructorArgs.Length == 0)
