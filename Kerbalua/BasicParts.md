@@ -8,7 +8,7 @@ end
 
 Using the native list of ship parts from `ship.native.parts` we can iterate over each part and each module.
 
-`ship` is a global that gies us the current ship if we are in Flight Mode, null otherwise.
+`ship` is a global that gives us the current ship if we are in Flight Mode, null otherwise.
 
 So this script iterates and prints each part:
 
