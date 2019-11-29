@@ -49,11 +49,13 @@ namespace RedOnion.UI
 			get => Core.alignment;
 			set => Core.alignment = value;
 		}
+		[Description("Size of the font used for the text.")]
 		public int FontSize
 		{
 			get => Core.fontSize;
 			set => Core.fontSize = value;
 		}
+		[Description("Style of the font used for the text.")]
 		public FontStyle FontStyle
 		{
 			get => Core.fontStyle;
