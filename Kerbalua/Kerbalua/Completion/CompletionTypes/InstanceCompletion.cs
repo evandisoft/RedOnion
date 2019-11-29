@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using MoonSharp.Interpreter;
-using RedOnion.KSP.Attributes;
+using RedOnion.Attributes;
 using RedOnion.ROS;
 using static RedOnion.KSP.Debugging.QueueLogger;
 
