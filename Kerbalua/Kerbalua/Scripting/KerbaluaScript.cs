@@ -67,7 +67,7 @@ namespace Kerbalua.Scripting
 						  co.Coroutine.Resume();
 						  if (co.Coroutine.State == CoroutineState.ForceSuspended)
 						  {
-							  script.PrintErrorAction?.Invoke("functions called in buttons cannot be long");
+							  script.PrintErrorAction?.Invoke("functions called in buttons must have a short runtime");
 						  }
 					  });
 				  });
@@ -87,7 +87,7 @@ namespace Kerbalua.Scripting
 			commonAPI["new"]=DoString(@"
 return function(stat,...) 
 	if type(stat)~='userdata' then
-		error('`new` only works for CLR objects')
+		error('First argument to `new` must be a CLR Static Class')
 	end
 	return stat.__new(...) 
 end
