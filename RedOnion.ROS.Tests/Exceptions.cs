@@ -37,11 +37,14 @@ namespace RedOnion.ROS.Tests
 				"  return ok");
 		}
 
+		public static void ThrowError()
+			=> throw new InvalidOperationException("error");
 		[Test]
-		public void ROS_Catch02_Throw()
+		public void ROS_Catch02_Finally()
 		{
 			Lines(ExitCode.Exception, "thrown",
 				"throw \"thrown\"");
+
 			Lines(ExitCode.Exception, "catch",
 				"global.done = false",
 				"try",
@@ -52,6 +55,23 @@ namespace RedOnion.ROS.Tests
 				"  return true", // must not override active exception
 				"return false");
 			Assert.IsTrue(Globals["done"].ToBool());
+
+			Lines(ExitCode.Exception, 3.14,
+				"global.counter = 0",
+				"try",
+				"  counter++",
+				"  try",
+				"    counter++",
+				"    raise 3.14",
+				"  finally",
+				"    counter++",
+				"  return 0",
+				"finally",
+				"  counter++");
+			Assert.AreEqual(Globals["counter"].ToInt(), 4);
+
+			Globals["throwError"] = new Value(ThrowError);
+			Test("throwError");
 		}
 	}
 }

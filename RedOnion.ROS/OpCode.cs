@@ -74,6 +74,7 @@ namespace RedOnion.ROS
 
 	public enum BlockCode : byte
 	{
+		Exception	= OpCode.Exception,	// 08 the catch block (needs to clear the active error unless re-throw)
 		Block		= OpCode.Block,     // 80
 		Finally     = OpCode.Raise,		// 83 the finally part of try..catch..finally when there is pending exception (simple block otherwise)
 

@@ -36,6 +36,8 @@ namespace RedOnion.ROS
 		protected Value result;
 		/// <summary>Pending exception (or Value.Void).</summary>
 		protected Value error;
+		/// <summary>Number of try..catch..finally blocks.</summary>
+		protected int catchBlocks;
 
 		protected struct SavedContext
 		{

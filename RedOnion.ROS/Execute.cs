@@ -23,9 +23,9 @@ namespace RedOnion.ROS
 			var str = this.str;
 			int blockEnd = ctx.BlockEnd;
 			var op = OpCode.Void;
-			try
+			for (; ; )
 			{
-				for (; ; )
+				try
 				{
 					#region Block exit and countdown
 
@@ -47,7 +47,10 @@ namespace RedOnion.ROS
 
 						switch (ctx.BlockCode)
 						{
-						default:
+						case BlockCode.Exception: // end of catch block - clear the pending exception
+							error = Value.Void;
+							goto default;
+						default: // usually BlockCode.Block (e.g. `if`)
 							blockEnd = ctx.Pop();
 							continue;
 						case BlockCode.While:
@@ -139,6 +142,7 @@ namespace RedOnion.ROS
 							continue;
 						}
 						case BlockCode.TryCatch:
+							catchBlocks--;
 							ctx.CatchBlocks--;
 							at = ctx.BlockAt1; // finally start
 							if (at == ctx.BlockAt2) // finally end
@@ -149,15 +153,13 @@ namespace RedOnion.ROS
 							continue;
 						case BlockCode.Finally:
 							result = error;
-							if (--ctx.CatchBlocks > 0)
+							--ctx.CatchBlocks;
+							if (--catchBlocks > 0)
 							{
-								while (ctx.BlockCode != BlockCode.TryCatch)
-									ctx.Pop();
-								if (ctx.BlockEnd != ctx.BlockAt1)
-									throw InvalidOperation("TODO: catch");
-								at = ctx.BlockStart = ctx.BlockAt1;
-								blockEnd = ctx.BlockEnd = ctx.BlockAt2;
-								ctx.BlockCode = BlockCode.Finally;
+								this.at = at;
+								HandleError();
+								at = this.at;
+								blockEnd = ctx.BlockEnd;
 								continue;
 							}
 							Exit = ExitCode.Exception;
@@ -644,10 +646,10 @@ namespace RedOnion.ROS
 					#region Simple statements (return, break, continue)
 
 					case OpCode.Return:
-						if (ctx.CatchBlocks > 0)
+						if (catchBlocks > 0)
 						{
 							if (ctx.BlockCode == BlockCode.Finally)
-							{//	we have pending exception, continue as if we reached and of the finally block
+							{//	we have pending exception, continue as if we reached end of the finally block
 								at = blockEnd;
 								continue;
 							}
@@ -871,15 +873,12 @@ namespace RedOnion.ROS
 					case OpCode.Raise:
 						Dereference(1);
 						result = error = vals.Pop();
-						if (ctx.CatchBlocks > 0)
+						if (catchBlocks > 0)
 						{
-							while (ctx.BlockCode != BlockCode.TryCatch)
-								ctx.Pop();
-							if (ctx.BlockEnd != ctx.BlockAt1)
-								throw InvalidOperation("TODO: catch");
-							at = ctx.BlockStart = ctx.BlockAt1;
-							blockEnd = ctx.BlockEnd = ctx.BlockAt2;
-							ctx.BlockCode = BlockCode.Finally;
+							this.at = at;
+							HandleError();
+							at = this.at;
+							blockEnd = ctx.BlockEnd;
 							continue;
 						}
 						Exit = ExitCode.Exception;
@@ -890,6 +889,7 @@ namespace RedOnion.ROS
 						int trysz = Int(code, at); at += 4;
 						int errsz = Int(code, at); at += 4;
 						int finsz = Int(code, at); at += 4;
+						catchBlocks++;
 						ctx.CatchBlocks++;
 						ctx.Push(at, blockEnd = at + trysz,
 							BlockCode.TryCatch,
@@ -1007,47 +1007,72 @@ namespace RedOnion.ROS
 					default:
 						throw new NotImplementedException("Not implemented: " + op.ToString());
 					}
+				finishNoReturn:
+					Exit = ExitCode.None;
+				finish:
+					if (vals.Count > 0)
+						result = vals.Pop();
+				finishWithResult:
+					if (result.IsReference && !result.desc.Get(ref result, result.num.Int))
+					{
+						if (Exit != ExitCode.None)
+							throw CouldNotGet(ref result);
+						result = Value.Void;
+					}
+					vals.Clear();
+					ctx.PopAll();
+					Countdown = countdown;
+					return true;
 				}
-			finishNoReturn:
-				Exit = ExitCode.None;
-			finish:
-				if (vals.Count > 0)
-					result = vals.Pop();
-			finishWithResult:
-				if (result.IsReference && !result.desc.Get(ref result, result.num.Int))
+				catch (Exception ex)
 				{
-					if (Exit != ExitCode.None)
-						throw CouldNotGet(ref result);
-					result = Value.Void;
-				}
-				vals.Clear();
-				ctx.PopAll();
-				Countdown = countdown;
-				return true;
-			}
-			catch (Exception ex)
-			{
-				this.at = at;
-				Exit = ExitCode.Exception;
-				if (ex is RuntimeError re)
-				{
-					result = new Value(re);
-					throw;
-				}
-				re = new RuntimeError(compiled, at, ex);
-				result = new Value(re);
-				processor?.PrintException("Core.Execute", re, logOnly: true);
-				Log("{0,2}: {1}", stack.size, ctx);
-				for (int i = stack.size; i > 0;)
-				{
-					ref var ss = ref stack.items[--i];
-					var lnum = ss.code.FindLine(ss.at-1);
-					var line = lnum >= 0 && lnum < ss.code.Lines.Count
+					this.at = at;
+					if (!(ex is RuntimeError re))
+						re = new RuntimeError(compiled, at, ex);
+					result = error = new Value(re);
+					Exit = ExitCode.Exception;
+					if (catchBlocks > 0 && HandleError())
+					{
+						at = this.at;
+						blockEnd = ctx.BlockEnd;
+						continue;
+					}
+					if (re != null)
+					{
+						result = error = new Value(re);
+						throw;
+					}
+					re = new RuntimeError(compiled, at, ex);
+					result = error = new Value(re);
+					processor?.PrintException("Core.Execute", re, logOnly: true);
+					Log("{0,2}: {1}", stack.size, ctx);
+					for (int i = stack.size; i > 0;)
+					{
+						ref var ss = ref stack.items[--i];
+						var lnum = ss.code.FindLine(ss.at-1);
+						var line = lnum >= 0 && lnum < ss.code.Lines.Count
 						? ss.code.Lines[lnum].Text : null;
-					Log("{0,2}: {1}, at:{2}, line:{3}:{4}", i, ss.context, ss.at, lnum+1, line ?? "<no source>");
+						Log("{0,2}: {1}, at:{2}, line:{3}:{4}", i, ss.context, ss.at, lnum+1, line ?? "<no source>");
+					}
+					throw re;
 				}
-				throw re;
 			}
+		}
+
+		protected virtual bool HandleError()
+		{
+			while (ctx.BlockCode != BlockCode.TryCatch)
+			{
+				if (ctx.BlockCount == 0 || ctx.BlockCode == BlockCode.Function || ctx.BlockCode == BlockCode.Library)
+					throw InvalidOperation("TODO: exception unwinding got to root block");
+				ctx.Pop();
+			}
+			if (ctx.BlockEnd != ctx.BlockAt1)
+				throw InvalidOperation("TODO: catch");
+			at = ctx.BlockStart = ctx.BlockAt1;
+			ctx.BlockEnd = ctx.BlockAt2;
+			ctx.BlockCode = BlockCode.Finally;
+			return true;
 		}
 	}
 }
