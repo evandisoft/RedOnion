@@ -6,7 +6,7 @@ function selfDestruct(part)
         selfDestruct(childParts[i])
     end
     part.explode()
-    sleep(Random.Range(0,10))
+    sleep(Random.Range(0,3))
 end
 
 selfDestruct(ship.parts[0])

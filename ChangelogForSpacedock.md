@@ -22,6 +22,7 @@ Just had a release (0.4.3)
 - Improved format for [CommonAPI](https://evandisoft.github.io/RedOnion/RedOnion.KSP/API/Globals) docs.
 - Removed OtherDLLs folder and switched to using nuget for the MunSharp.dll, so we can potentially make more changes in the future.
 - [Tutorial](https://evandisoft.github.io/RedOnion/Kerbalua/BasicParts) showing how to iterate over the parts and modules of a ship.
+- Lua constructor improved. (Firda found an already implemented, but undocumented version in MoonSharp)
 
 ## 0.4.2
 - Bug in ship.parts relating to explode functionality fixed.
