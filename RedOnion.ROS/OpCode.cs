@@ -89,7 +89,7 @@ namespace RedOnion.ROS
 		TryCatch    = OpCode.Catch,		// 97 the try part of try..catch..finally
 
 		Library     = OpCode.Import,    // D0 see Core.CallScript(..., include: true)
-		Function    = OpCode.Function,	// DB root block of function call
+		Function    = OpCode.Function,	// DB root block of function call (where arguments live)
 	}
 
 	public enum OpCode : byte

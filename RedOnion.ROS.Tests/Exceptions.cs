@@ -83,5 +83,19 @@ namespace RedOnion.ROS.Tests
 				"  global.done = true");
 			Assert.IsTrue(Globals["done"].ToBool());
 		}
+
+		[Test]
+		public void ROS_Catch03_FinallyWithDef()
+		{
+			Globals["throwError"] = new Value(ThrowError);
+			Expect<RuntimeError>(
+				"global.done = false",
+				"def throwIt => throwError",
+				"try",
+				"  throwIt",
+				"finally",
+				"  global.done = true");
+			Assert.IsTrue(Globals["done"].ToBool());
+		}
 	}
 }

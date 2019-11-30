@@ -55,11 +55,18 @@ namespace RedOnion.ROS
 
 		public Globals Globals
 		{
-			get => globals;
 			set => SetGlobals(value);
+			get
+			{
+				if (globals == null)
+					SetGlobals(GetGlobals());
+				return globals;
+			}
 		}
 		protected virtual void SetGlobals(Globals value)
 			=> globals = value;
+		protected virtual Globals GetGlobals()
+			=> processor?.globals ?? new Globals();
 		public Processor Processor => processor;
 		public Context Context => ctx;
 		public ExitCode Exit { get; protected set; }
