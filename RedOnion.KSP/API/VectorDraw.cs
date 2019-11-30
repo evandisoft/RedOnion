@@ -15,8 +15,6 @@ namespace RedOnion.KSP.API
 		[Description("Vector drawing")]
 		public class Draw : IDisposable
 		{
-			protected IProcessor _processor;
-
 			[Description("Reference for coordinate system (origin at zero if null).")]
 			public ISpaceObject reference { get; set; }
 			[Description("Starting point of the vector (relative to reference).")]
@@ -46,8 +44,18 @@ namespace RedOnion.KSP.API
 			protected LineRenderer _bodyRender;
 			protected LineRenderer _headRender;
 
-			public Draw(IProcessor processor)
-				=> _processor = processor;
+			/// <summary>
+			/// Unique ID of the vector-draw.
+			/// </summary>
+			public ulong id { get; }
+			protected static ulong id_counter;
+
+			public Draw()
+			{
+				id = ++id_counter;
+				Value.DebugLog("Creating new VectorDraw #{0} in process #{1}", id, OS.Process.currentId);
+				_hooks = new Hooks(this);
+			}
 
 			~Draw() => Dispose(false);
 			void IDisposable.Dispose()
@@ -57,46 +65,38 @@ namespace RedOnion.KSP.API
 			}
 			protected virtual void Dispose(bool disposing)
 			{
-				if (_processor == null)
-					return;
-				if (disposing)
+				if (_hooks != null)
 				{
-					hide();
-					_processor = null;
+					Value.DebugLog("Disposing VectorDraw #{0} in process #{1} (original: #{2}, dispose: {3})",
+						id, OS.Process.currentId, _hooks?.process.id ?? 0, disposing);
+					var hooks = _hooks;
+					_hooks = null;
+					hooks.Dispose();
 				}
+				if (disposing)
+					hide();
 				// see UI.Window for another example of this
 				else UI.Collector.Add(this);
 			}
 			// this is to avoid direct hard-link from processor to vector draw,
 			// so that it can be garbage-collected when no direct link exists
 			protected Hooks _hooks;
-			protected class Hooks : IDisposable
+			protected class Hooks : OS.Process.ShutdownHook<Draw>
 			{
-				protected WeakReference _draw;
-				protected IProcessor _processor;
-				public Hooks(Draw draw)
+				public Hooks(Draw draw) : base(draw) { }
+				public void show() => process.physicsUpdate += Update;
+				public void hide() => process.physicsUpdate -= Update;
+				protected override void Dispose(bool disposing)
 				{
-					_draw = new WeakReference(draw);
-					_processor = draw._processor;
-					_processor.PhysicsUpdate += Update;
-				}
-				~Hooks() => Dispose(false);
-				public void Dispose()
-				{
-					GC.SuppressFinalize(this);
-					Dispose(true);
-				}
-				protected virtual void Dispose(bool disposing)
-				{
-					if (_processor == null)
+					if (process == null)
 						return;
-					_processor.PhysicsUpdate -= Update;
-					_processor = null;
-					_draw = null;
+					process.physicsUpdate -= Update;
+					base.Dispose(disposing);
 				}
 				protected void Update()
 				{
-					if (_draw?.Target is Draw draw)
+					Draw draw = Target;
+					if (draw != null)
 						draw.Update();
 					else Dispose();
 				}
@@ -105,22 +105,18 @@ namespace RedOnion.KSP.API
 			[Description("Show the vector. It is created hidden so that you can subscribe to `system.update` first.")]
 			public void show()
 			{
-				if (_processor == null)
-					throw new ObjectDisposedException("Vector.Draw");
 				if (_hooks == null)
-					_hooks = new Hooks(this);
+					throw new ObjectDisposedException("Vector.Draw");
+				_hooks.show();
 			}
 			[Description("Hide the vector.")]
 			public void hide()
 			{
-				if (_hooks == null)
-					return;
+				_hooks?.hide();
 				_bodyObject?.DestroyGameObject();
 				_bodyObject = null;
 				_headObject?.DestroyGameObject();
 				_headObject = null;
-				_hooks.Dispose();
-				_hooks = null;
 			}
 
 			// see https://wiki.kerbalspaceprogram.com/wiki/API:Layers
@@ -179,6 +175,7 @@ namespace RedOnion.KSP.API
 					_bodyObject.layer = FlightLayer;
 					_headObject.layer = FlightLayer;
 				}
+				// TODO: fix the glitching origin in warp and shortly after launch
 				if (reference != null)
 					origin += reference.position;
 				else

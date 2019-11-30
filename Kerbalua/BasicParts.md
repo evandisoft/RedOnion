@@ -78,4 +78,4 @@ o> probeCoreHex.v2 (ModuleCommand)
 ```
 resulted.
 
-Parts in KSP have multiple modules. Mods can add modules to existing parts, so if you run the script, it will produce a different output depending on which mods you have installed.
+Parts in KSP have multiple modules. Mods can add modules to existing parts, so if you run the script, it may produce a different output, depending on which mods you have installed, for a given ship.
