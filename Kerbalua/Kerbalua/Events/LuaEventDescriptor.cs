@@ -288,6 +288,10 @@ namespace Kerbalua.Events
 			foreach (Closure c in closures)
 			{
 				var script=KerbaluaScript.Instance;
+				if (script==null)
+				{
+					throw new Exception("KerbaluaScirpt.Instance not initialized");
+				}
 				var co = script.CreateCoroutine(c);
 				co.Coroutine.AutoYieldCounter = 1000;
 				co.Coroutine.Resume(o01, o02, o03, o04, o05, o06, o07, o08, o09, o10, o11, o12, o13, o14, o15, o16);

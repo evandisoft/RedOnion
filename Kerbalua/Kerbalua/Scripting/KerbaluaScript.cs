@@ -29,14 +29,14 @@ namespace Kerbalua.Scripting
 		{
 			get
 			{
-				if (_instance==null)
-				{
-					_instance=new KerbaluaScript();
-				}
 				return _instance;
 			}
 		}
 
+		public static void Initialize()
+		{
+			_instance=new KerbaluaScript();
+		}
 
 		private KerbaluaScript() : base(CoreModules.Preset_Complete)
 		{
@@ -61,7 +61,7 @@ namespace Kerbalua.Scripting
 				  {
 					  return new Action<Button>((button) =>
 					  {
-						  var script=Instance;
+						  var script=this;
 						  var co = script.CreateCoroutine(f);
 						  co.Coroutine.AutoYieldCounter = 1000;
 						  co.Coroutine.Resume();
