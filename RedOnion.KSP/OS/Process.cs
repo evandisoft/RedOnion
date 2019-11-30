@@ -25,17 +25,57 @@ namespace RedOnion.KSP.OS
 		public static Process current { get; internal set; }
 
 		/// <summary>
+		/// ID of current process (or zero if not set).
+		/// </summary>
+		public static ulong currentId => current?.id ?? 0;
+
+		/// <summary>
 		/// Unique ID of the process.
 		/// </summary>
-		public uint id { get; }
-		public Process() => id = ++id_counter;
-		protected static uint id_counter;
+		public ulong id { get; }
+		public Process()
+		{
+			id = ++id_counter;
+			Value.DebugLog("Process #{0} created.", id);
+		}
+		protected static ulong id_counter;
 
 		/// <summary>
 		/// Process terminated.
 		/// Subscribers can use <see cref="ShutdownHook{T}" /> to avoid hard-links.
+		/// All subscriptions are removed prior to executing the handlers.
 		/// </summary>
 		public Action shutdown;
+
+		/// <summary>
+		/// Event invoked on every physics update (Unity FixedUpdate).
+		/// </summary>
+		public event Action physicsUpdate;
+
+		/// <summary>
+		/// To be called every physics tick (Unity: FixedUpdate)
+		/// after the execution of current script and all async events.
+		/// </summary>
+		public void UpdatePhysics()
+		{
+			// other updates (e.g. vector drawing)
+			var physics = physicsUpdate;
+			if (physics != null)
+			{
+				foreach (Action handler in physics.GetInvocationList())
+				{
+					try
+					{
+						handler();
+					}
+					catch //(Exception ex)
+					{
+						physicsUpdate -= handler;
+						//TODO: print the exception
+					}
+				}
+			}
+		}
 
 		/// <summary>
 		/// Terminate this process.
@@ -59,6 +99,7 @@ namespace RedOnion.KSP.OS
 				return;
 			if (disposing)
 			{
+				// clearing the list also prevents recursion when processor is itself hooked and calls terminate()
 				this.shutdown = null;
 				foreach (var fn in shutdown.GetInvocationList())
 				{
@@ -71,6 +112,7 @@ namespace RedOnion.KSP.OS
 						Value.Log("Exception in process #{0} shutdown: {1}", id, ex.Message);
 					}
 				}
+				Value.DebugLog("Process #{0} terminated.", id);
 			}
 			else
 			{//	this should really never happen (processor calls process.Dispose on reset/shutdown)
@@ -80,6 +122,13 @@ namespace RedOnion.KSP.OS
 			}
 		}
 
+		/// <summary>
+		/// Used to subscribe to <see cref="shutdown"/> but avoid direct hard-link
+		/// so that the target/subscriber can be garbage-collected.
+		/// </summary>
+		/// <remarks>
+		/// The target/subscriber should dispose this object in its own Dispose() method.
+		/// </remarks>
 		public class ShutdownHook : ShutdownHook<IDisposable>
 		{
 			public ShutdownHook(IDisposable target) : base(target) { }
@@ -91,16 +140,24 @@ namespace RedOnion.KSP.OS
 		/// <remarks>
 		/// The target/subscriber should dispose this object in its own Dispose() method.
 		/// </remarks>
-		/// <typeparam name="T"></typeparam>
 		public class ShutdownHook<T> : IDisposable
 			where T : class, IDisposable
 		{
 			protected WeakReference<T> _target;
 			public Process process { get; protected set; }
+			public T Target
+			{
+				get
+				{
+					T target = null;
+					return _target?.TryGetTarget(out target) == true ? target : null;
+				}
+			}
 
 			public ShutdownHook(T target)
 			{
 				_target = new WeakReference<T>(target);
+				Value.DebugLog("ShutdownHook created for process #{0}", currentId);
 				process = current;
 				process.shutdown += Shutdown;
 			}
@@ -114,6 +171,7 @@ namespace RedOnion.KSP.OS
 			{
 				if (process == null)
 					return;
+				Value.DebugLog("ShutdownHook disposed for process #{0}", process.id);
 				process.shutdown -= Shutdown;
 				process = null;
 				_target = null;
@@ -121,9 +179,7 @@ namespace RedOnion.KSP.OS
 			}
 			protected virtual void Shutdown()
 			{
-				T target = null;
-				if (_target?.TryGetTarget(out target) == true)
-					target.Dispose();
+				Target?.Dispose();
 				Dispose();
 			}
 		}

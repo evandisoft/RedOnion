@@ -162,6 +162,7 @@ end
 			Process.current = process;
 			coroutine.Coroutine.AutoYieldCounter = execlimit;
 			result = coroutine.Coroutine.Resume();
+			process.UpdatePhysics();
 			Process.current = null;
 
 			bool isComplete = false;

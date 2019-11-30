@@ -157,9 +157,7 @@ namespace LiveRepl.Execution
 
 		public override void ResetEngine()
 		{
-			state = State.Idle;
-			source = null;
-			path = null;
+			Terminate();
 			processor.Reset();
 			suggest.Reset();
 			base.ResetEngine();
@@ -170,7 +168,7 @@ namespace LiveRepl.Execution
 			state = State.Idle;
 			source = null;
 			path = null;
-			processor.ClearEvents();
+			processor.Terminate();
 		}
 
 		public override IList<string> GetDisplayableCompletions(string source, int cursorPos, out int replaceStart, out int replaceEnd)
