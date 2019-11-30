@@ -12,12 +12,12 @@ User interface, see [RedOnion.UI](../../RedOnion.UI/README.md)
 - `Layout`: [Layout](../../RedOnion.UI/Layout.md) - Layout - horizontal/vertical
 - `LayoutPadding`: [LayoutPadding](../../RedOnion.UI/LayoutPadding.md) - LayoutPadding - Padding + Spacing
 - `TextAnchor`: TextAnchor - Text anchors/positioning for e.g. `UI.Label`. (UnityEngine)
-- `FontStyle`: FontStyle - Font style for e.g. `UI.Lavel`. (UnityEngine)
+- `FontStyle`: FontStyle - Font style for e.g. `UI.Label`. (UnityEngine)
 - `Element`: [Element](../../RedOnion.UI/Element.md) - Element - base class for all elements/controls.
 - `Panel`: [Panel](../../RedOnion.UI/Panel.md) - Content panel (a box to hold other elements, manages layout).
 - `Label`: [Label](../../RedOnion.UI/Label.md) - Line of text
 - `Button`: [Button](../../RedOnion.UI/Button.md) - Clickable button (or toggle-button).
 - `Toggle`: Toggle - Toggle - experimental. WIP
-- `TextBox`: TextBox - Line of editable text (or multi-line text editor).
+- `TextBox`: [TextBox](../../RedOnion.UI/TextBox.md) - Line of editable text (or multi-line text editor).
 - `Image`: Image - Image / Icon.
 - `ImageType`: Type - UnityEngine.UI.Image.Type

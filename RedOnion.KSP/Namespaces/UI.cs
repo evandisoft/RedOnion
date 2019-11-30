@@ -27,7 +27,7 @@ namespace RedOnion.KSP.Namespaces
 
 		[Description("Text anchors/positioning for e.g. `UI.Label`. (UnityEngine)")]
 		public static readonly Type TextAnchor = typeof(UnityEngine.TextAnchor);
-		[Description("Font style for e.g. `UI.Lavel`. (UnityEngine)")]
+		[Description("Font style for e.g. `UI.Label`. (UnityEngine)")]
 		public static readonly Type FontStyle = typeof(UnityEngine.FontStyle);
 
 		// unused for now

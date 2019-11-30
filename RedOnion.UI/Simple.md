@@ -32,7 +32,7 @@ or `Anchors.MiddleLeft/MiddleCenter/UpperLeft...`
 - `AddVertical()`: [Panel](Panel.md) - Add new panel with vertical layout.
 - `AddLabel()`: [Label](Label.md), text string
   - Add new label with specified text.
-- `AddTextBox()`: TextBox, text string
+- `AddTextBox()`: [TextBox](TextBox.md), text string
   - Add new label with specified text.
 - `AddButton()`: [Button](Button.md), text string
   - Add new button with specified text.
