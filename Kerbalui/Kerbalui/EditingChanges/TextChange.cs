@@ -39,19 +39,19 @@ namespace Kerbalui.EditingChanges
 
 			int lengthDiff=newText.Length-originalText.Length;
 
-			int originalEndIndex=originalText.Length-1;
-			int newTextEndIndex=originalEndIndex+lengthDiff;
+			int originalDiffEnd=originalText.Length-1;
+			int newTextDiffEnd=originalDiffEnd+lengthDiff;
 
 			if (lengthDiff>0)
 			{
 				// Replacement text is longer.
-				for (; originalEndIndex>diffStart; originalEndIndex--, newTextEndIndex--)
+				for (; originalDiffEnd>diffStart; originalDiffEnd--, newTextDiffEnd--)
 				{
-					if (originalText[originalEndIndex]!=newText[newTextEndIndex])
+					if (originalText[originalDiffEnd]!=newText[newTextDiffEnd])
 					{
 						return new TextChange(diffStart,
-							originalText.Substring(diffStart, originalEndIndex+1-diffStart),
-							newText.Substring(diffStart, newTextEndIndex+1-diffStart)
+							originalText.Substring(diffStart, originalDiffEnd+1-diffStart),
+							newText.Substring(diffStart, newTextDiffEnd+1-diffStart)
 							);
 					}
 				}
@@ -59,21 +59,21 @@ namespace Kerbalui.EditingChanges
 			else
 			{
 				// Original text is longer
-				for (; newTextEndIndex>diffStart; originalEndIndex--, newTextEndIndex--)
+				for (; newTextDiffEnd>diffStart; originalDiffEnd--, newTextDiffEnd--)
 				{
-					if (originalText[originalEndIndex]!=newText[newTextEndIndex])
+					if (originalText[originalDiffEnd]!=newText[newTextDiffEnd])
 					{
 						return new TextChange(diffStart,
-							originalText.Substring(diffStart, originalEndIndex+1-diffStart),
-							newText.Substring(diffStart, newTextEndIndex+1-diffStart)
+							originalText.Substring(diffStart, originalDiffEnd+1-diffStart),
+							newText.Substring(diffStart, newTextDiffEnd+1-diffStart)
 							);
 					}
 				}
 			}
 
 			return new TextChange(diffStart,
-				originalText.Substring(diffStart, originalEndIndex-diffStart),
-				newText.Substring(diffStart, newTextEndIndex-diffStart)
+				originalText.Substring(diffStart, originalDiffEnd-diffStart),
+				newText.Substring(diffStart, newTextDiffEnd-diffStart)
 				);
 		}
 

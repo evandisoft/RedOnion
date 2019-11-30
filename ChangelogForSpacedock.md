@@ -9,20 +9,25 @@
 - More UI library features.
 
 # Next Release
+Just had a release (0.4.3)
 
+# Current
+# 0.4
+
+## 0.4.3
 - Undo/Redo for LiveRepl Editor. Stores at least 50 of the last changes.
 - Fixed bug where Lua was outputting strings twice
 - Renamed KerbaluaMoonSharp assembly ([our modified version of MoonSharp](https://evandisoft.github.io/RedOnion/Kerbalua/MunSharp)) to MunSharp.
 - Fixed MoonSharp issue where some classes could not be automatically registered because of having members that hide base class members without overriding them.
 - Improved format for [CommonAPI](https://evandisoft.github.io/RedOnion/RedOnion.KSP/API/Globals) docs.
-
-# Current
-# 0.4
+- Removed OtherDLLs folder and switched to using nuget for the MunSharp.dll, so we can potentially make more changes in the future.
+- [Tutorial](https://evandisoft.github.io/RedOnion/Kerbalua/BasicParts) showing how to iterate over the parts and modules of a ship.
+- Lua constructor improved. (Firda found an already implemented, but undocumented version in MoonSharp)
 
 ## 0.4.2
 - Bug in ship.parts relating to explode functionality fixed.
 - [Tutorial](https://evandisoft.github.io/RedOnion/Kerbalua/MajorMalfunctionNative) of how to fallback to native functionality.
-- [Tutorial](https://evandisoft.github.io/RedOnion/Kerbalua/SelfDestruct) for selfDestruct.lua (include a link)
+- [Tutorial](https://evandisoft.github.io/RedOnion/Kerbalua/SelfDestruct) for selfDestruct.lua
 - [Tutorial](https://evandisoft.github.io/RedOnion/Kerbalua/UIBasics) for using the ui in Lua code (uibasics.lua)
 - More docs.
 - Fixed a problem with `new(ui.Button,"buttontext",function() end)` where the `new` function  wasn't properly converting a lua function to the Action\<Button\> that the ui.Button constructor requires.

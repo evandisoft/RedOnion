@@ -54,9 +54,9 @@ namespace LiveRepl.Execution
 
 		public override void ResetEngine()
 		{
+			Terminate();
 			InternalResetEngine();
 			base.ResetEngine();
-			Terminate();
 		}
 
 		public override void Terminate()

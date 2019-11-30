@@ -1,9 +1,9 @@
-window=new(ui.Window,"Window",ui.Layout.Vertical)
+window=new(ui.Window,"Buttons")
 
 window.ChildAnchors=ui.Anchors.Fill
 
 function addbutton(text)
-    window.Add(new(ui.Button,text,function() print(text.." clicked!") end))
+    window.Add(new(ui.Button,text,function() while true do end end))
 end
 
 addbutton("button1")

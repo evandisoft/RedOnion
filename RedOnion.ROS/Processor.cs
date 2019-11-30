@@ -157,6 +157,20 @@ namespace RedOnion.ROS
 		/// </summary>
 		public virtual void Reset()
 		{
+			Terminate();
+			if (globals != null)
+			{
+				globals.Reset();
+				globals.Fill();
+			}
+			ctx = new Context();
+		}
+		/// <summary>
+		/// Terminate running script and clear all evets
+		/// (but preserve globals and top context).
+		/// </summary>
+		public virtual void Terminate()
+		{
 			var shutdown = Shutdown;
 			Shutdown = null;
 			if (shutdown != null)
@@ -174,14 +188,12 @@ namespace RedOnion.ROS
 				}
 			}
 			ClearEvents();
-			if (globals != null)
-			{
-				globals.Reset();
-				globals.Fill();
-			}
 			stack.Clear();
-			ctx = new Context();
+			ctx.PopAll();
+			ctx.CatchBlocks = 0;
 			Exit = ExitCode.None;
+			result = Value.Void;
+			error = Value.Void;
 		}
 
 		protected readonly List<Event.Subscription> eventsToRemove;

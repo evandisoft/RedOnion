@@ -67,10 +67,11 @@ namespace Kerbalua.Scripting
 						  co.Coroutine.Resume();
 						  if (co.Coroutine.State == CoroutineState.ForceSuspended)
 						  {
-							  script.PrintErrorAction?.Invoke("functions called in buttons cannot be long");
+							  script.PrintErrorAction?.Invoke("functions called in buttons must have a short runtime");
 						  }
 					  });
 				  });
+
 
 			//UnityEngine.Debug.Log("sanity check");
 			var metatable=new Table(this);
@@ -82,9 +83,34 @@ namespace Kerbalua.Scripting
 			Globals.MetaTable=metatable;
 			Globals.Remove("coroutine");
 
+			// This is the simplest way to define "new" to use __new.
+			commonAPI["new"]=DoString(@"
+return function(stat,...) 
+	if type(stat)~='userdata' then
+		error('First argument to `new` must be a CLR Static Class')
+	end
+	return stat.__new(...) 
+end
+			");
+
+
+			//commonAPI["new"]=new newdel(@new);
+			
 			commonAPI["sleep"] = new Action<double>(sleep);
 			//commonAPI["setexeclimit"] = new Action<double>(setexeclimit);
 		}
+
+		//delegate object newdel(object obj, params DynValue[] args);
+		//object @new(object typeStaticOrObject, params DynValue[] args)
+		//{
+		//	Type type=typeStaticOrObject as Type;
+		//	if (type==null)
+		//	{
+		//		type=typeStaticOrObject.GetType();
+		//	}
+
+
+		//}
 
 		public void setexeclimit(double counterlimit)
 		{
@@ -136,6 +162,7 @@ namespace Kerbalua.Scripting
 			Process.current = process;
 			coroutine.Coroutine.AutoYieldCounter = execlimit;
 			result = coroutine.Coroutine.Resume();
+			process.UpdatePhysics();
 			Process.current = null;
 
 			bool isComplete = false;
