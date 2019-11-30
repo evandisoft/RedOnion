@@ -1,0 +1,2 @@
+﻿Interface for an engine.
+

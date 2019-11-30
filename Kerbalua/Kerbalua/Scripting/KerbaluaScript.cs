@@ -91,7 +91,7 @@ return function(stat,...)
 	end
 	return stat.__new(...) 
 end
-			");
+");
 
 
 			//commonAPI["new"]=new newdel(@new);
