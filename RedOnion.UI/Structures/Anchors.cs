@@ -1,22 +1,20 @@
 using System;
+using System.ComponentModel;
 using System.Globalization;
 using UnityEngine;
 
 namespace RedOnion.UI
 {
-	/// <summary>
-	/// Anchor definition for positioning UI element within a cell
-	/// </summary>
-	[Serializable]
+	[Serializable, Description("Anchor definition for positioning UI element within a cell.")]
 	public struct Anchors : IEquatable<Anchors>
 	{
-		[SerializeField]
+		[SerializeField, Description("Fraction (0..1) of container's width to anchor left side of the element to.")]
 		public float left;
-		[SerializeField]
+		[SerializeField, Description("Fraction (0..1) of container's width to anchor right side of the element to.")]
 		public float right;
-		[SerializeField]
+		[SerializeField, Description("Fraction (0..1) of container's height to anchor top side of the element to.")]
 		public float top;
-		[SerializeField]
+		[SerializeField, Description("Fraction (0..1) of container's height to anchor bottom side of the element to.")]
 		public float bottom;
 
 		public static bool operator ==(Anchors lhs, Anchors rhs)
@@ -32,36 +30,62 @@ namespace RedOnion.UI
 			=> unchecked(left.GetHashCode() * 37 + right.GetHashCode() * 101
 			+ top.GetHashCode() * 277 + bottom.GetHashCode() * 613);
 
+		[Description("Position the element in top-left corner.")]
 		public static readonly Anchors TopLeft      = new Anchors(0f, 0f, 0f, 0f);
+		[Description("Position the element in top-right corner.")]
 		public static readonly Anchors TopRight     = new Anchors(1f, 1f, 0f, 0f);
+		[Description("Position the element in bottom-left corner.")]
 		public static readonly Anchors BottomLeft   = new Anchors(0f, 0f, 1f, 1f);
+		[Description("Position the element in bottom-right corner.")]
 		public static readonly Anchors BottomRight  = new Anchors(1f, 1f, 1f, 1f);
 
+		[Description("Fill the entire cell.")]
 		public static readonly Anchors Fill         = new Anchors(0f, 1f, 0f, 1f);
+		[Description("Fill the left side of the cell (top-down, anchor to left, keep the width).")]
 		public static readonly Anchors FillLeft     = new Anchors(0f, 0f, 0f, 1f);
+		[Description("Fill the right side of the cell (top-down, anchor to right, keep the width).")]
 		public static readonly Anchors FillRight    = new Anchors(1f, 1f, 0f, 1f);
+		[Description("Fill the top of the cell (left-right, anchor to top, keep the height).")]
 		public static readonly Anchors FillTop      = new Anchors(0f, 1f, 0f, 0f);
+		[Description("Fill the bottom of the cell (left-right, anchor to bottom, keep the height).")]
 		public static readonly Anchors FillBottom   = new Anchors(0f, 1f, 1f, 1f);
 
+		[Description("Position the element in the middle/center of the cell.")]
 		public static readonly Anchors Middle       = new Anchors(.5f, .5f, .5f, .5f);
+		[Description("Position the element in the middle of left side.")]
 		public static readonly Anchors MiddleLeft   = new Anchors(0f, 0f, .5f, .5f);
+		[Description("Position the element in the middle of right side.")]
 		public static readonly Anchors MiddleRight  = new Anchors(1f, 1f, .5f, .5f);
+		[Description("Position the element in the middle of the top.")]
 		public static readonly Anchors MiddleTop    = new Anchors(.5f, .5f, 0f, 0f);
+		[Description("Position the element in the middle of the bottom.")]
 		public static readonly Anchors MiddleBottom = new Anchors(.5f, .5f, 1f, 1f);
 
+		[Description("Stretch the element horizontally and place it in the middle/center (vertically).")]
 		public static readonly Anchors Horizontal	= new Anchors(0f, 1f, .5f, .5f);
+		[Description("Stretch the element vertically and place it in the middle/center (horizontally).")]
 		public static readonly Anchors Vertical		= new Anchors(.5f, .5f, 0f, 1f);
+
+		[Description("Marker for invalid / unused / default anchors.")]
 		public static readonly Anchors Invalid      = new Anchors(float.NaN, float.NaN, float.NaN, float.NaN);
 
 		// aliases from TextAnchor
+		[Description("`TopLeft`, name taken from `TextAnchor`.")]
 		public static readonly Anchors UpperLeft = TopLeft;
+		[Description("`MiddleTop`, name taken from `TextAnchor`.")]
 		public static readonly Anchors UpperCenter = MiddleTop;
+		[Description("`TopRight`, name taken from `TextAnchor`.")]
 		public static readonly Anchors UpperRight = TopRight;
+		[Description("`Middle`, name taken from `TextAnchor`.")]
 		public static readonly Anchors MiddleCenter = Middle;
+		[Description("`BottomLeft`, name taken from `TextAnchor`.")]
 		public static readonly Anchors LowerLeft = BottomLeft;
+		[Description("`MiddleLeft`, name taken from `TextAnchor`.")]
 		public static readonly Anchors LowerCenter = MiddleLeft;
+		[Description("`BottomRight`, name taken from `TextAnchor`.")]
 		public static readonly Anchors LowerRight = BottomRight;
 
+		[Description("Create anchors by specifying all four values.")]
 		public Anchors(float left, float right, float top, float bottom)
 		{
 			this.left   = left;
@@ -85,10 +109,13 @@ namespace RedOnion.UI
 			MiddleLeft, Middle, MiddleRight,
 			BottomLeft, MiddleBottom, BottomRight
 		};
+
+		[Description("Create anchors from `TextAnchor`.")]
 		public Anchors(TextAnchor anchor)
 		{
 			this = TextAnchorTable[(int)anchor];
 		}
+		[Description("Convert to `TextAnchor`.")]
 		public TextAnchor ToTextAnchor()
 		{
 			var x = float.IsNaN(left) ? right : float.IsNaN(right) ? left : (left + right) * 0.5f;
@@ -104,27 +131,6 @@ namespace RedOnion.UI
 					return (TextAnchor)i;
 			}
 			return TextAnchor.MiddleCenter;
-		}
-
-		public float Left
-		{
-			get => left;
-			set => left = value;
-		}
-		public float Right
-		{
-			get => right;
-			set => right = value;
-		}
-		public float Top
-		{
-			get => top;
-			set => top = value;
-		}
-		public float Bottom
-		{
-			get => bottom;
-			set => bottom = value;
 		}
 
 		public float GetMin(bool verticalAxis)

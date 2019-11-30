@@ -32,18 +32,8 @@ namespace LiveRepl.Parts {
 			this.uiparts=uiparts;
 
 			Text = SavedSettings.LoadSetting("lastScriptName",DefaultScriptFilename);
-			if (!File.Exists(Path.Combine(SavedSettings.BaseScriptsPath, Text))) {
-				IList<string> recentFiles = SavedSettings.LoadListSetting("recentFiles");
-				if (recentFiles.Count > 0) {
-					Text = recentFiles[0];
-				} else {
-					Text = DefaultScriptFilename;
-				}
-			};
 
 			keybindings.Clear();
-
-			//uiparts.FontChange+=editableText.FontChangeEventHandler;
 		}
 
 		protected override void DecoratorUpdate()
@@ -158,8 +148,6 @@ namespace LiveRepl.Parts {
 		Stopwatch ioDelayWatch = new Stopwatch();
 		List<string> scriptList;
 		const int ioDelayMillis = 1000;
-
-		public string ControlName => editableText.ControlName;
 
 		/// <summary>
 		/// This is used to update the script list at most every ioDelayMillis milliseconds.

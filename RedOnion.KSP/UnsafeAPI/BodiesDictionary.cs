@@ -9,8 +9,13 @@ using RedOnion.KSP.Completion;
 
 namespace RedOnion.KSP.UnsafeAPI
 {
-	[Description("A dictionary mapping body names to CelestialBody instances. The bodies will be whatever"
-	+" is returned by FlightGlobals.Bodies")]
+	[Description(@"
+A collection of space/celestial bodies.
+Acess them by `bodies.bodyname`. 
+For example bodies.mun will return a reference to the mun.
+
+This version of `bodies` returns the native CelestialBody.
+")]
 	public class BodiesDictionary : ScriptStringKeyedConstDictionary<CelestialBody>
 	{
 		BodiesDictionary()

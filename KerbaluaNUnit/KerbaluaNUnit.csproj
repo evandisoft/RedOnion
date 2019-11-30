@@ -51,23 +51,25 @@
     <Reference Include="Assembly-CSharp-firstpass">
       <HintPath>$(KerbalLibs)\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
-    <Reference Include="KerbaluaMoonSharp">
-      <HintPath>..\OtherDLLs\KerbaluaMoonSharp\KerbaluaMoonSharp.dll</HintPath>
+    <Reference Include="MunSharp">
+      <HintPath>..\packages\MunSharp.2.0.0\lib\net35\MunSharp.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MLUA_ProcessedIncompleteVarTests.cs" />
     <Compile Include="MLUA_ImportManagerTests.cs" />
     <Compile Include="MLUA_CompletionOperationsTests.cs" />
-    <Compile Include="TestingUtil.cs" />
     <Compile Include="MLUA_IntellisenseTests.cs" />
     <Compile Include="MLUA_ImplicitReturnTests.cs" />
     <Compile Include="MLUA_DummyAPITests.cs" />
-    <Compile Include="CommonAPITestUtil.cs" />
-    <Compile Include="ScriptTester.cs" />
-    <Compile Include="DummyAPI.cs" />
-    <Compile Include="CallableProperty_Namespace.cs" />
-    <Compile Include="CallableMethod_Namespace.cs" />
+    <Compile Include="KLUI_TextChangeTests.cs" />
+    <Compile Include="KLUI_EditChangesManagerTests.cs" />
+    <Compile Include="HelperClasses\CallableMethod_Namespace.cs" />
+    <Compile Include="HelperClasses\CallableProperty_Namespace.cs" />
+    <Compile Include="HelperClasses\CommonAPITestUtil.cs" />
+    <Compile Include="HelperClasses\DummyAPI.cs" />
+    <Compile Include="HelperClasses\ScriptTester.cs" />
+    <Compile Include="HelperClasses\TestingUtil.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Kerbalua\Kerbalua.csproj">
@@ -86,9 +88,16 @@
       <Project>{59399C9E-EBAC-4D7C-B2CB-6ECE22FE8D6E}</Project>
       <Name>RedOnion.ROS</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Kerbalui\Kerbalui.csproj">
+      <Project>{7A943166-A67E-420A-BCA0-5231D57A18BD}</Project>
+      <Name>Kerbalui</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="HelperClasses\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

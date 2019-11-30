@@ -2,6 +2,8 @@
 
 Shortcuts to (unsafe) Unity API.
 
+
+**Types:**
 - `Debug`: Debug - UnityEngine.Debug - debug tools, logging.
 - `Color`: Color - UnityEngine.Color - color (also in `ui.color`).
 - `Rect`: Rect - UnityEngine.Rect - bounds of a rectangle (int).

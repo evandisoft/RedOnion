@@ -34,13 +34,13 @@ ctrl + tab: make current line's indentation match previous line's indentation
 ctrl + j: move cursor left
 ctrl + k: move cursor down
 ctrl + l: move cursor up
-ctrl +;: move cursor right
+ctrl + ;: move cursor right
 ctrl + m: move cursor to next tab left
 shift + backspace: delete to next tab left
 ctrl + backspace: delete to next '.' left
 ctrl + comma: move cursor 4 lines down
 ctrl + period: move cursor 4 lines up
-ctrl +/: move cursor to next tab right
+ctrl + /: move cursor to next tab right
 ctrl + Home: move cursor to start
 ctrl + End: move cursor to end
 Shift plus movement commands selects text.
@@ -53,12 +53,14 @@ ctrl + h: insert and move to new line before current line
 Editor only:
 ctrl + s: Saves the file in `Scripts` folder within KSP folder based on the name specified in the textarea that is dedicated to this.
 ctrl + d: Loads the file from `Scripts` folder within KSP folder based on the name specified in the textarea that is dedicated to this.
+ctrl + z: Undo
+ctrl + shift + z: Redo
 
 REPL input area only:
 enter: evaluate content and clear repl input area.
 shift + enter: add newline
-ctrl +[or ctrl + UpArrow: go to previous history
-ctrl + ' or ctrl+DownArrow: go to next history
+ctrl + [ or ctrl + UpArrow: go to previous history
+ctrl + ' or ctrl + DownArrow: go to next history
 
 Completion area only:
 ctrl + k: select next line down

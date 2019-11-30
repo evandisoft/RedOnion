@@ -2,6 +2,8 @@
 
 Reflection functionality specific to Moonsharp.
 
+
+**Static Methods:**
 - `isstatic()`: bool, possbileStatic DynValue
   - Returns true if the argument is a static.
 - `isclrtype()`: bool, possibleType DynValue

@@ -1,6 +1,4 @@
-using RedOnion.KSP.API;
-using RedOnion.KSP.Attributes;
-using RedOnion.KSP.Utilities;
+using RedOnion.Attributes;
 using RedOnion.ROS;
 using RedOnion.ROS.Utilities;
 using System;
@@ -15,6 +13,29 @@ namespace RedOnion.Build
 	static class Documentation
 	{
 		static string unsafeMark = "\\[`Unsafe`\\] {0}";
+		static HashSet<Assembly> assemblies = new HashSet<Assembly>()
+		{
+			typeof(RedOnion.KSP.API.Globals).Assembly,
+			typeof(RedOnion.UI.Element).Assembly
+		};
+		static Type[] rootTypes = new Type[]
+		{
+			typeof(RedOnion.KSP.API.Globals),
+			typeof(KSP.MoonSharp.MoonSharpAPI.MoonSharpGlobals)
+		};
+		const BindingFlags iflags = BindingFlags.Instance|BindingFlags.Public|BindingFlags.DeclaredOnly;
+		const BindingFlags sflags = BindingFlags.Static|BindingFlags.Public|BindingFlags.DeclaredOnly;
+
+		readonly struct Member<Info>
+		{
+			public readonly Info info;
+			public readonly string desc;
+			public Member(Info info, string desc)
+			{
+				this.info = info;
+				this.desc = desc;
+			}
+		}
 
 		class Document
 		{
@@ -22,7 +43,55 @@ namespace RedOnion.Build
 			public string name;
 			public string path;
 			public string desc;
-			public ListCore<MemberInfo> members;
+
+			public Document baseClass;
+			public ListCore<Document> derived;
+			public ListCore<Member<MemberInfo>> nested;
+			public ListCore<Member<ConstructorInfo>> ctors;
+			public ListCore<Member<FieldInfo>> ifields;
+			public ListCore<Member<FieldInfo>> sfields;
+			public ListCore<Member<PropertyInfo>> iprops;
+			public ListCore<Member<PropertyInfo>> sprops;
+			public ListCore<Member<EventInfo>> ievents;
+			public ListCore<Member<EventInfo>> sevents;
+			public ListCore<Member<MethodInfo>> imethods;
+			public ListCore<Member<MethodInfo>> smethods;
+
+			public void Fill<Info>(ref ListCore<Member<Info>> list, Info[] infos) where Info : MemberInfo
+			{
+				if (infos.Length > 1)
+					Array.Sort(infos, MetaCmp.It);
+				foreach (var info in infos)
+				{
+					var desc = info.GetCustomAttribute<DescriptionAttribute>()?.Description;
+					if (info is FieldInfo f)
+					{
+						if (f.IsStatic && f.IsInitOnly  // static readonly
+						&& f.FieldType == typeof(Type)) // Type name = ...
+						{
+							var nested = (Type)f.GetValue(null);
+							if (desc == null)
+								desc = nested.GetCustomAttribute<DescriptionAttribute>(false)?.Description;
+							if (desc == null)
+								continue;
+							this.nested.Add(new Member<MemberInfo>(f, desc));
+							RegisterType(nested);
+							continue;
+						}
+					}
+					if (desc != null)
+						list.Add(new Member<Info>(info, desc));
+					if (info is PropertyInfo p)
+						RegisterType(p.PropertyType);
+					else if (info is MethodBase m)
+					{
+						if (m is MethodInfo mi)
+							RegisterType(mi.ReturnType);
+						foreach (var mp in m.GetParameters())
+							RegisterType(mp.ParameterType);
+					}
+				}
+			}
 		}
 		static Dictionary<string, Document> docs = new Dictionary<string, Document>();
 		static Dictionary<Type, Document> types = new Dictionary<Type, Document>();
@@ -51,13 +120,6 @@ namespace RedOnion.Build
 		class MetaCmp : IComparer<MemberInfo>
 		{
 			public static readonly IComparer<MemberInfo> It = new MetaCmp();
-			static bool ByType<T>(MemberInfo x, MemberInfo y, ref int cmp) where T : MemberInfo
-			{
-				cmp = x is T ? y is T
-					? x.MetadataToken.CompareTo(y.MetadataToken)
-					: -1 : y is T ? +1 : 0;
-				return cmp == 0;
-			}
 			public int Compare(MemberInfo x, MemberInfo y)
 			{
 				var idx1 = x.GetCustomAttribute<DocIndexAttribute>()?.Index ?? -1;
@@ -68,58 +130,51 @@ namespace RedOnion.Build
 						return idx2 < 0 ? -1 : idx2 - idx1;
 				}
 				else if (idx2 >= 0) return +1;
-				int cmp = 0;
-				return ByType<ConstructorInfo>(x, y, ref cmp)
-				&& ByType<FieldInfo>(x, y, ref cmp)
-				&& ByType<EventInfo>(x, y, ref cmp)
-				&& ByType<PropertyInfo>(x, y, ref cmp)
-				&& ByType<MethodInfo>(x, y, ref cmp)
-				? x.MetadataToken.CompareTo(y.MetadataToken)
-				: cmp;
+				return x.MetadataToken.CompareTo(y.MetadataToken);
 			}
 		}
 
-		static IEnumerable<MemberInfo> GetMembers(Type type)
+		static string GetName(ICustomAttributeProvider provider)
 		{
-			var members = type.GetMembers(BindingFlags.Public|BindingFlags.Instance);
-			if (members.Length > 1)
-				Array.Sort(members, MetaCmp.It);
-			foreach (var member in members)
-				yield return member;
-			members = type.GetMembers(BindingFlags.Public|BindingFlags.Static|BindingFlags.FlattenHierarchy);
-			if (members.Length > 1)
-				Array.Sort(members, MetaCmp.It);
-			foreach (var member in members)
-				yield return member;
+			string name = provider is MemberInfo member ? member is ConstructorInfo ci
+					? ci.DeclaringType.Name : member.Name
+					: provider is Type type ? type.Name : null;
+			var displayName = provider.GetCustomAttributes(typeof(DisplayNameAttribute), !(provider is Type));
+			if (displayName.Length == 1)
+				return ((DisplayNameAttribute)displayName[0]).DisplayName;
+			return name;
 		}
-		static string GetName(ICustomAttributeProvider member)
-			=> Descriptor.Reflected.GetName(member);
 
 		static ListCore<Type> queue = new ListCore<Type>();
 		static void RegisterType(Type type)
 		{
+			if (type == null)
+				return;
+			if (!assemblies.Contains(type.Assembly))
+				return;
 			var docb = type.GetCustomAttribute<DocBuildAttribute>();
 			if (docb != null && docb.AsType != null)
 			{
 				redirects[type] = docb.AsType;
 				type = docb.AsType;
 			}
-			if (type.Assembly != typeof(Globals).Assembly
-				&& type.Assembly != typeof(RedOnion.UI.Element).Assembly)
-				return;
 			var fullType = type;
 			if (type.IsGenericType)
 				type = type.GetGenericTypeDefinition();
 			if (type.IsGenericParameter || type.FullName == null)
 				return;
-			var desc = type.GetCustomAttribute<DescriptionAttribute>()?.Description;
-			if (desc != null && discovered.Add(type))
-				queue.Add(type);
+			var desc = type.GetCustomAttribute<DescriptionAttribute>(false)?.Description;
+			if (desc == null || !discovered.Add(type))
+				return;
+			RegisterType(type.BaseType);
 			if (fullType != type)
 			{
 				foreach (var gen in fullType.GetGenericArguments())
 					RegisterType(gen);
 			}
+			foreach (var nested in type.GetNestedTypes())
+				RegisterType(nested);
+			queue.Add(type);
 			if (docb != null && docb.RegisterTypes?.Length > 0)
 			{
 				foreach (var rtype in docb.RegisterTypes)
@@ -129,15 +184,16 @@ namespace RedOnion.Build
 		internal static void Exec()
 		{
 			Descriptor.Reflected.LowerFirstLetter = false;
-			RegisterType(typeof(Globals));
-			RegisterType(typeof(KSP.MoonSharp.MoonSharpAPI.MoonSharpGlobals));
-			var members = new Dictionary<string, MemberInfo>();
+			foreach (var rootType in rootTypes)
+				RegisterType(rootType);
 			for (int i = 0; i < queue.size; i++)
 			{
 				var type = queue[i];
-				var desc = type.GetCustomAttribute<DescriptionAttribute>()?.Description;
+				var desc = type.GetCustomAttribute<DescriptionAttribute>(false)?.Description;
 				var name = type.GetCustomAttribute<DisplayNameAttribute>(false)?.DisplayName
-					?? type.Name.Replace('`', '.');
+					?? (type.DeclaringType == null ? type.Name :
+					type.FullName.Substring(type.Namespace.Length + 1).Replace('+', '.') // nested type
+					).Replace('`', '.');
 				var path = "";
 				var full = type.FullName;
 				if (full.StartsWith("RedOnion.KSP."))
@@ -150,7 +206,7 @@ namespace RedOnion.Build
 					full = full.Substring("RedOnion.UI.".Length);
 					path = "RedOnion.UI/";
 				}
-				path += string.Join("/", full.Split('.')).Replace('`', '.');
+				path += string.Join("/", full.Split('.')).Replace('`', '.').Replace('+', '.');
 				var docb = type.GetCustomAttribute<DocBuildAttribute>();
 				if (docb != null && !string.IsNullOrEmpty(docb.Path))
 					path = docb.Path;
@@ -170,39 +226,23 @@ namespace RedOnion.Build
 				};
 				docs.Add(name, doc);
 				types.Add(type, doc);
-				foreach (var member in GetMembers(type))
+				if (type.BaseType != null)
+					(doc.baseClass = ResolveType(type.BaseType))?.derived.Add(doc);
+				doc.Fill(ref doc.ctors, type.GetConstructors());
+				doc.Fill(ref doc.ifields, type.GetFields(iflags));
+				doc.Fill(ref doc.sfields, type.GetFields(sflags));
+				doc.Fill(ref doc.iprops, type.GetProperties(iflags));
+				doc.Fill(ref doc.sprops, type.GetProperties(sflags));
+				doc.Fill(ref doc.ievents, type.GetEvents(iflags));
+				doc.Fill(ref doc.sevents, type.GetEvents(sflags));
+				doc.Fill(ref doc.imethods, type.GetMethods(iflags));
+				doc.Fill(ref doc.smethods, type.GetMethods(sflags));
+				foreach (var nested in type.GetNestedTypes())
 				{
-					FieldInfo f = member as FieldInfo;
-					bool typeRef = f != null
-						&& f.IsStatic && f.IsInitOnly	// static readonly
-						&& f.FieldType == typeof(Type);	// Type name = ...
-					if (member.GetCustomAttribute<DescriptionAttribute>() == null && (!typeRef ||
-						((Type)f.GetValue(null)).GetCustomAttribute<DescriptionAttribute>() == null))
-						continue;
-					var mname = GetName(member);
-					members.TryGetValue(mname, out var prev);
-					if (prev != null && !(prev is MethodInfo && member is MethodInfo))
-						continue;
-					if (f != null)
-						RegisterType(
-							f.FieldType == typeof(Type)
-							&& f.IsInitOnly && f.IsStatic
-							? (Type)f.GetValue(null)
-							: f.FieldType);
-					else if (member is PropertyInfo p)
-						RegisterType(p.PropertyType);
-					else if (member is MethodInfo m)
-					{
-						RegisterType(m.ReturnType);
-						foreach (var mp in m.GetParameters())
-							RegisterType(mp.ParameterType);
-					}
-					else continue;
-					doc.members.Add(member);
-					if (prev == null)
-						members.Add(mname, member);
+					var ndoc = ResolveType(nested);
+					if (ndoc != null)
+						doc.nested.Add(new Member<MemberInfo>(ndoc.type, null));
 				}
-				members.Clear();
 			}
 			foreach (var doc in docs.Values)
 			{
@@ -228,35 +268,115 @@ namespace RedOnion.Build
 
 		static void Print(StreamWriter wr, Document doc, string name)
 		{
+			if (doc.baseClass != null)
+			{
+				wr.WriteLine();
+				wr.WriteLine("**Base Class:** " + ResolveType(doc, doc.type.BaseType, out _));
+			}
+			if (doc.derived.Count > 0)
+			{
+				wr.WriteLine();
+				wr.Write("**Derived:** ");
+				bool first = true;
+				foreach (var derived in doc.derived)
+				{
+					if (!first)
+						wr.Write(", ");
+					wr.Write(ResolveType(doc, derived.type, out _));
+					first = false;
+				}
+				wr.WriteLine();
+			}
+
 			wr.WriteLine();
 			wr.WriteLine(doc.desc);
 			wr.WriteLine();
-			doc.members.Sort(MetaCmp.It);
-			foreach (var member in doc.members)
+
+			if (doc.nested.Count > 0)
 			{
-				var mname = GetName(member);
-				if (member is FieldInfo f)
-				{
-					PrintSimpleMember(wr, doc, mname, member,
-						f.FieldType == typeof(Type)
-						&& f.IsStatic && f.IsInitOnly
-						? (Type)f.GetValue(null)
-						: f.FieldType);
-					continue;
-				}
-				if (member is PropertyInfo p)
-				{
-					PrintSimpleMember(wr, doc, mname, member, p.PropertyType);
-					continue;
-				}
-				if (member is MethodInfo m)
-				{
-					PrintMethod(wr, doc, mname, m);
-					continue;
-				}
+				wr.WriteLine();
+				wr.WriteLine("**Types:**");
+				foreach (var nested in doc.nested)
+					PrintSimple(wr, doc, nested, nested.info as Type ?? (Type)((FieldInfo)nested.info).GetValue(null));
+			}
+			if (doc.ctors.Count > 0)
+			{
+				wr.WriteLine();
+				wr.WriteLine("**Constructors:**");
+				foreach (var m in doc.ctors)
+					PrintMethod(wr, doc, m);
+			}
+			if (doc.ifields.Count > 0)
+			{
+				wr.WriteLine();
+				wr.WriteLine("**Instance Fields:**");
+				foreach (var m in doc.ifields)
+					PrintSimple(wr, doc, m, m.info.FieldType);
+			}
+			if (doc.sfields.Count > 0)
+			{
+				wr.WriteLine();
+				wr.WriteLine("**Static Fields:**");
+				foreach (var m in doc.sfields)
+					PrintSimple(wr, doc, m, m.info.FieldType);
+			}
+			if (doc.iprops.Count > 0)
+			{
+				wr.WriteLine();
+				wr.WriteLine("**Instance Properties:**");
+				foreach (var m in doc.iprops)
+					PrintSimple(wr, doc, m, m.info.PropertyType);
+			}
+			if (doc.sprops.Count > 0)
+			{
+				wr.WriteLine();
+				wr.WriteLine("**Static Properties:**");
+				foreach (var m in doc.sprops)
+					PrintSimple(wr, doc, m, m.info.PropertyType);
+			}
+			if (doc.ievents.Count > 0)
+			{
+				wr.WriteLine();
+				wr.WriteLine("**Instance Events:**");
+				foreach (var m in doc.ievents)
+					PrintSimple(wr, doc, m, m.info.EventHandlerType);
+			}
+			if (doc.sevents.Count > 0)
+			{
+				wr.WriteLine();
+				wr.WriteLine("**Static Events:**");
+				foreach (var m in doc.sevents)
+					PrintSimple(wr, doc, m, m.info.EventHandlerType);
+			}
+			if (doc.imethods.Count > 0)
+			{
+				wr.WriteLine();
+				wr.WriteLine("**Instance Methods:**");
+				foreach (var m in doc.imethods)
+					PrintMethod(wr, doc, m);
+			}
+			if (doc.smethods.Count > 0)
+			{
+				wr.WriteLine();
+				wr.WriteLine("**Static Methods:**");
+				foreach (var m in doc.smethods)
+					PrintMethod(wr, doc, m);
 			}
 		}
 
+		static Document ResolveType(Type type)
+		{
+			if (type.IsGenericType)
+				type = type.GetGenericTypeDefinition();
+			if (redirects.TryGetValue(type, out var redir))
+			{
+				type = redir;
+				if (type.IsGenericType)
+					type = type.GetGenericTypeDefinition();
+			}
+			return types.TryGetValue(type, out var tdoc) ? tdoc : null;
+
+		}
 		static string ResolveType(Document doc, Type type, out string name)
 		{
 			string path = null;
@@ -303,14 +423,14 @@ namespace RedOnion.Build
 			return sb.ToString();
 		}
 
-		static void PrintSimpleMember(StreamWriter wr, Document doc, string name, MemberInfo member, Type type)
+		static void PrintSimple<Info>(StreamWriter wr, Document doc, Member<Info> member, Type type) where Info : MemberInfo
 		{
-			var desc = member.GetCustomAttribute<DescriptionAttribute>()?.Description
-				?? type.GetCustomAttribute<DescriptionAttribute>()?.Description;
+			var desc = member.desc;
 			var typeMd = ResolveType(doc, type, out var typeName);
-			if (member is MethodInfo || typeof(ICallable).IsAssignableFrom(type))
+			var name = GetName(member.info);
+			if (member.info is MethodInfo || typeof(ICallable).IsAssignableFrom(type))
 				name += "()";
-			else if (member is PropertyInfo p)
+			else if (member.info is PropertyInfo p)
 			{
 				var pars = p.GetIndexParameters();
 				if (pars.Length > 0)
@@ -330,28 +450,33 @@ namespace RedOnion.Build
 					name = sb.ToString();
 				}
 			}
-			wr.WriteLine("- `{0}`: {1} - {2}", name, typeMd,
-				member.IsDefined(typeof(UnsafeAttribute)) ?
+			wr.WriteLine(desc == null ? "- `{0}`: {1}" : "- `{0}`: {1} - {2}",
+				name, typeMd,
+				member.info.IsDefined(typeof(UnsafeAttribute)) ?
 				string.Format(unsafeMark, desc) : desc);
 		}
 
-		static void PrintMethod(StreamWriter wr, Document doc, string name, MethodInfo method)
+		static void PrintMethod<Info>(StreamWriter wr, Document doc, Member<Info> member) where Info : MethodBase
 		{
-			var desc = method.GetCustomAttribute<DescriptionAttribute>().Description;
-			var type = method.ReturnType;
-			var typeMd = ResolveType(doc, type, out _);
-			var pars = method.GetParameters();
-			wr.Write("- `{0}()`: {1}", name, typeMd);
+			var desc = member.desc;
+			var method = member.info as MethodInfo;
+			var type = method?.ReturnType;
+			var typeMd = type != null ? ResolveType(doc, type, out _) : null;
+			var name = GetName(member.info);
+			wr.Write(typeMd == null ? "- `{0}()`" : "- `{0}()`: {1}", name, typeMd);
+			var pars = member.info.GetParameters();
+			var first = true;
 			foreach (var par in pars)
 			{
 				type = par.ParameterType;
 				typeMd = ResolveType(doc, type, out _);
-				wr.Write(", {0} {1}", par.Name, typeMd);
+				wr.Write(first && method == null ? ": {0} {1}" : ", {0} {1}", par.Name, typeMd);
+				first = false;
 			}
 			if (pars.Length > 0)
 				wr.WriteLine();
 			wr.WriteLine(pars.Length == 0 ? " - {0}" : "  - {0}",
-				method.IsDefined(typeof(UnsafeAttribute)) ?
+				member.info.IsDefined(typeof(UnsafeAttribute)) ?
 				string.Format(unsafeMark, desc) : desc);
 		}
 

@@ -2,6 +2,8 @@
 
 Active vessel
 
+
+**Instance Properties:**
 - `native`: Vessel - \[`Unsafe`\] Native `Vessel` for unrestricted access to KSP API. Same as `FlightGlobals.ActiveVessel` if accessed through global `ship`.
 - `name`: string - Name of the ship (vehicle/vessel).
 - `autopilot`: [Autopilot](Autopilot.md) - Autopilot of this ship (vehicle/vessel).
@@ -27,8 +29,8 @@ Active vessel
 - `radarAltitude`: double - True height above ground in meters.
 - `dynamicPressure`: double - Dynamic pressure [atm = 101.325kPa]
 - `q`: double - Dynamic pressure [atm = 101.325kPa]
-- `body`: SpaceBody - KSP API. Orbited body.
-- `orbit`: Orbit - \[`Unsafe`\] KSP API. Orbit parameters.
+- `body`: [SpaceBody](SpaceBody.md) - KSP API. Orbited body.
+- `orbit`: Orbit - \[`Unsafe`\] KSP API. Orbit parameters. May get replaced by safe wrapper in the future.
 - `eccentricity`: double - Eccentricity of current orbit.
 - `semiMajorAxis`: double - Semi-major axis of current orbit.
 - `semiMinorAxis`: double - Semi-minor axis of current orbit.
@@ -67,6 +69,8 @@ Note that it can change violently when facing up or down.
 - `maxVacuumTorque`: [Vector](Vector.md) - Maximal ship torque in vacuum [N⋅m⋅deg=deg⋅kg⋅m²/s²] (ignoring control surfaces).
 - `maxAngular`: [Vector](Vector.md) - Maximal angular acceleration (deg/s²)
 - `maxVacuumAngular`: [Vector](Vector.md) - Maximal angular acceleration in vacuum (ignoring control surfaces).
+
+**Instance Methods:**
 - `positionAt()`: [Vector](Vector.md), time double
   - Predicted position at specified time.
 - `velocityAt()`: [Vector](Vector.md), time double

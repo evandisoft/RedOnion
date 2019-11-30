@@ -38,10 +38,10 @@ namespace RedOnion.KSP.API
 		public double P = 1.0;
 		[Description("Integral factor (dynamic error-correction, causes oscillation as side-effect)")]
 		public double I = 0.0;
-		[Description("Derivative factor (dumpening - applied to output, reduces the oscillation)")]
+		[Description("Derivative factor (dampening - applied to output, reduces the oscillation)")]
 		public double D = 0.0;
 		[Description("Reduction factor for accumulator"
-			+ " (dumpening - applied to accumulator used by integral factor,"
+			+ " (dampening - applied to accumulator used by integral factor,"
 			+ " works well against both oscillation and windup)")]
 		public double R = 0.0;
 
@@ -94,10 +94,10 @@ namespace RedOnion.KSP.API
 		public double P { get => _param.P; set => _param.P = value; }
 		[Description("Integral factor (dynamic error-correction, causes oscillation as side-effect)")]
 		public double I { get => _param.I; set => _param.I = value; }
-		[Description("Derivative factor (dumpening - applied to output, reduces the oscillation)")]
+		[Description("Derivative factor (dampening - applied to output, reduces the oscillation)")]
 		public double D { get => _param.D; set => _param.D = value; }
 		[Description("Reduction factor for accumulator"
-			+ " (dumpening - applied to accumulator used by integral factor,"
+			+ " (dampening - applied to accumulator used by integral factor,"
 			+ " works well against both oscillation and windup)")]
 		public double R { get => _param.R; set => _param.R = value; }
 

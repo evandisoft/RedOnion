@@ -1,8 +1,12 @@
 using System;
+using System.ComponentModel;
 using RedOnion.KSP.API;
 
 namespace RedOnion.KSP.Parts
 {
+	[Description(
+@"Docking port. Used to dock a ship in a station or to join various parts together.
+Can also function as separator when staging is enabled.")]
 	public class DockingPort : Decoupler
 	{
 		protected readonly ModuleDockingNode module;
@@ -10,6 +14,7 @@ namespace RedOnion.KSP.Parts
 			: base(ship, part, parent, decoupler)
 			=> this.module = module;
 
+		[Description("Accepts `port` and `dockingPort`. (Case insensitive)")]
 		public override bool istype(string name)
 			=> name.Equals("port", StringComparison.OrdinalIgnoreCase)
 			|| name.Equals("dockingPort", StringComparison.OrdinalIgnoreCase)

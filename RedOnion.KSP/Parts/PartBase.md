@@ -1,7 +1,11 @@
 ## Part
 
+**Derived:** [Decoupler](Decoupler.md), [Engine](Engine.md), [Sensor](Sensor.md)
+
 Part of the ship (vehicle/vessel).
 
+
+**Instance Properties:**
 - `native`: Part - \[`Unsafe`\] Native `Part` - KSP API.
 - `ship`: [Ship](../API/Ship.md) - Ship (vehicle/vessel) this part belongs to.
 - `parent`: Part - Parent part (this part is attached to).
@@ -13,6 +17,8 @@ Part of the ship (vehicle/vessel).
 - `state`: PartStates - State of the part (IDLE, ACTIVE (e.g. engine), DEACTIVATED, DEAD, FAILED).
 - `name`: string - Name of the part (assigned by KSP).
 - `title`: string - Title of the part (assigned by KSP).
+
+**Instance Methods:**
 - `istype()`: bool, name string
   - Method to test the type of the part (e.g. `.IsType("LaunchClamp")`)
 - `explode()`: void - Explode the part.

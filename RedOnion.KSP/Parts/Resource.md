@@ -2,6 +2,8 @@
 
 Resource like LiquidFuel etc.
 
+
+**Instance Properties:**
 - `Name`: string - Name of the resource (e.g. LiquidFuel).
 - `ID`: int - Identificator of the resource (for resource library; hash of the name).
 - `partCount`: int - Number of parts (in parent list/set) able to contain this resource.

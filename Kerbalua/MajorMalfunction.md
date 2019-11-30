@@ -16,7 +16,7 @@ end
 print("Done!")
 ```
 
-This script is a script that waits a short time, by calling sleep, and then explodes 5 random parts. It can be a fun piloting challenge because
+This script is a script that waits a short time, by calling sleep, and then explodes 8 random parts. It can be a fun piloting challenge because
 it can make your ship very difficult to recover from. A video demonstration of my poor piloting skills being put to the test by this script is [here](https://www.youtube.com/watch?v=xzAghlB2NLw)
 
 The first thing this script does is uses `native` to access UnityEngine's [Random](https://docs.unity3d.com/ScriptReference/Random.html) class.

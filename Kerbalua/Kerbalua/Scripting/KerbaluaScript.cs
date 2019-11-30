@@ -44,11 +44,11 @@ namespace Kerbalua.Scripting
 
 			UserData.RegistrationPolicy = InteropRegistrationPolicy.Automatic;
 
-			GlobalOptions.CustomConverters
-				.SetClrToScriptCustomConversion(
-					(Script script, ModuleControlSurface m)
-						=> DynValue.FromObject(script, new LuaProxy(m)) //DynValue.NewTable(new ModuleControlSurfaceProxyTable(this, m))
-					);
+			//GlobalOptions.CustomConverters
+				//.SetClrToScriptCustomConversion(
+					//(Script script, ModuleControlSurface m)
+					//	=> DynValue.FromObject(script, new LuaProxy(m)) //DynValue.NewTable(new ModuleControlSurfaceProxyTable(this, m))
+					//);
 
 			GlobalOptions.CustomConverters
 				.SetClrToScriptCustomConversion(
@@ -72,6 +72,7 @@ namespace Kerbalua.Scripting
 					  });
 				  });
 
+
 			//UnityEngine.Debug.Log("sanity check");
 			var metatable=new Table(this);
 			var commonAPI=new CommonAPITable(this);
@@ -82,9 +83,34 @@ namespace Kerbalua.Scripting
 			Globals.MetaTable=metatable;
 			Globals.Remove("coroutine");
 
+			// This is the simplest way to define "new" to use __new.
+			commonAPI["new"]=DoString(@"
+return function(stat,...) 
+	if type(stat)~='userdata' then
+		error('`new` only works for CLR objects')
+	end
+	return stat.__new(...) 
+end
+			");
+
+
+			//commonAPI["new"]=new newdel(@new);
+			
 			commonAPI["sleep"] = new Action<double>(sleep);
 			//commonAPI["setexeclimit"] = new Action<double>(setexeclimit);
 		}
+
+		//delegate object newdel(object obj, params DynValue[] args);
+		//object @new(object typeStaticOrObject, params DynValue[] args)
+		//{
+		//	Type type=typeStaticOrObject as Type;
+		//	if (type==null)
+		//	{
+		//		type=typeStaticOrObject.GetType();
+		//	}
+
+
+		//}
 
 		public void setexeclimit(double counterlimit)
 		{

@@ -1,4 +1,4 @@
-window=new(ui.Window,"Window",ui.Layout.Vertical)
+window=new(ui.Window,"Buttons")
 
 window.ChildAnchors=ui.Anchors.Fill
 

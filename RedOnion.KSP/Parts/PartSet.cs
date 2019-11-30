@@ -102,6 +102,7 @@ namespace RedOnion.KSP.Parts
 			}
 		}
 	}
+	[Description("Collection of all the parts in one ship/vessel.")]
 	public class ShipPartSet : PartSet<PartBase>, IDisposable
 	{
 		protected PartBase protectedRoot;
