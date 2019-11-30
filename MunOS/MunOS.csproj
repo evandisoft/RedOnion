@@ -35,9 +35,23 @@
     <Compile Include="MunOS\ExecutionManager.cs" />
     <Compile Include="MunOS\IEngine.cs" />
     <Compile Include="MunOS\IProcess.cs" />
+    <Compile Include="MunOS\Executors\IdleExecutor.cs" />
+    <Compile Include="MunOS\Executors\NormalExecutor.cs" />
+    <Compile Include="MunOS\Executors\OneShotExecutor.cs" />
+    <Compile Include="MunOS\Executors\PriorityExecutor.cs" />
+    <Compile Include="MunOS\Executors\RealtimeExecutor.cs" />
+    <Compile Include="MunOS\Process\ProcessOutputBuffer.cs" />
+    <Compile Include="MunOS\Process\ROProcess.cs" />
+    <Compile Include="MunOS\Repl\IReplEngine.cs" />
+    <Compile Include="MunOS\Repl\ReplHistory.cs" />
+    <Compile Include="MunOS\Repl\ReplProcess.cs" />
+    <Compile Include="MunOS\IExecutable.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MunOS\" />
+    <Folder Include="MunOS\Executors\" />
+    <Folder Include="MunOS\Process\" />
+    <Folder Include="MunOS\Repl\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="MunOS\MunOSNotes.md" />

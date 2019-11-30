@@ -1,13 +1,47 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using MunOS.Executors;
 
 namespace MunOS
 {
 	public class ExecutionManager
 	{
+		public enum Priority
+		{
+			REALTIME,
+			ONESHOT,
+			IDLE,
+			MAIN
+		}
+
+		static public int MaxIdleSkips = 9;
+		static public int MaxOneShotSkips = 1;
+		long frequency=Stopwatch.Frequency;
+		long nanosecPerTick = (1000L*1000L*1000L) / Stopwatch.Frequency;
+		double microsPerTick = (1000.0*1000.0) / Stopwatch.Frequency;
+
+		Dictionary<Priority, PriorityExecutor> priorities = new Dictionary<Priority, PriorityExecutor>();
+
 		public ExecutionManager()
 		{
+			priorities[Priority.REALTIME] = new RealtimeExecutor();
+			priorities[Priority.ONESHOT] = new OneShotExecutor();
+			priorities[Priority.IDLE] = new IdleExecutor();
+			priorities[Priority.MAIN] = new NormalExecutor();
+		}
 
+		static public ExecutionManager instance;
+		static public ExecutionManager Instance
+		{
+			get
+			{
+				if (instance == null)
+				{
+					instance = new ExecutionManager();
+				}
+				return instance;
+			}
 		}
 
 		// Only let the exectors run until this percentage of update execution
@@ -15,16 +49,23 @@ namespace MunOS
 		// for the first half of execution time. Only run oneshot until 40%
 		// remains (at most). Only run idle until 60% remains.
 		static public double RealtimeFractionalLimit = 0.5;
-		static public double OneShotFractionalLimit = 0.6;
-		static public double IdleFractionalLimit = 0.4;
+		static public double OneShotFractionalLimit = 0.4;
+		static public double IdleFractionalLimit = 0.6;
 		static public double OneShotForceExecuteTime = 1;
 		static public double IdleForceExecuteTime = 1;
 
-		double nsPerTick=(1000L*1000L*1000L/Stopwatch.Frequency);
-		long frequency=Stopwatch.Frequency;
+		public void Reset()
+		{
+			processes.Clear();
+		}
 
-		Stopwatch stopwatch=new Stopwatch();
-		public void Execute(double timeLimitMicros = 1000)
+		public void RegisterExecutable(Priority priority, IExecutable executable)
+		{
+			priorities[priority].RegisterExecutable(executable);
+		}
+
+		Stopwatch stopwatch = new Stopwatch();
+		public void Execute(double timeLimitMicros=2000)
 		{
 			double remainingTime = 0;
 
@@ -35,26 +76,40 @@ namespace MunOS
 			priorities[Priority.REALTIME].Execute(realtimeRuntime);
 			stopwatch.Stop();
 
-			remainingTime = remainingTime - stopwatch.Elapsed.TotalMilliseconds;
+			remainingTime = remainingTime - stopwatch.ElapsedTicks*microsPerTick;
 			var oneshotRuntime = remainingTime - timeLimitMicros * OneShotFractionalLimit;
 			stopwatch.Reset();
 			stopwatch.Start();
 			priorities[Priority.ONESHOT].Execute(oneshotRuntime);
 			stopwatch.Stop();
 
-			remainingTime = remainingTime - stopwatch.Elapsed.TotalMilliseconds;
+			remainingTime = remainingTime - stopwatch.ElapsedTicks*microsPerTick;
 			var idleRuntime = remainingTime - timeLimitMicros * IdleFractionalLimit;
 			stopwatch.Reset();
 			stopwatch.Start();
 			priorities[Priority.IDLE].Execute(idleRuntime);
 			stopwatch.Stop();
 
-			remainingTime = remainingTime - stopwatch.Elapsed.TotalMilliseconds;
+			remainingTime = remainingTime - stopwatch.ElapsedTicks*microsPerTick;
 			var normalRuntime = remainingTime;
 			stopwatch.Reset();
 			stopwatch.Start();
 			priorities[Priority.MAIN].Execute(normalRuntime);
 			stopwatch.Stop();
+		}
+
+
+		public float UpdateMicros = 2000;
+		List<ROProcess> processes = new List<ROProcess>();
+
+		public void RegisterProcess(ROProcess process)
+		{
+			processes.Add(process);
+		}
+
+		public void FixedUpdate()
+		{
+			Execute(UpdateMicros);
 		}
 	}
 }
