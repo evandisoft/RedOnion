@@ -27,7 +27,7 @@ Just had a release (0.4.3)
 ## 0.4.2
 - Bug in ship.parts relating to explode functionality fixed.
 - [Tutorial](https://evandisoft.github.io/RedOnion/Kerbalua/MajorMalfunctionNative) of how to fallback to native functionality.
-- [Tutorial](https://evandisoft.github.io/RedOnion/Kerbalua/SelfDestruct) for selfDestruct.lua (include a link)
+- [Tutorial](https://evandisoft.github.io/RedOnion/Kerbalua/SelfDestruct) for selfDestruct.lua
 - [Tutorial](https://evandisoft.github.io/RedOnion/Kerbalua/UIBasics) for using the ui in Lua code (uibasics.lua)
 - More docs.
 - Fixed a problem with `new(ui.Button,"buttontext",function() end)` where the `new` function  wasn't properly converting a lua function to the Action\<Button\> that the ui.Button constructor requires.

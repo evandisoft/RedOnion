@@ -14,6 +14,11 @@ Just had a release (0.4.3)
 # Current
 # 0.4
 
+## 0.4.5 - 0.4.4
+- My apologies about 0.4.4. I believe dropped in an unchanged zip.
+- Fixed a problem with Lua engine not resetting.
+- Also the terminate button now will destroy ui's and vectors that were created by a script.
+
 ## 0.4.3
 - Undo/Redo for LiveRepl Editor. Stores at least 50 of the last changes.
 - Fixed bug where Lua was outputting strings twice
@@ -27,7 +32,7 @@ Just had a release (0.4.3)
 ## 0.4.2
 - Bug in ship.parts relating to explode functionality fixed.
 - [Tutorial](Kerbalua/MajorMalfunctionNative.md) of how to fallback to native functionality.
-- [Tutorial](Kerbalua/SelfDestruct.md) for selfDestruct.lua (include a link)
+- [Tutorial](Kerbalua/SelfDestruct.md) for selfDestruct.lua
 - [Tutorial](Kerbalua/UIBasics.md) for using the ui in Lua code (uibasics.lua)
 - More docs.
 - Fixed a problem with `new(ui.Button,"buttontext",function() end)` where the `new` function  wasn't properly converting a lua function to the Action\<Button\> that the ui.Button constructor requires.

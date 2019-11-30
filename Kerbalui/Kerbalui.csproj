@@ -86,9 +86,6 @@
       <HintPath>$(KerbalLibs)\UnityEngine.InputLegacyModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="KerbaluaMoonSharp">
-      <HintPath>..\OtherDLLs\KerbaluaMoonSharp\KerbaluaMoonSharp.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
