@@ -26,7 +26,7 @@ namespace RedOnion.KSP.MoonSharp.MoonSharpAPI
 		}
 
 		//This will be overriden in KerbaluaScript.cs
-		[Description("Causes the script to sleep for the given number of seconds. "
+		[Description("Causes the script to wait, for the given number of seconds. "
 		+"This is not a precise timing mechanism. Sleeping for 0 seconds will cause the script "
 			+"to wait until the next unity FixedUpdate")]
 		public static void sleep(double seconds)
