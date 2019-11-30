@@ -12,6 +12,14 @@ namespace KerbaluaNUnit
 			this.script=script;
 		}
 
+		/// <summary>
+		/// Checks the existence of an entry in a given table, 
+		/// and whether it is the given type.
+		/// </summary>
+		/// <returns>The check.</returns>
+		/// <param name="table">Table.</param>
+		/// <param name="key">Key.</param>
+		/// <param name="type">Type.</param>
 		public DynValue MemberCheck(Table table, string key, Type type)
 		{
 			var d=GetCheck(table,key);
@@ -19,6 +27,12 @@ namespace KerbaluaNUnit
 			return d;
 		}
 
+		/// <summary>
+		/// Checks whether the given entry is a method
+		/// </summary>
+		/// <returns>The check.</returns>
+		/// <param name="table">Table.</param>
+		/// <param name="key">Key.</param>
 		public DynValue MethodCheck(Table table, string key)
 		{
 			var d=GetCheck(table,key);
@@ -48,7 +62,7 @@ namespace KerbaluaNUnit
 			return d.Table;
 		}
 
-		public DynValue[] CallCheck(DynValue f,object[] args,object[] expectedOutput)
+		public DynValue[] Call(DynValue f,object[] args)
 		{
 			script.Globals["fun"]=f;
 			script.Globals["args"]=new Table(script, ObjectsToDynValues(args));
@@ -59,6 +73,12 @@ namespace KerbaluaNUnit
 				results=new DynValue[1];
 				results[0]=result;
 			}
+			return results;
+		}
+
+		public DynValue[] CallCheck(DynValue f,object[] args,object[] expectedOutput)
+		{
+			DynValue[] results=Call(f, args);
 			Assert.AreEqual(results.Length, expectedOutput.Length, "Return values number differs");
 			for(int i = 0; i<results.Length; i++)
 			{

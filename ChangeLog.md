@@ -9,6 +9,12 @@
 - More UI library features.
 
 # Next Release
+Just had a release (0.4.3)
+
+# Current
+# 0.4
+
+## 0.4.3
 - Undo/Redo for LiveRepl Editor. Stores at least 50 of the last changes.
 - Fixed bug where Lua was outputting strings twice
 - Renamed KerbaluaMoonSharp assembly ([our modified version of MoonSharp](Kerbalua/MunSharp.md)) to MunSharp.
@@ -16,9 +22,6 @@
 - Improved format for [CommonAPI](RedOnion.KSP/API/Globals.md) docs.
 - Removed OtherDLLs folder and switched to using nuget for the MunSharp.dll, so we can potentially make more changes in the future.
 - [Tutorial](Kerbalua/BasicParts.md) showing how to iterate over the parts and modules of a ship.
-
-# Current
-# 0.4
 
 ## 0.4.2
 - Bug in ship.parts relating to explode functionality fixed.

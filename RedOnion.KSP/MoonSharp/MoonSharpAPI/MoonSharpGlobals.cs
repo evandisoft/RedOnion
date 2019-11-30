@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using System.Reflection;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
 using RedOnion.Attributes;
@@ -13,70 +14,15 @@ namespace RedOnion.KSP.MoonSharp.MoonSharpAPI
 	[Description("Functionality that is specific to Kerbalua.")]
 	public static class MoonSharpGlobals
 	{
-		[Unsafe, Description("Create new objects given a type, static, or object, in lua followed by the arguments to the constructor.")]
-		public static object @new(object typeStaticOrObject, params DynValue[] constructorArgs)
+		// this will be overriden in KerbaluaScript.cs
+		[Unsafe, Description(
+		"Create new objects given a static. A static is a special MunSharp value that represents a CLR Class." +
+		"You can access static members from them, including the __new member, which represents the CLR Class' constructor." +
+		"We provide references to many of these. For example, ui.Window, or any CLR Class received via the " +
+		"native global.")]
+		public static object @new(object type, params DynValue[] dynArgs)
 		{
-			Type type=typeStaticOrObject as Type;
-			if (type==null)
-			{
-				type=typeStaticOrObject.GetType();
-			}
-			var constructors = type.GetConstructors();
-			foreach (var constructor in constructors)
-			{
-				var parinfos = constructor.GetParameters();
-				if (parinfos.Length >= constructorArgs.Length)
-				{
-					object[] objArgs = new object[parinfos.Length];
-
-					for (int i = 0; i < objArgs.Length; i++)
-					{
-						var parinfo = parinfos[i];
-						if (i>= constructorArgs.Length)
-						{
-							if (!parinfo.IsOptional)
-							{
-								break;
-							}
-							objArgs[i] = parinfo.DefaultValue;
-						}
-						else
-						{
-							// If there is a converter set in the global options, we want to use that.
-							var converter=Script.GlobalOptions.CustomConverters
-								.GetScriptToClrCustomConversion(constructorArgs[i].Type, parinfo.ParameterType);
-							if (converter!=null)
-							{
-								objArgs[i]=converter(constructorArgs[i]);
-							}
-							else if (parinfo.ParameterType.IsValueType)
-							{
-								try
-								{
-									objArgs[i] = System.Convert.ChangeType(constructorArgs[i].ToObject(), parinfo.ParameterType);
-								}
-								catch (Exception)
-								{
-									break;
-								}
-							}
-							else
-							{
-								objArgs[i] = constructorArgs[i].ToObject();
-							}
-						}
-
-					}
-
-					return constructor.Invoke(objArgs);
-				}
-			}
-
-			if (constructorArgs.Length == 0)
-			{
-				return Activator.CreateInstance(type);
-			}
-			throw new Exception("Could not find constructor accepting given args for type " + type);
+			return null;
 		}
 
 		//This will be overriden in KerbaluaScript.cs

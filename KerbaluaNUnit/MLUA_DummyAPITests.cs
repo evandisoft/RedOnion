@@ -14,7 +14,6 @@ namespace KerbaluaNUnit
 	{
 		Script script;
 		Table globals;
-		//CommonAPICreator creator;
 		CommonAPITable apiTable;
 		ScriptTester st;
 
@@ -23,7 +22,6 @@ namespace KerbaluaNUnit
 			script = new Script(CoreModules.Preset_Complete);
 			UserData.RegistrationPolicy = InteropRegistrationPolicy.Automatic;
 			globals = script.Globals;
-			//creator=new CommonAPICreator(script);
 			apiTable=new CommonAPITable(script);
 			apiTable.AddAPI(typeof(DummyAPI));
 			Table metatable=new Table(script);
