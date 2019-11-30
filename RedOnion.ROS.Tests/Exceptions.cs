@@ -71,7 +71,17 @@ namespace RedOnion.ROS.Tests
 			Assert.AreEqual(Globals["counter"].ToInt(), 4);
 
 			Globals["throwError"] = new Value(ThrowError);
-			Test("throwError");
+			Expect<RuntimeError>("throwError");
+			Assert.IsTrue((error.obj as RuntimeError)?.InnerException is InvalidOperationException);
+			Assert.AreEqual("error", ((error.obj as RuntimeError)?.InnerException as InvalidOperationException)?.Message);
+
+			Expect<RuntimeError>(
+				"global.done = false",
+				"try",
+				"  throwError",
+				"finally",
+				"  global.done = true");
+			Assert.IsTrue(Globals["done"].ToBool());
 		}
 	}
 }

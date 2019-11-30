@@ -163,6 +163,8 @@ namespace RedOnion.ROS
 								continue;
 							}
 							Exit = ExitCode.Exception;
+							if (error.obj is RuntimeError re)
+								throw re;
 							goto finishWithResult;
 						}
 					}
@@ -1037,13 +1039,6 @@ namespace RedOnion.ROS
 						blockEnd = ctx.BlockEnd;
 						continue;
 					}
-					if (re != null)
-					{
-						result = error = new Value(re);
-						throw;
-					}
-					re = new RuntimeError(compiled, at, ex);
-					result = error = new Value(re);
 					processor?.PrintException("Core.Execute", re, logOnly: true);
 					Log("{0,2}: {1}", stack.size, ctx);
 					for (int i = stack.size; i > 0;)
@@ -1054,6 +1049,8 @@ namespace RedOnion.ROS
 						? ss.code.Lines[lnum].Text : null;
 						Log("{0,2}: {1}, at:{2}, line:{3}:{4}", i, ss.context, ss.at, lnum+1, line ?? "<no source>");
 					}
+					if (ex == re)
+						throw;
 					throw re;
 				}
 			}
