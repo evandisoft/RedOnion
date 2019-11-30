@@ -37,10 +37,6 @@ namespace Kerbalua.Scripting
 			}
 		}
 
-		public class MunFunctionToCLR
-		{
-
-		}
 
 		private KerbaluaScript() : base(CoreModules.Preset_Complete)
 		{
