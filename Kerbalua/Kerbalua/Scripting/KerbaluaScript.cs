@@ -29,14 +29,14 @@ namespace Kerbalua.Scripting
 		{
 			get
 			{
-				if (_instance==null)
-				{
-					_instance=new KerbaluaScript();
-				}
 				return _instance;
 			}
 		}
 
+		public static void Initialize()
+		{
+			_instance=new KerbaluaScript();
+		}
 
 		private KerbaluaScript() : base(CoreModules.Preset_Complete)
 		{
@@ -61,13 +61,13 @@ namespace Kerbalua.Scripting
 				  {
 					  return new Action<Button>((button) =>
 					  {
-						  var script=Instance;
+						  var script=this;
 						  var co = script.CreateCoroutine(f);
 						  co.Coroutine.AutoYieldCounter = 1000;
 						  co.Coroutine.Resume();
 						  if (co.Coroutine.State == CoroutineState.ForceSuspended)
 						  {
-							  script.PrintErrorAction?.Invoke("functions called in buttons cannot be long");
+							  script.PrintErrorAction?.Invoke("functions called in buttons must have a short runtime");
 						  }
 					  });
 				  });
@@ -87,7 +87,7 @@ namespace Kerbalua.Scripting
 			commonAPI["new"]=DoString(@"
 return function(stat,...) 
 	if type(stat)~='userdata' then
-		error('`new` only works for CLR objects')
+		error('First argument to `new` must be a CLR Static Class')
 	end
 	return stat.__new(...) 
 end
@@ -162,6 +162,7 @@ end
 			Process.current = process;
 			coroutine.Coroutine.AutoYieldCounter = execlimit;
 			result = coroutine.Coroutine.Resume();
+			process.UpdatePhysics();
 			Process.current = null;
 
 			bool isComplete = false;

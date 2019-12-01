@@ -14,8 +14,10 @@ Just had a release (0.4.4)
 # Current
 # 0.4
 
-## 0.4.4
-- Bug with Lua engine not resetting fixed.
+## 0.4.5 - 0.4.4
+- My apologies about 0.4.4. I believe dropped in an unchanged zip.
+- Fixed a problem with Lua engine not resetting.
+- Also the terminate button now will destroy ui's and vectors that were created by a script.
 
 ## 0.4.3
 - Undo/Redo for LiveRepl Editor. Stores at least 50 of the last changes.
