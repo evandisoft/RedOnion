@@ -9,7 +9,7 @@
 - More UI library features.
 
 # Next Release
-Just had a release (0.4.4)
+- Fixed an issue where the global keybindings of LiveRepl could be activated when the input is not locked to the window. (input is locked when the mouse is over the window)
 
 # Current
 # 0.4
