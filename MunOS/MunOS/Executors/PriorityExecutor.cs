@@ -68,7 +68,7 @@ namespace MunOS.Executors
 					{
 						executeList.RemoveAt(i);
 					}
-					remainingTime = timeLimitMicros - stopwatch.Elapsed.TotalMilliseconds;
+					remainingTime = timeLimitMicros - stopwatch.ElapsedTicks*ExecutionManager.MicrosPerTick;
 					if (remainingTime < 0)
 					{
 						break;

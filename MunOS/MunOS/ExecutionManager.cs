@@ -19,7 +19,7 @@ namespace MunOS
 		static public int MaxOneShotSkips = 1;
 		long frequency=Stopwatch.Frequency;
 		long nanosecPerTick = (1000L*1000L*1000L) / Stopwatch.Frequency;
-		double microsPerTick = (1000.0*1000.0) / Stopwatch.Frequency;
+		public static readonly double MicrosPerTick = (1000.0*1000.0) / Stopwatch.Frequency;
 
 		Dictionary<Priority, PriorityExecutor> priorities = new Dictionary<Priority, PriorityExecutor>();
 
@@ -76,21 +76,21 @@ namespace MunOS
 			priorities[Priority.REALTIME].Execute(realtimeRuntime);
 			stopwatch.Stop();
 
-			remainingTime = remainingTime - stopwatch.ElapsedTicks*microsPerTick;
+			remainingTime = remainingTime - stopwatch.ElapsedTicks*MicrosPerTick;
 			var oneshotRuntime = remainingTime - timeLimitMicros * OneShotFractionalLimit;
 			stopwatch.Reset();
 			stopwatch.Start();
 			priorities[Priority.ONESHOT].Execute(oneshotRuntime);
 			stopwatch.Stop();
 
-			remainingTime = remainingTime - stopwatch.ElapsedTicks*microsPerTick;
+			remainingTime = remainingTime - stopwatch.ElapsedTicks*MicrosPerTick;
 			var idleRuntime = remainingTime - timeLimitMicros * IdleFractionalLimit;
 			stopwatch.Reset();
 			stopwatch.Start();
 			priorities[Priority.IDLE].Execute(idleRuntime);
 			stopwatch.Stop();
 
-			remainingTime = remainingTime - stopwatch.ElapsedTicks*microsPerTick;
+			remainingTime = remainingTime - stopwatch.ElapsedTicks*MicrosPerTick;
 			var normalRuntime = remainingTime;
 			stopwatch.Reset();
 			stopwatch.Start();
