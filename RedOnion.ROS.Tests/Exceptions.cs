@@ -180,12 +180,22 @@ namespace RedOnion.ROS.Tests
 				"else",
 				"  result = true",
 				"return result");
+
+			Globals["throwError"] = new Value(ThrowError);
 			Lines(ExitCode.Return, true,
 				"var result = false",
 				"try",
-				"  throw 1",
+				"  throwError",
 				"catch",
 				"  result = true",
+				"return result");
+
+			Lines(ExitCode.Return, true,
+				"var result = false",
+				"try",
+				"  throw true",
+				"catch var x",
+				"  result = x",
 				"return result");
 		}
 	}

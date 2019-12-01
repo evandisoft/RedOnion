@@ -356,9 +356,17 @@ namespace RedOnion.ROS.Parsing
 				var catchAt = code.size;
 				while (ExCode == ExCode.Catch && ind == Indent)
 				{
-					Next();
-					Write(-1); // TODO: reserved for variable name
-					FullType(flags);
+					if (Next().ExCode != ExCode.Var)
+						Write(-1);
+					else
+					{
+						if (Next().Word == null)
+							throw new ParseError(this, "Expected variable name");
+						if (Word.Length > 127)
+							throw new ParseError(this, "Variable name too long");
+						Write(Word);
+					}
+					OptionalType(flags);
 					if (Curr == ';' || Curr == ':')
 						Next();
 					ParseBlock(flags, ind);

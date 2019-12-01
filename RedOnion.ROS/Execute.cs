@@ -1100,8 +1100,6 @@ namespace RedOnion.ROS
 				do
 				{
 					int nmi = Int(code, at);
-					if (nmi >= 0)
-						throw InvalidOperation("TODO: catch to variable");
 					at += 4;
 					var op = (OpCode)code[at++];
 					bool match = false;
@@ -1117,6 +1115,8 @@ namespace RedOnion.ROS
 					at += 4;
 					if (match)
 					{
+						if (nmi >= 0)
+							ctx.Add(str[nmi], error);
 						ctx.BlockCode = BlockCode.Exception;
 						ctx.BlockStart = this.at = at;
 						ctx.BlockEnd = at + sz;
