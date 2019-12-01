@@ -30,3 +30,5 @@ Firda has created a cmd script (create-links.cmd) for windows that will create t
 ("C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program")
 
 Once again, any questions, feedback, concerns for now can be placed into "issues" on the project github page.
+
+If you would like to interact more with us about development, we can give you an invite to our discord.
