@@ -1,7 +1,5 @@
 ## Development Philosophy:
-Some of my (Evan) code may appear a bit sloppy at times. Short reason is [opportunity cost](https://en.wikipedia.org/wiki/Opportunity_cost). Long rambling explanation is [here](DevDocs/EvansDevelopmentPhilosophy.md). If there is some desire to work with some of my code that is a bit ugly, let me know, and I will set aside some time to make it nicer.
-
-Once we have more people working on the project, I will put more focus on making sure that all of my code is more maintainable, but right now it is a waste of time, IMO.
+Some of my (Evan) code may appear a bit sloppy at times. Short reason is [opportunity cost](https://en.wikipedia.org/wiki/Opportunity_cost). Long rambling explanation is [here](DevDocs/EvansDevelopmentPhilosophy.md). If at any given time some of my code looks a bit messy but you want to work with it, let me know, and I may set aside some time to make it nicer.
 
 ## Sub-Projects
 The **RedOnion** project is divided into multiple sub-projects:

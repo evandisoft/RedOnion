@@ -9,10 +9,13 @@
 - More UI library features.
 
 # Next Release
-Just had a release (0.4.3)
+Just had a release (0.4.4)
 
 # Current
 # 0.4
+
+## 0.4.4
+- Bug with Lua engine not resetting fixed.
 
 ## 0.4.3
 - Undo/Redo for LiveRepl Editor. Stores at least 50 of the last changes.
