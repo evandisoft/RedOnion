@@ -51,7 +51,7 @@ namespace RedOnion.ROS.Tests
 				"  throw \"catch\"",
 				"  return false",
 				"finally",
-				"  global.done = true",
+				"  done = true",
 				"  return true", // must not override active exception
 				"return false");
 			Assert.IsTrue(Globals["done"].ToBool());
@@ -68,7 +68,7 @@ namespace RedOnion.ROS.Tests
 				"  return 0",
 				"finally",
 				"  counter++");
-			Assert.AreEqual(Globals["counter"].ToInt(), 4);
+			Assert.AreEqual(4, Globals["counter"].ToInt());
 
 			Globals["throwError"] = new Value(ThrowError);
 			Expect<RuntimeError>("throwError");
@@ -80,7 +80,7 @@ namespace RedOnion.ROS.Tests
 				"try",
 				"  throwError",
 				"finally",
-				"  global.done = true");
+				"  done = true");
 			Assert.IsTrue(Globals["done"].ToBool());
 		}
 
@@ -90,12 +90,33 @@ namespace RedOnion.ROS.Tests
 			Globals["throwError"] = new Value(ThrowError);
 			Expect<RuntimeError>(
 				"global.done = false",
-				"def throwIt => throwError",
+				"def throwIt",
+				"  throwError",
 				"try",
 				"  throwIt",
 				"finally",
-				"  global.done = true");
+				"  done = true");
 			Assert.IsTrue(Globals["done"].ToBool());
+			Assert.IsTrue((error.obj as RuntimeError)?.InnerException is InvalidOperationException);
+			Assert.AreEqual("error", ((error.obj as RuntimeError)?.InnerException as InvalidOperationException)?.Message);
+
+			Expect<RuntimeError>(
+				"global.counter = 0",
+				"def throwIt",
+				"  throwError",
+				"try",
+				"  counter++",
+				"  try",
+				"    counter++",
+				"    throwIt",
+				"  finally",
+				"    counter++",
+				"  return 0",
+				"finally",
+				"  counter++");
+			Assert.AreEqual(4, Globals["counter"].ToInt());
+			Assert.IsTrue((error.obj as RuntimeError)?.InnerException is InvalidOperationException);
+			Assert.AreEqual("error", ((error.obj as RuntimeError)?.InnerException as InvalidOperationException)?.Message);
 		}
 	}
 }

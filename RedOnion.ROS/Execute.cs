@@ -110,14 +110,23 @@ namespace RedOnion.ROS
 							this.code = code = compiled.Code;
 							this.str = str = compiled.Strings;
 							self = top.prevSelf;
-							error = top.prevError;
 							if (ctx != top.context)
 							{
 								ctx.PopAll();
 								ctx = top.context;
 								blockEnd = ctx.BlockEnd;
 							}
+							if (error.IsVoid)
+							{
+								error = top.prevError;
+								stack.Pop();
+								continue;
+							}
 							stack.Pop();
+							if (!HandleError())
+								goto finishWithResult;
+							at = this.at;
+							blockEnd = ctx.BlockEnd;
 							continue;
 						}
 						// library end (see CallScript)
@@ -145,9 +154,9 @@ namespace RedOnion.ROS
 							catchBlocks--;
 							ctx.CatchBlocks--;
 							at = ctx.BlockAt1; // finally start
-							if (at == ctx.BlockAt2) // finally end
+							if (at == ctx.BlockAt2 && error.IsVoid) // finally end
 								goto default;
-							ctx.BlockCode = BlockCode.Block; // no exception, no need for BlockCode.Finally
+							ctx.BlockCode = error.IsVoid ? BlockCode.Block : BlockCode.Finally;
 							ctx.BlockStart = at;
 							blockEnd = ctx.BlockEnd = ctx.BlockAt2;
 							continue;
@@ -157,10 +166,12 @@ namespace RedOnion.ROS
 							if (--catchBlocks > 0)
 							{
 								this.at = at;
-								HandleError();
-								at = this.at;
-								blockEnd = ctx.BlockEnd;
-								continue;
+								if (HandleError())
+								{
+									at = this.at;
+									blockEnd = ctx.BlockEnd;
+									continue;
+								}
 							}
 							Exit = ExitCode.Exception;
 							if (error.obj is RuntimeError re)
@@ -648,7 +659,7 @@ namespace RedOnion.ROS
 					#region Simple statements (return, break, continue)
 
 					case OpCode.Return:
-						if (catchBlocks > 0)
+						if (ctx.CatchBlocks > 0)
 						{
 							if (ctx.BlockCode == BlockCode.Finally)
 							{//	we have pending exception, continue as if we reached end of the finally block
@@ -878,10 +889,12 @@ namespace RedOnion.ROS
 						if (catchBlocks > 0)
 						{
 							this.at = at;
-							HandleError();
-							at = this.at;
-							blockEnd = ctx.BlockEnd;
-							continue;
+							if (HandleError())
+							{
+								at = this.at;
+								blockEnd = ctx.BlockEnd;
+								continue;
+							}
 						}
 						Exit = ExitCode.Exception;
 						goto finishWithResult;
@@ -1015,6 +1028,13 @@ namespace RedOnion.ROS
 					if (vals.Count > 0)
 						result = vals.Pop();
 				finishWithResult:
+					if (!error.IsVoid)
+					{
+						result = error;
+						if (error.obj is RuntimeError re)
+							throw re;
+							
+					}
 					if (result.IsReference && !result.desc.Get(ref result, result.num.Int))
 					{
 						if (Exit != ExitCode.None)
@@ -1060,7 +1080,15 @@ namespace RedOnion.ROS
 		{
 			while (ctx.BlockCode != BlockCode.TryCatch)
 			{
-				if (ctx.BlockCount == 0 || ctx.BlockCode == BlockCode.Function || ctx.BlockCode == BlockCode.Library)
+				if (ctx.BlockCode == BlockCode.Function)
+				{
+					if (stack.Count == 0)
+						return false; // root is function (like in update/idle) => throw
+					// let the block-end logic handle it
+					at = ctx.BlockEnd;
+					return true;
+				}
+				if (ctx.BlockCount == 0 || ctx.BlockCode == BlockCode.Library)
 					throw InvalidOperation("TODO: exception unwinding got to root block");
 				ctx.Pop();
 			}
