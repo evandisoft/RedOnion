@@ -365,10 +365,11 @@ namespace RedOnion.ROS.Parsing
 				}
 				if (ExCode == ExCode.Else && ind == Indent)
 				{
+					Next();
 					if (Curr == ';' || Curr == ':')
 						Next();
 					Write(-1);
-					Write(0);
+					Write(OpCode.Void);
 					ParseBlock(flags, ind);
 				}
 				Write(code.size - catchAt, mark+5);

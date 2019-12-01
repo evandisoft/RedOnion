@@ -47,9 +47,6 @@ namespace RedOnion.ROS
 
 						switch (ctx.BlockCode)
 						{
-						case BlockCode.Exception: // end of catch block - clear the pending exception
-							error = Value.Void;
-							goto default;
 						default: // usually BlockCode.Block (e.g. `if`)
 							blockEnd = ctx.Pop();
 							continue;
@@ -150,6 +147,11 @@ namespace RedOnion.ROS
 							stack.Pop();
 							continue;
 						}
+						//	end of catch block
+						case BlockCode.Exception:
+							error = Value.Void; // clear the pending exception
+							goto case BlockCode.TryCatch;
+						//	end of try block
 						case BlockCode.TryCatch:
 							catchBlocks--;
 							ctx.CatchBlocks--;
@@ -1093,8 +1095,38 @@ namespace RedOnion.ROS
 				ctx.Pop();
 			}
 			if (ctx.BlockEnd != ctx.BlockAt1)
-				throw InvalidOperation("TODO: catch");
-			at = ctx.BlockStart = ctx.BlockAt1;
+			{
+				int at = ctx.BlockEnd;
+				do
+				{
+					int nmi = Int(code, at);
+					if (nmi >= 0)
+						throw InvalidOperation("TODO: catch to variable");
+					at += 4;
+					var op = (OpCode)code[at++];
+					bool match = false;
+					switch (op)
+					{
+					default:
+						throw InvalidOperation("TODO: catch by type");
+					case OpCode.Void:
+						match = true;
+						break;
+					}
+					int sz = Int(code, at);
+					at += 4;
+					if (match)
+					{
+						ctx.BlockCode = BlockCode.Exception;
+						ctx.BlockStart = this.at = at;
+						ctx.BlockEnd = at + sz;
+						return true;
+					}
+					at += sz;
+				}
+				while (at < ctx.BlockAt1);
+			}
+			this.at = ctx.BlockStart = ctx.BlockAt1;
 			ctx.BlockEnd = ctx.BlockAt2;
 			ctx.BlockCode = BlockCode.Finally;
 			return true;

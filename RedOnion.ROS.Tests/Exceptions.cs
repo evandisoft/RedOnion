@@ -169,5 +169,24 @@ namespace RedOnion.ROS.Tests
 			Assert.IsFalse(Globals["test"].ToBool());
 			Assert.AreEqual(4, Globals["counter"].ToInt());
 		}
+
+		[Test]
+		public void ROS_Catch04_SimpleCatch()
+		{
+			Lines(ExitCode.Return, true,
+				"var result = false",
+				"try",
+				"  throw 1",
+				"else",
+				"  result = true",
+				"return result");
+			Lines(ExitCode.Return, true,
+				"var result = false",
+				"try",
+				"  throw 1",
+				"catch",
+				"  result = true",
+				"return result");
+		}
 	}
 }
