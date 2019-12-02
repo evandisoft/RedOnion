@@ -16,11 +16,6 @@ namespace Kerbalui.Controls.Abstract
 		private int Fontsize=KerbaluiSettings.DefaultFontsize;
 		public int ScaledFontsize => (int)(KerbaluiSettings.UI_SCALE*Fontsize);
 
-		static int ApplyScale(int fontsize)
-		{
-			return (int)(fontsize*KerbaluiSettings.UI_SCALE);
-		}
-
 		void SettingsChangeHandler()
 		{
 			UpdateFont();
