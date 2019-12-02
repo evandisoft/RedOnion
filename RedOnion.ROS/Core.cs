@@ -38,6 +38,8 @@ namespace RedOnion.ROS
 		protected Value error;
 		/// <summary>Number of try..catch..finally blocks.</summary>
 		protected int catchBlocks;
+		/// <summary>Had return statement inside try..catch..finally.</summary>
+		protected bool pendingReturn;
 
 		protected struct SavedContext
 		{
@@ -97,6 +99,7 @@ namespace RedOnion.ROS
 			Exit = ExitCode.None;
 			result = Value.Void;
 			error = Value.Void;
+			pendingReturn = false;
 			compiled = value;
 			if (ctx == null || reset)
 				ctx = new Context();

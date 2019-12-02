@@ -25,7 +25,7 @@ namespace RedOnion.ROS.Tests
 			Lines(ExitCode.Return, true,
 				"try",
 				"finally",
-				"  return true",
+				"  return true", // Java allows this, C# does not
 				"return false");
 			Lines(ExitCode.Return, true,
 				"var ok = false",
@@ -34,7 +34,7 @@ namespace RedOnion.ROS.Tests
 				"catch string",
 				"  ok = false",
 				"finally",
-				"  return ok");
+				"  return ok"); // again: Java
 		}
 
 		public static void ThrowError()
@@ -197,6 +197,44 @@ namespace RedOnion.ROS.Tests
 				"catch var x",
 				"  result = x",
 				"return result");
+
+			Lines(ExitCode.Return, "error",
+				"var result = false",
+				"try",
+				"  throwError",
+				"catch var x",
+				"  result = x.message",
+				"return result");
+		}
+
+		[Test]
+		public void ROS_Catch05_Return()
+		{
+			// like empty finally, but we have to track the pending return
+			Lines(ExitCode.Return, true,
+				"try",
+				"  return true");
+
+			// Java allows that, C# does not
+			Lines(ExitCode.Return, true,
+				"try",
+				"  return false",
+				"finally",
+				"  return true");
+
+			// with the pending return implemented, we can just pretend the return is inside try and no exception happened
+			Lines(ExitCode.Return, 2.7f,
+				"try",
+				"  throw 3.14",
+				"catch",
+				"  return 2.7f");
+
+			Globals["throwError"] = new Value(ThrowError);
+			Lines(ExitCode.Return, "error",
+				"try",
+				"  throwError",
+				"catch var x",
+				"  return x.message");
 		}
 	}
 }

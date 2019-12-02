@@ -34,7 +34,13 @@ namespace RedOnion.ROS
 						if (ctx.BlockCount == 0
 							&& ctx.BlockCode != BlockCode.Library
 							&& ctx.BlockCode != BlockCode.Function)
-							goto finishNoReturn;
+						{
+							if (!pendingReturn)
+								goto finishNoReturn;
+							pendingReturn = false;
+							Exit = ExitCode.Return;
+							goto finishWithResult;
+						}
 
 						if (countdown <= 0)
 						{
@@ -44,6 +50,46 @@ namespace RedOnion.ROS
 							return false;
 						}
 						countdown--;
+
+						if (pendingReturn)
+						{
+							switch (ctx.BlockCode)
+							{
+							default:
+								at = blockEnd = ctx.Pop();
+								continue;
+							case BlockCode.Function:
+								if (stack.size > 0)
+								{
+									pendingReturn = false;
+									vals.Push(result);
+									FunctionReturn();
+									code = this.code;
+									str = this.str;
+									at = this.at;
+									blockEnd = ctx.BlockEnd;
+									continue;
+								}
+								Exit = ExitCode.Return;
+								goto finishWithResult;
+							case BlockCode.Library:
+								pendingReturn = false;
+								break;
+							case BlockCode.Exception:
+							case BlockCode.Finally:
+								break;
+							case BlockCode.TryCatch:
+								catchBlocks--;
+								ctx.CatchBlocks--;
+								at = ctx.BlockAt1; // finally start
+								if (at == ctx.BlockAt2 && error.IsVoid) // finally end
+									goto default; // note that default here is different than below
+								ctx.BlockCode = error.IsVoid ? BlockCode.Block : BlockCode.Finally;
+								ctx.BlockStart = at;
+								blockEnd = ctx.BlockEnd = ctx.BlockAt2;
+								continue;
+							}
+						}
 
 						switch (ctx.BlockCode)
 						{
@@ -663,45 +709,22 @@ namespace RedOnion.ROS
 					case OpCode.Return:
 						if (ctx.CatchBlocks > 0)
 						{
+							at = blockEnd;
 							if (ctx.BlockCode == BlockCode.Finally)
-							{//	we have pending exception, continue as if we reached end of the finally block
-								at = blockEnd;
+							//	we have pending exception, continue as if we reached end of the finally block
 								continue;
-							}
-							throw InvalidOperation("TODO: return from try..catch..finally");
+							Dereference(1);
+							result = vals.Pop();
+							pendingReturn = true;
+							continue;
 						}
 						if (stack.size > 0)
 						{
-							ref var top = ref stack.Top();
-							var vtop = top.vtop;
-							ref var result = ref vals.GetRef(vals.Count, vtop - 1);
-							if (top.create)
-								result = self;
-							else
-							{
-								result = vals.Top();
-								if (result.IsReference && !result.desc.Get(ref result, result.num.Int))
-									throw CouldNotGet(ref result);
-							}
-							this.at = at = top.at;
-							compiled = top.code;
-							this.code = code = compiled.Code;
-							this.str = str = compiled.Strings;
-							self = top.prevSelf;
-							error = top.prevError;
-							if (ctx != top.context)
-							{
-								vals.Pop(vals.Count - top.vtop);
-								ctx.PopAll();
-								ctx = top.context;
-							}
-							else
-							{
-								ctx.BlockCode = top.blockCode;
-								ctx.BlockEnd = top.blockEnd;
-							}
+							FunctionReturn();
+							code = this.code;
+							str = this.str;
+							at = this.at;
 							blockEnd = ctx.BlockEnd;
-							stack.Pop();
 							continue;
 						}
 						Exit = ExitCode.Return;
@@ -1078,7 +1101,39 @@ namespace RedOnion.ROS
 			}
 		}
 
-		protected virtual bool HandleError()
+		private void FunctionReturn()
+		{
+			ref var top = ref stack.Top();
+			var vtop = top.vtop;
+			ref var result = ref vals.GetRef(vals.Count, vtop - 1);
+			if (top.create)
+				result = self;
+			else
+			{
+				Dereference(1);
+				result = vals.Top();
+			}
+			at = top.at;
+			compiled = top.code;
+			code = compiled.Code;
+			str = compiled.Strings;
+			self = top.prevSelf;
+			error = top.prevError;
+			if (ctx != top.context)
+			{
+				vals.Pop(vals.Count - top.vtop);
+				ctx.PopAll();
+				ctx = top.context;
+			}
+			else
+			{
+				ctx.BlockCode = top.blockCode;
+				ctx.BlockEnd = top.blockEnd;
+			}
+			stack.Pop();
+		}
+
+		private bool HandleError()
 		{
 			while (ctx.BlockCode != BlockCode.TryCatch)
 			{
