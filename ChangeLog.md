@@ -11,6 +11,7 @@
 # Next Release
 - Fixed an issue where the global keybindings of LiveRepl could be activated when the input is not locked to the window. (input is locked when the mouse is inside the window bounds)
 - Made LiveRepl use KSP's UI_SCALE setting. Hard for me to test this thoroughly as I don't have a monitor with a high enough resolution, but from what I can see it is working. I could add an additional scaling factor in some other setting later, if desired, to make it even larger. One thing I did not find how to scale was the scrollbar. But I was able to scale the part of the scrollbar that accepts mouse dragging.
+- Lua [reflection api](RedOnion.KSP/MoonSharp/MoonSharpAPI/Reflection.md) was a bit confusing. I changed the terminology to type and runtime type instead of static and type. So what was once a static is now called a type, and what was once a type is now called a runtime type. (Runtime types are for reflection whereas types are just for accessing static members or passing as the first argument to `new` to create a new object.)
 
 # Current
 # 0.4
