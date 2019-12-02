@@ -15,12 +15,9 @@ namespace RedOnion.KSP.MoonSharp.MoonSharpAPI
 	public static class MoonSharpGlobals
 	{
 		// this will be overriden in KerbaluaScript.cs
-		[Unsafe, Description(
-		"Create new objects given a static. A static is a special MunSharp value that represents a CLR Class." +
-		"You can access static members from them, including the __new member, which represents the CLR Class' constructor." +
-		"We provide references to many of these. For example, ui.Window, or any CLR Class received via the " +
-		"native global.")]
-		public static object @new(object type, params DynValue[] dynArgs)
+		[Description(
+		"Create new objects given a type. For example: `new(ui.Window)`")]
+		public static object @new(DynValue @static, params DynValue[] dynArgs)
 		{
 			return null;
 		}
@@ -41,22 +38,22 @@ namespace RedOnion.KSP.MoonSharp.MoonSharpAPI
 	[Description("Reflection functionality specific to Moonsharp.")]
 	public static class Reflection
 	{
-		[Description("Returns true if the argument is a static.")]
-		public static bool isstatic(DynValue possbileStatic)
+		[Description("Returns true if the argument is a type.")]
+		public static bool istype(DynValue possibleType)
 		{
-			return possbileStatic.UserData!=null && possbileStatic.UserData.Object==null;
+			return possibleType.UserData!=null && possibleType.UserData.Object==null;
 		}
 
-		[Description("Returns true if the argument is a Type.")]
-		public static bool isclrtype(DynValue possibleType)
+		[Description("Returns true if the argument is a runtime type. (which can be used for reflection).")]
+		public static bool isruntimetype(DynValue possibleRuntimeType)
 		{
-			return possibleType.UserData!=null && possibleType.UserData.Object!=null && possibleType.ToObject() is Type;
+			return possibleRuntimeType.UserData!=null && possibleRuntimeType.UserData.Object!=null && possibleRuntimeType.ToObject() is Type;
 		}
 
-		[Description("Returns a static based on the given Type or object.")]
-		public static DynValue getstatic(DynValue typeOrObject)
+		[Description("Returns a type given a runtime type or object.")]
+		public static DynValue gettype(DynValue runtimeTypeOrObject)
 		{
-			object o=typeOrObject.ToObject();
+			object o=runtimeTypeOrObject.ToObject();
 			if (o is Type t)
 			{
 				return UserData.CreateStatic(t);
@@ -64,14 +61,14 @@ namespace RedOnion.KSP.MoonSharp.MoonSharpAPI
 			return UserData.CreateStatic(o.GetType());
 		}
 
-		[Description("Returns the underyling clr type associated with this object.")]
-		public static object getclrtype(DynValue @object)
+		[Description("Returns the runtime type associated with this object or type. runtime types can be used for reflection.")]
+		public static object getruntimetype(DynValue objectOrType)
 		{
 			//if (dynValue.Type==DataType.UserData)
 			//{
 			//	return DynValue.FromObject(this, dynValue.UserData.Descriptor.Type);
 			//}
-			object o=@object.ToObject();
+			object o=objectOrType.ToObject();
 			if (o is Type t)
 			{
 				return t; //DynValue.FromObject(this, t);

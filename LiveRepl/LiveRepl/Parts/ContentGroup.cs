@@ -16,10 +16,10 @@ namespace LiveRepl.Parts
 		{
 			this.uiparts=uiparts;
 
-			AddFixed(ScriptWindow.replGroupWidth, uiparts.replGroup=new ReplGroup(uiparts));
-			AddFixed(ScriptWindow.centerGroupWidth, uiparts.centerGroup=new CenterGroup(uiparts));
-			AddFixed(ScriptWindow.editorGroupWidth, uiparts.scriptDisabledEditorGroup=new ScriptDisabledElement(uiparts, uiparts.editorGroup=new EditorGroup(uiparts)));
-			AddFixed(ScriptWindow.completionGroupWidth, uiparts.ScriptDisabledCompletionGroup=new ScriptDisabledElement(uiparts, uiparts.completionGroup=new CompletionGroup(uiparts)));
+			AddFixed(ScriptWindow.baseReplGroupWidth, uiparts.replGroup=new ReplGroup(uiparts));
+			AddFixed(ScriptWindow.baseCenterGroupWidth, uiparts.centerGroup=new CenterGroup(uiparts));
+			AddFixed(ScriptWindow.baseEditorGroupWidth, uiparts.scriptDisabledEditorGroup=new ScriptDisabledElement(uiparts, uiparts.editorGroup=new EditorGroup(uiparts)));
+			AddFixed(ScriptWindow.baseCompletionGroupWidth, uiparts.ScriptDisabledCompletionGroup=new ScriptDisabledElement(uiparts, uiparts.completionGroup=new CompletionGroup(uiparts)));
 
 		}
 	}

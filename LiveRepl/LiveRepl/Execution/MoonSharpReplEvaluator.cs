@@ -103,7 +103,7 @@ namespace LiveRepl.Execution
 					// This is a type
 					if (dynResult.ToObject() is Type)
 					{
-						result += " (type)";
+						result += " (runtime type)";
 						return isComplete;
 					}
 
