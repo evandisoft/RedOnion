@@ -1,4 +1,5 @@
 using System;
+using Kerbalui;
 using Kerbalui.Types;
 using LiveRepl.Decorators;
 using RedOnion.KSP.Settings;
@@ -8,11 +9,17 @@ namespace LiveRepl
 {
 	public partial class ScriptWindow : Window
 	{
-		public const float windowHeight=600;
-		public const float editorGroupWidth = 500;
-		public const float centerGroupWidth = 100;
-		public const float replGroupWidth = 400;
-		public const float completionGroupWidth = 150;
+		public static float WindowHeight => baseWindowHeight * GameSettings.UI_SCALE;
+		public static float EditorGroupWidth => baseEditorGroupWidth*GameSettings.UI_SCALE;
+		public static float CenterGroupWidth => baseCenterGroupWidth*GameSettings.UI_SCALE;
+		public static float ReplGroupWidth => baseReplGroupWidth*GameSettings.UI_SCALE;
+		public static float CompletionGroupWidth => baseCompletionGroupWidth*GameSettings.UI_SCALE;
+
+		public const float baseWindowHeight = 600;
+		public const float baseEditorGroupWidth = 500;
+		public const float baseCenterGroupWidth = 100;
+		public const float baseReplGroupWidth = 400;
+		public const float baseCompletionGroupWidth = 150;
 
 		public const float startingX = 100;
 		public const float startingY = 100;
@@ -28,30 +35,42 @@ namespace LiveRepl
 			ReplVisible = bool.Parse(SavedSettings.LoadSetting("replVisible", "true"));
 			rect.x = float.Parse(SavedSettings.LoadSetting("WindowPositionX", startingX.ToString()));
 			rect.y = float.Parse(SavedSettings.LoadSetting("WindowPositionY",startingY.ToString()));
-			rect.width=WindowWidth();
-			rect.height=windowHeight;
+			rect.width=WindowWidth;
+			rect.height=WindowHeight;
+
+			GameEvents.OnGameSettingsApplied.Add(GameSettingsChangeHandler);
 		}
 
-		public override void SetRect(Rect rect)
+		void GameSettingsChangeHandler()
 		{
-			rect.width=WindowWidth();
-			rect.height=windowHeight;
-
-			base.SetRect(rect);
+			KerbaluiSettings.ApplySettingsChange();
+			//titleStyle.fontSize=(int)(KerbaluiSettings.DefaultFontsize*GameSettings.UI_SCALE);
+			needsResize=true;
 		}
 
-		float WindowWidth()
+		public override void SetRect(Rect newRect)
 		{
-			float width=centerGroupWidth+completionGroupWidth;
-			if (EditorVisible)
+			newRect.width=WindowWidth;
+			newRect.height=WindowHeight;
+
+			base.SetRect(newRect);
+		}
+
+		float WindowWidth
+		{
+			get
 			{
-				width+=editorGroupWidth;
+				float width=CenterGroupWidth+CompletionGroupWidth;
+				if (EditorVisible)
+				{
+					width+=EditorGroupWidth;
+				}
+				if (ReplVisible)
+				{
+					width+=ReplGroupWidth;
+				}
+				return width;
 			}
-			if (ReplVisible)
-			{
-				width+=replGroupWidth;
-			}
-			return width;
 		}
 
 		private bool editorVisible = true;
@@ -65,12 +84,12 @@ namespace LiveRepl
 					if (editorVisible)
 					{
 						//rect.x+=editorGroupWidth;
-						rect.width-=editorGroupWidth;
+						rect.width-=EditorGroupWidth;
 					}
 					else
 					{
 						//rect.x-=editorGroupWidth;
-						rect.width+=editorGroupWidth;
+						rect.width+=EditorGroupWidth;
 					}
 
 					uiparts.scriptDisabledEditorGroup.Active=editorVisible=value;
@@ -89,13 +108,13 @@ namespace LiveRepl
 				{
 					if (replVisible)
 					{
-						rect.x+=replGroupWidth;
-						rect.width-=replGroupWidth;
+						rect.x+=ReplGroupWidth;
+						rect.width-=ReplGroupWidth;
 					}
 					else
 					{
-						rect.x-=replGroupWidth;
-						rect.width+=replGroupWidth;
+						rect.x-=ReplGroupWidth;
+						rect.width+=ReplGroupWidth;
 					}
 
 					uiparts.replGroup.Active=replVisible=value;

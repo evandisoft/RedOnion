@@ -21,9 +21,9 @@ namespace Kerbalui.Types
 		/// And it needs to be set for some things to run properly.
 		/// </summary>
 		public bool needsResize=true;
-		public virtual void SetRect(Rect rect)
+		public virtual void SetRect(Rect newRect)
 		{
-			this.rect=rect;
+			rect=newRect;
 			needsResize=false;
 		}
 

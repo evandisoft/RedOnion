@@ -54,10 +54,10 @@ namespace Kerbalui.Types
 			return new Rect(0, 0, rect.width, rect.height);
 		}
 
-		public override void SetRect(Rect rect)
+		public override void SetRect(Rect newRect)
 		{
-			base.SetRect(rect);
-			ContentRect=new Rect(0, 0, rect.width, rect.height);
+			base.SetRect(newRect);
+			ContentRect=new Rect(0, 0, newRect.width, newRect.height);
 			SetChildRects();
 		}
 

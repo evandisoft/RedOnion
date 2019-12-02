@@ -10,3 +10,4 @@ for j=1,8 do
     ship.parts[num].explode()
 end
 print("Done!")
+

@@ -16,12 +16,13 @@ namespace Kerbalui.Types
 		public GUIStyle titleStyle;
 		Rect titleRect;
 		Element content;
-
+		GUIStyle windowStyle;
 
 		public Window(string title)
 		{
 			titleContent.text=title;
 			titleStyle=GUI.skin.label;
+			windowStyle=new GUIStyle(GUI.skin.window);
 		}
 
 		protected void AssignContent(Element content)
@@ -33,19 +34,9 @@ namespace Kerbalui.Types
 		//bool secondRunPassed=false;
 		protected override void TypeSpecificUpdate()
 		{
-			//if (!firstRunPassed)
-			//{
-			//	firstRunPassed=true;
-			//	needsResize=true;
-			//}
-			//if (!secondRunPassed)
-			//{
-			//	secondRunPassed=true;
-			//	needsResize=true;
-			//}
 
 
-			rect=GUI.Window(windowID, rect, PointlessFunc, titleContent);
+			rect=GUI.Window(windowID, rect, PointlessFunc, titleContent, windowStyle);
 		}
 
 		void PointlessFunc(int id)
@@ -59,12 +50,13 @@ namespace Kerbalui.Types
 			content?.Update();
 		}
 
-		public override void SetRect(Rect rect)
+		public override void SetRect(Rect newRect)
 		{
-			base.SetRect(rect);
-
-			titleRect=new Rect(0, 0, rect.width, Math.Max(titleStyle.CalcSize(titleContent).y, 10));
-			content.SetRect(new Rect(0, titleRect.height, rect.width, rect.height-titleRect.height));
+			base.SetRect(newRect);
+			titleStyle.fontSize=(int)(KerbaluiSettings.DefaultFontsize*GameSettings.UI_SCALE);
+			windowStyle.fontSize=titleStyle.fontSize;
+			titleRect=new Rect(0, 0, newRect.width, Math.Max(titleStyle.CalcSize(titleContent).y, 10));
+			content.SetRect(new Rect(0, titleRect.height, newRect.width, newRect.height-titleRect.height));
 		}
 	}
 }
