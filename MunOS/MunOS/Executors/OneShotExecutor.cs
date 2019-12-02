@@ -21,6 +21,11 @@
 						ExecuteProcess(executeQueue.Dequeue(), ExecutionManager.OneshotForceTicks);
 					}
 				}
+				else
+				{
+					// if there is nothing in the queue, we should reset the skips
+					numSkips=0;
+				}
 			}
 		}
 	}

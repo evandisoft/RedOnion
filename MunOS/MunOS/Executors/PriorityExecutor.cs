@@ -16,12 +16,14 @@ namespace MunOS.Executors
 		// represents that the executable finished execution and can be removed.
 		FINISHED, 
 	}
+
 	/// <summary>
 	/// Holds all executables of a given priority and can execute them
 	/// with the given time limit.
 	/// </summary>
 	public abstract class PriorityExecutor
 	{
+		public int Count => waitQueue.Count+executeQueue.Count;
 		/// <summary>
 		/// Holds processes waiting to be executed. Each update the processes 
 		/// here that are not sleeping are put into the executeQueue
@@ -29,17 +31,40 @@ namespace MunOS.Executors
 		public Queue<Process> waitQueue=new Queue<Process>();
 		/// <summary>
 		/// Holds processes being executed. Some processes may remain here
-		/// after an update, indicating that they didn't voluntarily yield.
+		/// after an update, indicating that they didn't voluntarily yield or they
+		/// didn't even get a chance to execute at all last update.
 		/// </summary>
 		public Queue<Process> executeQueue=new Queue<Process>();
 
 		Stopwatch stopwatch = new Stopwatch();
 
-		void AddNonSleepingToExecuteQueue()
+		public void Kill(long ID)
 		{
+			Kill(ID, waitQueue);
+			Kill(ID, executeQueue);
+		}
+
+		void Kill(long ID, Queue<Process> processes)
+		{
+			for (int i = processes.Count; i > 0; i--)
+			{
+				var process=processes.Dequeue();
+
+				if (!process.terminated)
+				{
+					processes.Enqueue(process);
+				}
+			}
+		}
+
+		void PreProcessQueues()
+		{
+			// Add non-sleeping and processes from
+			// waitQueue to executeQueue
 			for (int i = waitQueue.Count; i > 0; i--)
 			{
 				var process=waitQueue.Dequeue();
+
 				if (process.executable.IsSleeping)
 				{
 					waitQueue.Enqueue(process);
@@ -63,7 +88,9 @@ namespace MunOS.Executors
 				switch (status)
 				{
 				case ExecStatus.FINISHED:
-					// if finished, don't put the process back on a queue.
+					// if finished, don't put the process back on a queue. Remove
+					// it from the process dictionary
+					ExecutionManager.Instance.Remove(process.ID);
 					break;
 				case ExecStatus.INTERRUPTED:
 					// if it was interrupted, put it at the back of the queue. it may get more time to execute
@@ -81,7 +108,9 @@ namespace MunOS.Executors
 			}
 			catch (Exception e)
 			{
+				ExecutionManager.Instance.Remove(process.ID);
 				// If there was an exception don't add the process back into the queue.
+				// Remove it from the process dictionary
 				// If they want to handle exceptions gracefully, they can surround their
 				// code in a try-catch.
 				process.executable.HandleException(process.name, process.ID, e);
@@ -93,7 +122,8 @@ namespace MunOS.Executors
 			stopwatch.Reset();
 			stopwatch.Start();
 
-			AddNonSleepingToExecuteQueue();
+			// This puts non-sleeping processes from waitQueue into executeQueue
+			PreProcessQueues();
 
 			long remainingTicks = tickLimit;
 			while (remainingTicks > 0 && executeQueue.Count > 0)

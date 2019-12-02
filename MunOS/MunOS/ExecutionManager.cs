@@ -19,7 +19,54 @@ namespace MunOS
 		static public int MaxOneShotSkips = 1;
 		public static readonly double TicksPerMicro=Stopwatch.Frequency/(1000.0 * 1000.0);
 
+		Dictionary<long,ProcessEntry> processDictionary = new Dictionary<long, ProcessEntry>();
 		Dictionary<Priority, PriorityExecutor> priorities = new Dictionary<Priority, PriorityExecutor>();
+
+		internal struct ProcessEntry
+		{
+			public Priority priority;
+			public Process process;
+
+			public ProcessEntry(Priority priority, Process process)
+			{
+				this.priority=priority;
+				this.process=process;
+			}
+		}
+		/// <summary>
+		/// Kill the process with the specified ID. mark it as terminated, don't hunt it down and remove it from
+		/// the queues, just mark it and it will not be executed.
+		/// </summary>
+		/// <param name="ID">Identifier.</param>
+		public void Kill(long ID)
+		{
+			if (processDictionary.ContainsKey(ID))
+			{
+				var processEntry=processDictionary[ID];
+				var process=processEntry.process;
+				process.executable.OnTerminated(process.name, process.ID);
+				var priority=processEntry.priority;
+				priorities[priority].Kill(ID);
+			}
+		}
+
+		internal void Remove(long ID)
+		{
+			processDictionary.Remove(ID);
+		}
+
+		public int Count
+		{
+			get
+			{
+				int count=0;
+				foreach (var executor in priorities.Values)
+				{
+					count+=executor.Count;
+				}
+				return count;
+			}
+		}
 
 		public ExecutionManager()
 		{
@@ -49,13 +96,13 @@ namespace MunOS
 		static public double RealtimeFractionalLimit = 0.5;
 		static public double OneShotFractionalLimit = 0.4;
 		static public double IdleFractionalLimit = 0.6;
-		static public long OneshotForceTicks = 1;
-		static public long IdleForceTicks = 1;
+		static public long OneshotForceTicks = 100;
+		static public long IdleForceTicks = 100;
 
-		public void Reset()
-		{
-			processes.Clear();
-		}
+		//public void Reset()
+		//{
+		//	processes.Clear();
+		//}
 
 		/// <summary>
 		/// Registers the executable.
@@ -67,6 +114,7 @@ namespace MunOS
 		public long RegisterExecutable(Priority priority, IExecutable executable, string name="")
 		{
 			var process=new Process(name, executable);
+			processDictionary[process.ID]=new ProcessEntry(priority,process);
 			priorities[priority].waitQueue.Enqueue(process);
 			return process.ID;
 		}
@@ -74,35 +122,26 @@ namespace MunOS
 		Stopwatch stopwatch = new Stopwatch();
 		public void Execute(long tickLimit)
 		{
-			long remainingTicks = 0;
-
-			remainingTicks = tickLimit;
-			var realtimeTicks = remainingTicks - (long)(tickLimit * RealtimeFractionalLimit);
 			stopwatch.Reset();
 			stopwatch.Start();
+
+			long realtimeTicks = tickLimit - (long)(tickLimit * RealtimeFractionalLimit);
 			priorities[Priority.REALTIME].Execute(realtimeTicks);
-			stopwatch.Stop();
 
-			remainingTicks = remainingTicks - stopwatch.ElapsedTicks;
-			var oneshotTicks = remainingTicks - (long)(tickLimit * OneShotFractionalLimit);
-			stopwatch.Reset();
-			stopwatch.Start();
+			long remainingTicks = tickLimit - stopwatch.ElapsedTicks;
+			long oneshotTicks = remainingTicks - (long)(tickLimit * OneShotFractionalLimit);
 			// if oneshotTicks is < 0 we still call Execute on it because execution of 
 			// oneshots is occasionally forced even when no time is available
 			priorities[Priority.ONESHOT].Execute(oneshotTicks);
-			stopwatch.Stop();
 
-			remainingTicks = remainingTicks - stopwatch.ElapsedTicks;
-			var idleTicks = remainingTicks - (long)(tickLimit * IdleFractionalLimit);
-			stopwatch.Reset();
-			stopwatch.Start();
+			remainingTicks = tickLimit - stopwatch.ElapsedTicks;
+			long idleTicks = remainingTicks - (long)(tickLimit * IdleFractionalLimit);
 			// if idleTicks is < 0 we still call Execute on it because execution of 
 			// oneshots is occasionally forced even when no time is available
 			priorities[Priority.IDLE].Execute(idleTicks);
 			stopwatch.Stop();
 
-			remainingTicks = remainingTicks - stopwatch.ElapsedTicks;
-			var normalTicks = remainingTicks;
+			long normalTicks = tickLimit - stopwatch.ElapsedTicks;
 			stopwatch.Reset();
 			stopwatch.Start();
 			priorities[Priority.MAIN].Execute(normalTicks);
@@ -111,12 +150,12 @@ namespace MunOS
 
 
 		public double UpdateMicros = 2000;
-		List<ROProcess> processes = new List<ROProcess>();
+		////List<ROProcess> processes = new List<ROProcess>();
 
-		public void RegisterProcess(ROProcess process)
-		{
-			processes.Add(process);
-		}
+		//public void RegisterProcess(ROProcess process)
+		//{
+		//	processes.Add(process);
+		//}
 
 		public void FixedUpdate()
 		{
