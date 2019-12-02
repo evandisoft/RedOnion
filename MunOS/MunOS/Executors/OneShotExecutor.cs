@@ -18,19 +18,8 @@
 					else
 					{
 						numSkips = 0;
-						for (int i = executeList.Count; i >= 0; i--)
-						{
-							if (executeList[i].IsSleeping())
-							{
-								executeList.RemoveAt(i);
-							}
-							else
-							{
-								executeList[i].Execute(ExecutionManager.OneShotForceExecuteTime);
-								executeList.RemoveAt(i);
-								break;
-							}
-						}
+						executeList[0].Execute(ExecutionManager.OneShotForceExecuteTime);
+						executeList.RemoveAt(0);
 					}
 				}
 			}

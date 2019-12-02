@@ -4,75 +4,95 @@ using System.Diagnostics;
 
 namespace MunOS.Executors
 {
+
+	public enum ExecStatus
+	{
+		YIELDED,
+		INTERRUPTED,
+		TERMINATED,
+	}
 	/// <summary>
 	/// Holds all executables of a given priority and can execute them
 	/// with the given time limit.
 	/// </summary>
 	public abstract class PriorityExecutor
 	{
+
 		/// <summary>
-		/// New executables to be added on next execute
+		/// Holds processes waiting to be executed.
 		/// </summary>
-		protected List<IExecutable> newExecutables = new List<IExecutable>();
+		public Queue<Process> waitQueue=new Queue<Process>();
 		/// <summary>
-		/// The total list of executables.
+		/// Holds processes being executed. Some processes may remain here
+		/// after an update, indicating that they did voluntarily yield.
 		/// </summary>
-		public List<IExecutable> executables = new List<IExecutable>();
-		/// <summary>
-		/// The list of executables currently executing, or ones that did not
-		/// finish last time.
-		/// </summary>
-		protected List<IExecutable> executeList = new List<IExecutable>();
+		public Queue<Process> executeQueue=new Queue<Process>();
 
 		Stopwatch stopwatch = new Stopwatch();
 
-		public void RegisterExecutable(IExecutable executable)
+		void AddNonSleepingToExecuteQueue()
 		{
-			newExecutables.Add(executable);
+			for (int i = waitQueue.Count; i-- > 0;)
+			{
+				var process=waitQueue.Dequeue();
+				if (process.executable.IsSleeping)
+				{
+					waitQueue.Enqueue(process);
+				}
+				else
+				{
+					executeQueue.Enqueue(process);
+				}
+			}
 		}
 
-		public virtual void Execute(double timeLimitMicros)
+		ExecStatus TryExecute(Process process,long ticks)
+		{
+			try
+			{
+				long start=stopwatch.ElapsedTicks;
+				var status=process.executable.Execute(ticks);
+				long end=stopwatch.ElapsedTicks;
+				return status;
+			}
+			catch (Exception e)
+			{
+				process.executable.HandleException(e);
+				// if there was an exception, don't add the process back into the queue.
+				// If they want to gracefully recover from an error they must catch any errors
+				// in their Execute function.
+				return ExecStatus.TERMINATED;
+			}
+		}
+
+		public virtual void Execute(long overallTickLimit)
 		{
 			stopwatch.Reset();
 			stopwatch.Start();
-			executables.AddRange(newExecutables);
-			newExecutables.Clear();
-			foreach (var e in executables)
+
+			AddNonSleepingToExecuteQueue();
+
+			long remainingTicks = overallTickLimit;
+			while (remainingTicks > 0 && executeQueue.Count > 0)
 			{
-				if (!executeList.Contains(e))
-				{
-					executeList.Add(e);
-				}
-			}
+				long perExecuteTickLimit = remainingTicks / executeQueue.Count;
 
-			double remainingTime = timeLimitMicros;
-			while (remainingTime > 0 && executeList.Count > 0)
-			{
-				for (int i = executeList.Count - 1; i >= 0; i--)
+				for (int i = executeQueue.Count; i-- > 0 && remainingTicks > 0;)
 				{
-					if (executeList[i].IsSleeping())
-					{
-						executeList.RemoveAt(i);
+					var process = executeQueue.Dequeue();
 
-					}
-				}
-				if (executeList.Count == 0)
-				{
-					break;
-				}
-				double executeTime = remainingTime / executeList.Count;
+					var status = TryExecute(process,perExecuteTickLimit);
 
-				for (int i = executeList.Count - 1; i >= 0; i--)
-				{
-					if (executeList[i].Execute(executeTime))
+					if (status == ExecStatus.YIELDED)
 					{
-						executeList.RemoveAt(i);
+						waitQueue.Enqueue(process);
 					}
-					remainingTime = timeLimitMicros - stopwatch.ElapsedTicks*ExecutionManager.MicrosPerTick;
-					if (remainingTime < 0)
+					else if (status == ExecStatus.INTERRUPTED)
 					{
-						break;
+						executeQueue.Enqueue(process);
 					}
+
+					remainingTicks = overallTickLimit - stopwatch.ElapsedTicks;
 				}
 			}
 

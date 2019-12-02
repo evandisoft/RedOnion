@@ -46,6 +46,7 @@
     <Compile Include="MunOS\Repl\ReplHistory.cs" />
     <Compile Include="MunOS\Repl\ReplProcess.cs" />
     <Compile Include="MunOS\IExecutable.cs" />
+    <Compile Include="MunOS\Process.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MunOS\" />
