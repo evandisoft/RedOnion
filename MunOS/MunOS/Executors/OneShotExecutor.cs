@@ -4,12 +4,12 @@
 	{
 		int numSkips = 0;
 
-		public override void Execute(double timeLimitMicros)
+		public override void Execute(long tickLimit)
 		{
-			base.Execute(timeLimitMicros);
-			if (timeLimitMicros < 0)
+			base.Execute(tickLimit);
+			if (tickLimit < 0)
 			{
-				if (executeList.Count > 0)
+				if (executeQueue.Count > 0)
 				{
 					if (numSkips < ExecutionManager.MaxOneShotSkips)
 					{
@@ -18,8 +18,7 @@
 					else
 					{
 						numSkips = 0;
-						executeList[0].Execute(ExecutionManager.OneShotForceExecuteTime);
-						executeList.RemoveAt(0);
+						ExecuteProcess(executeQueue.Dequeue(), ExecutionManager.OneshotForceTicks);
 					}
 				}
 			}

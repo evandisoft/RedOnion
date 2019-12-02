@@ -17,9 +17,7 @@ namespace MunOS
 
 		static public int MaxIdleSkips = 9;
 		static public int MaxOneShotSkips = 1;
-		long frequency=Stopwatch.Frequency;
-		long nanosecPerTick = (1000L*1000L*1000L) / Stopwatch.Frequency;
-		public static readonly double MicrosPerTick = (1000.0*1000.0) / Stopwatch.Frequency;
+		public static readonly double TicksPerMicro=Stopwatch.Frequency/(1000.0 * 1000.0);
 
 		Dictionary<Priority, PriorityExecutor> priorities = new Dictionary<Priority, PriorityExecutor>();
 
@@ -51,55 +49,68 @@ namespace MunOS
 		static public double RealtimeFractionalLimit = 0.5;
 		static public double OneShotFractionalLimit = 0.4;
 		static public double IdleFractionalLimit = 0.6;
-		static public double OneShotForceExecuteTime = 1;
-		static public double IdleForceExecuteTime = 1;
+		static public long OneshotForceTicks = 1;
+		static public long IdleForceTicks = 1;
 
 		public void Reset()
 		{
 			processes.Clear();
 		}
 
-		public void RegisterExecutable(Priority priority, IExecutable executable)
+		/// <summary>
+		/// Registers the executable.
+		/// </summary>
+		/// <returns>The ID of the process.</returns>
+		/// <param name="priority">The priority you want the execution to run on.</param>
+		/// <param name="executable">The object that we will call Execute on.</param>
+		/// <param name="name">The optional name of this process, to appear in process managers.</param>
+		public long RegisterExecutable(Priority priority, IExecutable executable, string name="")
 		{
-			priorities[priority].RegisterExecutable(executable);
+			var process=new Process(name, executable);
+			priorities[priority].waitQueue.Enqueue(process);
+			return process.ID;
 		}
 
 		Stopwatch stopwatch = new Stopwatch();
-		public void Execute(double timeLimitMicros=2000)
+		public void Execute(long tickLimit)
 		{
-			double remainingTime = 0;
+			long remainingTicks = 0;
 
-			remainingTime = timeLimitMicros;
-			var realtimeRuntime = remainingTime - timeLimitMicros * RealtimeFractionalLimit;
+			remainingTicks = tickLimit;
+			var realtimeTicks = remainingTicks - (long)(tickLimit * RealtimeFractionalLimit);
 			stopwatch.Reset();
 			stopwatch.Start();
-			priorities[Priority.REALTIME].Execute(realtimeRuntime);
+			priorities[Priority.REALTIME].Execute(realtimeTicks);
 			stopwatch.Stop();
 
-			remainingTime = remainingTime - stopwatch.ElapsedTicks*MicrosPerTick;
-			var oneshotRuntime = remainingTime - timeLimitMicros * OneShotFractionalLimit;
+			remainingTicks = remainingTicks - stopwatch.ElapsedTicks;
+			var oneshotTicks = remainingTicks - (long)(tickLimit * OneShotFractionalLimit);
 			stopwatch.Reset();
 			stopwatch.Start();
-			priorities[Priority.ONESHOT].Execute(oneshotRuntime);
+			// if oneshotTicks is < 0 we still call Execute on it because execution of 
+			// oneshots is occasionally forced even when no time is available
+			priorities[Priority.ONESHOT].Execute(oneshotTicks);
 			stopwatch.Stop();
 
-			remainingTime = remainingTime - stopwatch.ElapsedTicks*MicrosPerTick;
-			var idleRuntime = remainingTime - timeLimitMicros * IdleFractionalLimit;
+			remainingTicks = remainingTicks - stopwatch.ElapsedTicks;
+			var idleTicks = remainingTicks - (long)(tickLimit * IdleFractionalLimit);
 			stopwatch.Reset();
 			stopwatch.Start();
-			priorities[Priority.IDLE].Execute(idleRuntime);
+			// if idleTicks is < 0 we still call Execute on it because execution of 
+			// oneshots is occasionally forced even when no time is available
+			priorities[Priority.IDLE].Execute(idleTicks);
 			stopwatch.Stop();
 
-			remainingTime = remainingTime - stopwatch.ElapsedTicks*MicrosPerTick;
-			var normalRuntime = remainingTime;
+			remainingTicks = remainingTicks - stopwatch.ElapsedTicks;
+			var normalTicks = remainingTicks;
 			stopwatch.Reset();
 			stopwatch.Start();
-			priorities[Priority.MAIN].Execute(normalRuntime);
+			priorities[Priority.MAIN].Execute(normalTicks);
 			stopwatch.Stop();
 		}
 
 
-		public float UpdateMicros = 2000;
+		public double UpdateMicros = 2000;
 		List<ROProcess> processes = new List<ROProcess>();
 
 		public void RegisterProcess(ROProcess process)
@@ -109,7 +120,7 @@ namespace MunOS
 
 		public void FixedUpdate()
 		{
-			Execute(UpdateMicros);
+			Execute((long)(UpdateMicros*TicksPerMicro));
 		}
 	}
 }

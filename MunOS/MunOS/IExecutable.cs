@@ -9,30 +9,25 @@ namespace MunOS
 	public interface IExecutable
 	{
 		/// <summary>
-		/// Execute for the specified timeLimitMicros.
+		/// Execute for the specified tickLimit.
 		/// </summary>
-		/// <returns>Whether this executable voluntarily yielded. If it did not voluntarily yield we may be able to give it
-		/// more time later if the other processes finished early.</returns>
-		/// <param name="tickLimit">Time limit micros.</param>
+		/// <returns>The <see cref="ExecStatus"/> </returns>
+		/// <param name="tickLimit">Limit on number of ticks this should execute for.</param>
 		ExecStatus Execute(long tickLimit);
 		/// <returns><c>true</c>, if executable is sleeping, <c>false</c> otherwise.</returns>
 		bool IsSleeping { get; }
 
 		/// <summary>
-		/// If MunOS encounters an exception while running Execute, this handler will be called and the process
-		/// will be removed.
+		/// If MunOS encounters an exception while running this executable's Execute, 
+		/// this handler will be called and the process
+		/// associated with this executable will be removed.
 		/// </summary>
 		/// <param name="e">E.</param>
-		void HandleException(Exception e);
+		void HandleException(string name, long id, Exception e);
 
 		/// <summary>
-		/// Will be called when a process was terminated.
+		/// Will be called when this executable's process is terminated by the OS
 		/// </summary>
-		void OnTerminated();
-
-		/// <summary>
-		/// Will be called when a process is finished.
-		/// </summary>
-		void OnFinished();
+		void OnTerminated(string name,long id);
 	}
 }

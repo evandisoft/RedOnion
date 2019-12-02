@@ -2,9 +2,9 @@
 {
 	public class NormalExecutor : PriorityExecutor
 	{
-		public override void Execute(double timeLimitMicros)
+		public override void Execute(long tickLimit)
 		{
-			base.Execute(timeLimitMicros);
+			base.Execute(tickLimit);
 		}
 	}
 }

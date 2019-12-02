@@ -5,11 +5,9 @@ namespace MunOS.Executors
 {
 	public class RealtimeExecutor : PriorityExecutor
 	{
-		Stopwatch stopwatch = new Stopwatch();
-
-		public override void Execute(double timeLimitMicros)
+		public override void Execute(long tickLimit)
 		{
-			base.Execute(timeLimitMicros);
+			base.Execute(tickLimit);
 		}
 	}
 }
