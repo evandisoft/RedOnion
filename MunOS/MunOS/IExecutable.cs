@@ -24,5 +24,15 @@ namespace MunOS
 		/// </summary>
 		/// <param name="e">E.</param>
 		void HandleException(Exception e);
+
+		/// <summary>
+		/// Will be called when a process was terminated.
+		/// </summary>
+		void OnTerminated();
+
+		/// <summary>
+		/// Will be called when a process is finished.
+		/// </summary>
+		void OnFinished();
 	}
 }

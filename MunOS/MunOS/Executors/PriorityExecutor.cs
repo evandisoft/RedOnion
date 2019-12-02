@@ -10,6 +10,7 @@ namespace MunOS.Executors
 		YIELDED,
 		INTERRUPTED,
 		TERMINATED,
+		FINISHED,
 	}
 	/// <summary>
 	/// Holds all executables of a given priority and can execute them
@@ -83,13 +84,22 @@ namespace MunOS.Executors
 
 					var status = TryExecute(process,perExecuteTickLimit);
 
-					if (status == ExecStatus.YIELDED)
+					switch (status)
 					{
-						waitQueue.Enqueue(process);
-					}
-					else if (status == ExecStatus.INTERRUPTED)
-					{
+					case ExecStatus.FINISHED:
+						process.executable.OnFinished();
+						break;
+					case ExecStatus.TERMINATED:
+						process.executable.OnTerminated();
+						break;
+					case ExecStatus.INTERRUPTED:
 						executeQueue.Enqueue(process);
+						break;
+					case ExecStatus.YIELDED:
+						waitQueue.Enqueue(process);
+						break;
+					default:
+						throw new NotSupportedException("ExecStatus "+status+" not supported.");
 					}
 
 					remainingTicks = overallTickLimit - stopwatch.ElapsedTicks;
