@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace RedOnion.ROS
 {
 	public enum TypeFlags : ushort
@@ -68,6 +70,26 @@ namespace RedOnion.ROS
 		Model			= 0xD0, // object model (classes, methods, fields, properties, attributes)
 		Reserved		= 0xE0, // unused kind
 		Meta			= 0xF0, // comments and other metadata that can be ignored during execution
+	}
+
+	public enum BlockCode : byte
+	{
+		Exception	= OpCode.Exception,	// 08 the catch block (needs to clear the active error unless re-throw)
+		Block		= OpCode.Block,     // 80
+		Finally     = OpCode.Raise,		// 83 the finally part of try..catch..finally when there is pending exception (simple block otherwise)
+
+		// these need to be together and equal to OpCode - see IsLoop() and ToOpCode() extensions
+		For         = OpCode.For,       // 86
+		ForEach		= OpCode.ForEach,   // 87
+		While		= OpCode.While,		// 88
+		DoWhile		= OpCode.DoWhile,	// 89
+		Until		= OpCode.Until,		// 8A
+		DoUntil		= OpCode.DoUntil,   // 8B
+
+		TryCatch    = OpCode.Catch,		// 97 the try part of try..catch..finally
+
+		Library     = OpCode.Import,    // D0 see Core.CallScript(..., include: true)
+		Function    = OpCode.Function,	// DB root block of function call (where arguments live)
 	}
 
 	public enum OpCode : byte
@@ -204,7 +226,7 @@ namespace RedOnion.ROS
 		For				= 0x86, // for init; test; iter: stts
 		ForEach			= 0x87, // for var in list: stts
 		While			= 0x88, // while cond do stts
-		Do				= 0x89, // do stts; while cond
+		DoWhile			= 0x89, // do stts; while cond
 		Until			= 0x8A, // until cond do stts  
 		DoUntil			= 0x8B, // do stts; until cond
 		If				= 0x8C, // if cond then truestts
@@ -404,7 +426,7 @@ namespace RedOnion.ROS
 		For				= 0x0086, // for init; test; iter: stts
 		ForEach			= 0x0087, // for var in list: stts
 		While			= 0x0088, // while cond do stts
-		Do				= 0x0089, // do stts; while cond
+		DoWhile			= 0x0089, // do stts; while cond
 		Until			= 0x008A, // until cond do stts  
 		DoUntil			= 0x008B, // do stts; until cond
 		If				= 0x008C, // if cond then truestts
@@ -573,6 +595,14 @@ namespace RedOnion.ROS
 			default:
 				return 0;
 			}
+		}
+
+		public static bool IsLoop(this BlockCode self)
+			=> self >= BlockCode.For && self <= BlockCode.DoUntil;
+		public static BlockCode ToBlockCode(this OpCode self)
+		{
+			Debug.Assert(self >= OpCode.For && self <= OpCode.DoUntil);
+			return (BlockCode)self;
 		}
 
 		private static readonly byte[] _info = new byte[] {

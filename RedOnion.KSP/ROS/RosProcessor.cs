@@ -30,10 +30,8 @@ namespace RedOnion.KSP.ROS
 			}
 		}
 
-		public RosProcessor()
-			=> Globals = new RosGlobals();
-		protected RosProcessor(RedOnion.ROS.Objects.Globals globals)
-			=> Globals = globals;
+		protected override RedOnion.ROS.Objects.Globals GetGlobals()
+			=> new RosGlobals();
 		public override void Terminate()
 		{
 			if (_process != null)
