@@ -47,7 +47,7 @@ namespace Kerbalui.Decorators
 		GUIStyle verticalStyle;
 
 
-		public float ScrollbarWidth=>20*KerbaluiSettings.UI_SCALE;
+		public float ScrollbarWidth=>Math.Max(15,15*KerbaluiSettings.UI_SCALE);
 
 		public virtual void ResetScroll()
 		{
