@@ -15,7 +15,7 @@ namespace RedOnion.KSP.MoonSharp.MoonSharpAPI
 	public static class MoonSharpGlobals
 	{
 		// this will be overriden in KerbaluaScript.cs
-		[Unsafe, Description(
+		[Description(
 		"Create new objects given a static. A static is a special MunSharp value that represents a CLR Class." +
 		"You can access static members from them, including the __new member, which represents the CLR Class' constructor." +
 		"We provide references to many of these. For example, ui.Window, or any CLR Class received via the " +
