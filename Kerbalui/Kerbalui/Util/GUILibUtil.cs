@@ -43,6 +43,43 @@ namespace Kerbalui.Util
 			return relativeMousePos;
 		}
 
+
+
+		public struct FontEntry
+		{
+			public string name;
+			public int size;
+
+			public FontEntry(string name, int size)
+			{
+				this.name=name;
+				this.size=size;
+			}
+		}
+		// I'm assuming that Font.CreateDynamicFontFromOSFont is an expensive operation, so I'm gonna cache the created fonts
+		static public Dictionary<FontEntry,Font> FontCache=new Dictionary<FontEntry, Font>();
+		/// <summary>
+		/// Gets the font. Uses a FontCache as Font.CreateDynamicFontFromOSFont may be an expensive operation.
+		/// </summary>
+		/// <returns>The font.</returns>
+		/// <param name="fontname">Font name.</param>
+		/// <param name="size">Size.</param>
+		static public Font GetFont(string fontname,int size)
+		{
+			var fontEntry=new FontEntry(fontname,size);
+			Font font=null;
+			if (FontCache.ContainsKey(fontEntry))
+			{
+				font=FontCache[fontEntry];
+			}
+			else
+			{
+				font=Font.CreateDynamicFontFromOSFont(fontname, size);
+				FontCache[fontEntry]=font;
+			}
+			return font;
+		}
+
 		static public string[] windowsMonotypeFonts={"Courier New", "Consolas" };
 		static public string[] linuxMonotypeFonts={"Ubuntu Mono", "Noto Mono", "FreeMono", "DejaVu Sans Mono"};
 		static Font monoSpaceFont = null;
