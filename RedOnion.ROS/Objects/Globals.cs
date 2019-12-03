@@ -19,6 +19,10 @@ namespace RedOnion.ROS.Objects
 		public Print Print { get; protected set; }
 		public Run Run { get; protected set; }
 
+		/// <summary>
+		/// Called from Processor.SetGlobals and Processor.Reset
+		/// (the second calls Globals.Reset first).
+		/// </summary>
 		public virtual void Fill()
 		{
 			if (readOnlyTop > 0)
@@ -69,6 +73,9 @@ namespace RedOnion.ROS.Objects
 			System.Lock();
 			Lock();
 		}
+		/// <summary>
+		/// Called from Processor.Reset before calling Fill.
+		/// </summary>
 		public override void Reset()
 		{
 			base.Reset();

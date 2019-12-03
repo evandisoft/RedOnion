@@ -95,5 +95,21 @@ namespace RedOnion.ROS.Tests
 				prev = op;
 			}
 		}
+
+		[Test]
+		public void ROS_OpCode05_BlockCodes()
+		{
+			Assert.IsFalse(BlockCode.Block.IsLoop());
+
+			Assert.IsTrue(BlockCode.For.IsLoop());
+			Assert.IsTrue(BlockCode.ForEach.IsLoop());
+			Assert.IsTrue(BlockCode.While.IsLoop());
+			Assert.IsTrue(BlockCode.DoWhile.IsLoop());
+			Assert.IsTrue(BlockCode.Until.IsLoop());
+			Assert.IsTrue(BlockCode.DoUntil.IsLoop());
+
+			Assert.IsFalse(BlockCode.Library.IsLoop());
+			Assert.IsFalse(BlockCode.Function.IsLoop());
+		}
 	}
 }

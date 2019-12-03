@@ -34,8 +34,6 @@ namespace Kerbalui.Types
 		//bool secondRunPassed=false;
 		protected override void TypeSpecificUpdate()
 		{
-
-
 			rect=GUI.Window(windowID, rect, PointlessFunc, titleContent, windowStyle);
 		}
 

@@ -22,13 +22,21 @@ namespace RedOnion.KSP.MoonSharp.MoonSharpAPI
 			return null;
 		}
 
-		//This will be overriden in KerbaluaScript.cs
+		//This will be overridden in KerbaluaScript.cs
 		[Description("Causes the script to wait, for the given number of seconds. "
 		+"This is not a precise timing mechanism. Sleeping for 0 seconds will cause the script "
 			+"to wait until the next unity FixedUpdate")]
 		public static void sleep(double seconds)
 		{
 
+		}
+
+		//This will be overridden in KerbaluaScript.cs
+		[Description("Executes the file with the given filename. The base directory is" +
+			" KSPDir/GameData/RedOnion/Scripts.")]
+		public static DynValue dofile(string filename)
+		{
+			return null;
 		}
 
 		[Unsafe,Description("Unsafe, Kerbalua specific reflection stuff.")]

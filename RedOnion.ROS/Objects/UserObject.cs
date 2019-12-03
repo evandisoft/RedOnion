@@ -148,11 +148,10 @@ namespace RedOnion.ROS.Objects
 			set
 			{
 				int at = Find(name);
-				if (at < readOnlyTop)
-					return;
-				if (at >= prop.size)
+				if (at < 0)
 					Add(name, ref value);
-				else prop.items[at].value = value;
+				else if (at >= readOnlyTop)
+					prop.items[at].value = value;
 			}
 		}
 		public override int Find(object self, string name, bool add)

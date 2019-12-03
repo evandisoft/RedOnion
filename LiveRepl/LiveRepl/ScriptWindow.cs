@@ -69,19 +69,18 @@ namespace LiveRepl
 		{
 			SetOrReleaseInputLock();
 
+			if (ScriptRunning && inputIsLocked) HandleInputWhenExecuting();
+			GUILibUtil.ConsumeMarkedCharEvent(Event.current);
 			if (inputIsLocked)
 			{
-				GUILibUtil.ConsumeMarkedCharEvent(Event.current);
-
-				if (ScriptRunning) HandleInputWhenExecuting();
-
 				GlobalKeyBindings.ExecuteAndConsumeIfMatched(Event.current);
-				if (completionManager.Update(hadMouseDownLastUpdate))
-				{
-					uiparts.completionArea.needsResize=true;
-				}
-				hadMouseDownLastUpdate=Event.current.type==EventType.MouseDown;
 			}
+
+			if (completionManager.Update(hadMouseDownLastUpdate))
+			{
+				uiparts.completionArea.needsResize=true;
+			}
+			hadMouseDownLastUpdate=Event.current.type==EventType.MouseDown && inputIsLocked;
 
 			base.WindowsUpdate();
 

@@ -305,7 +305,7 @@ namespace RedOnion.ROS.Parsing
 			{ "foreach",    ExCode.ForEach },
 			{ "in",         ExCode.In },
 			{ "while",      ExCode.While },
-			{ "do",         ExCode.Do },
+			{ "do",         ExCode.DoWhile },
 			{ "until",      ExCode.Until },
 			{ "if",         ExCode.If },
 			{ "unless",     ExCode.Unless },

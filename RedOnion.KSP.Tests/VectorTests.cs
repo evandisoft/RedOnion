@@ -8,11 +8,10 @@ namespace RedOnion.KSP.Tests
 {
 	public class ApiTestsBase : RosProcessor
 	{
-		public ApiTestsBase() : base(null)
+		public ApiTestsBase()
 		{
 			Descriptor.Create = CustomCreateDescriptor;
 			Value.LogListener = LogListener;
-			Globals = new RosGlobals();
 		}
 		public static void LogListener(string msg)
 			=> System.Diagnostics.Debug.WriteLine(msg);
