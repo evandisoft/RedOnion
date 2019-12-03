@@ -13,6 +13,8 @@ using Process = RedOnion.KSP.OS.Process;
 using MoonSharp.Interpreter.Compatibility;
 using RedOnion.UI;
 using Kerbalua.Events;
+using System.IO;
+using RedOnion.KSP.Settings;
 
 namespace Kerbalua.Scripting
 {
@@ -98,12 +100,20 @@ return function(stat,...)
 end
 			");
 
+			//commonAPI["dofile"]=new Func<string, DynValue>(dofile);
 
 			//commonAPI["new"]=new newdel(@new);
-			
+
 			commonAPI["sleep"] = new Action<double>(sleep);
 			//commonAPI["setexeclimit"] = new Action<double>(setexeclimit);
+
 		}
+
+
+		//DynValue dofile(string filename)
+		//{
+		//	return DoFile(Path.Combine(ProjectSettings.BaseScriptsDir, filename));
+		//}
 
 		//delegate object newdel(object obj, params DynValue[] args);
 		//object @new(object typeStaticOrObject, params DynValue[] args)

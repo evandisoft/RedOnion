@@ -13,11 +13,27 @@ our own scripts are packed inside GameData/RedOnion/Scripts.zip.
 You can override our scripts simply by opening them in REPL
 and saving the modified version (which will become a file outside of the zip).
 
+## Autorun
+Both languages can make use of [Autorun](RedOnion.KSP/API/Autorun.md) to automatically load a list of scripts every time the engine gets reset. Which happens when you click the `Reset Engine` button, and whenever you switch to a different game scene.
+
+You can use a features of the [API](RedOnion.KSP/API/Globals.md), `app.current` to get the name of the current scene.
+
+This will allow you to make your autorun scripts do different things depending on which scene you are in.
+
+## Intellisense
+Both languages provide intellisense. It is very useful and fun to use.
+
+However, since both languages are dynamic, it's not possible to always guess correctly what type of return value there is from a function because we cannot know from looking at the source which overload will be used, as that requires knowledge of the types, but we won't have them until we actually execute the code.
+
+Furthermore, the intellisense does not even handle every case that it could handle. Kerbalua intellisense at least, doesn't even try to narrow down the possibilities in the case of overloads based on number of arguments to the function. This may change in the future.
+
+Usually overloaded functions return the same object, but they are technically not required to, so you may get situations where the intellisense will not give you the right answer.
+
 ## Limitations
-- Calls to long running CLR code is not interruptible.
+- Calls to long running CLR code are not interruptible.
 - You cannot safely pass a function to something like
 `List.Foreach(fn)` because we cannot interrupt the `Foreach` call. So the entire iteration would have to occur in one KSP FixedUpdate and it would pause the game to complete. Our scripting languages have functionality for iterating over CLR collections which is interruptible, so you will have to use that instead. There's a convenient way to iterate over dotnet collections in both [Kerbalua](Kerbalua/BasicParts.md) and [ROS](RedOnion.ROS/README.md#statements)
-- The CLR objects in the [KSP API](https://kerbalspaceprogram.com/api/annotated.html) that you might access using `ksp.` or `native.`, may be poorly documented. Modders had to expend a lot of effort to figure out how they work and how to avoid problems.
+- The CLR objects in the [KSP API](https://kerbalspaceprogram.com/api/annotated.html) that you might access using `ksp.` or `native.`, may be poorly documented. For some api features, modders had to expend a lot of effort to figure out how they work and how to avoid problems.
 
 ## Scripting Links
 

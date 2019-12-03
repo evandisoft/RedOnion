@@ -50,6 +50,7 @@ namespace LiveRepl.Execution
 			scriptEngine.Options.ScriptLoader = new FileSystemScriptLoader();
 			var slb=scriptEngine.Options.ScriptLoader as ScriptLoaderBase;
 			slb.IgnoreLuaPathGlobal = true;
+			
 			slb.ModulePaths = new string[] { SavedSettings.BaseScriptsPath+"/?.lua" };
 		 }
 
