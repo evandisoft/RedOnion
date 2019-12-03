@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using MunOS.Core;
+using MunOS.Core.Executors;
 
 namespace MunOS
 {
@@ -19,18 +20,18 @@ namespace MunOS
 		static public int MaxOneShotSkips = 1;
 		public static readonly double TicksPerMicro=Stopwatch.Frequency/(1000.0 * 1000.0);
 
-		Dictionary<long,ProcessEntry> processDictionary = new Dictionary<long, ProcessEntry>();
+		Dictionary<long,ExecInfoEntry> execInfoDictionary = new Dictionary<long, ExecInfoEntry>();
 		Dictionary<Priority, PriorityExecutor> priorities = new Dictionary<Priority, PriorityExecutor>();
 
-		internal struct ProcessEntry
+		internal struct ExecInfoEntry
 		{
 			public Priority priority;
-			public ExecInfo process;
+			public ExecInfo execInfo;
 
-			public ProcessEntry(Priority priority, ExecInfo process)
+			public ExecInfoEntry(Priority priority, ExecInfo process)
 			{
 				this.priority=priority;
-				this.process=process;
+				this.execInfo=process;
 			}
 		}
 		/// <summary>
@@ -40,12 +41,12 @@ namespace MunOS
 		/// <param name="ID">Identifier.</param>
 		public void Kill(long ID)
 		{
-			if (processDictionary.ContainsKey(ID))
+			if (execInfoDictionary.ContainsKey(ID))
 			{
-				var processEntry=processDictionary[ID];
-				var process=processEntry.process;
-				process.executable.OnTerminated(process.name, process.ID);
-				var priority=processEntry.priority;
+				var execInfoEntry=execInfoDictionary[ID];
+				var execInfo=execInfoEntry.execInfo;
+				execInfo.executable.OnTerminated(execInfo.name, execInfo.ID);
+				var priority=execInfoEntry.priority;
 				priorities[priority].Kill(ID);
 				Remove(ID);
 			}
@@ -53,7 +54,7 @@ namespace MunOS
 
 		internal void Remove(long ID)
 		{
-			processDictionary.Remove(ID);
+			execInfoDictionary.Remove(ID);
 		}
 
 		public int Count
@@ -124,10 +125,10 @@ namespace MunOS
 		/// <param name="name">The optional name of this process, to appear in process managers.</param>
 		public long RegisterExecutable(Priority priority, IExecutable executable, string name="")
 		{
-			var process=new ExecInfo(name, executable);
-			processDictionary[process.ID]=new ProcessEntry(priority,process);
-			priorities[priority].waitQueue.Enqueue(process);
-			return process.ID;
+			var execInfo=new ExecInfo(name, executable);
+			execInfoDictionary[execInfo.ID]=new ExecInfoEntry(priority,execInfo);
+			priorities[priority].waitQueue.Enqueue(execInfo);
+			return execInfo.ID;
 		}
 
 		Stopwatch stopwatch = new Stopwatch();

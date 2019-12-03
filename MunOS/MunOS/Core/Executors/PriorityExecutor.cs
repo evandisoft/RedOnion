@@ -44,42 +44,42 @@ namespace MunOS.Core.Executors
 			Kill(ID, executeQueue);
 		}
 
-		void Kill(long ID, Queue<ExecInfo> processes)
+		void Kill(long ID, Queue<ExecInfo> execInfos)
 		{
-			for (int i = processes.Count; i > 0; i--)
+			for (int i = execInfos.Count; i > 0; i--)
 			{
-				var process=processes.Dequeue();
+				var execInfo=execInfos.Dequeue();
 
-				if (!process.terminated)
+				if (execInfo.ID!=ID)
 				{
-					processes.Enqueue(process);
+					execInfos.Enqueue(execInfo);
 				}
 			}
 		}
 
-		void AddNonSleepingProcessesToExecuteQueue()
+		void AddNonSleepingExecutablesToExecuteQueue()
 		{
 			for (int i = waitQueue.Count; i > 0; i--)
 			{
-				var process=waitQueue.Dequeue();
+				var execInfo=waitQueue.Dequeue();
 
-				if (process.executable.IsSleeping)
+				if (execInfo.executable.IsSleeping)
 				{
-					waitQueue.Enqueue(process);
+					waitQueue.Enqueue(execInfo);
 				}
 				else
 				{
-					executeQueue.Enqueue(process);
+					executeQueue.Enqueue(execInfo);
 				}
 			}
 		}
 
-		protected void ExecuteProcess(ExecInfo process,long ticks)
+		protected void ExecuteExecutable(ExecInfo execInfo,long ticks)
 		{
 			try
 			{
 				long start=stopwatch.ElapsedTicks;
-				var status=process.executable.Execute(ticks);
+				var status=execInfo.executable.Execute(ticks);
 				long end=stopwatch.ElapsedTicks;
 				// EvanTODO: Can record stats with end-start
 
@@ -88,17 +88,17 @@ namespace MunOS.Core.Executors
 				case ExecStatus.FINISHED:
 					// if finished, don't put the process back on a queue. Remove
 					// it from the process dictionary
-					ExecutionManager.Instance.Remove(process.ID);
+					ExecutionManager.Instance.Remove(execInfo.ID);
 					break;
 				case ExecStatus.INTERRUPTED:
 					// if it was interrupted, put it at the back of the queue. it may get more time to execute
 					// this update if other processes finish or yield early.
-					executeQueue.Enqueue(process);
+					executeQueue.Enqueue(execInfo);
 					break;
 				case ExecStatus.YIELDED:
 					// if it yielded voluntarily, put it back in the waitQueue to wait for the next
 					// update
-					waitQueue.Enqueue(process);
+					waitQueue.Enqueue(execInfo);
 					break;
 				default:
 					throw new NotSupportedException("ExecStatus "+status+" not supported.");
@@ -106,12 +106,12 @@ namespace MunOS.Core.Executors
 			}
 			catch (Exception e)
 			{
-				ExecutionManager.Instance.Remove(process.ID);
+				ExecutionManager.Instance.Remove(execInfo.ID);
 				// If there was an exception don't add the process back into the queue.
 				// Remove it from the process dictionary
 				// If they want to handle exceptions gracefully, they can surround their
 				// code in a try-catch.
-				process.executable.HandleException(process.name, process.ID, e);
+				execInfo.executable.HandleException(execInfo.name, execInfo.ID, e);
 			}
 		}
 
@@ -120,7 +120,7 @@ namespace MunOS.Core.Executors
 			stopwatch.Reset();
 			stopwatch.Start();
 
-			AddNonSleepingProcessesToExecuteQueue();
+			AddNonSleepingExecutablesToExecuteQueue();
 
 			long remainingTicks = tickLimit;
 			while (remainingTicks > 0 && executeQueue.Count > 0)
@@ -129,7 +129,7 @@ namespace MunOS.Core.Executors
 
 				for (int i = executeQueue.Count; i > 0 && remainingTicks > 0; i--)
 				{
-					ExecuteProcess(executeQueue.Dequeue(),remainingTicks);
+					ExecuteExecutable(executeQueue.Dequeue(),remainingTicks);
 
 					remainingTicks = tickLimit - stopwatch.ElapsedTicks;
 				}
