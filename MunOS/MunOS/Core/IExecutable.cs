@@ -1,5 +1,6 @@
 using System;
-using MunOS.Executors;
+using MunOS.Core;
+using MunOS.Core.Executors;
 
 namespace MunOS
 {

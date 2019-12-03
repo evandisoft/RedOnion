@@ -32,14 +32,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="MunOS\ExecutionManager.cs" />
-    <Compile Include="MunOS\Executors\IdleExecutor.cs" />
-    <Compile Include="MunOS\Executors\NormalExecutor.cs" />
-    <Compile Include="MunOS\Executors\OneShotExecutor.cs" />
-    <Compile Include="MunOS\Executors\PriorityExecutor.cs" />
-    <Compile Include="MunOS\Executors\RealtimeExecutor.cs" />
-    <Compile Include="MunOS\IExecutable.cs" />
-    <Compile Include="MunOS\Process.cs" />
     <Compile Include="MunOS\oldstuff\Process\ProcessOutputBuffer.cs" />
     <Compile Include="MunOS\oldstuff\Process\ROProcess.cs" />
     <Compile Include="MunOS\oldstuff\Repl\IReplEngine.cs" />
@@ -47,18 +39,28 @@
     <Compile Include="MunOS\oldstuff\Repl\ReplProcess.cs" />
     <Compile Include="MunOS\oldstuff\IEngine.cs" />
     <Compile Include="MunOS\oldstuff\IProcess.cs" />
+    <Compile Include="MunOS\Core\Executors\IdleExecutor.cs" />
+    <Compile Include="MunOS\Core\Executors\NormalExecutor.cs" />
+    <Compile Include="MunOS\Core\Executors\OneShotExecutor.cs" />
+    <Compile Include="MunOS\Core\Executors\PriorityExecutor.cs" />
+    <Compile Include="MunOS\Core\Executors\RealtimeExecutor.cs" />
+    <Compile Include="MunOS\Core\ExecutionManager.cs" />
+    <Compile Include="MunOS\Core\ExecInfo.cs" />
+    <Compile Include="MunOS\Core\IExecutable.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MunOS\" />
-    <Folder Include="MunOS\Executors\" />
     <Folder Include="MunOS\oldstuff\" />
     <Folder Include="MunOS\oldstuff\Process\" />
     <Folder Include="MunOS\oldstuff\Repl\" />
+    <Folder Include="MunOS\Core\" />
+    <Folder Include="MunOS\Core\Executors\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="MunOS\MunOSNotes.md" />
     <None Include="MunOS\MunOSRequirements.md" />
     <None Include="MunOS\UseCases.md" />
+    <None Include="MunOS\Layer2.md" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>

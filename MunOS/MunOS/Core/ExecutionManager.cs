@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using MunOS.Executors;
+using MunOS.Core;
 
 namespace MunOS
 {
@@ -25,9 +25,9 @@ namespace MunOS
 		internal struct ProcessEntry
 		{
 			public Priority priority;
-			public Process process;
+			public ExecInfo process;
 
-			public ProcessEntry(Priority priority, Process process)
+			public ProcessEntry(Priority priority, ExecInfo process)
 			{
 				this.priority=priority;
 				this.process=process;
@@ -124,7 +124,7 @@ namespace MunOS
 		/// <param name="name">The optional name of this process, to appear in process managers.</param>
 		public long RegisterExecutable(Priority priority, IExecutable executable, string name="")
 		{
-			var process=new Process(name, executable);
+			var process=new ExecInfo(name, executable);
 			processDictionary[process.ID]=new ProcessEntry(priority,process);
 			priorities[priority].waitQueue.Enqueue(process);
 			return process.ID;

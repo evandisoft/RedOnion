@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace MunOS.Executors
+namespace MunOS.Core.Executors
 {
 	public class RealtimeExecutor : PriorityExecutor
 	{

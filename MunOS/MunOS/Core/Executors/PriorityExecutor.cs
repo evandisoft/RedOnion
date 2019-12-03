@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace MunOS.Executors
+namespace MunOS.Core.Executors
 {
 
 	public enum ExecStatus
@@ -28,13 +28,13 @@ namespace MunOS.Executors
 		/// Holds processes waiting to be executed. Each update the processes 
 		/// here that are not sleeping are put into the executeQueue
 		/// </summary>
-		public Queue<Process> waitQueue=new Queue<Process>();
+		public Queue<ExecInfo> waitQueue=new Queue<ExecInfo>();
 		/// <summary>
 		/// Holds processes being executed. Some processes may remain here
 		/// after an update, indicating that they didn't voluntarily yield or they
 		/// didn't even get a chance to execute at all last update.
 		/// </summary>
-		public Queue<Process> executeQueue=new Queue<Process>();
+		public Queue<ExecInfo> executeQueue=new Queue<ExecInfo>();
 
 		Stopwatch stopwatch = new Stopwatch();
 
@@ -44,7 +44,7 @@ namespace MunOS.Executors
 			Kill(ID, executeQueue);
 		}
 
-		void Kill(long ID, Queue<Process> processes)
+		void Kill(long ID, Queue<ExecInfo> processes)
 		{
 			for (int i = processes.Count; i > 0; i--)
 			{
@@ -74,7 +74,7 @@ namespace MunOS.Executors
 			}
 		}
 
-		protected void ExecuteProcess(Process process,long ticks)
+		protected void ExecuteProcess(ExecInfo process,long ticks)
 		{
 			try
 			{
