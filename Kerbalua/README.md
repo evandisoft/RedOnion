@@ -11,11 +11,13 @@ If you really want any of these features, let me (Evan/evandisoft) know and I'll
 - Removed `dofile`, `loadfile`, and `loadfilesafe` because they use base paths that are far outside the KSP install location, and I think that would be unexpected. `require`'s load path can be configured and I have configured it to start in the
 Scripts directory. I might implement a version of `dofile` in the future that has a base path that is appropriate.
 
-If you need to reload a lib that was loaded with `require("packagepath")`, you can do `packages["packagepath"]=nil` and then
-`require("packagepath")` will execute it again rather than using a cached version of the resulting module.
+If you need to reload a lib that was loaded with `require("lib/testfile")`, you can do `packages["lib/testfile"]=nil` and then
+`require("lib/testfile")` will execute it again rather than using a cached version of the resulting module.
 
 To create libs you can create a folder in the Scripts directory. You can call it "lib", and then put scripts you want to use
-as libraries in that folder. If you make a lib called "test.lua". You would load it with `require("lib/test")`. Any directory in the scripts folder won't show up in the file list in the completion area but files inside of them can be loaded with `require(dirname/filenameWithoutExtension)`. You use `require` without the `.lua` part of the filename.
+as libraries in that folder. If you make a file called "test.lua" in the "lib" folder. You would load it with `require("lib/test")`. Any directory in the scripts folder won't show up in the file list in the completion area but files inside of them can be loaded with `require(dirname/filenameWithoutExtension)`. You use `require` without the `.lua` part of the filename.
+
+For more info on Modules, see [this section of the Lua manual](https://www.lua.org/manual/5.2/manual.html#6.3) 
 
 ### API
 In addition to the [Common API](../RedOnion.KSP/Globals.md), Kerbalua has some functionality [specific to it](../RedOnion.KSP/MoonSharp/MoonSharpAPI/MoonSharpGlobals.md).
