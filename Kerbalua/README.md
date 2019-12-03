@@ -17,6 +17,7 @@ If you really want any of these features, let me (Evan/evandisoft) know and I'll
 - **No implementation of coroutines** - This is due to using coroutines to automatically yield. I cannot expose MoonSharp's implementation of coroutines because it would interfere with my use of them. I believe I could implement a replacement implementation, but not for now.
 - Removed `dofile`, `loadfile`, and `loadfilesafe` as they do not use the Scripts directory as the base directory and cannot be configured to do so. Versions of these (at least `dofile`) will be implemented in the future.
 
+[require](https://www.lua.org/manual/5.2/manual.html#6.3) can be used, as I was able to specify the paths that are to be used to search for libs. `require` will only run something the first time you call it on some filepath. To make it run that file again again you have to do `packages[filepath]=nil`.
 
 ## API
 In addition to the [Common API](../RedOnion.KSP/Globals.md), Kerbalua has some functionality specific to it: [Kerbalua API](../RedOnion.KSP/MoonSharp/MoonSharpAPI/MoonSharpGlobals.md).

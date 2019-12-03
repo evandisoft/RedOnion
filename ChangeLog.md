@@ -17,6 +17,8 @@
 - Lua [reflection api](RedOnion.KSP/MoonSharp/MoonSharpAPI/Reflection.md) was a bit confusing. I'm changing the terminology to `type` and `runtime type` instead of `static` and `type`. So what was once a `static` will now be called a `type`, and what was once a `type` will now be called a `runtime type`. (`runtime types` are for reflection whereas `types` are for accessing `static members` of clr classes or passing as the first argument to `new` to create a new object.)
 - Removed `dofile`, `loadfile`, and `loadfilesafe` as they do not use the Scripts directory as the base directory and cannot be configured to do so. Versions of these (at least `dofile`) will be implemented in the future.
 
+`require` can be used, as it allows me to specify the paths that are to be used. `require` will only run something the first time you call it on some path. To make it run that file again again you have to do `packages[filepath]=nil`.
+
 # Current
 # 0.4
 
