@@ -47,6 +47,7 @@ namespace MunOS
 				process.executable.OnTerminated(process.name, process.ID);
 				var priority=processEntry.priority;
 				priorities[priority].Kill(ID);
+				Remove(ID);
 			}
 		}
 
@@ -76,15 +77,25 @@ namespace MunOS
 			priorities[Priority.MAIN] = new NormalExecutor();
 		}
 
+		static public void Initialize()
+		{
+			instance = new ExecutionManager();
+		}
 		static public ExecutionManager instance;
+		/// <summary>
+		/// Should be initialized by LiveReplMain prior to anything else being
+		/// able to use it. Must be reinitialized on every scene change.
+		/// </summary>
+		/// <value>The instance.</value>
 		static public ExecutionManager Instance
 		{
 			get
 			{
-				if (instance == null)
+				if (instance==null)
 				{
-					instance = new ExecutionManager();
+					throw new Exception("ExecutionManager.Instance was not initialized!");
 				}
+
 				return instance;
 			}
 		}
@@ -120,7 +131,7 @@ namespace MunOS
 		}
 
 		Stopwatch stopwatch = new Stopwatch();
-		public void Execute(long tickLimit)
+		void Execute(long tickLimit)
 		{
 			stopwatch.Reset();
 			stopwatch.Start();

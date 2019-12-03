@@ -29,6 +29,10 @@ namespace Kerbalua.Scripting
 		{
 			get
 			{
+				if (_instance==null)
+				{
+					throw new Exception("KerbaluaScript.Instance was not initialized!");
+				}
 				return _instance;
 			}
 		}

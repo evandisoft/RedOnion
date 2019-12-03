@@ -2,6 +2,7 @@
 using UnityEngine;
 using KSP.UI.Screens;
 using System.Collections.Generic;
+using MunOS;
 
 namespace LiveRepl
 {
@@ -37,6 +38,8 @@ namespace LiveRepl
             // particular scene. If ToggleGui was already set, it was with
             // a delegate from another scene.
             ToggleGui = LocalToggleGui;
+
+			ExecutionManager.Initialize();
         }
 
 		ScriptWindow scriptWindow;
@@ -64,6 +67,7 @@ namespace LiveRepl
 		void FixedUpdate()
 		{
 			scriptWindow?.FixedUpdate();
+			ExecutionManager.Instance.FixedUpdate();
 		}
 
 		void OnGUI()

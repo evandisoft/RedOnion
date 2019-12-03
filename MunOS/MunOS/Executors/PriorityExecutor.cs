@@ -57,10 +57,8 @@ namespace MunOS.Executors
 			}
 		}
 
-		void PreProcessQueues()
+		void AddNonSleepingProcessesToExecuteQueue()
 		{
-			// Add non-sleeping and processes from
-			// waitQueue to executeQueue
 			for (int i = waitQueue.Count; i > 0; i--)
 			{
 				var process=waitQueue.Dequeue();
@@ -122,8 +120,7 @@ namespace MunOS.Executors
 			stopwatch.Reset();
 			stopwatch.Start();
 
-			// This puts non-sleeping processes from waitQueue into executeQueue
-			PreProcessQueues();
+			AddNonSleepingProcessesToExecuteQueue();
 
 			long remainingTicks = tickLimit;
 			while (remainingTicks > 0 && executeQueue.Count > 0)
