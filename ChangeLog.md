@@ -9,6 +9,15 @@
 - More UI library features.
 
 # Next Release
+Just had a release (0.4.6)!
+
+# Current
+# 0.4
+
+## 0.4.6
+### RedOnionScript (ROS) Changes:
+- [Try/Catch/Finally](RedOnion.ROS/Docs/Errors.md) for handling errors. Kerbalua has Lua's [pcall](https://www.lua.org/manual/5.2/manual.html#pdf-pcall).
+
 ### LiveRepl Changes:
 - Fixed an issue where the global keybindings of LiveRepl could be activated when the input is not locked to the window. (input is locked when the mouse is inside the window bounds)
 - Made LiveRepl use KSP's UI_SCALE setting. Hard for me to test this thoroughly as I don't have a monitor with a high enough resolution, but from what I can see it is working. I could add an additional scaling factor in some other setting later, if desired, to make it even larger. One thing I did not find how to scale was the scrollbar. But I was able to scale the part of the scrollbar that accepts mouse dragging.
@@ -17,10 +26,7 @@
 - Lua [reflection api](RedOnion.KSP/MoonSharp/MoonSharpAPI/Reflection.md) was a bit confusing. I'm changing the terminology to `type` and `runtime type` instead of `static` and `type`. So what was once a `static` will now be called a `type`, and what was once a `type` will now be called a `runtime type`. (`runtime types` are for reflection whereas `types` are for accessing `static members` of clr classes or passing as the first argument to `new` to create a new object.)
 - Removed `dofile`, `loadfile`, and `loadfilesafe` as they do not use the Scripts directory as the base directory and cannot be configured to do so. Versions of these (at least `dofile`) will be implemented in the future.
 
-`require` can be used, as it allows me to specify the paths that are to be used. `require` will only run something the first time you call it on some path. To make it run that file again again you have to do `packages[filepath]=nil`.
-
-# Current
-# 0.4
+[require](https://www.lua.org/manual/5.2/manual.html#6.3) can be used because it allowed me to specify the base path. However, `require` will only run something the first time you call it on some `filepath`. To make it run that file again again you have to do `packages[filepath]=nil`.
 
 ## 0.4.5 - 0.4.4
 - My apologies about 0.4.4. I believe I dropped in an unchanged zip.

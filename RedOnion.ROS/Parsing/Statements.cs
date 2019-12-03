@@ -356,21 +356,32 @@ namespace RedOnion.ROS.Parsing
 				var catchAt = code.size;
 				while (ExCode == ExCode.Catch && ind == Indent)
 				{
-					Next();
-					Write(-1); // TODO: reserved for variable name
-					FullType(flags);
+					if (Next().ExCode != ExCode.Var)
+						Write(-1);
+					else
+					{
+						if (Next().Word == null)
+							throw new ParseError(this, "Expected variable name");
+						if (Word.Length > 127)
+							throw new ParseError(this, "Variable name too long");
+						Write(Word);
+					}
+					OptionalType(flags);
 					if (Curr == ';' || Curr == ':')
 						Next();
 					ParseBlock(flags, ind);
 				}
+				/* Python uses `else` with different meaning (run if no exception)
 				if (ExCode == ExCode.Else && ind == Indent)
 				{
+					Next();
 					if (Curr == ';' || Curr == ':')
 						Next();
 					Write(-1);
-					Write(0);
+					Write(OpCode.Void);
 					ParseBlock(flags, ind);
 				}
+				*/
 				Write(code.size - catchAt, mark+5);
 
 				var finAt = code.size;

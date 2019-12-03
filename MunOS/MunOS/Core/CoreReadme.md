@@ -12,3 +12,9 @@ use the Core for the specific task of managing multiple things running at once.
 
 - An additional plus of this is that anything that wants to can run something on the
 core directly without going through additional layers.
+
+- One features that may be added to the Core later, is some way to make it so that there are multiple
+`views` into the executionmanager and each view gets an equal slice of the execution time in any given priority.
+And the executables a view contains have to execute using the overall time given to that view. (But it
+would give a view more time in this update if its executables didn't all yield and other view's executables 
+did all yield or finish early)
