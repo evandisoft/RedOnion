@@ -26,9 +26,11 @@ vessels, anything, with own script.
 
 License: [MIT](https://github.com/evandisoft/RedOnion/blob/master/LICENSE)
 
-Github: [here](https://github.com/evandisoft/RedOnion)
+[Github](https://github.com/evandisoft/RedOnion)
 
-[Github Pages](https://evandisoft.github.io/RedOnion) is where the most up-to-date information is.
+[Github Pages](https://evandisoft.github.io/RedOnion): where the most up-to-date information is.
+
+[KSP Forums thread](https://forum.kerbalspaceprogram.com/index.php?/topic/189983-18x-redonion-unrestricted-in-game-scripting-v-040/)
 
 **Warning: Do not use scripts from untrusted sources!**
 This is not a sandbox, any script has the power to do almost anything a modder could do in C#.
@@ -43,7 +45,7 @@ but our goal now is to:
 
 ## Releases
 
-**Your scripts are in GameData/RedOnion/Scripts. If you delete this folder to update to a new version, it will destroy your scripts.** I believe that CKAN does not delete them when uninstalling the mod or updating it, but you might want to make a copy of the folder just in case. We provide example scripts in a zip file, which will appear in the list of scripts in-game but wont be in the Scripts folder. If the example programs don't run, check out that section in [TroubleShooting](TroubleShooting.md)
+**Your scripts are in GameData/RedOnion/Scripts. If you delete this folder, it will destroy your scripts.** I believe that CKAN does not delete them when uninstalling the mod or updating it, but you might want to make a copy of the folder just in case. We provide example scripts in a zip file, which will appear in the list of scripts in-game but wont be in the Scripts folder. If the example programs don't run, check out that section in [TroubleShooting](TroubleShooting.md)
 
 Latest Releases are available at:
 - [CKAN](https://github.com/KSP-CKAN/CKAN)

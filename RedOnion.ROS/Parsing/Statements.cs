@@ -236,7 +236,7 @@ namespace RedOnion.ROS.Parsing
 				if (!HasOption(Option.Prefix))
 					Write(OpCode.Cond);
 				Write(code.size-condAt, condAt-4);
-				if (ExCode == ExCode.Do)
+				if (ExCode == ExCode.DoWhile)
 					Next();
 				if (Curr == ';' || Curr == ':')
 					Next();
@@ -244,7 +244,7 @@ namespace RedOnion.ROS.Parsing
 				return;
 			}
 			// do; cond size; block size; block; cond
-			case ExCode.Do:
+			case ExCode.DoWhile:
 			{
 				var doAt = Write(op);
 				Write(0);
@@ -304,7 +304,7 @@ namespace RedOnion.ROS.Parsing
 				if (!HasOption(Option.Prefix))
 					Write(OpCode.Pop);
 				Write(code.size-lastAt, lastAt-4);
-				if (ExCode == ExCode.Do)
+				if (ExCode == ExCode.DoWhile)
 					Next();
 				if (Curr == ';' || Curr == ':')
 					Next();
@@ -333,7 +333,7 @@ namespace RedOnion.ROS.Parsing
 				if (!HasOption(Option.Prefix))
 					Write(OpCode.Cond);
 				Write(code.size - listAt, mark + 5);
-				if (ExCode == ExCode.Do)
+				if (ExCode == ExCode.DoWhile)
 					Next();
 				if (Curr == ';' || Curr == ':')
 					Next();
@@ -356,21 +356,32 @@ namespace RedOnion.ROS.Parsing
 				var catchAt = code.size;
 				while (ExCode == ExCode.Catch && ind == Indent)
 				{
-					Next();
-					Write(-1); // TODO: reserved for variable name
-					FullType(flags);
+					if (Next().ExCode != ExCode.Var)
+						Write(-1);
+					else
+					{
+						if (Next().Word == null)
+							throw new ParseError(this, "Expected variable name");
+						if (Word.Length > 127)
+							throw new ParseError(this, "Variable name too long");
+						Write(Word);
+					}
+					OptionalType(flags);
 					if (Curr == ';' || Curr == ':')
 						Next();
 					ParseBlock(flags, ind);
 				}
+				/* Python uses `else` with different meaning (run if no exception)
 				if (ExCode == ExCode.Else && ind == Indent)
 				{
+					Next();
 					if (Curr == ';' || Curr == ':')
 						Next();
 					Write(-1);
-					Write(0);
+					Write(OpCode.Void);
 					ParseBlock(flags, ind);
 				}
+				*/
 				Write(code.size - catchAt, mark+5);
 
 				var finAt = code.size;

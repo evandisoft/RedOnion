@@ -18,6 +18,8 @@ namespace Kerbalui.Decorators
 		public EditingAreaScroller(EditingArea editingArea)
 		{
 			this.editingArea=editingArea;
+			horizontalStyle=new GUIStyle(GUI.skin.horizontalScrollbar);
+			verticalStyle=new GUIStyle(GUI.skin.verticalScrollbar);
 		}
 
 		public string Text { get => editingArea.Text; set => editingArea.Text=value; }
@@ -41,14 +43,22 @@ namespace Kerbalui.Decorators
 
 		public bool ReceivedInput => editingArea.ReceivedInput;
 
+		GUIStyle horizontalStyle;
+		GUIStyle verticalStyle;
 
 
-
-		public const int ScrollbarWidth=20;
+		public float ScrollbarWidth=>Math.Max(15,15*KerbaluiSettings.UI_SCALE);
 
 		public virtual void ResetScroll()
 		{
 			resetScroll = true;
+		}
+
+		public override void SetRect(Rect newRect)
+		{
+			verticalStyle.fixedWidth=ScrollbarWidth;
+			horizontalStyle.fixedHeight=ScrollbarWidth;
+			base.SetRect(newRect);
 		}
 
 		protected override void SetChildRect()
@@ -74,16 +84,11 @@ namespace Kerbalui.Decorators
 				//Debug.Log("edit area scroller grabbing mouse");
 				GrabFocus();
 			}
-			scrollPos = GUI.BeginScrollView(rect, scrollPos, editingArea.rect, HorizontalScrollBarPresent, VerticalScrollBarPresent);
+
+
+			scrollPos = GUI.BeginScrollView(rect, scrollPos, editingArea.rect, 
+				HorizontalScrollBarPresent, VerticalScrollBarPresent,horizontalStyle, verticalStyle);
 			{
-				//var scrollbarlessrect=new Rect(ContentRect);
-				//if(VerticalScrollBarPresent)
-				//	scrollbarlessrect.width-=ScrollbarWidth;
-				//if (HorizontalScrollBarPresent)
-					//scrollbarlessrect.height-=ScrollbarWidth;
-				// Without this, it takes two clicks to update the cursor when the editingArea is not focused.
-
-
 				editingArea.Update();
 
 				lastScrollViewVector2 = new Vector2(rect.width, rect.height);

@@ -1,3 +1,4 @@
+using Kerbalui;
 using Kerbalui.Util;
 using LiveRepl.Completion;
 using RedOnion.KSP.Settings;
@@ -12,6 +13,7 @@ namespace LiveRepl
 
 		public ScriptWindow(string title) : base(title)
 		{
+			//Debug.Log("UI scale is "+GameSettings.UI_SCALE);
 			InitLayout();
 			InitEvaluation();
 			InitCompletion();
@@ -24,19 +26,10 @@ namespace LiveRepl
 
 		public void InitFont()
 		{
-			var defaultFont=GUILibUtil.GetMonoSpaceFont();
-			var fontname=SavedSettings.LoadSetting("fontname", "");
-			Font font=null;
-			if (fontname=="")
-			{
-				font=defaultFont;
-			}
-			else
-			{
-				font=Font.CreateDynamicFontFromOSFont(fontname, 14);
-			}
+			var defaultFontName=GUILibUtil.GetMonoSpaceFontName();
+			var fontname=SavedSettings.LoadSetting("fontname", defaultFontName);
 
-			uiparts.ChangeFont(font);
+			uiparts.ChangeFont(fontname,KerbaluiSettings.DefaultFontsize);
 		}
 
 		public void SetOrReleaseInputLock()
@@ -76,16 +69,19 @@ namespace LiveRepl
 		{
 			SetOrReleaseInputLock();
 
+			if (ScriptRunning && inputIsLocked) HandleInputWhenExecuting();
 			GUILibUtil.ConsumeMarkedCharEvent(Event.current);
+			if (inputIsLocked)
+			{
+				GlobalKeyBindings.ExecuteAndConsumeIfMatched(Event.current);
+			}
 
-			if (ScriptRunning) HandleInputWhenExecuting();
-
-			GlobalKeyBindings.ExecuteAndConsumeIfMatched(Event.current);
 			if (completionManager.Update(hadMouseDownLastUpdate))
 			{
 				uiparts.completionArea.needsResize=true;
 			}
-			hadMouseDownLastUpdate=Event.current.type==EventType.MouseDown;
+			hadMouseDownLastUpdate=Event.current.type==EventType.MouseDown && inputIsLocked;
+
 			base.WindowsUpdate();
 
 			if (inputIsLocked && Event.current.type == EventType.ScrollWheel)

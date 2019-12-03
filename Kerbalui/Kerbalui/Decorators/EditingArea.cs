@@ -135,46 +135,6 @@ namespace Kerbalui.Decorators
 			}
 		}
 
-		//void AdjustScrollX()
-		//{
-		//	//Debug.Log("Adjusting scroll x");
-		//	float cursorX = CursorX();
-		//	float diff = lastContentVector2.x - lastScrollViewVector2.x;
-		//	float contentStartX = scrollPos.x;
-		//	float contentEndX = contentStartX + lastScrollViewVector2.x;
-		//	if (Math.Max(cursorX - editableText.style.lineHeight, 0) < contentStartX)
-		//	{
-		//		scrollPos.x = Math.Max(cursorX - editableText.style.lineHeight, 0);
-		//	}
-		//	else if (cursorX + editableText.style.lineHeight > contentEndX)
-		//	{
-		//		scrollPos.x = cursorX - lastContentVector2.x + editableText.style.lineHeight;
-		//	}
-		//}
-
-		//void AdjustScrollY()
-		//{
-		//	//Debug.Log("Adjusting scroll y");
-		//	float cursorY = CursorY();
-		//	//Debug.Log("CursorY " + cursorY);
-		//	float diff = lastContentVector2.y - lastScrollViewVector2.y;
-		//	//Debug.Log("diff " + diff);
-		//	float contentStartY = scrollPos.y;
-		//	//Debug.Log("contentStartY " + contentStartY);
-		//	float contentEndY = contentStartY + lastScrollViewVector2.y;
-		//	//Debug.Log("contentEndY " + contentEndY);
-		//	if (cursorY - editableText.style.lineHeight < contentStartY)
-		//	{
-		//		scrollPos.y = cursorY - editableText.style.lineHeight;
-		//		//Debug.Log("reducing to " + scrollPos.y);
-		//	}
-		//	else if (cursorY + editableText.style.lineHeight > contentEndY)
-		//	{
-		//		scrollPos.y = cursorY - lastContentVector2.y + editableText.style.lineHeight;
-		//		//Debug.Log("expanding to " + scrollPos.y);
-		//	}
-		//}
-
 		public float CursorX()
 		{
 			int c = CharsFromLineStart();
@@ -627,9 +587,9 @@ namespace Kerbalui.Decorators
 			return lineNum;
 		}
 
-		public void FontChangeEventHandler(Font obj)
+		public void FontChangeEventHandler(string fontname, int size)
 		{
-			editableText.FontChangeEventHandler(obj);
+			editableText.FontChangeEventHandler(fontname,size);
 		}
 	}
 }

@@ -116,6 +116,7 @@
     <Compile Include="Kerbalui\EditingChanges\EditingChange.cs" />
     <Compile Include="Kerbalui\Decorators\UndoRedoEditor.cs" />
     <Compile Include="Kerbalui\Interfaces\IEditingArea.cs" />
+    <Compile Include="Kerbalui\KerbaluiSettings.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

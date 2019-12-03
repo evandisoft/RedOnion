@@ -35,14 +35,14 @@ namespace LiveRepl
         internal QueueTagInputArea queueTagInputArea;
 		public FontSelector fontSelector;
 
-		public event Action<Font> FontChange;
+		public event Action<string,int> FontChange;
 		/// <summary>
 		/// Called by the FontSelector. Changes fonts for all ContentControl's that have subscribed to FontChange
 		/// </summary>
 		/// <param name="font">Font.</param>
-		public void ChangeFont(Font font)
+		public void ChangeFont(string fontname, int size)
 		{
-			FontChange(font);
+			FontChange(fontname,size);
 			scriptWindow.needsResize=true;
 		}
 	}

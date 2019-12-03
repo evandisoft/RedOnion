@@ -1,5 +1,6 @@
 using System;
 using Kerbalui.Types;
+using Kerbalui.Util;
 using UnityEngine;
 
 namespace Kerbalui.Controls.Abstract
@@ -11,15 +12,34 @@ namespace Kerbalui.Controls.Abstract
 	{
 		public GUIContent Content { get; set; }=new GUIContent("");
 		public GUIStyle Style { get; set; }
+		public string Fontname=KerbaluiSettings.DefaultFontname;
+		private int Fontsize=KerbaluiSettings.DefaultFontsize;
+		public int ScaledFontsize => (int)(KerbaluiSettings.UI_SCALE*Fontsize);
+
+		void SettingsChangeHandler()
+		{
+			UpdateFont();
+		}
 
 		protected ContentControl(GUIStyle style)
 		{
 			Style=new GUIStyle(style);
+			Style.fontSize=ScaledFontsize;
+			//UpdateFont();
+			KerbaluiSettings.SettingsChange+=SettingsChangeHandler;
 		}
 
-		public void FontChangeEventHandler(Font font)
+		void UpdateFont()
 		{
-			Style.font=font;
+			Style.fontSize=ScaledFontsize;
+		}
+
+		public void FontChangeEventHandler(string fontname,int fontsize)
+		{
+			Fontname=fontname;
+			Fontsize=fontsize;
+			Style.font=GUILibUtil.GetFont(fontname, fontsize);
+			UpdateFont();
 		}
 
 		public override Vector2 MinSize

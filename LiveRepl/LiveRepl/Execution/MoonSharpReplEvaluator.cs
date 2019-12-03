@@ -48,9 +48,10 @@ namespace LiveRepl.Execution
 			scriptEngine.PrintErrorAction = (str)=>PrintErrorAction?.Invoke(str);
 			
 			scriptEngine.Options.ScriptLoader = new FileSystemScriptLoader();
-			((ScriptLoaderBase)scriptEngine.Options.ScriptLoader).IgnoreLuaPathGlobal = true;
-			((ScriptLoaderBase)scriptEngine.Options.ScriptLoader).ModulePaths = new string[] { SavedSettings.BaseScriptsPath+"/?.lua" };
-		
+			var slb=scriptEngine.Options.ScriptLoader as ScriptLoaderBase;
+			slb.IgnoreLuaPathGlobal = true;
+			
+			slb.ModulePaths = new string[] { SavedSettings.BaseScriptsPath+"/?.lua" };
 		 }
 
 		public override void ResetEngine()
@@ -103,7 +104,7 @@ namespace LiveRepl.Execution
 					// This is a type
 					if (dynResult.ToObject() is Type)
 					{
-						result += " (type)";
+						result += " (runtime type)";
 						return isComplete;
 					}
 
