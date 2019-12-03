@@ -101,6 +101,9 @@
     <Compile Include="Value.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Docs\Errors.md" />
+    <None Include="Docs\LambdaAdv.md" />
+    <None Include="Docs\Links.md" />
     <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
