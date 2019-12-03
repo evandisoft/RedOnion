@@ -28,8 +28,6 @@ Just had a release (0.4.6)!
 
 [require](https://www.lua.org/manual/5.2/manual.html#6.3) can be used because it allowed me to specify the base path. However, `require` will only run something the first time you call it on some `filepath`. To make it run that file again again you have to do `packages[filepath]=nil`.
 
-Future versions will fix this issue.
-
 ## 0.4.5 - 0.4.4
 - My apologies about 0.4.4. I believe I dropped in an unchanged zip.
 - Fixed a problem with Lua engine not resetting.
