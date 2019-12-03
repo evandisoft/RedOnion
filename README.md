@@ -26,9 +26,11 @@ vessels, anything, with own script.
 
 License: [MIT](https://github.com/evandisoft/RedOnion/blob/master/LICENSE)
 
-Github: [here](https://github.com/evandisoft/RedOnion)
+[Github](https://github.com/evandisoft/RedOnion)
 
-[Github Pages](https://evandisoft.github.io/RedOnion) is where the most up-to-date information is.
+[Github Pages](https://evandisoft.github.io/RedOnion): where the most up-to-date information is.
+
+[KSP Forums thread](https://forum.kerbalspaceprogram.com/index.php?/topic/189983-18x-redonion-unrestricted-in-game-scripting-v-040/)
 
 **Warning: Do not use scripts from untrusted sources!**
 This is not a sandbox, any script has the power to do almost anything a modder could do in C#.
