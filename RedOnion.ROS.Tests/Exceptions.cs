@@ -236,5 +236,33 @@ namespace RedOnion.ROS.Tests
 				"catch var x",
 				"  return x.message");
 		}
+
+		[Test]
+		public void ROS_Catch06_Break()
+		{
+			Lines(ExitCode.Return, true,
+				"do",
+				"  try",
+				"    throw false",
+				"  catch",
+				"    break",
+				"while true",
+				"return true");
+		}
+
+		[Test]
+		public void ROS_Catch07_Continue()
+		{
+			Lines(ExitCode.Return, 3,
+				"var x = 0",
+				"for var i = 0; i < 3; i++",
+				"  try",
+				"    throw 1",
+				"  catch var e",
+				"    x += e",
+				"    continue",
+				"  return false",
+				"return x");
+		}
 	}
 }
