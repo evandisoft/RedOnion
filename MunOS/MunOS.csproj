@@ -61,6 +61,7 @@
     <None Include="MunOS\MunOSRequirements.md" />
     <None Include="MunOS\UseCases.md" />
     <None Include="MunOS\Layer2.md" />
+    <None Include="MunOS\Core\CoreReadme.md" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
