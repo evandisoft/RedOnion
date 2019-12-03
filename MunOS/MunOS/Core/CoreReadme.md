@@ -9,3 +9,6 @@ it is easy to understand and relatively easy to test.
 
 - More functionality is going to be added, but in different `layers`, which will
 use the Core for the specific task of managing multiple things running at once.
+
+- An additional plus of this is that anything that wants to can run something on the
+core directly without going through additional layers.
