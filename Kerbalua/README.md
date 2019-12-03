@@ -20,7 +20,7 @@ If you really want any of these features, let me (Evan/evandisoft) know and I'll
 [require](https://www.lua.org/manual/5.2/manual.html#6.3) can be used, as I was able to specify the paths that are to be used to search for libs. `require` will only run something the first time you call it on some filepath. To make it run that file again again you have to do `packages[filepath]=nil`.
 
 ## API
-In addition to the [Common API](../RedOnion.KSP/Globals.md), Kerbalua has some functionality specific to it: [Kerbalua API](../RedOnion.KSP/MoonSharp/MoonSharpAPI/MoonSharpGlobals.md).
+In addition to the [Common API](../RedOnion.KSP/API/Globals.md), Kerbalua has some functionality specific to it: [Kerbalua API](../RedOnion.KSP/MoonSharp/MoonSharpAPI/MoonSharpGlobals.md).
 
 For basic information about Lua there is lots of documentation available online. The version MoonSharp uses is 5.2.
 
