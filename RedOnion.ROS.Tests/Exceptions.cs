@@ -177,7 +177,7 @@ namespace RedOnion.ROS.Tests
 				"var result = false",
 				"try",
 				"  throw 1",
-				"else",
+				"catch",
 				"  result = true",
 				"return result");
 
@@ -263,6 +263,16 @@ namespace RedOnion.ROS.Tests
 				"    continue",
 				"  return false",
 				"return x");
+		}
+
+		[Test]
+		public void ROS_Catch08_ReThrow()
+		{
+			Lines(ExitCode.Exception, true,
+				"try",
+				"  throw true",
+				"catch var e",
+				"  throw e");
 		}
 	}
 }

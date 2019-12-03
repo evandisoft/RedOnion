@@ -371,6 +371,7 @@ namespace RedOnion.ROS.Parsing
 						Next();
 					ParseBlock(flags, ind);
 				}
+				/* Python uses `else` with different meaning (run if no exception)
 				if (ExCode == ExCode.Else && ind == Indent)
 				{
 					Next();
@@ -380,6 +381,7 @@ namespace RedOnion.ROS.Parsing
 					Write(OpCode.Void);
 					ParseBlock(flags, ind);
 				}
+				*/
 				Write(code.size - catchAt, mark+5);
 
 				var finAt = code.size;

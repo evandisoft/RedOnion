@@ -1189,7 +1189,9 @@ namespace RedOnion.ROS
 		{
 			while (ctx.BlockCode != BlockCode.TryCatch)
 			{
-				if (ctx.BlockCode == BlockCode.Function)
+				if (ctx.BlockCount == 0
+					|| ctx.BlockCode == BlockCode.Function
+					|| ctx.BlockCode == BlockCode.Library)
 				{
 					if (stack.Count == 0)
 						return false; // root is function (like in update/idle) => throw
@@ -1197,8 +1199,19 @@ namespace RedOnion.ROS
 					at = ctx.BlockEnd;
 					return true;
 				}
-				if (ctx.BlockCount == 0 || ctx.BlockCode == BlockCode.Library)
-					throw InvalidOperation("TODO: exception unwinding got to root block");
+				if (ctx.BlockCode == BlockCode.Exception)
+				{// throw inside catch
+					catchBlocks--;
+					ctx.CatchBlocks--;
+					at = ctx.BlockAt1; // finally start
+					if (at != ctx.BlockAt2)
+					{// we have a finally after the catch
+						ctx.BlockCode = BlockCode.Finally;
+						ctx.BlockStart = at;
+						ctx.BlockEnd = ctx.BlockAt2;
+						return true;
+					}
+				}
 				ctx.Pop();
 			}
 			if (ctx.BlockEnd != ctx.BlockAt1)
