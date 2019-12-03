@@ -28,10 +28,10 @@ namespace MunOS
 			public Priority priority;
 			public ExecInfo execInfo;
 
-			public ExecInfoEntry(Priority priority, ExecInfo process)
+			public ExecInfoEntry(Priority priority, ExecInfo execInfo)
 			{
 				this.priority=priority;
-				this.execInfo=process;
+				this.execInfo=execInfo;
 			}
 		}
 		/// <summary>

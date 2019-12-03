@@ -1,4 +1,4 @@
-﻿namespace MunOS.Executors
+﻿namespace MunOS.Core.Executors
 {
 	public class OneShotExecutor : PriorityExecutor
 	{
@@ -18,7 +18,7 @@
 					else
 					{
 						numSkips = 0;
-						ExecuteProcess(executeQueue.Dequeue(), ExecutionManager.OneshotForceTicks);
+						ExecuteExecutable(executeQueue.Dequeue(), ExecutionManager.OneshotForceTicks);
 					}
 				}
 				else

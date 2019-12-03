@@ -18,7 +18,7 @@
 					else
 					{
 						numSkips = 0;
-						ExecuteProcess(executeQueue.Dequeue(), ExecutionManager.IdleForceTicks);
+						ExecuteExecutable(executeQueue.Dequeue(), ExecutionManager.IdleForceTicks);
 					}
 				}
 				else

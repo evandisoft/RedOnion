@@ -1,4 +1,4 @@
-﻿namespace MunOS.Executors
+﻿namespace MunOS.Core.Executors
 {
 	public class NormalExecutor : PriorityExecutor
 	{
