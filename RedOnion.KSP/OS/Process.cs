@@ -157,6 +157,7 @@ namespace RedOnion.KSP.OS
 			public ShutdownHook(T target)
 			{
 				_target = new WeakReference<T>(target);
+				Value.DebugLog("ShutdownHook created for process #{0}", currentId);
 				process = current;
 				process.shutdown += Shutdown;
 			}
@@ -170,6 +171,7 @@ namespace RedOnion.KSP.OS
 			{
 				if (process == null)
 					return;
+				Value.DebugLog("ShutdownHook disposed for process #{0}", process.id);
 				process.shutdown -= Shutdown;
 				process = null;
 				_target = null;
