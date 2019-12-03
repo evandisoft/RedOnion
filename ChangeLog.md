@@ -9,9 +9,16 @@
 - More UI library features.
 
 # Next Release
+### LiveRepl Changes:
 - Fixed an issue where the global keybindings of LiveRepl could be activated when the input is not locked to the window. (input is locked when the mouse is inside the window bounds)
 - Made LiveRepl use KSP's UI_SCALE setting. Hard for me to test this thoroughly as I don't have a monitor with a high enough resolution, but from what I can see it is working. I could add an additional scaling factor in some other setting later, if desired, to make it even larger. One thing I did not find how to scale was the scrollbar. But I was able to scale the part of the scrollbar that accepts mouse dragging.
+### Lua Changes:
 - Lua [reflection api](RedOnion.KSP/MoonSharp/MoonSharpAPI/Reflection.md) was a bit confusing. I'm changing the terminology to `type` and `runtime type` instead of `static` and `type`. So what was once a `static` will now be called a `type`, and what was once a `type` will now be called a `runtime type`. (`runtime types` are for reflection whereas `types` are for accessing `static members` of clr classes or passing as the first argument to `new` to create a new object.)
+- Removed `dofile`, `loadfile`, and `loadfilesafe` because they use base paths that are far outside the KSP install location, and I think that would be unexpected. `require`'s load path can be configured and I have configured it to start in the
+Scripts directory. I might implement a version of `dofile` in the future that has a base path that is appropriate.
+
+If you need to reload a lib that was loaded with `require("packagepath")`, you can do `packages["packagepath"]=nil` and then
+`require("packagepath")` will reload a again rather than using a cached version.
 
 # Current
 # 0.4

@@ -82,6 +82,11 @@ namespace Kerbalua.Scripting
 			metatable["__index"]=commonAPI;
 			Globals.MetaTable=metatable;
 			Globals.Remove("coroutine");
+			Globals.Remove("dofile");
+			//Globals.Remove("load");
+			Globals.Remove("loadfilesafe");
+			Globals.Remove("loadfile");
+			//Globals.Remove("loadsafe");
 
 			// This is the simplest way to define "new" to use __new.
 			commonAPI["new"]=DoString(@"
