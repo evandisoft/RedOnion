@@ -40,7 +40,7 @@ namespace LiveRepl
 				{
 					//Debug.Log("Input is now locked");
 					inputIsLocked = true;
-					InputLockManager.SetControlLock(ControlTypes.CAMERACONTROLS, "kerbalua");
+					InputLockManager.SetControlLock(ControlTypes.CAMERACONTROLS, "LiveRepl");
 				}
 			}
 			else
@@ -49,7 +49,7 @@ namespace LiveRepl
 				{
 					//Debug.Log("Input is no longer locked");
 					inputIsLocked = false;
-					InputLockManager.RemoveControlLock("kerbalua");
+					InputLockManager.RemoveControlLock("LiveRepl");
 				}
 			}
 		}
