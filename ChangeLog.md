@@ -12,7 +12,7 @@
 
 # Next Release
 ### LiveRepl Changes:
-- Stopped using the ControlTypes.KEYBOARDINPUT lock, which could possibly interfere with other mods. Had to keep locking ControlTypes.CAMERACONTROLS when the mouse is over the LiveRepl window because Scroll events are being sent to KSP even when the mouse is over the window. Also I no longer call InputLockManager.ClearControlLocks, which made no sense and could interfere with other uses of the InputLockManager.
+- Stopped using the ControlTypes.KEYBOARDINPUT lock, which could possibly interfere with other mods. Had to keep locking ControlTypes.CAMERACONTROLS when the mouse is over the LiveRepl window because Scroll events are causing KSP's view to zoom in and out even when the mouse is over the window.
 
 # Current
 # 0.4
