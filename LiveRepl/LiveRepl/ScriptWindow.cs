@@ -1,3 +1,4 @@
+using Kerbalui;
 using Kerbalui.Util;
 using LiveRepl.Completion;
 using RedOnion.KSP.Settings;
@@ -12,6 +13,7 @@ namespace LiveRepl
 
 		public ScriptWindow(string title) : base(title)
 		{
+			//Debug.Log("UI scale is "+GameSettings.UI_SCALE);
 			InitLayout();
 			InitEvaluation();
 			InitCompletion();
@@ -24,19 +26,10 @@ namespace LiveRepl
 
 		public void InitFont()
 		{
-			var defaultFont=GUILibUtil.GetMonoSpaceFont();
-			var fontname=SavedSettings.LoadSetting("fontname", "");
-			Font font=null;
-			if (fontname=="")
-			{
-				font=defaultFont;
-			}
-			else
-			{
-				font=Font.CreateDynamicFontFromOSFont(fontname, 14);
-			}
+			var defaultFontName=GUILibUtil.GetMonoSpaceFontName();
+			var fontname=SavedSettings.LoadSetting("fontname", defaultFontName);
 
-			uiparts.ChangeFont(font);
+			uiparts.ChangeFont(fontname,KerbaluiSettings.DefaultFontsize);
 		}
 
 		public void SetOrReleaseInputLock()
@@ -47,7 +40,7 @@ namespace LiveRepl
 				{
 					//Debug.Log("Input is now locked");
 					inputIsLocked = true;
-					InputLockManager.SetControlLock(ControlTypes.KEYBOARDINPUT, "kerbalua");
+					InputLockManager.SetControlLock(ControlTypes.CAMERACONTROLS, "LiveRepl");
 				}
 			}
 			else
@@ -56,7 +49,7 @@ namespace LiveRepl
 				{
 					//Debug.Log("Input is no longer locked");
 					inputIsLocked = false;
-					InputLockManager.ClearControlLocks();
+					InputLockManager.RemoveControlLock("LiveRepl");
 				}
 			}
 		}
@@ -76,26 +69,17 @@ namespace LiveRepl
 		{
 			SetOrReleaseInputLock();
 
-			if (inputIsLocked)
+			if (ScriptRunning ) HandleInputWhenExecuting();
+			GUILibUtil.ConsumeMarkedCharEvent(Event.current);
+
+			GlobalKeyBindings.ExecuteAndConsumeIfMatched(Event.current);
+			if (completionManager.Update(hadMouseDownLastUpdate))
 			{
-				GUILibUtil.ConsumeMarkedCharEvent(Event.current);
-
-				if (ScriptRunning) HandleInputWhenExecuting();
-
-				GlobalKeyBindings.ExecuteAndConsumeIfMatched(Event.current);
-				if (completionManager.Update(hadMouseDownLastUpdate))
-				{
-					uiparts.completionArea.needsResize=true;
-				}
-				hadMouseDownLastUpdate=Event.current.type==EventType.MouseDown;
+				uiparts.completionArea.needsResize=true;
 			}
+			hadMouseDownLastUpdate=Event.current.type==EventType.MouseDown && rect.Contains(Event.current.mousePosition);
 
 			base.WindowsUpdate();
-
-			if (inputIsLocked && Event.current.type == EventType.ScrollWheel)
-			{
-				Event.current.Use();
-			}
 		}
 
 		private void HandleInputWhenExecuting()

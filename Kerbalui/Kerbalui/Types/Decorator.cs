@@ -8,9 +8,9 @@ namespace Kerbalui.Types
 	/// </summary>
 	public abstract class Decorator:Element
 	{
-		public override void SetRect(Rect rect)
+		public override void SetRect(Rect newRect)
 		{
-			base.SetRect(rect);
+			base.SetRect(newRect);
 			SetChildRect();
 		}
 

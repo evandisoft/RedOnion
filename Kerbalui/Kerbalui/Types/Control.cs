@@ -33,8 +33,6 @@ namespace Kerbalui.Types
 
 		protected override void TypeSpecificUpdate()
 		{
-
-
 			GUI.SetNextControlName(ControlName);
 			ControlUpdate();
 		}

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Kerbalui;
 using Kerbalui.Controls;
 using Kerbalui.Controls.Abstract;
 using Kerbalui.Decorators;
@@ -16,7 +17,7 @@ namespace LiveRepl.Parts
 	/// </summary>
 	public class FontSelector : EditingArea, ICompletableElement
 	{
-		public Font CurrentFont { get; private set; } = null;
+		public string CurrentFontname { get; private set; } = "";
 
 		ScriptWindowParts uiparts;
 
@@ -28,15 +29,7 @@ namespace LiveRepl.Parts
 			//Debug.Log("defaultFontName is "+defaultFontName);
 			var currentFontName=SavedSettings.LoadSetting("fontname",defaultFontName);
 			//Debug.Log("currentFontName is "+currentFontName);
-			if (currentFontName=="")
-			{
-				CurrentFont=GUI.skin.font;
-				currentFontName="Default Font";
-			}
-			else
-			{
-				CurrentFont=Font.CreateDynamicFontFromOSFont(currentFontName, 14);
-			}
+			CurrentFontname=currentFontName;
 
 			Text=currentFontName;
 			keybindings.Clear();
@@ -53,13 +46,10 @@ namespace LiveRepl.Parts
 				Text = completionContent[index];
 				SelectIndex=CursorIndex = Text.Length;
 			}
-			var newFont=Font.CreateDynamicFontFromOSFont(Text,14);
-			if (newFont!=null)
-			{
-				CurrentFont=newFont;
-				uiparts.ChangeFont(CurrentFont);
-			}
-			SavedSettings.SaveSetting("fontname",Text);
+			CurrentFontname=Text;
+
+			uiparts.ChangeFont(CurrentFontname,KerbaluiSettings.DefaultFontsize);
+			SavedSettings.SaveSetting("fontname", CurrentFontname);
 		}
 
 		public IList<string> GetCompletionContent(out int replaceStart, out int replaceEnd)

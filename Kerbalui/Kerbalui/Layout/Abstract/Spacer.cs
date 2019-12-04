@@ -48,18 +48,13 @@ namespace Kerbalui.Layout.Abstract
         {
 
         }
-        /// <summary>
-        /// Returns the minimum content size for elements that are contentControls and have style initialized.
-        /// Otherwise returns zero.
-        /// </summary>
-        /// <returns>The content size.</returns>
-        /// <param name="spacerEntry">Spacer entry.</param>
+
         protected float MinContentWidth(SpacerEntry spacerEntry)
         {
             switch (spacerEntry.type)
             {
                 case SpacerEntryType.FIXED:
-                    return spacerEntry.size;
+                    return spacerEntry.size*KerbaluiSettings.UI_SCALE;
                 case SpacerEntryType.MINSIZED:
                     return spacerEntry.element.MinSize.x;
             }
@@ -71,7 +66,7 @@ namespace Kerbalui.Layout.Abstract
             switch (spacerEntry.type)
             {
                 case SpacerEntryType.FIXED:
-                    return spacerEntry.size;
+					return spacerEntry.size*KerbaluiSettings.UI_SCALE;
                 case SpacerEntryType.MINSIZED:
                     return spacerEntry.element.MinSize.y;
             }

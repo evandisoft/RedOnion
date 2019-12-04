@@ -63,6 +63,7 @@ namespace LiveRepl.Parts
 
 		public Editor(ScriptWindowParts uiparts) : base(new UndoRedoEditor(new TextArea()))
 		{
+
 			this.uiparts=uiparts;
 			undoRedoEditor=editingArea as UndoRedoEditor;
 
@@ -75,6 +76,10 @@ namespace LiveRepl.Parts
 
 		protected override void DecoratorUpdate()
 		{
+			var keyboardInput=Event.current.type == EventType.KeyDown;
+
+			string prevString=Text;
+
 			if (HasFocus()) 
 			{
 				keybindings.ExecuteAndConsumeIfMatched(Event.current);
@@ -89,7 +94,7 @@ namespace LiveRepl.Parts
 
 			uiparts.editorStatusLabel.UpdateCursorInfo(editingArea.LineNumber, editingArea.ColumnNumber);
 
-			if (editingArea.ReceivedInput)
+			if (editingArea.ReceivedInput && Text!=prevString)
 			{
 				uiparts.editorChangesIndicator.Changed();
 				uiparts.scriptWindow.needsResize=true;

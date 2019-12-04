@@ -93,6 +93,7 @@ namespace LiveRepl.Parts
 			SelectionIndex = 0;
 			partialLength = replaceEnd - replaceStart;
 			UpdateCursorPosition();
+			scrollPos.y=0;
 		}
 
 		void InitializeKeyBindings()
