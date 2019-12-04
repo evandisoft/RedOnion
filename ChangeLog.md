@@ -1,7 +1,6 @@
 # Planned Features
 - New user-centric system for managing scripts. Will be a file-selection dialog or the completion area will do this.
 - Editor/Repl reimplementation in new library. Hopefully allowing multiple editors/repls open at a time.
-- Ability to run multiple scripts at a time and a gui to manage them.
 - Lots of new user interfaces for various features built on new gui library.
 - Ingame testing framework.
 - Ingame debugging.
@@ -12,7 +11,8 @@
 - Working on some sort of system for running multiple scripts at a time. May not initially have a UI that can provide this feature to the user in full. That will probably come later.
 
 # Next Release
-Just had a release (0.4.6)!
+### LiveRepl Changes:
+- It seems that the newer version of Unity/KSP properly gives keyboard events to my focused LiveRepl window instead of to KSP. So I removed the ControlTypes.KEYBOARDINPUT lock, which could possibly interfere with other mods. Had to keep locking ControlTypes.CAMERACONTROLS when the mouse is over the window because Scroll events are still being sent to KSP even when the mouse is over the window. Also I no longer call InputManager.ClearAllInputLocks, which made no sense and could possibly interfere with other mods. 
 
 # Current
 # 0.4
