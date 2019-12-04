@@ -20,6 +20,8 @@ You can use a features of the [API](RedOnion.KSP/API/Globals.md), `app.current` 
 
 This will allow you to make your autorun scripts do different things depending on which scene you are in.
 
+You can also define various functions and functionality in a file and set it as an autorun script.
+
 ## Intellisense
 Both languages provide intellisense. It is very useful and fun to use.
 
