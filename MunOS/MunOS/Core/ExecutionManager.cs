@@ -23,6 +23,9 @@ namespace MunOS
 		Dictionary<long,ExecInfoEntry> execInfoDictionary = new Dictionary<long, ExecInfoEntry>();
 		Dictionary<Priority, PriorityExecutor> priorities = new Dictionary<Priority, PriorityExecutor>();
 
+		static long NextExecID=0;
+
+
 		internal struct ExecInfoEntry
 		{
 			public Priority priority;
@@ -125,7 +128,7 @@ namespace MunOS
 		/// <param name="name">The optional name of this process, to appear in process managers.</param>
 		public long RegisterExecutable(Priority priority, IExecutable executable, string name="")
 		{
-			var execInfo=new ExecInfo(name, executable);
+			var execInfo=new ExecInfo(NextExecID++,name, executable);
 			execInfoDictionary[execInfo.ID]=new ExecInfoEntry(priority,execInfo);
 			priorities[priority].waitQueue.Enqueue(execInfo);
 			return execInfo.ID;

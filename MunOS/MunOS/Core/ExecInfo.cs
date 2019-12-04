@@ -6,12 +6,12 @@ namespace MunOS.Core
 	/// </summary>
 	public class ExecInfo
 	{
-		static long NextID=0;
 		public readonly string name;
-		public readonly long ID=NextID++;
+		public readonly long ID;
 		public readonly IExecutable executable;
-		public ExecInfo(string name, IExecutable executable)
+		public ExecInfo(long ID, string name, IExecutable executable)
 		{
+			this.ID=ID;
 			this.name=name;
 			this.executable=executable;
 		}

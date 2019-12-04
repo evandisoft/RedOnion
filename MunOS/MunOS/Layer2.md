@@ -15,3 +15,18 @@ OS to remove itself OS consideration), until they get a notification from the ot
 1. Implementation of IExecutable that is itself a queue of IExecutables. They run in sequence. IExecutables don't have
 a return value though. So maybe we extend IExecutable. The extension has an event which can signal when it is done
 with a Return value
+
+1. Users will want to be able to run something and then later check it out. Process manager stats could be handled
+in layer 2 instead of Core. Or separate exec stats from selecting finished processes. We won't want all running things
+to stick around. Some things like button presses we will want to have them run and then finish.
+
+We will also want people to be able to run functions from button presses that will stick around and can be connected
+to processes. Perhaps if in 
+
+1. Maybe process/thread distinction is important in layer2 because we want to be able to connect the process to LiveRepl
+(or equivalent) in order to play around with the globals and what-not.
+
+1. And LiveRepl's `terminate` button will destroy all threads associated with a process. Processes will not be IExecutables, but
+threads will be.
+
+1. ProcessManager will show information for processes and allow you to "switch" to a process, opening it in liverepl.
