@@ -53,7 +53,7 @@ namespace LiveRepl
         {
 			if (scriptWindow.inputIsLocked)
 			{
-				InputLockManager.ClearControlLocks();
+				InputLockManager.RemoveControlLock("LiveRepl");
 				scriptWindow.inputIsLocked=false;
 			}
 			guiActive = !guiActive;
