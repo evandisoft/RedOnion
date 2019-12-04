@@ -45,7 +45,10 @@ namespace Kerbalui.Types
 
 		protected virtual void WindowsUpdate()
 		{
-			content?.Update();
+			if (content!=null)
+			{
+				content.Update();
+			}
 		}
 
 		public override void SetRect(Rect newRect)

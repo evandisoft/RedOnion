@@ -1,0 +1,4 @@
+for var part in ship.native.parts
+    for var module in part.modules
+        print(module)
+

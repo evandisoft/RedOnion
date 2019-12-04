@@ -50,7 +50,7 @@ namespace LiveRepl
         {
 			if (scriptWindow.inputIsLocked)
 			{
-				InputLockManager.ClearControlLocks();
+				InputLockManager.RemoveControlLock("kerbalua");
 				scriptWindow.inputIsLocked=false;
 			}
 			guiActive = !guiActive;

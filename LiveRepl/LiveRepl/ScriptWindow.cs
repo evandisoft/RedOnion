@@ -40,7 +40,7 @@ namespace LiveRepl
 				{
 					//Debug.Log("Input is now locked");
 					inputIsLocked = true;
-					InputLockManager.SetControlLock(ControlTypes.KEYBOARDINPUT, "kerbalua");
+					InputLockManager.SetControlLock(ControlTypes.CAMERACONTROLS, "kerbalua");
 				}
 			}
 			else
@@ -49,7 +49,7 @@ namespace LiveRepl
 				{
 					//Debug.Log("Input is no longer locked");
 					inputIsLocked = false;
-					InputLockManager.ClearControlLocks();
+					InputLockManager.RemoveControlLock("kerbalua");
 				}
 			}
 		}
@@ -68,26 +68,42 @@ namespace LiveRepl
 		protected override void WindowsUpdate()
 		{
 			SetOrReleaseInputLock();
+			//if (inputIsLocked)
+			//{
+			//	GUI.FocusWindow(windowID);
+			//}
+			//else
+			//{
+			//	GUI.UnfocusWindow();
+			//}
 
-			if (ScriptRunning && inputIsLocked) HandleInputWhenExecuting();
+			if (ScriptRunning ) HandleInputWhenExecuting();
 			GUILibUtil.ConsumeMarkedCharEvent(Event.current);
-			if (inputIsLocked)
-			{
-				GlobalKeyBindings.ExecuteAndConsumeIfMatched(Event.current);
-			}
-
+			//if (inputIsLocked)
+			//{
+			//	//GlobalKeyBindings.ExecuteAndConsumeIfMatched(Event.current);
+			//}
+			GlobalKeyBindings.ExecuteAndConsumeIfMatched(Event.current);
 			if (completionManager.Update(hadMouseDownLastUpdate))
 			{
 				uiparts.completionArea.needsResize=true;
 			}
-			hadMouseDownLastUpdate=Event.current.type==EventType.MouseDown && inputIsLocked;
+			hadMouseDownLastUpdate=Event.current.type==EventType.MouseDown && rect.Contains(Event.current.mousePosition);
 
 			base.WindowsUpdate();
 
-			if (inputIsLocked && Event.current.type == EventType.ScrollWheel)
-			{
-				Event.current.Use();
-			}
+			//if (inputIsLocked && Event.current.type == EventType.ScrollWheel)
+			//{
+			//	Event.current.Use();
+			//}
+			//if (Event.current.type == EventType.ScrollWheel && content.rect.Contains(Event.current.mousePosition))
+			//{
+			//	Event.current.Use();
+			//}
+			//if (Event.current.isKey || Event.current.isMouse || Event.current.isScrollWheel)
+			//{
+
+			//}
 		}
 
 		private void HandleInputWhenExecuting()
