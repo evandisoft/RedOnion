@@ -64,5 +64,10 @@ namespace RedOnion.KSP.Namespaces
 		public static readonly Type InputLockManager = typeof(InputLockManager);
 		[Description("Alias to `InputLockManager`.")]
 		public static readonly Type InputLock = typeof(InputLockManager);
+
+		[Description("[KSP API](https://kerbalspaceprogram.com/api/class_game_settings.html): Various KSP settings.")]
+		public static readonly Type GameSettings = typeof(GameSettings);
+		[Description("[KSP API](https://kerbalspaceprogram.com/api/class_game_events.html): Various KSP events.")]
+		public static readonly Type GameEvents = typeof(GameEvents);
 	}
 }
