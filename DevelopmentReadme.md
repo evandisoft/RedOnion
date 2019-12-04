@@ -1,6 +1,3 @@
-## Development Philosophy:
-Some of my (Evan) code may appear a bit sloppy at times. Short reason is [opportunity cost](https://en.wikipedia.org/wiki/Opportunity_cost). Long rambling explanation is [here](DevDocs/EvansDevelopmentPhilosophy.md). If at any given time some of my code looks a bit messy but you want to work with it, let me know, and I may set aside some time to make it nicer.
-
 ## Sub-Projects
 The **RedOnion** project is divided into multiple sub-projects:
 - [Kerbalua](Kerbalua/Development.md) - A MoonSharp-based [Lua scripting engine](Kerbalua/README.md).
