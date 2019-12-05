@@ -17,7 +17,7 @@ and saving the modified version (which will become a file outside of the zip).
 Both languages can make use of [Autorun](RedOnion.KSP/API/Autorun.md) to automatically load a list of scripts every time the engine gets reset. Which happens when you click the `Reset Engine` button, and whenever you switch to a different game scene.
 
 You can access `ksp.HighLogic.LoadedScene` to get the enum of the current scene and compare it with any of the scenes in 
-`ksp.GameScenes`. So for the editor, you can check `ksp.HighLogic.LoadedScene==ksp.GameScenes.EDITOR`.
+`ksp.GameScenes`. So for the editor (SPH or VAB), you can check `ksp.HighLogic.LoadedScene==ksp.GameScenes.EDITOR`.
 
 For `FLIGHT` you can check `ksp.HighLogic.LoadedScene==ksp.GameScenes.FLIGHT`.
 
@@ -29,11 +29,11 @@ This will allow you to make your autorun scripts do different things depending o
 ## Intellisense
 Both languages provide intellisense. It is very useful and fun to use.
 
-However, since both languages are dynamic, it's not possible to always guess correctly what type of return value there is from a function because we cannot know from looking at the source which overload will be used, as that requires knowledge of the types, but we won't have them until we actually execute the code.
+However, since both languages are dynamic, it's not possible to always guess correctly what type of return value there is from a CLR function because we cannot know from looking at the source which overload will be used, as that requires knowledge of the types of the arguments we will pas it, but we won't have them until we actually execute the code.
 
 Furthermore, the intellisense does not even handle every case that it could handle. Kerbalua intellisense at least, doesn't even try to narrow down the possibilities in the case of overloads based on number of arguments to the function. This may change in the future.
 
-Usually overloaded functions return the same object, but they are technically not required to, so you may get situations where the intellisense will not give you the right answer.
+Usually overloaded functions return the same type, but they are technically not required to, so you may get situations where the intellisense will not give you the right answer for that reason.
 
 ## Limitations
 - Calls to long running CLR code are not interruptible.

@@ -1,4 +1,4 @@
-MoonSharp provides a useful way to iterate over dotnet collections.
+MoonSharp provides Kerbalua a useful way to iterate over dotnet collections.
 
 ```
 for item in collection do
