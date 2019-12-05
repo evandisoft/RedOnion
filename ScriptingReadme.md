@@ -16,11 +16,9 @@ and saving the modified version (which will become a file outside of the zip).
 ## Autorun
 Both languages can make use of [Autorun](RedOnion.KSP/API/Autorun.md) to automatically load a list of scripts every time the engine gets reset. Which happens when you click the `Reset Engine` button, and whenever you switch to a different game scene.
 
-You can use a features of the [API](RedOnion.KSP/API/Globals.md), `app.current` to get the name of the current scene.
+You will be able to use a features of the [API](RedOnion.KSP/API/Globals.md), to get the name of the current scene. Right now `app` is a WIP.
 
 This will allow you to make your autorun scripts do different things depending on which scene you are in.
-
-You can also define various functions and functionality in a file and set it as an autorun script.
 
 ## Intellisense
 Both languages provide intellisense. It is very useful and fun to use.
