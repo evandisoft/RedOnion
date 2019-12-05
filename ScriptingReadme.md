@@ -21,7 +21,7 @@ You can access `ksp.HighLogic.LoadedScene` to get the enum of the current scene 
 
 For `FLIGHT` you can check `ksp.HighLogic.LoadedScene==ksp.GameScenes.FLIGHT`.
 
-Note that `ksp.HighLogic.LoadedScene` is an enum value. If you compare it to a string it will always return false. You need
+Note that `ksp.HighLogic.LoadedScene` is an enum value. If you compare it to a string (`ksp.HighLogic.LoadedScene=="EDITOR"`) it will always return false. You need
 to compare it to one of the enum values in `ksp.GameScenes`.
 
 This will allow you to make your autorun scripts do different things depending on which scene you are in.
