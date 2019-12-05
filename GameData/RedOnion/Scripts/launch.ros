@@ -25,84 +25,88 @@ def gui
   var lblWidth = 120
   var boxWidth = 60
   var uniWidth = 46
-  var wnd = new ui.window "Launch " + ship.name
-//move the window to the left side
-  wnd.x -= (unity.screen.width - 200) / 3
-  var hintLabel = new ui.label
-  def boxEnter box
-    hintLabel.text = box.tag
-  def row text, value, units, hint
-    var row = wnd.addHorizontal()
-    var lbl = row.addLabel text
-    lbl.minWidth = lblWidth
-  //string(value) performs to-string conversion:
-    var box = row.addTextBox string value
-    box.tag = hint
-    box.enter.add boxEnter
-    if units == null
-      box.preferWidth = boxWidth + 3 + uniWidth
-    else
-      box.preferWidth = boxWidth
-      var uni = row.add new ui.label
-      uni.text = units
-      uni.minWidth = uniWidth
-    return box
-  
-  var ta = row "Target altitude: ",  targetAltitude, "km",    "Final Apoapsis"
-  var ah = row "Ascent heading: ",   ascentHeading,  "°",     "Course during ascent (not inclination)"
-  var ar = row "Ascent roll: ",      ascentRoll,     "°",     "Roll/bank during ascent"
-  var cr = row "Circularize roll: ", circleRoll,     "°",     "Roll/bank during circularization"
-  var pf = row "Ascent profile: ",   ascentProfile,  "1-9",   "Lower means less agressive turn"
-  var pr = row "Speed/Alt ratio: ",  speedRatio,     "*10%",  "Higher for speed, above 10 means earlier"
-  var ms = row "Max. Speed: ",       maxSpeed,       "*|m/s", "<= 2 for fraction of minimal, or m/s"
-  var sa = row "Safe altitude: ",    safeAltitude,   "km",    "Above atmposhepre and mountains"
-  var sd = row "Start angle: ",      startAngle,     "°",     "Start degrees of pitch"
-  var fa = row "First angle: ",      firstAngle,     "°",     "Degrees of pitch for first phase"
-  var a1 = row "First altitude: ",   firstAltitude,  "km",    "Altitude for first phase"
-  var na = row "Narrow altitude: ",  narrowAltitude,  "m",    "Minimal altitude to go straight up"
-  
-  var apsel = wnd.addHorizontal()
-  apsel.addLabel "Pilot: "
-  var xfirda = apsel.addExclusive "Firda"
-  var xevan  = apsel.addExclusive "Evan"
-  var xcust  = apsel.addExclusive "Custom"
-  xfirda.pressed = true
-  
-  wnd.add hintLabel
-  var brow = wnd.addHorizontal()
   var selected = 0
-  wnd.closed += def => selected = 1
-  brow.addButton("Cancel",  def => selected = 1).flexWidth = 1
-  brow.addButton("Control", def => selected = 2).flexWidth = 1
-  brow.addButton("Launch",  def => selected = 3).flexWidth = 1
-  
-//wait until user selects what to do (or closes the window)
-  while selected == 0
-    wait
-  
+  var wnd = new ui.window "Launch " + ship.name
+  try
+
+  //move the window to the left side
+    wnd.x -= (unity.screen.width - 200) / 3
+    var hintLabel = new ui.label
+    def boxEnter box
+      hintLabel.text = box.tag
+    def row text, value, units, hint
+      var row = wnd.addHorizontal()
+      var lbl = row.addLabel text
+      lbl.minWidth = lblWidth
+    //string(value) performs to-string conversion:
+      var box = row.addTextBox string value
+      box.tag = hint
+      box.enter.add boxEnter
+      if units == null
+        box.preferWidth = boxWidth + 3 + uniWidth
+      else
+        box.preferWidth = boxWidth
+        var uni = row.add new ui.label
+        uni.text = units
+        uni.minWidth = uniWidth
+      return box
+    
+    var ta = row "Target altitude: ",  targetAltitude, "km",    "Final Apoapsis"
+    var ah = row "Ascent heading: ",   ascentHeading,  "°",     "Course during ascent (not inclination)"
+    var ar = row "Ascent roll: ",      ascentRoll,     "°",     "Roll/bank during ascent"
+    var cr = row "Circularize roll: ", circleRoll,     "°",     "Roll/bank during circularization"
+    var pf = row "Ascent profile: ",   ascentProfile,  "1-9",   "Lower means less agressive turn"
+    var pr = row "Speed/Alt ratio: ",  speedRatio,     "*10%",  "Higher for speed, above 10 means earlier"
+    var ms = row "Max. Speed: ",       maxSpeed,       "*|m/s", "<= 2 for fraction of minimal, or m/s"
+    var sa = row "Safe altitude: ",    safeAltitude,   "km",    "Above atmposhepre and mountains"
+    var sd = row "Start angle: ",      startAngle,     "°",     "Start degrees of pitch"
+    var fa = row "First angle: ",      firstAngle,     "°",     "Degrees of pitch for first phase"
+    var a1 = row "First altitude: ",   firstAltitude,  "km",    "Altitude for first phase"
+    var na = row "Narrow altitude: ",  narrowAltitude,  "m",    "Minimal altitude to go straight up"
+    
+    var apsel = wnd.addHorizontal()
+    apsel.addLabel "Pilot: "
+    var xfirda = apsel.addExclusive "Firda"
+    var xevan  = apsel.addExclusive "Evan"
+    var xcust  = apsel.addExclusive "Custom"
+    xfirda.pressed = true
+    
+    wnd.add hintLabel
+    var brow = wnd.addHorizontal()
+    wnd.closed += def => selected = 1
+    brow.addButton("Cancel",  def => selected = 1).flexWidth = 1
+    brow.addButton("Control", def => selected = 2).flexWidth = 1
+    brow.addButton("Launch",  def => selected = 3).flexWidth = 1
+    
+  //wait until user selects what to do (or closes the window)
+    while selected == 0
+      wait
+    
+    if selected == 3 // launch
+      targetAltitude = double ta.text
+      ascentHeading  = double ah.text
+      ascentRoll     = double ar.text
+      circleRoll     = double cr.text
+      ascentProfile  = double pf.text
+      speedRatio     = double pr.text
+      maxSpeed       = double ms.text
+      safeAltitude   = double sa.text
+      startAngle     = double sd.text
+      firstAngle     = double fa.text
+      firstAltitude  = double a1.text
+      narrowAltitude = double na.text
+
+    firda = xfirda.pressed
+    evan  = xevan.pressed
+    cust  = xcust.pressed
+
+  finally 
+    wnd.dispose
+
   if selected == 2 // control
-    wnd.dispose()
     run.replace "control.ros"
     //script not continuing here, replaced by control.ros
-  
-  if selected == 3 // launch
-    targetAltitude = double ta.text
-    ascentHeading  = double ah.text
-    ascentRoll     = double ar.text
-    circleRoll     = double cr.text
-    ascentProfile  = double pf.text
-    speedRatio     = double pr.text
-    maxSpeed       = double ms.text
-    safeAltitude   = double sa.text
-    startAngle     = double sd.text
-    firstAngle     = double fa.text
-    firstAltitude  = double a1.text
-    narrowAltitude = double na.text
 
-  wnd.dispose
-  firda = xfirda.pressed
-  evan  = xevan.pressed
-  cust  = xcust.pressed
   return selected == 3
 if not gui()
 //user selected "Cancel" or closed the window
@@ -247,7 +251,7 @@ def staging
       print "Pending last stage"
       stage
     return
-  if nextDecoupler.isType("LaunchClamp")
+  if nextDecoupler.isType "LaunchClamp"
     print "Releasing launch clamps"
     stage
     return
@@ -303,142 +307,146 @@ var vdraws = system.update vectors
 var steers = customSteering == null ? null :
   system.update customSteering
 
-print "Target apoapsis: " + targetAltitude
-print "Safe altitude:   " + safeAltitude
-until ship.altitude >= safeAltitude and ship.apoapsis >= targetAltitude*.99
-  wait
+try
+  print "Target apoapsis: " + targetAltitude
+  print "Safe altitude:   " + safeAltitude
+  until ship.altitude >= safeAltitude and ship.apoapsis >= targetAltitude*.99
+    wait
 
-ctlsub.remove()
-user.throttle = 0
-ship.autopilot.disable
-print "Safe altitude reached"
-vd[3].hide //srfvel
-
+  ctlsub.remove()
+  ctlsub = null
+  user.throttle = 0
+  ship.autopilot.disable
+  print "Safe altitude reached"
+  vd[3].hide //srfvel
 
 //: CIRCULARIZE
 
-def dt => ship.eccentricity < 0.001 or
-  ship.periapsis < safeAltitude and ship.timeToAp > ship.timeToPe ?
-  0 : ship.timeToAp
-var minE = ship.eccentricity
-def dv
-  minE = math.min minE, ship.eccentricity
-  if minE < 0.001 and (minE < 0.00001 or ship.eccentricity > 1.1*minE)
-    return vector.zero
-  var p = ship.position-body.position
-  var v1 = ship.velocity
-  var v2 = math.sqrt(body.mu/p.size) * (p.cross v1.cross p).normalized
-  return v2-v1
+  def dt => ship.eccentricity < 0.001 or
+    ship.periapsis < safeAltitude and ship.timeToAp > ship.timeToPe ?
+    0 : ship.timeToAp
+  var minE = ship.eccentricity
+  def dv
+    minE = math.min minE, ship.eccentricity
+    if minE < 0.001 and (minE < 0.00001 or ship.eccentricity > 1.1*minE)
+      return vector.zero
+    var p = ship.position-body.position
+    var v1 = ship.velocity
+    var v2 = math.sqrt(body.mu/p.size) * (p.cross v1.cross p).normalized
+    return v2-v1
 
-if not evan
-  autopilot.roll = circleRoll
-ctlsub = system.update def
-  autopilot.direction = ship.away.cross ship.velocity.cross ship.away
+  if not evan
+    autopilot.roll = circleRoll
+  ctlsub = system.update def
+    autopilot.direction = ship.away.cross ship.velocity.cross ship.away
 
-var maxThrottle = 0.0
-def circle
-  var pwr = 1
-  var tta = ship.timeToAp
-  var dir
-  if tta < ship.timeToPe
-  //minimize velocity vector difference when before apoapsis
-    dir = dv()
-    pwr = 1 / math.clamp (tta - 0.5 * stage.burnTime dir.size), 1.0, 100.0
-    if pwr <= 0.01; pwr = 0.0
-  else
-  //pitch-up when past apoapsis
-    var a = math.clamp(ship.period - tta, 0, 30)
-    dir = ship.velocity.rotate a, ship.velocity.cross ship.away
-    pwr = 1 + math.tan a
-  if evan; ksp.flightControl.targetDir = dir
-  else autopilot.direction = dir
-  var d = dir.angle ship.forward // direction / face-angle error
-  var e = d <= 1 ? 1 : math.deg.cos math.min 89.4, d^2 // min 0.0105
-  var needSpeed = math.sqrt(body.mu/(body.radius+ship.apoapsis))
-  var haveSpeed = ship.velocity.size
-  var need = (needSpeed-haveSpeed) * ship.mass / math.max 1, ship.engines.getThrust()
-  autopilot.throttle = pwr * e * math.min(maxThrottle, need)
-
-var prevEtaReport = -10
-var switched = false
-var warped = false
-for
-  var bt = stage.burnTime dv().size
-  if bt != bt; bt = 120 // bt != bt is test for nan
-  var eta = dt()-0.5*bt
-  if time.since(prevEtaReport) >= (eta > 10 ? 10 : eta > 5 ? 2 : 1)
-    prevEtaReport = time.now
-    print "ETA: {0:F1}s", eta
-    if eta > 20 and !warped
-      warped = true
-      time.warp.to prevEtaReport + eta - 10
-  if eta <= 5 and not switched
-    switched = true
-    time.warp.cancel()
-    ctlsub.remove
-    ctlsub = system.update circle
-  if eta <= 1; break
-  wait
-maxThrottle = 1.0
-
-var almost = null
-var almost2 = null
-var choked = null
-var warned = 0
-var maxHeight = ship.apoapsis*1.1+1000
-var prevReport = 0
-print "Burn!"
-until ship.eccentricity < 0.00001 // perfect
-  if ship.timeToPe < ship.period*0.3
-  //happens with good accuracy, not a failure
-    print "Apoapsis too far"
-    break
-  if ship.apoapsis > maxHeight and ship.periapsis > math.max(atmosphere.depth,1000)+1000
-    print "Overshot apoapsis"
-    break
-  if ship.apoapsis > maxHeight*1.5+5000
-    print "Something went wrong!"
-    break
-
-//time limit for fine-tuning
-  if ship.eccentricity < 0.01 and ship.periapsis > safeAltitude
-    if almost == null; almost = time()
-    else if time.since(almost) > 60; break
-    if ship.eccentricity < 0.001
-      if almost2 == null; almost2 = time()
-      else if time.since(almost2) > 20; break
-
-//progress printout
-  if time.since(prevReport) >= 1
-    prevReport = time()
-    var delta = dv().size
+  var maxThrottle = 0.0
+  def circle
+    var pwr = 1
     var tta = ship.timeToAp
-    if tta > ship.timeToPe
-      tta -= ship.period
-    print "TTA: {0,6:F1} DV: {1,6:F1} BT: {2,6:F1}", tta, delta, stage.burnTime delta
-    
-//check that staging is working (and we have fuel)
-  if ship.engines.getThrust() == 0
-    if choked == null
-      choked = time()
-    if time.since(choked) >= 3 and time.since(warned) >= 1
-      warned = time()
-      print "No acceleration!"
-    if time()-choked >= 30
-      print "No acceleration!!"
-      break
-    continue
-  choked = null
+    var dir
+    if tta < ship.timeToPe
+    //minimize velocity vector difference when before apoapsis
+      dir = dv()
+      pwr = 1 / math.clamp (tta - 0.5 * stage.burnTime dir.size), 1.0, 100.0
+      if pwr <= 0.01; pwr = 0.0
+    else
+    //pitch-up when past apoapsis
+      var a = math.clamp(ship.period - tta, 0, 30)
+      dir = ship.velocity.rotate a, ship.velocity.cross ship.away
+      pwr = 1 + math.tan a
+    if evan; ksp.flightControl.targetDir = dir
+    else autopilot.direction = dir
+    var d = dir.angle ship.forward // direction / face-angle error
+    var e = d <= 1 ? 1 : math.deg.cos math.min 89.4, d^2 // min 0.0105
+    var needSpeed = math.sqrt(body.mu/(body.radius+ship.apoapsis))
+    var haveSpeed = ship.velocity.size
+    var need = (needSpeed-haveSpeed) * ship.mass / math.max 1, ship.engines.getThrust()
+    autopilot.throttle = pwr * e * math.min(maxThrottle, need)
 
-ctlsub.remove
-stgsub.remove
-vdraws.remove
-if steers != null
-  steers.remove
-for var d in vd
-  d.hide
-vd = null
-user.throttle = 0
-ship.autopilot.disable
+  var prevEtaReport = -10
+  var switched = false
+  var warped = false
+  for
+    var bt = stage.burnTime dv().size
+    if bt != bt; bt = 120 // bt != bt is test for nan
+    var eta = dt()-0.5*bt
+    if time.since(prevEtaReport) >= (eta > 10 ? 10 : eta > 5 ? 2 : 1)
+      prevEtaReport = time.now
+      print "ETA: {0:F1}s", eta
+      if eta > 20 and !warped
+        warped = true
+        time.warp.to prevEtaReport + eta - 10
+    if eta <= 5 and not switched
+      switched = true
+      time.warp.cancel()
+      ctlsub.remove
+      ctlsub = system.update circle
+    if eta <= 1; break
+    wait
+  maxThrottle = 1.0
+
+  var almost = null
+  var almost2 = null
+  var choked = null
+  var warned = 0
+  var maxHeight = ship.apoapsis*1.1+1000
+  var prevReport = 0
+  print "Burn!"
+  until ship.eccentricity < 0.00001 // perfect
+    if ship.timeToPe < ship.period*0.3
+    //happens with good accuracy, not a failure
+      print "Apoapsis too far"
+      break
+    if ship.apoapsis > maxHeight and ship.periapsis > math.max(atmosphere.depth,1000)+1000
+      print "Overshot apoapsis"
+      break
+    if ship.apoapsis > maxHeight*1.5+5000
+      print "Something went wrong!"
+      break
+
+  //time limit for fine-tuning
+    if ship.eccentricity < 0.01 and ship.periapsis > safeAltitude
+      if almost == null; almost = time()
+      else if time.since(almost) > 60; break
+      if ship.eccentricity < 0.001
+        if almost2 == null; almost2 = time()
+        else if time.since(almost2) > 20; break
+
+  //progress printout
+    if time.since(prevReport) >= 1
+      prevReport = time()
+      var delta = dv().size
+      var tta = ship.timeToAp
+      if tta > ship.timeToPe
+        tta -= ship.period
+      print "TTA: {0,6:F1} DV: {1,6:F1} BT: {2,6:F1}", tta, delta, stage.burnTime delta
+      
+  //check that staging is working (and we have fuel)
+    if ship.engines.getThrust() == 0
+      if choked == null
+        choked = time()
+      if time.since(choked) >= 3 and time.since(warned) >= 1
+        warned = time()
+        print "No acceleration!"
+      if time()-choked >= 30
+        print "No acceleration!!"
+        break
+      continue
+    choked = null
+
+finally
+  if ctlsub != null
+    ctlsub.remove
+  stgsub.remove
+  vdraws.remove
+  if steers != null
+    steers.remove
+  for var d in vd
+    d.dispose()
+  vd = null
+  user.throttle = 0
+  ship.autopilot.disable
+
 print "DONE! e={0:F5} Ap:{1:F3} Pe:{2:F3}", ship.eccentricity, ship.apoapsis*0.001, ship.periapsis*0.001
 run.replace "control.ros"

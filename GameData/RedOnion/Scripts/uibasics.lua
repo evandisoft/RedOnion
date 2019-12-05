@@ -14,6 +14,3 @@ addbutton("button5")
 addbutton("button6")
 addbutton("button7")
 addbutton("button8")
-
-
-

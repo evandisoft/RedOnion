@@ -309,6 +309,12 @@ namespace RedOnion.ROS.Objects
 					if (closure.Captured.Count == 0)
 						closure.Captured = null;
 
+					if (!dict.ContainsKey(name))
+					{
+						Value.DebugLog("SeparateVars: '{0}' does not exist in '{1}'.", name, Name);
+						continue;
+					}
+
 					var cousin = Cousin;
 					if (cousin == null)
 						Cousin = cousin = new Context(this);

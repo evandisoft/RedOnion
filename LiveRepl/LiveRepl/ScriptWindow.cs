@@ -40,7 +40,7 @@ namespace LiveRepl
 				{
 					//Debug.Log("Input is now locked");
 					inputIsLocked = true;
-					InputLockManager.SetControlLock(ControlTypes.KEYBOARDINPUT, "kerbalua");
+					InputLockManager.SetControlLock(ControlTypes.CAMERACONTROLS, "LiveRepl");
 				}
 			}
 			else
@@ -49,7 +49,7 @@ namespace LiveRepl
 				{
 					//Debug.Log("Input is no longer locked");
 					inputIsLocked = false;
-					InputLockManager.ClearControlLocks();
+					InputLockManager.RemoveControlLock("LiveRepl");
 				}
 			}
 		}
@@ -69,25 +69,17 @@ namespace LiveRepl
 		{
 			SetOrReleaseInputLock();
 
-			if (ScriptRunning && inputIsLocked) HandleInputWhenExecuting();
+			if (ScriptRunning ) HandleInputWhenExecuting();
 			GUILibUtil.ConsumeMarkedCharEvent(Event.current);
-			if (inputIsLocked)
-			{
-				GlobalKeyBindings.ExecuteAndConsumeIfMatched(Event.current);
-			}
 
+			GlobalKeyBindings.ExecuteAndConsumeIfMatched(Event.current);
 			if (completionManager.Update(hadMouseDownLastUpdate))
 			{
 				uiparts.completionArea.needsResize=true;
 			}
-			hadMouseDownLastUpdate=Event.current.type==EventType.MouseDown && inputIsLocked;
+			hadMouseDownLastUpdate=Event.current.type==EventType.MouseDown && rect.Contains(Event.current.mousePosition);
 
 			base.WindowsUpdate();
-
-			if (inputIsLocked && Event.current.type == EventType.ScrollWheel)
-			{
-				Event.current.Use();
-			}
 		}
 
 		private void HandleInputWhenExecuting()

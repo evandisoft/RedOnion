@@ -41,8 +41,7 @@ namespace LiveRepl.Execution
 
 		public override void FixedUpdate()
 		{
-			if (state < State.Yielding)
-				return;
+			// note: we can get `once` even in State.Idle because we do not track UI events (and GameEvents)
 			try
 			{
 				processor.UpdatePhysics();
