@@ -18,3 +18,4 @@ Vector drawing
 **Instance Methods:**
 - `show()`: void - Show the vector. It is created hidden so that you can subscribe to `system.update` first.
 - `hide()`: void - Hide the vector.
+- `dispose()`: void - Dispose the vector. (Cannot be shown again after that.)

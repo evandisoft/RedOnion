@@ -11,12 +11,22 @@
 - Working on some sort of system for running multiple scripts at a time. May not initially have a UI that can provide this feature to the user in full. That will probably come later.
 
 # Next Release
-### LiveRepl Changes:
-- Fixed bug where LiveRepl cleared all Input ControlLocks instead of just the one it had set.
-- Stopped using the ControlTypes.KEYBOARDINPUT lock. Now keyboard input (except camera control) is only locked to the window when the window is focused. Still have to lock ControlTypes.CAMERACONTROLS when mouse is in the window bounds, as otherwise scrolling the mouse zooms KSP in and out regardless of the mouse being over a window and that window being focused.
+Just had a release (0.4.7).
 
 # Current
 # 0.4
+## 0.4.7
+### General Changes:
+- time.warp.ready improved
+- added GameSettings and GameEvents into KSP namespace
+
+### ROS Changes:
+- launch.ros and control.ros now use try..finally
+- fixed delay in repl for native events in ROS
+
+### LiveRepl Changes:
+- Fixed bug where LiveRepl cleared all Input ControlLocks instead of just the one it had set.
+- Stopped using the ControlTypes.KEYBOARDINPUT lock. Now keyboard input (except camera control) is only locked to the window when the window is focused. Still have to lock ControlTypes.CAMERACONTROLS when mouse is in the window bounds, as otherwise scrolling the mouse zooms KSP in and out regardless of the mouse being over a window and that window being focused.
 
 ## 0.4.6
 ### RedOnionScript (ROS) Changes:
