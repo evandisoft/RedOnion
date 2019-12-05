@@ -161,8 +161,11 @@
     <Compile Include="MoonSharp\MoonSharpAPI\MoonSharpGlobals.cs" />
     <Compile Include="Completion\Instance.cs" />
     <Compile Include="Debugging\QueueLogger.cs" />
-    <Compile Include="OS\Process.cs" />
+    <Compile Include="MunOS\Process.cs" />
     <Compile Include="Utilities\ScriptStringKeyedConstDictionary.cs" />
+    <Compile Include="MunOS\EngineProcess.cs" />
+    <Compile Include="MunOS\ScriptOutputHandler.cs" />
+    <Compile Include="MunOS\EngineThread.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RedOnion.Common\RedOnion.Common.csproj">
@@ -176,6 +179,10 @@
     <ProjectReference Include="..\RedOnion.UI\RedOnion.UI.csproj">
       <Project>{034C16AB-D16E-4AFE-9837-812499EE2F3D}</Project>
       <Name>RedOnion.UI</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MunOS\MunOS.csproj">
+      <Project>{A4C93278-A705-4AC2-B2A9-16B30C2E2C36}</Project>
+      <Name>MunOS</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

@@ -11,14 +11,14 @@
 			{
 				if (executeQueue.Count > 0)
 				{
-					if (numSkips < ExecutionManager.MaxOneShotSkips)
+					if (numSkips < CoreExecMgr.MaxOneShotSkips)
 					{
 						numSkips++;
 					}
 					else
 					{
 						numSkips = 0;
-						ExecuteExecutable(executeQueue.Dequeue(), ExecutionManager.OneshotForceTicks);
+						ExecuteExecutable(executeQueue.Dequeue(), CoreExecMgr.OneshotForceTicks);
 					}
 				}
 				else

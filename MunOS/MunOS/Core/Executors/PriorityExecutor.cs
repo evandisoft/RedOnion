@@ -38,19 +38,19 @@ namespace MunOS.Core.Executors
 
 		Stopwatch stopwatch = new Stopwatch();
 
-		public void Kill(long ID)
+		public void RemoveTerminated()
 		{
-			Kill(ID, waitQueue);
-			Kill(ID, executeQueue);
+			RemoveTerminated(waitQueue);
+			RemoveTerminated(executeQueue);
 		}
 
-		void Kill(long ID, Queue<ExecInfo> execInfos)
+		void RemoveTerminated(Queue<ExecInfo> execInfos)
 		{
 			for (int i = execInfos.Count; i > 0; i--)
 			{
 				var execInfo=execInfos.Dequeue();
 
-				if (execInfo.ID!=ID)
+				if (!execInfo.terminated)
 				{
 					execInfos.Enqueue(execInfo);
 				}
@@ -76,23 +76,27 @@ namespace MunOS.Core.Executors
 
 		protected void ExecuteExecutable(ExecInfo execInfo,long ticks)
 		{
+			if (execInfo.terminated) 
+			{
+				// a previous executable could have terminated this one.
+				// And this executable's OnTerminated will have already been called by
+				// ExecutionManager at this point.
+				return;
+			}
 			try
 			{
-				long start=stopwatch.ElapsedTicks;
 				var status=execInfo.executable.Execute(ticks);
-				long end=stopwatch.ElapsedTicks;
-				// EvanTODO: Can record stats with end-start
 
 				switch (status)
 				{
 				case ExecStatus.FINISHED:
 					// if finished, don't put the executable back on a queue. Remove
 					// it from the executable dictionary
-					ExecutionManager.Instance.Remove(execInfo.ID);
+					CoreExecMgr.Instance.Remove(execInfo.ID);
 					break;
 				case ExecStatus.INTERRUPTED:
 					// if it was interrupted, put it at the back of the queue. it may get more time to execute
-					// this update if other executablees finish or yield early.
+					// this update if other executables finish or yield early.
 					executeQueue.Enqueue(execInfo);
 					break;
 				case ExecStatus.YIELDED:
@@ -106,12 +110,12 @@ namespace MunOS.Core.Executors
 			}
 			catch (Exception e)
 			{
-				ExecutionManager.Instance.Remove(execInfo.ID);
+				CoreExecMgr.Instance.Remove(execInfo.ID);
 				// If there was an exception don't add the executable back into the queue.
 				// Remove it from the executable dictionary
 				// If they want to handle exceptions gracefully, they can surround their
 				// code in a try-catch.
-				execInfo.executable.HandleException(execInfo.name, execInfo.ID, e);
+				execInfo.executable.HandleException(e);
 			}
 		}
 
@@ -129,7 +133,7 @@ namespace MunOS.Core.Executors
 
 				for (int i = executeQueue.Count; i > 0 && remainingTicks > 0; i--)
 				{
-					ExecuteExecutable(executeQueue.Dequeue(),remainingTicks);
+					ExecuteExecutable(executeQueue.Dequeue(), perExecuteTickLimit);
 
 					remainingTicks = tickLimit - stopwatch.ElapsedTicks;
 				}

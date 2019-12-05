@@ -30,3 +30,16 @@ to processes. Perhaps if in
 threads will be.
 
 1. ProcessManager will show information for processes and allow you to "switch" to a process, opening it in liverepl.
+
+1. For simplicity, Process will have an output buffer and all its threads will access that buffer.
+
+1. Process will have facilities for adding a thread to it and will manage its threads, but will not manage
+their execution time. It will just register them to the OS to run.
+
+1. Need a way to get execution time at the process level so that processes could be shown with how long they are executing
+1. ProcessManager can show a dropdown list for each process that shows which threads are running and for how much time.
+1. Threads can have a Property that returns how many ticks were executed last update.
+
+1. Global update counter can help us more easily record stats.
+1. ROSProcess, KerbaluaProcess, and they are both EngineProcess (or ScriptProcess). EngineProcess is a MunProcess.
+1. EngineProcess has an optional input history.

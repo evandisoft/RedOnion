@@ -3,6 +3,7 @@ using UnityEngine;
 using KSP.UI.Screens;
 using System.Collections.Generic;
 using MunOS;
+using System.Diagnostics;
 
 namespace LiveRepl
 {
@@ -21,8 +22,17 @@ namespace LiveRepl
         // no longer has any relevance.
         static public ToggleGUI ToggleGui;
 
+		bool highResolution;
         public void Awake()
         {
+			highResolution=Stopwatch.IsHighResolution;
+			if (!highResolution)
+			{
+				throw new Exception("Versions 0.5.0+ of LiveRepl require a high precision timer for MunOS. " +
+					"It seems your computer does not have one. Please let the maintainers know, because we are under the " +
+					"impression that pretty much every computer these days has one.");
+			}
+
 			toolbarTexture = RedOnion.UI.Element.LoadIcon(38, 38, "LiveRepl.png");
             if (ToggleGui == null) {
                 ApplicationLauncher.Instance.AddModApplication(
@@ -39,7 +49,7 @@ namespace LiveRepl
             // a delegate from another scene.
             ToggleGui = LocalToggleGui;
 
-			ExecutionManager.Initialize();
+			CoreExecMgr.Initialize();
         }
 
 		ScriptWindow scriptWindow;
@@ -61,17 +71,20 @@ namespace LiveRepl
 
 		void OnDestroy()
 		{
-			scriptWindow.OnDestroy();
+			scriptWindow?.OnDestroy();
 		}
 
 		void FixedUpdate()
 		{
+			if (!highResolution) return;
+
 			scriptWindow?.FixedUpdate();
-			ExecutionManager.Instance.FixedUpdate();
+			CoreExecMgr.Instance.FixedUpdate();
 		}
 
 		void OnGUI()
         {
+			if (!highResolution) return;
 
 			if (scriptWindow==null)
 			{
@@ -86,7 +99,7 @@ namespace LiveRepl
 			}
 			catch (Exception e)
 			{
-				Debug.Log(e);
+				UnityEngine.Debug.Log(e);
 			}
 		}
     }

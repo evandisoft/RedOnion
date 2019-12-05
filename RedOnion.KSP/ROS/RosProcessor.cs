@@ -16,14 +16,14 @@ namespace RedOnion.KSP.ROS
 {
 	public class RosProcessor : Processor, IProcessor
 	{
-		protected OS.Process _process;
-		public OS.Process Process
+		protected MunOS.Process _process;
+		public MunOS.Process Process
 		{
 			get
 			{
 				if (_process == null)
 				{
-					_process = new OS.Process();
+					_process = new MunOS.Process();
 					_process.shutdown += Terminate;
 				}
 				return _process;
@@ -47,10 +47,10 @@ namespace RedOnion.KSP.ROS
 
 		public override bool Execute(int countdown = 1000)
 		{
-			OS.Process.current = Process;
+			MunOS.Process.current = Process;
 			var result = base.Execute(countdown);
 			_process.UpdatePhysics();
-			OS.Process.current = null;
+			MunOS.Process.current = null;
 			return result;
 		}
 

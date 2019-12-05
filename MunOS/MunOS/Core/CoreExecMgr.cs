@@ -4,9 +4,12 @@ using System.Diagnostics;
 using MunOS.Core;
 using MunOS.Core.Executors;
 
-namespace MunOS
+namespace MunOS.Core
 {
-	public class ExecutionManager
+	/// <summary>
+	/// Manages execution of IExecutables among 4 priority levels. Lowest level of execution.
+	/// </summary>
+	public class CoreExecMgr
 	{
 		public enum Priority
 		{
@@ -37,6 +40,13 @@ namespace MunOS
 				this.execInfo=execInfo;
 			}
 		}
+
+		public bool Contains(long ID)
+		{
+			return execInfoDictionary.ContainsKey(ID);
+		}
+
+		bool needToRemoveTerminated;
 		/// <summary>
 		/// Kill the process with the specified ID. mark it as terminated, don't hunt it down and remove it from
 		/// the queues, just mark it and it will not be executed.
@@ -48,10 +58,12 @@ namespace MunOS
 			{
 				var execInfoEntry=execInfoDictionary[ID];
 				var execInfo=execInfoEntry.execInfo;
-				execInfo.executable.OnTerminated(execInfo.name, execInfo.ID);
-				var priority=execInfoEntry.priority;
-				priorities[priority].Kill(ID);
+				execInfo.executable.OnTerminated();
+				execInfo.terminated=true; // mark it and it will be removed at the beginning of the update.
+				//var priority=execInfoEntry.priority;
+				//priorities[priority].Kill(ID);
 				Remove(ID);
+				needToRemoveTerminated=true;
 			}
 		}
 
@@ -73,7 +85,15 @@ namespace MunOS
 			}
 		}
 
-		public ExecutionManager()
+		void RemoveTerminated()
+		{
+			foreach (var executor in priorities.Values)
+			{
+				executor.RemoveTerminated();
+			}
+		}
+
+		private CoreExecMgr()
 		{
 			priorities[Priority.REALTIME] = new RealtimeExecutor();
 			priorities[Priority.ONESHOT] = new OneShotExecutor();
@@ -83,21 +103,21 @@ namespace MunOS
 
 		static public void Initialize()
 		{
-			instance = new ExecutionManager();
+			instance = new CoreExecMgr();
 		}
-		static public ExecutionManager instance;
+		static public CoreExecMgr instance;
 		/// <summary>
 		/// Should be initialized by LiveReplMain prior to anything else being
 		/// able to use it. Must be reinitialized on every scene change.
 		/// </summary>
 		/// <value>The instance.</value>
-		static public ExecutionManager Instance
+		static public CoreExecMgr Instance
 		{
 			get
 			{
 				if (instance==null)
 				{
-					throw new Exception("ExecutionManager.Instance was not initialized!");
+					throw new Exception(nameof(CoreExecMgr)+" was not initialized!");
 				}
 
 				return instance;
@@ -125,10 +145,9 @@ namespace MunOS
 		/// <returns>The ID of the process.</returns>
 		/// <param name="priority">The priority you want the execution to run on.</param>
 		/// <param name="executable">The object that we will call Execute on.</param>
-		/// <param name="name">The optional name of this process, to appear in process managers.</param>
-		public long RegisterExecutable(Priority priority, IExecutable executable, string name="")
+		public long RegisterExecutable(Priority priority, IExecutable executable)
 		{
-			var execInfo=new ExecInfo(NextExecID++,name, executable);
+			var execInfo=new ExecInfo(NextExecID++,executable);
 			execInfoDictionary[execInfo.ID]=new ExecInfoEntry(priority,execInfo);
 			priorities[priority].waitQueue.Enqueue(execInfo);
 			return execInfo.ID;
@@ -174,6 +193,10 @@ namespace MunOS
 
 		public void FixedUpdate()
 		{
+			if (needToRemoveTerminated)
+			{
+				RemoveTerminated();
+			}
 			Execute((long)(UpdateMicros*TicksPerMicro));
 		}
 	}

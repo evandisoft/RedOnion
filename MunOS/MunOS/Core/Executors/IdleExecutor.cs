@@ -11,14 +11,14 @@
 			{
 				if (executeQueue.Count > 0)
 				{
-					if (numSkips < ExecutionManager.MaxIdleSkips)
+					if (numSkips < CoreExecMgr.MaxIdleSkips)
 					{
 						numSkips++;
 					}
 					else
 					{
 						numSkips = 0;
-						ExecuteExecutable(executeQueue.Dequeue(), ExecutionManager.IdleForceTicks);
+						ExecuteExecutable(executeQueue.Dequeue(), CoreExecMgr.IdleForceTicks);
 					}
 				}
 				else

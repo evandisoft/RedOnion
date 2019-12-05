@@ -9,7 +9,7 @@ using RedOnion.KSP.API;
 using RedOnion.KSP.MoonSharp.CommonAPI;
 using System.ComponentModel;
 using RedOnion.KSP.MoonSharp.MoonSharpAPI;
-using Process = RedOnion.KSP.OS.Process;
+using Process = RedOnion.KSP.MunOS.Process;
 using MoonSharp.Interpreter.Compatibility;
 using RedOnion.UI;
 using Kerbalua.Events;
