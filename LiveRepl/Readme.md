@@ -34,6 +34,7 @@ There are a number of hotkeys for using **LiveRepl** without taking your hands o
 
 ## Limitations
 There are some limitations with **LiveRepl** which may be fixed over time.
+- All versions prior to 0.4.7 had a bug where all the Input Control Locks where cleared by **LiveRepl** whenever the mouse left the window bounds. This bug could allow some user input when it is not appropriate, for example, when time warping.
 - Only one **LiveRepl** can be open at a time. We are intending to eventually in create a more flexible system that allows multiple **LiveRepl**'s and multiple scripts running at a time.
 - All scripts are in one big directory. We are planning on eventually having some sort of file navigation mode and also allowing this editor to be used for general editing of files inside the KSP directory, not just user scripts.
 - LiveRepl cannot really handle large text files. And by large, I only mean about 19kb (from my testing)
