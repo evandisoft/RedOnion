@@ -25,6 +25,7 @@ def gui
   var lblWidth = 120
   var boxWidth = 60
   var uniWidth = 46
+  var selected = 0
   var wnd = new ui.window "Launch " + ship.name
   try
 
@@ -72,7 +73,6 @@ def gui
     
     wnd.add hintLabel
     var brow = wnd.addHorizontal()
-    var selected = 0
     wnd.closed += def => selected = 1
     brow.addButton("Cancel",  def => selected = 1).flexWidth = 1
     brow.addButton("Control", def => selected = 2).flexWidth = 1
@@ -81,11 +81,6 @@ def gui
   //wait until user selects what to do (or closes the window)
     while selected == 0
       wait
-    
-    if selected == 2 // control
-      wnd.dispose()
-      run.replace "control.ros"
-      //script not continuing here, replaced by control.ros
     
     if selected == 3 // launch
       targetAltitude = double ta.text
@@ -107,7 +102,12 @@ def gui
 
   finally 
     wnd.dispose
-    return selected == 3
+
+  if selected == 2 // control
+    run.replace "control.ros"
+    //script not continuing here, replaced by control.ros
+
+  return selected == 3
 if not gui()
 //user selected "Cancel" or closed the window
   return
@@ -443,7 +443,7 @@ finally
   if steers != null
     steers.remove
   for var d in vd
-    d.hide
+    d.dispose()
   vd = null
   user.throttle = 0
   ship.autopilot.disable

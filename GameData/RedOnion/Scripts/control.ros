@@ -70,10 +70,10 @@ try
       var nextDecoupler = ship.parts.nextDecoupler
       if nextDecoupler != null
       //nothing to separate (using stage.pending is too dangerous in this script)
-        return
+        continue
       if nextDecoupler.isType "LaunchClamp"
       //not releasing launch clamps in this script
-        return
+        continue
       if !stage.engines.anyOperational
         print "No operational engine"
         stage
