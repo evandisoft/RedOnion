@@ -12,8 +12,8 @@
 
 # Next Release
 ### LiveRepl Changes:
-- Fixed a mistake where LiveRepl was clearing all input locks instead of just the one it was using.
-- Stopped using the ControlTypes.KEYBOARDINPUT lock. Now keyboard input is only locked when the window is focused, not determined by whether the mouse is in the window bounds. Still have to lock ControlTypes.CAMERACONTROLS for scroll events (when mouse is in the window boudns).
+- Changed LiveRepl to only clear ControlLocks that it is using. Possibly it was like this for a bug in a past version of KSP. Not sure.
+- Stopped using the ControlTypes.KEYBOARDINPUT lock. Now keyboard input is only locked when the window is focused, not determined by whether the mouse is in the window bounds. Still have to lock ControlTypes.CAMERACONTROLS when mouse is in the window bounds, as otherwise scrolling the mouse zooms KSP in and out regardless of the mouse being over a window and that window being focused.
 
 # Current
 # 0.4
