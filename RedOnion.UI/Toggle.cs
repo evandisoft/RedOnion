@@ -1,3 +1,4 @@
+using RedOnion.Attributes;
 using RedOnion.UI.Components;
 using System;
 using UnityEngine;
@@ -5,6 +6,7 @@ using UUI = UnityEngine.UI;
 
 namespace RedOnion.UI
 {
+	[WorkInProgress]
 	public class Toggle : Element
 	{
 		public UUI.Toggle Core { get; private set; }

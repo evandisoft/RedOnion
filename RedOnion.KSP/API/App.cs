@@ -1,4 +1,5 @@
 using KSP.UI.Screens;
+using RedOnion.Attributes;
 using RedOnion.KSP.ROS;
 using System;
 using System.ComponentModel;
@@ -8,7 +9,7 @@ using Scenes = KSP.UI.Screens.ApplicationLauncher.AppScenes;
 
 namespace RedOnion.KSP.API
 {
-	[Description("Safe API for KSP Application Launcher (toolbar/buttons). WIP")]
+	[WorkInProgress, Description("Safe API for KSP Application Launcher (toolbar/buttons). WIP")]
 	public static class App
 	{
 		[Description("Application launcher is ready for use.")]

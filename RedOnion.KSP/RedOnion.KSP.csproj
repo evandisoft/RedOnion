@@ -88,6 +88,8 @@
     <Compile Include="API\App.cs" />
     <Compile Include="API\Autopilot.cs" />
     <Compile Include="API\Globals.cs" />
+    <Compile Include="API\Node.cs" />
+    <Compile Include="Namespaces\Types.cs" />
     <Compile Include="Parts\PartChildren.cs" />
     <Compile Include="Utilities\InteropUtilities.cs" />
     <Compile Include="API\VectorUtils.cs" />
