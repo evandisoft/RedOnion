@@ -47,6 +47,8 @@ but our goal now is to:
 
 **Your scripts are in GameData/RedOnion/Scripts. If you delete this folder, it will destroy your scripts.** I believe that CKAN does not delete them when uninstalling the mod or updating it, but you might want to make a copy of the folder just in case. We provide example scripts in a zip file, which will appear in the list of scripts in-game but wont be in the Scripts folder. If the example programs don't run, check out that section in [TroubleShooting](TroubleShooting.md)
 
+**Versions prior to 0.4 are not being maintained and have some bugs that will not be fixed.** This could change in the future if we get more people working on the project.
+
 Latest Releases are available at:
 - [CKAN](https://github.com/KSP-CKAN/CKAN)
 - [Spacedock](https://spacedock.info/mod/2116/Red%20Onion)
