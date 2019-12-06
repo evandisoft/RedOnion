@@ -21,7 +21,7 @@ namespace MunOS.Processing
 			stopwatch.Start(); 
 		}
 		/// <summary>
-		/// Should be called every update
+		/// Should be called every update to reset the timer.
 		/// </summary>
 		public static void ResetStopwatch()
 		{
@@ -29,9 +29,11 @@ namespace MunOS.Processing
 			stopwatch.Start();
 		}
 
+		public readonly MunProcess parentProcess;
 		public readonly string name;
-		protected MunThread(string name="")
+		protected MunThread(MunProcess parentProcess,string name="")
 		{
+			this.parentProcess=parentProcess;
 			this.name=name;
 		}
 
@@ -56,11 +58,27 @@ namespace MunOS.Processing
 
 		public ExecStatus Execute(long tickLimit)
 		{
-			//long starttime=stopwatch.ElapsedTicks;
-			var status=ProtectedExecute(tickLimit);
-			//long endtime=stopwatch.ElapsedTicks;
-			//perfQueue.Enqueue(endtime-starttime);
-			ExecutionComplete.Invoke(this,null);
+			ExecStatus status;
+			MunProcess.current=parentProcess;
+			try
+			{
+				status=ProtectedExecute(tickLimit);
+			}
+			catch(Exception)
+			{
+				MunProcess.current=null;
+				// On an exception, throw it to CoreExecMgr so that it will call 
+				// HandleException. But first set the current MunProcess to null
+				// as we are supposed to do.
+				throw;
+			}
+			MunProcess.current=null;
+
+			if (status==ExecStatus.FINISHED)
+			{
+				ExecutionComplete.Invoke(this, null);
+			}
+
 			return status;
 		}
 

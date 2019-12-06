@@ -50,6 +50,8 @@
     <Compile Include="MunOS\Processing\MunProcess.cs" />
     <Compile Include="MunOS\Processing\MunThread.cs" />
     <Compile Include="MunOS\Processing\ProcessOutputBuffer.cs" />
+    <Compile Include="MunOS\Processing\EngineProcess.cs" />
+    <Compile Include="MunOS\Processing\EngineThread.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MunOS\" />

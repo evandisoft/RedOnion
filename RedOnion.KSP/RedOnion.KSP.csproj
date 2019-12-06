@@ -163,9 +163,6 @@
     <Compile Include="Debugging\QueueLogger.cs" />
     <Compile Include="MunOS\Process.cs" />
     <Compile Include="Utilities\ScriptStringKeyedConstDictionary.cs" />
-    <Compile Include="MunOS\EngineProcess.cs" />
-    <Compile Include="MunOS\ScriptOutputHandler.cs" />
-    <Compile Include="MunOS\EngineThread.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RedOnion.Common\RedOnion.Common.csproj">

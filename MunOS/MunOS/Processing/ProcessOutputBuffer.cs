@@ -27,7 +27,7 @@ namespace MunOS.Processing
 			return outputText;
 		}
 
-		public void AddOutput(string str)
+		public void AddString(string str)
 		{
 			OutputBuffer.Append(str);
 			int diff = OutputBuffer.Length - BufferSizeLimit;
@@ -36,6 +36,36 @@ namespace MunOS.Processing
 				OutputBuffer.Remove(0, diff);
 			}
 			newOutput = true;
+		}
+
+		public void AddText(string str)
+		{
+			AddString("\n" + str);
+		}
+
+		public void AddReturnValue(string str)
+		{
+			AddString("\nr> " + str);
+		}
+
+		public void AddOutput(string str)
+		{
+			AddString("\no> " + str);
+		}
+
+		public void AddError(string str)
+		{
+			AddString("\ne> " + str);
+		}
+
+		public void AddSourceString(string str)
+		{
+			AddString("\ni> " + str);
+		}
+
+		public void AddFileContent(string str)
+		{
+			AddString("\nf> " + str);
 		}
 	}
 }

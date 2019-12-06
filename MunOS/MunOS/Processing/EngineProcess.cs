@@ -1,18 +1,13 @@
 using System;
 using System.Collections.Generic;
 using MunOS.Processing;
-using RedOnion.KSP.Autopilot;
-using RedOnion.KSP.API;
 
 namespace RedOnion.KSP.MunOS
 {
 	public abstract class EngineProcess:MunProcess
 	{
-		protected ScriptOutputHandler outputHandler;
-
 		protected EngineProcess(string name = "") : base(name)
 		{
-			outputHandler=new ScriptOutputHandler(outputBuffer);
 		}
 
 		const int maxHistorySize = 1000;
@@ -25,7 +20,7 @@ namespace RedOnion.KSP.MunOS
 
 		protected override void ThreadExecutionComplete(MunThread thread, Exception e)
 		{
-			outputHandler.AddError("In thread "+thread+": "+e.Message);
+			outputBuffer.AddError("In thread "+thread+": "+e.Message);
 		}
 
 		/// <summary>
@@ -58,11 +53,6 @@ namespace RedOnion.KSP.MunOS
 				}
 
 				currentHistoryItem = null;
-
-				//foreach (var item in History) {
-				//	Debug.Log(item);
-				//}
-
 			}
 
 			ProtectedRunInThread(source, path);
@@ -148,8 +138,6 @@ namespace RedOnion.KSP.MunOS
 		/// </summary>
 		public virtual void ResetEngine()
 		{
-			FlightControl.Instance.Shutdown();
-			Ship.DisableAutopilot();
 			Terminate();
 		}
 	}

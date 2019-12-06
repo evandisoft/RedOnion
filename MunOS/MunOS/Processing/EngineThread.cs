@@ -8,7 +8,7 @@ namespace RedOnion.KSP.MunOS
 	{
 		protected ScriptOutputHandler outputHandler;
 
-		protected EngineThread(ScriptOutputHandler outputHandler, string name = "") : base(name)
+		protected EngineThread(MunProcess parentProcess,ScriptOutputHandler outputHandler, string name = "") : base(parentProcess, name)
 		{
 			this.outputHandler=outputHandler;
 		}
