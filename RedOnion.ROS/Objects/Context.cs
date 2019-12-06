@@ -21,6 +21,8 @@ namespace RedOnion.ROS.Objects
 		/// </summary>
 		protected struct Block
 		{
+			// NOTE: Look into Clear() and Context.Push() when adding anything!
+
 			// INNER: (used through blockStack.Top() for current block)
 
 			/// <summary>
@@ -54,6 +56,15 @@ namespace RedOnion.ROS.Objects
 			/// Code/type of the block
 			/// </summary>
 			public BlockCode op;
+
+			/// <summary>
+			/// Used for fast cleanup in Context.Pop and PopAll.
+			/// </summary>
+			public void Clear()
+			{
+				added.Clear();
+				shadow?.Clear();
+			}
 		}
 		/// <summary>
 		/// Stack of blocks
@@ -167,6 +178,7 @@ namespace RedOnion.ROS.Objects
 
 		public void Push(int start, int end, BlockCode op = BlockCode.Block, int at1 = 0, int at2 = 0)
 		{
+			// make sure to set everything except what is cleared in Block.Clear()!
 			ref var block = ref blockStack.Add();
 			block.op = BlockCode;
 			block.start = BlockStart;
@@ -238,20 +250,20 @@ namespace RedOnion.ROS.Objects
 			BlockAt1 = top.at1;
 			BlockAt2 = top.at2;
 			BlockCode = top.op;
-			var shadow = top.shadow;
 			if (closures.size > 0)
 				SeparateVars(ref top.added);
 			else
 				foreach (var name in top.added)
 					dict.Remove(name);
 			prop.Count = top.varsFrom;
-			blockStack.size--;
+			var shadow = top.shadow;
 			if (shadow != null)
 			{
 				foreach (var pair in shadow)
 					dict[pair.Key] = pair.Value;
-				shadow.Clear();
 			}
+			top.Clear();
+			blockStack.size--;
 			return BlockEnd;
 		}
 		/// <summary>
@@ -271,21 +283,20 @@ namespace RedOnion.ROS.Objects
 				ref var top = ref blockStack.Top();
 				BlockCode = top.op;
 				propSize = top.varsFrom;
-				var shadow = top.shadow;
 				if (closures.size > 0)
 					SeparateVars(ref top.added);
 				else
 					foreach (var name in top.added)
 						dict.Remove(name);
+				var shadow = top.shadow;
 				if (shadow != null)
 				{
 					foreach (var pair in shadow)
 						dict[pair.Key] = pair.Value;
-					shadow.Clear();
 				}
+				top.Clear();
 				blockStack.size--;
 			}
-			blockStack.size = 0;
 			prop.Count = propSize;
 		}
 		/// <summary>

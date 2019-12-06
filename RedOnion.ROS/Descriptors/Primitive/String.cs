@@ -71,13 +71,35 @@ namespace RedOnion.ROS
 
 			public override bool Binary(ref Value lhs, OpCode op, ref Value rhs)
 			{
-				if (op != OpCode.Add)
+				if (lhs.desc.Primitive != ExCode.String && !lhs.desc.Convert(ref lhs, this))
 					return false;
-				if (lhs.desc.Primitive != ExCode.String)
-					lhs.desc.Convert(ref lhs, this);
-				if (rhs.desc.Primitive != ExCode.String)
-					rhs.desc.Convert(ref rhs, this);
-				lhs.obj = lhs.obj.ToString() + rhs.obj.ToString();
+				if (rhs.desc.Primitive != ExCode.String && !rhs.desc.Convert(ref rhs, this))
+					return false;
+				switch (op)
+				{
+				case OpCode.Add:
+					lhs.obj = lhs.obj.ToString() + rhs.obj.ToString();
+					return true;
+
+				case OpCode.Equals:
+					lhs = lhs.obj.ToString() == rhs.obj.ToString();
+					return true;
+				case OpCode.Differ:
+					lhs = lhs.obj.ToString() != rhs.obj.ToString();
+					return true;
+				case OpCode.Less:
+					lhs = string.CompareOrdinal(lhs.obj.ToString(), rhs.obj.ToString()) < 0;
+					return true;
+				case OpCode.More:
+					lhs = string.CompareOrdinal(lhs.obj.ToString(), rhs.obj.ToString()) > 0;
+					return true;
+				case OpCode.LessEq:
+					lhs = string.CompareOrdinal(lhs.obj.ToString(), rhs.obj.ToString()) <= 0;
+					return true;
+				case OpCode.MoreEq:
+					lhs = string.CompareOrdinal(lhs.obj.ToString(), rhs.obj.ToString()) >= 0;
+					return true;
+				}
 				return true;
 			}
 
