@@ -9,11 +9,13 @@ def control ship
   self.stgsubs = null // system.idle subscription for staging
   var wnd = new ui.window
   self.wnd = wnd
+  self.main = null // signal that it is not fully created yet
   guis.add self
   wnd.x -= (unity.screen.width - 200) / 3
   wnd.title = "Control " + ship.name
   wnd.closed.add def
     self.terminate = true
+  var autopilot = ship.autopilot
 
 //mode vs. the rest
   var split = wnd.addHorizontal()
@@ -43,10 +45,10 @@ def control ship
     if self.dirsubs != null
       self.dirsubs.remove
       self.dirsubs = null
-    ship.autopilot.disable
+    autopilot.disable
     if fn != null and (btn == null || btn.pressed)
       self.dirsubs = system.update def
-        ship.autopilot.direction = fn()
+        autopilot.direction = fn()
   def xbtn parent, text, steer
     var btn = parent.addExclusive2 text, lockdir.bind steer
     btn.width = 80
@@ -83,6 +85,46 @@ def control ship
     if target != null
       return -target.position
     return -ship.velocity
+
+  row = blk2.addHorizontal()
+  var bMatchSpeed = xbtn row, "Match Speed", def
+    var dv
+    var target = ship.target
+    if target != null
+      if target is types.part
+        target = target.ship
+      dv = target.velocity-ship.velocity
+    else // circularization if no target
+      var pos = ship.position - ship.body.position
+      dv = math.sqrt(ship.body.mu/pos.size) * pos.cross(ship.velocity.cross pos).normalized - ship.velocity
+    if dv.size < 0.01
+      if ship == global.ship
+        user.throttle = 0
+      autopilot.throttle = nan
+      unlock2.press
+    else
+      var d = dv.angle ship.forward // direction / face-angle error
+      var e = d <= 1 ? 1 : math.deg.cos math.min 89.4, d^2.0 // min 0.0105
+      autopilot.throttle = e * math.min ship == global.ship ? user.throttle : 0.5,
+        dv.size * ship.mass / math.max 1, ship.engines.getThrust()
+    return dv
+  bMatchSpeed.flexWidth = 1
+
+  row = blk2.addHorizontal()
+  var bControlTarget = xbtn row, "Control Target", def
+    var target = ship.target
+    if target != null
+      if target is types.part
+        target = target.ship
+      if target is types.ship
+        var gui = control target
+        gui.wnd.x = wnd.x
+        gui.wnd.y = wnd.y + wnd.height * 2 < unity.screen.height ?
+          wnd.y + wnd.height : wnd.y - wnd.height          
+    unlock2.press
+    return vector.none
+  bControlTarget.flexWidth = 1
+
   row = blk2.addHorizontal()
   var unlock2 = row.addExclusive2 "UNLOCK", lockdir.bind null
   unlock2.flexWidth = 1
@@ -119,14 +161,14 @@ def control ship
 
 //main loop
   self.main = def
-    if terminate
+    if self.terminate
       if dirsubs != null
         dirsubs.remove
         dirsubs = null
       if stgsubs != null
         stgsubs.remove
         stgsubs = null
-      ship.autopilot.disable()
+      autopilot.disable()
       wnd.dispose()
       guis.remove self
       return false
@@ -148,7 +190,10 @@ control ship
 try
   while guis.count > 0
     for var i = 0; i < guis.count
-      if guis[i].main(); i++
+    //the gui can still be in the process of creation
+      var main = guis[i].main
+      if main == null or main()
+        i++
     yield
 finally
   for var gui in guis

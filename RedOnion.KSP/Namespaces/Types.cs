@@ -21,6 +21,8 @@ namespace RedOnion.KSP.Namespaces
 		[Description("Decoupler, separator, launch clamp or docking port.")]
 		public static readonly Type separator = typeof(Decoupler);
 		[Description("Docking port.")]
+		public static readonly Type dock = typeof(DockingPort);
+		[Description("Docking port.")]
 		public static readonly Type port = typeof(DockingPort);
 		[Description("Launch Clamp.")]
 		public static readonly Type clamp = typeof(LaunchClamp);

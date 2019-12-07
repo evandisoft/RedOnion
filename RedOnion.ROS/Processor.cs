@@ -65,6 +65,12 @@ namespace RedOnion.ROS
 			{
 				Log(trace);
 				print?.Invoke(trace);
+
+				while ((ex = ex.InnerException) != null)
+				{
+					Log("Inner: " + ex.Message);
+					Log(ex.StackTrace);
+				}
 			}
 			if (re != null)
 			{
@@ -224,7 +230,7 @@ namespace RedOnion.ROS
 		readonly Stopwatch watch = new Stopwatch();
 		int onceSkipped, idleSkipped;
 
-		public void UpdateGraphic()
+		public virtual void UpdateGraphic()
 		{
 			var graphic = GraphicUpdate;
 			if (graphic != null)
@@ -243,7 +249,7 @@ namespace RedOnion.ROS
 				}
 			}
 		}
-		public void UpdatePhysics()
+		public virtual void UpdatePhysics()
 		{
 			TotalCountdown = UpdateCountdown;
 			watch.Reset();

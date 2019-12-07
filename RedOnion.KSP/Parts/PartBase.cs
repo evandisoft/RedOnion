@@ -45,7 +45,7 @@ namespace RedOnion.KSP.Parts
 		public virtual bool istype(string name) => false;
 
 		[WorkInProgress, Description("Position of the part.")]
-		public Vector position => new Vector(native.partTransform.position);
+		public Vector position => new Vector(native.partTransform.position - FlightGlobals.ActiveVessel.CoMD);
 
 		[Description("Explode the part.")]
 		public void explode() => native.explode();
