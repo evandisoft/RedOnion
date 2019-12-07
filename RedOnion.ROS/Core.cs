@@ -97,7 +97,7 @@ namespace RedOnion.ROS
 			code = value?.Code;
 			str = value?.Strings;
 			vals.Clear();
-			self = Value.Null;
+			self = new Value(Descriptor.NullSelf, null);
 			Exit = ExitCode.None;
 			result = Value.Void;
 			error = Value.Void;
@@ -307,19 +307,27 @@ namespace RedOnion.ROS
 					throw CouldNotGet(ref arg);
 			}
 		}
+		protected void Dereference(ref Value arg)
+		{
+			if (arg.IsReference && !arg.desc.Get(ref arg, arg.num.Int))
+				throw CouldNotGet(ref arg);
+		}
 
 		protected void Call(int argc, bool create, OpCode op = OpCode.Void)
 		{
 			if (argc > 0)
 				Dereference(argc);
 			object self = null;
-			Descriptor selfDesc = null;
+			Descriptor selfDesc = Descriptor.NullSelf;
 			int idx = -1;
 			ref var it = ref vals.Top(-argc-1);
 			if (it.IsReference)
 			{
-				selfDesc = it.desc;
-				self = it.obj;
+				if (!(it.obj is Context))
+				{
+					selfDesc = it.desc;
+					self = it.obj;
+				}
 				idx = it.num.Int;
 				if (!it.desc.Get(ref it, idx))
 					throw CouldNotGet(ref it);

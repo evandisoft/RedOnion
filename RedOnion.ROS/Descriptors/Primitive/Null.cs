@@ -5,6 +5,7 @@ namespace RedOnion.ROS
 	public partial class Descriptor
 	{
 		public static readonly Descriptor Null = new OfNull();
+		internal static readonly Descriptor NullSelf = new OfNullSelf();
 
 		/// <summary>
 		/// Represents empty reference
@@ -25,14 +26,21 @@ namespace RedOnion.ROS
 				switch (op)
 				{
 				case OpCode.Equals:
-					lhs = lhs.desc == this && rhs.desc == this;
+					lhs = lhs.desc.Primitive == ExCode.Null && rhs.desc.Primitive == ExCode.Null;
 					return true;
 				case OpCode.Differ:
-					lhs = lhs.desc != this || rhs.desc != this;
+					lhs = lhs.desc.Primitive != ExCode.Null || rhs.desc.Primitive != ExCode.Null;
 					return true;
 				}
 				return false;
 			}
+		}
+
+		/// <summary>
+		/// Used in functions when you reference this which is null.
+		/// </summary>
+		internal class OfNullSelf : OfNull
+		{
 		}
 	}
 }

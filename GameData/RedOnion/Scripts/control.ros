@@ -1,10 +1,22 @@
-var dirsubs = null // system.update subscriptions for direction manipulation
-var wnd = new ui.window
-try
-  wnd.x -= (unity.screen.width - 200) / 3
-  var ship = global.ship // keep reference to current ship
+// list of all active control guis
+var guis = new list
+
+def control ship
+//can be called as both `control ship` and `new control ship`
+  if this == null then this = new object // this is the only situation you can assign to `this`
+  var self = this // that we can reference it from inner functions
+  this.terminate = false
+  this.ship = ship
+  this.autopilot = ship.autopilot
+  this.dirsubs = null // system.update subscriptions for direction manipulation
+  this.stgsubs = null // system.idle subscription for staging
+  this.wnd = new ui.window
+  guis.add this
+//this-scope is between inner scope and outer scope (and globals)
+  wnd.x -= (unity.screen.width - 200) / 3 // so `wnd` is same as `this.wnd`
   wnd.title = "Control " + ship.name
-  var autopilot = ship.autopilot
+  wnd.closed.add def
+    self.terminate = true
 
 //mode vs. the rest
   var split = wnd.addHorizontal()
@@ -31,6 +43,7 @@ try
   btns.childAnchors = ui.anchors.fill
 
   def lockdir fn, btn
+    this = self // share this-scope (we know `this` is null prior to the assignment)
     if dirsubs != null
       dirsubs.remove
       dirsubs = null
@@ -65,12 +78,12 @@ try
   blk2.visible = false
   row = blk2.addHorizontal()
   var bTowards = xbtn row, "Towards", def
-    var tgt = target
+    var target = ship.target
     if target != null
       return target.position
     return ship.velocity
   var bAway = xbtn row, "Away Fr.", def
-    var tgt = target
+    var target = ship.target
     if target != null
       return -target.position
     return -ship.velocity
@@ -79,21 +92,48 @@ try
   unlock2.flexWidth = 1
   unlock2.flexHeight = 1
 
-  // startup selection
+//startup selection
   if "control_dir" in global
     var sel = global.control_dir
     global.control_dir = null
     if sel == "obt.prograde"
       bProgr.pressed = true
 
-  // main loop
-  var done = false
-  wnd.closed.add def
-    done = true
-  until done
-    if mObt.pressed and altitude < math.max atmosphere.height/4, 1000
+//staging
+  this.stgsubs = system.idle def
+    if !stage.ready
+      return
+    var nextDecoupler = ship.parts.nextDecoupler
+    if nextDecoupler == null
+    //nothing to separate (using stage.pending is too dangerous in this script)
+        return
+    if nextDecoupler.isType "LaunchClamp"
+    //not releasing launch clamps in this script
+      return
+    if !stage.engines.anyOperational
+      print "No operational engine"
+      stage
+      return
+    if stage.fuel <= 0.1
+      print "Stage out of fuel"
+      stage
+      return
+
+//main loop
+  this.main = def
+    if terminate
+      if dirsubs != null
+        dirsubs.remove
+        dirsubs = null
+      if stgsubs != null
+        stgsubs.remove
+        stgsubs = null
+      autopilot.disable()
+      wnd.dispose()
+      return false
+    if mObt.pressed and ship.altitude < math.max atmosphere.height/4, 1000
       mSrf.pressed = true
-    if !blk1.visible and mObt.pressed or mSrf.pressed
+    if !blk1.visible and (mObt.pressed or mSrf.pressed)
       blk2.visible = false
       blk1.visible = true
       unlock.press
@@ -101,26 +141,31 @@ try
       blk1.visible = false
       blk2.visible = true
       unlock2.press
+    return true
 
-    wait
-    if stage.ready // could be moved to system.idle but why actually
-      var nextDecoupler = ship.parts.nextDecoupler
-      if nextDecoupler == null
-      //nothing to separate (using stage.pending is too dangerous in this script)
-        continue
-      if nextDecoupler.isType "LaunchClamp"
-      //not releasing launch clamps in this script
-        continue
-      if !stage.engines.anyOperational
-        print "No operational engine"
-        stage
-      else if stage.fuel <= 0.1
-        print "Stage out of fuel"
-        stage
-
+control ship
+try
+  while guis.count > 0
+    for var i = 0; i < guis.count
+      if guis[i].main(); i++
+    yield
 finally
-  wnd.dispose
-  if dirsubs != null
-    dirsubs.remove
-    dirsubs = null
+  for var gui in guis
+    gui.terminate = true
+    var dirsubs = gui.dirsubs
+    gui.dirsubs = null
+    if dirsubs != null
+      dirsubs.remove
+    var stgsubs = gui.stgsubs
+    gui.stgsubs = null
+    if stgsubs != null
+      stgsubs.remove
+    var wnd = gui.wnd
+    gui.wnd = null
+    if wnd != null
+      wnd.dispose()
+    var autopilot = gui.autopilot
+    gui.autopilot = null
+    if autopilot != null
+      autopilot.disable
   autopilot.disable
