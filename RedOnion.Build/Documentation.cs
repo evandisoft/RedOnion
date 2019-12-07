@@ -13,6 +13,7 @@ namespace RedOnion.Build
 	static class Documentation
 	{
 		static string unsafeMark = "\\[`Unsafe`\\] {0}";
+		static string wipMark = "\\[`WIP`\\] {0}";
 		static HashSet<Assembly> assemblies = new HashSet<Assembly>()
 		{
 			typeof(RedOnion.KSP.API.Globals).Assembly,
@@ -256,11 +257,15 @@ namespace RedOnion.Build
 				{
 					if (cdoc != null)
 					{
-						wr.WriteLine("## {0} (Function)", doc.name);
+						wr.WriteLine("## {0} (Function)", AddMarks(doc.name,
+							notsafe: doc.type.IsDefined(typeof(UnsafeAttribute)),
+							wip: doc.type.IsDefined(typeof(WorkInProgressAttribute))));
 						Print(wr, cdoc, doc.name);
 						wr.WriteLine();
 					}
-					wr.WriteLine(cdoc == null ? "## {0}" : "## {0} (Instance)", doc.name);
+					wr.WriteLine(cdoc == null ? "## {0}" : "## {0} (Instance)", AddMarks(doc.name,
+						notsafe: doc.type.IsDefined(typeof(UnsafeAttribute)),
+						wip: doc.type.IsDefined(typeof(WorkInProgressAttribute))));
 					Print(wr, doc, doc.name);
 				}
 			}
@@ -451,9 +456,17 @@ namespace RedOnion.Build
 				}
 			}
 			wr.WriteLine(desc == null ? "- `{0}`: {1}" : "- `{0}`: {1} - {2}",
-				name, typeMd,
-				member.info.IsDefined(typeof(UnsafeAttribute)) ?
-				string.Format(unsafeMark, desc) : desc);
+				name, typeMd, AddMarks(desc,
+				notsafe: member.info.IsDefined(typeof(UnsafeAttribute)),
+				wip: member.info.IsDefined(typeof(WorkInProgressAttribute))));
+		}
+		static string AddMarks(string desc, bool notsafe, bool wip)
+		{
+			if (wip)
+				desc = string.Format(wipMark, desc);
+			if (notsafe)
+				desc = string.Format(unsafeMark, desc);
+			return desc;
 		}
 
 		static void PrintMethod<Info>(StreamWriter wr, Document doc, Member<Info> member) where Info : MethodBase
@@ -476,8 +489,8 @@ namespace RedOnion.Build
 			if (pars.Length > 0)
 				wr.WriteLine();
 			wr.WriteLine(pars.Length == 0 ? " - {0}" : "  - {0}",
-				member.info.IsDefined(typeof(UnsafeAttribute)) ?
-				string.Format(unsafeMark, desc) : desc);
+				AddMarks(desc, notsafe: member.info.IsDefined(typeof(UnsafeAttribute)),
+				wip: member.info.IsDefined(typeof(WorkInProgressAttribute))));
 		}
 
 		static string GetRelativePath(string fromPath, string toPath)

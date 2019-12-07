@@ -6,6 +6,7 @@ using RedOnion.KSP.API;
 using System.ComponentModel;
 using MoonSharp.Interpreter;
 using KSP.UI.Screens;
+using RedOnion.ROS;
 
 namespace RedOnion.KSP.Parts
 {
@@ -98,7 +99,11 @@ namespace RedOnion.KSP.Parts
 			get
 			{
 				if (Dirty) DoRefresh();
-				return cache.TryGetValue(part, out var it) ? it : null;
+				if (cache.TryGetValue(part, out var it))
+					return it;
+				Value.DebugLog("Could not find part {0}/{1} in ship {1}/{2}/{3}",
+					part.persistentId, part.name, ship.id, ship.persistentId, ship.name);
+				return null;
 			}
 		}
 	}
@@ -176,19 +181,21 @@ namespace RedOnion.KSP.Parts
 		{
 			if (cache == null)
 				return;
+			if (!disposing)
+			{
+				UI.Collector.Add(this);
+				return;
+			}
 			GameEvents.onVesselWasModified.Remove(VesselModified);
 			cache = null;
 			_ship = null;
 			protectedRoot = null;
 			protectedNextDecoupler = null;
-			if (disposing)
-			{
-				list.Clear();
-				decouplers.Clear();
-				dockingports.Clear();
-				engines.Clear();
-				sensors.Clear();
-			}
+			list.Clear();
+			decouplers.Clear();
+			dockingports.Clear();
+			engines.Clear();
+			sensors.Clear();
 			decouplers = null;
 			dockingports = null;
 			engines = null;

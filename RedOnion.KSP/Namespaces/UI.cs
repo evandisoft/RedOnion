@@ -44,7 +44,7 @@ namespace RedOnion.KSP.Namespaces
 		public static readonly Type Label = typeof(UI.Label);
 		[Description("Clickable button (or toggle-button).")]
 		public static readonly Type Button = typeof(UI.Button);
-		[Description("Toggle - experimental. WIP")]
+		[WorkInProgress, Description("Toggle - experimental. WIP")]
 		public static readonly Type Toggle = typeof(UI.Toggle);
 		[Description("Line of editable text (or multi-line text editor).")]
 		public static readonly Type TextBox = typeof(UI.TextBox);

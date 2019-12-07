@@ -2,10 +2,12 @@ using System;
 
 namespace RedOnion.Attributes
 {
-	/// <summary>
-	/// Marker for potentially dangerous API.
-	/// </summary>
+	/// <summary>Marks potentially dangerous API.</summary>
 	public class UnsafeAttribute : Attribute { }
 
+	/// <summary>Marks unfinished API.</summary>
+	public class WorkInProgressAttribute : Attribute { }
+
+	/// <summary>Marks classes with properies without side-effects (usually script-namespace).</summary>
 	public class SafeProps : Attribute { }
 }

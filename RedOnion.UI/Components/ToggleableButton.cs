@@ -82,6 +82,8 @@ namespace RedOnion.UI.Components
 			{
 				if (!_pressed)
 					Toggle(action);
+				else if (action)
+					Click?.Invoke(Button);
 				return;
 			}
 			

@@ -1,4 +1,4 @@
-## App
+## \[`WIP`\] App
 
 Safe API for KSP Application Launcher (toolbar/buttons). WIP
 

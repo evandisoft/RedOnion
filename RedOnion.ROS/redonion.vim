@@ -102,7 +102,7 @@ syn cluster	rosContained		add=rosDocCommentBody
 
 
 "parenthesis
-syn region	rosParen			transparent start='(' end=')' contains=ALLBUT,@rosContained,rosParenError,rosDontUseComma
+syn region	rosParen			transparent start='(' end=')' contains=ALLBUT,@rosContained,rosParenError
 syn match	rosParenError		display "[)]"
 
 
