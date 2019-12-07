@@ -2,18 +2,15 @@
 var guis = new list
 
 def control ship
-//can be called as both `control ship` and `new control ship`
-  if this == null then this = new object // this is the only situation you can assign to `this`
-  var self = this // that we can reference it from inner functions
-  this.terminate = false
-  this.ship = ship
-  this.autopilot = ship.autopilot
-  this.dirsubs = null // system.update subscriptions for direction manipulation
-  this.stgsubs = null // system.idle subscription for staging
-  this.wnd = new ui.window
-  guis.add this
-//this-scope is between inner scope and outer scope (and globals)
-  wnd.x -= (unity.screen.width - 200) / 3 // so `wnd` is same as `this.wnd`
+  var self = this ?? new object
+  self.terminate = false
+  self.ship = ship
+  self.dirsubs = null // system.update subscriptions for direction manipulation
+  self.stgsubs = null // system.idle subscription for staging
+  var wnd = new ui.window
+  self.wnd = wnd
+  guis.add self
+  wnd.x -= (unity.screen.width - 200) / 3
   wnd.title = "Control " + ship.name
   wnd.closed.add def
     self.terminate = true
@@ -43,14 +40,13 @@ def control ship
   btns.childAnchors = ui.anchors.fill
 
   def lockdir fn, btn
-    this = self // share this-scope (we know `this` is null prior to the assignment)
-    if dirsubs != null
-      dirsubs.remove
-      dirsubs = null
-    autopilot.disable
+    if self.dirsubs != null
+      self.dirsubs.remove
+      self.dirsubs = null
+    ship.autopilot.disable
     if fn != null and (btn == null || btn.pressed)
-      dirsubs = system.update def
-        autopilot.direction = fn()
+      self.dirsubs = system.update def
+        ship.autopilot.direction = fn()
   def xbtn parent, text, steer
     var btn = parent.addExclusive2 text, lockdir.bind steer
     btn.width = 80
@@ -100,7 +96,9 @@ def control ship
       bProgr.pressed = true
 
 //staging
-  this.stgsubs = system.idle def
+  self.stgsubs = system.idle def
+    if ship != global.ship
+      return
     if !stage.ready
       return
     var nextDecoupler = ship.parts.nextDecoupler
@@ -120,7 +118,7 @@ def control ship
       return
 
 //main loop
-  this.main = def
+  self.main = def
     if terminate
       if dirsubs != null
         dirsubs.remove
@@ -128,8 +126,9 @@ def control ship
       if stgsubs != null
         stgsubs.remove
         stgsubs = null
-      autopilot.disable()
+      ship.autopilot.disable()
       wnd.dispose()
+      guis.remove self
       return false
     if mObt.pressed and ship.altitude < math.max atmosphere.height/4, 1000
       mSrf.pressed = true
@@ -142,6 +141,8 @@ def control ship
       blk2.visible = true
       unlock2.press
     return true
+
+  return self
 
 control ship
 try
@@ -160,12 +161,6 @@ finally
     gui.stgsubs = null
     if stgsubs != null
       stgsubs.remove
-    var wnd = gui.wnd
-    gui.wnd = null
-    if wnd != null
-      wnd.dispose()
-    var autopilot = gui.autopilot
-    gui.autopilot = null
-    if autopilot != null
-      autopilot.disable
+    gui.wnd.dispose()
+    gui.ship.autopilot.disable
   autopilot.disable

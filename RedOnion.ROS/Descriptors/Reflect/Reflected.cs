@@ -158,9 +158,30 @@ namespace RedOnion.ROS
 			public override bool Unary(ref Value self, OpCode op)
 				=> self.obj is IOperators ops ? ops.Unary(ref self, op) : false;
 			public override bool Binary(ref Value lhs, OpCode op, ref Value rhs)
-				=> lhs.obj is IOperators ops ? ops.Binary(ref lhs, op, ref rhs)
-				: rhs.obj is IOperators ops2 ? ops2.Binary(ref lhs, op, ref rhs)
-				: false;
+			{
+				if (lhs.obj is IOperators ops && ops.Binary(ref lhs, op, ref rhs))
+					return true;
+				if (rhs.obj is IOperators ops2 && ops2.Binary(ref lhs, op, ref rhs))
+					return true;
+				if (lhs.desc != this)
+					return false;
+				switch (op)
+				{
+				case OpCode.Equals:
+					lhs = lhs.obj?.Equals(rhs.Box()) == true;
+					return true;
+				case OpCode.Differ:
+					lhs = lhs.obj?.Equals(rhs.Box()) != true;
+					return true;
+				case OpCode.Identity:
+					lhs = ReferenceEquals(lhs.obj, rhs.obj);
+					return true;
+				case OpCode.NotIdentity:
+					lhs = !ReferenceEquals(lhs.obj, rhs.obj);
+					return true;
+				}
+				return false;
+			}
 			public override bool Convert(ref Value self, Descriptor to)
 				=> self.obj is IConvert cvt && cvt.Convert(ref self, to)
 				|| base.Convert(ref self, to);

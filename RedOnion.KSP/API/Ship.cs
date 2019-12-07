@@ -318,9 +318,8 @@ namespace RedOnion.KSP.API
 
 		#region Orbit - vectors
 
-		[WorkInProgress, Description("Current position relative to active ship (so `ship.position` always reads zero)."
-			+ " NOTE: We may return centerOfMass in the future.")]
-		public Vector position => new Vector(native.transform.position);
+		[Description("Center of mass relative to (CoM of) active ship (zero for active ship).")]
+		public Vector position => new Vector(native.CoMD - FlightGlobals.ActiveVessel.CoMD);
 		[Description("Current orbital velocity.")]
 		public Vector velocity => new Vector(native.obt_velocity);
 		[Description("Current surface velocity.")]
@@ -422,9 +421,6 @@ namespace RedOnion.KSP.API
 
 		#region Properties for autopilot
 
-		[WorkInProgress, Description("Center of mass. (May get removed if we decide to use it for `position`.)")]
-		public Vector centerOfMass => new Vector(native.CoMD);
-		Vector ISpaceObject.position => centerOfMass;
 		[Description("Angular velocity (ω, deg/s), how fast the ship rotates")]
 		public Vector angularVelocity => new Vector(native.angularVelocityD * RosMath.Rad2Deg);
 		[Description("Angular momentum (L = Iω, kg⋅m²⋅deg/s=N⋅m⋅s⋅deg) aka moment of momentum or rotational momentum.")]
