@@ -79,6 +79,13 @@ namespace RedOnion.KSP.API
 				var target = FlightGlobals.fetch.VesselTarget;
 				if (target is CelestialBody body)
 					return bodies[body];
+				if (target is Vessel vessel)
+					return Ship.FromVessel(vessel);
+				if (target is PartModule dock)
+				{
+					var part = dock.part;
+					return Ship.FromVessel(part.vessel).parts[part];
+				}
 				return null;
 			}
 		}

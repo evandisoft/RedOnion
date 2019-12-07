@@ -39,9 +39,13 @@ namespace RedOnion.KSP.Parts
 		[Description("Title of the part (assigned by KSP).")]
 		public string title => native.partInfo.title;
 
-		// TODO: make this generic feature of ROS (`typeof` and `is` operators)
-		[Description("Method to test the type of the part (e.g. `.IsType(\"LaunchClamp\")`)")]
+		[Description("Method to test the type of the part (e.g. `.istype(\"LaunchClamp\")`)."
+			+ " Note that ROS has `is` operator and Lua has `isa` function that can be used togehter with"
+			+ " `types.engine` etc.")]
 		public virtual bool istype(string name) => false;
+
+		[WorkInProgress, Description("Position of the part.")]
+		public Vector position => new Vector(native.partTransform.position);
 
 		[Description("Explode the part.")]
 		public void explode() => native.explode();

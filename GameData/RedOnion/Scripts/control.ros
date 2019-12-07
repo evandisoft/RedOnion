@@ -1,13 +1,16 @@
 var dirsubs = null // system.update subscriptions for direction manipulation
-var wnd = new ui.window "Control " + ship.name
+var wnd = new ui.window
 try
   wnd.x -= (unity.screen.width - 200) / 3
+  var ship = global.ship // keep reference to current ship
+  wnd.title = "Control " + ship.name
+  var autopilot = ship.autopilot
 
-  // mode vs. the rest
+//mode vs. the rest
   var split = wnd.addHorizontal()
   split.padding = 0
 
-  // mode
+//mode
   var mode = split.addVertical()
   def mbtn text
     var btn = mode.addExclusive text
@@ -20,19 +23,19 @@ try
   var mNde = mbtn "NDE" // nodes only (+ "EXEC" button)
   mObt.pressed = true
 
-  // main content (buttons and footer)
+//main content (buttons and footer)
   var main = split.addVertical()
   main.width = 163
   main.childAnchors = ui.anchors.fill
   var btns = main.addHorizontal() //TODO: stack
   btns.childAnchors = ui.anchors.fill
 
-  def lockdir fn
+  def lockdir fn, btn
     if dirsubs != null
       dirsubs.remove
       dirsubs = null
     autopilot.disable
-    if fn != null
+    if fn != null and (btn == null || btn.pressed)
       dirsubs = system.update def
         autopilot.direction = fn()
   def xbtn parent, text, steer
@@ -40,8 +43,8 @@ try
     btn.width = 80
     return btn
 
-  // orbital/surfece buttons
-  var blk1 = btns.addVertical() //TODO: vertical flow and/or easy stretch for UNLOCK
+//orbital/surface buttons
+  var blk1 = btns.addVertical()
   var row = blk1.addHorizontal()
   var bProgr  = xbtn row, "Progr.", def => mSrf.pressed ? ship.srfvel : ship.velocity
   var bRetro  = xbtn row, "Retro.", def => mSrf.pressed ? -ship.srfvel : -ship.velocity
@@ -57,6 +60,25 @@ try
   unlock.flexHeight = 1
   unlock.pressed = true
 
+//target buttons
+  var blk2 = btns.addVertical()
+  blk2.visible = false
+  row = blk2.addHorizontal()
+  var bTowards = xbtn row, "Towards", def
+    var tgt = target
+    if target != null
+      return target.position
+    return ship.velocity
+  var bAway = xbtn row, "Away Fr.", def
+    var tgt = target
+    if target != null
+      return -target.position
+    return -ship.velocity
+  row = blk2.addHorizontal()
+  var unlock2 = row.addExclusive2 "UNLOCK", lockdir.bind null
+  unlock2.flexWidth = 1
+  unlock2.flexHeight = 1
+
   // startup selection
   if "control_dir" in global
     var sel = global.control_dir
@@ -71,7 +93,15 @@ try
   until done
     if mObt.pressed and altitude < math.max atmosphere.height/4, 1000
       mSrf.pressed = true
-    blk1.visible = mObt.pressed or mSrf.pressed
+    if !blk1.visible and mObt.pressed or mSrf.pressed
+      blk2.visible = false
+      blk1.visible = true
+      unlock.press
+    if !blk2.visible and mTgt.pressed
+      blk1.visible = false
+      blk2.visible = true
+      unlock2.press
+
     wait
     if stage.ready // could be moved to system.idle but why actually
       var nextDecoupler = ship.parts.nextDecoupler
