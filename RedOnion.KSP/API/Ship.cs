@@ -287,7 +287,7 @@ namespace RedOnion.KSP.API
 		[Description("KSP API. Orbited body.")]
 		public SpaceBody body => Bodies.Instance[native.mainBody];
 		ISpaceObject ISpaceObject.body => body;
-		[Unsafe, Description("KSP API. Orbit parameters. May get replaced by safe wrapper in the future.")]
+		[Unsafe, WorkInProgress, Description("KSP API. Orbit parameters. May get replaced by safe wrapper in the future.")]
 		public Orbit orbit => native.orbit;
 		[Description("Eccentricity of current orbit.")]
 		public double eccentricity => native.orbit.eccentricity;
@@ -422,7 +422,7 @@ namespace RedOnion.KSP.API
 
 		#region Properties for autopilot
 
-		[Description("Center of mass.")]
+		[WorkInProgress, Description("Center of mass. (May get removed if we decide to use it for `position`.)")]
 		public Vector centerOfMass => new Vector(native.CoMD);
 		Vector ISpaceObject.position => centerOfMass;
 		[Description("Angular velocity (ω, deg/s), how fast the ship rotates")]
