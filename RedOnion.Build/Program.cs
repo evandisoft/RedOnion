@@ -35,6 +35,9 @@ namespace RedOnion.Build
 				case "docs":
 					Documentation.Exec();
 					continue;
+				case "links":
+					GithubIOLinks.Exec();
+					continue;
 				}
 			}
 		}

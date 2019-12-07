@@ -69,7 +69,7 @@ namespace RedOnion.KSP.API
 		//[Unsafe, Description("A map of kerbal names to kerbals for kerbals in the crew.")]
 		//public static KerbalsDictionary kerbals => KerbalsDictionary.Instance;
 
-		[WorkInProgress, Description("Target of active ship. Null if none. WIP: currently only works for space/celestial body.")]
+		[WorkInProgress, Description("Target of active ship. Null if none.")]
 		public static object target
 		{
 			get

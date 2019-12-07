@@ -17,7 +17,7 @@ User interface, see [RedOnion.UI](../../RedOnion.UI/README.md)
 - `Panel`: [Panel](../../RedOnion.UI/Panel.md) - Content panel (a box to hold other elements, manages layout).
 - `Label`: [Label](../../RedOnion.UI/Label.md) - Line of text
 - `Button`: [Button](../../RedOnion.UI/Button.md) - Clickable button (or toggle-button).
-- `Toggle`: Toggle - Toggle - experimental. WIP
+- `Toggle`: Toggle - \[`WIP`\] Toggle - experimental. WIP
 - `TextBox`: [TextBox](../../RedOnion.UI/TextBox.md) - Line of editable text (or multi-line text editor).
 - `Image`: Image - Image / Icon.
 - `ImageType`: Type - UnityEngine.UI.Image.Type

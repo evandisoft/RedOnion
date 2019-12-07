@@ -8,10 +8,11 @@ Global variables, objects and functions common to all scripting languages.
 - `ui`: [UI](../Namespaces/UI.md) - User Interface.
 - `ksp`: [KSP](../Namespaces/KSP.md) - \[`Unsafe`\] Shortcuts to KSP API + some tools.
 - `unity`: [Unity](../Namespaces/Unity.md) - \[`Unsafe`\] Shortcuts to Unity API.
+- `types`: [Types](../Namespaces/Types.md) - Types to be used with ROS: `is` operator; Lua: `isa` function.
 - `stage`: [Stage](Stage.md) - Staging logic.
 - `time`: [Time](Time.md) - Current time and related functions.
 - `PID`: [PID](PID.md) - PID regulator (alias to `system.pid` in ROS).
-- `app`: [App](App.md) - Safe API for KSP Application Launcher (toolbar/buttons). WIP
+- `app`: [App](App.md) - \[`WIP`\] Safe API for KSP Application Launcher (toolbar/buttons). WIP
 
 **Static Fields:**
 - `native`: NamespaceInstance - \[`Unsafe`\] Namespace Mappings (import of native types by namespace). More info [here](../ReflectionUtil/NamespaceInstance.md)
@@ -24,6 +25,7 @@ Global variables, objects and functions common to all scripting languages.
 - `player`: Player - User/player controls.
 - `user`: Player - User/player controls.
 - `bodies`: [Bodies](Bodies.md) - A collection of space/celestial bodies. (Safe API)
+- `target`: Object - \[`WIP`\] Target of active ship. Null if none.
 - `altitude`: double - Alias to `ship.altitude`. (`NaN` if no ship.)
 - `apoapsis`: double - Alias to `ship.apoapsis`. (`NaN` if no ship.)
 - `periapsis`: double - Alias to `ship.periapsis`. (`NaN` if no ship.)

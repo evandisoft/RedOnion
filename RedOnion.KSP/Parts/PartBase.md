@@ -17,8 +17,9 @@ Part of the ship (vehicle/vessel).
 - `state`: PartStates - State of the part (IDLE, ACTIVE (e.g. engine), DEACTIVATED, DEAD, FAILED).
 - `name`: string - Name of the part (assigned by KSP).
 - `title`: string - Title of the part (assigned by KSP).
+- `position`: [Vector](../API/Vector.md) - \[`WIP`\] Position of the part.
 
 **Instance Methods:**
 - `istype()`: bool, name string
-  - Method to test the type of the part (e.g. `.IsType("LaunchClamp")`)
+  - Method to test the type of the part (e.g. `.istype("LaunchClamp")`). Note that ROS has `is` operator and Lua has `isa` function that can be used togehter with `types.engine` etc.
 - `explode()`: void - Explode the part.

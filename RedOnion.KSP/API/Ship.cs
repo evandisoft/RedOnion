@@ -187,7 +187,7 @@ namespace RedOnion.KSP.API
 		}
 		internal readonly static string autoLocMarker = "#autoLOC_";
 
-		[WorkInProgress, Description("Target of active ship. Null if none. WIP: currently only works for space/celestial body.")]
+		[WorkInProgress, Description("Target of active ship. Null if none.")]
 		public object target
 		{
 			get
