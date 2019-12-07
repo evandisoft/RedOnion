@@ -4,7 +4,7 @@ using System.Diagnostics;
 using MunOS.Core;
 using MunOS.Core.Executors;
 
-namespace MunOS.Processing
+namespace MunOS.ProcessLayer
 {
 	public abstract class MunThread : IExecutable
 	{
@@ -29,12 +29,19 @@ namespace MunOS.Processing
 			stopwatch.Start();
 		}
 
+
+		/// <summary>
+		/// Before executing, a <see cref="MunThread"/> sets this to itself so that 
+		/// calls made in the script can be linked to this thread.
+		/// </summary>
+		public static MunThread ExecutingThread { get; private set; }
+
 		public readonly MunProcess parentProcess;
-		public readonly string name;
-		protected MunThread(MunProcess parentProcess,string name="")
+		public string Name { get; set; } = "";
+
+		protected MunThread(MunProcess parentProcess)
 		{
 			this.parentProcess=parentProcess;
-			this.name=name;
 		}
 
 		public readonly long ID=nextID++; 
@@ -59,20 +66,23 @@ namespace MunOS.Processing
 		public ExecStatus Execute(long tickLimit)
 		{
 			ExecStatus status;
-			MunProcess.current=parentProcess;
+			ExecutingThread=this;
 			try
 			{
 				status=ProtectedExecute(tickLimit);
 			}
 			catch(Exception)
 			{
-				MunProcess.current=null;
 				// On an exception, throw it to CoreExecMgr so that it will call 
 				// HandleException. But first set the current MunProcess to null
 				// as we are supposed to do.
 				throw;
 			}
-			MunProcess.current=null;
+			finally
+			{
+				ExecutingThread=null;
+			}
+
 
 			if (status==ExecStatus.FINISHED)
 			{
@@ -95,11 +105,11 @@ namespace MunOS.Processing
 
 		public override string ToString()
 		{
-			if (name=="")
+			if (Name =="")
 			{
 				return ID.ToString();
 			}
-			return name+","+ID;
+			return Name +","+ID;
 		}
 
 		/// <summary>

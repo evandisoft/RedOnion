@@ -1,7 +1,7 @@
 using System;
 using System.Text;
 
-namespace MunOS.Processing
+namespace MunOS.ProcessLayer
 {
 	public class ProcessOutputBuffer
 	{

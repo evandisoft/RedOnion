@@ -1,11 +1,24 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using MunOS.Core;
 using MunOS.Core.Executors;
 
 namespace MunOS.Core
 {
+	public enum ExecStatus
+	{
+		// represents that the executable is sleeping.
+		SLEEPING,
+		// Represents that the executable voluntarily yielded
+		YIELDED,
+		// represents that the executable was interrupted by an auto-yield or timeout type functionality
+		// In otherwords, represents that the executable wanted to do more computations this update but was
+		// paused prematurely.
+		INTERRUPTED,
+		// represents that the executable finished execution and can be removed.
+		FINISHED,
+	}
+
 	/// <summary>
 	/// Manages execution of IExecutables among 4 priority levels. Lowest level of execution.
 	/// </summary>

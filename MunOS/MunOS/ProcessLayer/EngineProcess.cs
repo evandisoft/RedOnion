@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
-using MunOS.Processing;
 
-namespace RedOnion.KSP.MunOS
+namespace MunOS.ProcessLayer
 {
 	public abstract class EngineProcess:MunProcess
 	{
@@ -38,7 +37,7 @@ namespace RedOnion.KSP.MunOS
 		/// <param name="source">The source string to be evaluated.</param>
 		/// <param name="path">Script path or null for repl.</param>
 		/// <param name="withHistory">True if this source should be added to the history.</param>
-		public void RunInThread(string source, string path = null, bool withHistory = false)
+		public void ExecuteSource(string source, string path = null, bool withHistory = false)
 		{
 			if (withHistory)
 			{
@@ -55,10 +54,10 @@ namespace RedOnion.KSP.MunOS
 				currentHistoryItem = null;
 			}
 
-			ProtectedRunInThread(source, path);
+			ExecuteSourceInThread(source, path);
 		}
 
-		protected abstract void ProtectedRunInThread(string source, string path);
+		protected abstract void ExecuteSourceInThread(string source, string path);
 
 
 		public string GetCurrentHistoryItem()

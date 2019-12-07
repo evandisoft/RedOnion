@@ -4,19 +4,6 @@ using System.Diagnostics;
 
 namespace MunOS.Core.Executors
 {
-
-	public enum ExecStatus
-	{
-		// Represents that the executable voluntarily yielded
-		YIELDED, 
-		// represents that the executable was interrupted by an auto-yield or timeout type functionality
-		// In otherwords, represents that the executable wanted to do more computations this update but was
-		// paused prematurely.
-		INTERRUPTED,
-		// represents that the executable finished execution and can be removed.
-		FINISHED, 
-	}
-
 	/// <summary>
 	/// Holds all executables of a given priority and can execute them
 	/// with the given time limit.
@@ -99,6 +86,7 @@ namespace MunOS.Core.Executors
 					// this update if other executables finish or yield early.
 					executeQueue.Enqueue(execInfo);
 					break;
+				case ExecStatus.SLEEPING:
 				case ExecStatus.YIELDED:
 					// if it yielded voluntarily, put it back in the waitQueue to wait for the next
 					// update

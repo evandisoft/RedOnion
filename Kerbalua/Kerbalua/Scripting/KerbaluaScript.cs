@@ -44,7 +44,7 @@ namespace Kerbalua.Scripting
 			_instance=new KerbaluaScript();
 		}
 
-		private KerbaluaScript() : base(CoreModules.Preset_Complete)
+		public KerbaluaScript() : base(CoreModules.Preset_Complete)
 		{
 			UserData.RegisterType<Button>(new LuaDescriptor(typeof(Button)));
 

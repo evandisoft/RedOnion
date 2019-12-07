@@ -47,11 +47,11 @@
     <Compile Include="MunOS\Core\CoreExecMgr.cs" />
     <Compile Include="MunOS\Core\ExecInfo.cs" />
     <Compile Include="MunOS\Core\IExecutable.cs" />
-    <Compile Include="MunOS\Processing\MunProcess.cs" />
-    <Compile Include="MunOS\Processing\MunThread.cs" />
-    <Compile Include="MunOS\Processing\ProcessOutputBuffer.cs" />
-    <Compile Include="MunOS\Processing\EngineProcess.cs" />
-    <Compile Include="MunOS\Processing\EngineThread.cs" />
+    <Compile Include="MunOS\ProcessLayer\MunProcess.cs" />
+    <Compile Include="MunOS\ProcessLayer\MunThread.cs" />
+    <Compile Include="MunOS\ProcessLayer\ProcessOutputBuffer.cs" />
+    <Compile Include="MunOS\ProcessLayer\EngineProcess.cs" />
+    <Compile Include="MunOS\ProcessLayer\EngineThread.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MunOS\" />
@@ -60,7 +60,7 @@
     <Folder Include="MunOS\oldstuff\Repl\" />
     <Folder Include="MunOS\Core\" />
     <Folder Include="MunOS\Core\Executors\" />
-    <Folder Include="MunOS\Processing\" />
+    <Folder Include="MunOS\ProcessLayer\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="MunOS\MunOSNotes.md" />

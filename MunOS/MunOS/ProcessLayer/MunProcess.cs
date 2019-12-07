@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using MunOS.Core;
 
-namespace MunOS.Processing
+namespace MunOS.ProcessLayer
 {
 	/// <summary>
 	/// A <see cref="MunProcess"/> manages a number of <see cref="MunThread"/>s. It has a list of running threads and
@@ -16,19 +16,12 @@ namespace MunOS.Processing
 		static long nextID=0;
 		public readonly long ID=nextID++;
 
-		public readonly string name;
-		protected MunProcess(string name="")
+		public string Name { get; set; } = "";
+		protected MunProcess()
 		{
-			this.name=name;
 		}
 
-		/// <summary>
-		/// While executing, a <see cref="MunThread"/> sets this to its parent process so that threads and special resources
-		/// it creates (like VecDraw) can be linked up to its parent process.
-		/// </summary>
-		public static MunProcess current;
-
-		protected ProcessOutputBuffer outputBuffer=new ProcessOutputBuffer();
+		public readonly ProcessOutputBuffer outputBuffer=new ProcessOutputBuffer();
 		/// <summary>
 		/// A mapping of running threads to <see cref="ExecInfo"/> ID's. Distinct from a thread ID.
 		/// Threads can exist outside of <see cref="CoreExecMgr"/>, but these <see cref="ExecInfo"/> IDs are only valid between
@@ -42,7 +35,7 @@ namespace MunOS.Processing
 
 		public int RunningThreadsCount => runningThreads.Count;
 
-		public long RunThread(CoreExecMgr.Priority priority, MunThread thread)
+		public long ExecuteThread(CoreExecMgr.Priority priority, MunThread thread)
 		{
 			long RunningExecutableID=CoreExecMgr.Instance.RegisterExecutable(priority, thread);
 			runningThreads[thread]=RunningExecutableID;
