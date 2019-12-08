@@ -40,6 +40,7 @@ namespace RedOnion.KSP.API
 			_heading = double.NaN;
 			_roll = double.NaN;
 			_direction = new Vector(double.NaN, double.NaN, double.NaN);
+			_killRot = false;
 			Unhook();
 		}
 
