@@ -99,7 +99,9 @@ namespace LiveRepl
 			engineProcesses["Lua"] = kerbaluaProcess;
 			ProcessManager.Instance.Processes.Add(kerbaluaProcess);
 
-
+			var kerbaluaProcess2= new KerbaluaProcess();
+			engineProcesses["Lua2"] = kerbaluaProcess2;
+			ProcessManager.Instance.Processes.Add(kerbaluaProcess2);
 
 			string lastEngineName = SavedSettings.LoadSetting("lastEngine", "Lua");
 			if (engineProcesses.ContainsKey(lastEngineName))
