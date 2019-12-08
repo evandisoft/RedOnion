@@ -5,6 +5,29 @@ Make sure to keep reference to it and dispose it when you are done with it.
 It may get garbage-collected otherwise, but that can take time and is rather backup measure.
 
 
+**Constructors:**
+- `Window()` - Create new window (immediately visible).
+- `Window()`: title string
+  - Create new window with a title (immediately visible).
+- `Window()`: title string, layout [Layout](Layout.md)
+  - Create new window with a title and defined layout (immediately visible).
+- `Window()`: layout [Layout](Layout.md), title string
+  - Create new window with defined layout and a title (immediately visible).
+- `Window()`: layout [Layout](Layout.md)
+  - Create new window with defined layout (immediately visible).
+- `Window()`: layout [Layout](Layout.md), visible bool
+  - Create new window with defined layout and selected visibility.
+- `Window()`: visible bool
+  - Create new window with selected visibility.
+- `Window()`: visible bool, title string
+  - Create new window with selected visibility and title.
+- `Window()`: visible bool, title string, layout [Layout](Layout.md)
+  - Create new window with selected visibility, title and layout.
+- `Window()`: visible bool, layout [Layout](Layout.md), title string
+  - Create new window with selected visibility, layout and title.
+- `Window()`: visible bool, layout [Layout](Layout.md)
+  - Create new window with selected visibility and layout.
+
 **Instance Properties:**
 - `Active`: bool - Window is set to be visible/active. [`GameObject.activeSelf`](https://docs.unity3d.com/ScriptReference/GameObject-activeSelf.html), [`GameObject.SetActive`](https://docs.unity3d.com/ScriptReference/GameObject.SetActive.html)
 - `Visible`: bool - Window is visible (and all parents are). [`GameObject.activeInHierarchy`](https://docs.unity3d.com/ScriptReference/GameObject-activeInHierarchy.html), [`GameObject.SetActive`](https://docs.unity3d.com/ScriptReference/GameObject.SetActive.html)
