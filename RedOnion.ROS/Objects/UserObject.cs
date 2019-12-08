@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using RedOnion.ROS.Utilities;
+using RedOnion.Collections;
 
 namespace RedOnion.ROS.Objects
 {

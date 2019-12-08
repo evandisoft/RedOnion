@@ -37,6 +37,8 @@
   <ItemGroup>
     <Compile Include="Attributes\Attributes.cs" />
     <Compile Include="Attributes\DocBuildAttribute.cs" />
+    <Compile Include="Collections\ListCore.cs" />
+    <Compile Include="Collections\GenQueue.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

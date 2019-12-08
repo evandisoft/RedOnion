@@ -8,6 +8,7 @@ using UnityEngine;
 using KSP.Localization;
 using System.Collections.Generic;
 using RedOnion.ROS;
+using RedOnion.Collections;
 
 namespace RedOnion.KSP.API
 {

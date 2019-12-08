@@ -2,7 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Text;
 using System.Globalization;
-using RedOnion.ROS.Utilities;
+using RedOnion.Collections;
 
 namespace RedOnion.ROS.Parsing
 {

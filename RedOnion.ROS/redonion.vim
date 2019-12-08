@@ -41,7 +41,7 @@ syn case match
 syn keyword rosOperator			and or not
 syn keyword rosConstant			true false null this self base super exception
 syn keyword rosStatement		return break continue goto
-syn keyword rosStatement		yield function def var new using import
+syn keyword rosStatement		wait yield function def var new using import
 syn keyword rosStatement		raise throw try catch finally
 syn keyword rosStatement		as in is out ref params lock
 syn keyword rosStatement		get set add remove value

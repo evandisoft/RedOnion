@@ -30,10 +30,11 @@ It may get garbage-collected otherwise, but that can take time and is rather bac
 			// weak reference to main window to allow auto-dispose when there is no hard-reference to it
 			protected readonly WeakReference window;
 
-			public FramePanel(Window window)
+			public FramePanel(Window window, bool visible = true)
 			{
 				this.window = new WeakReference(window);
 				Scenes = (SceneFlags)(1 << (int)HighLogic.LoadedScene);
+				Visible = visible;
 				GameObject.transform.SetParent(UIMasterController.Instance.dialogCanvas.transform, false);
 				Group = GameObject.AddComponent<CanvasGroup>();
 				Group.alpha = .9f;
@@ -106,16 +107,34 @@ It may get garbage-collected otherwise, but that can take time and is rather bac
 		protected FramePanel Frame => frame;
 		public Panel Content { get; private set; }
 
+		[Description("Create new window (immediately visible).")]
 		public Window() : this(Layout.Vertical) { }
+		[Description("Create new window with a title (immediately visible).")]
 		public Window(string title) : this(Layout.Vertical) => Title = title;
+		[Description("Create new window with a title and defined layout (immediately visible).")]
 		public Window(string title, Layout layout) : this(layout) => Title = title;
+		[Description("Create new window with defined layout and a title (immediately visible).")]
 		public Window(Layout layout, string title) : this(layout) => Title = title;
-		public Window(Layout layout)
+		[Description("Create new window with defined layout (immediately visible).")]
+		public Window(Layout layout) : this(layout, true) { }
+		[Description("Create new window with defined layout and selected visibility.")]
+		public Window(Layout layout, bool visible)
 		{
-			frame = new FramePanel(this);
+			frame = new FramePanel(this, visible);
 			Content = frame.Content;
 			Content.Layout = layout;
 		}
+		[Description("Create new window with selected visibility.")]
+		public Window(bool visible) : this(Layout.Vertical, visible) { }
+		[Description("Create new window with selected visibility and title.")]
+		public Window(bool visible, string title) : this(Layout.Vertical, visible) => Title = title;
+		[Description("Create new window with selected visibility, title and layout.")]
+		public Window(bool visible, string title, Layout layout) : this(layout, visible) => Title = title;
+		[Description("Create new window with selected visibility, layout and title.")]
+		public Window(bool visible, Layout layout, string title) : this(layout, visible) => Title = title;
+		[Description("Create new window with selected visibility and layout.")]
+		public Window(bool visible, Layout layout) : this(layout, visible) { }
+
 		protected Window(FramePanel frame)
 		{
 			this.frame = frame;
