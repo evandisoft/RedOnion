@@ -12,15 +12,19 @@ namespace LiveRepl.Parts
 			this.uiparts=uiparts;
 		}
 
-		public void Changed()
+		public bool IsChanged { get; private set; } = false;
+
+		public void MarkAsChanged()
 		{
 			Content.text="*";
+			IsChanged=true;
 			uiparts.scriptWindow.needsResize=true;
 		}
 
-		public void Unchanged()
+		public void MarkAsUnchanged()
 		{
 			Content.text="";
+			IsChanged=false;
 			uiparts.scriptWindow.needsResize=true;
 		}
 	}
