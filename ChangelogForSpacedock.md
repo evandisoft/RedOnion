@@ -11,10 +11,23 @@
 - Working on some sort of system for running multiple scripts at a time. May not initially have a UI that can provide this feature to the user in full. That will probably come later.
 
 # Next Release
-Just had a release (0.4.7).
+Just had a release (0.4.8)
 
 # Current
 # 0.4
+## 0.4.8
+### ROS Changes:
+- ROS: fixed problem with variables with same name
+- launch.ros: pitch-down logic for tilted/off-center engines (Dynawing)
+- target and ship.target - works for bodies, ships and parts (docks)
+- control.ros: targeting, rendezvous and docking assist
+
+### LiveRepl Changes:
+- Kerbalui to use GetControlID to get a unique controlid for each window. Could have interferred with other mods.
+- Fixed issue where LiveRepl was making modifications to the fontsize of the default GUI.Label style instead of making those changes to a copy of that style.
+- Hitting run will only save the file if it has been modified in the editor. Otherwise it loads the file from disk into the editor. This will allow you to more conveniently use an outside editor.
+- Scene changes, including revert, now terminate any windows or vecdraws.
+
 ## 0.4.7
 ### General Changes:
 - time.warp.ready improved
