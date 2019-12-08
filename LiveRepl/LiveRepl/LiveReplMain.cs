@@ -6,7 +6,7 @@ using System.Collections.Generic;
 namespace LiveRepl
 {
     [KSPAddon(KSPAddon.Startup.AllGameScenes, false)]
-    public class LiveReplMain : MonoBehaviour
+    public class LiveReplMain2 : MonoBehaviour
     {        
 		static Texture2D toolbarTexture=null;
 
@@ -76,14 +76,28 @@ namespace LiveRepl
 
 			if (!guiActive) return;
 
+			//GUI.Window(0, new Rect(100, 100, 100, 100), HandleWindowFunction, "Title");
+			//Debug.Log(scriptWindow.windowID);
+			//Debug.Log(GUI.skin.textArea.fontSize);
 			try
 			{
 				scriptWindow.Update();
+
 			}
 			catch (Exception e)
 			{
 				Debug.Log(e);
 			}
 		}
-    }
+
+		void HandleWindowFunction(int id)
+		{
+			if (Event.current.isKey || Event.current.isMouse)
+			{
+				Debug.Log("current event is "+Event.current);
+			}
+			GUI.TextArea(new Rect(0,0,100,100),"blah");
+		}
+
+	}
 }

@@ -11,7 +11,9 @@
 - Working on some sort of system for running multiple scripts at a time. May not initially have a UI that can provide this feature to the user in full. That will probably come later.
 
 # Next Release
-Just had a release (0.4.7).
+### LiveRepl Changes:
+- Fixed issue where Kerbalui wasn't using GetControlID to get a unique controlid for each window. Could have interferred with other mods.
+- Fixed issue where LiveRepl was making modifications to the fontsize of the default GUI.Label style instead of making those changes to a copy of that style.
 
 # Current
 # 0.4
