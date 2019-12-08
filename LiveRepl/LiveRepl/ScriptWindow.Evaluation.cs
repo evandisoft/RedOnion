@@ -99,6 +99,8 @@ namespace LiveRepl
 			engineProcesses["Lua"] = kerbaluaProcess;
 			ProcessManager.Instance.Processes.Add(kerbaluaProcess);
 
+
+
 			string lastEngineName = SavedSettings.LoadSetting("lastEngine", "Lua");
 			if (engineProcesses.ContainsKey(lastEngineName))
 			{
@@ -114,7 +116,14 @@ namespace LiveRepl
 				}
 			}
 
-
+			foreach (var engineName in engineProcesses.Keys)
+			{
+				uiparts.scriptEngineSelector.AddMinSized(new Button(engineName,() =>
+				{
+					SetCurrentEngineProcess(engineName);
+					SavedSettings.SaveSetting("lastEngine", engineName);
+				}));
+			}
 			//replEvaluators["ROS"] = new RedOnionReplEvaluator()
 			//{
 			//	PrintAction = uiparts.replOutoutArea.AddOutput,
@@ -134,31 +143,31 @@ namespace LiveRepl
 			//#endif
 			//var scriptEngineSelector=uiparts.scriptEngineSelector;
 
-				//string lastEngineName = SavedSettings.LoadSetting("lastEngine", "Lua");
-				//if (replEvaluators.ContainsKey(lastEngineName))
-				//{
-				//	SetCurrentEvaluator(lastEngineName);
-				//}
-				//else
-				//{
-				//	foreach (var evaluatorName in replEvaluators.Keys)
-				//	{
-				//		SetCurrentEvaluator(evaluatorName);
-				//		SavedSettings.SaveSetting("lastEngine", evaluatorName);
-				//		break;
-				//	}
-				//}
+			//string lastEngineName = SavedSettings.LoadSetting("lastEngine", "Lua");
+			//if (replEvaluators.ContainsKey(lastEngineName))
+			//{
+			//	SetCurrentEvaluator(lastEngineName);
+			//}
+			//else
+			//{
+			//	foreach (var evaluatorName in replEvaluators.Keys)
+			//	{
+			//		SetCurrentEvaluator(evaluatorName);
+			//		SavedSettings.SaveSetting("lastEngine", evaluatorName);
+			//		break;
+			//	}
+			//}
 
-				//foreach (var evaluatorName in replEvaluators.Keys)
-				//{
-				//	scriptEngineSelector.AddMinSized(new Button(evaluatorName,() =>
-				//	{
-				//		SetCurrentEvaluator(evaluatorName);
-				//		SavedSettings.SaveSetting("lastEngine", evaluatorName);
-				//	}));
-				//}
+			//foreach (var evaluatorName in replEvaluators.Keys)
+			//{
+			//	scriptEngineSelector.AddMinSized(new Button(evaluatorName,() =>
+			//	{
+			//		SetCurrentEvaluator(evaluatorName);
+			//		SavedSettings.SaveSetting("lastEngine", evaluatorName);
+			//	}));
+			//}
 
-				//RunAutorunScripts();
+			//RunAutorunScripts();
 		}
 	}
 }
