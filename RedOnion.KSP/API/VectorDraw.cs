@@ -58,11 +58,7 @@ namespace RedOnion.KSP.API
 			}
 
 			~Draw() => Dispose(false);
-			void IDisposable.Dispose()
-			{
-				GC.SuppressFinalize(this);
-				Dispose(true);
-			}
+			void IDisposable.Dispose() => dispose();
 			protected virtual void Dispose(bool disposing)
 			{
 				if (_hooks != null)
@@ -117,6 +113,12 @@ namespace RedOnion.KSP.API
 				_bodyObject = null;
 				_headObject?.DestroyGameObject();
 				_headObject = null;
+			}
+			[Description("Dispose the vector. (Cannot be shown again after that.)")]
+			public void dispose()
+			{
+				GC.SuppressFinalize(this);
+				Dispose(true);
 			}
 
 			// see https://wiki.kerbalspaceprogram.com/wiki/API:Layers

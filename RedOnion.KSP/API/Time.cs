@@ -31,7 +31,8 @@ namespace RedOnion.KSP.API
 		[Description("Indicator that warping utilities are ready for commands. (`to` will return false otherwise.)")]
 		public static bool ready
 			=> KSPTW.fetch?.setAutoWarp == false
-			&& !InputLockManager.IsLocked(ControlTypes.TIMEWARP|ControlTypes.WARPTO_LOCK);
+			&& !InputLockManager.lockStack.ContainsKey("TimeWarpLock")
+			&& !InputLockManager.lockStack.ContainsKey("TimeWarpTo");
 
 		[Description("Warp mode set to low aka physics warp. Note that it can only be changed on zero rate-index (and when `ready`).")]
 		public static bool low

@@ -18,6 +18,8 @@ Unsafe KSP API - see [CommonScriptApi](../../CommonScriptApi.md)
 - `PartLoader`: PartLoader - [KSP API](https://kerbalspaceprogram.com/api/class_part_loader.html)
 - `InputLockManager`: InputLockManager - [KSP API](https://kerbalspaceprogram.com/api/class_input_lock_manager.html): For locking input.
 - `InputLock`: InputLockManager - Alias to `InputLockManager`.
+- `GameSettings`: GameSettings - [KSP API](https://kerbalspaceprogram.com/api/class_game_settings.html): Various KSP settings.
+- `GameEvents`: GameEvents - [KSP API](https://kerbalspaceprogram.com/api/class_game_events.html): Various KSP events.
 
 **Static Fields:**
 - `Scalar`: Scalar - Math utilities.
