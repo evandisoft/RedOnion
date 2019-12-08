@@ -138,6 +138,16 @@ namespace RedOnion.ROS.Tests
 				"obj.action = action",
 				"obj.action",
 				"return obj.counter");
+
+			Lines(2,
+				"def test",
+				"  if this == null",
+				"    this = new object",
+				"  this.one = 1",
+				"  return this",
+				"var a = test()",
+				"var b = new test",
+				"return a.one + b.one");
 		}
 
 		[Test]

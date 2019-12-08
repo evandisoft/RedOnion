@@ -38,25 +38,24 @@ hi def link rosParenError		rosError
 
 syn case match
 
+syn keyword rosOperator			and or not
+syn keyword rosConstant			true false null this self base super exception
 syn keyword rosStatement		return break continue goto
-syn keyword rosStatement		yield function def var new using import
+syn keyword rosStatement		wait yield function def var new using import
 syn keyword rosStatement		raise throw try catch finally
 syn keyword rosStatement		as in is out ref params lock
 syn keyword rosStatement		get set add remove value
 syn keyword rosConditional		if unless then else switch
+syn keyword rosRepeat			while until do for foreach
 syn keyword rosLabel			case default
 syn match	rosLabel			display "^\s*\I\i*:$"
 syn match	rosLabel			display ";\s*\I\i*:$"
 syn match	rosLabel			display "^\s*\I\i*:[^:]"me=e-1
 syn match	rosLabel			display ";\s*\I\i*:[^:]"me=e-1
-syn match	rosRepeat			display "\<\(while\|until\|do\|for\|foreach\)\>"
-syn keyword rosOperator			and or not
-syn keyword rosConstant			true false null this base super
-
-syn match	rosStructure		display "\<\(class\|namespace\|interface\|struct\|union\|enum\)\>"
-syn match	rosAccess			display "\<\(public\|protected\|internal\|private\|friend\)\>"
-syn match	rosStorageClass		display "\<\(static\|const\|virtual\|delegate\|event\|partial\|abstract\|where\)\>"
-syn match	rosType				display	"\<\(void\|bool\|char\|int\|long\|short\|small\|uint\|word\|byte\|float\|double\|decimal\|object\|sbyte\|string\|ulong\|ushort\)\>"
+syn keyword rosStructure		class namespace interface struct union enum
+syn keyword	rosAccess			public protected internal private friend
+syn keyword	rosStorageClass		static const virtual delegate event partial abstract where
+syn keyword	rosType				void bool char int long short small uint word byte float double decimal object sbyte string ulong ushort
 
 "number
 syn case ignore
@@ -102,7 +101,7 @@ syn cluster	rosContained		add=rosDocCommentBody
 
 
 "parenthesis
-syn region	rosParen			transparent start='(' end=')' contains=ALLBUT,@rosContained,rosParenError,rosDontUseComma
+syn region	rosParen			transparent start='(' end=')' contains=ALLBUT,@rosContained,rosParenError
 syn match	rosParenError		display "[)]"
 
 

@@ -1,13 +1,31 @@
-var dirsubs = null // system.update subscriptions for direction manipulation
-var wnd = new ui.window "Control " + ship.name
-try
-  wnd.x -= (unity.screen.width - 200) / 3
+// list of all active control guis
+var guis = new list
+// requests for new windows (better do that in main)
+var reqs = new queue
 
-  // mode vs. the rest
+def control ship, target, x, y
+  var self = this ?? new object
+  self.terminate = false
+  self.ship = ship
+  self.target = target
+  self.dirsubs = null // system.update subscriptions for direction manipulation
+  self.stgsubs = null // system.idle subscription for staging
+  var wnd = new ui.window false, ui.layout.vertical
+  self.wnd = wnd
+  guis.add self
+  wnd.x -= (unity.screen.width - 200) / 3
+  if x != null then wnd.x = x
+  if y != null then wnd.y = y
+  wnd.title = "Control " + ship.name
+  wnd.closed.add def
+    self.terminate = true
+  var autopilot = ship.autopilot
+
+//mode vs. the rest
   var split = wnd.addHorizontal()
   split.padding = 0
 
-  // mode
+//mode
   var mode = split.addVertical()
   def mbtn text
     var btn = mode.addExclusive text
@@ -20,70 +38,194 @@ try
   var mNde = mbtn "NDE" // nodes only (+ "EXEC" button)
   mObt.pressed = true
 
-  // main content (buttons and footer)
+//main content (buttons and footer)
   var main = split.addVertical()
   main.width = 163
   main.childAnchors = ui.anchors.fill
   var btns = main.addHorizontal() //TODO: stack
   btns.childAnchors = ui.anchors.fill
 
-  def lockdir fn
-    if dirsubs != null
-      dirsubs.remove
-      dirsubs = null
+  def lockdir fn, btn
+    if self.dirsubs != null
+      self.dirsubs.remove
+      self.dirsubs = null
     autopilot.disable
-    if fn != null
-      dirsubs = system.update def
+    if fn != null and (btn == null || btn.pressed)
+      self.dirsubs = system.update def
         autopilot.direction = fn()
   def xbtn parent, text, steer
     var btn = parent.addExclusive2 text, lockdir.bind steer
     btn.width = 80
     return btn
 
-  // orbital/surfece buttons
-  var blk1 = btns.addVertical() //TODO: vertical flow and/or easy stretch for UNLOCK
+//orbital/surface buttons
+  var blk1 = btns.addVertical()
   var row = blk1.addHorizontal()
-  xbtn row, "Progr.", def => mSrf.pressed ? ship.srfvel : ship.velocity
-  xbtn row, "Retro.", def => mSrf.pressed ? -ship.srfvel : -ship.velocity
+  var bProgr  = xbtn row, "Progr.", def => mSrf.pressed ? ship.srfvel : ship.velocity
+  var bRetro  = xbtn row, "Retro.", def => mSrf.pressed ? -ship.srfvel : -ship.velocity
   row = blk1.addHorizontal()
-  xbtn row, "Normal", def => ship.velocity.cross ship.away
-  xbtn row, "Anti-N", def => -ship.velocity.cross ship.away
+  var bNormal = xbtn row, "Normal", def => ship.velocity.cross ship.away
+  var bAntiN  = xbtn row, "Anti-N", def => -ship.velocity.cross ship.away
   row = blk1.addHorizontal()
-  xbtn row, "Rad-OUT", def => ship.velocity.cross ship.away.cross ship.velocity
-  xbtn row, "Rad-IN", def => -ship.velocity.cross ship.away.cross ship.velocity
+  var bRadOut = xbtn row, "Rad-OUT", def => ship.velocity.cross ship.away.cross ship.velocity
+  var bRadIn  = xbtn row, "Rad-IN", def => -ship.velocity.cross ship.away.cross ship.velocity
   row = blk1.addHorizontal()
   var unlock = row.addExclusive2 "UNLOCK", lockdir.bind null
   unlock.flexWidth = 1
   unlock.flexHeight = 1
   unlock.pressed = true
 
-  // main loop
-  var done = false
-  wnd.closed.add def
-    done = true
-  until done
-    if mObt.pressed and altitude < math.max atmosphere.height/4, 1000
-      mSrf.pressed = true
-    blk1.visible = mObt.pressed or mSrf.pressed
-    wait
-    if stage.ready // could be moved to system.idle but why actually
-      var nextDecoupler = ship.parts.nextDecoupler
-      if nextDecoupler != null
-      //nothing to separate (using stage.pending is too dangerous in this script)
-        continue
-      if nextDecoupler.isType "LaunchClamp"
-      //not releasing launch clamps in this script
-        continue
-      if !stage.engines.anyOperational
-        print "No operational engine"
-        stage
-      else if stage.fuel <= 0.1
-        print "Stage out of fuel"
-        stage
+//target buttons
+  var blk2 = btns.addVertical()
+  blk2.visible = false
+  row = blk2.addHorizontal()
+  var bTowards = xbtn row, "Towards", def
+    prevTgtBtn = bTowards
+    var target = ship.target ?? self.target
+    if target != null
+      return target.position - ship.position
+    autopilot.killRot = true
+    return vector.none
+  var bAway = xbtn row, "Away Fr.", def
+    prevTgtBtn = bAway
+    var target = ship.target ?? self.target
+    if target != null
+      return ship.position - target.position
+    autopilot.killRot = true
+    return vector.none
 
+  row = blk2.addHorizontal()
+  var bMatchSpeed = xbtn row, "Match Speed", def
+    prevTgtBtn = bMatchSpeed
+    var dv = vector.none
+    var target = ship.target ?? self.target
+    if target == null
+      autopilot.killRot = true
+    else
+      if target is types.part
+        target = target.ship
+      dv = target.velocity-ship.velocity
+      if dv.size >= 0.01
+        var d = dv.angle ship.forward // direction / face-angle error
+        var e = d <= 1 ? 1 : math.deg.cos math.min 89.4, d^2.0 // min 0.0105
+        autopilot.throttle = e * math.min ship == global.ship ? user.throttle : 0.5,
+          dv.size * ship.mass / math.max 1, ship.engines.getThrust()
+      else
+        if ship == global.ship
+          user.throttle = 0
+        autopilot.throttle = nan
+        unlock2.press
+    return dv
+  bMatchSpeed.flexWidth = 1
+
+  row = blk2.addHorizontal()
+  var bControlTarget = xbtn row, "Control Target", def
+    var target = ship.target ?? self.target
+    if target != null
+      if target is types.part
+        target = target.ship
+      if target is types.ship
+        var rq = new object
+        rq.ship = target
+        rq.target = ship
+        rq.x = wnd.x
+        rq.y = wnd.y + wnd.height * 2 < unity.screen.height ?
+          wnd.y + wnd.height : wnd.y - wnd.height
+        reqs.push rq
+    prevTgtBtn.press
+    return vector.none
+  bControlTarget.flexWidth = 1
+
+  row = blk2.addHorizontal()
+  var unlock2 = row.addExclusive2 "UNLOCK", lockdir.bind def
+    prevTgtBtn = unlock2
+    return vector.none
+  unlock2.flexWidth = 1
+  unlock2.flexHeight = 1
+  var prevTgtBtn = unlock2
+
+//startup selection
+  if "control_dir" in global
+    var sel = global.control_dir
+    global.control_dir = null
+    if sel == "obt.prograde"
+      bProgr.pressed = true
+
+//staging
+  self.stgsubs = system.idle def
+    if ship != global.ship
+      return
+    if !stage.ready
+      return
+    if stage.pending
+      return
+    var nextDecoupler = ship.parts.nextDecoupler
+    if nextDecoupler == null
+        return
+    if nextDecoupler.isType "LaunchClamp"
+    //not releasing launch clamps in this script
+      return
+    if !stage.engines.anyOperational
+      print "No operational engine"
+      stage
+      return
+    if stage.fuel <= 0.1
+      print "Stage out of fuel"
+      stage
+      return
+
+//main loop
+  self.main = def
+    if self.terminate
+      if self.dirsubs != null
+        self.dirsubs.remove
+        self.dirsubs = null
+      if self.stgsubs != null
+        self.stgsubs.remove
+        self.stgsubs = null
+      autopilot.disable()
+      wnd.dispose()
+      guis.remove self
+      return false
+    if mObt.pressed and ship.altitude < math.max atmosphere.height/4, 1000
+      mSrf.pressed = true
+    if !blk1.visible and (mObt.pressed or mSrf.pressed)
+      blk2.visible = false
+      blk1.visible = true
+      unlock.press
+    if !blk2.visible and mTgt.pressed
+      blk1.visible = false
+      blk2.visible = true
+      unlock2.press
+    //remember last target
+    self.target = ship.target ?? self.target
+    //visual hint which ship is active
+    wnd.alpha = ship == global.ship ? 0.9 : 0.7
+    return true
+
+  wnd.visible = true
+  return self
+
+control ship
+try
+  while guis.count > 0
+    for var i = 0; i < guis.count
+      if guis[i].main(); i++
+    if reqs.count > 0
+      var rq = reqs.pop()
+      control rq.ship, rq.target, rq.x, rq.y
+    wait
 finally
-  wnd.dispose
-  if dirsubs != null
-    dirsubs.remove
-    dirsubs = null
+  for var gui in guis
+    gui.terminate = true
+    var dirsubs = gui.dirsubs
+    gui.dirsubs = null
+    if dirsubs != null
+      dirsubs.remove
+    var stgsubs = gui.stgsubs
+    gui.stgsubs = null
+    if stgsubs != null
+      stgsubs.remove
+    gui.wnd.dispose()
+    gui.ship.autopilot.disable
   autopilot.disable

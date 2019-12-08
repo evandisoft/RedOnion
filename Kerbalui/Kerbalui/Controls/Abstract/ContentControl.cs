@@ -24,8 +24,8 @@ namespace Kerbalui.Controls.Abstract
 		protected ContentControl(GUIStyle style)
 		{
 			Style=new GUIStyle(style);
-			Style.fontSize=ScaledFontsize;
-			//UpdateFont();
+
+			UpdateFont();
 			KerbaluiSettings.SettingsChange+=SettingsChangeHandler;
 		}
 

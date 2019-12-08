@@ -580,14 +580,23 @@ namespace RedOnion.ROS
 					case OpCode.ModAssign:
 					{
 						ref var lhs = ref vals.Top(-2);
+						ref var rhs = ref vals.Top(-1);
+						if (rhs.IsReference && !rhs.desc.Get(ref rhs, rhs.num.Int))
+							throw CouldNotGet(ref rhs);
 						if (!lhs.IsReference)
+						{
+							if (op == OpCode.Assign && self.obj == null && lhs.obj == null
+								&& ReferenceEquals(lhs.desc, Descriptor.NullSelf))
+							{
+								self = lhs = rhs;
+								vals.Pop(1);
+								continue;
+							}
 							throw InvalidOperation(
 								"Cannot {0} '{1}'",
 								op == OpCode.Assign ? "assign to" : "modify",
 								lhs.desc.Name);
-						ref var rhs = ref vals.Top(-1);
-						if (rhs.IsReference && !rhs.desc.Get(ref rhs, rhs.num.Int))
-							throw CouldNotGet(ref rhs);
+						}
 						if (!lhs.desc.Set(ref lhs, lhs.num.Int, op, ref rhs))
 							throw InvalidOperation(
 								"Property '{0}' of '{1}' {2}",

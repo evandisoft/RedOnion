@@ -35,7 +35,7 @@ License: [MIT](https://github.com/evandisoft/RedOnion/blob/master/LICENSE)
 **Warning: Do not use scripts from untrusted sources!**
 This is not a sandbox, any script has the power to do almost anything a modder could do in C#.
 We plan to eventually implement a switch to limit the power
-(disable what is marked `[Unsafe]` in the code),
+(disable what is marked `[Unsafe]` in the code/docs),
 but our goal now is to:
 
 - Allow users to do whatever they wish to do to the game environment to have fun.

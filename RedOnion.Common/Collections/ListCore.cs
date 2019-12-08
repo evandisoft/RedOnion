@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 
-namespace RedOnion.ROS.Utilities
+namespace RedOnion.Collections
 {
 	/// <summary>
 	/// Helper class for efficient list implementation

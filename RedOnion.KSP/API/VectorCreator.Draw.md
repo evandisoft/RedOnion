@@ -1,6 +1,6 @@
-## VectorCreator.Draw
+## \[`WIP`\] VectorCreator.Draw
 
-Vector drawing
+Vector drawing. WIP: The origin is glitching a bit shortly after launch and during warp.
 
 
 **Instance Properties:**

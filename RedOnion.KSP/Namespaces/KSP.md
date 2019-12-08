@@ -1,4 +1,4 @@
-## KSP
+## \[`Unsafe`\] KSP
 
 Unsafe KSP API - see [CommonScriptApi](../../CommonScriptApi.md)
 

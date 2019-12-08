@@ -18,9 +18,9 @@ namespace RedOnion.ROS
 		{
 			ctx = new Context();
 			eventsToRemove = new List<Event.Subscription>();
-			Update = new Event(eventsToRemove);
-			Once = new Event(eventsToRemove);
-			Idle = new Event(eventsToRemove);
+			Update = new Event("Update", eventsToRemove);
+			Once = new Event("Once", eventsToRemove);
+			Idle = new Event("Idle", eventsToRemove);
 		}
 		protected override void SetGlobals(Globals value)
 		{
@@ -65,6 +65,12 @@ namespace RedOnion.ROS
 			{
 				Log(trace);
 				print?.Invoke(trace);
+
+				while ((ex = ex.InnerException) != null)
+				{
+					Log("Inner: " + ex.Message);
+					Log(ex.StackTrace);
+				}
 			}
 			if (re != null)
 			{
@@ -224,7 +230,7 @@ namespace RedOnion.ROS
 		readonly Stopwatch watch = new Stopwatch();
 		int onceSkipped, idleSkipped;
 
-		public void UpdateGraphic()
+		public virtual void UpdateGraphic()
 		{
 			var graphic = GraphicUpdate;
 			if (graphic != null)
@@ -243,7 +249,7 @@ namespace RedOnion.ROS
 				}
 			}
 		}
-		public void UpdatePhysics()
+		public virtual void UpdatePhysics()
 		{
 			TotalCountdown = UpdateCountdown;
 			watch.Reset();
@@ -263,7 +269,7 @@ namespace RedOnion.ROS
 				do
 				{
 					var call = Update.GetNext();
-					if (!Call(call, "Update", UpdatePercent))
+					if (!Call(call, Update, UpdatePercent))
 						call.Remove();
 				} while (!Update.AtFirst //TODO: reconsider this condition
 				&& CountdownPercent > UpdatePercent
@@ -281,7 +287,7 @@ namespace RedOnion.ROS
 				do
 				{
 					var call = Once.GetNext();
-					if (!Call(call, "Once", OncePercent) || call.Core == null)
+					if (!Call(call, Once, OncePercent) || call.Core == null)
 						call.Remove();
 				} while (!Once.IsEmpty
 				&& CountdownPercent > OncePercent
@@ -299,7 +305,7 @@ namespace RedOnion.ROS
 				do
 				{
 					var call = Idle.GetNext();
-					if (!Call(call, "Idle", IdlePercent))
+					if (!Call(call, Idle, IdlePercent))
 						call.Remove();
 				} while (!Idle.AtFirst //TODO: reconsider this condition
 				&& CountdownPercent > IdlePercent
@@ -345,7 +351,7 @@ namespace RedOnion.ROS
 			if (milli > PeakMillis)
 				PeakMillis = milli;
 		}
-		private bool Call(Event.Subscription e, string name, int downtoPercent)
+		private bool Call(Event.Subscription e, Event loop, int downtoPercent)
 		{
 			try
 			{
@@ -379,7 +385,7 @@ namespace RedOnion.ROS
 			}
 			catch (Exception ex)
 			{
-				PrintException("FixedUpdate." + name, ex);
+				PrintException(Value.Format("FixedUpdate.{0}[{1}]", loop.name, loop.Count), ex);
 				return false;
 			}
 			return true;
@@ -424,8 +430,12 @@ wait // will not get executed
 ")]
 		public sealed class Event : ICallable
 		{
-			internal Event(List<Subscription> eventsToRemove)
-				=> this.eventsToRemove = eventsToRemove;
+			internal Event(string name, List<Subscription> eventsToRemove)
+			{
+				this.name = name;
+				this.eventsToRemove = eventsToRemove;
+			}
+			internal readonly string name;
 			internal readonly List<Subscription> eventsToRemove;
 			internal Subscription first, next;
 			internal bool AtFirst => next == first;

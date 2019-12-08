@@ -18,22 +18,25 @@ if startAngle > 89
 
 //: PARAM GUI
 
-var firda = true
-var evan = false
-var cust = false
+var firda = true // use ship.autopilot (and its own PIDs)
+var evan = false // use ksp.flightControl
+var cust = false // use autopilot.rawXXX with script-controlled PIDs
 def gui
-  var lblWidth = 120
-  var boxWidth = 60
-  var uniWidth = 46
   var selected = 0
   var wnd = new ui.window "Launch " + ship.name
-  try
-
+  try // try..finally wnd.dispose
+    var lblWidth = 120
+    var boxWidth = 60
+    var uniWidth = 46
   //move the window to the left side
     wnd.x -= (unity.screen.width - 200) / 3
+
+  //bottom label (above cancel/control/launch buttons) showing additional info
     var hintLabel = new ui.label
     def boxEnter box
-      hintLabel.text = box.tag
+      hintLabel.text = box.tag //...when some edit box is entered (focused, key-cursor inside)
+
+  //row-creating helper
     def row text, value, units, hint
       var row = wnd.addHorizontal()
       var lbl = row.addLabel text
@@ -51,6 +54,7 @@ def gui
         uni.minWidth = uniWidth
       return box
     
+  //parameters
     var ta = row "Target altitude: ",  targetAltitude, "km",    "Final Apoapsis"
     var ah = row "Ascent heading: ",   ascentHeading,  "°",     "Course during ascent (not inclination)"
     var ar = row "Ascent roll: ",      ascentRoll,     "°",     "Roll/bank during ascent"
@@ -64,13 +68,17 @@ def gui
     var a1 = row "First altitude: ",   firstAltitude,  "km",    "Altitude for first phase"
     var na = row "Narrow altitude: ",  narrowAltitude,  "m",    "Minimal altitude to go straight up"
     
+  //autopilot selection
     var apsel = wnd.addHorizontal()
     apsel.addLabel "Pilot: "
     var xfirda = apsel.addExclusive "Firda"
     var xevan  = apsel.addExclusive "Evan"
     var xcust  = apsel.addExclusive "Custom"
-    xfirda.pressed = true
+    if evan then xevan.pressed = true
+    else if cust; xcust.pressed = true
+    else xfirda.pressed = true
     
+  //hint label and final buttons
     wnd.add hintLabel
     var brow = wnd.addHorizontal()
     wnd.closed += def => selected = 1
@@ -131,6 +139,7 @@ var setPitch = evan ? setPitchEvan : setPitchFirda
 
 var customSteering = null
 if not evan
+  autopilot.reset
   autopilot.killRot = true
   if cust
   //this is the same logic as in the autopilot
@@ -284,7 +293,7 @@ vd[3].width = .2
 vd[3].scale = 12
 def vectors
   vd[0].vector = ship.forward
-  vd[1].vector = ship.autopilot.direction.normalized
+  vd[1].vector = autopilot.direction.normalized
   vd[2].vector = ship.velocity.normalized
   vd[3].vector = ship.srfVel.normalized
 vectors
@@ -316,7 +325,7 @@ try
   ctlsub.remove()
   ctlsub = null
   user.throttle = 0
-  ship.autopilot.disable
+  autopilot.disable
   print "Safe altitude reached"
   vd[3].hide //srfvel
 
@@ -341,28 +350,32 @@ try
     autopilot.direction = ship.away.cross ship.velocity.cross ship.away
 
   var maxThrottle = 0.0
+  var dvLast = dv().size
+  var dvMin = dvLast
+  var tta = ship.timeToAp
+  var pitchDown = 0.0
   def circle
+    tta = ship.timeToAp
     var pwr = 1
-    var tta = ship.timeToAp
-    var dir
-    if tta < ship.timeToPe
+    var dir = dv()
+    dvMin = math.min dvMin, dvLast = dir.size
+    if tta <= ship.timeToPe
     //minimize velocity vector difference when before apoapsis
-      dir = dv()
-      pwr = 1 / math.clamp (tta - 0.5 * stage.burnTime dir.size), 1.0, 100.0
-      if pwr <= 0.01; pwr = 0.0
+      pwr = (0.1 / math.clamp tta - 0.5 * stage.burnTime(dvMin), 0.1, 10.0) ^ 2.0
     else
+      tta -= ship.period
     //pitch-up when past apoapsis
-      var a = math.clamp(ship.period - tta, 0, 30)
+      var a = math.clamp(-tta, 0, 30)
       dir = ship.velocity.rotate a, ship.velocity.cross ship.away
       pwr = 1 + math.tan a
+    if pitchDown != 0.0
+      dir = dir.rotate pitchDown, ship.away.cross ship.velocity
     if evan; ksp.flightControl.targetDir = dir
     else autopilot.direction = dir
     var d = dir.angle ship.forward // direction / face-angle error
-    var e = d <= 1 ? 1 : math.deg.cos math.min 89.4, d^2 // min 0.0105
-    var needSpeed = math.sqrt(body.mu/(body.radius+ship.apoapsis))
-    var haveSpeed = ship.velocity.size
-    var need = (needSpeed-haveSpeed) * ship.mass / math.max 1, ship.engines.getThrust()
-    autopilot.throttle = pwr * e * math.min(maxThrottle, need)
+    var e = d <= 1 ? 1 : math.deg.cos math.min 89.4, d^2.0 // min 0.0105
+    autopilot.throttle = pwr * e * math.min maxThrottle,
+      dvMin * ship.mass / math.max 1, ship.engines.getThrust()
 
   var prevEtaReport = -10
   var switched = false
@@ -376,11 +389,14 @@ try
       print "ETA: {0:F1}s", eta
       if eta > 20 and !warped
         warped = true
+        time.warp.index = 0
+        time.warp.high = true
         time.warp.to prevEtaReport + eta - 10
     if eta <= 5 and not switched
       switched = true
       time.warp.cancel()
       ctlsub.remove
+      tta = ship.timeToAp
       ctlsub = system.update circle
     if eta <= 1; break
     wait
@@ -392,9 +408,11 @@ try
   var warned = 0
   var maxHeight = ship.apoapsis*1.1+1000
   var prevReport = 0
+  var lastTta = null
+  var pitchDownFactor = 1.0
   print "Burn!"
-  until ship.eccentricity < 0.00001 // perfect
-    if ship.timeToPe < ship.period*0.3
+  until dvLast < 0.01 or ship.eccentricity < 0.00001
+    if minE < 0.001 and ship.timeToPe < ship.period*0.3
     //happens with good accuracy, not a failure
       print "Apoapsis too far"
       break
@@ -405,22 +423,18 @@ try
       print "Something went wrong!"
       break
 
-  //time limit for fine-tuning
-    if ship.eccentricity < 0.01 and ship.periapsis > safeAltitude
-      if almost == null; almost = time()
-      else if time.since(almost) > 60; break
-      if ship.eccentricity < 0.001
-        if almost2 == null; almost2 = time()
-        else if time.since(almost2) > 20; break
-
-  //progress printout
+  //progress printout + pitch-down logic
     if time.since(prevReport) >= 1
       prevReport = time()
-      var delta = dv().size
-      var tta = ship.timeToAp
-      if tta > ship.timeToPe
-        tta -= ship.period
-      print "TTA: {0,6:F1} DV: {1,6:F1} BT: {2,6:F1}", tta, delta, stage.burnTime delta
+    //this is to handle tilted/off-center engines like on Dynawing
+      var currTta = tta // to avoid hazards, tta is updated asynchronously
+      if lastTta != null
+        var diff = lastTta-currTta
+        pitchDown = math.clamp pitchDown + pitchDownFactor * math.clamp(ship.throttle - diff,
+          -0.5, currTta < 0 ? 0.0 : 0.5), 0.0, 7.0
+      lastTta = currTta
+      print "TTA: {0,6:F1} DV: {1,6:F1} BT: {2,6:F1} E: {3,7:F5} PD: {4,3:F1}",
+        currTta, dvLast, stage.burnTime(dvLast), ship.eccentricity, pitchDown
       
   //check that staging is working (and we have fuel)
     if ship.engines.getThrust() == 0
@@ -435,6 +449,29 @@ try
       continue
     choked = null
 
+  //time limit for fine-tuning
+    if ship.periapsis < safeAltitude
+      continue
+    if dvMin < 0.2 or ship.eccentricity < 0.01
+      if almost == null
+        almost = time()
+        maxThrottle = 0.2
+        print "AT1: {0,6:F1} DV: {1,6:F1} BT: {2,6:F1} E: {3,7:F5} PD: {4,3:F1}",
+          tta, dvLast, stage.burnTime(dvLast), ship.eccentricity, pitchDown
+        pitchDownFactor = 0.5
+      else if time.since(almost) > 30
+        break
+      if dvMin < 0.05 or ship.eccentricity < 0.001
+        if almost2 == null
+          almost2 = time()
+          maxThrottle = 0.025
+          print "AT2: {0,6:F1} DV: {1,6:F1} BT: {2,6:F1} E: {3,7:F5} PD: {4,3:F1}",
+            tta, dvLast, stage.burnTime(dvLast), ship.eccentricity, pitchDown
+          pitchDownFactor = 0.1
+        else if time.since(almost2) > 10
+          break
+
+  maxThrottle = 0.0
 finally
   if ctlsub != null
     ctlsub.remove
@@ -446,7 +483,9 @@ finally
     d.dispose()
   vd = null
   user.throttle = 0
-  ship.autopilot.disable
+  autopilot.disable
+  autopilot.reset
 
 print "DONE! e={0:F5} Ap:{1:F3} Pe:{2:F3}", ship.eccentricity, ship.apoapsis*0.001, ship.periapsis*0.001
+global.control_dir = "obt.prograde"
 run.replace "control.ros"

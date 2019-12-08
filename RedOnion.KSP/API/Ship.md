@@ -6,6 +6,7 @@ Active vessel
 **Instance Properties:**
 - `native`: Vessel - \[`Unsafe`\] Native `Vessel` for unrestricted access to KSP API. Same as `FlightGlobals.ActiveVessel` if accessed through global `ship`.
 - `name`: string - Name of the ship (vehicle/vessel).
+- `target`: Object - \[`WIP`\] Target of active ship. Null if none.
 - `autopilot`: [Autopilot](Autopilot.md) - Autopilot of this ship (vehicle/vessel).
 - `throttle`: float - Current throttle (assign redirects to `Autopilot`, reads control state if autopilot disabled)
 - `parts`: [ShipPartSet](../Parts/ShipPartSet.md) - All parts of this ship/vessel/vehicle.
@@ -16,8 +17,8 @@ Active vessel
 - `dockingports`: [ReadOnlyList](ReadOnlyList.1.md)\[[DockingPort](../Parts/DockingPort.md)\] - List of all docking ports (regardless of staging).
 - `engines`: [EngineSet](../Parts/EngineSet.md) - All engines (regardless of state).
 - `sensors`: [ReadOnlyList](ReadOnlyList.1.md)\[[Sensor](../Parts/Sensor.md)\] - All sensors.
-- `ID`: Guid - Unique identifier of the ship (vehicle/vessel). Can change when docking/undocking.
-- `PersistentID`: uint - Unique identifier of the ship (vehicle/vessel). Should be same as it was before docking (after undocking).
+- `id`: Guid - Unique identifier of the ship (vehicle/vessel). Can change when docking/undocking.
+- `persistentId`: uint - Unique identifier of the ship (vehicle/vessel). Should be same as it was before docking (after undocking).
 - `vesseltype`: VesselType - KSP API. Vessel type as selected by user (or automatically).
 - `mass`: float - Total mass of the ship (vehicle/vessel). [tons = 1000 kg]
 - `packed`: bool - Wheter the ship is still packed (reduced physics).
@@ -30,7 +31,7 @@ Active vessel
 - `dynamicPressure`: double - Dynamic pressure [atm = 101.325kPa]
 - `q`: double - Dynamic pressure [atm = 101.325kPa]
 - `body`: [SpaceBody](SpaceBody.md) - KSP API. Orbited body.
-- `orbit`: Orbit - \[`Unsafe`\] KSP API. Orbit parameters. May get replaced by safe wrapper in the future.
+- `orbit`: Orbit - \[`Unsafe`\] \[`WIP`\] KSP API. Orbit parameters. May get replaced by safe wrapper in the future.
 - `eccentricity`: double - Eccentricity of current orbit.
 - `semiMajorAxis`: double - Semi-major axis of current orbit.
 - `semiMinorAxis`: double - Semi-minor axis of current orbit.
@@ -43,7 +44,7 @@ Active vessel
 - `period`: double - Period of current orbit in seconds.
 - `trueAnomaly`: double - Angle in degrees between the direction of periapsis and the current position.
 - `meanAnomaly`: double - Angle in degrees between the direction of periapsis and the current position extrapolated on circular orbit.
-- `position`: [Vector](Vector.md) - Current position relative to active ship (so `ship.position` always reads zero).
+- `position`: [Vector](Vector.md) - Center of mass relative to (CoM of) active ship (zero for active ship).
 - `velocity`: [Vector](Vector.md) - Current orbital velocity.
 - `surfaceVelocity`: [Vector](Vector.md) - Current surface velocity.
 - `srfVelocity`: [Vector](Vector.md) - Current surface velocity (Alias to `surfaceVelocity`).
@@ -61,7 +62,6 @@ Active vessel
 - `heading`: double - Current heading / yaw (the angle between forward and north vectors in tangent plane) [0..360]. Note that it can change violently around the poles.
 - `roll`: double - Current roll / bank (the angle between up and away vectors in the plane perpendicular to forward vector) [-180..+180]. 
 Note that it can change violently when facing up or down.
-- `centerOfMass`: [Vector](Vector.md) - Center of mass.
 - `angularVelocity`: [Vector](Vector.md) - Angular velocity (ω, deg/s), how fast the ship rotates
 - `angularMomentum`: [Vector](Vector.md) - Angular momentum (L = Iω, kg⋅m²⋅deg/s=N⋅m⋅s⋅deg) aka moment of momentum or rotational momentum.
 - `momentOfInertia`: Vector3d - Moment of inertia (I, kg⋅m²=N⋅m⋅s²) aka angular mass or rotational inertia.
@@ -76,4 +76,6 @@ Note that it can change violently when facing up or down.
 - `velocityAt()`: [Vector](Vector.md), time double
   - Predicted velocity at specified time.
 - `local()`: [Vector](Vector.md), v [Vector](Vector.md)
-  - Translate vector/direction into local coordinates.
+  - Translate vector/direction into ship-local coordinates (like looking at it from the cockpit).
+- `world()`: [Vector](Vector.md), v [Vector](Vector.md)
+  - Translate vector/direction into world coordinates (reverse the `local` transformation).

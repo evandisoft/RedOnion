@@ -9,11 +9,11 @@ namespace LiveRepl
 {
 	public partial class ScriptWindow : Window
 	{
-		public static float WindowHeight => baseWindowHeight * GameSettings.UI_SCALE;
-		public static float EditorGroupWidth => baseEditorGroupWidth*GameSettings.UI_SCALE;
-		public static float CenterGroupWidth => baseCenterGroupWidth*GameSettings.UI_SCALE;
-		public static float ReplGroupWidth => baseReplGroupWidth*GameSettings.UI_SCALE;
-		public static float CompletionGroupWidth => baseCompletionGroupWidth*GameSettings.UI_SCALE;
+		public static float WindowHeight => baseWindowHeight * KerbaluiSettings.UI_SCALE;
+		public static float EditorGroupWidth => baseEditorGroupWidth*KerbaluiSettings.UI_SCALE;
+		public static float CenterGroupWidth => baseCenterGroupWidth*KerbaluiSettings.UI_SCALE;
+		public static float ReplGroupWidth => baseReplGroupWidth*KerbaluiSettings.UI_SCALE;
+		public static float CompletionGroupWidth => baseCompletionGroupWidth*KerbaluiSettings.UI_SCALE;
 
 		public const float baseWindowHeight = 600;
 		public const float baseEditorGroupWidth = 500;

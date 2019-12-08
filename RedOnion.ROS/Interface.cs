@@ -2,8 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using RedOnion.Collections;
 using RedOnion.ROS.Parsing;
-using RedOnion.ROS.Utilities;
 
 namespace RedOnion.ROS
 {

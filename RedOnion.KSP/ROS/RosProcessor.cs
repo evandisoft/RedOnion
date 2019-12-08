@@ -49,9 +49,21 @@ namespace RedOnion.KSP.ROS
 		{
 			OS.Process.current = Process;
 			var result = base.Execute(countdown);
-			_process.UpdatePhysics();
 			OS.Process.current = null;
 			return result;
+		}
+		public override void UpdateGraphic()
+		{
+			OS.Process.current = Process;
+			base.UpdateGraphic();
+			OS.Process.current = null;
+		}
+		public override void UpdatePhysics()
+		{
+			OS.Process.current = Process;
+			base.UpdatePhysics();
+			_process.UpdatePhysics();
+			OS.Process.current = null;
 		}
 
 		public override void Log(string msg)
