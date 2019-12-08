@@ -4,11 +4,12 @@ using KSP.UI.Screens;
 using System.Collections.Generic;
 using MunOS;
 using System.Diagnostics;
+using MunOS.Core;
 
 namespace LiveRepl
 {
     [KSPAddon(KSPAddon.Startup.AllGameScenes, false)]
-    public class LiveReplMain : MonoBehaviour
+    public class LiveReplMain2 : MonoBehaviour
     {        
 		static Texture2D toolbarTexture=null;
 
@@ -96,11 +97,12 @@ namespace LiveRepl
 			try
 			{
 				scriptWindow.Update();
+
 			}
 			catch (Exception e)
 			{
 				UnityEngine.Debug.Log(e);
 			}
 		}
-    }
+	}
 }

@@ -34,15 +34,15 @@ namespace RedOnion.KSP.API
 			this.R = R;
 		}
 
-		[Description("Proportional factor (strength of direct control)")]
+		[Description("Proportional factor (strength of direct control).")]
 		public double P = 1.0;
-		[Description("Integral factor (dynamic error-correction, causes oscillation as side-effect)")]
+		[Description("Integral factor (dynamic error-correction, causes oscillation as side-effect).")]
 		public double I = 0.0;
-		[Description("Derivative factor (dampening - applied to output, reduces the oscillation)")]
+		[Description("Derivative factor (dampening - applied to output, reduces the oscillation).")]
 		public double D = 0.0;
 		[Description("Reduction factor for accumulator"
 			+ " (dampening - applied to accumulator used by integral factor,"
-			+ " works well against both oscillation and windup)")]
+			+ " works well against both oscillation and windup).")]
 		public double R = 0.0;
 
 		[Description("Difference scaling factor")]
@@ -55,9 +55,9 @@ namespace RedOnion.KSP.API
 		public double targetChangeLimit = double.PositiveInfinity;
 
 		[Description("Maximal abs(output-input)"
-			+ " and also abs(target-input) for integral and reduction factors)."
+			+ " and also abs(target-input) for integral and reduction factors."
 			+ " Helps preventing overshooting especially after change of Target (windup)."
-			+ " NaN or +Inf means no limit (which is default)")]
+			+ " NaN or +Inf means no limit (which is default).")]
 		public double outputChangeLimit = double.PositiveInfinity;
 
 		[Description("Limit of abs(target-input) used by P and I factors."
@@ -90,18 +90,18 @@ namespace RedOnion.KSP.API
 		[Description("All the parameters.")]
 		public Params param => _param;
 
-		[Description("Proportional factor (strength of direct control)")]
+		[Description("Proportional factor (strength of direct control).")]
 		public double P { get => _param.P; set => _param.P = value; }
-		[Description("Integral factor (dynamic error-correction, causes oscillation as side-effect)")]
+		[Description("Integral factor (dynamic error-correction, causes oscillation as side-effect).")]
 		public double I { get => _param.I; set => _param.I = value; }
-		[Description("Derivative factor (dampening - applied to output, reduces the oscillation)")]
+		[Description("Derivative factor (dampening - applied to output, reduces the oscillation).")]
 		public double D { get => _param.D; set => _param.D = value; }
 		[Description("Reduction factor for accumulator"
 			+ " (dampening - applied to accumulator used by integral factor,"
-			+ " works well against both oscillation and windup)")]
+			+ " works well against both oscillation and windup).")]
 		public double R { get => _param.R; set => _param.R = value; }
 
-		[Description("Difference scaling factor")]
+		[Description("Difference scaling factor.")]
 		public double scale { get => _param.scale; set => _param.scale = value; }
 
 		[Description("Maximal abs(target - previous target) per second."
@@ -116,7 +116,7 @@ namespace RedOnion.KSP.API
 		[Description("Maximal abs(output-input)"
 			+ " and also abs(target-input) for integral and reduction factors)."
 			+ " Helps preventing overshooting especially after change of Target (windup)."
-			+ " NaN or +Inf means no limit (which is default)")]
+			+ " NaN or +Inf means no limit (which is default).")]
 		public double outputChangeLimit
 		{
 			get => _param.outputChangeLimit;
@@ -156,11 +156,11 @@ namespace RedOnion.KSP.API
 		public double minTarget { get; set; } = double.NegativeInfinity;
 
 		[Description("Last computed output value (control signal,"
-			+ " call Update() after changing Input/Target)")]
+			+ " call Update() after changing Input/Target).")]
 		public double output => _output;
-		[Description("Highest output allowed")]
+		[Description("Highest output allowed.")]
 		public double maxOutput { get; set; } = double.PositiveInfinity;
-		[Description("Lowest output allowed")]
+		[Description("Lowest output allowed.")]
 		public double minOutput { get; set; } = double.NegativeInfinity;
 
 		public PID(Params param)
@@ -169,7 +169,7 @@ namespace RedOnion.KSP.API
 			reset();
 		}
 
-		[Description("Reset internal state of the regulator (won't change PIDR and limits)")]
+		[Description("Reset internal state of the regulator (won't change PIDR and limits).")]
 		public void reset()
 		{
 			_stamp = double.NaN;
@@ -189,7 +189,7 @@ namespace RedOnion.KSP.API
 		[Description("Time elapsed between last and previous update.")]
 		public double lastDt { get; protected set; }
 
-		[Description("Update output according to time elapsed (and Input and Target)")]
+		[Description("Update output according to time elapsed (and Input and Target).")]
 		public double update()
 		{
 			var now = Time.now;
@@ -200,7 +200,7 @@ namespace RedOnion.KSP.API
 			}
 			return _output;
 		}
-		[Description("Set input and update output according to time elapsed (provided as dt)")]
+		[Description("Set input and update output according to time elapsed (provided as dt).")]
 		public double update(
 			[Description("Time elapsed since last update (in seconds).")]
 			double dt,
@@ -210,22 +210,22 @@ namespace RedOnion.KSP.API
 			this.input = input;
 			return update(dt);
 		}
-		[Description("Set input and target and update output according to time elapsed (provided as dt)")]
+		[Description("Set input and target and update output according to time elapsed (provided as dt).")]
 		public double Update(
-			[Description("Time elapsed since last update (in seconds)")]
+			[Description("Time elapsed since last update (in seconds).")]
 			double dt,
-			[Description("New input/feedback")]
+			[Description("New input/feedback.")]
 			double input,
-			[Description("New target / desired state")]
+			[Description("New target / desired state.")]
 			double target)
 		{
 			this.input = input;
 			this.target = target;
 			return update(dt);
 		}
-		[Description("Update output according to time elapsed (provided as dt, using current Input and Target)")]
+		[Description("Update output according to time elapsed (provided as dt, using current Input and Target).")]
 		public virtual double update(
-			[Description("Time elapsed since last update (in seconds)")]
+			[Description("Time elapsed since last update (in seconds).")]
 			double dt)
 		{
 			_stamp = Time.now;

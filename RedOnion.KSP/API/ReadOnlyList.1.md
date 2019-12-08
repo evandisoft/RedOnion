@@ -1,6 +1,6 @@
 ## ReadOnlyList.1
 
-**Derived:** [PropellantList](../Parts/PropellantList.md), [ResourceList](../Parts/ResourceList.md)
+**Derived:** [ResourceList](../Parts/ResourceList.md), [PropellantList](../Parts/PropellantList.md)
 
 Read-only list (or set). Enumerable (can be used in `foreach`).
 Used e.g. for parts and all lists and sets you are not allowed to modify.

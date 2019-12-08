@@ -6,6 +6,9 @@ using RedOnion.ROS.Utilities;
 using RedOnion.KSP.Parts;
 using UnityEngine;
 using KSP.Localization;
+using System.Collections.Generic;
+using RedOnion.ROS;
+using RedOnion.Collections;
 
 namespace RedOnion.KSP.API
 {
@@ -36,40 +39,104 @@ namespace RedOnion.KSP.API
 				{
 					ClearActive();
 					if (vessel != null)
-					{
-						active = new Ship(vessel);
-						Stage.SetDirty();
-						GameEvents.onVesselChange.Add(active.VesselChange);
-					}
+						FromVessel(vessel);
 				}
 				return active;
 			}
 		}
-		static void ClearActive(bool disposing = false)
+		static void ClearActive()
 		{
 			if (active == null)
 				return;
 			GameEvents.onVesselChange.Remove(active.VesselChange);
 			Stage.SetDirty();
-			if (!disposing)
-				active.Dispose();
 			active = null;
 		}
-		// this would be static if EventData<T>.EvtDelegate
-		// would not try to access evt.Target.GetType().Name
-		// (evt.Target is null for static functions)
 		void VesselChange(Vessel vessel)
 			=> ClearActive();
-
 		#endregion
 
 		#region Create and destroy
 
+		// could use ConditionalWeakTable here, but we track game events and want to keep expensive Ship objects alive
+		protected static readonly Dictionary<Vessel, Ship>
+			cache = new Dictionary<Vessel, Ship>();
+		protected static Hooks hooks;
+		protected class Hooks : IDisposable
+		{
+			public Hooks()
+			{
+				hooks = this;
+				GameEvents.onGameSceneLoadRequested.Add(SceneChange);
+				GameEvents.onVesselDestroy.Add(VesselDestroy);
+				GameEvents.onVesselWillDestroy.Add(VesselDestroy);
+			}
+			~Hooks() => Dispose(false);
+			public void Dispose()
+			{
+				GC.SuppressFinalize(this);
+				Dispose(true);
+			}
+			protected virtual void Dispose(bool disposing)
+			{
+				hooks = null;
+				GameEvents.onGameSceneLoadRequested.Remove(SceneChange);
+				GameEvents.onVesselDestroy.Remove(VesselDestroy);
+				GameEvents.onVesselWillDestroy.Remove(VesselDestroy);
+			}
+			public void SceneChange(GameScenes scene)
+			{
+				if (scene == GameScenes.FLIGHT)
+					return;
+				var ships = new ListCore<Ship>();
+				foreach (var pair in cache)
+					ships.Add(pair.Value);
+				cache.Clear();
+				foreach (var ship in ships)
+					ship.Dispose();
+				Dispose();
+			}
+			public void VesselDestroy(Vessel vessel)
+			{
+				if (cache.TryGetValue(vessel, out var ship))
+				{
+					ship.Dispose();
+					if (cache.Count == 0)
+						Dispose();
+				}
+			}
+		}
+
+		public static Ship FromVessel(Vessel vessel)
+		{
+			if (cache.TryGetValue(vessel, out var ship))
+			{
+				if (active == null && ship.native == FlightGlobals.ActiveVessel)
+				{
+					active = ship;
+					GameEvents.onVesselChange.Add(ship.VesselChange);
+					Value.DebugLog("Reusing active vessel {0}/{1} named {2}.", ship.native.id, ship.native.persistentId, ship.name);
+				}
+				return ship;
+			}
+			return new Ship(vessel);
+		}
 		protected Ship(Vessel vessel)
 		{
 			native = vessel;
 			parts = new ShipPartSet(this);
-			GameEvents.onGameSceneLoadRequested.Add(SceneChange);
+			cache[vessel] = this;
+			if (hooks == null)
+				new Hooks();
+
+			if (FlightGlobals.ActiveVessel != native)
+			{
+				Value.DebugLog("Creating Ship for vessel id {0}/{1} named {2}.", native.id, native.persistentId, name);
+				return;
+			}
+			Value.DebugLog("Creating Ship for active vessel {0}/{1} named {2}.", native.id, native.persistentId, name);
+			active = this;
+			GameEvents.onVesselChange.Add(VesselChange);
 		}
 
 		~Ship() => Dispose(false);
@@ -81,32 +148,30 @@ namespace RedOnion.KSP.API
 		}
 		protected virtual void Dispose(bool disposing)
 		{
+			if (!disposing)
+			{
+				UI.Collector.Add(this);
+				return;
+			}
+			Value.DebugLog("Disposing Ship for vessel id {0}/{1} named {2}.", native.id, native.persistentId, name);
+			cache.Remove(native);
 			if (ReferenceEquals(active, this))
-				ClearActive(disposing: true);
+				ClearActive();
 			if (parts != null)
 			{
 				parts.Dispose();
 				parts = null;
-			}
-			if (native != null)
-			{
-				GameEvents.onGameSceneLoadRequested.Remove(SceneChange);
-				native = null;
 			}
 			if (_autopilot != null)
 			{
 				_autopilot.Dispose();
 				_autopilot = null;
 			}
-		}
-		void SceneChange(GameScenes scene)
-		{
-			if (scene != GameScenes.FLIGHT)
-				Dispose();
+			native = null;
 		}
 		#endregion
 
-		#region Native and name
+		#region Native, name and target
 
 		[Unsafe, Description("Native `Vessel` for unrestricted access to KSP API."
 			+ " Same as `FlightGlobals.ActiveVessel` if accessed through global `ship`.")]
@@ -122,6 +187,27 @@ namespace RedOnion.KSP.API
 			}
 		}
 		internal readonly static string autoLocMarker = "#autoLOC_";
+
+		[WorkInProgress, Description("Target of active ship. Null if none.")]
+		public object target
+		{
+			get
+			{
+				if (!HighLogic.LoadedSceneIsFlight)
+					return null;
+				var target = native.targetObject;
+				if (target is CelestialBody body)
+					return Bodies.Instance[body];
+				if (target is Vessel vessel)
+					return FromVessel(vessel);
+				if (target is PartModule dock)
+				{
+					var part = dock.part;
+					return FromVessel(part.vessel).parts[part];
+				}
+				return null;
+			}
+		}
 		#endregion
 
 		#region Autopilot
@@ -169,9 +255,9 @@ namespace RedOnion.KSP.API
 		#region Basic properties
 
 		[Description("Unique identifier of the ship (vehicle/vessel). Can change when docking/undocking.")]
-		public Guid ID => native.id;
+		public Guid id => native.id;
 		[Description("Unique identifier of the ship (vehicle/vessel). Should be same as it was before docking (after undocking).")]
-		public uint PersistentID => native.persistentId;
+		public uint persistentId => native.persistentId;
 		[Description("KSP API. Vessel type as selected by user (or automatically).")]
 		public VesselType vesseltype => native.vesselType;
 		[Description("Total mass of the ship (vehicle/vessel). [tons = 1000 kg]")]
@@ -202,7 +288,7 @@ namespace RedOnion.KSP.API
 		[Description("KSP API. Orbited body.")]
 		public SpaceBody body => Bodies.Instance[native.mainBody];
 		ISpaceObject ISpaceObject.body => body;
-		[Unsafe, Description("KSP API. Orbit parameters. May get replaced by safe wrapper in the future.")]
+		[Unsafe, WorkInProgress, Description("KSP API. Orbit parameters. May get replaced by safe wrapper in the future.")]
 		public Orbit orbit => native.orbit;
 		[Description("Eccentricity of current orbit.")]
 		public double eccentricity => native.orbit.eccentricity;
@@ -233,8 +319,8 @@ namespace RedOnion.KSP.API
 
 		#region Orbit - vectors
 
-		[Description("Current position relative to active ship (so `ship.position` always reads zero).")]
-		public Vector position => new Vector(native.transform.position);
+		[Description("Center of mass relative to (CoM of) active ship (zero for active ship).")]
+		public Vector position => new Vector(native.CoMD - FlightGlobals.ActiveVessel.CoMD);
 		[Description("Current orbital velocity.")]
 		public Vector velocity => new Vector(native.obt_velocity);
 		[Description("Current surface velocity.")]
@@ -336,9 +422,6 @@ namespace RedOnion.KSP.API
 
 		#region Properties for autopilot
 
-		[Description("Center of mass.")]
-		public Vector centerOfMass => new Vector(native.CoMD);
-		Vector ISpaceObject.position => centerOfMass;
 		[Description("Angular velocity (ω, deg/s), how fast the ship rotates")]
 		public Vector angularVelocity => new Vector(native.angularVelocityD * RosMath.Rad2Deg);
 		[Description("Angular momentum (L = Iω, kg⋅m²⋅deg/s=N⋅m⋅s⋅deg) aka moment of momentum or rotational momentum.")]

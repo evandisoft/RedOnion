@@ -35,7 +35,7 @@ namespace MunOS.ProcessLayer
 
 		public int RunningThreadsCount => runningThreads.Count;
 
-		public long ExecuteThread(CoreExecMgr.Priority priority, MunThread thread)
+		public long ExecuteThread(ExecPriority priority, MunThread thread)
 		{
 			long RunningExecutableID=CoreExecMgr.Instance.RegisterExecutable(priority, thread);
 			runningThreads[thread]=RunningExecutableID;

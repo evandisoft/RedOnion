@@ -12,11 +12,23 @@
 
 # Next Release
 ### LiveRepl Changes:
-- Fixed bug where LiveRepl cleared all Input ControlLocks instead of just the one it had set.
-- Stopped using the ControlTypes.KEYBOARDINPUT lock. Now keyboard input (except camera control) is only locked to the window when the window is focused. Still have to lock ControlTypes.CAMERACONTROLS when mouse is in the window bounds, as otherwise scrolling the mouse zooms KSP in and out regardless of the mouse being over a window and that window being focused.
+- Fixed issue where Kerbalui wasn't using GetControlID to get a unique controlid for each window. Could have interferred with other mods.
+- Fixed issue where LiveRepl was making modifications to the fontsize of the default GUI.Label style instead of making those changes to a copy of that style.
 
 # Current
 # 0.4
+## 0.4.7
+### General Changes:
+- time.warp.ready improved
+- added GameSettings and GameEvents into KSP namespace
+
+### ROS Changes:
+- launch.ros and control.ros now use try..finally
+- fixed delay in repl for native events in ROS
+
+### LiveRepl Changes:
+- Fixed bug where LiveRepl cleared all Input ControlLocks instead of just the one it had set.
+- Stopped using the ControlTypes.KEYBOARDINPUT lock. Now keyboard input (except camera control) is only locked to the window when the window is focused. Still have to lock ControlTypes.CAMERACONTROLS when mouse is in the window bounds, as otherwise scrolling the mouse zooms KSP in and out regardless of the mouse being over a window and that window being focused.
 
 ## 0.4.6
 ### RedOnionScript (ROS) Changes:

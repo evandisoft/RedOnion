@@ -9,8 +9,7 @@ namespace Kerbalui.Types
 	/// </summary>
 	public abstract class Window:Element
 	{
-		static int nextID = 0;
-		public readonly int windowID=nextID++;
+		public readonly int windowID;
 
 		public GUIContent titleContent=new GUIContent("");
 		public GUIStyle titleStyle;
@@ -21,8 +20,9 @@ namespace Kerbalui.Types
 		public Window(string title)
 		{
 			titleContent.text=title;
-			titleStyle=GUI.skin.label;
+			titleStyle=new GUIStyle(GUI.skin.label);
 			windowStyle=new GUIStyle(GUI.skin.window);
+			windowID=GUIUtility.GetControlID(FocusType.Keyboard);
 		}
 
 		protected void AssignContent(Element content)
@@ -54,7 +54,7 @@ namespace Kerbalui.Types
 		public override void SetRect(Rect newRect)
 		{
 			base.SetRect(newRect);
-			titleStyle.fontSize=(int)(KerbaluiSettings.DefaultFontsize*GameSettings.UI_SCALE);
+			titleStyle.fontSize=(int)(KerbaluiSettings.DefaultFontsize*KerbaluiSettings.UI_SCALE);
 			windowStyle.fontSize=titleStyle.fontSize;
 			titleRect=new Rect(0, 0, newRect.width, Math.Max(titleStyle.CalcSize(titleContent).y, 10));
 			content.SetRect(new Rect(0, titleRect.height, newRect.width, newRect.height-titleRect.height));

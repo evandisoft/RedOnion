@@ -46,6 +46,12 @@ namespace MunOS.ProcessLayer
 
 		public readonly long ID=nextID++; 
 
+		/// <summary>
+		/// If you want your thread to run every update then return
+		/// false here. If this is true, at the beginning of the update,
+		/// it will not be added to the list of executing threads.
+		/// </summary>
+		/// <value><c>true</c> if is sleeping; otherwise, <c>false</c>.</value>
 		public abstract bool IsSleeping { get; }
 		/// <summary>
 		/// These queues are to store performance information of the last 10

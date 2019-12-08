@@ -19,35 +19,37 @@ namespace MunOS.Core
 		FINISHED,
 	}
 
+	public enum ExecPriority
+	{
+		REALTIME,
+		ONESHOT,
+		IDLE,
+		MAIN
+	}
+
 	/// <summary>
 	/// Manages execution of IExecutables among 4 priority levels. Lowest level of execution.
 	/// </summary>
 	public class CoreExecMgr
 	{
-		public enum Priority
-		{
-			REALTIME,
-			ONESHOT,
-			IDLE,
-			MAIN
-		}
+
 
 		static public int MaxIdleSkips = 9;
 		static public int MaxOneShotSkips = 1;
 		public static readonly double TicksPerMicro=Stopwatch.Frequency/(1000.0 * 1000.0);
 
 		Dictionary<long,ExecInfoEntry> execInfoDictionary = new Dictionary<long, ExecInfoEntry>();
-		Dictionary<Priority, PriorityExecutor> priorities = new Dictionary<Priority, PriorityExecutor>();
+		Dictionary<ExecPriority, PriorityExecutor> priorities = new Dictionary<ExecPriority, PriorityExecutor>();
 
 		static long NextExecID=0;
 
 
 		internal struct ExecInfoEntry
 		{
-			public Priority priority;
+			public ExecPriority priority;
 			public ExecInfo execInfo;
 
-			public ExecInfoEntry(Priority priority, ExecInfo execInfo)
+			public ExecInfoEntry(ExecPriority priority, ExecInfo execInfo)
 			{
 				this.priority=priority;
 				this.execInfo=execInfo;
@@ -108,10 +110,10 @@ namespace MunOS.Core
 
 		private CoreExecMgr()
 		{
-			priorities[Priority.REALTIME] = new RealtimeExecutor();
-			priorities[Priority.ONESHOT] = new OneShotExecutor();
-			priorities[Priority.IDLE] = new IdleExecutor();
-			priorities[Priority.MAIN] = new NormalExecutor();
+			priorities[ExecPriority.REALTIME] = new RealtimeExecutor();
+			priorities[ExecPriority.ONESHOT] = new OneShotExecutor();
+			priorities[ExecPriority.IDLE] = new IdleExecutor();
+			priorities[ExecPriority.MAIN] = new NormalExecutor();
 		}
 
 		static public void Initialize()
@@ -158,7 +160,7 @@ namespace MunOS.Core
 		/// <returns>The ID of the process.</returns>
 		/// <param name="priority">The priority you want the execution to run on.</param>
 		/// <param name="executable">The object that we will call Execute on.</param>
-		public long RegisterExecutable(Priority priority, IExecutable executable)
+		public long RegisterExecutable(ExecPriority priority, IExecutable executable)
 		{
 			var execInfo=new ExecInfo(NextExecID++,executable);
 			execInfoDictionary[execInfo.ID]=new ExecInfoEntry(priority,execInfo);
@@ -173,25 +175,25 @@ namespace MunOS.Core
 			stopwatch.Start();
 
 			long realtimeTicks = tickLimit - (long)(tickLimit * RealtimeFractionalLimit);
-			priorities[Priority.REALTIME].Execute(realtimeTicks);
+			priorities[ExecPriority.REALTIME].Execute(realtimeTicks);
 
 			long remainingTicks = tickLimit - stopwatch.ElapsedTicks;
 			long oneshotTicks = remainingTicks - (long)(tickLimit * OneShotFractionalLimit);
 			// if oneshotTicks is < 0 we still call Execute on it because execution of 
 			// oneshots is occasionally forced even when no time is available
-			priorities[Priority.ONESHOT].Execute(oneshotTicks);
+			priorities[ExecPriority.ONESHOT].Execute(oneshotTicks);
 
 			remainingTicks = tickLimit - stopwatch.ElapsedTicks;
 			long idleTicks = remainingTicks - (long)(tickLimit * IdleFractionalLimit);
 			// if idleTicks is < 0 we still call Execute on it because execution of 
 			// oneshots is occasionally forced even when no time is available
-			priorities[Priority.IDLE].Execute(idleTicks);
+			priorities[ExecPriority.IDLE].Execute(idleTicks);
 			stopwatch.Stop();
 
 			long normalTicks = tickLimit - stopwatch.ElapsedTicks;
 			stopwatch.Reset();
 			stopwatch.Start();
-			priorities[Priority.MAIN].Execute(normalTicks);
+			priorities[ExecPriority.MAIN].Execute(normalTicks);
 			stopwatch.Stop();
 		}
 

@@ -15,6 +15,8 @@ using RedOnion.UI;
 using Kerbalua.Events;
 using System.IO;
 using RedOnion.KSP.Settings;
+using MunOS.ProcessLayer;
+using MunOS.Core;
 
 namespace Kerbalua.Scripting
 {
@@ -67,14 +69,21 @@ namespace Kerbalua.Scripting
 				  {
 					  return new Action<Button>((button) =>
 					  {
-						  var script=this;
-						  var co = script.CreateCoroutine(f);
-						  co.Coroutine.AutoYieldCounter = 1000;
-						  co.Coroutine.Resume();
-						  if (co.Coroutine.State == CoroutineState.ForceSuspended)
+						  var currentProcess=MunThread.ExecutingThread?.parentProcess as KerbaluaProcess;
+						  if (currentProcess==null)
 						  {
-							  script.PrintErrorAction?.Invoke("functions called in buttons must have a short runtime");
+							  throw new Exception("Could not get current process in KerbaluaScript custom converter");
 						  }
+
+						  currentProcess.ExecuteFunctionInThread(ExecPriority.ONESHOT,f.Function);
+						  //var script=this;
+						  //var co = script.CreateCoroutine(f);
+						  //co.Coroutine.AutoYieldCounter = 1000;
+						  //co.Coroutine.Resume();
+						  //if (co.Coroutine.State == CoroutineState.ForceSuspended)
+						  //{
+						  // script.PrintErrorAction?.Invoke("functions called in buttons must have a short runtime");
+						  //}
 					  });
 				  });
 
@@ -108,15 +117,13 @@ end
 
 			//commonAPI["new"]=new newdel(@new);
 
-			var coroutine=Globals["coroutine"] as Table;
+			var coroutineTable=Globals["coroutine"] as Table;
 
-			commonAPI["yield"] = coroutine["yield"];//new Action<double>(sleep);
+			var yield = coroutineTable["yield"];//new Action<double>(sleep);
 			Globals.Remove("coroutine");
 			//commonAPI["setexeclimit"] = new Action<double>(setexeclimit);
-			commonAPI["sleep"] = DoString(@"
-return function(seconds)
-	
-			");
+
+			commonAPI["sleep"] = yield;
 		}
 
 

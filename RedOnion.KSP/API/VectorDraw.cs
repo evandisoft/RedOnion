@@ -1,4 +1,5 @@
 using MoonSharp.Interpreter;
+using RedOnion.Attributes;
 using RedOnion.ROS;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,7 @@ namespace RedOnion.KSP.API
 {
 	public partial class VectorCreator
 	{
-		[Description("Vector drawing")]
+		[WorkInProgress, Description("Vector drawing. WIP: The origin is glitching a bit shortly after launch and during warp.")]
 		public class Draw : IDisposable
 		{
 			[Description("Reference for coordinate system (origin at zero if null).")]

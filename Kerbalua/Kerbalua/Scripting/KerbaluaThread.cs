@@ -14,15 +14,32 @@ namespace Kerbalua.Scripting
 		KerbaluaScript ScriptEngine => ScriptProcess.scriptEngine;
 		DynValue coroutine;
 
-		public KerbaluaThread(string source, string path, KerbaluaProcess parentProcess, string name = "") : base(source, path, parentProcess, name)
+		/// <summary>
+		/// This can throw an errorif the script syntax is incorrect.
+		/// </summary>
+		/// <param name="source">Source.</param>
+		/// <param name="path">Path.</param>
+		/// <param name="parentProcess">Parent process.</param>
+		/// <param name="name">Name.</param>
+		public KerbaluaThread(string source, string path, KerbaluaProcess parentProcess) : base(source, path, parentProcess)
 		{
-			if (IncompleteLuaParsing.IsImplicitReturn(source))
-			{
-				source = "return " + source;
-			}
-			DynValue mainFunction = ScriptProcess.scriptEngine.DoString("return function () " + source + "\n end");
-
+			var mainFunction=CreateFunction(source);
 			coroutine = ScriptEngine.CreateCoroutine(mainFunction);
+		}
+
+		DynValue CreateFunction(string scriptSource)
+		{
+			if (IncompleteLuaParsing.IsImplicitReturn(scriptSource))
+			{
+				scriptSource = "return " + scriptSource;
+			}
+			DynValue mainFunction = ScriptProcess.scriptEngine.DoString("return function () " + scriptSource + "\n end");
+			return mainFunction;
+		}
+
+		public KerbaluaThread(Closure f,KerbaluaProcess parentProcess) : base("fn", "", parentProcess)
+		{
+			coroutine = ScriptEngine.CreateCoroutine(f);
 		}
 
 		public override bool IsSleeping
@@ -45,22 +62,11 @@ namespace Kerbalua.Scripting
 
 		long sleeptimeMillis=0;
 		Stopwatch sleepwatch=new Stopwatch();
-		public void Sleep(double sleepSeconds)
-		{
-			sleeptimeMillis=(long)(sleepSeconds*1000);
-			sleepwatch.Start();
-			coroutine.Coroutine.AutoYieldCounter=0;
-		}
 
 		Stopwatch tickwatch=new Stopwatch();
 		int perIterationCounter=100;
 		protected override ExecStatus ProtectedExecute(long tickLimit)
 		{
-			if (coroutine == null)
-			{
-				throw new Exception("Coroutine not set in KerbaluaScript");
-			}
-
 			if (IsSleeping)
 			{
 				return ExecStatus.SLEEPING;
@@ -70,13 +76,14 @@ namespace Kerbalua.Scripting
 			tickwatch.Start();
 
 			DynValue retval=null;
-			while (tickwatch.ElapsedTicks<tickLimit)
+			CoroutineState state=CoroutineState.ForceSuspended;
+			while (tickwatch.ElapsedTicks<tickLimit && state!=CoroutineState.ForceSuspended)
 			{
 				coroutine.Coroutine.AutoYieldCounter = perIterationCounter;
 				retval = coroutine.Coroutine.Resume();
+				state=coroutine.Coroutine.State;
 			}
 
-			var state=coroutine.Coroutine.State;
 			if (state == CoroutineState.Dead)
 			{
 				string retvalString=GetOutputString(retval);
@@ -85,14 +92,29 @@ namespace Kerbalua.Scripting
 			}
 			if (state == CoroutineState.ForceSuspended)
 			{
-				if (IsSleeping)
-				{
-					return ExecStatus.SLEEPING;
-				}
 				return ExecStatus.INTERRUPTED;
 			}
 			if (state == CoroutineState.Suspended)
 			{
+				// if it is suspended we assume sleep (which is just a renamed yield)
+				// was called. The argument passed to yield 
+				// as the amount of time to sleep.
+				if (retval.Tuple!=null) 
+				{
+					throw new Exception("Too many arguments to sleep");
+				}
+				if (retval.IsNil())
+				{
+					return ExecStatus.YIELDED;
+				}
+				if (retval.Type!=DataType.Number)
+				{
+					throw new Exception("Argument to sleep must be a number");
+				}
+				double sleepSeconds=retval.Number;
+				sleeptimeMillis=(long)(sleepSeconds*1000);
+				sleepwatch.Start();
+
 				return ExecStatus.YIELDED;
 			}
 

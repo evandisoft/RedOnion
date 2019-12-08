@@ -41,7 +41,7 @@ namespace RedOnion.ROS.Objects
 			System.Add("print", new Value(Print = new Print(Prototype)));
 			System.Add("run", new Value(Run = new Run(Prototype)));
 			System.Add("list", new Value(typeof(List<Value>)));
-			System.Add("queue", new Value(typeof(Queue<Value>)));
+			System.Add("queue", new Value(typeof(Collections.GenQueue<Value>)));
 			System.Add("stack", new Value(typeof(Stack<Value>)));
 
 			if (Processor is Processor processor)

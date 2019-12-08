@@ -99,8 +99,8 @@ namespace RedOnion.ROS
 		Null			= 0x01, // null/nullptr (object if used as type)
 		False			= 0x02, // boolean false
 		True			= 0x03, // boolean true
-		This			= 0x04, // this (self)
-		Base			= 0x05, // base (super)
+		This			= 0x04, // this
+		Base			= 0x05, // base
 		Value			= 0x06, // value in setter
 		Implicit		= 0x07, // implicit value (in case of conditional switch)
 		Exception		= 0x08, // exception in catch block
@@ -297,10 +297,8 @@ namespace RedOnion.ROS
 		Null			= 0x0001, // null/nullptr
 		False			= 0x0002, // boolean false
 		True			= 0x0003, // boolean true
-		This			= 0x0004, // this (self) - preferred
-		Self			= 0x0104, // self (this) - alternative (used in extension methods)
-		Base			= 0x0005, // base (super) - preferred
-		Super			= 0x0105, // super (base) - alternative (Java)
+		This			= 0x0004, // this
+		Base			= 0x0005, // base
 		Value			= 0x0006, // value in setter
 		Implicit		= 0x0007, // implicit value (in case of conditional switch)
 		Exception		= 0x0008, // exception in catch block

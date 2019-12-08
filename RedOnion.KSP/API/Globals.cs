@@ -27,6 +27,8 @@ namespace RedOnion.KSP.API
 		public static readonly Type ksp = typeof(KSP_Namespace);
 		[Unsafe, Description("Shortcuts to Unity API.")]
 		public static readonly Type unity = typeof(Unity_Namespace);
+		[Description("Types to be used with ROS: `is` operator; Lua: `isa` function.")]
+		public static readonly Type types = typeof(Types_Namespace);
 
 		[Unsafe, Description("Namespace Mappings (import of native types by namespace). More info [here](../ReflectionUtil/NamespaceInstance.md)")]
 		public static readonly NamespaceInstance native = NamespaceMappings.DefaultAssemblies.GetNamespace("");
@@ -40,7 +42,7 @@ namespace RedOnion.KSP.API
 
 		[Description("PID regulator (alias to `system.pid` in ROS).")]
 		public static readonly Type PID = typeof(PID);
-		[Description("Safe API for KSP Application Launcher (toolbar/buttons). WIP")]
+		[WorkInProgress, Description("Safe API for KSP Application Launcher (toolbar/buttons). WIP")]
 		public static readonly Type app = typeof(App);
 
 		#endregion
@@ -66,6 +68,27 @@ namespace RedOnion.KSP.API
 		// structured this way.
 		//[Unsafe, Description("A map of kerbal names to kerbals for kerbals in the crew.")]
 		//public static KerbalsDictionary kerbals => KerbalsDictionary.Instance;
+
+		[WorkInProgress, Description("Target of active ship. Null if none.")]
+		public static object target
+		{
+			get
+			{
+				if (!HighLogic.LoadedSceneIsFlight)
+					return null;
+				var target = FlightGlobals.fetch.VesselTarget;
+				if (target is CelestialBody body)
+					return bodies[body];
+				if (target is Vessel vessel)
+					return Ship.FromVessel(vessel);
+				if (target is PartModule dock)
+				{
+					var part = dock.part;
+					return Ship.FromVessel(part.vessel).parts[part];
+				}
+				return null;
+			}
+		}
 
 		#endregion
 
@@ -162,7 +185,7 @@ namespace RedOnion.KSP.API
 			{
 				IList<string> completions =
 					typeof(Globals).GetProperties().Select(t => t.Name).Concat(
-						typeof(Globals).GetFields().Select(t => t.Name)).ToList();  
+						typeof(Globals).GetFields().Select(t => t.Name)).ToList();
 				return completions;
 			}
 		}

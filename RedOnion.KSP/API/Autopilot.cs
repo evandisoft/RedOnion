@@ -57,7 +57,10 @@ namespace RedOnion.KSP.API
 		protected virtual void Dispose(bool disposing)
 		{
 			_ship = null;
-			Unhook();
+			if (disposing)
+				Unhook();
+			else if (_hooked != null)
+				UI.Collector.Add(this);
 		}
 
 		[Description("Throttle control (0..1). NaN for releasing the control.")]
@@ -295,7 +298,7 @@ namespace RedOnion.KSP.API
 			{
 				// translate the direction into local space
 				// (like if we were looking at the vector from cockpit)
-				var want = _ship.native.transform.InverseTransformDirection(direction.normalized);
+				var want = _ship.local(direction).normalized;
 				// now get the angles in respective planes and feed it into the PIDs
 				// ship.forward => (0,1,0)  <= transform.up
 				// ship.right   => (1,0,0)  <= transform.right

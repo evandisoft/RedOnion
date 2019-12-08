@@ -1,0 +1,13 @@
+settingsFileExists = True
+lastScriptName = controlocks.lua
+WindowPositionX = 77
+WindowPositionY = 38
+editorVisible = True
+replVisible = True
+lastQueueTag = completion
+fontname = Ubuntu Mono
+lastEngine = ROS
+AutoRun
+{
+	AutoRun = scenes.lua
+}

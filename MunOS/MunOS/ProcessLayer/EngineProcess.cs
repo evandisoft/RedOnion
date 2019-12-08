@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
+using MunOS.Core;
 
 namespace MunOS.ProcessLayer
 {
 	public abstract class EngineProcess:MunProcess
 	{
-		protected EngineProcess(string name = "") : base(name)
+		protected EngineProcess() : base()
 		{
 		}
 
@@ -37,7 +38,7 @@ namespace MunOS.ProcessLayer
 		/// <param name="source">The source string to be evaluated.</param>
 		/// <param name="path">Script path or null for repl.</param>
 		/// <param name="withHistory">True if this source should be added to the history.</param>
-		public void ExecuteSource(string source, string path = null, bool withHistory = false)
+		public void ExecuteSource(ExecPriority priority, string source, string path = null, bool withHistory = false)
 		{
 			if (withHistory)
 			{
@@ -54,10 +55,10 @@ namespace MunOS.ProcessLayer
 				currentHistoryItem = null;
 			}
 
-			ExecuteSourceInThread(source, path);
+			ExecuteSourceInThread(priority, source, path);
 		}
 
-		protected abstract void ExecuteSourceInThread(string source, string path);
+		protected abstract void ExecuteSourceInThread(ExecPriority priority, string source, string path);
 
 
 		public string GetCurrentHistoryItem()

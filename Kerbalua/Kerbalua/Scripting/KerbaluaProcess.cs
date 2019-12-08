@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Kerbalua.Completion;
+using MoonSharp.Interpreter;
+using MunOS.Core;
 using MunOS.ProcessLayer;
 using UnityEngine;
 
@@ -32,6 +34,8 @@ namespace Kerbalua.Scripting
 			}
 		}
 
+
+
 		public override IList<string> GetDisplayableCompletions(string source, int cursorPos, out int replaceStart, out int replaceEnd)
 		{
 			return GetCompletions(source, cursorPos, out replaceStart, out replaceEnd);
@@ -44,16 +48,30 @@ namespace Kerbalua.Scripting
 			return "require(\""+basename+"\")";
 		}
 
-		protected override void ExecuteSourceInThread(string source, string path)
+		public void ExecuteFunctionInThread(ExecPriority priority, Closure closure)
 		{
-			KerbaluaThread thread=null;
 			try
 			{
-				thread=new KerbaluaThread(source,path,this);
+				var thread=new KerbaluaThread(closure,this);
+				ExecuteThread(priority, thread);
 			}
+			catch (Exception e)
+			{
+				outputBuffer.AddError(e.Message);
+			}
+		}
 
-			ExecuteThread(MunOS.Core.CoreExecMgr.Priority.MAIN, thread);
-
+		protected override void ExecuteSourceInThread(ExecPriority priority, string source, string path)
+		{
+			try
+			{
+				var thread=new KerbaluaThread(source,path,this);
+				ExecuteThread(priority, thread);
+			}
+			catch(Exception e)
+			{
+				outputBuffer.AddError(e.Message);
+			}
 		}
 	}
 }

@@ -1,10 +1,8 @@
 using RedOnion.KSP.API;
-using RedOnion.ROS.Utilities;
+using RedOnion.Collections;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
 
 namespace RedOnion.KSP.Parts
 {
