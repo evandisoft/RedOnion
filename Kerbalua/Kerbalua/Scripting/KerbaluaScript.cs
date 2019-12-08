@@ -87,7 +87,7 @@ namespace Kerbalua.Scripting
 
 			metatable["__index"]=commonAPI;
 			Globals.MetaTable=metatable;
-			Globals.Remove("coroutine");
+
 			Globals.Remove("dofile");
 			//Globals.Remove("load");
 			Globals.Remove("loadfilesafe");
@@ -108,9 +108,15 @@ end
 
 			//commonAPI["new"]=new newdel(@new);
 
-			commonAPI["sleep"] = new Action<double>(sleep);
-			//commonAPI["setexeclimit"] = new Action<double>(setexeclimit);
+			var coroutine=Globals["coroutine"] as Table;
 
+			commonAPI["yield"] = coroutine["yield"];//new Action<double>(sleep);
+			Globals.Remove("coroutine");
+			//commonAPI["setexeclimit"] = new Action<double>(setexeclimit);
+			commonAPI["sleep"] = DoString(@"
+return function(seconds)
+	
+			");
 		}
 
 
