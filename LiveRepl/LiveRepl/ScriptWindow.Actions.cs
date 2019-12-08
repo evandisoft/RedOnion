@@ -63,7 +63,7 @@ namespace LiveRepl
 		public void SaveEditorText()
 		{
 			uiparts.scriptNameInputArea.SaveText(uiparts.editor.Text);
-			uiparts.editorChangesIndicator.Unchanged();
+			uiparts.editorChangesIndicator.MarkAsUnchanged();
 			SetReplEvaluatorByFilename(uiparts.scriptNameInputArea.Text);
 		}
 
@@ -71,7 +71,7 @@ namespace LiveRepl
 		{
 			string text=uiparts.scriptNameInputArea.LoadText();
 			uiparts.editor.ModifyAndResetUndo(text);
-			uiparts.editorChangesIndicator.Unchanged();
+			uiparts.editorChangesIndicator.MarkAsUnchanged();
 			SetReplEvaluatorByFilename(uiparts.scriptNameInputArea.Text);
 		}
 
@@ -105,7 +105,14 @@ namespace LiveRepl
 
 		public void RunEditorScript()
 		{
-			SaveEditorText();
+			if (uiparts.editorChangesIndicator.IsChanged)
+			{
+				SaveEditorText();
+			}
+			else
+			{
+				LoadEditorText();
+			}
 			Evaluate(uiparts.editor.Text, uiparts.scriptNameInputArea.Text);
 			uiparts.replOutoutArea.AddFileContent(uiparts.scriptNameInputArea.Text);
 		}

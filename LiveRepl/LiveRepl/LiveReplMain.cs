@@ -76,9 +76,6 @@ namespace LiveRepl
 
 			if (!guiActive) return;
 
-			//GUI.Window(0, new Rect(100, 100, 100, 100), HandleWindowFunction, "Title");
-			//Debug.Log(scriptWindow.windowID);
-			//Debug.Log(GUI.skin.textArea.fontSize);
 			try
 			{
 				scriptWindow.Update();
@@ -89,15 +86,5 @@ namespace LiveRepl
 				Debug.Log(e);
 			}
 		}
-
-		void HandleWindowFunction(int id)
-		{
-			if (Event.current.isKey || Event.current.isMouse)
-			{
-				Debug.Log("current event is "+Event.current);
-			}
-			GUI.TextArea(new Rect(0,0,100,100),"blah");
-		}
-
 	}
 }
