@@ -506,13 +506,21 @@ namespace RedOnion.KSP.API
 
 		#region Tools
 
-		[Description("Translate vector/direction into local coordinates.")]
+		[Description("Translate vector/direction into ship-local coordinates (like looking at it from the cockpit).")]
 		public Vector local(Vector v)
 			=> new Vector(native.transform.InverseTransformDirection(v));
 		public Vector3d local(Vector3d v)
 			=> native.transform.InverseTransformDirection(v);
 		public Vector3 local(Vector3 v)
 			=> native.transform.InverseTransformDirection(v);
+
+		[Description("Translate vector/direction into world coordinates (reverse the `local` transformation).")]
+		public Vector world(Vector v)
+			=> new Vector(native.transform.TransformDirection(v));
+		public Vector3d world(Vector3d v)
+			=> native.transform.TransformDirection(v);
+		public Vector3 world(Vector3 v)
+			=> native.transform.TransformDirection(v);
 
 		#endregion
 	}
