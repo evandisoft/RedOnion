@@ -83,14 +83,14 @@ def control ship, target, x, y
     prevTgtBtn = bTowards
     var target = ship.target ?? self.target
     if target != null
-      return target.position
+      return target.position - ship.position
     autopilot.killRot = true
     return vector.none
   var bAway = xbtn row, "Away Fr.", def
     prevTgtBtn = bAway
     var target = ship.target ?? self.target
     if target != null
-      return -target.position
+      return ship.position - target.position
     autopilot.killRot = true
     return vector.none
 
