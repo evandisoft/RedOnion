@@ -76,4 +76,6 @@ Note that it can change violently when facing up or down.
 - `velocityAt()`: [Vector](Vector.md), time double
   - Predicted velocity at specified time.
 - `local()`: [Vector](Vector.md), v [Vector](Vector.md)
-  - Translate vector/direction into local coordinates.
+  - Translate vector/direction into ship-local coordinates (like looking at it from the cockpit).
+- `world()`: [Vector](Vector.md), v [Vector](Vector.md)
+  - Translate vector/direction into world coordinates (reverse the `local` transformation).

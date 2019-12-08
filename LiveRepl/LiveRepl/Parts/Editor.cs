@@ -96,7 +96,7 @@ namespace LiveRepl.Parts
 
 			if (editingArea.ReceivedInput && Text!=prevString)
 			{
-				uiparts.editorChangesIndicator.Changed();
+				uiparts.editorChangesIndicator.MarkAsChanged();
 				uiparts.scriptWindow.needsResize=true;
 			}
 		}

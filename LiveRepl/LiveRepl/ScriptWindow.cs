@@ -109,6 +109,10 @@ namespace LiveRepl
 			SavedSettings.SaveSetting("lastQueueTag", uiparts.queueTagInputArea.Text);
 #endif
 			SavedSettings.SaveToDisk();
+			foreach(var repleval in replEvaluators.Values)
+			{
+				repleval.Terminate();
+			}
 		}
 	}
 }

@@ -24,11 +24,8 @@ namespace Kerbalui.Controls.Abstract
 		protected ContentControl(GUIStyle style)
 		{
 			Style=new GUIStyle(style);
-			Style.fontSize=ScaledFontsize;
-			//Style=new GUIStyle();
 
-			//UpdateFont();
-			// EvanTODO: change back
+			UpdateFont();
 			KerbaluiSettings.SettingsChange+=SettingsChangeHandler;
 		}
 
