@@ -162,7 +162,6 @@
     <Compile Include="MoonSharp\Interfaces\IMoonSharpCompletable.cs" />
     <Compile Include="MoonSharp\MoonSharpAPI\MoonSharpGlobals.cs" />
     <Compile Include="Completion\Instance.cs" />
-    <Compile Include="Debugging\QueueLogger.cs" />
     <Compile Include="MunOS\Process.cs" />
     <Compile Include="Utilities\ScriptStringKeyedConstDictionary.cs" />
   </ItemGroup>

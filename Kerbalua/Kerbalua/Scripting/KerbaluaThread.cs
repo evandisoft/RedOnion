@@ -5,13 +5,14 @@ using MoonSharp.Interpreter;
 using MunOS.Core;
 using MunOS.Core.Executors;
 using MunOS.ProcessLayer;
+using static MunOS.Debugging.QueueLogger;
 
 namespace Kerbalua.Scripting
 {
 	public class KerbaluaThread:EngineThread
 	{
 		public KerbaluaProcess ScriptProcess => parentProcess as KerbaluaProcess;
-		KerbaluaScript ScriptEngine => ScriptProcess.scriptEngine;
+		KerbaluaScript ScriptEngine => ScriptProcess.ScriptEngine;
 		DynValue coroutine;
 
 		/// <summary>
@@ -20,7 +21,6 @@ namespace Kerbalua.Scripting
 		/// <param name="source">Source.</param>
 		/// <param name="path">Path.</param>
 		/// <param name="parentProcess">Parent process.</param>
-		/// <param name="name">Name.</param>
 		public KerbaluaThread(string source, string path, KerbaluaProcess parentProcess) : base(source, path, parentProcess)
 		{
 			var mainFunction=CreateFunction(source);
@@ -33,7 +33,7 @@ namespace Kerbalua.Scripting
 			{
 				scriptSource = "return " + scriptSource;
 			}
-			DynValue mainFunction = ScriptProcess.scriptEngine.DoString("return function () " + scriptSource + "\n end");
+			DynValue mainFunction = ScriptProcess.ScriptEngine.DoString("return function () " + scriptSource + "\n end");
 			return mainFunction;
 		}
 
@@ -75,14 +75,17 @@ namespace Kerbalua.Scripting
 			tickwatch.Reset();
 			tickwatch.Start();
 
+			//MunLogger.Log("tick limit is "+tickLimit);
 			DynValue retval=null;
 			CoroutineState state=CoroutineState.ForceSuspended;
-			while (tickwatch.ElapsedTicks<tickLimit && state!=CoroutineState.ForceSuspended)
+			while (tickwatch.ElapsedTicks<tickLimit && state==CoroutineState.ForceSuspended)
 			{
 				coroutine.Coroutine.AutoYieldCounter = perIterationCounter;
 				retval = coroutine.Coroutine.Resume();
 				state=coroutine.Coroutine.State;
 			}
+
+			//MunLogger.Log("state was "+state);
 
 			if (state == CoroutineState.Dead)
 			{

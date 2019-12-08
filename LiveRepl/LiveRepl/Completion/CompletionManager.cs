@@ -2,7 +2,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using LiveRepl.Interfaces;
-using static RedOnion.KSP.Debugging.QueueLogger;
+using static MunOS.Debugging.QueueLogger;
 
 namespace LiveRepl.Completion
 {

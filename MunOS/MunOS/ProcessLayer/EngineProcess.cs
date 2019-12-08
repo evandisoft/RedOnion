@@ -18,11 +18,6 @@ namespace MunOS.ProcessLayer
 
 		public abstract string Extension { get; }
 
-		protected override void ThreadExecutionComplete(MunThread thread, Exception e)
-		{
-			outputBuffer.AddError("In thread "+thread+": "+e.Message);
-		}
-
 		/// <summary>
 		/// Get a string that will run the file as an import. 
 		/// This is for autorun. The file is to be ran to populate globals

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using MunOS.Core;
 using MunOS.Core.Executors;
+using static MunOS.Debugging.QueueLogger;
 
 namespace MunOS.ProcessLayer
 {
@@ -106,6 +107,7 @@ namespace MunOS.ProcessLayer
 		}
 		public void OnTerminated()
 		{
+			MunLogger.Log("ex complete is null?"+(ExecutionComplete==null));
 			ExecutionComplete.Invoke(this,null);
 		}
 

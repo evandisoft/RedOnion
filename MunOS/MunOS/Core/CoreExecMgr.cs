@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using MunOS.Core.Executors;
+using static MunOS.Debugging.QueueLogger;
 
 namespace MunOS.Core
 {
@@ -69,17 +70,21 @@ namespace MunOS.Core
 		/// <param name="ID">Identifier.</param>
 		public void Kill(long ID)
 		{
+			MunLogger.Log("before kill for id "+ID);
 			if (execInfoDictionary.ContainsKey(ID))
 			{
 				var execInfoEntry=execInfoDictionary[ID];
 				var execInfo=execInfoEntry.execInfo;
+				MunLogger.Log("before on terminated ");
 				execInfo.executable.OnTerminated();
+				MunLogger.Log("after on terminated ");
 				execInfo.terminated=true; // mark it and it will be removed at the beginning of the update.
 				//var priority=execInfoEntry.priority;
 				//priorities[priority].Kill(ID);
 				Remove(ID);
 				needToRemoveTerminated=true;
 			}
+			MunLogger.Log("after kill for id "+ID);
 		}
 
 		internal void Remove(long ID)

@@ -1,10 +1,10 @@
-using System;
+﻿using System;
 using Kerbalui.Controls.Abstract;
 using Kerbalui.EditingChanges;
 using Kerbalui.EventHandling;
 using UnityEngine;
 
-using static RedOnion.KSP.Debugging.QueueLogger;
+using static MunOS.Debugging.QueueLogger;
 
 namespace Kerbalui.Decorators
 {

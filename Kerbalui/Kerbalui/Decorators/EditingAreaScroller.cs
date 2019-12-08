@@ -1,11 +1,11 @@
-using System;
+﻿using System;
 using Kerbalui.EditingChanges;
 using Kerbalui.EventHandling;
 using Kerbalui.Interfaces;
 using Kerbalui.Types;
 using Kerbalui.Util;
 using UnityEngine;
-using static RedOnion.KSP.Debugging.QueueLogger;
+using static MunOS.Debugging.QueueLogger;
 
 namespace Kerbalui.Decorators
 {

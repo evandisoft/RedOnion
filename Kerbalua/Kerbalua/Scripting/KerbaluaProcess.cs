@@ -3,19 +3,34 @@ using System.Collections.Generic;
 using System.IO;
 using Kerbalua.Completion;
 using MoonSharp.Interpreter;
+using MoonSharp.Interpreter.Loaders;
 using MunOS.Core;
 using MunOS.ProcessLayer;
+using RedOnion.KSP.Settings;
 using UnityEngine;
 
 namespace Kerbalua.Scripting
 {
 	public class KerbaluaProcess:EngineProcess
 	{
-		public readonly KerbaluaScript scriptEngine;
+		public KerbaluaScript ScriptEngine { get; private set; }
 
 		public KerbaluaProcess()
 		{
-			scriptEngine=new KerbaluaScript();
+			InternalResetEngine();
+		}
+
+		void InternalResetEngine()
+		{
+			ScriptEngine=new KerbaluaScript();
+			ScriptEngine.Options.DebugPrint = outputBuffer.AddOutput;
+			ScriptEngine.PrintErrorAction = outputBuffer.AddError;
+
+			ScriptEngine.Options.ScriptLoader = new FileSystemScriptLoader();
+			var slb=ScriptEngine.Options.ScriptLoader as ScriptLoaderBase;
+			slb.IgnoreLuaPathGlobal = true;
+
+			slb.ModulePaths = new string[] { SavedSettings.BaseScriptsPath+"/?.lua" };
 		}
 
 		public override string Extension => ".lua";
@@ -24,7 +39,7 @@ namespace Kerbalua.Scripting
 		{
 			try
 			{
-				return MoonSharpIntellisense.GetCompletions(scriptEngine.Globals, source, cursorPos, out replaceStart, out replaceEnd);
+				return MoonSharpIntellisense.GetCompletions(ScriptEngine.Globals, source, cursorPos, out replaceStart, out replaceEnd);
 			}
 			catch (Exception e)
 			{
@@ -72,6 +87,12 @@ namespace Kerbalua.Scripting
 			{
 				outputBuffer.AddError(e.Message);
 			}
+		}
+
+		public override void ResetEngine()
+		{
+			base.ResetEngine();
+			InternalResetEngine();
 		}
 	}
 }

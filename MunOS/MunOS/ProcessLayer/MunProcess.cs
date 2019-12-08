@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using MunOS.Core;
+using static MunOS.Debugging.QueueLogger;
 
 namespace MunOS.ProcessLayer
 {
@@ -49,6 +51,11 @@ namespace MunOS.ProcessLayer
 			// of what will be done with the thread because it is no longer running
 			// in CoreExecMgr
 			runningThreads.Remove(thread);
+			if (e!=null)
+			{
+				outputBuffer.AddError(e.Message);
+			}
+
 			ThreadExecutionComplete(thread, e);
 		}
 
@@ -75,7 +82,17 @@ namespace MunOS.ProcessLayer
 
 		public virtual void Terminate()
 		{
+			MunLogger.Log("Before munprocess terminate");
 
+			// each thread will be removed from the list immediatly after
+			// being killed.
+			var ids=runningThreads.Values.ToList();
+			foreach(var id in ids)
+			{
+				CoreExecMgr.Instance.Kill(id);
+			}
+
+			MunLogger.Log("after munprocess terminate");
 		}
 	}
 }

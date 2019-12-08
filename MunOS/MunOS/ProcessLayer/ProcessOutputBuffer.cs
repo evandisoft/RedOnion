@@ -27,6 +27,12 @@ namespace MunOS.ProcessLayer
 			return outputText;
 		}
 
+		public void Clear()
+		{
+			OutputBuffer.Clear();
+			newOutput = true;
+		}
+
 		public void AddString(string str)
 		{
 			OutputBuffer.Append(str);

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using MunOS;
 using System.Diagnostics;
 using MunOS.Core;
+using MunOS.ProcessLayer;
 
 namespace LiveRepl
 {
@@ -51,6 +52,7 @@ namespace LiveRepl
             ToggleGui = LocalToggleGui;
 
 			CoreExecMgr.Initialize();
+			ProcessManager.Initialize();
         }
 
 		ScriptWindow scriptWindow;
@@ -81,6 +83,7 @@ namespace LiveRepl
 
 			scriptWindow?.FixedUpdate();
 			CoreExecMgr.Instance.FixedUpdate();
+			ProcessManager.Instance.FixedUpdate();
 		}
 
 		void OnGUI()
