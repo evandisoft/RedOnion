@@ -35,6 +35,21 @@ Furthermore, the intellisense does not even handle every case that it could hand
 
 Usually overloaded functions return the same type, but they are technically not required to, so you may get situations where the intellisense will not give you the right answer for that reason.
 
+Another issue you might run into is when intellisense runs into types that are a certain base class where you would expect intellisense results for the derived class, but you instead just get results for the subclass.
+
+Example:
+```
+ship.native.parts[1].Modules[0].
+```
+If the second part on the ship is a parachute, the zeroth module might be the ParachuteModule. However, current intellisense for lua will return results for the class PartModule, instead of ParachuteModule.
+
+If you want to do intellisense on the actual ParachuteModule you can first assign it to another global variable.
+
+```
+para=ship.native.parts[1].Modules[0]
+para.
+```
+
 ## Limitations
 - Calls to long running CLR code are not interruptible.
 - You cannot safely pass a function to something like
