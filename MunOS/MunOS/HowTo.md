@@ -50,6 +50,7 @@ You have to add the process both into the engineProcesses dict so it will show u
 `ProcessManager.Instance.Processes`, so that its FixedUpdate will be called. (Though currently this does nothing).
 
 I'm planning on having a user list of perhaps about 5 engine buttons that they can setup themselves in an autorun
-script, given them whatever name they wish, and choosing which of the 5 slots each engine goes into.
+script, given them whatever name they wish, optionally instantiating each process with a list of files to run 
+on creation (not yet implemented), and choosing which of the 5 slots each engine goes into.
 
 That would be 5 user engine buttons in addition to the two default engine buttons, which will always be present.
