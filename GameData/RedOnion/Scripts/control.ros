@@ -62,7 +62,25 @@ def control ship, target, x, y
   var blk1 = btns.addVertical()
   var row = blk1.addHorizontal()
   var bProgr  = xbtn row, "Progr.", def => mSrf.pressed ? ship.srfvel : ship.velocity
-  var bRetro  = xbtn row, "Retro.", def => mSrf.pressed ? -ship.srfvel : -ship.velocity
+  var bRetro  = xbtn row, "Retro.", def
+    if mObt.pressed
+      return -ship.velocity
+  //landing assist
+    var rv = -ship.srfvel
+    if rv.size < 1 then rv = ship.away
+    if ship.altitude >= 10000 or ship.periapsis >= 0
+      autopilot.throttle = nan
+      return rv
+    var acc = ship.engines.getThrust() / ship.mass
+    if acc <= 0.001
+      autopilot.throttle = nan
+      return rv
+    if rv.angle(ship.away) > 120
+      autopilot.throttle = 0
+      return rv
+    autopilot.throttle = math.min user.throttle, rv.size / acc
+    return rv
+
   row = blk1.addHorizontal()
   var bNormal = xbtn row, "Normal", def => ship.velocity.cross ship.away
   var bAntiN  = xbtn row, "Anti-N", def => -ship.velocity.cross ship.away

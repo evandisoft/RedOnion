@@ -127,6 +127,13 @@ ascentProfile  = 1-math.clamp(ascentProfile, 1, 9)*0.1
 speedRatio     = speedRatio*0.1
 if maxSpeed <= 2
   maxSpeed *= math.sqrt body.mu/(body.radius+safeAltitude)
+if safeAltitude + 1000 >= targetAltitude
+  var minSafe = math.max atmosphere.depth, 7000
+  safeAltitude = 0.5 * (minSafe + targetAltitude)
+  if safeAltitude + 1000 >= targetAltitude
+    safeAltitude = minSafe
+    if safeAltitude + 1000 >= targetAltitude
+      safeAltitude = targetAltitude - 1000
 
 
 //: STEERING
