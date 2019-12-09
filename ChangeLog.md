@@ -23,7 +23,7 @@ Just had a release (0.4.8)
 - control.ros: targeting, rendezvous and docking assist
 
 ### LiveRepl Changes:
-- Kerbalui to use GetControlID to get a unique controlid for each window. Could have interferred with other mods.
+- Changed Kerbalui to use GetControlID to get a unique controlid for each window.
 - Fixed issue where LiveRepl was making modifications to the fontsize of the default GUI.Label style instead of making those changes to a copy of that style.
 - Hitting run will only save the file if it has been modified in the editor. Otherwise it loads the file from disk into the editor. This will allow you to more conveniently use an outside editor.
 - Scene changes, including revert, now terminate any windows or vecdraws.
