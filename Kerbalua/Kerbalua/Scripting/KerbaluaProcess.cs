@@ -49,8 +49,6 @@ namespace Kerbalua.Scripting
 			}
 		}
 
-
-
 		public override IList<string> GetDisplayableCompletions(string source, int cursorPos, out int replaceStart, out int replaceEnd)
 		{
 			return GetCompletions(source, cursorPos, out replaceStart, out replaceEnd);

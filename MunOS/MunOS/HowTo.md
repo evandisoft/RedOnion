@@ -1,7 +1,8 @@
 ﻿Extend EngineProcess and EngineThread with ROSProcess and ROSThread.
 You can look at my implementation of KerbaluaProcess and KerbaluaThread.
 
-ROSProcess will implement the completion-related elements of ReplEvaluator.
+ROSProcess will implement many aspects of ReplEvaluator the same way: completion related functionality, as well as GetImportString, and Extension.
+
 It will also implement `ExecuteSourceInThread`, which will create a new ROSThread
 to execute the given source with whatever `ExecPriority` you wish.
 
