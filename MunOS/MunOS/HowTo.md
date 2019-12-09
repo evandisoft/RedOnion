@@ -1,8 +1,7 @@
 ﻿Extend EngineProcess and EngineThread with ROSProcess and ROSThread.
 You can look at my implementation of KerbaluaProcess and KerbaluaThread.
 
-ROSProcess will implement many aspects of ReplEvaluator the same way: completion related functionality, as well as GetImportString, and Extension.
-
+ROSProcess will implement the completion-related elements of ReplEvaluator.
 It will also implement `ExecuteSourceInThread`, which will create a new ROSThread
 to execute the given source with whatever `ExecPriority` you wish.
 
@@ -20,7 +19,7 @@ CoreExecMgr, and each time a thread is killed, it will remove the thread from th
 call `ThreadExecutionComplete`.
 
 MunProcess has a public field called outputBuffer, which is the buffer to which you will print
-whatever you wish to print. It has the same features of the OutputArea, like AddError() to print a new line
+whatever you wish to print. It has the same features of the OutputArea, like AddError to print a new line
 starting with "e> ", or AddOutput to print a new line starting with "o> ". This outputBuffer belongs to the
 process itself, and LiveRepl fills the OutputArea with the contents of the outputBuffer from the current process
 every update.
@@ -49,3 +48,6 @@ I added two different instances of the lua engine for demonstration/testing.
 
 You have to add the process both into the engineProcesses dict so it will show up in LiveRepl, and also
 `ProcessManager.Instance.Processes`, so that its FixedUpdate will be called. (Though currently this does nothing).
+
+I'm planning on having a user list of perhaps about 5 engine buttons that they can setup themselves in an autorun
+script, given them whatever name they wish, and choosing which of the 5 slots each engine goes into.
