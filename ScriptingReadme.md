@@ -41,9 +41,9 @@ Example:
 ```
 ship.native.parts[1].Modules[0].
 ```
-If the second part on the ship is a parachute, the zeroth module might be the parachute module. However, current intellisense for lua will return results for the class PartModule, instead of ParachuteModule.
+If the second part on the ship is a parachute, the zeroth module might be the ParachuteModule. However, current intellisense for lua will return results for the class PartModule, instead of ParachuteModule.
 
-If you want to do intellisense on the actual parachutemodule you can first assign it to another global variable.
+If you want to do intellisense on the actual ParachuteModule you can first assign it to another global variable.
 
 ```
 para=ship.native.parts[1].Modules[0]
