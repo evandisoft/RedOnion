@@ -4,7 +4,7 @@ using System.Text;
 using System.IO;
 using System.Reflection;
 
-namespace RedOnion.KSP.Debugging {
+namespace MunOS.Debugging {
 	/// <summary>
 	/// For now, this is disabled when project is not built in debug mode.
 	/// </summary>
@@ -15,11 +15,15 @@ namespace RedOnion.KSP.Debugging {
             Complogger = new QueueLogger("completion", 1000);
 			UILogger = new QueueLogger("ui", 1000);
 			UndoLogger = new QueueLogger("undoredo", 1000);
+			MunLogger = new QueueLogger("munos", 1000);
 		}
 
         static public QueueLogger Complogger;
 		static public QueueLogger UILogger;
 		static public QueueLogger UndoLogger;
+
+		public static QueueLogger MunLogger;
+
 		static public HashSet<string> RegisteredTags;
 
         //static public void WriteTaggedToDisk(string tag = "all")

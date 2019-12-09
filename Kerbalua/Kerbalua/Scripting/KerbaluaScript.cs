@@ -9,12 +9,14 @@ using RedOnion.KSP.API;
 using RedOnion.KSP.MoonSharp.CommonAPI;
 using System.ComponentModel;
 using RedOnion.KSP.MoonSharp.MoonSharpAPI;
-using Process = RedOnion.KSP.OS.Process;
+using Process = RedOnion.KSP.MunOS.Process;
 using MoonSharp.Interpreter.Compatibility;
 using RedOnion.UI;
 using Kerbalua.Events;
 using System.IO;
 using RedOnion.KSP.Settings;
+using MunOS.ProcessLayer;
+using MunOS.Core;
 
 namespace Kerbalua.Scripting
 {
@@ -31,6 +33,10 @@ namespace Kerbalua.Scripting
 		{
 			get
 			{
+				if (_instance==null)
+				{
+					throw new Exception("KerbaluaScript.Instance was not initialized!");
+				}
 				return _instance;
 			}
 		}
@@ -40,7 +46,7 @@ namespace Kerbalua.Scripting
 			_instance=new KerbaluaScript();
 		}
 
-		private KerbaluaScript() : base(CoreModules.Preset_Complete)
+		public KerbaluaScript() : base(CoreModules.Preset_Complete)
 		{
 			UserData.RegisterType<Button>(new LuaDescriptor(typeof(Button)));
 
@@ -63,14 +69,21 @@ namespace Kerbalua.Scripting
 				  {
 					  return new Action<Button>((button) =>
 					  {
-						  var script=this;
-						  var co = script.CreateCoroutine(f);
-						  co.Coroutine.AutoYieldCounter = 1000;
-						  co.Coroutine.Resume();
-						  if (co.Coroutine.State == CoroutineState.ForceSuspended)
+						  var currentProcess=MunThread.ExecutingThread?.parentProcess as KerbaluaProcess;
+						  if (currentProcess==null)
 						  {
-							  script.PrintErrorAction?.Invoke("functions called in buttons must have a short runtime");
+							  throw new Exception("Could not get current process in KerbaluaScript custom converter");
 						  }
+
+						  currentProcess.ExecuteFunctionInThread(ExecPriority.ONESHOT,f.Function);
+						  //var script=this;
+						  //var co = script.CreateCoroutine(f);
+						  //co.Coroutine.AutoYieldCounter = 1000;
+						  //co.Coroutine.Resume();
+						  //if (co.Coroutine.State == CoroutineState.ForceSuspended)
+						  //{
+						  // script.PrintErrorAction?.Invoke("functions called in buttons must have a short runtime");
+						  //}
 					  });
 				  });
 
@@ -83,7 +96,7 @@ namespace Kerbalua.Scripting
 
 			metatable["__index"]=commonAPI;
 			Globals.MetaTable=metatable;
-			Globals.Remove("coroutine");
+
 			Globals.Remove("dofile");
 			//Globals.Remove("load");
 			Globals.Remove("loadfilesafe");
@@ -98,15 +111,19 @@ return function(stat,...)
 	end
 	return stat.__new(...) 
 end
-			");
+");
 
 			//commonAPI["dofile"]=new Func<string, DynValue>(dofile);
 
 			//commonAPI["new"]=new newdel(@new);
 
-			commonAPI["sleep"] = new Action<double>(sleep);
+			var coroutineTable=Globals["coroutine"] as Table;
+
+			var yield = coroutineTable["yield"];//new Action<double>(sleep);
+			Globals.Remove("coroutine");
 			//commonAPI["setexeclimit"] = new Action<double>(setexeclimit);
 
+			commonAPI["sleep"] = yield;
 		}
 
 

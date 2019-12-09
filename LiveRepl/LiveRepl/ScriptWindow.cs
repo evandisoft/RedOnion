@@ -109,10 +109,11 @@ namespace LiveRepl
 			SavedSettings.SaveSetting("lastQueueTag", uiparts.queueTagInputArea.Text);
 #endif
 			SavedSettings.SaveToDisk();
-			foreach(var repleval in replEvaluators.Values)
-			{
-				repleval.Terminate();
-			}
+			// EvanTODO: not sure how we will handle this in the new version
+			//foreach(var repleval in replEvaluators.Values)
+			//{
+			//	repleval.Terminate();
+			//}
 		}
 	}
 }

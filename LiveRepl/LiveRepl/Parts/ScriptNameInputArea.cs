@@ -17,9 +17,13 @@ namespace LiveRepl.Parts {
 			get
 			{
 				var extension=".lua";
-				if (uiparts.scriptWindow.currentReplEvaluator!=null)
+				//if (uiparts.scriptWindow.currentReplEvaluator!=null)
+				//{
+				//	extension=uiparts.scriptWindow.currentReplEvaluator.Extension;
+				//}
+				if (uiparts.scriptWindow.currentEngineProcess!=null)
 				{
-					extension=uiparts.scriptWindow.currentReplEvaluator.Extension;
+					extension=uiparts.scriptWindow.currentEngineProcess.Extension;
 				}
 
 				return "untitled"+extension;

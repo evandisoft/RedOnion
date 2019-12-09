@@ -9,6 +9,7 @@ using MoonSharp.Interpreter.DataStructs;
 using MoonSharp.Interpreter.Interop;
 using MoonSharp.Interpreter.Interop.BasicDescriptors;
 using MoonSharp.Interpreter.Interop.StandardDescriptors;
+using MunOS.ProcessLayer;
 using RedOnion.KSP.MoonSharp.Proxies;
 using RedOnion.KSP.Utilities;
 using UnityEngine;
@@ -287,18 +288,13 @@ namespace Kerbalua.Events
 
 			foreach (Closure c in closures)
 			{
-				var script=KerbaluaScript.Instance;
-				if (script==null)
+				var process=MunThread.ExecutingThread?.parentProcess as KerbaluaProcess;
+				if (process==null)
 				{
-					throw new Exception("KerbaluaScirpt.Instance not initialized");
+					throw new Exception("Could not get current process in LuaEventDescriptor");
 				}
-				var co = script.CreateCoroutine(c);
-				co.Coroutine.AutoYieldCounter = 1000;
-				co.Coroutine.Resume(o01, o02, o03, o04, o05, o06, o07, o08, o09, o10, o11, o12, o13, o14, o15, o16);
-				if (co.Coroutine.State == CoroutineState.ForceSuspended)
-				{
-					script.PrintErrorAction?.Invoke("UnityAction callback unable to finish");
-				}
+
+				process.ExecuteFunctionInThread(MunOS.Core.ExecPriority.ONESHOT,c);
 			}
 		}
 

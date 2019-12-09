@@ -1,7 +1,7 @@
 using System;
 using RedOnion.Attributes;
 using RedOnion.ROS;
-using RedOnion.KSP.OS;
+using RedOnion.KSP.MunOS;
 
 namespace RedOnion.KSP
 {

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Kerbalua")]
 
-namespace RedOnion.KSP.OS
+namespace RedOnion.KSP.MunOS
 {
 	/// <summary>
 	/// Process is one instance of a script with all its functions subscribed to update

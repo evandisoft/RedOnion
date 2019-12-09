@@ -4,7 +4,7 @@ using System.Reflection;
 using MoonSharp.Interpreter;
 using RedOnion.Attributes;
 using RedOnion.ROS;
-using static RedOnion.KSP.Debugging.QueueLogger;
+using static MunOS.Debugging.QueueLogger;
 
 namespace Kerbalua.Completion.CompletionTypes
 {

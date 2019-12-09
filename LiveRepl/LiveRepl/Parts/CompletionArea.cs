@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using Kerbalui.Controls;
@@ -7,7 +7,7 @@ using Kerbalui.EventHandling;
 using Kerbalui.Util;
 using LiveRepl.Interfaces;
 using UnityEngine;
-using static RedOnion.KSP.Debugging.QueueLogger;
+using static MunOS.Debugging.QueueLogger;
 
 namespace LiveRepl.Parts
 {

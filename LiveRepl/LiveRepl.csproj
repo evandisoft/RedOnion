@@ -153,6 +153,10 @@
       <Project>{7A943166-A67E-420A-BCA0-5231D57A18BD}</Project>
       <Name>Kerbalui</Name>
     </ProjectReference>
+    <ProjectReference Include="..\MunOS\MunOS.csproj">
+      <Project>{A4C93278-A705-4AC2-B2A9-16B30C2E2C36}</Project>
+      <Name>MunOS</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="LiveRepl\" />

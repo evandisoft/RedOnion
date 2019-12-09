@@ -4,7 +4,7 @@ using Kerbalui.Decorators;
 using Kerbalui.EditingChanges;
 using Kerbalui.Interfaces;
 using LiveRepl.Interfaces;
-using static RedOnion.KSP.Debugging.QueueLogger;
+using static MunOS.Debugging.QueueLogger;
 
 namespace LiveRepl.Completion {
 	/// <summary>
@@ -16,7 +16,8 @@ namespace LiveRepl.Completion {
 		public static EditingState Complete(int index,ScriptWindowParts uiparts, EditingState editingState)
 		{
 			UILogger.Log("In EditAreaCompletionAdapter Complete for index "+index);
-			var completions = uiparts.scriptWindow.currentReplEvaluator.GetCompletions(editingState.text, editingState.cursorIndex,out int replaceStart,out int replaceEnd);
+			//var completions = uiparts.scriptWindow.currentReplEvaluator.GetCompletions(editingState.text, editingState.cursorIndex,out int replaceStart,out int replaceEnd);
+			var completions = uiparts.scriptWindow.currentEngineProcess.GetCompletions(editingState.text, editingState.cursorIndex,out int replaceStart,out int replaceEnd);
 			UILogger.Log("CursorIndex", editingState.cursorIndex,"replaceStart",replaceStart,"replaceEnd",replaceEnd);
 			if (completions.Count > index) {
 				int partialLength = replaceEnd - replaceStart;

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
@@ -8,7 +8,7 @@ using Kerbalua.Completion.CompletionTypes;
 using Kerbalua.Parsing;
 using MoonSharp.Interpreter;
 using UnityEngine;
-using static RedOnion.KSP.Debugging.QueueLogger;
+using static MunOS.Debugging.QueueLogger;
 
 namespace Kerbalua.Completion
 {

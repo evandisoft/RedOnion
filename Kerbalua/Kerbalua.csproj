@@ -111,6 +111,8 @@
     <Compile Include="Kerbalua\Events\LuaEventDescriptor.cs" />
     <Compile Include="Kerbalua\Events\LuaEventProxy.cs" />
     <Compile Include="Kerbalua\Completion\CompletionTypes\EnumCompletion.cs" />
+    <Compile Include="Kerbalua\Scripting\KerbaluaProcess.cs" />
+    <Compile Include="Kerbalua\Scripting\KerbaluaThread.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -145,6 +147,10 @@
     <ProjectReference Include="..\RedOnion.Common\RedOnion.Common.csproj">
       <Project>{2D34D879-1A21-4F8F-BF49-38CED2B40406}</Project>
       <Name>RedOnion.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MunOS\MunOS.csproj">
+      <Project>{A4C93278-A705-4AC2-B2A9-16B30C2E2C36}</Project>
+      <Name>MunOS</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

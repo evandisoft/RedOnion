@@ -84,7 +84,7 @@ shift + space: Intellisense completion.
 ctrl + enter: Intellisense completion.
 ";
 
-			uiparts.replOutoutArea.AddText(hotkeyText);
+			currentEngineProcess.outputBuffer.AddText(hotkeyText);
 		}
 	}
 }
