@@ -99,7 +99,7 @@ namespace RedOnion.ROS
 		/// Total time-limit for all handlers (one of each type can still be executed).
 		/// Main loop always gets at least StepCountdown (100 by default) instructions executed.
 		/// </summary>
-		public TimeSpan UpdateTimeout { get; set; } = TimeSpan.FromMilliseconds(10.0);
+		public TimeSpan UpdateTimeout { get; set; } = TimeSpan.FromMilliseconds(1.0);
 		/// <summary>
 		/// Limit of instructions per fixed update
 		/// (not a hard max-limit, can be breached by some small multiple of StepCountdown).
@@ -218,22 +218,20 @@ namespace RedOnion.ROS
 			Idle.Clear();
 			onceSkipped = 0;
 			idleSkipped = 0;
-			PeakMillis = AverageMillis;
 		}
 
 		public int TotalCountdown { get; protected set; }
 		public int CountdownPercent => 100 * TotalCountdown / UpdateCountdown;
 		public int TimeoutPercent => (int)(100 * (1 - watch.Elapsed.TotalMilliseconds / UpdateTimeout.TotalMilliseconds));
 		public double AverageMillis { get; set; }
-		public double PeakMillis { get; set; }
 		public double AverageCount { get; set; }
+		public double PeakMillis { get; set; }
 		public double PeakCount { get; set; }
+		double _peakMillis, _peakCount;
 
 		readonly Stopwatch watch = new Stopwatch();
+		readonly Stopwatch secWatch = new Stopwatch();
 		int onceSkipped, idleSkipped;
-#if DEBUG
-		readonly Stopwatch logWatch = new Stopwatch();
-#endif
 
 		public virtual void UpdateGraphic()
 		{
@@ -353,24 +351,30 @@ namespace RedOnion.ROS
 			if (AverageMillis <= 0)
 				AverageMillis = milli;
 			else AverageMillis = (AverageMillis * 9 + milli) * 0.1;
-			if (milli > PeakMillis)
-				PeakMillis = milli;
+			if (milli > _peakMillis)
+				_peakMillis = milli;
 			var count = UpdateCountdown - TotalCountdown;
 			if (AverageCount <= 0)
 				AverageCount = count;
 			else AverageCount = (AverageCount * 9 + count) * 0.1;
-			if (count > PeakCount)
-				PeakCount = count;
+			if (count > _peakCount)
+				_peakCount = count;
 
-#if DEBUG
-			if (!logWatch.IsRunning)
-				logWatch.Start();
-			if (logWatch.ElapsedMilliseconds >= 10000)
+			if (!secWatch.IsRunning)
 			{
-				logWatch.Restart();
-				Value.DebugLog("AVG: {0,5:F2}ms {1,4:F2}i PEAK: {2,5:F2}ms {3,4:F2}i", AverageMillis, AverageCount, PeakMillis, PeakCount);
+				secWatch.Start();
+				_peakMillis = 0;
+				_peakCount = 0;
 			}
-#endif
+			if (secWatch.ElapsedMilliseconds >= 3333)
+			{
+				secWatch.Restart();
+				Value.DebugLog("AVG: {0,5:F2}ms {1,4:F2}i PEAK: {2,5:F2}ms {3,4:F2}i", AverageMillis, AverageCount, PeakMillis, PeakCount);
+				PeakMillis = 0.5 * (PeakMillis + _peakMillis);
+				PeakCount = 0.5 * (PeakCount + _peakCount);
+				_peakMillis = 0;
+				_peakCount = 0;
+			}
 		}
 		private bool Call(Event.Subscription e, Event loop, int downtoPercent)
 		{
