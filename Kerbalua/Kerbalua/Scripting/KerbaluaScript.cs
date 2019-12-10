@@ -60,24 +60,6 @@ namespace Kerbalua.Scripting
 
 						process.ExecuteFunctionInThread(MunOS.Core.ExecPriority.ONESHOT, closure);
 					});
-
-					//var currentProcess=MunThread.ExecutingThread?.parentProcess as KerbaluaProcess;
-					//if (currentProcess==null)
-					//{
-					//	throw new Exception("Could not get current process in KerbaluaScript custom converter");
-					//}
-					//return new Action<Button>((button) =>
-					//{
-					//	currentProcess.ExecuteFunctionInThread(ExecPriority.ONESHOT, f.Function);
-					//	//var script=this;
-					//	//var co = script.CreateCoroutine(f);
-					//	//co.Coroutine.AutoYieldCounter = 1000;
-					//	//co.Coroutine.Resume();
-					//	//if (co.Coroutine.State == CoroutineState.ForceSuspended)
-					//	//{
-					//	// script.PrintErrorAction?.Invoke("functions called in buttons must have a short runtime");
-					//	//}
-					//});
 				});
 		}
 

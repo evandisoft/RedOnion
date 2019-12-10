@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using MunOS.Core;
+using UnityEngine;
 using static MunOS.Debugging.QueueLogger;
 
 namespace MunOS.ProcessLayer
@@ -166,18 +167,16 @@ namespace MunOS.ProcessLayer
 					}
 					catch (Exception ex)
 					{
-						MunLogger.Log($"Exception in process #{ID} shutdown: {ex.Message}");
+						Debug.Log($"Exception in process #{ID} shutdown: {ex.Message}");
 					}
 				}
-				MunLogger.Log("Process #{ID} terminated.");
+				Debug.Log("Process #{ID} terminated.");
 			}
 			else
 			{//	this should really never happen (processor calls process.Dispose on reset/shutdown)
-				MunLogger.Log($"Process #{ID} is being collected with active shutdown subscribers!");
+				Debug.Log($"Process #{ID} is being collected with active shutdown subscribers!");
 				//	we at least try to notify the subscribers for cleanup and rather schedule it on main/ui thread
-				// EvanTodo: commented this out but probably is necessary
-				throw new NotImplementedException("Evan commented this out but it needs firda's attention");
-				//UI.Collector.Add(this);
+				RedOnion.UI.Collector.Add(this);
 			}
 		}
 
