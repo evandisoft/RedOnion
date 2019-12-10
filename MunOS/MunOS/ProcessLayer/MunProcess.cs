@@ -167,14 +167,14 @@ namespace MunOS.ProcessLayer
 					}
 					catch (Exception ex)
 					{
-						Debug.Log($"Exception in process #{ID} shutdown: {ex.Message}");
+						Debug.Log($"[RedOnion] Exception in process #{ID} shutdown: {ex.Message}");
 					}
 				}
-				Debug.Log("Process #{ID} terminated.");
+				Debug.Log("[RedOnion] Process #{ID} terminated.");
 			}
 			else
 			{//	this should really never happen (processor calls process.Dispose on reset/shutdown)
-				Debug.Log($"Process #{ID} is being collected with active shutdown subscribers!");
+				Debug.Log($"[RedOnion] Process #{ID} is being collected with active shutdown subscribers!");
 				//	we at least try to notify the subscribers for cleanup and rather schedule it on main/ui thread
 				RedOnion.UI.Collector.Add(this);
 			}

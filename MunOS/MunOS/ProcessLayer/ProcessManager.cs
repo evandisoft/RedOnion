@@ -32,6 +32,7 @@ namespace MunOS.ProcessLayer
 
 		public void FixedUpdate()
 		{
+			MunThread.ResetStopwatch();
 			foreach(var process in Processes)
 			{
 				process.FixedUpdate();
