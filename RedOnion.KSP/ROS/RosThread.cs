@@ -19,9 +19,9 @@ namespace RedOnion.KSP.ROS
 
 		protected override ExecStatus ProtectedExecute(long tickLimit)
 		{
-			var tmo = TimeSpan.FromSeconds((double)tickLimit / Stopwatch.Frequency);
-			processor.UpdateTimeout = tmo;
-			processor.UpdateCountdown = Math.Max(3, (int)Math.Round(tmo.TotalMilliseconds) * 100); 
+			//var tmo = TimeSpan.FromSeconds((double)tickLimit / Stopwatch.Frequency);
+			//processor.UpdateTimeout = tmo;
+			//processor.UpdateCountdown = Math.Max(3, (int)Math.Round(tmo.TotalMilliseconds) * 100); 
 			processor.UpdatePhysics();
 			switch (processor.Exit)
 			{
@@ -30,6 +30,7 @@ namespace RedOnion.KSP.ROS
 			case ExitCode.Countdown:
 				return ExecStatus.INTERRUPTED;
 			default:
+				parentProcess.outputBuffer.AddReturnValue(processor.Result.ToString());
 				return ExecStatus.FINISHED;
 			}
 		}
