@@ -81,7 +81,11 @@ namespace LiveRepl.Parts
 		{
 			InterceptMostInput();
 
-			editingArea.Text=uiparts.scriptWindow.currentEngineProcess.outputBuffer.GetString();
+			editingArea.Text=uiparts.scriptWindow.currentEngineProcess.outputBuffer.GetString(out bool newOutput);
+			if (newOutput)
+			{
+				ResetScroll();
+			}
 			//bool hadKeyDownThisUpdate=Event.current.type==EventType.KeyDown;
 			//if (outputBuffer.Length>0)
 			//{
