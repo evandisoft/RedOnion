@@ -1,6 +1,6 @@
 [![buttonscode.jpg](https://i.postimg.cc/HLbbKzWs/buttonscode.jpg)](https://postimg.cc/jWdWnzJG)
 
-**Note: There is an issue with running things in Lua by button presses. There is a limit to how long they can run. And if you call sleep in a function that is ran by a button press, it will silently end execution. If you don't call sleep it will eventually print out an error and end execution. Version 0.5.0 will provide a new execution system which will create a new thread each time you press a button and allow it to execute normally.**
+**Note: There is an issue with running things in the lua engine by button presses. There is a limit to how long they can run. And if you call sleep in a function that is ran by a button press, it will silently end execution. If you don't call sleep it will eventually print out an error and end execution. Version 0.5.0 will provide a new execution system which will create a new thread each time you press a button and allow it to execute normally.**
 
 This is a simple tutorial with the most basic use of the RedOnion.UI library. Demonstrates creating some buttons and adding them to a window.
 
