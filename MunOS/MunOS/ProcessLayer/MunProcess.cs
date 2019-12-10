@@ -176,7 +176,7 @@ namespace MunOS.ProcessLayer
 				MunLogger.Log($"Process #{ID} is being collected with active shutdown subscribers!");
 				//	we at least try to notify the subscribers for cleanup and rather schedule it on main/ui thread
 				// EvanTodo: commented this out but probably is necessary
-				throw new NotImplementedException("Evan commented this out but it needs special attention");
+				throw new NotImplementedException("Evan commented this out but it needs firda's attention");
 				//UI.Collector.Add(this);
 			}
 		}

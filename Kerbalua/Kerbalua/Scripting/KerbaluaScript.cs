@@ -29,52 +29,64 @@ namespace Kerbalua.Scripting
 		private const int execLimitMin=100;
 		private const int execLimitMax=5000;
 
+		static KerbaluaScript()
+		{
+			GlobalOptions.CustomConverters
+				.SetClrToScriptCustomConversion(
+					(Script script, Vector3d vector3d)
+						=> DynValue.FromObject(script, new Vector(vector3d)) //DynValue.NewTable(new ModuleControlSurfaceProxyTable(this, m))
+					);
+			UserData.RegisterType<Button>(new LuaDescriptor(typeof(Button)));
+
+			UserData.RegistrationPolicy = InteropRegistrationPolicy.Automatic;
+
+			GlobalOptions.CustomConverters
+				.SetScriptToClrCustomConversion(DataType.Function, typeof(Action<Button>), (f) =>
+				{
+					return new Action<Button>((button) =>
+					{
+						var closure=f.Function;
+						var kerbaluaScript=closure.OwnerScript as KerbaluaScript;
+						if (kerbaluaScript==null)
+						{
+							throw new Exception("Ownerscript was not KerbaluaScript in LuaEventDescriptor");
+						}
+
+						var process=kerbaluaScript?.kerbaluaProcess;
+						if (process==null)
+						{
+							throw new Exception("Could not get current process in LuaEventDescriptor");
+						}
+
+						process.ExecuteFunctionInThread(MunOS.Core.ExecPriority.ONESHOT, closure);
+					});
+
+					//var currentProcess=MunThread.ExecutingThread?.parentProcess as KerbaluaProcess;
+					//if (currentProcess==null)
+					//{
+					//	throw new Exception("Could not get current process in KerbaluaScript custom converter");
+					//}
+					//return new Action<Button>((button) =>
+					//{
+					//	currentProcess.ExecuteFunctionInThread(ExecPriority.ONESHOT, f.Function);
+					//	//var script=this;
+					//	//var co = script.CreateCoroutine(f);
+					//	//co.Coroutine.AutoYieldCounter = 1000;
+					//	//co.Coroutine.Resume();
+					//	//if (co.Coroutine.State == CoroutineState.ForceSuspended)
+					//	//{
+					//	// script.PrintErrorAction?.Invoke("functions called in buttons must have a short runtime");
+					//	//}
+					//});
+				});
+		}
+
 		public readonly KerbaluaProcess kerbaluaProcess;
 
 		public KerbaluaScript(KerbaluaProcess kerbaluaProcess) : base(CoreModules.Preset_Complete)
 		{
 			this.kerbaluaProcess=kerbaluaProcess;
 
-			UserData.RegisterType<Button>(new LuaDescriptor(typeof(Button)));
-
-			UserData.RegistrationPolicy = InteropRegistrationPolicy.Automatic;
-
-			//GlobalOptions.CustomConverters
-				//.SetClrToScriptCustomConversion(
-					//(Script script, ModuleControlSurface m)
-					//	=> DynValue.FromObject(script, new LuaProxy(m)) //DynValue.NewTable(new ModuleControlSurfaceProxyTable(this, m))
-					//);
-
-			GlobalOptions.CustomConverters
-				.SetClrToScriptCustomConversion(
-					(Script script, Vector3d vector3d)
-						=> DynValue.FromObject(script, new Vector(vector3d)) //DynValue.NewTable(new ModuleControlSurfaceProxyTable(this, m))
-					);
-
-			GlobalOptions.CustomConverters
-				.SetScriptToClrCustomConversion(DataType.Function, typeof(Action<Button>), (f) =>
-				  {
-					  var currentProcess=MunThread.ExecutingThread?.parentProcess as KerbaluaProcess;
-					  if (currentProcess==null)
-					  {
-						  throw new Exception("Could not get current process in KerbaluaScript custom converter");
-					  }
-					  return new Action<Button>((button) =>
-					  {
-						  currentProcess.ExecuteFunctionInThread(ExecPriority.ONESHOT,f.Function);
-						  //var script=this;
-						  //var co = script.CreateCoroutine(f);
-						  //co.Coroutine.AutoYieldCounter = 1000;
-						  //co.Coroutine.Resume();
-						  //if (co.Coroutine.State == CoroutineState.ForceSuspended)
-						  //{
-						  // script.PrintErrorAction?.Invoke("functions called in buttons must have a short runtime");
-						  //}
-					  });
-				  });
-
-
-			//UnityEngine.Debug.Log("sanity check");
 			var metatable=new Table(this);
 			var commonAPI=new CommonAPITable(this);
 			commonAPI.AddAPI(typeof(Globals));
