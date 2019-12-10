@@ -12,10 +12,6 @@ namespace MunOS.ProcessLayer
 
 		const int maxHistorySize = 1000;
 
-		~EngineProcess() => Dispose(false);
-		public void Dispose() => Dispose(true);
-		protected virtual void Dispose(bool disposing) { }
-
 		public abstract string Extension { get; }
 
 		/// <summary>

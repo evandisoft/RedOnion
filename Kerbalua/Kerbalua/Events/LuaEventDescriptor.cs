@@ -288,7 +288,13 @@ namespace Kerbalua.Events
 
 			foreach (Closure c in closures)
 			{
-				var process=MunThread.ExecutingThread?.parentProcess as KerbaluaProcess;
+				var kerbaluaScript=c.OwnerScript as KerbaluaScript;
+				if (kerbaluaScript==null)
+				{
+					throw new Exception("Ownerscript was not KerbaluaScript in LuaEventDescriptor");
+				}
+
+				var process=kerbaluaScript?.kerbaluaProcess;
 				if (process==null)
 				{
 					throw new Exception("Could not get current process in LuaEventDescriptor");

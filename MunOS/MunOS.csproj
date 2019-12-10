@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
+    <KerbalLibs Condition=" '$(KerbalLibs)' == '' And '$(OS)' == 'Windows_NT' And Exists('$(SolutionDir)\ksp')">$(SolutionDir)\ksp\KSP_x64_Data\Managed</KerbalLibs>
+    <KerbalLibs Condition=" '$(KerbalLibs)' == '' And '$(OS)' != 'Windows_NT' And Exists('$(SolutionDir)\ksp')">$(SolutionDir)\ksp\KSP_Data\Managed</KerbalLibs>
+    <KerbalLibs Condition=" '$(KerbalLibs)' == '' And '$(OS)' == 'Windows_NT' ">C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\KSP_x64_Data\Managed</KerbalLibs>
+    
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{A4C93278-A705-4AC2-B2A9-16B30C2E2C36}</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>MunOS</RootNamespace>
     <AssemblyName>MunOS</AssemblyName>
-    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <ReleaseVersion>0.4.0</ReleaseVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -29,6 +33,14 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="UnityEngine">
+      <HintPath>$(KerbalLibs)\UnityEngine.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>$(KerbalLibs)\UnityEngine.CoreModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -61,6 +73,13 @@
     <None Include="MunOS\UseCases.md" />
     <None Include="MunOS\Layer2.md" />
     <None Include="MunOS\Core\CoreReadme.md" />
+    <None Include="MunOS\HowTo.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\RedOnion.UI\RedOnion.UI.csproj">
+      <Project>{034C16AB-D16E-4AFE-9837-812499EE2F3D}</Project>
+      <Name>RedOnion.UI</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>

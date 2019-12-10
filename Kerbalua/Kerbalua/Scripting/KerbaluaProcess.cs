@@ -22,7 +22,7 @@ namespace Kerbalua.Scripting
 
 		void InternalResetEngine()
 		{
-			ScriptEngine=new KerbaluaScript();
+			ScriptEngine=new KerbaluaScript(this);
 			ScriptEngine.Options.DebugPrint = outputBuffer.AddOutput;
 			ScriptEngine.PrintErrorAction = outputBuffer.AddError;
 
@@ -48,8 +48,6 @@ namespace Kerbalua.Scripting
 				return new List<string>();
 			}
 		}
-
-
 
 		public override IList<string> GetDisplayableCompletions(string source, int cursorPos, out int replaceStart, out int replaceEnd)
 		{

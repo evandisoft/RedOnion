@@ -16,8 +16,9 @@ namespace MunOS.ProcessLayer
 		private bool newOutput;
 		string outputText;
 
-		public string GetString()
+		public string GetString(out bool isNewOutput)
 		{
+			isNewOutput=newOutput;
 			if (newOutput)
 			{
 				outputText=OutputBuffer.ToString();

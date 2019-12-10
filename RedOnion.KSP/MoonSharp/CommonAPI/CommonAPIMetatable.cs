@@ -62,6 +62,10 @@ namespace RedOnion.KSP.MoonSharp.CommonAPI
 			}
 
 			var str=key.String;
+			if (!properties.ContainsKey(str))
+			{
+				return DynValue.Nil;
+			}
 			var func=properties[str];
 			var value=func();
 

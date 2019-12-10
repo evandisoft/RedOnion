@@ -12,167 +12,167 @@ using System.IO;
 
 namespace LiveRepl.Execution
 {
-    public class MoonSharpReplEvaluator:ReplEvaluator
-    {
-		KerbaluaScript scriptEngine;
+ //   public class MoonSharpReplEvaluator:ReplEvaluator
+ //   {
+	//	KerbaluaScript scriptEngine;
 
-		public override string Extension => ".lua";
+	//	public override string Extension => ".lua";
 
-		public MoonSharpReplEvaluator()
-		{
-			InternalResetEngine();
-		}
+	//	public MoonSharpReplEvaluator()
+	//	{
+	//		InternalResetEngine();
+	//	}
 
-		/// <summary>
-		/// See the abstract version for complete comments.
-		/// </summary>
-		public override IList<string> GetCompletions(string source, int cursorPos,out int replaceStart,out int replaceEnd)
-		{
-			try {
-				return MoonSharpIntellisense.GetCompletions(scriptEngine.Globals, source, cursorPos, out replaceStart, out replaceEnd);
-			} catch (Exception e) {
-				Debug.Log(e);
-				replaceStart = replaceEnd = cursorPos;
-				return new List<string>();
-			}
-		}
+	//	/// <summary>
+	//	/// See the abstract version for complete comments.
+	//	/// </summary>
+	//	public override IList<string> GetCompletions(string source, int cursorPos,out int replaceStart,out int replaceEnd)
+	//	{
+	//		try {
+	//			return MoonSharpIntellisense.GetCompletions(scriptEngine.Globals, source, cursorPos, out replaceStart, out replaceEnd);
+	//		} catch (Exception e) {
+	//			Debug.Log(e);
+	//			replaceStart = replaceEnd = cursorPos;
+	//			return new List<string>();
+	//		}
+	//	}
 
 
-		void InternalResetEngine()
-		{
-			KerbaluaScript.Initialize();
-			scriptEngine = KerbaluaScript.Instance;
-			scriptEngine.Options.DebugPrint = (string str) => {
-				PrintAction?.Invoke(str);
-			};
-			scriptEngine.PrintErrorAction = (str)=>PrintErrorAction?.Invoke(str);
+	//	void InternalResetEngine()
+	//	{
+	//		KerbaluaScript.Initialize();
+	//		scriptEngine = KerbaluaScript.Instance;
+	//		scriptEngine.Options.DebugPrint = (string str) => {
+	//			PrintAction?.Invoke(str);
+	//		};
+	//		scriptEngine.PrintErrorAction = (str)=>PrintErrorAction?.Invoke(str);
 			
-			scriptEngine.Options.ScriptLoader = new FileSystemScriptLoader();
-			var slb=scriptEngine.Options.ScriptLoader as ScriptLoaderBase;
-			slb.IgnoreLuaPathGlobal = true;
+	//		scriptEngine.Options.ScriptLoader = new FileSystemScriptLoader();
+	//		var slb=scriptEngine.Options.ScriptLoader as ScriptLoaderBase;
+	//		slb.IgnoreLuaPathGlobal = true;
 			
-			slb.ModulePaths = new string[] { SavedSettings.BaseScriptsPath+"/?.lua" };
-		 }
+	//		slb.ModulePaths = new string[] { SavedSettings.BaseScriptsPath+"/?.lua" };
+	//	 }
 
-		public override void ResetEngine()
-		{
-			Terminate();
-			InternalResetEngine();
-			base.ResetEngine();
-		}
+	//	public override void ResetEngine()
+	//	{
+	//		Terminate();
+	//		InternalResetEngine();
+	//		base.ResetEngine();
+	//	}
 
-		public override void Terminate()
-		{
-			scriptEngine.Terminate();
-		}
+	//	public override void Terminate()
+	//	{
+	//		scriptEngine.Terminate();
+	//	}
 
-		public override bool Evaluate(out string result)
-		{
-			result = "";
-			DynValue dynResult;
-			bool isComplete = false;
-			try
-			{
-				if (scriptEngine.Evaluate(out dynResult))
-				{
-					isComplete = true;
+	//	public override bool Evaluate(out string result)
+	//	{
+	//		result = "";
+	//		DynValue dynResult;
+	//		bool isComplete = false;
+	//		try
+	//		{
+	//			if (scriptEngine.Evaluate(out dynResult))
+	//			{
+	//				isComplete = true;
 
-					if (dynResult.Type==DataType.String)
-					{
-						result = "\"" + dynResult.ToObject() + "\"";
-						return isComplete;
-					}
-					else if (dynResult.Type == DataType.Nil || dynResult.Type== DataType.Void)
-					{
-						result = dynResult.ToString();
-						return isComplete;
-					}
+	//				if (dynResult.Type==DataType.String)
+	//				{
+	//					result = "\"" + dynResult.ToObject() + "\"";
+	//					return isComplete;
+	//				}
+	//				else if (dynResult.Type == DataType.Nil || dynResult.Type== DataType.Void)
+	//				{
+	//					result = dynResult.ToString();
+	//					return isComplete;
+	//				}
 
-					result += dynResult.ToObject().ToString();
+	//				result += dynResult.ToObject().ToString();
 
-					if (dynResult.UserData==null)
-					{
-						return isComplete;
-					}
+	//				if (dynResult.UserData==null)
+	//				{
+	//					return isComplete;
+	//				}
 
-					// This is a static.
-					if (dynResult.UserData.Object==null)
-					{
-						return isComplete;
-					}
+	//				// This is a static.
+	//				if (dynResult.UserData.Object==null)
+	//				{
+	//					return isComplete;
+	//				}
 
-					// This is a type
-					if (dynResult.ToObject() is Type)
-					{
-						result += " (runtime type)";
-						return isComplete;
-					}
+	//				// This is a type
+	//				if (dynResult.ToObject() is Type)
+	//				{
+	//					result += " (runtime type)";
+	//					return isComplete;
+	//				}
 
-					return isComplete;
-				}
-				else
-				{
-					result = "";
-				}
+	//				return isComplete;
+	//			}
+	//			else
+	//			{
+	//				result = "";
+	//			}
 
-			}
-			catch (Exception exception)
-			{
-				if (exception is InterpreterException interExcept)
-				{
-					PrintErrorAction?.Invoke(interExcept.DecoratedMessage);
-				}
-				else
-				{
-					PrintErrorAction?.Invoke(exception.Message);
-				}
+	//		}
+	//		catch (Exception exception)
+	//		{
+	//			if (exception is InterpreterException interExcept)
+	//			{
+	//				PrintErrorAction?.Invoke(interExcept.DecoratedMessage);
+	//			}
+	//			else
+	//			{
+	//				PrintErrorAction?.Invoke(exception.Message);
+	//			}
 
-				Debug.Log(exception);
-				Terminate();
-				isComplete = true;
-			}
+	//			Debug.Log(exception);
+	//			Terminate();
+	//			isComplete = true;
+	//		}
 
-			return isComplete;
-		}
+	//		return isComplete;
+	//	}
 
-		protected override void ProtectedSetSource(string source, string path)
-		{
-			try
-			{
-				scriptEngine.SetCoroutine(source);
-			}
-			catch (Exception exception)
-			{
-				if (exception is InterpreterException interExcept)
-				{
-					PrintErrorAction?.Invoke(interExcept.DecoratedMessage);
-				}
-				else
-				{
-					PrintErrorAction?.Invoke(exception.Message);
-				}
+	//	protected override void ProtectedSetSource(string source, string path)
+	//	{
+	//		try
+	//		{
+	//			scriptEngine.SetCoroutine(source);
+	//		}
+	//		catch (Exception exception)
+	//		{
+	//			if (exception is InterpreterException interExcept)
+	//			{
+	//				PrintErrorAction?.Invoke(interExcept.DecoratedMessage);
+	//			}
+	//			else
+	//			{
+	//				PrintErrorAction?.Invoke(exception.Message);
+	//			}
 
-				Debug.Log(exception);
-				Terminate();
-			}
-		}
+	//			Debug.Log(exception);
+	//			Terminate();
+	//		}
+	//	}
 
-		public override void FixedUpdate()
-		{
-			// do nothing, LUA/MoonSharp Engine does not use events
-		}
+	//	public override void FixedUpdate()
+	//	{
+	//		// do nothing, LUA/MoonSharp Engine does not use events
+	//	}
 
-		public override IList<string> GetDisplayableCompletions(string source, int cursorPos, out int replaceStart, out int replaceEnd)
-		{
+	//	public override IList<string> GetDisplayableCompletions(string source, int cursorPos, out int replaceStart, out int replaceEnd)
+	//	{
 
-			return GetCompletions(source, cursorPos, out replaceStart, out replaceEnd);
-		}
+	//		return GetCompletions(source, cursorPos, out replaceStart, out replaceEnd);
+	//	}
 
-		public override string GetImportString(string scriptname)
-		{
-			string basename = Path.GetFileNameWithoutExtension(scriptname);
+	//	public override string GetImportString(string scriptname)
+	//	{
+	//		string basename = Path.GetFileNameWithoutExtension(scriptname);
 
-			return "require(\""+basename+"\")";
-		}
-	}
+	//		return "require(\""+basename+"\")";
+	//	}
+	//}
 }
