@@ -10,8 +10,9 @@ Autopilot (throttle and steering) for a ship (vehicle/vessel).
 - `rawRoll`: float - Raw roll control (rotation, -1..+1). NaN for releasing the control.
 - `direction`: [Vector](Vector.md) - Target direction vector. NaN/vector.none for releasing the control.
 - `heading`: double - Target heading [0..360]. NaN for releasing the control.
-- `pitch`: double - Target pitch/elevation [-180..+180]. Values outside -90..+90 flip heading.NaN for releasing the control.
-- `roll`: double - Target roll/bank [-180..+180].NaN for releasing the control.
+- `pitch`: double - Target pitch/elevation [-180..+180]. Values outside -90..+90 flip heading. NaN for releasing the control.
+- `roll`: double - Target roll/bank [-180..+180]. NaN for releasing the control.
+- `killRot`: bool - Fix the roll of the ship.
 
 **Instance Methods:**
 - `disable()`: void - Disable the autopilot, setting all values to NaN.
