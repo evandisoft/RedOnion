@@ -1,4 +1,6 @@
-﻿Create ui.Buttons. Pussibly, things executed in a button would only run when
+﻿(notes I made beforehand)
+
+Create ui.Buttons. Pussibly, things executed in a button would only run when
 parent thread is sleeping. Things executed in the buttons run on a different thread.
 
 Ideas:

@@ -1,4 +1,6 @@
-﻿1. make it so that processes can start other processes, and go into a sleep mode (or return a ExecStatus.FINISHED to the
+﻿(Mostly implemented)
+
+1. make it so that processes can start other processes, and go into a sleep mode (or return a ExecStatus.FINISHED to the
 OS to remove itself OS consideration), until they get a notification from the other processes.
 
 1. Use this to implement LiveRepl evaluate. Make LiveRepl create a process which waits for the executing process.

@@ -7,8 +7,8 @@ when calling IExecutable.Execute throws an exception.
 - This allows the code for the Core to be potentially very simple and independant, so
 it is easy to understand and relatively easy to test.
 
-- More functionality is going to be added, but in different `layers`, which will
-use the Core for the specific task of managing multiple things running at once.
+- More functionality is available in the ProcessLayer, which uses
+the Core for the specific task of managing multiple things running at once.
 
 - An additional plus of this is that anything that wants to run something on the
 core directly, without going through additional layers, can do that.

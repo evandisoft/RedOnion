@@ -33,8 +33,7 @@ after `ProtectedExecute` completes.
 ROSThread will also implement IsSleeping, but you can just return false and the thread will just be selected to run
 every update.
 
-Note: There is a Process ID, a Thread ID, and an ExecInfo ID. ExecInfo ID's are only for running threads and only
-used by the CoreExecMgr for killing threads. The ID in the runningThreads dictionary is the ExecInfo ID.
+Note: There is a Process ID, a Thread ID, and an ExecInfo ID. ExecInfo ID's only exist between the time a thread is registered to run in CoreExecMgr, and the time that thread finishes execution. They can be used with the CoreExecMgr to kill running threads. The ID in the runningThreads dictionary is the ExecInfo ID.
 
 I've decided that the Process and Threads will handle stats, so those are the ID's that will show up in any process
 manager window.

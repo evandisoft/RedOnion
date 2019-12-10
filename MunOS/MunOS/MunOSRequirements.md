@@ -1,4 +1,6 @@
-﻿Interface for an engine.
+﻿(some notes I made beforehand)
+
+Interface for an engine.
 
 should be able to run a script without connecting it to a ui 
     facilitate people using our scripting languages as a normal part of their mod.
