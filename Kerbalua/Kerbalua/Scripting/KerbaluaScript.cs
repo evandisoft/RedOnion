@@ -28,26 +28,13 @@ namespace Kerbalua.Scripting
 		private const int defaultExecLimit=1000;
 		private const int execLimitMin=100;
 		private const int execLimitMax=5000;
-		static KerbaluaScript _instance;
-		public static KerbaluaScript Instance
-		{
-			get
-			{
-				if (_instance==null)
-				{
-					throw new Exception("KerbaluaScript.Instance was not initialized!");
-				}
-				return _instance;
-			}
-		}
 
-		public static void Initialize()
-		{
-			_instance=new KerbaluaScript();
-		}
+		public readonly KerbaluaProcess kerbaluaProcess;
 
-		public KerbaluaScript() : base(CoreModules.Preset_Complete)
+		public KerbaluaScript(KerbaluaProcess kerbaluaProcess) : base(CoreModules.Preset_Complete)
 		{
+			this.kerbaluaProcess=kerbaluaProcess;
+
 			UserData.RegisterType<Button>(new LuaDescriptor(typeof(Button)));
 
 			UserData.RegistrationPolicy = InteropRegistrationPolicy.Automatic;
@@ -67,14 +54,13 @@ namespace Kerbalua.Scripting
 			GlobalOptions.CustomConverters
 				.SetScriptToClrCustomConversion(DataType.Function, typeof(Action<Button>), (f) =>
 				  {
+					  var currentProcess=MunThread.ExecutingThread?.parentProcess as KerbaluaProcess;
+					  if (currentProcess==null)
+					  {
+						  throw new Exception("Could not get current process in KerbaluaScript custom converter");
+					  }
 					  return new Action<Button>((button) =>
 					  {
-						  var currentProcess=MunThread.ExecutingThread?.parentProcess as KerbaluaProcess;
-						  if (currentProcess==null)
-						  {
-							  throw new Exception("Could not get current process in KerbaluaScript custom converter");
-						  }
-
 						  currentProcess.ExecuteFunctionInThread(ExecPriority.ONESHOT,f.Function);
 						  //var script=this;
 						  //var co = script.CreateCoroutine(f);
@@ -127,6 +113,8 @@ end
 		}
 
 
+
+
 		//DynValue dofile(string filename)
 		//{
 		//	return DoFile(Path.Combine(ProjectSettings.BaseScriptsDir, filename));
@@ -169,6 +157,7 @@ end
 		delegate Table Importer(string name);
 		DynValue coroutine;
 		Process process;
+
 
 		public bool Evaluate(out DynValue result)
 		{

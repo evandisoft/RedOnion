@@ -9,7 +9,7 @@ namespace MunOS.ProcessLayer
 {
 	public abstract class MunThread : IExecutable
 	{
-		static long nextID=0;
+		static long nextID=1;
 
 		/// <summary>
 		/// This will be used to time Executions.

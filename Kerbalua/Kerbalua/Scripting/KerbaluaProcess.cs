@@ -22,7 +22,7 @@ namespace Kerbalua.Scripting
 
 		void InternalResetEngine()
 		{
-			ScriptEngine=new KerbaluaScript();
+			ScriptEngine=new KerbaluaScript(this);
 			ScriptEngine.Options.DebugPrint = outputBuffer.AddOutput;
 			ScriptEngine.PrintErrorAction = outputBuffer.AddError;
 
