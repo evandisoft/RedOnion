@@ -85,6 +85,7 @@ namespace LiveRepl.Parts
 			if (newOutput)
 			{
 				ResetScroll();
+				SetChildRect();
 			}
 			//bool hadKeyDownThisUpdate=Event.current.type==EventType.KeyDown;
 			//if (outputBuffer.Length>0)
