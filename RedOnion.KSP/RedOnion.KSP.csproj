@@ -91,6 +91,8 @@
     <Compile Include="API\Node.cs" />
     <Compile Include="Namespaces\Types.cs" />
     <Compile Include="Parts\PartChildren.cs" />
+    <Compile Include="ROS\RosProcess.cs" />
+    <Compile Include="ROS\RosThread.cs" />
     <Compile Include="Utilities\InteropUtilities.cs" />
     <Compile Include="API\VectorUtils.cs" />
     <Compile Include="ROS\RosExecutor.cs" />

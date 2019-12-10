@@ -5,6 +5,7 @@ using Kerbalua.Scripting;
 using Kerbalui.Controls;
 using LiveRepl.Execution;
 using MunOS.ProcessLayer;
+using RedOnion.KSP.ROS;
 using RedOnion.KSP.Settings;
 using UnityEngine;
 
@@ -95,6 +96,10 @@ namespace LiveRepl
 
 		void InitEvaluation()
 		{
+			var rosProcess= new RosProcess();
+			engineProcesses["ROS"] = rosProcess;
+			ProcessManager.Instance.Processes.Add(rosProcess);
+
 			var kerbaluaProcess= new KerbaluaProcess();
 			engineProcesses["Lua"] = kerbaluaProcess;
 			ProcessManager.Instance.Processes.Add(kerbaluaProcess);
