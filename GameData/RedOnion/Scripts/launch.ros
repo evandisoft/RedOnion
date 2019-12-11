@@ -329,7 +329,7 @@ try
   print "Safe altitude:   " + safeAltitude
   until ship.altitude >= safeAltitude/2 and (
     ship.altitude >= safeAltitude and ship.apoapsis >= targetAltitude*.99
-    or ship.timeToAp > ship.timeToPe)
+    or ship.timeToAp > ship.timeToPe) // this is here until I find better way for weak orbital engines (TODO: use stage.burntime)
     wait
 
   ctlsub.remove()
