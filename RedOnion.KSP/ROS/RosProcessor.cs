@@ -1,11 +1,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Text;
 using Ionic.Zip;
+using MunOS.ProcessLayer;
 using RedOnion.KSP.API;
 using RedOnion.ROS;
 using RedOnion.ROS.Objects;
@@ -16,55 +16,10 @@ namespace RedOnion.KSP.ROS
 {
 	public class RosProcessor : Processor, IProcessor
 	{
-		protected MunOS.Process _process;
-		public MunOS.Process Process
-		{
-			get
-			{
-				if (_process == null)
-				{
-					_process = new MunOS.Process();
-					_process.shutdown += Terminate;
-				}
-				return _process;
-			}
-		}
-
 		protected override RedOnion.ROS.Objects.Globals GetGlobals()
 			=> new RosGlobals();
-		public override void Terminate()
-		{
-			if (_process != null)
-			{
-				_process.shutdown -= Terminate;
-				_process.terminate();
-				_process = null;
-			}
-			base.Terminate();
-		}
 		protected void ProcessorReset()
 			=> base.Reset();
-
-		public override bool Execute(int countdown = 1000)
-		{
-			MunOS.Process.current = Process;
-			var result = base.Execute(countdown);
-			MunOS.Process.current = null;
-			return result;
-		}
-		public override void UpdateGraphic()
-		{
-			MunOS.Process.current = Process;
-			base.UpdateGraphic();
-			MunOS.Process.current = null;
-		}
-		public override void UpdatePhysics()
-		{
-			MunOS.Process.current = Process;
-			base.UpdatePhysics();
-			_process.UpdatePhysics();
-			MunOS.Process.current = null;
-		}
 
 		public override void Log(string msg)
 			=> UE.Debug.Log("[RedOnion] " + msg);

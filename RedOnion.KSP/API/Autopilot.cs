@@ -173,7 +173,8 @@ namespace RedOnion.KSP.API
 				public override void reset()
 				{
 					base.reset();
-					R = 0.3;
+					I = 0.2;
+					R = 0.2;
 					D = 0.2;
 				}
 			}
