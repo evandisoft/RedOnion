@@ -112,7 +112,7 @@ namespace LiveRepl
 
 		public void Terminate()
 		{
-			MunLogger.Log("Scriptwindow terminate start");
+			//MunLogger.Log("Scriptwindow terminate start");
 			currentEngineProcess.Terminate();
 			//evaluationList.Clear();
 			//foreach (var replEvaluator in replEvaluators.Values)
@@ -120,7 +120,7 @@ namespace LiveRepl
 			//	replEvaluator.Terminate();
 			//}
 			currentEngineProcess.outputBuffer.AddError("Execution Manually Terminated");
-			MunLogger.Log("Scriptwindow terminate end");
+			//MunLogger.Log("Scriptwindow terminate end");
 		}
 
 		public void RunEditorScript()

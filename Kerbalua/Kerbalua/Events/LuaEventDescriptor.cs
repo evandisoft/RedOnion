@@ -202,7 +202,7 @@ namespace Kerbalua.Events
 
 		private void RegisterCallback(object o)
 		{
-			delegates.GetOrCreate(o, () =>
+			if (!delegates.ContainsKey(o))
 			{
 				Delegate d = CreateDelegate(o);
 #if NETFX_CORE
@@ -211,13 +211,18 @@ namespace Kerbalua.Events
 				Delegate handler = Delegate.CreateDelegate(EventInfo.EventHandlerType, d.Target, d.Method);
 #endif
 				m_Add.Invoke(o, new object[] { handler });
-				return handler;
-			});
+				delegates.Add(o,handler);
+			}
 		}
 
 		private void UnregisterCallback(object o)
 		{
-			Delegate handler = delegates.GetOrDefault(o);
+			Delegate handler = null;
+
+			if (delegates.ContainsKey(o))
+			{
+				handler=delegates[o];
+			}
 
 			if (handler == null)
 				throw new ScriptRuntimeException("can't unregister null delegate");
