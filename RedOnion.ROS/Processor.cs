@@ -225,11 +225,11 @@ namespace RedOnion.ROS
 		public int TimeoutPercent => (int)(100 * (1 - watch.Elapsed.TotalMilliseconds / UpdateTimeout.TotalMilliseconds));
 
 #if DEBUG
-		public double AverageMillis { get; set; }
-		public double AverageCount { get; set; }
-		public double PeakMillis { get; set; }
-		public double PeakCount { get; set; }
-		double _avgMillis, _avgCount, _peakMillis, _peakCount;
+		public double AvgMilli { get; set; }
+		public double AvgCount { get; set; }
+		public double MaxMilli { get; set; }
+		public double MaxCount { get; set; }
+		double _avgMilli, _avgCount, _peakMilli, _peakCount;
 		int _avgSamples;
 		bool _debug;
 		readonly Stopwatch secWatch = new Stopwatch();
@@ -354,9 +354,9 @@ namespace RedOnion.ROS
 
 #if DEBUG
 			var milli = watch.Elapsed.TotalMilliseconds;
-			_avgMillis += milli;
-			if (milli > _peakMillis)
-				_peakMillis = milli;
+			_avgMilli += milli;
+			if (milli > _peakMilli)
+				_peakMilli = milli;
 			var count = UpdateCountdown - TotalCountdown;
 			_avgCount += count;
 			if (count > _peakCount)
@@ -369,15 +369,15 @@ namespace RedOnion.ROS
 			if (secWatch.ElapsedMilliseconds >= 3333)
 			{
 				secWatch.Restart();
-				AverageMillis = _avgMillis / _avgSamples;
-				AverageCount = _avgCount / _avgSamples;
-				PeakMillis = _peakMillis;
-				PeakCount = _peakCount;
-				Value.DebugLog($"AVG: {AverageMillis,5:F2}ms {AverageCount,4:F2}i PEAK: {PeakMillis,5:F2}ms {PeakCount,4:F2}i");
-				_avgMillis = 0;
+				AvgMilli = _avgMilli / _avgSamples;
+				AvgCount = _avgCount / _avgSamples;
+				MaxMilli = _peakMilli;
+				MaxCount = _peakCount;
+				Value.DebugLog($"AVG: {AvgMilli,5:F2}ms {AvgCount,4:F2}i MAX: {MaxMilli,5:F2}ms {MaxCount,4:F2}i");
+				_avgMilli = 0;
 				_avgCount = 0;
 				_avgSamples = 0;
-				_peakMillis = 0;
+				_peakMilli = 0;
 				_peakCount = 0;
 				_debug = true;
 			}
