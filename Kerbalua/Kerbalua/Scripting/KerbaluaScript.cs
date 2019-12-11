@@ -9,7 +9,6 @@ using RedOnion.KSP.API;
 using RedOnion.KSP.MoonSharp.CommonAPI;
 using System.ComponentModel;
 using RedOnion.KSP.MoonSharp.MoonSharpAPI;
-using Process = RedOnion.KSP.MunOS.Process;
 using MoonSharp.Interpreter.Compatibility;
 using RedOnion.UI;
 using Kerbalua.Events;
@@ -174,11 +173,8 @@ end
 				}
 			}
 
-			Process.current = process;
 			coroutine.Coroutine.AutoYieldCounter = execlimit;
 			result = coroutine.Coroutine.Resume();
-			process.UpdatePhysics();
-			Process.current = null;
 
 			bool isComplete = false;
 			if (coroutine.Coroutine.State == CoroutineState.Dead)
@@ -199,25 +195,11 @@ end
 			DynValue mainFunction = base.DoString("return function () " + source + "\n end");
 
 			coroutine = CreateCoroutine(mainFunction);
-			if (process == null)
-			{
-				process = new Process();
-				process.shutdown += Terminate;
-			}
 		}
 
 		public void Terminate()
 		{
 			coroutine = null;
-
-			// If SetCoroutine has an error, it is caught in MoonSharpReplEvaluator, which
-			// calls Terminate, and this means that process could, in that situation be null.
-			if (process!=null) 
-			{
-				process.shutdown -= Terminate;
-				process.terminate();
-				process = null;
-			}
 			sleepwatch.Reset();
 			sleeptimeMillis=0;
 		}

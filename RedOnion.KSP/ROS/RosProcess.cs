@@ -37,6 +37,11 @@ namespace RedOnion.KSP.ROS
 			Processor.Reset();
 			suggest.Reset();
 		}
+		public override void Terminate()
+		{
+			Processor.Terminate();
+			base.Terminate();
+		}
 
 		RosSuggest suggest;
 		public override IList<string> GetDisplayableCompletions(string source, int cursorPos, out int replaceStart, out int replaceEnd)
