@@ -5,7 +5,7 @@ using System.Text;
 
 namespace RedOnion.KSP.Utilities
 {
-	internal static class Extensions
+	public static class Extensions
 	{
 		/// <summary>
 		/// Gets a value from the dictionary or returns the default value
