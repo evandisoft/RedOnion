@@ -7,7 +7,7 @@
     <ProjectGuid>{2D34D879-1A21-4F8F-BF49-38CED2B40406}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RedOnion.Common</RootNamespace>
+    <RootNamespace>RedOnion</RootNamespace>
     <AssemblyName>RedOnion.Common</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -40,6 +40,8 @@
     <Compile Include="Collections\ListCore.cs" />
     <Compile Include="Collections\GenQueue.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utilities\StringWrapper.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

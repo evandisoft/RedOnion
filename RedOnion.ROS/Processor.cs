@@ -223,14 +223,19 @@ namespace RedOnion.ROS
 		public int TotalCountdown { get; protected set; }
 		public int CountdownPercent => 100 * TotalCountdown / UpdateCountdown;
 		public int TimeoutPercent => (int)(100 * (1 - watch.Elapsed.TotalMilliseconds / UpdateTimeout.TotalMilliseconds));
+
+#if DEBUG
 		public double AverageMillis { get; set; }
 		public double AverageCount { get; set; }
 		public double PeakMillis { get; set; }
 		public double PeakCount { get; set; }
-		double _peakMillis, _peakCount;
+		double _avgMillis, _avgCount, _peakMillis, _peakCount;
+		int _avgSamples;
+		bool _debug;
+		readonly Stopwatch secWatch = new Stopwatch();
+#endif
 
 		readonly Stopwatch watch = new Stopwatch();
-		readonly Stopwatch secWatch = new Stopwatch();
 		int onceSkipped, idleSkipped;
 
 		public virtual void UpdateGraphic()
@@ -347,34 +352,36 @@ namespace RedOnion.ROS
 			// watch
 			watch.Stop();
 
+#if DEBUG
 			var milli = watch.Elapsed.TotalMilliseconds;
-			if (AverageMillis <= 0)
-				AverageMillis = milli;
-			else AverageMillis = (AverageMillis * 9 + milli) * 0.1;
+			_avgMillis += milli;
 			if (milli > _peakMillis)
 				_peakMillis = milli;
 			var count = UpdateCountdown - TotalCountdown;
-			if (AverageCount <= 0)
-				AverageCount = count;
-			else AverageCount = (AverageCount * 9 + count) * 0.1;
+			_avgCount += count;
 			if (count > _peakCount)
 				_peakCount = count;
+			_avgSamples++;
 
 			if (!secWatch.IsRunning)
-			{
 				secWatch.Start();
-				_peakMillis = 0;
-				_peakCount = 0;
-			}
+			_debug = false;
 			if (secWatch.ElapsedMilliseconds >= 3333)
 			{
 				secWatch.Restart();
-				Value.DebugLog("AVG: {0,5:F2}ms {1,4:F2}i PEAK: {2,5:F2}ms {3,4:F2}i", AverageMillis, AverageCount, PeakMillis, PeakCount);
-				PeakMillis = 0.5 * (PeakMillis + _peakMillis);
-				PeakCount = 0.5 * (PeakCount + _peakCount);
+				AverageMillis = _avgMillis / _avgSamples;
+				AverageCount = _avgCount / _avgSamples;
+				PeakMillis = _peakMillis;
+				PeakCount = _peakCount;
+				Value.DebugLog($"AVG: {AverageMillis,5:F2}ms {AverageCount,4:F2}i PEAK: {PeakMillis,5:F2}ms {PeakCount,4:F2}i");
+				_avgMillis = 0;
+				_avgCount = 0;
+				_avgSamples = 0;
 				_peakMillis = 0;
 				_peakCount = 0;
+				_debug = true;
 			}
+#endif
 		}
 		private bool Call(Event.Subscription e, Event loop, int downtoPercent)
 		{
@@ -390,6 +397,9 @@ namespace RedOnion.ROS
 					do
 					{
 						var countdown = Math.Min(StepCountdown, TotalCountdown);
+#if DEBUG
+						if (_debug) Value.DebugLog($"{loop.name}: {countdown}/{TotalCountdown} {CountdownPercent}/{UpdatePercent}/{downtoPercent}");
+#endif
 						if (e.Core == null)
 						{
 							e.Core = new Core(this);
@@ -398,9 +408,12 @@ namespace RedOnion.ROS
 							e.Core.Execute(fn, countdown);
 						}
 						else e.Core.Execute(countdown);
-						TotalCountdown -= (countdown - Countdown);
+						TotalCountdown -= (countdown - e.Core.Countdown);
 					} while (e.Core.Exit == ExitCode.Countdown
 					&& CountdownPercent > downtoPercent && UpdatePercent > downtoPercent);
+#if DEBUG
+					if (_debug) Value.DebugLog($"{loop.name}: {e.Core.Exit} {TotalCountdown} {CountdownPercent}/{UpdatePercent}/{downtoPercent}");
+#endif
 					if (!e.Core.Paused)
 					{
 						// TODO: pool
