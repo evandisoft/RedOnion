@@ -23,7 +23,7 @@ var evan = false // use ksp.flightControl
 var cust = false // use autopilot.rawXXX with script-controlled PIDs
 def gui
   var selected = 0
-  var wnd = new ui.window "Launch " + ship.name
+  var wnd = new ui.window false, "Launch " + ship.name
   try // try..finally wnd.dispose
     var lblWidth = 120
     var boxWidth = 60
@@ -87,6 +87,7 @@ def gui
     brow.addButton("Launch",  def => selected = 3).flexWidth = 1
     
   //wait until user selects what to do (or closes the window)
+    wnd.show
     while selected == 0
       wait
     
@@ -326,7 +327,9 @@ var steers = customSteering == null ? null :
 try
   print "Target apoapsis: " + targetAltitude
   print "Safe altitude:   " + safeAltitude
-  until ship.altitude >= safeAltitude and ship.apoapsis >= targetAltitude*.99
+  until ship.altitude >= safeAltitude/2 and (
+    ship.altitude >= safeAltitude and ship.apoapsis >= targetAltitude*.99
+    or ship.timeToAp > ship.timeToPe)
     wait
 
   ctlsub.remove()

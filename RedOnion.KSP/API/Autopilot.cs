@@ -168,16 +168,15 @@ namespace RedOnion.KSP.API
 				time = 3.0;
 				angular = 10.0;
 			}
-			/*
 			internal class Roll : PidParams
 			{
 				public override void reset()
 				{
 					base.reset();
-					scale = 0.5;
+					R = 0.3;
+					D = 0.2;
 				}
 			}
-			*/
 		}
 		public class PID : API.PID<PidParams>
 		{
