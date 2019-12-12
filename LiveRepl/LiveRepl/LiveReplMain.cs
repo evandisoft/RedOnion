@@ -82,8 +82,8 @@ namespace LiveRepl
 			if (!highResolution) return;
 
 			scriptWindow?.FixedUpdate();
-			CoreExecMgr.Instance.FixedUpdate();
 			ProcessManager.Instance.FixedUpdate();
+			CoreExecMgr.Instance.FixedUpdate();
 		}
 
 		void OnGUI()

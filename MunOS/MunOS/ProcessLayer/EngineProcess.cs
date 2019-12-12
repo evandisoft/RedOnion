@@ -29,7 +29,7 @@ namespace MunOS.ProcessLayer
 		/// <param name="source">The source string to be evaluated.</param>
 		/// <param name="path">Script path or null for repl.</param>
 		/// <param name="withHistory">True if this source should be added to the history.</param>
-		public void ExecuteSource(ExecPriority priority, string source, string path = null, bool withHistory = false)
+		public void ExecuteSourceInRepl(ExecPriority priority, string source, string path = null, bool withHistory = false)
 		{
 			if (withHistory)
 			{
@@ -46,11 +46,11 @@ namespace MunOS.ProcessLayer
 				currentHistoryItem = null;
 			}
 
-			ExecuteSourceInThread(priority, source, path);
+			ExecuteSourceInReplThread(priority, source, path);
 		}
 
-		protected abstract void ExecuteSourceInThread(ExecPriority priority, string source, string path);
-
+		protected abstract void ExecuteSourceInReplThread(ExecPriority priority, string source, string path);
+		public abstract void ExecuteSourceInThread(ExecPriority priority, string source, string path);
 
 		public string GetCurrentHistoryItem()
 		{

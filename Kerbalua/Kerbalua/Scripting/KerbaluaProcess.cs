@@ -66,7 +66,7 @@ namespace Kerbalua.Scripting
 			try
 			{
 				var thread=new KerbaluaThread(closure,this);
-				ExecuteThread(priority, thread);
+				EnqueueThread(priority, thread);
 			}
 			catch (Exception e)
 			{
@@ -74,14 +74,27 @@ namespace Kerbalua.Scripting
 			}
 		}
 
-		protected override void ExecuteSourceInThread(ExecPriority priority, string source, string path)
+		protected override void ExecuteSourceInReplThread(ExecPriority priority, string source, string path)
 		{
 			try
 			{
 				var thread=new KerbaluaReplThread(source,path,this);
-				ExecuteThread(priority, thread);
+				EnqueueThread(priority, thread);
 			}
 			catch(Exception e)
+			{
+				outputBuffer.AddError(e.Message);
+			}
+		}
+
+		public override void ExecuteSourceInThread(ExecPriority priority, string source, string path)
+		{
+			try
+			{
+				var thread=new KerbaluaThread(source,path,this);
+				EnqueueThread(priority, thread);
+			}
+			catch (Exception e)
 			{
 				outputBuffer.AddError(e.Message);
 			}
@@ -92,5 +105,7 @@ namespace Kerbalua.Scripting
 			base.ResetEngine();
 			InternalResetEngine();
 		}
+
+
 	}
 }

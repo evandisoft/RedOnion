@@ -7,6 +7,18 @@ using static RedOnion.Debugging.QueueLogger;
 
 namespace MunOS.ProcessLayer
 {
+	public struct MunThreadEntry
+	{
+		public ExecPriority priority;
+		public MunThread thread;
+
+		public MunThreadEntry(ExecPriority priority, MunThread thread)
+		{
+			this.priority=priority;
+			this.thread=thread;
+		}
+	}
+
 	/// <summary>
 	/// A <see cref="MunProcess"/> manages a number of <see cref="MunThread"/>s. It has a list of running threads and
 	/// receives notice from a <see cref="MunThread"/> any time it completes execution, whereby the <see cref="MunProcess"/>
@@ -25,6 +37,7 @@ namespace MunOS.ProcessLayer
 		{
 		}
 
+
 		public readonly ProcessOutputBuffer outputBuffer=new ProcessOutputBuffer();
 		/// <summary>
 		/// A mapping of running threads to <see cref="ExecInfo"/> ID's. Distinct from a thread ID.
@@ -37,14 +50,35 @@ namespace MunOS.ProcessLayer
 		/// </summary>
 		protected Dictionary<MunThread,long> runningThreads=new Dictionary<MunThread,long>();
 
+		/// <summary>
+		/// Where threads wait to be ran next update (if we are not currently processing init threads)
+		/// </summary>
+		protected Queue<MunThreadEntry> waitingThreads=new Queue<MunThreadEntry>();
+
+		/// <summary>
+		/// Where threads wait in a queue to be executed one by one to initialize the process.
+		/// </summary>
+		protected Queue<MunThread> initThreads=new Queue<MunThread>();
+
+		public int TotalThreadCount => runningThreads.Count+waitingThreads.Count+initThreads.Count;
 		public int RunningThreadsCount => runningThreads.Count;
 
-		public long ExecuteThread(ExecPriority priority, MunThread thread)
+		/// <summary>
+		/// Adds a  thread into the <see cref="waitingThreads"/> queue. This thread will be sent to the
+		/// Core next update if no init threads are still running.
+		/// </summary>
+		/// <param name="priority">Priority.</param>
+		/// <param name="thread">Thread.</param>
+		public void EnqueueThread(ExecPriority priority, MunThread thread)
 		{
-			long RunningExecutableID=CoreExecMgr.Instance.RegisterExecutable(priority, thread);
-			runningThreads[thread]=RunningExecutableID;
-			thread.ExecutionComplete+=MunProcessThreadExecutionComplete;
-			return RunningExecutableID;
+			waitingThreads.Enqueue(new MunThreadEntry(priority, thread));
+		}
+
+		void ExecuteThread(MunThreadEntry threadEntry)
+		{
+			long RunningExecutableID=CoreExecMgr.Instance.RegisterExecutable(threadEntry.priority, threadEntry.thread);
+			runningThreads[threadEntry.thread]=RunningExecutableID;
+			threadEntry.thread.ExecutionComplete+=MunProcessThreadExecutionComplete;
 		}
 
 		void MunProcessThreadExecutionComplete(MunThread thread,Exception e)
@@ -80,6 +114,17 @@ namespace MunOS.ProcessLayer
 
 		public virtual void FixedUpdate()
 		{
+			if (initThreads.Count ==0)
+			{
+				// If there are no initThreads, send all the waitingThreads into
+				// the Core.
+				foreach(var waitingThreadEntry in waitingThreads)
+				{
+					ExecuteThread(waitingThreadEntry);
+				}
+				waitingThreads.Clear();
+			}
+
 			var physics = physicsUpdate;
 			if (physics != null)
 			{
