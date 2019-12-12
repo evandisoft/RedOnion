@@ -168,16 +168,6 @@ namespace RedOnion.KSP.API
 				time = 3.0;
 				angular = 10.0;
 			}
-			internal class Roll : PidParams
-			{
-				public override void reset()
-				{
-					base.reset();
-					I = 0.2;
-					R = 0.2;
-					D = 0.2;
-				}
-			}
 		}
 		public class PID : API.PID<PidParams>
 		{
@@ -209,7 +199,7 @@ namespace RedOnion.KSP.API
 
 			protected internal PID _pitch = new PID();
 			protected internal PID _yaw = new PID();
-			protected internal PID _roll = new PID(/*new PidParams.Roll()*/);
+			protected internal PID _roll = new PID();
 
 			public PidParams pitch => _pitch.param;
 			public PidParams yaw => _yaw.param;
