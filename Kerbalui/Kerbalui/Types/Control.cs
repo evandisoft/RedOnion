@@ -27,7 +27,7 @@ namespace Kerbalui.Types
 		/// </summary>
 		public void GrabFocus()
 		{
-			UILogger.Log("Control ", ControlName, "is grabbing focus");
+			UILogger.DebugLogArray("Control ", ControlName, "is grabbing focus");
 			GUI.FocusControl(ControlName);
 		}
 

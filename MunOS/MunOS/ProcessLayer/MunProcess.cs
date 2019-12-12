@@ -92,7 +92,7 @@ namespace MunOS.ProcessLayer
 					catch (Exception ex)
 					{
 						physicsUpdate -= handler;
-						MunLogger.Log($"Exception in process #{ID} physics update: {ex.Message}");
+						MunLogger.DebugLogArray($"Exception in process #{ID} physics update: {ex.Message}");
 					}
 				}
 			}
@@ -117,7 +117,7 @@ namespace MunOS.ProcessLayer
 					catch (Exception ex)
 					{
 						physicsUpdate -= handler;
-						MunLogger.Log($"Exception in process #{ID} graphics update: {ex.Message}");
+						MunLogger.DebugLogArray($"Exception in process #{ID} graphics update: {ex.Message}");
 					}
 				}
 			}
@@ -134,7 +134,7 @@ namespace MunOS.ProcessLayer
 		{
 			// first notify all subscribers that this process is shutting down
 			var shutdown = this.shutdown;
-			MunLogger.Log($"Process ID#{ID} terminating. (shutdown: {shutdown?.GetInvocationList().Length ?? 0})");
+			MunLogger.DebugLogArray($"Process ID#{ID} terminating. (shutdown: {shutdown?.GetInvocationList().Length ?? 0})");
 			if (shutdown != null)
 			{
 				this.shutdown = null;
@@ -146,7 +146,7 @@ namespace MunOS.ProcessLayer
 					}
 					catch (Exception ex)
 					{
-						MunLogger.Log($"Exception in process #{ID} shutdown: {ex.Message}");
+						MunLogger.DebugLogArray($"Exception in process #{ID} shutdown: {ex.Message}");
 					}
 				}
 			}
@@ -154,13 +154,13 @@ namespace MunOS.ProcessLayer
 			// each thread will be removed from the list immediatly after
 			// being killed.
 			var ids=runningThreads.Values.ToList();
-			MunLogger.Log($"Process ID#{ID} terminating {ids.Count} thread(s).");
+			MunLogger.DebugLogArray($"Process ID#{ID} terminating {ids.Count} thread(s).");
 			foreach (var id in ids)
 			{
 				CoreExecMgr.Instance.Kill(id);
 			}
 
-			MunLogger.Log($"Process ID#{ID} terminated.");
+			MunLogger.DebugLogArray($"Process ID#{ID} terminated.");
 		}
 
 		/// <summary>
@@ -200,7 +200,7 @@ namespace MunOS.ProcessLayer
 				_target = new WeakReference<T>(target);
 				process = MunThread.ExecutingThread.parentProcess;
 				process.shutdown += Shutdown;
-				MunLogger.Log($"ShutdownHook for process ID#{process.ID} created.");
+				MunLogger.DebugLogArray($"ShutdownHook for process ID#{process.ID} created.");
 			}
 			~ShutdownHook() => Dispose(false);
 			public void Dispose()
@@ -221,7 +221,7 @@ namespace MunOS.ProcessLayer
 			{
 				var target = Target;
 				var tgtstr = target == null ? "target is null" : "disposing target";
-				MunLogger.Log($"ShutdownHook invoked for process ID#{process.ID}, {tgtstr}.");
+				MunLogger.DebugLogArray($"ShutdownHook invoked for process ID#{process.ID}, {tgtstr}.");
 				target?.Dispose();
 				Dispose();
 			}
