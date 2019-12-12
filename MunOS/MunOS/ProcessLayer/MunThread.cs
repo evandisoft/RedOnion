@@ -107,7 +107,7 @@ namespace MunOS.ProcessLayer
 		}
 		public void OnTerminated()
 		{
-			MunLogger.Log("ex complete is null?"+(ExecutionComplete==null));
+			MunLogger.DebugLogArray("ex complete is null?"+(ExecutionComplete==null));
 			ExecutionComplete.Invoke(this,null);
 		}
 

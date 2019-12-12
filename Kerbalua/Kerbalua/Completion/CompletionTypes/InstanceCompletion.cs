@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using MoonSharp.Interpreter;
@@ -48,7 +48,7 @@ namespace Kerbalua.Completion.CompletionTypes
 
 			Type type=obj.GetType();
 			var getMember = operations.Current as GetMemberOperation;
-			Complogger.Log("type is "+type+", member name is "+getMember.Name);
+			Complogger.DebugLog($"type is {type}, member name is {getMember.Name}");
 			if (CompletionReflectionUtil.TryGetField(type, getMember.Name, out FieldInfo fieldInfo, CompletionReflectionUtil.AllPublic))
 			{
 				if (fieldInfo.GetCustomAttribute<MoonSharpHiddenAttribute>()!=null)
@@ -65,7 +65,7 @@ namespace Kerbalua.Completion.CompletionTypes
 					return true;
 				}
 				completionObject=GetCompletionObject(fieldObj);
-				Complogger.Log("instance field access");
+				Complogger.DebugLog("instance field access");
 				operations.MoveNext();
 				return true;
 			}
@@ -87,7 +87,7 @@ namespace Kerbalua.Completion.CompletionTypes
 						return true;
 					}
 					completionObject=GetCompletionObject(propObj);
-					Complogger.Log("instance safe property access");
+					Complogger.DebugLog("instance safe property access");
 					operations.MoveNext();
 					return true;
 				}
