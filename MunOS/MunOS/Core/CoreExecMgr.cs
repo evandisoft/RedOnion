@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using MunOS.Core.Executors;
-using static MunOS.Debugging.QueueLogger;
+using static RedOnion.Debugging.QueueLogger;
 
 namespace MunOS.Core
 {

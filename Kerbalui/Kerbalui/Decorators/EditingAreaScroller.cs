@@ -5,7 +5,7 @@ using Kerbalui.Interfaces;
 using Kerbalui.Types;
 using Kerbalui.Util;
 using UnityEngine;
-using static MunOS.Debugging.QueueLogger;
+using static RedOnion.Debugging.QueueLogger;
 
 namespace Kerbalui.Decorators
 {

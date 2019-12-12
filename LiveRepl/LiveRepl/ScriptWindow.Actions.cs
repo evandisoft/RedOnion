@@ -1,10 +1,10 @@
-using System;
+﻿using System;
 using System.IO;
 using LiveRepl.Execution;
 using MunOS.Core;
 using RedOnion.KSP.API;
 using UnityEngine;
-using static MunOS.Debugging.QueueLogger;
+using static RedOnion.Debugging.QueueLogger;
 
 namespace LiveRepl
 {

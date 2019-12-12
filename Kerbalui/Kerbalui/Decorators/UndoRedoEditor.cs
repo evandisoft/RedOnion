@@ -4,7 +4,7 @@ using Kerbalui.EditingChanges;
 using Kerbalui.EventHandling;
 using UnityEngine;
 
-using static MunOS.Debugging.QueueLogger;
+using static RedOnion.Debugging.QueueLogger;
 
 namespace Kerbalui.Decorators
 {

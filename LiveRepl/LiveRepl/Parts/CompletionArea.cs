@@ -7,7 +7,7 @@ using Kerbalui.EventHandling;
 using Kerbalui.Util;
 using LiveRepl.Interfaces;
 using UnityEngine;
-using static MunOS.Debugging.QueueLogger;
+using static RedOnion.Debugging.QueueLogger;
 
 namespace LiveRepl.Parts
 {

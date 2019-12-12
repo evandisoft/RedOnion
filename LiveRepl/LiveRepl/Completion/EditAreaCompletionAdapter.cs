@@ -1,10 +1,10 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Kerbalui.Decorators;
 using Kerbalui.EditingChanges;
 using Kerbalui.Interfaces;
 using LiveRepl.Interfaces;
-using static MunOS.Debugging.QueueLogger;
+using static RedOnion.Debugging.QueueLogger;
 
 namespace LiveRepl.Completion {
 	/// <summary>

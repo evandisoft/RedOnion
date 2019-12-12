@@ -1,9 +1,9 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using MoonSharp.Interpreter;
 using RedOnion.KSP.Completion;
 using RedOnion.KSP.MoonSharp.Interfaces;
-using static MunOS.Debugging.QueueLogger;
+using static RedOnion.Debugging.QueueLogger;
 
 namespace Kerbalua.Completion.CompletionTypes
 {

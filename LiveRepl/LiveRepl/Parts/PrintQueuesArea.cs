@@ -1,7 +1,7 @@
 ﻿using System;
 using Kerbalui.Controls;
 using Kerbalui.Layout;
-using MunOS.Debugging;
+using RedOnion.Debugging;
 using RedOnion.KSP.Settings;
 
 namespace LiveRepl.Parts

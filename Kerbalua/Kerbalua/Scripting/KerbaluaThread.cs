@@ -1,10 +1,10 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using Kerbalua.Parsing;
 using MoonSharp.Interpreter;
 using MunOS.Core;
 using MunOS.ProcessLayer;
-using static MunOS.Debugging.QueueLogger;
+using static RedOnion.Debugging.QueueLogger;
 
 namespace Kerbalua.Scripting
 {

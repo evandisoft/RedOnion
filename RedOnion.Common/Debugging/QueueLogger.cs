@@ -7,7 +7,7 @@ using System.Diagnostics;
 using System.Globalization;
 using RedOnion.Utilities;
 
-namespace MunOS.Debugging
+namespace RedOnion.Debugging
 {
 	/// <summary>
 	/// For now, this is disabled when project is not built in debug mode.

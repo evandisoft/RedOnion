@@ -4,7 +4,7 @@ using Kerbalui.EditingChanges;
 using Kerbalui.EventHandling;
 using Kerbalui.Types;
 using Kerbalui.Util;
-using MunOS.Debugging;
+using RedOnion.Debugging;
 using UnityEngine;
 
 namespace Kerbalui.Decorators

@@ -57,7 +57,6 @@
     <Compile Include="MunOS\ProcessLayer\EngineProcess.cs" />
     <Compile Include="MunOS\ProcessLayer\EngineThread.cs" />
     <Compile Include="MunOS\ProcessLayer\ProcessManager.cs" />
-    <Compile Include="MunOS\Debugging\QueueLogger.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
