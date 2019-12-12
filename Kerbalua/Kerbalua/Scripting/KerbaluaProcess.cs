@@ -78,7 +78,7 @@ namespace Kerbalua.Scripting
 		{
 			try
 			{
-				var thread=new KerbaluaThread(source,path,this);
+				var thread=new KerbaluaReplThread(source,path,this);
 				ExecuteThread(priority, thread);
 			}
 			catch(Exception e)

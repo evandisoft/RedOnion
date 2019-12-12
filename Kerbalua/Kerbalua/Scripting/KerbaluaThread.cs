@@ -3,7 +3,6 @@ using System.Diagnostics;
 using Kerbalua.Parsing;
 using MoonSharp.Interpreter;
 using MunOS.Core;
-using MunOS.Core.Executors;
 using MunOS.ProcessLayer;
 using static MunOS.Debugging.QueueLogger;
 
@@ -14,6 +13,8 @@ namespace Kerbalua.Scripting
 		public KerbaluaProcess ScriptProcess => parentProcess as KerbaluaProcess;
 		KerbaluaScript ScriptEngine => ScriptProcess.ScriptEngine;
 		DynValue coroutine;
+
+		public DynValue ReturnValue { get; private set; }
 
 		/// <summary>
 		/// This can throw an errorif the script syntax is incorrect.
@@ -89,8 +90,7 @@ namespace Kerbalua.Scripting
 
 			if (state == CoroutineState.Dead)
 			{
-				string retvalString=GetOutputString(retval);
-				parentProcess.outputBuffer.AddReturnValue(retvalString);
+				ReturnValue=retval;
 				return ExecStatus.FINISHED;
 			}
 			if (state == CoroutineState.ForceSuspended)

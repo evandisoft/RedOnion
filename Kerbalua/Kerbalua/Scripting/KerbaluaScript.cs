@@ -105,26 +105,6 @@ end
 			commonAPI["sleep"] = yield;
 		}
 
-
-
-
-		//DynValue dofile(string filename)
-		//{
-		//	return DoFile(Path.Combine(ProjectSettings.BaseScriptsDir, filename));
-		//}
-
-		//delegate object newdel(object obj, params DynValue[] args);
-		//object @new(object typeStaticOrObject, params DynValue[] args)
-		//{
-		//	Type type=typeStaticOrObject as Type;
-		//	if (type==null)
-		//	{
-		//		type=typeStaticOrObject.GetType();
-		//	}
-
-
-		//}
-
 		public void setexeclimit(double counterlimit)
 		{
 			try

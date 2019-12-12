@@ -113,6 +113,7 @@
     <Compile Include="Kerbalua\Completion\CompletionTypes\EnumCompletion.cs" />
     <Compile Include="Kerbalua\Scripting\KerbaluaProcess.cs" />
     <Compile Include="Kerbalua\Scripting\KerbaluaThread.cs" />
+    <Compile Include="Kerbalua\Scripting\KerbaluaReplThread.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

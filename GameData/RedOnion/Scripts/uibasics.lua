@@ -6,7 +6,7 @@ function addbutton(text)
     window.Add(new(ui.Button,text,function() print(text) end))
 end
 b=new(ui.Button,"blah")
-b.click.Add(function()print("blah")end)
+b.click.Add(function() while true do print("blah") end end)
 window.Add(b)
 addbutton("button1")
 addbutton("button2")
