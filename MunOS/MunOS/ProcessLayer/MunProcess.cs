@@ -18,6 +18,7 @@ namespace MunOS.ProcessLayer
 	{
 		static long nextID=1;
 		public readonly long ID=nextID++;
+		public static long CurrentID => MunThread.ExecutingThread?.parentProcess?.ID ?? 0;
 
 		public string Name { get; set; } = "";
 		protected MunProcess()
@@ -131,10 +132,9 @@ namespace MunOS.ProcessLayer
 
 		public virtual void Terminate()
 		{
-			//MunLogger.Log("Before munprocess terminate");
-
 			// first notify all subscribers that this process is shutting down
 			var shutdown = this.shutdown;
+			MunLogger.Log($"Process ID#{ID} terminating. (shutdown: {shutdown?.GetInvocationList().Length ?? 0})");
 			if (shutdown != null)
 			{
 				this.shutdown = null;
@@ -154,12 +154,13 @@ namespace MunOS.ProcessLayer
 			// each thread will be removed from the list immediatly after
 			// being killed.
 			var ids=runningThreads.Values.ToList();
-			foreach(var id in ids)
+			MunLogger.Log($"Process ID#{ID} terminating {ids.Count} thread(s).");
+			foreach (var id in ids)
 			{
 				CoreExecMgr.Instance.Kill(id);
 			}
 
-			//MunLogger.Log("after munprocess terminate");
+			MunLogger.Log($"Process ID#{ID} terminated.");
 		}
 
 		/// <summary>
@@ -199,6 +200,7 @@ namespace MunOS.ProcessLayer
 				_target = new WeakReference<T>(target);
 				process = MunThread.ExecutingThread.parentProcess;
 				process.shutdown += Shutdown;
+				MunLogger.Log($"ShutdownHook for process ID#{process.ID} created.");
 			}
 			~ShutdownHook() => Dispose(false);
 			public void Dispose()
@@ -217,7 +219,10 @@ namespace MunOS.ProcessLayer
 			}
 			protected virtual void Shutdown()
 			{
-				Target?.Dispose();
+				var target = Target;
+				var tgtstr = target == null ? "target is null" : "disposing target";
+				MunLogger.Log($"ShutdownHook invoked for process ID#{process.ID}, {tgtstr}.");
+				target?.Dispose();
 				Dispose();
 			}
 		}

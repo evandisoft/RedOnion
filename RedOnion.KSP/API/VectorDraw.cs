@@ -55,7 +55,7 @@ namespace RedOnion.KSP.API
 			public Draw()
 			{
 				id = ++id_counter;
-				Value.DebugLog("Creating new VectorDraw #{0} in process #{1}", id, MunThread.ExecutingThread.parentProcess.ID);
+				Value.DebugLog("Creating new VectorDraw #{0} in process #{1}", id, MunProcess.CurrentID);
 				_hooks = new Hooks(this);
 			}
 
@@ -66,7 +66,7 @@ namespace RedOnion.KSP.API
 				if (_hooks != null)
 				{
 					Value.DebugLog("Disposing VectorDraw #{0} in process #{1} (original: #{2}, dispose: {3})",
-						id, MunThread.ExecutingThread.parentProcess.ID, _hooks?.process.ID ?? 0, disposing);
+						id, MunProcess.CurrentID, _hooks?.process.ID ?? 0, disposing);
 					var hooks = _hooks;
 					_hooks = null;
 					hooks.Dispose();

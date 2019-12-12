@@ -1,5 +1,6 @@
 using MunOS.Core;
 using MunOS.ProcessLayer;
+using RedOnion.ROS;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -39,6 +40,7 @@ namespace RedOnion.KSP.ROS
 		}
 		public override void Terminate()
 		{
+			Value.DebugLog($"ROS Process ID#{ID} terminated. (shutdown: {shutdown?.GetInvocationList().Length ?? 0})");
 			Processor.Terminate();
 			base.Terminate();
 		}

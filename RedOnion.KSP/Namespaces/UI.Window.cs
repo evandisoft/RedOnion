@@ -21,7 +21,7 @@ namespace RedOnion.KSP
 		public UI_Window(string title, UI.Layout layout = UI.Layout.Vertical, bool visible = true) : base(layout, visible)
 		{
 			id = ++id_counter;
-			Value.DebugLog("Creating new UI.Window #{0} in process #{1}", id, MunThread.ExecutingThread.parentProcess.ID);
+			Value.DebugLog("Creating new UI.Window #{0} in process #{1}", id, MunProcess.CurrentID);
 			_hooks = new MunProcess.ShutdownHook(this);
 			if (title != null)
 				Title = title;
@@ -34,7 +34,7 @@ namespace RedOnion.KSP
 			if (_hooks != null)
 			{
 				Value.DebugLog("Disposing UI.Window #{0} in process #{1} (original: #{2}, dispose: {3})",
-					id, MunThread.ExecutingThread.parentProcess.ID, _hooks?.process.ID ?? 0, disposing);
+					id, MunProcess.CurrentID, _hooks?.process.ID ?? 0, disposing);
 				var hooks = _hooks;
 				_hooks = null;
 				hooks.Dispose();
