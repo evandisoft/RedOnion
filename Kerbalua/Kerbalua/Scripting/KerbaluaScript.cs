@@ -149,7 +149,7 @@ end
 		Stopwatch sleepwatch=new Stopwatch();
 		delegate Table Importer(string name);
 		DynValue coroutine;
-		Process process;
+		//Process process;
 
 
 		public bool Evaluate(out DynValue result)
