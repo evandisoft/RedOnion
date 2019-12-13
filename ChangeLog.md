@@ -7,11 +7,9 @@
 - Provide editors that can be used for editing files in contexts unrelated to our scripting engines.
 - More UI library features.
 
-## 0.5.0:
-- Working on some sort of system for running multiple scripts at a time. May not initially have a UI that can provide this feature to the user in full. That will probably come later.
-
 # Next Release
-Just had a release (0.4.8)
+## 0.5.0:
+- Working on a system for running multiple scripts at a time. May not initially have a UI that can provide this feature to the user in full, but it is an improvement of the underlying execution system, and gives us a better base to work on. Over the course of 0.5.X we will be adding more and more features related to running, and managing multiple scripts at a time, including a user-facing api, as well as an api for other modders to run scripts from their mod if they wish.
 
 # Current
 # 0.4
