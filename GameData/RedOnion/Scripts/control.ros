@@ -176,6 +176,10 @@ def control ship, target, x, y
     if !stage.ready
       return
     if stage.pending
+    //not using that in this script
+      return
+    if ship.engines.count == 0
+    //no point in staging if there is no engine
       return
     var nextDecoupler = ship.parts.nextDecoupler
     if nextDecoupler == null
