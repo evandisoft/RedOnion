@@ -37,7 +37,6 @@ namespace MunOS.ProcessLayer
 		{
 		}
 
-
 		public readonly ProcessOutputBuffer outputBuffer=new ProcessOutputBuffer();
 		/// <summary>
 		/// A mapping of running threads to <see cref="ExecInfo"/> ID's. Distinct from a thread ID.
@@ -51,7 +50,7 @@ namespace MunOS.ProcessLayer
 		protected Dictionary<MunThread,long> runningThreads=new Dictionary<MunThread,long>();
 
 		/// <summary>
-		/// Where threads wait to be ran next update (if we are not currently processing init threads)
+		/// Where threads wait to be ran next update if the initQueue is empty.
 		/// </summary>
 		protected Queue<MunThreadEntry> waitingThreads=new Queue<MunThreadEntry>();
 
@@ -101,7 +100,7 @@ namespace MunOS.ProcessLayer
 				{
 					outputBuffer.AddError("Error during init for thread "+thread);
 					outputBuffer.AddError(e.Message);
-					outputBuffer.AddError("Calling Terminate on Process.");
+					outputBuffer.AddError("Calling Terminate on Process "+this);
 					Terminate();
 					return;
 				}
@@ -113,7 +112,7 @@ namespace MunOS.ProcessLayer
 			{
 				outputBuffer.AddError("Error during init for thread "+thread);
 				outputBuffer.AddError("Completed thread was not the current init thread");
-				outputBuffer.AddError("Calling Terminate on Process.");
+				outputBuffer.AddError("Calling Terminate on Process "+this);
 				Terminate();
 				return;
 			}

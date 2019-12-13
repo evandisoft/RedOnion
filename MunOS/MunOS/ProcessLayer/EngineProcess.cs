@@ -15,7 +15,9 @@ namespace MunOS.ProcessLayer
 			foreach (var sourceFilename in initSourceFilenames)
 			{
 				string importString=GetImportString(sourceFilename);
-				initQueue.Enqueue(CreateThread(importString, sourceFilename));
+				var thread=CreateThread(importString, sourceFilename);
+				thread.Name=sourceFilename+" init";
+				initQueue.Enqueue(thread);
 			}
 			ExecuteNextInit();
 		}
@@ -41,7 +43,7 @@ namespace MunOS.ProcessLayer
 		/// <param name="source">The source string to be evaluated.</param>
 		/// <param name="path">Script path or null for repl.</param>
 		/// <param name="withHistory">True if this source should be added to the history.</param>
-		public void ExecuteSourceInRepl(ExecPriority priority, string source, string path = null, bool withHistory = false)
+		public void ExecuteInRepl(ExecPriority priority, string source, string path = null, bool withHistory = false)
 		{
 			if (withHistory)
 			{
@@ -58,11 +60,10 @@ namespace MunOS.ProcessLayer
 				currentHistoryItem = null;
 			}
 
-			ExecuteSourceInReplThread(priority, source, path);
+			Execute(priority, source, path, true);
 		}
 
-		protected abstract void ExecuteSourceInReplThread(ExecPriority priority, string source, string path);
-		public abstract void ExecuteSourceInThread(ExecPriority priority, string source, string path);
+		public abstract void Execute(ExecPriority priority, string source, string path, bool inRepl=false);
 
 		public string GetCurrentHistoryItem()
 		{

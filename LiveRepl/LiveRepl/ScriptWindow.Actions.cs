@@ -100,7 +100,7 @@ namespace LiveRepl
 		public System.Diagnostics.Stopwatch disableClock=new System.Diagnostics.Stopwatch();
 		public void Evaluate(string source, string path, bool withHistory = false)
 		{
-			currentEngineProcess.ExecuteSourceInRepl(ExecPriority.MAIN, source, path, withHistory);
+			currentEngineProcess.ExecuteInRepl(ExecPriority.MAIN, source, path, withHistory);
 			//evaluationList.Add(new Evaluation(source, path, currentReplEvaluator, withHistory));
 		}
 

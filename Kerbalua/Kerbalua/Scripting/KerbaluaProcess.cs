@@ -66,7 +66,7 @@ namespace Kerbalua.Scripting
 			return "require(\""+basename+"\")";
 		}
 
-		public void ExecuteFunctionInThread(ExecPriority priority, Closure closure)
+		public void Execute(ExecPriority priority, Closure closure)
 		{
 			try
 			{
@@ -79,27 +79,22 @@ namespace Kerbalua.Scripting
 			}
 		}
 
-		protected override void ExecuteSourceInReplThread(ExecPriority priority, string source, string path)
+		public override void Execute(ExecPriority priority, string source, string path, bool inRepl)
 		{
 			try
 			{
-				var thread=new KerbaluaReplThread(source,path,this);
+				MunThread thread=null;
+				if (inRepl)
+				{
+					thread=new KerbaluaReplThread(source, path, this);
+				}
+				else
+				{
+					thread=new KerbaluaThread(source, path, this);
+				}
 				EnqueueThread(priority, thread);
 			}
 			catch(Exception e)
-			{
-				outputBuffer.AddError(e.Message);
-			}
-		}
-
-		public override void ExecuteSourceInThread(ExecPriority priority, string source, string path)
-		{
-			try
-			{
-				var thread=new KerbaluaThread(source,path,this);
-				EnqueueThread(priority, thread);
-			}
-			catch (Exception e)
 			{
 				outputBuffer.AddError(e.Message);
 			}

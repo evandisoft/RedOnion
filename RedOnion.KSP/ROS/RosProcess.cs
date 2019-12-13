@@ -25,19 +25,7 @@ namespace RedOnion.KSP.ROS
 			return new RosThread(source, path, this);
 		}
 
-		protected override void ExecuteSourceInReplThread(ExecPriority priority, string source, string path)
-		{
-			try
-			{
-				EnqueueThread(priority, new RosThread(source, path, this));
-			}
-			catch (Exception e)
-			{
-				outputBuffer.AddError(e.Message);
-			}
-		}
-
-		public override void ExecuteSourceInThread(ExecPriority priority, string source, string path)
+		public override void Execute(ExecPriority priority, string source, string path, bool inRepl)
 		{
 			try
 			{
