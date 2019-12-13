@@ -20,6 +20,11 @@ namespace RedOnion.KSP.ROS
 			Processor.PrintError += outputBuffer.AddError;
 		}
 
+		protected override MunThread CreateThread(string source, string path)
+		{
+			return new RosThread(source, path, this);
+		}
+
 		protected override void ExecuteSourceInReplThread(ExecPriority priority, string source, string path)
 		{
 			try

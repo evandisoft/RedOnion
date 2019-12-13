@@ -10,6 +10,18 @@ namespace MunOS.ProcessLayer
 		{
 		}
 
+		public void Init(IList<string> initSourceFilenames)
+		{
+			foreach (var sourceFilename in initSourceFilenames)
+			{
+				string importString=GetImportString(sourceFilename);
+				initQueue.Enqueue(CreateThread(importString, sourceFilename));
+			}
+			ExecuteNextInit();
+		}
+
+		protected abstract MunThread CreateThread(string source, string path);
+
 		const int maxHistorySize = 1000;
 
 		public abstract string Extension { get; }

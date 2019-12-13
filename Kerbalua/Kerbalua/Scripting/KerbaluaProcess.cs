@@ -20,6 +20,11 @@ namespace Kerbalua.Scripting
 			InternalResetEngine();
 		}
 
+		protected override MunThread CreateThread(string source, string path)
+		{
+			return new KerbaluaThread(source, path, this);
+		}
+
 		void InternalResetEngine()
 		{
 			ScriptEngine=new KerbaluaScript(this);

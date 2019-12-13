@@ -5,6 +5,7 @@ using Kerbalua.Scripting;
 using Kerbalui.Controls;
 using LiveRepl.Execution;
 using MunOS.ProcessLayer;
+using RedOnion.KSP.API;
 using RedOnion.KSP.ROS;
 using RedOnion.KSP.Settings;
 using UnityEngine;
@@ -27,7 +28,7 @@ namespace LiveRepl
 
 
 
-		public bool ScriptRunning => currentEngineProcess.RunningThreadsCount > 0;
+		public bool ScriptRunning => currentEngineProcess.TotalThreadCount > 0;
 		public void SetCurrentEngineProcess(string engineName)
 		{
 			currentEngineProcess = engineProcesses[engineName];
@@ -37,7 +38,17 @@ namespace LiveRepl
 		Dictionary<string,EngineProcess> engineProcesses=new Dictionary<string, EngineProcess>();
 		public EngineProcess currentEngineProcess;
 
-
+		private EngineProcess GetEngineProcessByExtension(string extension)
+		{
+			foreach(var engineProcessEntry in engineProcesses)
+			{
+				if (engineProcessEntry.Value.Extension.ToLower()==extension.ToLower())
+				{
+					return engineProcessEntry.Value;
+				}
+			}
+			return null;
+		}
 
 		public bool DisableElements;
 		public void FixedUpdate()
@@ -94,6 +105,7 @@ namespace LiveRepl
 			//}
 		}
 
+
 		void InitEvaluation()
 		{
 			var rosProcess= new RosProcess();
@@ -103,10 +115,6 @@ namespace LiveRepl
 			var kerbaluaProcess= new KerbaluaProcess();
 			engineProcesses["Lua"] = kerbaluaProcess;
 			ProcessManager.Instance.Processes.Add(kerbaluaProcess);
-
-			var kerbaluaProcess2= new KerbaluaProcess();
-			engineProcesses["Lua2"] = kerbaluaProcess2;
-			ProcessManager.Instance.Processes.Add(kerbaluaProcess2);
 
 			string lastEngineName = SavedSettings.LoadSetting("lastEngine", "Lua");
 			if (engineProcesses.ContainsKey(lastEngineName))
@@ -174,7 +182,23 @@ namespace LiveRepl
 			//	}));
 			//}
 
-			//RunAutorunScripts();
+			RunAutorunScripts();
+		}
+
+		public IList<string> GetAutorunScripts(string extensionToMatch)
+		{
+			// EvanTodo: Disabling autorun scripts for now
+			var allScriptNames = AutoRun.scripts();
+			var extensionScriptNames=new List<string>();
+			foreach (var scriptname in allScriptNames)
+			{
+				var extension=Path.GetExtension(scriptname);
+				if (extension==extensionToMatch)
+				{
+					extensionScriptNames.Add(scriptname);
+				}
+			}
+			return extensionScriptNames;
 		}
 	}
 }

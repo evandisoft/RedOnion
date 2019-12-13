@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using LiveRepl.Execution;
 using MunOS.Core;
@@ -110,6 +111,15 @@ namespace LiveRepl
 			RunAutorunScripts();
 		}
 
+		private void RunAutorunScripts()
+		{
+			foreach(var engineProcessEntry in engineProcesses)
+			{
+				var scripts=GetAutorunScripts(engineProcessEntry.Value.Extension);
+				engineProcessEntry.Value.Init(scripts);
+			}
+		}
+
 		public void Terminate()
 		{
 			//MunLogger.Log("Scriptwindow terminate start");
@@ -152,18 +162,8 @@ namespace LiveRepl
 			needsResize=true;
 		}
 
-		public void RunAutorunScripts()
-		{
-			// EvanTodo: Disabling autorun scripts for now
-			//var scriptnames = AutoRun.scripts();
-			//foreach (var scriptname in scriptnames)
-			//{
-			//	ReplEvaluator replEvaluator=GetReplEvaluatorByFilename(scriptname);
-			//	if (replEvaluator==null) continue;
-			//	uiparts.replOutoutArea.AddFileContent("loading "+scriptname+"...");
-			//	Evaluation newEvaluation=new Evaluation(replEvaluator.GetImportString(scriptname), scriptname, replEvaluator);
-			//	evaluationList.Add(newEvaluation);
-			//}
-		}
+
+
+
 	}
 }

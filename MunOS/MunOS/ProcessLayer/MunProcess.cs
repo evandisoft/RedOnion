@@ -58,9 +58,9 @@ namespace MunOS.ProcessLayer
 		/// <summary>
 		/// Where threads wait in a queue to be executed one by one to initialize the process.
 		/// </summary>
-		protected Queue<MunThread> initThreads=new Queue<MunThread>();
+		protected Queue<MunThread> initQueue=new Queue<MunThread>();
 
-		public int TotalThreadCount => runningThreads.Count+waitingThreads.Count+initThreads.Count;
+		public int TotalThreadCount => runningThreads.Count+waitingThreads.Count+initQueue.Count;
 		public int RunningThreadsCount => runningThreads.Count;
 
 		/// <summary>
@@ -81,8 +81,52 @@ namespace MunOS.ProcessLayer
 			threadEntry.thread.ExecutionComplete+=MunProcessThreadExecutionComplete;
 		}
 
+		protected void ExecuteNextInit()
+		{
+			if (initQueue.Count>0)
+			{
+				if (!runningThreads.ContainsKey(initQueue.Peek()))
+				{
+					ExecuteThread(new MunThreadEntry(ExecPriority.MAIN, initQueue.Peek()));
+				}
+			}
+		}
+
+		void HandleInitQueue(MunThread thread, Exception e)
+		{
+			if (initQueue.Peek()==thread)
+			{
+				runningThreads.Remove(thread);
+				if (e!=null)
+				{
+					outputBuffer.AddError("Error during init for thread "+thread);
+					outputBuffer.AddError(e.Message);
+					outputBuffer.AddError("Calling Terminate on Process.");
+					Terminate();
+					return;
+				}
+				initQueue.Dequeue();
+				ExecuteNextInit();
+				return;
+			}
+			else
+			{
+				outputBuffer.AddError("Error during init for thread "+thread);
+				outputBuffer.AddError("Completed thread was not the current init thread");
+				outputBuffer.AddError("Calling Terminate on Process.");
+				Terminate();
+				return;
+			}
+		}
+
 		void MunProcessThreadExecutionComplete(MunThread thread,Exception e)
 		{
+			if (initQueue.Count>0)
+			{
+				HandleInitQueue(thread, e);
+				return;
+			}
+
 			// This thread should always be removed from runningThreads, regarldess
 			// of what will be done with the thread because it is no longer running
 			// in CoreExecMgr
@@ -114,7 +158,7 @@ namespace MunOS.ProcessLayer
 
 		public virtual void FixedUpdate()
 		{
-			if (initThreads.Count ==0)
+			if (initQueue.Count == 0)
 			{
 				// If there are no initThreads, send all the waitingThreads into
 				// the Core.
@@ -204,6 +248,8 @@ namespace MunOS.ProcessLayer
 			{
 				CoreExecMgr.Instance.Kill(id);
 			}
+			initQueue.Clear();
+			waitingThreads.Clear();
 
 			MunLogger.DebugLogArray($"Process ID#{ID} terminated.");
 		}
