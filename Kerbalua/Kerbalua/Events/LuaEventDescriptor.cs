@@ -9,6 +9,7 @@ using MoonSharp.Interpreter.DataStructs;
 using MoonSharp.Interpreter.Interop;
 using MoonSharp.Interpreter.Interop.BasicDescriptors;
 using MoonSharp.Interpreter.Interop.StandardDescriptors;
+using MunOS.ProcessLayer;
 using RedOnion.KSP.MoonSharp.Proxies;
 using RedOnion.KSP.Utilities;
 using UnityEngine;
@@ -206,7 +207,7 @@ namespace Kerbalua.Events
 
 		private void RegisterCallback(object o)
 		{
-			delegates.GetOrCreate(o, () =>
+			if (!delegates.ContainsKey(o))
 			{
 				Delegate d = CreateDelegate(o);
 #if NETFX_CORE
@@ -215,13 +216,18 @@ namespace Kerbalua.Events
 				Delegate handler = Delegate.CreateDelegate(EventInfo.EventHandlerType, d.Target, d.Method);
 #endif
 				m_Add.Invoke(o, new object[] { handler });
-				return handler;
-			});
+				delegates.Add(o,handler);
+			}
 		}
 
 		private void UnregisterCallback(object o)
 		{
-			Delegate handler = delegates.GetOrDefault(o);
+			Delegate handler = null;
+
+			if (delegates.ContainsKey(o))
+			{
+				handler=delegates[o];
+			}
 
 			if (handler == null)
 				throw new ScriptRuntimeException("can't unregister null delegate");
@@ -287,18 +293,19 @@ namespace Kerbalua.Events
 
 			foreach (Closure c in closures)
 			{
-				var script=KerbaluaScript.Instance;
-				if (script==null)
+				var kerbaluaScript=c.OwnerScript as KerbaluaScript;
+				if (kerbaluaScript==null)
 				{
-					throw new Exception("KerbaluaScirpt.Instance not initialized");
+					throw new Exception("Ownerscript was not KerbaluaScript in LuaEventDescriptor");
 				}
-				var co = script.CreateCoroutine(c);
-				co.Coroutine.AutoYieldCounter = 1000;
-				co.Coroutine.Resume(o01, o02, o03, o04, o05, o06, o07, o08, o09, o10, o11, o12, o13, o14, o15, o16);
-				if (co.Coroutine.State == CoroutineState.ForceSuspended)
+
+				var process=kerbaluaScript?.kerbaluaProcess;
+				if (process==null)
 				{
-					script.PrintErrorAction?.Invoke("UnityAction callback unable to finish");
+					throw new Exception("Could not get current process in LuaEventDescriptor");
 				}
+
+				process.Execute(MunOS.Core.ExecPriority.ONESHOT,c);
 			}
 		}
 

@@ -1,10 +1,10 @@
-using System;
+﻿using System;
 using Kerbalui.Controls.Abstract;
 using Kerbalui.EditingChanges;
 using Kerbalui.EventHandling;
 using UnityEngine;
 
-using static RedOnion.KSP.Debugging.QueueLogger;
+using static RedOnion.Debugging.QueueLogger;
 
 namespace Kerbalui.Decorators
 {
@@ -17,15 +17,15 @@ namespace Kerbalui.Decorators
 		{
 			keybindings.Add(new EventKey(KeyCode.Z, true), () =>
 			{
-				UndoLogger.Log("Undo pressed");
+				UndoLogger.DebugLogArray("Undo pressed");
 				var initialState=new EditingState(Text,CursorIndex,SelectIndex);
 				var newState=changesManager.Undo(initialState);
 				Text=newState.text; CursorIndex=newState.cursorIndex; SelectIndex=newState.selectionIndex;
-				UndoLogger.Log("CursorIndex", CursorIndex, "SelectIndex", SelectIndex);
+				UndoLogger.DebugLogArray("CursorIndex", CursorIndex, "SelectIndex", SelectIndex);
 			});
 			keybindings.Add(new EventKey(KeyCode.Z, true, true), () =>
 			{
-				UndoLogger.Log("Redo pressed");
+				UndoLogger.DebugLogArray("Redo pressed");
 				var initialState=new EditingState(Text,CursorIndex,SelectIndex);
 				var newState=changesManager.Redo(initialState);
 				Text=newState.text; CursorIndex=newState.cursorIndex; SelectIndex=newState.selectionIndex;
@@ -39,7 +39,7 @@ namespace Kerbalui.Decorators
 
 			if (mouseOrKeyboardInput)
 			{
-				UndoLogger.Log("Has input");
+				UndoLogger.DebugLogArray("Has input");
 				initialState=new EditingState(Text, CursorIndex, SelectIndex);
 			}
 
@@ -55,7 +55,7 @@ namespace Kerbalui.Decorators
 			{
 				var endState=new EditingState(Text,CursorIndex,SelectIndex);
 				changesManager.AddChange(initialState, endState);
-				UndoLogger.Log("Recording change", 
+				UndoLogger.DebugLogArray("Recording change", 
 					"\nchanges length:", changesManager.ChangesLength,
 					"\nchanges index:", changesManager.CurrentIndex);
 			}

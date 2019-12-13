@@ -1,8 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Kerbalua.Scripting;
 using Kerbalui.Controls;
 using LiveRepl.Execution;
+using MunOS.ProcessLayer;
+using RedOnion.KSP.API;
+using RedOnion.KSP.ROS;
 using RedOnion.KSP.Settings;
 using UnityEngine;
 
@@ -10,23 +14,46 @@ namespace LiveRepl
 {
 	public partial class ScriptWindow
 	{
-		public bool ScriptRunning => evaluationList.Count!=0;
+		//public bool ScriptRunning => evaluationList.Count!=0;
 
-		List<Evaluation> evaluationList = new List<Evaluation>();
 
-		public void SetCurrentEvaluator(string evaluatorName)
+		//List<Evaluation> evaluationList = new List<Evaluation>();
+		//public void SetCurrentEvaluator(string evaluatorName)
+		//{
+		//	currentReplEvaluator = replEvaluators[evaluatorName];
+		//	uiparts.scriptEngineLabel.SetEngine(evaluatorName);
+		//}
+		//Dictionary<string,ReplEvaluator> replEvaluators=new Dictionary<string, ReplEvaluator>();
+		//public ReplEvaluator currentReplEvaluator;
+
+
+
+		public bool ScriptRunning => currentEngineProcess.TotalThreadCount > 0;
+		public void SetCurrentEngineProcess(string engineName)
 		{
-			currentReplEvaluator = replEvaluators[evaluatorName];
-			uiparts.scriptEngineLabel.SetEngine(evaluatorName);
+			currentEngineProcess = engineProcesses[engineName];
+			uiparts.scriptEngineLabel.SetEngine(engineName);
 		}
 
-		Dictionary<string,ReplEvaluator> replEvaluators=new Dictionary<string, ReplEvaluator>();
-		public ReplEvaluator currentReplEvaluator;
+		Dictionary<string,EngineProcess> engineProcesses=new Dictionary<string, EngineProcess>();
+		public EngineProcess currentEngineProcess;
+
+		private EngineProcess GetEngineProcessByExtension(string extension)
+		{
+			foreach(var engineProcessEntry in engineProcesses)
+			{
+				if (engineProcessEntry.Value.Extension.ToLower()==extension.ToLower())
+				{
+					return engineProcessEntry.Value;
+				}
+			}
+			return null;
+		}
 
 		public bool DisableElements;
 		public void FixedUpdate()
 		{
-			if (evaluationList.Count!=0)
+			if (ScriptRunning)
 			{
 				// make a delay after script starts running before disabling elements
 				if (!disableClock.IsRunning) 
@@ -39,13 +66,13 @@ namespace LiveRepl
 					disableClock.Reset();
 				}
 
-				var currentEvaluation = evaluationList[0];
-				if (currentEvaluation.Evaluate())
-				{
-					uiparts.replOutoutArea.AddReturnValue(currentEvaluation.Result);
-					evaluationList.RemoveAt(0);
-					completionManager.DisplayCurrentCompletions();
-				}
+				//var currentEvaluation = evaluationList[0];
+				//if (currentEvaluation.Evaluate())
+				//{
+				//	uiparts.replOutoutArea.AddReturnValue(currentEvaluation.Result);
+				//	evaluationList.RemoveAt(0);
+				//	completionManager.DisplayCurrentCompletions();
+				//}
 			}
 			else
 			{
@@ -62,68 +89,116 @@ namespace LiveRepl
 				}
 			}
 
-			foreach (var engineName in replEvaluators.Keys)
-			{
-				var replEvaluator = replEvaluators[engineName];
-				try
-				{
-					replEvaluator.FixedUpdate();
-				}
-				catch (Exception ex)
-				{
-					Debug.Log("Exception in REPL.FixedUpdate: " + ex.Message);
-					replEvaluator.ResetEngine();
-					//RunStartupScripts(engineName);
-				}
-			}
+			//foreach (var engineName in replEvaluators.Keys)
+			//{
+			//	var replEvaluator = replEvaluators[engineName];
+			//	try
+			//	{
+			//		replEvaluator.FixedUpdate();
+			//	}
+			//	catch (Exception ex)
+			//	{
+			//		Debug.Log("Exception in REPL.FixedUpdate: " + ex.Message);
+			//		replEvaluator.ResetEngine();
+			//		//RunStartupScripts(engineName);
+			//	}
+			//}
 		}
+
 
 		void InitEvaluation()
 		{
-			replEvaluators["ROS"] = new RedOnionReplEvaluator()
-			{
-				PrintAction = uiparts.replOutoutArea.AddOutput,
-				PrintErrorAction = uiparts.replOutoutArea.AddError
-			};
-			replEvaluators["Lua"] = new MoonSharpReplEvaluator()
-			{
-				PrintAction = uiparts.replOutoutArea.AddOutput,
-				PrintErrorAction = uiparts.replOutoutArea.AddError
-			};
-//#if DEBUG
-//			replEvaluators["nLua"] = new KerbnluaReplEvaluator()
-//			{
-//				PrintAction = uiparts.replOutoutArea.AddOutput,
-//				PrintErrorAction = uiparts.replOutoutArea.AddError
-//			};
-//#endif
-			var scriptEngineSelector=uiparts.scriptEngineSelector;
+			var rosProcess= new RosProcess();
+			engineProcesses["ROS"] = rosProcess;
+			ProcessManager.Instance.Processes.Add(rosProcess);
+
+			var kerbaluaProcess= new KerbaluaProcess();
+			engineProcesses["Lua"] = kerbaluaProcess;
+			ProcessManager.Instance.Processes.Add(kerbaluaProcess);
 
 			string lastEngineName = SavedSettings.LoadSetting("lastEngine", "Lua");
-			if (replEvaluators.ContainsKey(lastEngineName))
+			if (engineProcesses.ContainsKey(lastEngineName))
 			{
-				SetCurrentEvaluator(lastEngineName);
+				SetCurrentEngineProcess(lastEngineName);
 			}
 			else
 			{
-				foreach (var evaluatorName in replEvaluators.Keys)
+				foreach (var engineName in engineProcesses.Keys)
 				{
-					SetCurrentEvaluator(evaluatorName);
-					SavedSettings.SaveSetting("lastEngine", evaluatorName);
+					SetCurrentEngineProcess(engineName);
+					SavedSettings.SaveSetting("lastEngine", engineName);
 					break;
 				}
 			}
 
-			foreach (var evaluatorName in replEvaluators.Keys)
+			foreach (var engineName in engineProcesses.Keys)
 			{
-				scriptEngineSelector.AddMinSized(new Button(evaluatorName,() =>
+				uiparts.scriptEngineSelector.AddMinSized(new Button(engineName,() =>
 				{
-					SetCurrentEvaluator(evaluatorName);
-					SavedSettings.SaveSetting("lastEngine", evaluatorName);
+					SetCurrentEngineProcess(engineName);
+					SavedSettings.SaveSetting("lastEngine", engineName);
 				}));
 			}
+			//replEvaluators["ROS"] = new RedOnionReplEvaluator()
+			//{
+			//	PrintAction = uiparts.replOutoutArea.AddOutput,
+			//	PrintErrorAction = uiparts.replOutoutArea.AddError
+			//};
+			//replEvaluators["Lua"] = new MoonSharpReplEvaluator()
+			//{
+			//	PrintAction = uiparts.replOutoutArea.AddOutput,
+			//	PrintErrorAction = uiparts.replOutoutArea.AddError
+			//};
+			//#if DEBUG
+			//			replEvaluators["nLua"] = new KerbnluaReplEvaluator()
+			//			{
+			//				PrintAction = uiparts.replOutoutArea.AddOutput,
+			//				PrintErrorAction = uiparts.replOutoutArea.AddError
+			//			};
+			//#endif
+			//var scriptEngineSelector=uiparts.scriptEngineSelector;
+
+			//string lastEngineName = SavedSettings.LoadSetting("lastEngine", "Lua");
+			//if (replEvaluators.ContainsKey(lastEngineName))
+			//{
+			//	SetCurrentEvaluator(lastEngineName);
+			//}
+			//else
+			//{
+			//	foreach (var evaluatorName in replEvaluators.Keys)
+			//	{
+			//		SetCurrentEvaluator(evaluatorName);
+			//		SavedSettings.SaveSetting("lastEngine", evaluatorName);
+			//		break;
+			//	}
+			//}
+
+			//foreach (var evaluatorName in replEvaluators.Keys)
+			//{
+			//	scriptEngineSelector.AddMinSized(new Button(evaluatorName,() =>
+			//	{
+			//		SetCurrentEvaluator(evaluatorName);
+			//		SavedSettings.SaveSetting("lastEngine", evaluatorName);
+			//	}));
+			//}
 
 			RunAutorunScripts();
+		}
+
+		public IList<string> GetAutorunScripts(string extensionToMatch)
+		{
+			// EvanTodo: Disabling autorun scripts for now
+			var allScriptNames = AutoRun.scripts();
+			var extensionScriptNames=new List<string>();
+			foreach (var scriptname in allScriptNames)
+			{
+				var extension=Path.GetExtension(scriptname);
+				if (extension==extensionToMatch)
+				{
+					extensionScriptNames.Add(scriptname);
+				}
+			}
+			return extensionScriptNames;
 		}
 	}
 }

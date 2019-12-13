@@ -1,4 +1,5 @@
 using RedOnion.ROS.Objects;
+using RedOnion.Utilities;
 using System;
 using System.Diagnostics;
 using System.Globalization;
@@ -34,20 +35,21 @@ namespace RedOnion.ROS
 		/// Culture settings for formatting (invariant by default).
 		/// </summary>
 		public static CultureInfo Culture = CultureInfo.InvariantCulture;
-		public static string Format(string msg) => msg;
-		public static string Format(string msg, params object[] args)
-			=> string.Format(Culture, msg, args);
+		public static string Format(FormattableString msg)
+			=> msg.ToString(Culture);
+		public static string Format(StringWrapper msg, params object[] args)
+			=> string.Format(Culture, msg.String, args);
 
 		public static Action<string> LogListener;
-		public static void Log(string msg)
-			=> LogListener?.Invoke(msg);
-		public static void Log(string msg, params object[] args)
+		public static void Log(FormattableString msg)
+			=> LogListener?.Invoke(msg.ToString(Culture));
+		public static void Log(StringWrapper msg, params object[] args)
 			=> LogListener?.Invoke(Format(msg, args));
 		[Conditional("DEBUG")]
-		public static void DebugLog(string msg)
-			=> LogListener?.Invoke(msg);
+		public static void DebugLog(FormattableString msg)
+			=> LogListener?.Invoke(msg.ToString(Culture));
 		[Conditional("DEBUG")]
-		public static void DebugLog(string msg, params object[] args)
+		public static void DebugLog(StringWrapper msg, params object[] args)
 			=> LogListener?.Invoke(Format(msg, args));
 
 		/// <summary>

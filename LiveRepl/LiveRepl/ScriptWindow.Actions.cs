@@ -1,8 +1,11 @@
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using LiveRepl.Execution;
+using MunOS.Core;
 using RedOnion.KSP.API;
 using UnityEngine;
+using static RedOnion.Debugging.QueueLogger;
 
 namespace LiveRepl
 {
@@ -23,32 +26,45 @@ namespace LiveRepl
 			};
 		}
 
-		public void SetReplEvaluatorByFilename(string filename)
+		//public void SetReplEvaluatorByFilename(string filename)
+		//{
+		//	string extension=Path.GetExtension(filename);
+
+		//	foreach (var replEvaluatorEntry in replEvaluators)
+		//	{
+		//		if (replEvaluatorEntry.Value.Extension.ToLower()==extension.ToLower())
+		//		{
+		//			SetCurrentEvaluator(replEvaluatorEntry.Key);
+		//		}
+		//	}
+		//}
+
+		public void SetEngineProcessByFilename(string filename)
 		{
 			string extension=Path.GetExtension(filename);
 
-			foreach (var replEvaluatorEntry in replEvaluators)
+			foreach (var engineProcessEntry in engineProcesses)
 			{
-				if (replEvaluatorEntry.Value.Extension.ToLower()==extension.ToLower())
+				if (engineProcessEntry.Value.Extension.ToLower()==extension.ToLower())
 				{
-					SetCurrentEvaluator(replEvaluatorEntry.Key);
+					SetCurrentEngineProcess(engineProcessEntry.Key);
 				}
 			}
 		}
 
-		public ReplEvaluator GetReplEvaluatorByFilename(string filename)
-		{
-			string extension=Path.GetExtension(filename);
+		//public ReplEvaluator GetReplEvaluatorByFilename(string filename)
+		//{
+		//	string extension=Path.GetExtension(filename);
 
-			foreach (var replEvaluatorEntry in replEvaluators)
-			{
-				if (replEvaluatorEntry.Value.Extension.ToLower()==extension.ToLower())
-				{
-					return replEvaluatorEntry.Value;
-				}
-			}
-			return null;
-		}
+		//	foreach (var replEvaluatorEntry in replEvaluators)
+		//	{
+		//		if (replEvaluatorEntry.Value.Extension.ToLower()==extension.ToLower())
+		//		{
+		//			return replEvaluatorEntry.Value;
+		//		}
+		//	}
+		//	return null;
+		//}
 
 		public void ToggleEditor()
 		{
@@ -64,7 +80,7 @@ namespace LiveRepl
 		{
 			uiparts.scriptNameInputArea.SaveText(uiparts.editor.Text);
 			uiparts.editorChangesIndicator.MarkAsUnchanged();
-			SetReplEvaluatorByFilename(uiparts.scriptNameInputArea.Text);
+			SetEngineProcessByFilename(uiparts.scriptNameInputArea.Text);
 		}
 
 		public void LoadEditorText()
@@ -72,35 +88,49 @@ namespace LiveRepl
 			string text=uiparts.scriptNameInputArea.LoadText();
 			uiparts.editor.ModifyAndResetUndo(text);
 			uiparts.editorChangesIndicator.MarkAsUnchanged();
-			SetReplEvaluatorByFilename(uiparts.scriptNameInputArea.Text);
+			SetEngineProcessByFilename(uiparts.scriptNameInputArea.Text);
 		}
 
 		public void ClearRepl()
 		{
-			uiparts.replOutoutArea.Clear();
+			currentEngineProcess.outputBuffer.Clear();
 		}
 
 		public System.Diagnostics.Stopwatch enableClock=new System.Diagnostics.Stopwatch();
 		public System.Diagnostics.Stopwatch disableClock=new System.Diagnostics.Stopwatch();
 		public void Evaluate(string source, string path, bool withHistory = false)
 		{
-			evaluationList.Add(new Evaluation(source, path, currentReplEvaluator, withHistory));
+			currentEngineProcess.ExecuteInRepl(ExecPriority.MAIN, source, path, withHistory);
+			//evaluationList.Add(new Evaluation(source, path, currentReplEvaluator, withHistory));
 		}
 
 		public void ResetEngine()
 		{
-			currentReplEvaluator?.ResetEngine();
+			currentEngineProcess?.ResetEngine();
+			//currentReplEvaluator?.ResetEngine();
 			RunAutorunScripts();
+		}
+
+		private void RunAutorunScripts()
+		{
+			foreach(var engineProcessEntry in engineProcesses)
+			{
+				var scripts=GetAutorunScripts(engineProcessEntry.Value.Extension);
+				engineProcessEntry.Value.Init(scripts);
+			}
 		}
 
 		public void Terminate()
 		{
-			evaluationList.Clear();
-			foreach (var replEvaluator in replEvaluators.Values)
-			{
-				replEvaluator.Terminate();
-			}
-			uiparts.replOutoutArea.AddError("Execution Manually Terminated");
+			//MunLogger.Log("Scriptwindow terminate start");
+			currentEngineProcess.Terminate();
+			//evaluationList.Clear();
+			//foreach (var replEvaluator in replEvaluators.Values)
+			//{
+			//	replEvaluator.Terminate();
+			//}
+			currentEngineProcess.outputBuffer.AddError("Execution Manually Terminated");
+			//MunLogger.Log("Scriptwindow terminate end");
 		}
 
 		public void RunEditorScript()
@@ -114,14 +144,14 @@ namespace LiveRepl
 				LoadEditorText();
 			}
 			Evaluate(uiparts.editor.Text, uiparts.scriptNameInputArea.Text);
-			uiparts.replOutoutArea.AddFileContent(uiparts.scriptNameInputArea.Text);
+			currentEngineProcess.outputBuffer.AddFileContent(uiparts.scriptNameInputArea.Text);
 		}
 
 		public void EvaluateReplText()
 		{
 			string text=uiparts.replInputArea.Text;
-			uiparts.replOutoutArea.AddSourceString(text);
-			uiparts.scriptWindow.Evaluate(text, null, true);
+			currentEngineProcess.outputBuffer.AddSourceString(text);
+			Evaluate(text, null, true);
 		}
 
 		public void SubmitReplText()
@@ -132,17 +162,8 @@ namespace LiveRepl
 			needsResize=true;
 		}
 
-		public void RunAutorunScripts()
-		{
-			var scriptnames = AutoRun.scripts();
-			foreach (var scriptname in scriptnames)
-			{
-				ReplEvaluator replEvaluator=GetReplEvaluatorByFilename(scriptname);
-				if (replEvaluator==null) continue;
-				uiparts.replOutoutArea.AddFileContent("loading "+scriptname+"...");
-				Evaluation newEvaluation=new Evaluation(replEvaluator.GetImportString(scriptname), scriptname, replEvaluator);
-				evaluationList.Add(newEvaluation);
-			}
-		}
+
+
+
 	}
 }

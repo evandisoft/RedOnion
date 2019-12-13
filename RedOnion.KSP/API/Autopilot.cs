@@ -40,6 +40,7 @@ namespace RedOnion.KSP.API
 			_heading = double.NaN;
 			_roll = double.NaN;
 			_direction = new Vector(double.NaN, double.NaN, double.NaN);
+			_killRot = false;
 			Unhook();
 		}
 
@@ -124,20 +125,20 @@ namespace RedOnion.KSP.API
 		}
 		[Description("Target pitch/elevation [-180..+180]."
 			+ " Values outside -90..+90 flip heading."
-			+ "NaN for releasing the control.")]
+			+ " NaN for releasing the control.")]
 		public double pitch
 		{
 			get => _pitch;
 			set => Check(_pitch = RosMath.ClampS180(value));
 		}
 		[Description("Target roll/bank [-180..+180]."
-			+ "NaN for releasing the control.")]
+			+ " NaN for releasing the control.")]
 		public double roll
 		{
 			get => _roll;
 			set => Check(_roll = RosMath.ClampS180(value));
 		}
-
+		[Description("Fix the roll of the ship.")]
 		public bool killRot
 		{
 			get => _killRot;
@@ -167,16 +168,6 @@ namespace RedOnion.KSP.API
 				time = 3.0;
 				angular = 10.0;
 			}
-			/*
-			internal class Roll : PidParams
-			{
-				public override void reset()
-				{
-					base.reset();
-					scale = 0.5;
-				}
-			}
-			*/
 		}
 		public class PID : API.PID<PidParams>
 		{
@@ -208,7 +199,7 @@ namespace RedOnion.KSP.API
 
 			protected internal PID _pitch = new PID();
 			protected internal PID _yaw = new PID();
-			protected internal PID _roll = new PID(/*new PidParams.Roll()*/);
+			protected internal PID _roll = new PID();
 
 			public PidParams pitch => _pitch.param;
 			public PidParams yaw => _yaw.param;

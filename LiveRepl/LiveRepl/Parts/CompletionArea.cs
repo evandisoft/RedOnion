@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using Kerbalui.Controls;
@@ -7,7 +7,7 @@ using Kerbalui.EventHandling;
 using Kerbalui.Util;
 using LiveRepl.Interfaces;
 using UnityEngine;
-using static RedOnion.KSP.Debugging.QueueLogger;
+using static RedOnion.Debugging.QueueLogger;
 
 namespace LiveRepl.Parts
 {
@@ -49,10 +49,10 @@ namespace LiveRepl.Parts
 				scrollbarlessrect.height-=ScrollbarWidth;
 			if (lastEventWasMouseDown && Event.current.type == EventType.Used && GUILibUtil.MouseInRect(scrollbarlessrect)) //ContentRect.Contains(Event.current.mousePosition))
 			{
-				UILogger.Log("CompletionArea was clicked",Event.current.mousePosition,scrollbarlessrect);
+				UILogger.DebugLogArray("CompletionArea was clicked",Event.current.mousePosition,scrollbarlessrect);
 				//Debug.Log("This was clicked");
 				SelectionIndex = editingArea.LineNumber-1;
-				UILogger.Log("SelectionIndex is ",SelectionIndex);
+				UILogger.DebugLogArray("SelectionIndex is ",SelectionIndex);
 				//Debug.Log("Selection is "+SelectionIndex);
 				UpdateCursorPosition();
 				uiparts.scriptWindow.completionManager.Complete();

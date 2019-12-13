@@ -1,4 +1,5 @@
 using MoonSharp.Interpreter;
+using MunOS.ProcessLayer;
 using RedOnion.Attributes;
 using RedOnion.ROS;
 using System;
@@ -54,7 +55,7 @@ namespace RedOnion.KSP.API
 			public Draw()
 			{
 				id = ++id_counter;
-				Value.DebugLog("Creating new VectorDraw #{0} in process #{1}", id, OS.Process.currentId);
+				Value.DebugLog("Creating new VectorDraw #{0} in process #{1}", id, MunProcess.CurrentID);
 				_hooks = new Hooks(this);
 			}
 
@@ -65,7 +66,7 @@ namespace RedOnion.KSP.API
 				if (_hooks != null)
 				{
 					Value.DebugLog("Disposing VectorDraw #{0} in process #{1} (original: #{2}, dispose: {3})",
-						id, OS.Process.currentId, _hooks?.process.id ?? 0, disposing);
+						id, MunProcess.CurrentID, _hooks?.process.ID ?? 0, disposing);
 					var hooks = _hooks;
 					_hooks = null;
 					hooks.Dispose();
@@ -78,7 +79,7 @@ namespace RedOnion.KSP.API
 			// this is to avoid direct hard-link from processor to vector draw,
 			// so that it can be garbage-collected when no direct link exists
 			protected Hooks _hooks;
-			protected class Hooks : OS.Process.ShutdownHook<Draw>
+			protected class Hooks : MunProcess.ShutdownHook<Draw>
 			{
 				public Hooks(Draw draw) : base(draw) { }
 				public void show() => process.physicsUpdate += Update;

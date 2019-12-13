@@ -6,7 +6,7 @@ var circleRoll = ascentRoll
 var ascentProfile  = 5    // profile (1-9, less means less aggresive turn)
 var speedRatio     = 5    // speed/altitude ratio to base the curve on (higher is for speed, more than 10 means switch earlier to full speed-based)
 var maxSpeed       = .9   // target escape speed (fraction of minimal or in m/s if above 2)
-var safeAltitude   = 2 + math.max atmosphere.depth/1000, 8 // safe altitude above atmosphere and mountains
+var safeAltitude   = 1 + math.max atmosphere.depth/1000, 7 // safe altitude above atmosphere and mountains
 var startAngle     = math.round(ship.pitch,1) // usually 90 but e.g. DynaWing starts with 81.2
 var firstAngle     = 60   // angle upto which to use simple ratio
 var firstAltitude  = math.max safeAltitude/10, 3 // altitude (in km) of first phase (to reach pitch=firstAngle)
@@ -23,7 +23,7 @@ var evan = false // use ksp.flightControl
 var cust = false // use autopilot.rawXXX with script-controlled PIDs
 def gui
   var selected = 0
-  var wnd = new ui.window "Launch " + ship.name
+  var wnd = new ui.window false, "Launch " + ship.name
   try // try..finally wnd.dispose
     var lblWidth = 120
     var boxWidth = 60
@@ -87,6 +87,7 @@ def gui
     brow.addButton("Launch",  def => selected = 3).flexWidth = 1
     
   //wait until user selects what to do (or closes the window)
+    wnd.show
     while selected == 0
       wait
     
@@ -127,6 +128,13 @@ ascentProfile  = 1-math.clamp(ascentProfile, 1, 9)*0.1
 speedRatio     = speedRatio*0.1
 if maxSpeed <= 2
   maxSpeed *= math.sqrt body.mu/(body.radius+safeAltitude)
+if safeAltitude + 1000 >= targetAltitude
+  var minSafe = math.max atmosphere.depth, 7000
+  safeAltitude = 0.5 * (minSafe + targetAltitude)
+  if safeAltitude + 1000 >= targetAltitude
+    safeAltitude = minSafe
+    if safeAltitude + 1000 >= targetAltitude
+      safeAltitude = targetAltitude - 1000
 
 
 //: STEERING
@@ -319,7 +327,9 @@ var steers = customSteering == null ? null :
 try
   print "Target apoapsis: " + targetAltitude
   print "Safe altitude:   " + safeAltitude
-  until ship.altitude >= safeAltitude and ship.apoapsis >= targetAltitude*.99
+  until ship.altitude >= safeAltitude/2 and (
+    ship.altitude >= safeAltitude and ship.apoapsis >= targetAltitude*.99
+    or ship.timeToAp > ship.timeToPe) // this is here until I find better way for weak orbital engines (TODO: use stage.burntime)
     wait
 
   ctlsub.remove()

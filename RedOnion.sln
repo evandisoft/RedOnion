@@ -46,6 +46,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kerbalui", "Kerbalui\Kerbal
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedOnion.Common", "RedOnion.Common\RedOnion.Common.csproj", "{2D34D879-1A21-4F8F-BF49-38CED2B40406}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MunOS", "MunOS\MunOS.csproj", "{A4C93278-A705-4AC2-B2A9-16B30C2E2C36}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -100,6 +102,10 @@ Global
 		{2D34D879-1A21-4F8F-BF49-38CED2B40406}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2D34D879-1A21-4F8F-BF49-38CED2B40406}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2D34D879-1A21-4F8F-BF49-38CED2B40406}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A4C93278-A705-4AC2-B2A9-16B30C2E2C36}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A4C93278-A705-4AC2-B2A9-16B30C2E2C36}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A4C93278-A705-4AC2-B2A9-16B30C2E2C36}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A4C93278-A705-4AC2-B2A9-16B30C2E2C36}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

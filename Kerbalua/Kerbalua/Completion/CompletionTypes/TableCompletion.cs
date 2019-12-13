@@ -1,9 +1,9 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using MoonSharp.Interpreter;
 using RedOnion.KSP.Completion;
-using static RedOnion.KSP.Debugging.QueueLogger;
+using static RedOnion.Debugging.QueueLogger;
 
 namespace Kerbalua.Completion.CompletionTypes
 {
@@ -38,7 +38,7 @@ namespace Kerbalua.Completion.CompletionTypes
 				possibleCompletions.Add(key.String);
 			}
 
-			Complogger.Log("TryResolveMetatable");
+			Complogger.DebugLog("TryResolveMetatable");
 			if (TryResolveMetatable(table.MetaTable, out CompletionObject completionObject))
 			{
 				IList<string> metatableCompletions=completionObject.GetPossibleCompletions();
@@ -54,22 +54,22 @@ namespace Kerbalua.Completion.CompletionTypes
 		{
 			if (metatable != null)
 			{
-				Complogger.Log("This metatable is not null");
+				Complogger.DebugLog("This metatable is not null");
 				completionObject=GetCompletionObject(metatable);
 				var index=metatable.RawGet("__index");
 				if (completionObject is TableCompletion && index!=null && index.Table!=null)
 				{
-					Complogger.Log("This metatable's index is safe.");
+					Complogger.DebugLog("This metatable's index is safe.");
 					completionObject=new TableCompletion(index.Table);
 					return true;
 				}
 
 				if (!(completionObject is TableCompletion))
 				{
-					Complogger.Log("This metatable's completion is handled another way.");
+					Complogger.DebugLog("This metatable's completion is handled another way.");
 					return true;
 				}
-				Complogger.Log("The metatable is not safe to use for completion");
+				Complogger.DebugLog("The metatable is not safe to use for completion");
 			}
 			completionObject=null;
 			return false;
@@ -81,7 +81,7 @@ namespace Kerbalua.Completion.CompletionTypes
 
 			if (dynValue == null)
 			{
-				Complogger.Log("dynvalue is null");
+				Complogger.DebugLog("dynvalue is null");
 				TryResolveMetatable(table.MetaTable, out completionObject);
 				return false;
 			}
@@ -136,9 +136,9 @@ namespace Kerbalua.Completion.CompletionTypes
 				throw new LuaIntellisenseException("getArrayAccess was null in TryArrayAccess for "+GetType());
 			}
 
-			Complogger.Log("Trying array access");
+			Complogger.DebugLog("Trying array access");
 
-			Complogger.Log("exp was {"+getArrayAccess.exp?.GetText()+"}");
+			Complogger.DebugLog("exp was {"+getArrayAccess.exp?.GetText()+"}");
 			var strNode=getArrayAccess.exp.@string();
 			if (strNode!=null)
 			{

@@ -109,9 +109,12 @@ namespace LiveRepl
 			SavedSettings.SaveSetting("lastQueueTag", uiparts.queueTagInputArea.Text);
 #endif
 			SavedSettings.SaveToDisk();
-			foreach(var repleval in replEvaluators.Values)
+
+			Debug.Log("[RedOnion] Terminating processes");
+			foreach(var engineProcess in engineProcesses.Values)
 			{
-				repleval.Terminate();
+				Debug.Log("[RedOnion] Terminating process "+engineProcess.ID);
+				engineProcess.Terminate();
 			}
 		}
 	}

@@ -19,89 +19,95 @@ namespace LiveRepl.Parts
 			uiparts.FontChange+=editingArea.FontChangeEventHandler;
 		}
 
-		public StringBuilder outputBuffer=new StringBuilder();
+		//public StringBuilder outputBuffer=new StringBuilder();
 
-		public const int OUTPUT_LENGTH_LIMIT = 10000;
+		//public const int OUTPUT_LENGTH_LIMIT = 10000;
 
-		void CommonOutputProcessing()
-		{
-			ResetScroll();
-			if(outputBuffer.Length > OUTPUT_LENGTH_LIMIT)
-			{
-				editingArea.Text=outputBuffer.ToString();
-				outputBuffer.Clear();
-			}
-		}
+		//void CommonOutputProcessing()
+		//{
+		//	ResetScroll();
+		//	if(outputBuffer.Length > OUTPUT_LENGTH_LIMIT)
+		//	{
+		//		editingArea.Text=outputBuffer.ToString();
+		//		outputBuffer.Clear();
+		//	}
+		//}
 
-		protected void AppendString(string text)
-		{
-			outputBuffer.Append(text);
-			CommonOutputProcessing();
-		}
+		//protected void AppendString(string text)
+		//{
+		//	outputBuffer.Append(text);
+		//	CommonOutputProcessing();
+		//}
 
-		public void Clear()
-		{
-			editingArea.Text = "";
-			outputBuffer.Clear();
-			CommonOutputProcessing();
-			needsResize=true;
-		}
+		//public void Clear()
+		//{
+		//	editingArea.Text = "";
+		//	outputBuffer.Clear();
+		//	CommonOutputProcessing();
+		//	needsResize=true;
+		//}
 
-		public void AddText(string str)
-		{
-			AppendString("\n" + str);
-		}
+		//public void AddText(string str)
+		//{
+		//	AppendString("\n" + str);
+		//}
 
-		public void AddReturnValue(string str)
-		{
-			AppendString("\nr> " + str);
-		}
+		//public void AddReturnValue(string str)
+		//{
+		//	AppendString("\nr> " + str);
+		//}
 
-		public void AddOutput(string str)
-		{
-			AppendString("\no> " + str);
-		}
+		//public void AddOutput(string str)
+		//{
+		//	AppendString("\no> " + str);
+		//}
 
-		public void AddError(string str)
-		{
-			AppendString("\ne> " + str);
-		}
+		//public void AddError(string str)
+		//{
+		//	AppendString("\ne> " + str);
+		//}
 
-		public void AddSourceString(string str)
-		{
-			AppendString("\ni> " + str);
-		}
+		//public void AddSourceString(string str)
+		//{
+		//	AppendString("\ni> " + str);
+		//}
 
-		public void AddFileContent(string str)
-		{
-			AppendString("\nf> " + str);
-		}
+		//public void AddFileContent(string str)
+		//{
+		//	AppendString("\nf> " + str);
+		//}
 
 		protected override void DecoratorUpdate()
 		{
 			InterceptMostInput();
 
-			//bool hadKeyDownThisUpdate=Event.current.type==EventType.KeyDown;
-			if (outputBuffer.Length>0)
+			editingArea.Text=uiparts.scriptWindow.currentEngineProcess.outputBuffer.GetString(out bool newOutput);
+			if (newOutput)
 			{
-				if (outputBuffer.Length>OUTPUT_LENGTH_LIMIT)
-				{
-					editingArea.Text=outputBuffer.ToString();
-					outputBuffer.Clear();
-				}
-
-				int diff=editingArea.Text.Length+outputBuffer.Length-OUTPUT_LENGTH_LIMIT;
-				if (diff>=0 && diff<editingArea.Text.Length)
-				{
-					editingArea.Text=editingArea.Text.Substring(diff, editingArea.Text.Length-diff)+outputBuffer;
-				}
-				else
-				{
-					editingArea.Text=editingArea.Text+outputBuffer;
-				}
-				outputBuffer.Clear();
+				ResetScroll();
 				SetChildRect();
 			}
+			//bool hadKeyDownThisUpdate=Event.current.type==EventType.KeyDown;
+			//if (outputBuffer.Length>0)
+			//{
+			//	if (outputBuffer.Length>OUTPUT_LENGTH_LIMIT)
+			//	{
+			//		editingArea.Text=outputBuffer.ToString();
+			//		outputBuffer.Clear();
+			//	}
+
+			//	int diff=editingArea.Text.Length+outputBuffer.Length-OUTPUT_LENGTH_LIMIT;
+			//	if (diff>=0 && diff<editingArea.Text.Length)
+			//	{
+			//		editingArea.Text=editingArea.Text.Substring(diff, editingArea.Text.Length-diff)+outputBuffer;
+			//	}
+			//	else
+			//	{
+			//		editingArea.Text=editingArea.Text+outputBuffer;
+			//	}
+			//	outputBuffer.Clear();
+			//	SetChildRect();
+			//}
 
 			base.DecoratorUpdate();
 
