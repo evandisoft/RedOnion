@@ -10,6 +10,7 @@
 # Next Release
 ## 0.5.0:
 - Working on a system for running multiple scripts at a time. May not initially have a UI that can provide this feature to the user in full, but it is an improvement of the underlying execution system, and gives us a better base to work on. Over the course of 0.5.X we will be adding more and more features related to running, and managing multiple scripts at a time, including a user-facing api, as well as an api for other modders to run scripts from their mod if they wish.
+- The version we are working on seems stable enough that it will be the next release. We are just working on some features, and trying to ensure that things are done in an appropriate way.
 
 # Current
 # 0.4
