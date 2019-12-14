@@ -69,7 +69,7 @@ namespace LiveRepl
 		{
 			SetOrReleaseInputLock();
 
-			if (ScriptRunning ) HandleInputWhenExecuting();
+			//if (ScriptRunning ) HandleInputWhenExecuting();
 			GUILibUtil.ConsumeMarkedCharEvent(Event.current);
 
 			GlobalKeyBindings.ExecuteAndConsumeIfMatched(Event.current);

@@ -18,6 +18,7 @@ namespace LiveRepl
 			GlobalKeyBindings.Add(new EventKey(KeyCode.D, true), LoadEditorText);
 			GlobalKeyBindings.Add(new EventKey(KeyCode.Space, false, true), completionManager.Complete);
 			GlobalKeyBindings.Add(new EventKey(KeyCode.Return, true), completionManager.Complete);
+			GlobalKeyBindings.Add(new EventKey(KeyCode.C, true), Terminate);
 		}
 
 		public void PrintKeyBindingsInOutputArea()
