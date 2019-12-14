@@ -45,6 +45,7 @@ def control ship, target, x, y
   var btns = main.addHorizontal() //TODO: stack
   btns.childAnchors = ui.anchors.fill
 
+//helper for buttons that control direction
   def lockdir fn, btn
     if self.dirsubs != null
       self.dirsubs.remove
@@ -53,6 +54,7 @@ def control ship, target, x, y
     if fn != null and (btn == null || btn.pressed)
       self.dirsubs = system.update def
         autopilot.direction = fn()
+//create button that controls direction
   def xbtn parent, text, initOrSteer, steer
     if steer == null
       var btn = parent.addExclusive2 text, lockdir.bind initOrSteer
@@ -63,7 +65,17 @@ def control ship, target, x, y
       lockdir steer, btn
     btn.width = 80
     return btn
-
+//create button that manages the subscriptions on its own
+  def cbtn parent, text, fn
+    var btn = parent.addExclusive2 text, def btn
+      if self.dirsubs != null
+        self.dirsubs.remove
+        self.dirsubs = null
+      autopilot.disable
+      if fn != null and (btn == null || btn.pressed)
+        fn()
+    btn.width = 80
+    return btn
 
 //orbital/surface buttons
   var blk1 = btns.addVertical()
@@ -210,11 +222,27 @@ def control ship, target, x, y
       dv.size * ship.mass / math.max 1, ship.engines.getThrust()
     dvMin = math.min dvMin, dv.size
     if dvMin < 0.05
+      nde.remove
       bAbort.press
     return dv
   var bExec = xbtn row, "EXEC", execInit, execSteer
-  var bCirc = xbtn row, "CIRC"
-  bCirc.enabled = false
+
+  var bCirc = cbtn row, "CIRC", def
+    while node.next != null
+      node.next.remove
+      wait
+    var tm = time() + (ship.apoapsis > 0 and ship.timeToPe > ship.timeToAp and ship.eccentricity > 0.001 ?
+      ship.timeToAp : ship.periapsis > math.max(atmosphere.height, 3000) and ship.eccentricity > 0.001 ?
+      ship.timeToPe : 0)
+    var pos = ship.positionAt(tm) - body.position
+    var vel = ship.velocityAt(tm)
+    var dv = math.sqrt(body.mu / pos.size) * pos.cross(vel.cross pos).normalized - vel
+    print dv
+    new node tm, dv
+    if mMan.pressed
+      bExec.press
+    else bAbort.press
+
   row = blk3.addHorizontal()
   var bHohm = xbtn row, "Hohmann"
   bHohm.enabled = false
@@ -289,6 +317,7 @@ def control ship, target, x, y
       blk2.visible = false
       blk3.visible = true
       lockdir //null, null - disable current
+      bAbort.press
       
     //remember last target
     self.target = ship.target ?? self.target

@@ -32,3 +32,4 @@ Unsafe KSP API - see [CommonScriptApi](../../CommonScriptApi.md)
 - `bodies`: [BodiesDictionary](../UnsafeAPI/BodiesDictionary.md) - A map of planet names to planet bodies. (Unsafe API)
 - `HighLogic`: HighLogic - [KSP API](https://kerbalspaceprogram.com/api/class_high_logic.html): LoadedScene indicator and other global state.
 - `PartResourceLibrary`: PartResourceLibrary - [KSP API](https://kerbalspaceprogram.com/api/class_part_resource_library.html)
+- `GameVariables`: GameVariables - [KSP API](https://kerbalspaceprogram.com/api/class_game_variables.html): Various KSP variables.
