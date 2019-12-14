@@ -329,10 +329,15 @@ namespace RedOnion.KSP.API
 		public Vector srfVelocity => new Vector(native.srf_velocity);
 		[Description("Current surface velocity (Alias to `surfaceVelocity`).")]
 		public Vector srfvel => new Vector(native.srf_velocity);
-		[Description("Predicted position at specified time.")]
-		public Vector positionAt(double time) => new Vector(native.orbit.getPositionAtUT(time));
-		[Description("Predicted velocity at specified time.")]
-		public Vector velocityAt(double time) => new Vector(native.orbit.getOrbitalVelocityAtUT(time));
+		[WorkInProgress, Description("Predicted position at specified time.")]
+		public Vector positionAt(double time) => new Vector(native.orbit.getPositionAtUT(time) - FlightGlobals.ActiveVessel.CoMD);
+		[WorkInProgress, Description("Predicted velocity at specified time.")]
+		public Vector velocityAt(double time)
+		{
+			// Y and Z are swapped (compared to native.obt_velocity)
+			var v = native.orbit.getOrbitalVelocityAtUT(time);
+			return new Vector(v.x, v.z, v.y);
+		}
 
 		[Description("Vector pointing forward (from cockpit - in the direction of the 'nose').")]
 		public Vector forward => new Vector(native.transform.up);

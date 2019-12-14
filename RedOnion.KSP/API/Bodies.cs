@@ -10,11 +10,15 @@ using System.Text;
 
 namespace RedOnion.KSP.API
 {
+	[Description("Properties that all targetable space-objects have to implement.")]
 	public interface ISpaceObject
 	{
+		[Description("Position of the object relative to active ship.")]
 		Vector position { get; }
+		[Description("Space body this object orbits.")]
 		ISpaceObject body { get; }
 	}
+
 	[DocBuild(typeof(SpaceBody)), Description(
 @"Collection of [celestial bodies](SpaceBody.md). Can be indexed (`bodies[""kerbin""]`)
 and elements are also properties (`bodies.kerbin`, `bodies.mun`).")]
@@ -65,11 +69,22 @@ and elements are also properties (`bodies.kerbin`, `bodies.mun`).")]
 
 		[Description("Name of the body.")]
 		public string name => native.bodyName;
-		[Description("Position of the body (relative to active ship).")]
-		public Vector position => new Vector(native.position);
 		[Description("Celestial body this body is orbiting.")]
 		public SpaceBody body => Bodies.Instance[native.referenceBody];
 		ISpaceObject ISpaceObject.body => body;
+
+		[Description("Position of the body (relative to active ship).")]
+		public Vector position => new Vector(native.position);
+		[WorkInProgress, Description("Predicted position at specified time.")]
+		public Vector positionAt(double time) => new Vector(native.getPositionAtUT(time) - FlightGlobals.ActiveVessel.CoMD);
+		[WorkInProgress, Description("Predicted velocity at specified time.")]
+		public Vector velocityAt(double time)
+		{
+			// suppose that Y and Z are swapped as in `Ship.velocityAt`
+			var v = native.orbit.getOrbitalVelocityAtUT(time);
+			return new Vector(v.x, v.z, v.y);
+		}
+
 
 		[Description("Orbiting celestial bodies.")]
 		public ReadOnlyList<SpaceBody> bodies { get; }

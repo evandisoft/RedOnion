@@ -76,7 +76,7 @@ namespace RedOnion.KSP.API
 			set
 			{
 				var vel = ship.velocityAt(time);
-				var pos = ship.positionAt(time) - ship.body.position;
+				var pos = ship.positionAt(time) - ship.body.position/*At(time)*/;
 				var pro = vel.normalized;
 				var nrm = vel.cross(pos).normalized;
 				var rad = nrm.cross(vel).normalized;

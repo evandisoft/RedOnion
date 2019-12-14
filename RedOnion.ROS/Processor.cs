@@ -550,7 +550,7 @@ wait // will not get executed
 				}
 			}
 
-			[Description("The subscription to `system.update` or `idle` (or `oneShot`).")]
+			[Description("The subscription to `system.update`, `idle` or `once`.")]
 			public sealed class Subscription : IDisposable, IEquatable<Subscription>, IEquatable<Value>
 			{
 				internal Subscription(Value action) => Action = action;

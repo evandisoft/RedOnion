@@ -237,7 +237,6 @@ def control ship, target, x, y
     var pos = ship.positionAt(tm) - body.position
     var vel = ship.velocityAt(tm)
     var dv = math.sqrt(body.mu / pos.size) * pos.cross(vel.cross pos).normalized - vel
-    print dv
     new node tm, dv
     if mMan.pressed
       bExec.press
