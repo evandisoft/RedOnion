@@ -53,41 +53,41 @@ namespace LiveRepl
 		public bool DisableElements;
 		public void FixedUpdate()
 		{
-			if (ScriptRunning)
-			{
-				// make a delay after script starts running before disabling elements
-				if (!disableClock.IsRunning) 
-				{
-					disableClock.Start();
-				}
-				if (disableClock.ElapsedMilliseconds>50)
-				{
-					DisableElements=true;
-					disableClock.Reset();
-				}
+			//if (ScriptRunning)
+			//{
+			//	// make a delay after script starts running before disabling elements
+			//	if (!disableClock.IsRunning) 
+			//	{
+			//		disableClock.Start();
+			//	}
+			//	if (disableClock.ElapsedMilliseconds>50)
+			//	{
+			//		DisableElements=true;
+			//		disableClock.Reset();
+			//	}
 
-				//var currentEvaluation = evaluationList[0];
-				//if (currentEvaluation.Evaluate())
-				//{
-				//	uiparts.replOutoutArea.AddReturnValue(currentEvaluation.Result);
-				//	evaluationList.RemoveAt(0);
-				//	completionManager.DisplayCurrentCompletions();
-				//}
-			}
-			else
-			{
-				disableClock.Reset();
-				// have a delay after script ends before enabling elements
-				if (!enableClock.IsRunning) 
-				{
-					enableClock.Start();
-				}
-				if (enableClock.ElapsedMilliseconds>50)
-				{
-					DisableElements=false;
-					enableClock.Reset();
-				}
-			}
+			//	//var currentEvaluation = evaluationList[0];
+			//	//if (currentEvaluation.Evaluate())
+			//	//{
+			//	//	uiparts.replOutoutArea.AddReturnValue(currentEvaluation.Result);
+			//	//	evaluationList.RemoveAt(0);
+			//	//	completionManager.DisplayCurrentCompletions();
+			//	//}
+			//}
+			//else
+			//{
+			//	disableClock.Reset();
+			//	// have a delay after script ends before enabling elements
+			//	if (!enableClock.IsRunning) 
+			//	{
+			//		enableClock.Start();
+			//	}
+			//	if (enableClock.ElapsedMilliseconds>50)
+			//	{
+			//		DisableElements=false;
+			//		enableClock.Reset();
+			//	}
+			//}
 
 			//foreach (var engineName in replEvaluators.Keys)
 			//{

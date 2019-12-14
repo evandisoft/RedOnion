@@ -39,6 +39,17 @@ function runexps()
     end
 end
 
+function runexp(title)
+    local experiments=findmodules("ModuleScienceExperiment")
+    for experiment in experiments do
+        if experiment.experiment.experimentTitle==title then
+            print("running experiment "..experiment.experiment.experimentTitle)
+            experiment.ResetAction()
+            experiment.DeployAction()
+        end
+    end
+end
+
 function autopara()
     local parachutes=findmodules("ModuleParachute")
     local parachute=nil
