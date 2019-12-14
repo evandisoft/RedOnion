@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using MunOS.Core;
@@ -78,6 +78,7 @@ namespace MunOS.ProcessLayer
 			{
 				status=ProtectedExecute(tickLimit);
 			}
+			/* no need to catch to only rethrow
 			catch(Exception)
 			{
 				// On an exception, throw it to CoreExecMgr so that it will call 
@@ -85,6 +86,7 @@ namespace MunOS.ProcessLayer
 				// as we are supposed to do.
 				throw;
 			}
+			*/
 			finally
 			{
 				ExecutingThread=null;

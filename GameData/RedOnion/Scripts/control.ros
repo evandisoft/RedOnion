@@ -53,10 +53,17 @@ def control ship, target, x, y
     if fn != null and (btn == null || btn.pressed)
       self.dirsubs = system.update def
         autopilot.direction = fn()
-  def xbtn parent, text, steer
-    var btn = parent.addExclusive2 text, lockdir.bind steer
+  def xbtn parent, text, initOrSteer, steer
+    if steer == null
+      var btn = parent.addExclusive2 text, lockdir.bind initOrSteer
+      btn.width = 80
+      return btn
+    var btn = parent.addExclusive2 text, def
+      initOrSteer()
+      lockdir steer, btn
     btn.width = 80
     return btn
+
 
 //orbital/surface buttons
   var blk1 = btns.addVertical()
@@ -162,6 +169,62 @@ def control ship, target, x, y
   unlock2.flexHeight = 1
   var prevTgtBtn = unlock2
 
+//maneuvers
+  var blk3 = btns.addVertical()
+  blk3.visible = false
+  row = blk3.addHorizontal()
+  var warpDelay
+  var report
+  var dvMin
+  def execInit
+    warpDelay = null
+    report = null
+    dvMin = inf
+    ship.sas = true
+  def execSteer
+    if bAbort.pressed
+      return
+    unless mMan.pressed or mNde.pressed
+      return
+    var nde = node.next
+    if nde == null
+      bAbort.press
+      return vector.none
+    var dv = nde.deltav
+    var xt = 0.5 * stage.burnTime dv.size
+    var dt = nde.time - time() - xt
+    var d = dv.angle ship.forward // direction / face-angle error
+    var e = d <= 1 ? 1 : math.deg.cos math.min 89.4, d^2.0 // min 0.0105
+    if dt > 30 and time.warp.ready
+      if warpDelay == null
+        warpDelay = time()
+        ship.sas = true
+      else if (time.since(warpDelay) >= 1 and d < 1
+        and ship.angularVelocity.size < 0.1)
+        warpDelay = null
+        time.warp.to time() + dt - (dt > 600 ? 600 : 10)
+      if report == null or time.since(report) >= 1
+        report = time()
+        print "DV: {0,4:F1} AD: {1,4:F1} AV: {2,5:F2}", dv.size, d, ship.angularVelocity.size
+    autopilot.throttle = dt >= 1 ? 0 : (dt <= 0 ? 1 : 1-dt) * e *
+      dv.size * ship.mass / math.max 1, ship.engines.getThrust()
+    dvMin = math.min dvMin, dv.size
+    if dvMin < 0.05
+      bAbort.press
+    return dv
+  var bExec = xbtn row, "EXEC", execInit, execSteer
+  var bCirc = xbtn row, "CIRC"
+  bCirc.enabled = false
+  row = blk3.addHorizontal()
+  var bHohm = xbtn row, "Hohmann"
+  bHohm.enabled = false
+  var bIncline = xbtn row, "Incline"
+  bIncline.enabled = false
+  row = blk3.addHorizontal()
+  var bAbort = xbtn row, "ABORT"
+  bAbort.flexWidth = 1
+  bAbort.flexHeight = 1
+
 //startup selection
   if "control_dir" in global
     var sel = global.control_dir
@@ -213,12 +276,20 @@ def control ship, target, x, y
       mSrf.pressed = true
     if !blk1.visible and (mObt.pressed or mSrf.pressed)
       blk2.visible = false
+      blk3.visible = false
       blk1.visible = true
       unlock.press
     if !blk2.visible and mTgt.pressed
       blk1.visible = false
+      blk3.visible = false
       blk2.visible = true
       unlock2.press
+    if !blk3.visible and (mMan.pressed or mNde.pressed)
+      blk1.visible = false
+      blk2.visible = false
+      blk3.visible = true
+      lockdir //null, null - disable current
+      
     //remember last target
     self.target = ship.target ?? self.target
     //visual hint which ship is active

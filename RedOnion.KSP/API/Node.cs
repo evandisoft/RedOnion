@@ -19,26 +19,42 @@ namespace RedOnion.KSP.API
 			{
 				if (!HighLogic.LoadedSceneIsFlight)
 					return null;
-				var nodes = FlightGlobals.ActiveVessel?.patchedConicSolver?.maneuverNodes;
+				var ship = Ship.Active;
+				if (ship == null)
+					return null;
+				var nodes = ship.native.patchedConicSolver?.maneuverNodes;
 				if (nodes == null || nodes.Count == 0)
 					return null;
 				var mnode = nodes[0];
 				if (cachedNext == null || cachedNext.native != mnode)
-					cachedNext = new Node(mnode);
+					cachedNext = new Node(mnode, ship);
 				return cachedNext;
 			}
 		}
 
 		[Unsafe, Description("KSP API.")]
 		public ManeuverNode native { get; }
+		[Description("Ship the node belongs to.")]
+		public Ship ship { get; }
 
-		protected internal Node(ManeuverNode native)
-			=> this.native = native;
-
-		[Description("Delta-V of the node (direction and amount of velocity change needed).")]
-		public Vector deltav => new Vector(native.DeltaV);
+		protected internal Node(ManeuverNode native, Ship ship)
+		{
+			this.native = native;
+			this.ship = ship;
+		}
 
 		[Description("Planned time for the maneuver.")]
 		public double time => native.UT;
+		[Description("Seconds until the maneuver.")]
+		public double eta => native.UT - Time.now;
+
+		[Description("Direction and amount of velocity change needed.")]
+		public Vector deltav => new Vector(native.GetBurnVector(ship.orbit));
+		[Description("Amount of velocity change in prograde direction.")]
+		public double prograde => native.DeltaV.z;
+		[Description("Amount of velocity change in normal direction.")]
+		public double normal => native.DeltaV.y;
+		[Description("Amount of velocity change in radial-out direction.")]
+		public double radial => native.DeltaV.x;
 	}
 }

@@ -33,8 +33,15 @@ namespace RedOnion.KSP.ROS
 			}
 			catch (Exception e)
 			{
-				outputBuffer.AddError(e.Message);
+				Processor.PrintException("Execute", e);
 			}
+		}
+
+		protected override void ThreadExecutionComplete(MunThread thread, Exception e)
+		{
+			base.ThreadExecutionComplete(thread, e);
+			if (e != null)
+				Processor.PrintException(null, e);
 		}
 
 		public override void ResetEngine()

@@ -138,11 +138,25 @@ namespace RedOnion.KSP.API
 			get => _roll;
 			set => Check(_roll = RosMath.ClampS180(value));
 		}
-		[Description("Fix the roll of the ship.")]
+		[Description("Fix the roll of the ship. Note that this is not SAS and currently does not allow user override.")]
 		public bool killRot
 		{
 			get => _killRot;
 			set => Check((_killRot = value) ? 1.0 : double.NaN);
+		}
+
+		[Description("SAS: Stability Assist System. This is stock alternative to `killRot` which allows user override."
+			+ " Can be used to allow user/player to adjust roll while autopilot controls direction.")]
+		public bool sas
+		{
+			get => _ship.sas;
+			set => _ship.sas = value;
+		}
+		[Description("RCS: Reaction Control System.")]
+		public bool rcs
+		{
+			get => _ship.rcs;
+			set => _ship.rcs = value;
 		}
 
 		public PIDs pids { get; } = new PIDs();

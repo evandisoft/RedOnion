@@ -39,6 +39,8 @@ namespace RedOnion.KSP.API
 		public static readonly Type stage = typeof(Stage);
 		[Description("Current time and related functions.")]
 		public static readonly Type time = typeof(Time);
+		[WorkInProgress, Description("Maneuver node.")]
+		public static readonly Type node = typeof(Node);
 
 		[Description("PID regulator (alias to `system.pid` in ROS).")]
 		public static readonly Type PID = typeof(PID);

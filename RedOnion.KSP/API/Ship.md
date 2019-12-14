@@ -69,6 +69,8 @@ Note that it can change violently when facing up or down.
 - `maxVacuumTorque`: [Vector](Vector.md) - Maximal ship torque in vacuum [N⋅m⋅deg=deg⋅kg⋅m²/s²] (ignoring control surfaces).
 - `maxAngular`: [Vector](Vector.md) - Maximal angular acceleration (deg/s²)
 - `maxVacuumAngular`: [Vector](Vector.md) - Maximal angular acceleration in vacuum (ignoring control surfaces).
+- `sas`: bool - SAS: Stability Assist System.
+- `rcs`: bool - RCS: Reaction Control System.
 
 **Instance Methods:**
 - `positionAt()`: [Vector](Vector.md), time double

@@ -39,9 +39,11 @@ namespace RedOnion.ROS
 		public void PrintException(string where, Exception ex, bool logOnly = false)
 		{
 			var print = logOnly ? null : PrintError;
-			var hdr = Value.Format("Exception in {0}: {1}", where, ex.Message);
+			var hdr = where == null ? "Exception: " + ex.Message :
+				Value.Format("Exception in {0}: {1}", where, ex.Message);
 			Log(hdr);
-			print?.Invoke(hdr);
+			if (where != null)
+				print?.Invoke(hdr);
 			var err = ex as Error;
 			var re = err as RuntimeError;
 			if (err != null)

@@ -504,6 +504,24 @@ namespace RedOnion.KSP.API
 
 		#endregion
 
+		#region Action Groups, SAS, RCS, ...
+
+		[Description("SAS: Stability Assist System.")]
+		public bool sas
+		{
+			get => native.ActionGroups[KSPActionGroup.SAS];
+			set => native.ActionGroups.SetGroup(KSPActionGroup.SAS, value);
+		}
+
+		[Description("RCS: Reaction Control System.")]
+		public bool rcs
+		{
+			get => native.ActionGroups[KSPActionGroup.RCS];
+			set => native.ActionGroups.SetGroup(KSPActionGroup.RCS, value);
+		}
+
+		#endregion
+
 		#region Tools
 
 		[Description("Translate vector/direction into ship-local coordinates (like looking at it from the cockpit).")]

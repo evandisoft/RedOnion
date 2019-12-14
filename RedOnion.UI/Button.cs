@@ -96,6 +96,13 @@ namespace RedOnion.UI
 			remove => Core.Click -= value;
 		}
 
+		[Description("Enabled/Disabled (for clicks, Unity: `interactable`).")]
+		public bool Enabled
+		{
+			get => Core.interactable;
+			set => Core.interactable = value;
+		}
+
 		[Description("Toggleable button (false by default).")]
 		public bool Toggleable
 		{
