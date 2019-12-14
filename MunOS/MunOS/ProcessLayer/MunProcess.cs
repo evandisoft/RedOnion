@@ -130,10 +130,12 @@ namespace MunOS.ProcessLayer
 			// of what will be done with the thread because it is no longer running
 			// in CoreExecMgr
 			runningThreads.Remove(thread);
-			if (e!=null)
-			{
-				outputBuffer.AddError(e.Message);
-			}
+
+			// This will be handled 
+			//if (e!=null)
+			//{
+			//	outputBuffer.AddError(e.Message);
+			//}
 
 			ThreadExecutionComplete(thread, e);
 		}
@@ -144,10 +146,7 @@ namespace MunOS.ProcessLayer
 		/// </summary>
 		/// <param name="thread">The thread for which execution completed.</param>
 		/// <param name="e">The exception that was thrown. Null if the thread completed normally or was terminated.</param>
-		protected virtual void ThreadExecutionComplete(MunThread thread, Exception e)
-		{
-
-		}
+		protected abstract void ThreadExecutionComplete(MunThread thread, Exception e);
 
 
 		/// <summary>
