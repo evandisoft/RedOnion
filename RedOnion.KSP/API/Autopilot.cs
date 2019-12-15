@@ -172,9 +172,9 @@ namespace RedOnion.KSP.API
 			public virtual void reset()
 			{
 				P = 1.0;    // direct control
-				I = 0.5;    // error-correcting, *dt
-				R = 0.4;    // cumulated change, *dt
-				D = 0.01;   // change-resisting, /dt
+				I = 0.3;    // error-correcting, *dt
+				R = 0.25;   // cumulated change, *dt
+				D = 0.05;   // change-resisting, /dt
 				outputChangeLimit = 5; //*dt => 10% per std. tick
 				targetChangeLimit = 5; //*dt => 10% per std. tick
 				accumulatorLimit = 0.5; // abs(accu) <= 50%
@@ -188,9 +188,8 @@ namespace RedOnion.KSP.API
 				public override void reset()
 				{
 					base.reset();
-					I = 0.3;
-					R = 0.6;
-					D = 0.1;
+					I = 0.0;
+					R = 0.1;
 				}
 			}
 		}
