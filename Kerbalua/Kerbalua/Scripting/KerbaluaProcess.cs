@@ -75,7 +75,7 @@ namespace Kerbalua.Scripting
 			}
 			catch (Exception e)
 			{
-				outputBuffer.AddError(e.Message);
+				PrintException(e);
 			}
 		}
 
@@ -96,7 +96,7 @@ namespace Kerbalua.Scripting
 			}
 			catch(Exception e)
 			{
-				outputBuffer.AddError(e.Message);
+				PrintException(e);
 			}
 		}
 
@@ -106,6 +106,26 @@ namespace Kerbalua.Scripting
 			InternalResetEngine();
 		}
 
+		public void PrintException(Exception exception)
+		{
+			if (exception is InterpreterException interExcept)
+			{
+				outputBuffer.AddError(interExcept.DecoratedMessage);
+			}
+			else
+			{
+				outputBuffer.AddError(exception.Message);
+			}
 
+			Debug.Log(exception);
+		}
+
+		protected override void ThreadExecutionComplete(MunThread thread, Exception e)
+		{
+			if (e!=null)
+			{
+				PrintException(e);
+			}
+		}
 	}
 }

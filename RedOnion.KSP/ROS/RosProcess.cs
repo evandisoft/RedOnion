@@ -39,7 +39,6 @@ namespace RedOnion.KSP.ROS
 
 		protected override void ThreadExecutionComplete(MunThread thread, Exception e)
 		{
-			base.ThreadExecutionComplete(thread, e);
 			if (e != null)
 				Processor.PrintException(null, e);
 		}
