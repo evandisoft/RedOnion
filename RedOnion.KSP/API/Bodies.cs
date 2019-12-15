@@ -155,7 +155,7 @@ and elements are also properties (`bodies.kerbin`, `bodies.mun`).")]
 		public double timeToPe => native.orbit.timeToPe;
 		[Description("Period of current orbit in seconds.")]
 		public double period => native.orbit.period;
-		[Description("Angle in degrees between the direction of periapsis and the current position.")]
+		[Description("Angle in degrees between the direction of periapsis and the current position. Zero at periapsis, 180 at apoapsis.")]
 		public double trueAnomaly => RosMath.Deg.Clamp360(native.orbit.trueAnomaly * RosMath.Rad2Deg);
 		[Description("Angle in degrees between the direction of periapsis and the current position extrapolated on circular orbit.")]
 		public double meanAnomaly => RosMath.Deg.Clamp360(native.orbit.meanAnomaly * RosMath.Rad2Deg);

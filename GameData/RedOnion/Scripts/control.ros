@@ -340,7 +340,7 @@ def control ship, target, x, y
     var i0 = ship.inclination
     var sp = ship.position - body.position
     var sv = ship.velocity
-    var sn = sv.cross sp
+    var sn = sv.cross sp // our normal
     var target = ship.target ?? self.target
     if target == null
       di = -i0
@@ -349,10 +349,12 @@ def control ship, target, x, y
       var i1 = target.inclination
       var tp = target.position - body.position
       var tv = target.velocity
-      var tn = tv.cross tp
-      var ln = tn.cross sn
-      di = sn.angle tn, ln
-      ta = sp.angle ln, sn
+      var tn = tv.cross tp // its normal
+      var ln = tn.cross sn // AN-DN line
+      di = tn.angle sn, ln // angle between normals
+      ta = ln.angle sp, sn // angle to DN
+      print "Our I: {0,5:F1} its: {1,5:F1}, diff: {2,5:F1}", i0, i1, di
+      print "To DN: {0,5:F1}, TA: {1,5:F1} PE-DN: {2,5:F1}", ta, ship.trueAnomaly, ta + ship.trueAnomaly
       ta += ship.trueAnomaly
     ta = math.clamp360 ta
     if math.clamp360(ta-ship.trueAnomaly) > 180
@@ -370,6 +372,8 @@ def control ship, target, x, y
       t1 = t0 + dt
       v1 = ship.velocityAt t1
       dv = v1.rotate(-di, ship.positionAt(t1) - body.position) - v1
+
+    print "DT: {0,5:F0} TA: {1,3:F0}", dt, ta
     new node t1, dv
     
     if mMan.pressed
