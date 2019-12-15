@@ -122,7 +122,10 @@ namespace Kerbalua.Scripting
 
 		protected override void ThreadExecutionComplete(MunThread thread, Exception e)
 		{
-			PrintException(e);
+			if (e!=null)
+			{
+				PrintException(e);
+			}
 		}
 	}
 }
