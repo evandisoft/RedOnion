@@ -243,10 +243,139 @@ def control ship, target, x, y
     else bAbort.press
 
   row = blk3.addHorizontal()
-  var bHohm = xbtn row, "Hohmann"
-  bHohm.enabled = false
-  var bIncline = xbtn row, "Incline"
-  bIncline.enabled = false
+  var bHohm = cbtn row, "Hohmann", def
+    var target = ship.target ?? self.target
+    if target == null
+      print "No target"
+      bAbort.press
+      return
+    var our = ship
+    var its = target
+    if our.body != its.body
+      if its.body != null and our.body.body == its.body
+      //e.g. from Kerbin to Duna or from Mun to Minmus, calculate like if transfering Kerbin/Mun itself
+        set our to our.body
+      else if its.body != null and its.body.body != null and our.body.body == its.body.body
+      //e.g. Kerbin to Ike, redirect to Duna
+        set our to our.body
+        set its to its.body
+      else
+        print "Incompatible orbits"
+        bAbort.press
+        return
+    while node.next != null
+      node.next.remove
+      wait
+    var r1 = our.semiMajorAxis
+    var r2 = its.semiMajorAxis
+    var pt = 0.5 * ((r1+r2) / (2*r2))^1.5
+    var ft = pt - math.floor pt
+  //angular distance that target will travel during transfer (if circular)
+    var theta = 360 * ft
+  //angles to universal reference direction
+    var sa = our.lan + our.argumentOfPeriapsis + our.trueAnomaly
+    var ta = its.lan + its.argumentOfPeriapsis + its.trueAnomaly
+    var t0 = time()
+  //match angle (+k*360)
+    var ma = math.clamp360 ta+theta-sa-180
+  //angle change rate (inaccurate for eccentric orbits but good for a start)
+    var ar = 360/our.period - 360/its.period
+  //estimated burn time
+    var dv = math.sqrt(our.body.mu/r1) * (math.sqrt((2*r2)/(r1+r2)) - 1)
+    var mt = 5+.5*dv*ship.mass/math.max(0.1,ship.engines.getThrust())
+  //k closest to zero such that (ma + k*360)/ar >= mt
+    var k = (mt*ar - ma)/360
+  //closest integer
+    if ar < 0 then k = math.floor k
+    else k = math.ceiling k
+  //time to node (exact if both orbits are perfectly circular)
+    var dt = (ma+k*360)/ar
+  //precise burn vector
+    var t1 = t0+dt
+    var v1 = our.velocityAt t1
+    var p1 = our.positionAt(t1)-our.body.position
+    var r1 = p1.size
+  //https://en.wikipedia.org/wiki/Orbital_speed#Precise_orbital_speed
+    var nv = p1.cross(v1.cross p1).normalized
+    var v2 = math.sqrt(our.body.mu*(2/r1-2/(r1+r2))) * nv
+    var dv = v2 - v1
+    if our == ship
+      new node t1, dv
+    else
+    // interplanetary or moon-to-moon transfer
+      if our.body.body != null
+      //moon to moon (e.g. Mun to Minmus)
+      // We can no longer ignore the semi minor axis of departure hyperbolic
+      // - this is very rough correction, needs some more work
+        if r1 > r2 then r1 -= ship.semiMajorAxis*3
+        else r1 += ship.semiMajorAxis*3
+        v2 = math.sqrt(our.body.mu*(2/r1-2/(r1+r2))) * p1.cross(nv).normalized
+        dv = v2 - v1
+
+    //hyperbolic departure magnitude
+      var pb = math.sqrt(dv.size^2+2*body.mu/ship.semiMajorAxis) - math.sqrt(body.mu/ship.semiMajorAxis)
+      var mt = 5+.5*pb*ship.mass/math.max(0.1,ship.engines.getThrust())
+    //correction for optimal angle
+      var ca = (ship.positionAt(t1)-body.position).angle(v2, nv) - 90 -
+        math.deg.asin(1/(1+ship.semiMajorAxis*dv.size^2/body.mu))
+      if r2 < r1 then ca += ca+180
+      ca = math.clamp360 ca
+    //finalize eta and add node
+      t1 += ca/360*ship.period
+      if ca > 180 and t1 - ship.period > mt
+        t1 -= ship.period
+      new node t1, pb
+    
+    if mMan.pressed
+      bExec.press
+    else bAbort.press
+
+  var bIncline = cbtn row, "Incline", def
+    while node.next != null
+      node.next.remove
+      wait
+    var di = 0 // inclination difference (target-current)
+    var ta = 0 // angle from periapsis to DN (burn in normal direction here)
+    var t0 = time()
+    var i0 = ship.inclination
+    var sp = ship.position - body.position
+    var sv = ship.velocity
+    var sn = sv.cross sp
+    var target = ship.target ?? self.target
+    if target == null
+      di = -i0
+      ta = -ship.argumentOfPeriapsis
+    else
+      var i1 = target.inclination
+      var tp = target.position - body.position
+      var tv = target.velocity
+      var tn = tv.cross tp
+      var ln = tn.cross sn
+      di = sn.angle tn, ln
+      ta = sp.angle ln, sn
+      ta += ship.trueAnomaly
+    ta = math.clamp360 ta
+    if math.clamp360(ta-ship.trueAnomaly) > 180
+      ta = math.clamp360(ta+180)
+      di = -di
+    var dt = ship.timeToTrueAnomaly ta
+    var t1 = t0 + dt
+    var v1 = ship.velocityAt t1
+    var dv = v1.rotate(-di, ship.positionAt(t1) - body.position) - v1
+
+    if dt < 5+.5*stage.burnTime dv.size
+      ta = math.clamp360 ta+180
+      di = -di
+      dt = ship.timeToTrueAnomaly ta
+      t1 = t0 + dt
+      v1 = ship.velocityAt t1
+      dv = v1.rotate(-di, ship.positionAt(t1) - body.position) - v1
+    new node t1, dv
+    
+    if mMan.pressed
+      bExec.press
+    else bAbort.press
+    
   row = blk3.addHorizontal()
   var bAbort = xbtn row, "ABORT"
   bAbort.flexWidth = 1

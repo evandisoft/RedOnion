@@ -292,13 +292,15 @@ namespace RedOnion.KSP.API
 		public Orbit orbit => native.orbit;
 		[Description("Eccentricity of current orbit.")]
 		public double eccentricity => native.orbit.eccentricity;
+		[Description("Inclination of current orbit.")]
+		public double inclination => native.orbit.inclination;
 		[Description("Semi-major axis of current orbit.")]
 		public double semiMajorAxis => native.orbit.semiMajorAxis;
 		[Description("Semi-minor axis of current orbit.")]
 		public double semiMinorAxis => native.orbit.semiMinorAxis;
-		[Description("Height above ground of highest point of current orbit).")]
+		[Description("Height above ground of highest point of current orbit.")]
 		public double apoapsis => native.orbit.ApA;
-		[Description("Height above ground of lowest point of current orbit).")]
+		[Description("Height above ground of lowest point of current orbit.")]
 		public double periapsis => native.orbit.PeA;
 		[Description("Highest distance between center of orbited body and any point of current orbit.")]
 		public double apocenter => native.orbit.ApR;
@@ -313,7 +315,11 @@ namespace RedOnion.KSP.API
 		[Description("Angle in degrees between the direction of periapsis and the current position.")]
 		public double trueAnomaly => RosMath.Deg.Clamp360(native.orbit.trueAnomaly * RosMath.Rad2Deg);
 		[Description("Angle in degrees between the direction of periapsis and the current position extrapolated on circular orbit.")]
-		public double meanAnomaly => native.orbit.meanAnomaly;
+		public double meanAnomaly => RosMath.Deg.Clamp360(native.orbit.meanAnomaly * RosMath.Rad2Deg);
+		[Description("Longitude of ascending node.")]
+		public double lan => native.orbit.LAN;
+		[Description("Argument of periapsis.")]
+		public double argumentOfPeriapsis => native.orbit.argumentOfPeriapsis;
 
 		#endregion
 

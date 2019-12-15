@@ -1,6 +1,7 @@
 using RedOnion.Attributes;
 using RedOnion.KSP.Completion;
 using RedOnion.KSP.Utilities;
+using RedOnion.ROS.Utilities;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -70,7 +71,8 @@ and elements are also properties (`bodies.kerbin`, `bodies.mun`).")]
 		[Description("Name of the body.")]
 		public string name => native.bodyName;
 		[Description("Celestial body this body is orbiting.")]
-		public SpaceBody body => Bodies.Instance[native.referenceBody];
+		public SpaceBody body => native.referenceBody == null || native.referenceBody == native ? null :
+			Bodies.Instance[native.referenceBody];
 		ISpaceObject ISpaceObject.body => body;
 
 		[Description("Position of the body (relative to active ship).")]
@@ -128,5 +130,45 @@ and elements are also properties (`bodies.kerbin`, `bodies.mun`).")]
 			[Description("Used when there is no body/ship. Returns false/NaN in properties.")]
 			public static readonly Atmosphere none = new Atmosphere();
 		}
+
+		[Unsafe, WorkInProgress, Description("KSP API. Orbit parameters. May get replaced by safe wrapper in the future.")]
+		public Orbit orbit => native.orbit;
+		[Description("Eccentricity of the orbit.")]
+		public double eccentricity => native.orbit.eccentricity;
+		[Description("Semi-major axis of the orbit.")]
+		public double semiMajorAxis => native.orbit.semiMajorAxis;
+		[Description("Semi-minor axis of the orbit.")]
+		public double semiMinorAxis => native.orbit.semiMinorAxis;
+		[Description("Inclination of the orbit.")]
+		public double inclination => native.orbit.inclination;
+		[Description("Height above ground of highest point of the orbit.")]
+		public double apoapsis => native.orbit.ApA;
+		[Description("Height above ground of lowest point of the orbit.")]
+		public double periapsis => native.orbit.PeA;
+		[Description("Highest distance between center of orbited body and any point of the orbit.")]
+		public double apocenter => native.orbit.ApR;
+		[Description("Lowest distance between center of orbited body and any point of the orbit.")]
+		public double pericenter => native.orbit.PeR;
+		[Description("Eta to apoapsis in seconds.")]
+		public double timeToAp => native.orbit.timeToAp;
+		[Description("Eta to periapsis in seconds.")]
+		public double timeToPe => native.orbit.timeToPe;
+		[Description("Period of current orbit in seconds.")]
+		public double period => native.orbit.period;
+		[Description("Angle in degrees between the direction of periapsis and the current position.")]
+		public double trueAnomaly => RosMath.Deg.Clamp360(native.orbit.trueAnomaly * RosMath.Rad2Deg);
+		[Description("Angle in degrees between the direction of periapsis and the current position extrapolated on circular orbit.")]
+		public double meanAnomaly => RosMath.Deg.Clamp360(native.orbit.meanAnomaly * RosMath.Rad2Deg);
+		[Description("Longitude of ascending node.")]
+		public double lan => native.orbit.LAN;
+		[Description("Argument of periapsis.")]
+		public double argumentOfPeriapsis => native.orbit.argumentOfPeriapsis;
+
+		[WorkInProgress, Description("Get time at true anomaly (absolute time).")]
+		public double timeAtTrueAnomaly(double trueAnomaly)
+			=> orbit.GetUTforTrueAnomaly(trueAnomaly * RosMath.Deg2Rad, 0.0);
+		[WorkInProgress, Description("Get time to true anomaly (relative time).")]
+		public double timeToTrueAnomaly(double trueAnomaly)
+			=> orbit.GetDTforTrueAnomaly(trueAnomaly * RosMath.Deg2Rad, 0.0);
 	}
 }
