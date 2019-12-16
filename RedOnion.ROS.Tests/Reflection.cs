@@ -231,16 +231,14 @@ namespace RedOnion.ROS.Tests
 		}
 		public class EnumTest
 		{
-			public IProcessor Processor { get; set; }
 			public string Name { get; set; }
 			public TestEnum Value { get; set; }
-			public EnumTest(IProcessor processor)
-				: this(processor, null, TestEnum.One) { }
-			public EnumTest(IProcessor processor, TestEnum value, string name = null)
-				: this(processor, name, value) { }
-			public EnumTest(IProcessor processor, string name, TestEnum value = TestEnum.Three)
+			public EnumTest()
+				: this(null, TestEnum.One) { }
+			public EnumTest(TestEnum value, string name = null)
+				: this(name, value) { }
+			public EnumTest(string name, TestEnum value = TestEnum.Three)
 			{
-				Processor = processor;
 				Name = name;
 				Value = value;
 			}

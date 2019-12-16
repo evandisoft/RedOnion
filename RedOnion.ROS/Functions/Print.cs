@@ -12,17 +12,16 @@ namespace RedOnion.ROS.Functions
 
 		public override bool Call(ref Value result, object self, Arguments args, bool create)
 		{
-			IProcessor processor = args.Processor;
 			if (args.Length == 0)
 			{
-				processor?.Print("");
+				args.Processor?.Print?.Invoke("");
 				result = "";
 				return true;
 			}
 			var msg = args[0].ToStr();
 			if (args.Length == 1)
 			{
-				processor?.Print(msg);
+				args.Processor?.Print?.Invoke(msg);
 				result = msg;
 				return true;
 			}
@@ -30,7 +29,7 @@ namespace RedOnion.ROS.Functions
 			for (int i = 1; i < args.Length; i++)
 				call[i-1] = args[i].Box();
 			msg = string.Format(Value.Culture, msg, call);
-			processor?.Print(msg);
+			args.Processor?.Print?.Invoke(msg);
 			result = msg;
 			return true;
 		}

@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -18,6 +19,10 @@ namespace RedOnion.UI
 			{
 				queue.Add(item);
 			}
+		}
+		public static void Coroutine(IEnumerator coroutine)
+		{
+			instance.StartCoroutine(coroutine);
 		}
 
 		static Collector instance;

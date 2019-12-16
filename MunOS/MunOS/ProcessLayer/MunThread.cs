@@ -19,7 +19,7 @@ namespace MunOS.ProcessLayer
 		static MunThread()
 		{
 			stopwatch=new Stopwatch();
-			stopwatch.Start(); 
+			stopwatch.Start();
 		}
 		/// <summary>
 		/// Should be called every update to reset the timer.
@@ -39,13 +39,15 @@ namespace MunOS.ProcessLayer
 
 		public readonly MunProcess parentProcess;
 		public string Name { get; set; } = "";
+		public bool Terminated { get; protected set; }
 
 		protected MunThread(MunProcess parentProcess)
 		{
 			this.parentProcess=parentProcess;
 		}
 
-		public readonly long ID=nextID++; 
+		public readonly long ID=nextID++;
+		public long ExecID { get; internal set; } = -1;
 
 		/// <summary>
 		/// If you want your thread to run every update then return
@@ -76,7 +78,7 @@ namespace MunOS.ProcessLayer
 			ExecutingThread=this;
 			try
 			{
-				status=ProtectedExecute(tickLimit);
+				status = Terminated ? ExecStatus.FINISHED : ProtectedExecute(tickLimit);
 			}
 			/* no need to catch to only rethrow
 			catch(Exception)
@@ -105,12 +107,14 @@ namespace MunOS.ProcessLayer
 
 		public void HandleException(Exception e)
 		{
-			ExecutionComplete.Invoke(this,e);
+			ExecutionComplete.Invoke(this, e);
 		}
 		public void OnTerminated()
 		{
-			MunLogger.DebugLogArray("ex complete is null?"+(ExecutionComplete==null));
-			ExecutionComplete.Invoke(this,null);
+			Terminated = true;
+			ExecID = -1;
+			MunLogger.DebugLogArray("ex complete is null? "+(ExecutionComplete==null));
+			ExecutionComplete.Invoke(this, null);
 		}
 
 		public override string ToString()
@@ -126,5 +130,25 @@ namespace MunOS.ProcessLayer
 		/// For a normal termination, the exception is null;
 		/// </summary>
 		public event Action<MunThread,Exception> ExecutionComplete;
+
+		public void Terminate()
+		{
+			if (!Terminated)
+			{
+				Terminated = true;
+				if (ExecID >= 0)
+					CoreExecMgr.Instance.Kill(ExecID);
+			}
+		}
+		public void TerminateAsync()
+		{
+			if (!Terminated)
+			{
+				Terminated = true;
+				var execId = ExecID;
+				if (execId >= 0)
+					CoreExecMgr.Instance.KillAsync(execId);
+			}
+		}
 	}
 }

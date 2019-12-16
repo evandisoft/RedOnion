@@ -391,16 +391,6 @@ namespace RedOnion.ROS
 						defaultCtor = c;
 					return;
 				}
-				if (args[0].ParameterType == typeof(IProcessor)
-					&& (args.Length == 1 || args[1].RawDefaultValue != DBNull.Value)
-					&& !args[0].ParameterType.IsByRef && !args[0].IsOut)
-				{
-					Value.DebugLog("Found default {0}#ctor accepting processor [args: {1}]",
-						Type.Name, args.Length);
-					if (processorCtor == null || c.GetParameters().Length < processorCtor.GetParameters().Length)
-						processorCtor = c;
-					return;
-				}
 			}
 
 			protected static Value ReflectMethod(MethodInfo m)

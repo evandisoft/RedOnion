@@ -45,7 +45,6 @@ namespace RedOnion.ROS
 			protected Func<object, string, Value> strIndexGet;
 			protected Action<object, string, Value> strIndexSet;
 			protected ConstructorInfo defaultCtor;
-			protected ConstructorInfo processorCtor;
 			protected string callableMemberName;
 
 			public Reflected(Type type) : this(type.Name, type) { }
@@ -134,9 +133,6 @@ namespace RedOnion.ROS
 				}
 				if (args.Count == 0)
 				{
-					if (processorCtor != null
-						&& Callable.TryCall(processorCtor, ref result, self, args))
-						return true;
 					if (defaultCtor != null
 						&& Callable.TryCall(defaultCtor, ref result, self, args))
 						return true;

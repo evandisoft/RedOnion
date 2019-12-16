@@ -12,19 +12,23 @@ namespace RedOnion.ROS.Functions
 	public class Run : UserObject
 	{
 		public RunSource Source { get; }
-		public RunLibrary Library { get; }
+		public RunOnce Once { get; }
+		public RunInclude Include { get; }
 		public RunReplace Replace { get; }
 		public Run(UserObject baseClass) : base("run", baseClass)
 		{
 			Add("source", Source = new RunSource(baseClass));
-			Add("library", Library = new RunLibrary(baseClass));
+			Add("once", Once = new RunOnce(baseClass));
+			Add("include", Include = new RunInclude(baseClass));
 			Add("replace", Replace = new RunReplace(baseClass));
+
+			Add("library", Include); // older alias
 			Lock();
 		}
 		public override void Reset()
 		{
 			Source.Reset();
-			Library.Reset();
+			Include.Reset();
 			base.Reset();
 		}
 		public override bool Call(ref Value result, object self, Arguments args, bool create)
@@ -57,15 +61,43 @@ namespace RedOnion.ROS.Functions
 				return true;
 			}
 		}
+
+		/// <summary>
+		/// Run only once (manages set of paths and does not run scripts twice).
+		/// </summary>
+		public class RunOnce : UserObject
+		{
+			public readonly HashSet<string> packages = new HashSet<string>();
+			public RunOnce(UserObject baseClass) : base("run.once", baseClass) { }
+			public override bool Call(ref Value result, object self, Arguments args, bool create)
+			{
+				if (args.Length != 1)
+					return false;
+				var path = args[0].ToStr();
+				if (packages.Contains(path))
+				{
+					result = Value.False;
+					return true;
+				}
+				var core = args.Core;
+				var proc = core.Processor;
+				var src = proc.ReadScript(path);
+				if (src == null) throw InvalidOperation("Could not read " + path);
+				core.CallScript(proc.Compile(src, path));
+				packages.Add(path);
+				return true;
+			}
+		}
+
 		/// <summary>
 		/// Run another script in the same context (given path to the script)
 		/// </summary>
-		public class RunLibrary : UserObject
+		public class RunInclude : UserObject
 		{
-			public RunLibrarySource Source { get; }
-			public RunLibrary(UserObject baseClass) : base("run.library", baseClass)
+			public RunIncludeSource Source { get; }
+			public RunInclude(UserObject baseClass) : base("run.include", baseClass)
 			{
-				Add("source", Source = new RunLibrarySource(baseClass));
+				Add("source", Source = new RunIncludeSource(baseClass));
 				Lock();
 			}
 			public override void Reset()
@@ -89,9 +121,9 @@ namespace RedOnion.ROS.Functions
 		/// <summary>
 		/// Run another script in the same context (given the script as string)
 		/// </summary>
-		public class RunLibrarySource : UserObject
+		public class RunIncludeSource : UserObject
 		{
-			public RunLibrarySource(UserObject baseClass) : base("run.library.source", baseClass) { }
+			public RunIncludeSource(UserObject baseClass) : base("run.include.source", baseClass) { }
 			public override bool Call(ref Value result, object self, Arguments args, bool create)
 			{
 				if (args.Length != 1)

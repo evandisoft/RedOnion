@@ -126,7 +126,6 @@
     <Compile Include="LiveRepl\Completion\CompletionManager.cs" />
     <Compile Include="LiveRepl\Execution\Evaluation.cs" />
     <Compile Include="LiveRepl\Execution\MoonSharpReplEvaluator.cs" />
-    <Compile Include="LiveRepl\Execution\RedOnionReplEvaluator.cs" />
     <Compile Include="LiveRepl\Execution\ReplEvaluator.cs" />
     <Compile Include="LiveRepl\Parts\FontSelector.cs" />
     <Compile Include="LiveRepl\Execution\KerbnluaReplEvaluator.cs" />
@@ -162,14 +161,7 @@
       <Name>RedOnion.Common</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="LiveRepl\" />
-    <Folder Include="LiveRepl\Parts\" />
-    <Folder Include="LiveRepl\Interfaces\" />
-    <Folder Include="LiveRepl\Completion\" />
-    <Folder Include="LiveRepl\Decorators\" />
-    <Folder Include="LiveRepl\Execution\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>

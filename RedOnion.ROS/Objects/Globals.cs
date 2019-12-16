@@ -7,7 +7,7 @@ namespace RedOnion.ROS.Objects
 {
 	public class Globals : Namespace
 	{
-		public IProcessor Processor { get; set; }
+		public Processor Processor { get; set; }
 		public UserObject System => parent;
 
 		public Globals() : base("Globals", typeof(Globals)) { }
@@ -44,7 +44,7 @@ namespace RedOnion.ROS.Objects
 			System.Add("queue", new Value(typeof(Collections.GenQueue<Value>)));
 			System.Add("stack", new Value(typeof(Stack<Value>)));
 
-			if (Processor is Processor processor)
+			if (Processor is Processor.WithEvents processor)
 			{
 				System.Add("update", new Value(processor.Update));
 				System.Add("idle", new Value(processor.Idle));

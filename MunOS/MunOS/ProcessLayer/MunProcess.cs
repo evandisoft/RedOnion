@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using MunOS.Core;
@@ -77,6 +77,7 @@ namespace MunOS.ProcessLayer
 		{
 			long RunningExecutableID=CoreExecMgr.Instance.RegisterExecutable(threadEntry.priority, threadEntry.thread);
 			runningThreads[threadEntry.thread]=RunningExecutableID;
+			threadEntry.thread.ExecID = RunningExecutableID;
 			threadEntry.thread.ExecutionComplete+=MunProcessThreadExecutionComplete;
 		}
 
@@ -118,7 +119,7 @@ namespace MunOS.ProcessLayer
 			}
 		}
 
-		void MunProcessThreadExecutionComplete(MunThread thread,Exception e)
+		void MunProcessThreadExecutionComplete(MunThread thread, Exception e)
 		{
 			if (initQueue.Count>0)
 			{
@@ -160,7 +161,7 @@ namespace MunOS.ProcessLayer
 			{
 				// If there are no initThreads, send all the waitingThreads into
 				// the Core.
-				foreach(var waitingThreadEntry in waitingThreads)
+				foreach (var waitingThreadEntry in waitingThreads)
 				{
 					ExecuteThread(waitingThreadEntry);
 				}

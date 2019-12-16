@@ -14,8 +14,13 @@ using UE = UnityEngine;
 
 namespace RedOnion.KSP.ROS
 {
-	public class RosProcessor : Processor, IProcessor
+	public class RosProcessor : Processor
 	{
+		public RosProcess Process { get; }
+		public RosProcessor(RosProcess process) => Process = process;
+		public override void ExecuteLater(Function fn)
+			=> Process.EnqueueThread(MunOS.Core.ExecPriority.ONESHOT, new RosThread(MunOS.Core.ExecPriority.ONESHOT, fn, Process));
+
 		protected override RedOnion.ROS.Objects.Globals GetGlobals()
 			=> new RosGlobals();
 		protected void ProcessorReset()

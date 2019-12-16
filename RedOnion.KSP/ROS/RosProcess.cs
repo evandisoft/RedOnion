@@ -10,35 +10,52 @@ namespace RedOnion.KSP.ROS
 	public class RosProcess : EngineProcess
 	{
 		public override string Extension => ".ros";
-		public override string GetImportString(string scriptname) => "run.library \"" + scriptname + "\"";
 
 		public RosProcessor Processor { get; private set; }
-		public RosProcess()
+		protected internal RosThread ReplThread { get; set; }
+
+		public RosProcess() : this(false) { }
+		public RosProcess(bool lateBind)
 		{
-			Processor = new RosProcessor();
+			if (!lateBind)
+				SetProcessor(new RosProcessor(this));
+		}
+		public void SetProcessor(RosProcessor processor)
+		{
+			if (Processor != null)
+				throw new InvalidOperationException("ROS Processor already set");
+			Processor = processor;
 			Processor.Print += outputBuffer.AddOutput;
 			Processor.PrintError += outputBuffer.AddError;
 		}
 
+		// TODO: redesign Init
+		public override string GetImportString(string scriptname)
+			=> "run \"" + scriptname + "\"";
 		protected override MunThread CreateThread(string source, string path)
-		{
-			return new RosThread(source, path, this);
-		}
+			=> new RosThread(ExecPriority.MAIN, source, path, this);
 
+		// note that `inRepl` is true for full scripts as well, so we check path==null
 		public override void Execute(ExecPriority priority, string source, string path, bool inRepl)
 		{
-			try
+			if (path == null)
 			{
-				EnqueueThread(priority, new RosThread(source, path, this));
+				if (ReplThread == null)
+				{
+					EnqueueThread(priority, ReplThread = new RosThread(priority, source, path, this));
+					return;
+				}
+				ReplThread.core = null; // this forces source replacement
+				ReplThread.source = source;
+				return;
 			}
-			catch (Exception e)
-			{
-				Processor.PrintException("Execute", e);
-			}
+			EnqueueThread(priority, new RosThread(priority, source, path, this));
 		}
 
 		protected override void ThreadExecutionComplete(MunThread thread, Exception e)
 		{
+			if (ReplThread == thread)
+				ReplThread = null;
 			if (e != null)
 				Processor.PrintException(null, e);
 		}

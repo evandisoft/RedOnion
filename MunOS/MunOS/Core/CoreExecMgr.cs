@@ -41,10 +41,14 @@ namespace MunOS.Core
 
 		Dictionary<long,ExecInfoEntry> execInfoDictionary = new Dictionary<long, ExecInfoEntry>();
 		Dictionary<ExecPriority, PriorityExecutor> priorities = new Dictionary<ExecPriority, PriorityExecutor>();
+		// access only under lock
+		readonly List<long> asyncKillList = new List<long>();
+		// can be set to true asynchronously (GC finalizers)
+		bool needToRemoveTerminated;
 
 		static long NextExecID=0;
 
-
+		// TODO: move all of  this into MunThread
 		internal struct ExecInfoEntry
 		{
 			public ExecPriority priority;
@@ -62,7 +66,6 @@ namespace MunOS.Core
 			return execInfoDictionary.ContainsKey(ID);
 		}
 
-		bool needToRemoveTerminated;
 		/// <summary>
 		/// Kill the process with the specified ID. mark it as terminated, don't hunt it down and remove it from
 		/// the queues, just mark it and it will not be executed.
@@ -86,6 +89,16 @@ namespace MunOS.Core
 			}
 			MunLogger.DebugLogArray("after kill for id "+ID);
 		}
+		/// <summary>
+		/// Kill thread asynchronously. To be used from finalizers (or any other thread).
+		/// </summary>
+		/// <param name="ID"></param>
+		public void KillAsync(long ID)
+		{
+			lock(asyncKillList)
+				asyncKillList.Add(ID);
+			needToRemoveTerminated = true;
+		}
 
 		internal void Remove(long ID)
 		{
@@ -107,6 +120,20 @@ namespace MunOS.Core
 
 		void RemoveTerminated()
 		{
+			long[] asyncKill = null;
+			lock (asyncKillList)
+			{
+				if (asyncKillList.Count > 0)
+				{
+					asyncKill = asyncKillList.ToArray();
+					asyncKillList.Clear();
+				}
+			}
+			if (asyncKill != null)
+			{
+				foreach (var id in asyncKill)
+					Kill(id); // will set needToRemoveTerminated, but that does not hurt
+			}
 			foreach (var executor in priorities.Values)
 			{
 				executor.RemoveTerminated();
@@ -215,6 +242,8 @@ namespace MunOS.Core
 		{
 			if (needToRemoveTerminated)
 			{
+				// keep that order, because `needToRemoveTerminated` can be set from different thread (GC - finalizers)
+				needToRemoveTerminated = false;
 				RemoveTerminated();
 			}
 			Execute((long)(UpdateMicros*TicksPerMicro));

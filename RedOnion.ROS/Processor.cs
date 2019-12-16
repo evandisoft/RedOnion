@@ -12,15 +12,31 @@ using RedOnion.ROS.Utilities;
 
 namespace RedOnion.ROS
 {
-	public class Processor : Core, IProcessor
+	public abstract class Processor : Core
 	{
-		public Processor() : base(null)
+		public event Action Shutdown;
+		public Action<string> Print;
+		public Action<string> PrintError;
+
+		public abstract void ExecuteLater(Function fn);
+
+		//TODO: cache scripts - both compiled and the source (watch file modification time)
+		protected Parser Parser { get; }
+		public virtual CompiledCode Compile(string source, string path = null)
+			=> Parser.Compile(source, path);
+		public virtual string ReadScript(string path)
 		{
+			if (!Path.IsPathRooted(path) && !File.Exists(path))
+				path = Path.Combine(Path.GetDirectoryName(typeof(Processor).Assembly.Location), path);
+			if (File.Exists(path))
+				return File.ReadAllText(path, Encoding.UTF8);
+			return null;
+		}
+
+		protected Processor(Parser parser = null) : base(null)
+		{
+			Parser = parser ?? new Parser();
 			ctx = new Context();
-			eventsToRemove = new List<Event.Subscription>();
-			Update = new Event("Update", eventsToRemove);
-			Once = new Event("Once", eventsToRemove);
-			Idle = new Event("Idle", eventsToRemove);
 		}
 		protected override void SetGlobals(Globals value)
 		{
@@ -30,12 +46,6 @@ namespace RedOnion.ROS
 			value.Fill();
 		}
 
-		public event Action Shutdown;
-		public event Action PhysicsUpdate;
-		public event Action GraphicUpdate;
-		public Action<string> Print;
-		public Action<string> PrintError;
-		void IProcessor.Print(string msg) => Print?.Invoke(msg);
 		public void PrintException(string where, Exception ex, bool logOnly = false)
 		{
 			var print = logOnly ? null : PrintError;
@@ -98,68 +108,6 @@ namespace RedOnion.ROS
 		}
 
 		/// <summary>
-		/// Total time-limit for all handlers (one of each type can still be executed).
-		/// Main loop always gets at least StepCountdown (100 by default) instructions executed.
-		/// </summary>
-		public TimeSpan UpdateTimeout { get; set; } = TimeSpan.FromMilliseconds(1.0);
-		/// <summary>
-		/// Limit of instructions per fixed update
-		/// (not a hard max-limit, can be breached by some small multiple of StepCountdown).
-		/// </summary>
-		public int UpdateCountdown { get; set; } = 1000;
-		/// <summary>
-		/// Minimum number of instructions executed by sub-cycle
-		/// (limits are checked after reaching this number of instructions, or yield/wait instruction).
-		/// </summary>
-		public int StepCountdown { get; set; } = 100;
-		/// <summary>
-		/// The percentage of the limit (going down from 100% to zero)
-		/// when to stop executing update handlers.
-		/// At least one handler is always executed (with at least StepCountdown instructions).
-		/// 50% by default (500 instructions total with default StepCountdown).
-		/// </summary>
-		public int UpdatePercent { get; set; } = 50;
-		/// <summary>
-		/// The percentage of the limit (going down from 100% to zero)
-		/// when to stop executing one-shot handlers.
-		/// 40% by default (at least 100 instructions total with default StepCountdown,
-		/// upto 600 if no update handlers).
-		/// At least one handler is always executed every (MaxOneShotSkips+1) updates
-		/// (every other fixed update by default).
-		/// </summary>
-		public int OncePercent { get; set; } = 40;
-		/// <summary>
-		/// The percentage of the limit (going down from 100% to zero)
-		/// when to stop executing idle handlers.
-		/// 60% by default (skipped if update + one-shot already used 400 instructions,
-		/// upto 400 if update + one-shot used none).
-		/// At least one handler is always executed every (MaxIdleSkips+1) updates
-		/// (every 10th update by default).
-		/// </summary>
-		public int IdlePercent { get; set; } = 60;
-		/// <summary>
-		/// Maximum number of updates when no one-shot handler was executed (if there was any).
-		/// </summary>
-		public int MaxOneShotSkips { get; set; } = 1;
-		/// <summary>
-		/// Maximum number of updates when no idle handler was executed (if there was any).
-		/// </summary>
-		public int MaxIdleSkips { get; set; } = 9;
-
-		//TODO: cache scripts - both compiled and the source (watch file modification time)
-		protected Parser Parser { get; } = new Parser();
-		public virtual CompiledCode Compile(string source, string path = null)
-			=> Parser.Compile(source, path);
-		public virtual string ReadScript(string path)
-		{
-			if (!Path.IsPathRooted(path) && !File.Exists(path))
-				path = Path.Combine(Path.GetDirectoryName(typeof(Processor).Assembly.Location), path);
-			if (File.Exists(path))
-				return File.ReadAllText(path, Encoding.UTF8);
-			return null;
-		}
-
-		/// <summary>
 		/// Reset the engine - clear all event lists
 		/// and reset/recreate globals.
 		/// </summary>
@@ -195,7 +143,6 @@ namespace RedOnion.ROS
 					}
 				}
 			}
-			ClearEvents();
 			stack.Clear();
 			ctx.PopAll();
 			ctx.CatchBlocks = 0;
@@ -204,235 +151,305 @@ namespace RedOnion.ROS
 			error = Value.Void;
 		}
 
-		protected readonly List<Event.Subscription> eventsToRemove;
-		public Event Update { get; }
-		public Event Once { get; }
-		public Event Idle { get; }
-
-		public bool HasEvents
-			=> Update.Count > 0
-			|| Once.Count > 0
-			|| Idle.Count > 0;
-		public void ClearEvents()
+		public class WithEvents : Processor
 		{
-			Update.Clear();
-			Once.Clear();
-			Idle.Clear();
-			onceSkipped = 0;
-			idleSkipped = 0;
-		}
+			public event Action PhysicsUpdate;
+			public event Action GraphicUpdate;
 
-		public int TotalCountdown { get; protected set; }
-		public int CountdownPercent => 100 * TotalCountdown / UpdateCountdown;
-		public int TimeoutPercent => (int)(100 * (1 - watch.Elapsed.TotalMilliseconds / UpdateTimeout.TotalMilliseconds));
+			protected readonly List<Event.Subscription> eventsToRemove;
+			public Event Update { get; }
+			public Event Once { get; }
+			public Event Idle { get; }
+
+			public override void ExecuteLater(Function fn)
+				=> Once.Add(new Value(fn));
+
+			public bool HasEvents
+				=> Update.Count > 0
+				|| Once.Count > 0
+				|| Idle.Count > 0;
+			public void ClearEvents()
+			{
+				Update.Clear();
+				Once.Clear();
+				Idle.Clear();
+				onceSkipped = 0;
+				idleSkipped = 0;
+			}
+
+			public WithEvents()
+			{
+				eventsToRemove = new List<Event.Subscription>();
+				Update = new Event("Update", eventsToRemove);
+				Once = new Event("Once", eventsToRemove);
+				Idle = new Event("Idle", eventsToRemove);
+			}
+
+			public override void Terminate()
+			{
+				base.Terminate();
+				ClearEvents();
+			}
+
+			/// <summary>
+			/// Total time-limit for all handlers (one of each type can still be executed).
+			/// Main loop always gets at least StepCountdown (100 by default) instructions executed.
+			/// </summary>
+			public TimeSpan UpdateTimeout { get; set; } = TimeSpan.FromMilliseconds(1.0);
+			/// <summary>
+			/// Limit of instructions per fixed update
+			/// (not a hard max-limit, can be breached by some small multiple of StepCountdown).
+			/// </summary>
+			public int UpdateCountdown { get; set; } = 1000;
+			/// <summary>
+			/// Minimum number of instructions executed by sub-cycle
+			/// (limits are checked after reaching this number of instructions, or yield/wait instruction).
+			/// </summary>
+			public int StepCountdown { get; set; } = 100;
+			/// <summary>
+			/// The percentage of the limit (going down from 100% to zero)
+			/// when to stop executing update handlers.
+			/// At least one handler is always executed (with at least StepCountdown instructions).
+			/// 50% by default (500 instructions total with default StepCountdown).
+			/// </summary>
+			public int UpdatePercent { get; set; } = 50;
+			/// <summary>
+			/// The percentage of the limit (going down from 100% to zero)
+			/// when to stop executing one-shot handlers.
+			/// 40% by default (at least 100 instructions total with default StepCountdown,
+			/// upto 600 if no update handlers).
+			/// At least one handler is always executed every (MaxOneShotSkips+1) updates
+			/// (every other fixed update by default).
+			/// </summary>
+			public int OncePercent { get; set; } = 40;
+			/// <summary>
+			/// The percentage of the limit (going down from 100% to zero)
+			/// when to stop executing idle handlers.
+			/// 60% by default (skipped if update + one-shot already used 400 instructions,
+			/// upto 400 if update + one-shot used none).
+			/// At least one handler is always executed every (MaxIdleSkips+1) updates
+			/// (every 10th update by default).
+			/// </summary>
+			public int IdlePercent { get; set; } = 60;
+			/// <summary>
+			/// Maximum number of updates when no one-shot handler was executed (if there was any).
+			/// </summary>
+			public int MaxOneShotSkips { get; set; } = 1;
+			/// <summary>
+			/// Maximum number of updates when no idle handler was executed (if there was any).
+			/// </summary>
+			public int MaxIdleSkips { get; set; } = 9;
+
+			public int TotalCountdown { get; protected set; }
+			public int CountdownPercent => 100 * TotalCountdown / UpdateCountdown;
+			public int TimeoutPercent => (int)(100 * (1 - watch.Elapsed.TotalMilliseconds / UpdateTimeout.TotalMilliseconds));
 
 #if DEBUG
-		public double AvgMilli { get; set; }
-		public double AvgCount { get; set; }
-		public double MaxMilli { get; set; }
-		public double MaxCount { get; set; }
-		double _avgMilli, _avgCount, _peakMilli, _peakCount;
-		int _avgSamples;
-		bool _debug;
-		readonly Stopwatch secWatch = new Stopwatch();
+			public double AvgMilli { get; set; }
+			public double AvgCount { get; set; }
+			public double MaxMilli { get; set; }
+			public double MaxCount { get; set; }
+			double _avgMilli, _avgCount, _peakMilli, _peakCount;
+			int _avgSamples;
+			bool _debug;
+			readonly Stopwatch secWatch = new Stopwatch();
 #endif
 
-		readonly Stopwatch watch = new Stopwatch();
-		int onceSkipped, idleSkipped;
+			readonly Stopwatch watch = new Stopwatch();
+			int onceSkipped, idleSkipped;
 
-		public virtual void UpdateGraphic()
-		{
-			var graphic = GraphicUpdate;
-			if (graphic != null)
+			public virtual void UpdateGraphic()
 			{
-				foreach (Action handler in graphic.GetInvocationList())
+				var graphic = GraphicUpdate;
+				if (graphic != null)
 				{
-					try
+					foreach (Action handler in graphic.GetInvocationList())
 					{
-						handler();
-					}
-					catch (Exception ex)
-					{
-						PhysicsUpdate -= handler;
-						PrintException("GraphicUpdate", ex);
-					}
-				}
-			}
-		}
-		public virtual void UpdatePhysics()
-		{
-			TotalCountdown = UpdateCountdown;
-			watch.Reset();
-			watch.Start();
-
-			// see Event.AutoRemove (the list is filled from destructors)
-			lock (eventsToRemove)
-			{
-				foreach (var e in eventsToRemove)
-					e.Remove();
-				eventsToRemove.Clear();
-			}
-
-			// update (periodic, every physics/fixed update if possible)
-			if (!Update.IsEmpty)
-			{
-				do
-				{
-					var call = Update.GetNext();
-					if (!Call(call, Update, UpdatePercent))
-						call.Remove();
-				} while (!Update.AtFirst //TODO: reconsider this condition
-				&& CountdownPercent > UpdatePercent
-				&& TimeoutPercent > UpdatePercent);
-			}
-
-			// one shot (usually from UI like button click)
-			if (Once.IsEmpty)
-				onceSkipped = 0;
-			else if (CountdownPercent <= OncePercent && onceSkipped < MaxOneShotSkips)
-				onceSkipped++;
-			else
-			{
-				onceSkipped = 0;
-				do
-				{
-					var call = Once.GetNext();
-					if (!Call(call, Once, OncePercent) || call.Core == null)
-						call.Remove();
-				} while (!Once.IsEmpty
-				&& CountdownPercent > OncePercent
-				&& TimeoutPercent > OncePercent);
-			}
-
-			// idle (less important like staging logic)
-			if (Idle.IsEmpty)
-				idleSkipped = 0;
-			else if (CountdownPercent <= IdlePercent && idleSkipped < MaxIdleSkips)
-				idleSkipped++;
-			else
-			{
-				idleSkipped = 0;
-				do
-				{
-					var call = Idle.GetNext();
-					if (!Call(call, Idle, IdlePercent))
-						call.Remove();
-				} while (!Idle.AtFirst //TODO: reconsider this condition
-				&& CountdownPercent > IdlePercent
-				&& TimeoutPercent > IdlePercent);
-			}
-
-			// main (note: exceptions are propagated, terminating execution)
-			do
-			{
-				if (!Paused)
-					break;
-				var countdown = Math.Min(StepCountdown, TotalCountdown);
-				Execute(countdown);
-				TotalCountdown -= (countdown - Countdown);
-			} while (Exit == ExitCode.Countdown
-			&& TotalCountdown > 0 && watch.Elapsed < UpdateTimeout);
-
-			// other updates (e.g. vector drawing)
-			var physics = PhysicsUpdate;
-			if (physics != null)
-			{
-				foreach (Action handler in physics.GetInvocationList())
-				{
-					try
-					{
-						handler();
-					}
-					catch (Exception ex)
-					{
-						PhysicsUpdate -= handler;
-						PrintException("PhysicsUpdate", ex);
+						try
+						{
+							handler();
+						}
+						catch (Exception ex)
+						{
+							PhysicsUpdate -= handler;
+							PrintException("GraphicUpdate", ex);
+						}
 					}
 				}
 			}
-
-			// watch
-			watch.Stop();
-
-#if DEBUG
-			var milli = watch.Elapsed.TotalMilliseconds;
-			_avgMilli += milli;
-			if (milli > _peakMilli)
-				_peakMilli = milli;
-			var count = UpdateCountdown - TotalCountdown;
-			_avgCount += count;
-			if (count > _peakCount)
-				_peakCount = count;
-			_avgSamples++;
-
-			if (!secWatch.IsRunning)
-				secWatch.Start();
-			_debug = false;
-			if (secWatch.ElapsedMilliseconds >= 3333)
+			public virtual void UpdatePhysics()
 			{
-				secWatch.Restart();
-				AvgMilli = _avgMilli / _avgSamples;
-				AvgCount = _avgCount / _avgSamples;
-				MaxMilli = _peakMilli;
-				MaxCount = _peakCount;
-				Value.DebugLog($"AVG: {AvgMilli,5:F2}ms {AvgCount,4:F2}i MAX: {MaxMilli,5:F2}ms {MaxCount,4:F2}i");
-				_avgMilli = 0;
-				_avgCount = 0;
-				_avgSamples = 0;
-				_peakMilli = 0;
-				_peakCount = 0;
-				_debug = true;
-			}
-#endif
-		}
-		private bool Call(Event.Subscription e, Event loop, int downtoPercent)
-		{
-			try
-			{
-				if (!e.Action.IsFunction)
+				TotalCountdown = UpdateCountdown;
+				watch.Restart();
+
+				// see Event.AutoRemove (the list is filled from destructors)
+				lock (eventsToRemove)
 				{
-					var result = e.Action;
-					e.Action.desc.Call(ref result, null, new Arguments(Arguments, 0));
+					foreach (var e in eventsToRemove)
+						e.Remove();
+					eventsToRemove.Clear();
 				}
-				else
+
+				// update (periodic, every physics/fixed update if possible)
+				if (!Update.IsEmpty)
 				{
 					do
 					{
-						var countdown = Math.Min(StepCountdown, TotalCountdown);
-#if DEBUG
-						if (_debug) Value.DebugLog($"{loop.name}: {countdown}/{TotalCountdown} {CountdownPercent}/{UpdatePercent}/{downtoPercent}");
-#endif
-						if (e.Core == null)
-						{
-							e.Core = new Core(this);
-							e.Core.Globals = Globals;
-							var fn = e.Action.obj as Function;
-							e.Core.Execute(fn, countdown);
-						}
-						else e.Core.Execute(countdown);
-						TotalCountdown -= (countdown - e.Core.Countdown);
-					} while (e.Core.Exit == ExitCode.Countdown
-					&& CountdownPercent > downtoPercent && UpdatePercent > downtoPercent);
-#if DEBUG
-					if (_debug) Value.DebugLog($"{loop.name}: {e.Core.Exit} {TotalCountdown} {CountdownPercent}/{UpdatePercent}/{downtoPercent}");
-#endif
-					if (!e.Core.Paused)
+						var call = Update.GetNext();
+						if (!Call(call, Update, UpdatePercent))
+							call.Remove();
+					} while (!Update.AtFirst //TODO: reconsider this condition
+					&& CountdownPercent > UpdatePercent
+					&& TimeoutPercent > UpdatePercent);
+				}
+
+				// one shot (usually from UI like button click)
+				if (Once.IsEmpty)
+					onceSkipped = 0;
+				else if (CountdownPercent <= OncePercent && onceSkipped < MaxOneShotSkips)
+					onceSkipped++;
+				else
+				{
+					onceSkipped = 0;
+					do
 					{
-						// TODO: pool
-						e.Core = null;
+						var call = Once.GetNext();
+						if (!Call(call, Once, OncePercent) || call.Core == null)
+							call.Remove();
+					} while (!Once.IsEmpty
+					&& CountdownPercent > OncePercent
+					&& TimeoutPercent > OncePercent);
+				}
+
+				// idle (less important like staging logic)
+				if (Idle.IsEmpty)
+					idleSkipped = 0;
+				else if (CountdownPercent <= IdlePercent && idleSkipped < MaxIdleSkips)
+					idleSkipped++;
+				else
+				{
+					idleSkipped = 0;
+					do
+					{
+						var call = Idle.GetNext();
+						if (!Call(call, Idle, IdlePercent))
+							call.Remove();
+					} while (!Idle.AtFirst //TODO: reconsider this condition
+					&& CountdownPercent > IdlePercent
+					&& TimeoutPercent > IdlePercent);
+				}
+
+				// main (note: exceptions are propagated, terminating execution)
+				do
+				{
+					if (!Paused)
+						break;
+					var countdown = Math.Min(StepCountdown, TotalCountdown);
+					Execute(countdown);
+					TotalCountdown -= (countdown - Countdown);
+				} while (Exit == ExitCode.Countdown
+				&& TotalCountdown > 0 && watch.Elapsed < UpdateTimeout);
+
+				// other updates (e.g. vector drawing)
+				var physics = PhysicsUpdate;
+				if (physics != null)
+				{
+					foreach (Action handler in physics.GetInvocationList())
+					{
+						try
+						{
+							handler();
+						}
+						catch (Exception ex)
+						{
+							PhysicsUpdate -= handler;
+							PrintException("PhysicsUpdate", ex);
+						}
 					}
 				}
-			}
-			catch (Exception ex)
-			{
-				PrintException(Value.Format("FixedUpdate.{0}[{1}]", loop.name, loop.Count), ex);
-				return false;
-			}
-			return true;
-		}
 
-		[Description(
-@"List of subscriptions - actions to be called.
+				// watch
+				watch.Stop();
+
+#if DEBUG
+				var milli = watch.Elapsed.TotalMilliseconds;
+				_avgMilli += milli;
+				if (milli > _peakMilli)
+					_peakMilli = milli;
+				var count = UpdateCountdown - TotalCountdown;
+				_avgCount += count;
+				if (count > _peakCount)
+					_peakCount = count;
+				_avgSamples++;
+
+				if (!secWatch.IsRunning)
+					secWatch.Start();
+				_debug = false;
+				if (secWatch.ElapsedMilliseconds >= 3333)
+				{
+					secWatch.Restart();
+					AvgMilli = _avgMilli / _avgSamples;
+					AvgCount = _avgCount / _avgSamples;
+					MaxMilli = _peakMilli;
+					MaxCount = _peakCount;
+					Value.DebugLog($"AVG: {AvgMilli,5:F2}ms {AvgCount,4:F2}i MAX: {MaxMilli,5:F2}ms {MaxCount,4:F2}i");
+					_avgMilli = 0;
+					_avgCount = 0;
+					_avgSamples = 0;
+					_peakMilli = 0;
+					_peakCount = 0;
+					_debug = true;
+				}
+#endif
+			}
+			private bool Call(Event.Subscription e, Event loop, int downtoPercent)
+			{
+				try
+				{
+					if (!e.Action.IsFunction)
+					{
+						var result = e.Action;
+						e.Action.desc.Call(ref result, null, new Arguments(Arguments, 0));
+					}
+					else
+					{
+						do
+						{
+							var countdown = Math.Min(StepCountdown, TotalCountdown);
+#if DEBUG
+							if (_debug) Value.DebugLog($"{loop.name}: {countdown}/{TotalCountdown} {CountdownPercent}/{UpdatePercent}/{downtoPercent}");
+#endif
+							if (e.Core == null)
+							{
+								e.Core = new Core(this);
+								e.Core.Globals = Globals;
+								var fn = e.Action.obj as Function;
+								e.Core.Execute(fn, countdown);
+							}
+							else e.Core.Execute(countdown);
+							TotalCountdown -= (countdown - e.Core.Countdown);
+						} while (e.Core.Exit == ExitCode.Countdown
+						&& CountdownPercent > downtoPercent && UpdatePercent > downtoPercent);
+#if DEBUG
+						if (_debug) Value.DebugLog($"{loop.name}: {e.Core.Exit} {TotalCountdown} {CountdownPercent}/{UpdatePercent}/{downtoPercent}");
+#endif
+						if (!e.Core.Paused)
+						{
+							// TODO: pool
+							e.Core = null;
+						}
+					}
+				}
+				catch (Exception ex)
+				{
+					PrintException(Value.Format("FixedUpdate.{0}[{1}]", loop.name, loop.Count), ex);
+					return false;
+				}
+				return true;
+			}
+
+			[Description(
+	@"List of subscriptions - actions to be called.
 (Periodically for `update` and `idle`, once for `once`.).
 Either use `add/remove` pair, or call the list and store the auto-remove subscription object.
 The subscription will be automatically removed if there is no reference to the subscription object.
@@ -468,202 +485,203 @@ test // will get executed once
 wait // will not get executed
 ```
 ")]
-		public sealed class Event : ICallable
-		{
-			internal Event(string name, List<Subscription> eventsToRemove)
+			public sealed class Event : ICallable
 			{
-				this.name = name;
-				this.eventsToRemove = eventsToRemove;
-			}
-			internal readonly string name;
-			internal readonly List<Subscription> eventsToRemove;
-			internal Subscription first, next;
-			internal bool AtFirst => next == first;
-			internal bool IsEmpty => first == null;
-			internal Subscription GetNext()
-			{
-				var it = next;
-				next = next.next;
-				return it;
-			}
-
-			[Description("Number of subscribers")]
-			public int Count { get; private set; }
-
-			bool ICallable.Call(ref Value result, object self, Arguments args, bool create)
-			{
-				if (args.Length != 1)
-					return false;
-				var it = args[0];
-				if (!it.IsFunction)
-					return false;
-				result = new Value(new AutoRemove(Add(it)));
-				return true;
-			}
-
-			[Description("The auto-remove subscription object returned by call to `system.update` or `idle` (or `oneShot`).")]
-			public sealed class AutoRemove : IDisposable, IEquatable<AutoRemove>, IEquatable<Subscription>, IEquatable<Value>
-			{
-				internal AutoRemove(Subscription subscription)
-					=> Subscription = subscription;
-				[Description("The subscription.")]
-				public Subscription Subscription { get; }
-
-				[Description("The subscribed action (ROS function or .NET action delegate).")]
-				public Value Action => Subscription.Action;
-				[Description("The event the action is subscribed to (null when removed).")]
-				public Event Event => Subscription.Event;
-				[Browsable(false), Description("Core it is currently running on (if yielding).")]
-				public Core Core => Subscription.Core;
-
-				[Browsable(false)]
-				public bool Equals(AutoRemove it)
-					=> ReferenceEquals(this, it);
-				[Browsable(false)]
-				public bool Equals(Subscription subscription)
-					=> ReferenceEquals(Subscription, subscription);
-				[Browsable(false)]
-				public bool Equals(Value value)
-					=> value.obj is Subscription s ? ReferenceEquals(this, s) : Action.Equals(value);
-				[Browsable(false)]
-				public override bool Equals(object o)
-					=> o is Value v ? Equals(v) : ReferenceEquals(this, o);
-				[Browsable(false)]
-				public override int GetHashCode()
-					=> Subscription.GetHashCode();
-
-				[Description("Remove this subscription from its list. (Ignored if already removed.)")]
-				public void Remove() => Subscription.Remove();
-
-				void IDisposable.Dispose() => Subscription.Remove();
-
-				// destructors could be called from different thread
-				// this is a way to delegate the removal to main thread
-				~AutoRemove()
+				internal Event(string name, List<Subscription> eventsToRemove)
 				{
-					var e = Subscription.Event;
-					if (e != null)
+					this.name = name;
+					this.eventsToRemove = eventsToRemove;
+				}
+				internal readonly string name;
+				internal readonly List<Subscription> eventsToRemove;
+				internal Subscription first, next;
+				internal bool AtFirst => next == first;
+				internal bool IsEmpty => first == null;
+				internal Subscription GetNext()
+				{
+					var it = next;
+					next = next.next;
+					return it;
+				}
+
+				[Description("Number of subscribers")]
+				public int Count { get; private set; }
+
+				bool ICallable.Call(ref Value result, object self, Arguments args, bool create)
+				{
+					if (args.Length != 1)
+						return false;
+					var it = args[0];
+					if (!it.IsFunction)
+						return false;
+					result = new Value(new AutoRemove(Add(it)));
+					return true;
+				}
+
+				[Description("The auto-remove subscription object returned by call to `system.update` or `idle` (or `oneShot`).")]
+				public sealed class AutoRemove : IDisposable, IEquatable<AutoRemove>, IEquatable<Subscription>, IEquatable<Value>
+				{
+					internal AutoRemove(Subscription subscription)
+						=> Subscription = subscription;
+					[Description("The subscription.")]
+					public Subscription Subscription { get; }
+
+					[Description("The subscribed action (ROS function or .NET action delegate).")]
+					public Value Action => Subscription.Action;
+					[Description("The event the action is subscribed to (null when removed).")]
+					public Event Event => Subscription.Event;
+					[Browsable(false), Description("Core it is currently running on (if yielding).")]
+					public Core Core => Subscription.Core;
+
+					[Browsable(false)]
+					public bool Equals(AutoRemove it)
+						=> ReferenceEquals(this, it);
+					[Browsable(false)]
+					public bool Equals(Subscription subscription)
+						=> ReferenceEquals(Subscription, subscription);
+					[Browsable(false)]
+					public bool Equals(Value value)
+						=> value.obj is Subscription s ? ReferenceEquals(this, s) : Action.Equals(value);
+					[Browsable(false)]
+					public override bool Equals(object o)
+						=> o is Value v ? Equals(v) : ReferenceEquals(this, o);
+					[Browsable(false)]
+					public override int GetHashCode()
+						=> Subscription.GetHashCode();
+
+					[Description("Remove this subscription from its list. (Ignored if already removed.)")]
+					public void Remove() => Subscription.Remove();
+
+					void IDisposable.Dispose() => Subscription.Remove();
+
+					// destructors could be called from different thread
+					// this is a way to delegate the removal to main thread
+					~AutoRemove()
 					{
-						lock (e.eventsToRemove)
-							e.eventsToRemove.Add(Subscription);
+						var e = Subscription.Event;
+						if (e != null)
+						{
+							lock (e.eventsToRemove)
+								e.eventsToRemove.Add(Subscription);
+						}
 					}
 				}
-			}
 
-			[Description("The subscription to `system.update`, `idle` or `once`.")]
-			public sealed class Subscription : IDisposable, IEquatable<Subscription>, IEquatable<Value>
-			{
-				internal Subscription(Value action) => Action = action;
-				internal Subscription next, prev; // cyclic (when subscribed, null if removed)
-
-				[Description("The subscribed action (ROS function or .NET action delegate).")]
-				public Value Action { get; }
-				[Description("The event the action is subscribed to (null when removed).")]
-				public Event Event { get; internal set; }
-				[Browsable(false), Description("Core it is currently running on (if yielding).")]
-				public Core Core { get; internal set; }
-
-				[Browsable(false)]
-				public bool Equals(Subscription subscription)
-					=> ReferenceEquals(this, subscription);
-				[Browsable(false)]
-				public bool Equals(Value value)
-					=> value.obj is Subscription s ? ReferenceEquals(this, s) : Action.Equals(value);
-				[Browsable(false)]
-				public override bool Equals(object o)
-					=> o is Subscription s ? Equals(s) : o is Value v && Equals(v);
-				[Browsable(false)]
-				public override int GetHashCode()
-					=> base.GetHashCode();
-
-				[Description("Remove this subscription from its list. (Ignored if already removed.)")]
-				public void Remove()
+				[Description("The subscription to `system.update`, `idle` or `once`.")]
+				public sealed class Subscription : IDisposable, IEquatable<Subscription>, IEquatable<Value>
 				{
-					if (Event == null)
-						return;
-					if (--Event.Count == 0)
+					internal Subscription(Value action) => Action = action;
+					internal Subscription next, prev; // cyclic (when subscribed, null if removed)
+
+					[Description("The subscribed action (ROS function or .NET action delegate).")]
+					public Value Action { get; }
+					[Description("The event the action is subscribed to (null when removed).")]
+					public Event Event { get; internal set; }
+					[Browsable(false), Description("Core it is currently running on (if yielding).")]
+					public Core Core { get; internal set; }
+
+					[Browsable(false)]
+					public bool Equals(Subscription subscription)
+						=> ReferenceEquals(this, subscription);
+					[Browsable(false)]
+					public bool Equals(Value value)
+						=> value.obj is Subscription s ? ReferenceEquals(this, s) : Action.Equals(value);
+					[Browsable(false)]
+					public override bool Equals(object o)
+						=> o is Subscription s ? Equals(s) : o is Value v && Equals(v);
+					[Browsable(false)]
+					public override int GetHashCode()
+						=> base.GetHashCode();
+
+					[Description("Remove this subscription from its list. (Ignored if already removed.)")]
+					public void Remove()
 					{
-						Event.first = null;
-						Event.next = null;
+						if (Event == null)
+							return;
+						if (--Event.Count == 0)
+						{
+							Event.first = null;
+							Event.next = null;
+						}
+						else
+						{
+							if (Event.first == this)
+								Event.first = next;
+							if (Event.next == this)
+								Event.next = next;
+						}
+						next.prev = prev;
+						prev.next = next;
+						next = null;
+						prev = null;
+						Event = null;
+						Core = null;
+					}
+					void IDisposable.Dispose() => Remove();
+				}
+
+				public Subscription Add(Value value)
+				{
+					if (value.obj is Subscription s)
+						s.Remove();
+					else s = new Subscription(value);
+					Count++;
+					s.Event = this;
+					if (first == null)
+					{
+						s.next = s;
+						s.prev = s;
+						first = s;
+						next = s;
 					}
 					else
 					{
-						if (Event.first == this)
-							Event.first = next;
-						if (Event.next == this)
-							Event.next = next;
+						s.next = first;
+						s.prev = first.prev;
+						s.prev.next = s;
+						first.prev = s;
 					}
-					next.prev = prev;
-					prev.next = next;
-					next = null;
-					prev = null;
-					Event = null;
-					Core = null;
+					return s;
 				}
-				void IDisposable.Dispose() => Remove();
-			}
-
-			public Subscription Add(Value value)
-			{
-				if (value.obj is Subscription s)
-					s.Remove();
-				else s = new Subscription(value);
-				Count++;
-				s.Event = this;
-				if (first == null)
+				public bool Remove(Value value)
 				{
-					s.next = s;
-					s.prev = s;
-					first = s;
-					next = s;
-				}
-				else
-				{
-					s.next = first;
-					s.prev = first.prev;
-					s.prev.next = s;
-					first.prev = s;
-				}
-				return s;
-			}
-			public bool Remove(Value value)
-			{
-				if (first == null)
-					return false;
-				if (value.obj is Subscription s)
-				{
-					if (s.Event != this)
+					if (first == null)
 						return false;
-					s.Remove();
-					return true;
-				}
-				bool found = false;
-				var next = first;
-				do
-				{
-					var it = next;
-					next = next.next;
-					if (it.Action.Equals(value))
+					if (value.obj is Subscription s)
 					{
-						found = true;
+						if (s.Event != this)
+							return false;
+						s.Remove();
+						return true;
+					}
+					bool found = false;
+					var next = first;
+					do
+					{
+						var it = next;
+						next = next.next;
+						if (it.Action.Equals(value))
+						{
+							found = true;
+							it.Remove();
+						}
+					}
+					while (next != first);
+					return found;
+				}
+				public void Clear()
+				{
+					var next = first;
+					if (next == null)
+						return;
+					do
+					{
+						var it = next;
+						next = next.next;
 						it.Remove();
 					}
+					while (next != first);
 				}
-				while (next != first);
-				return found;
-			}
-			public void Clear()
-			{
-				var next = first;
-				if (next == null)
-					return;
-				do
-				{
-					var it = next;
-					next = next.next;
-					it.Remove();
-				}
-				while (next != first);
 			}
 		}
 	}

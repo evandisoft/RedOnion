@@ -108,39 +108,46 @@ namespace RedOnion.ROS.Objects
 
 		Action executeLater;
 		public Action ExecuteLater => executeLater
-			?? (executeLater = () => Processor.Once.Add(new Value(this)));
+			?? (executeLater = () => Processor.ExecuteLater(this));
 
 		public void ExecuteLater0()
-			=> Processor.Once.Add(new Value(this));
+			=> Processor.ExecuteLater(this);
 		static MethodInfo executeLater0 = typeof(Function).GetMethod("ExecuteLater0");
 
 		public void ExecuteLater1(Value arg)
-			=> Processor.Once.Add(new Value(this.Bind(arg)));
+			=> Processor.ExecuteLater(this.Bind(arg));
 		public void ExecuteLater1Gen<Arg>(Arg arg)
-			=> Processor.Once.Add(new Value(this.Bind(new Value(arg))));
+			=> Processor.ExecuteLater(this.Bind(new Value(arg)));
 		static MethodInfo executeLater1 = typeof(Function).GetMethod("ExecuteLater1");
 		static MethodInfo executeLater1Gen = typeof(Function).GetMethod("ExecuteLater1Gen");
 
 		public void ExecuteLater2(Value a, Value b)
-			=> Processor.Once.Add(new Value(this.Bind(a, b)));
+			=> Processor.ExecuteLater(this.Bind(a, b));
 		public void ExecuteLater2Gen<A, B>(A a, B b)
-			=> Processor.Once.Add(new Value(this.Bind(new Value(a), new Value(b))));
+			=> Processor.ExecuteLater(this.Bind(new Value(a), new Value(b)));
 		static MethodInfo executeLater2 = typeof(Function).GetMethod("ExecuteLater2");
 		static MethodInfo executeLater2Gen = typeof(Function).GetMethod("ExecuteLater2Gen");
 
 		public void ExecuteLater3(Value a, Value b, Value c)
-			=> Processor.Once.Add(new Value(this.Bind(a, b, c)));
+			=> Processor.ExecuteLater(this.Bind(a, b, c));
 		public void ExecuteLater3Gen<A, B, C>(A a, B b, C c)
-			=> Processor.Once.Add(new Value(this.Bind(new Value(a), new Value(b), new Value(c))));
+			=> Processor.ExecuteLater(this.Bind(new Value(a), new Value(b), new Value(c)));
 		static MethodInfo executeLater3 = typeof(Function).GetMethod("ExecuteLater3");
 		static MethodInfo executeLater3Gen = typeof(Function).GetMethod("ExecuteLater3Gen");
 
 		public void ExecuteLater4(Value a, Value b, Value c, Value d)
-			=> Processor.Once.Add(new Value(this.Bind(a, b, c, d)));
+			=> Processor.ExecuteLater(this.Bind(a, b, c, d));
 		public void ExecuteLater4Gen<A, B, C, D>(A a, B b, C c, D d)
-			=> Processor.Once.Add(new Value(this.Bind(new Value(a), new Value(b), new Value(c), new Value(d))));
+			=> Processor.ExecuteLater(this.Bind(new Value(a), new Value(b), new Value(c), new Value(d)));
 		static MethodInfo executeLater4 = typeof(Function).GetMethod("ExecuteLater4");
 		static MethodInfo executeLater4Gen = typeof(Function).GetMethod("ExecuteLater4Gen");
+
+		public void ExecuteLater5(Value a, Value b, Value c, Value d, Value e)
+			=> Processor.ExecuteLater(this.Bind(a, b, c, d, e));
+		public void ExecuteLater5Gen<A, B, C, D, E>(A a, B b, C c, D d, E e)
+			=> Processor.ExecuteLater(this.Bind(new Value(a), new Value(b), new Value(c), new Value(d), new Value(e)));
+		static MethodInfo executeLater5 = typeof(Function).GetMethod("ExecuteLater5");
+		static MethodInfo executeLater5Gen = typeof(Function).GetMethod("ExecuteLater5Gen");
 
 		public override bool Convert(ref Value self, Descriptor to)
 		{
@@ -205,7 +212,24 @@ namespace RedOnion.ROS.Objects
 						return true;
 					}
 					self = new Value(to, Delegate.CreateDelegate(to.Type, this,
-						executeLater4Gen.MakeGenericMethod(pars[0].ParameterType, pars[1].ParameterType, pars[2].ParameterType, pars[3].ParameterType)));
+						executeLater4Gen.MakeGenericMethod(pars[0].ParameterType, pars[1].ParameterType,
+						pars[2].ParameterType, pars[3].ParameterType)));
+					return true;
+				}
+				if (pars.Length == 5)
+				{
+					if (pars[0].ParameterType == typeof(Value)
+						&& pars[1].ParameterType == typeof(Value)
+						&& pars[2].ParameterType == typeof(Value)
+						&& pars[3].ParameterType == typeof(Value)
+						&& pars[4].ParameterType == typeof(Value))
+					{
+						self = new Value(to, Delegate.CreateDelegate(to.Type, this, executeLater5));
+						return true;
+					}
+					self = new Value(to, Delegate.CreateDelegate(to.Type, this,
+						executeLater5Gen.MakeGenericMethod(pars[0].ParameterType, pars[1].ParameterType,
+						pars[2].ParameterType, pars[3].ParameterType, pars[4].ParameterType)));
 					return true;
 				}
 			}

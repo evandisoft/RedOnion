@@ -241,37 +241,7 @@ namespace RedOnion.ROS
 
 	#endregion
 
-	#region Processor, Arguments and related
-
-	/// <summary>
-	/// The root of scripting engine, usually the main core
-	/// </summary>
-	public interface IProcessor
-	{
-		/// <summary>
-		/// Event invoked on engine shutdown or reset.
-		/// (All subscriptions are removed prior to executing the handlers.)
-		/// </summary>
-		event Action Shutdown;
-		/// <summary>
-		/// Event invoked on every physics update (Unity FixedUpdate).
-		/// </summary>
-		event Action PhysicsUpdate;
-		/// <summary>
-		/// Event invoked on every graphic update (Unity Update).
-		/// </summary>
-		event Action GraphicUpdate;
-
-		/// <summary>
-		/// Invoked by print function
-		/// </summary>
-		void Print(string msg);
-
-		/// <summary>
-		/// Log message
-		/// </summary>
-		void Log(string msg);
-	}
+	#region Arguments and related
 
 	/// <summary>
 	/// Exit code (of last statement, code block or whole program)
