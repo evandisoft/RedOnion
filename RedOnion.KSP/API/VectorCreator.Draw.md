@@ -4,7 +4,7 @@ Vector drawing. WIP: The origin is glitching a bit shortly after launch and duri
 
 
 **Instance Properties:**
-- `reference`: ISpaceObject - Reference for coordinate system (origin at zero if null).
+- `reference`: [ISpaceObject](ISpaceObject.md) - Reference for coordinate system (origin at zero if null).
 - `origin`: [Vector](Vector.md) - Starting point of the vector (relative to reference).
 - `direction`: [Vector](Vector.md) - Direction of the vector (from starting point).
 - `from`: [Vector](Vector.md) - Alias to `origin`.

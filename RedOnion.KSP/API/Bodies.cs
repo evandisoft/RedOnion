@@ -77,16 +77,12 @@ and elements are also properties (`bodies.kerbin`, `bodies.mun`).")]
 
 		[Description("Position of the body (relative to active ship).")]
 		public Vector position => new Vector(native.position);
+		[Description("Current orbital velocity.")]
+		public Vector velocity => new Vector(native.orbit.GetVel());
 		[WorkInProgress, Description("Predicted position at specified time.")]
 		public Vector positionAt(double time) => new Vector(native.getPositionAtUT(time) - FlightGlobals.ActiveVessel.CoMD);
 		[WorkInProgress, Description("Predicted velocity at specified time.")]
-		public Vector velocityAt(double time)
-		{
-			// suppose that Y and Z are swapped as in `Ship.velocityAt`
-			var v = native.orbit.getOrbitalVelocityAtUT(time);
-			return new Vector(v.x, v.z, v.y);
-		}
-
+		public Vector velocityAt(double time) => new Vector(native.orbit.getOrbitalVelocityAtUT(time).xzy);
 
 		[Description("Orbiting celestial bodies.")]
 		public ReadOnlyList<SpaceBody> bodies { get; }

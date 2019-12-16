@@ -28,6 +28,7 @@ namespace RedOnion.ROS.Functions
 		public override void Reset()
 		{
 			Source.Reset();
+			Once.Reset();
 			Include.Reset();
 			base.Reset();
 		}
