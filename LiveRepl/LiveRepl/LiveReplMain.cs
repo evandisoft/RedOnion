@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UnityEngine;
 using KSP.UI.Screens;
 using System.Collections.Generic;
@@ -81,9 +81,13 @@ namespace LiveRepl
 		{
 			if (!highResolution) return;
 
+			// this can probably be removed, since it was used before MunOS (and is now empty, doing nothing)
 			scriptWindow?.FixedUpdate();
-			ProcessManager.Instance.FixedUpdate();
+
+			// first execute scripts
 			CoreExecMgr.Instance.FixedUpdate();
+			// then do the update (which may use new state created by scripts)
+			ProcessManager.Instance.FixedUpdate();
 		}
 
 		void OnGUI()

@@ -257,7 +257,24 @@ namespace RedOnion.ROS
 				self = read(self.obj);
 				return true;
 			}
+#if DEBUG
 			public override bool Set(ref Value self, int at, OpCode op, ref Value value)
+			{
+				try
+				{
+					return InternalSet(ref self, at, op, ref value);
+				}
+				catch
+				{
+					Value.DebugLog($"Exception in {Name}.Set");
+					Value.DebugLog($"Self: {self}; at: {at}; op: {op}; value: {value}; prop: {NameOf(this, at)}");
+					throw;
+				}
+			}
+			private bool InternalSet(ref Value self, int at, OpCode op, ref Value value)
+#else
+			public override bool Set(ref Value self, int at, OpCode op, ref Value value)
+#endif
 			{
 				if (at == int.MaxValue)
 				{
