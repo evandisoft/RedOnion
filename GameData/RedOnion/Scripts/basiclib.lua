@@ -18,6 +18,8 @@ function findmodules(modulename)
     return modules
 end
 
+
+
 function waitforfalling()
     local alt1=altitude
     local alt2=altitude+100000
@@ -47,6 +49,13 @@ function runexp(title)
             experiment.ResetAction()
             experiment.DeployAction()
         end
+    end
+end
+
+function printexperiments()
+    local experiments=findmodules("ModuleScienceExperiment")
+    for experiment in experiments do
+        print(experiment.experiment.experimentTitle)
     end
 end
 

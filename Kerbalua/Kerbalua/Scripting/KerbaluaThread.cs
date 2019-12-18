@@ -79,12 +79,14 @@ namespace Kerbalua.Scripting
 			//MunLogger.Log("tick limit is "+tickLimit);
 			DynValue retval=null;
 			CoroutineState state=CoroutineState.ForceSuspended;
-			while (tickwatch.ElapsedTicks<tickLimit && state==CoroutineState.ForceSuspended)
+			// We want this to run at least once, to always give anything that woke up a guarantee
+			// of at least perIterationCounter instructions
+			do
 			{
 				coroutine.Coroutine.AutoYieldCounter = perIterationCounter;
 				retval = coroutine.Coroutine.Resume();
 				state=coroutine.Coroutine.State;
-			}
+			} while (tickwatch.ElapsedTicks<tickLimit && state==CoroutineState.ForceSuspended);
 
 			//MunLogger.Log("state was "+state);
 
