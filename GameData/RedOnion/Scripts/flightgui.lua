@@ -23,7 +23,7 @@ addbutton("temperature scan",function() runexp("Temperature Scan") end)
 
 local function addScienceButtons()
     local modules=findmodules("ModuleScienceExperiment")
-    local titles=new(HashSet,1)
+    local titles=new(HashSet)
     for module in modules do
         titles.Add(module.experiment.experimentTitle)
     end
