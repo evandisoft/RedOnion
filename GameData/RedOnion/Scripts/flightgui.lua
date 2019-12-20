@@ -15,3 +15,5 @@ addbutton("run experiments",runexps)
 addbutton("auto parachutes",autopara)
 addbutton("eva report",function() runexp("EVA Report") end)
 addbutton("crew report",function() runexp("Crew Report") end)
+addbutton("temperature scan",function() runexp("Temperature Scan") end)
+
