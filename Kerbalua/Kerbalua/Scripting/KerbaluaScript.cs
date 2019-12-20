@@ -88,7 +88,12 @@ return function(stat,...)
 	if type(stat)~='userdata' then
 		error('First argument to `new` must be a CLR Static Class')
 	end
-	return stat.__new(...) 
+	local args={...}
+	if #args>0 then
+		return stat.__new(...)
+	else
+		return stat.__new()
+	end
 end
 ");
 
