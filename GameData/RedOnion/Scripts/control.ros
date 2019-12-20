@@ -195,9 +195,9 @@ def control ship, target, x, y
     ship.sas = true
   def execSteer
     if bAbort.pressed
-      return
+      return vector.none
     unless mMan.pressed or mNde.pressed
-      return
+      return vector.none
     var nde = node.next
     if nde == null
       bAbort.press

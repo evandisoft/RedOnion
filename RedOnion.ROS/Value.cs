@@ -41,6 +41,7 @@ namespace RedOnion.ROS
 			=> string.Format(Culture, msg.String, args);
 
 		public static Action<string> LogListener;
+
 		public static void Log(FormattableString msg)
 			=> LogListener?.Invoke(msg.ToString(Culture));
 		public static void Log(StringWrapper msg, params object[] args)
@@ -51,6 +52,22 @@ namespace RedOnion.ROS
 		[Conditional("DEBUG")]
 		public static void DebugLog(StringWrapper msg, params object[] args)
 			=> LogListener?.Invoke(Format(msg, args));
+
+#if DEBUG
+		public static Action<string> ExtraLogListener;
+		[Conditional("DEBUG")]
+		public static void ExtraLog(FormattableString msg)
+			=> ExtraLogListener?.Invoke(msg.ToString(Culture));
+		[Conditional("DEBUG")]
+		public static void ExtraLog(StringWrapper msg, params object[] args)
+			=> ExtraLogListener?.Invoke(Format(msg, args));
+#else
+		[Conditional("DEBUG")]
+		public static void ExtraLog(FormattableString msg) { }
+		[Conditional("DEBUG")]
+		public static void ExtraLog(StringWrapper msg, params object[] args) { }
+#endif
+
 
 		/// <summary>
 		/// The descriptor - how the core interacts with the value
