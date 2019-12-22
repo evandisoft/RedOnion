@@ -42,18 +42,21 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Executors\MunSleepingExecutor.cs" />
+    <Compile Include="MunEvent.cs" />
+    <Compile Include="MunID.cs" />
+    <Compile Include="MunPriority.cs" />
+    <Compile Include="MunStatus.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="MunOS\Core\Executors\IdleExecutor.cs" />
-    <Compile Include="MunOS\Core\Executors\NormalExecutor.cs" />
-    <Compile Include="MunOS\Core\Executors\OneShotExecutor.cs" />
-    <Compile Include="MunOS\Core\Executors\PriorityExecutor.cs" />
-    <Compile Include="MunOS\Core\Executors\RealtimeExecutor.cs" />
-    <Compile Include="MunOS\Core\CoreExecMgr.cs" />
-    <Compile Include="MunOS\Core\ExecInfo.cs" />
-    <Compile Include="MunOS\Core\IExecutable.cs" />
-    <Compile Include="MunOS\ProcessLayer\MunProcess.cs" />
-    <Compile Include="MunOS\ProcessLayer\MunThread.cs" />
-    <Compile Include="MunOS\ProcessLayer\ProcessOutputBuffer.cs" />
+    <Compile Include="Executors\MunIdleExecutor.cs" />
+    <Compile Include="Executors\MunMainExecutor.cs" />
+    <Compile Include="Executors\MunCallbackExecutor.cs" />
+    <Compile Include="Executors\MunExecutor.cs" />
+    <Compile Include="Executors\MunRealtimeExecutor.cs" />
+    <Compile Include="MunCore.cs" />
+    <Compile Include="MunProcess.cs" />
+    <Compile Include="MunThread.cs" />
+    <Compile Include="Repl\OutputBuffer.cs" />
     <Compile Include="MunOS\ProcessLayer\EngineProcess.cs" />
     <Compile Include="MunOS\ProcessLayer\EngineThread.cs" />
     <Compile Include="MunOS\ProcessLayer\ProcessManager.cs" />
@@ -64,7 +67,6 @@
     <None Include="MunOS\MunOSRequirements.md" />
     <None Include="MunOS\UseCases.md" />
     <None Include="MunOS\Layer2.md" />
-    <None Include="MunOS\Core\CoreReadme.md" />
     <None Include="MunOS\HowTo.md" />
   </ItemGroup>
   <ItemGroup>
