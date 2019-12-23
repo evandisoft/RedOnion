@@ -4,8 +4,6 @@ using KSP.UI.Screens;
 using System.Collections.Generic;
 using MunOS;
 using System.Diagnostics;
-using MunOS.Core;
-using MunOS.ProcessLayer;
 
 namespace LiveRepl
 {

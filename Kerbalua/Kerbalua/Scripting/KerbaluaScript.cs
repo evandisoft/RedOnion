@@ -14,8 +14,7 @@ using RedOnion.UI;
 using Kerbalua.Events;
 using System.IO;
 using RedOnion.KSP.Settings;
-using MunOS.ProcessLayer;
-using MunOS.Core;
+using MunOS;
 
 namespace Kerbalua.Scripting
 {

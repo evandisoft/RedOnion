@@ -1,5 +1,5 @@
-using MunOS.Core;
-using MunOS.ProcessLayer;
+using MunOS;
+using MunOS.Repl;
 using RedOnion.ROS;
 using System;
 using System.Collections.Generic;
@@ -7,15 +7,13 @@ using UnityEngine;
 
 namespace RedOnion.KSP.ROS
 {
-	public class RosProcess : EngineProcess
+	public class RosProcess : MunProcess
 	{
-		public override string Extension => ".ros";
-
 		public RosProcessor Processor { get; private set; }
 		protected internal RosThread ReplThread { get; set; }
 
-		public RosProcess() : this(false) { }
-		public RosProcess(bool lateBind)
+		public RosProcess(MunCore core) : this(core, false) { }
+		public RosProcess(MunCore core, bool lateBind) : base(core)
 		{
 			if (!lateBind)
 				SetProcessor(new RosProcessor(this));
@@ -25,13 +23,28 @@ namespace RedOnion.KSP.ROS
 			if (Processor != null)
 				throw new InvalidOperationException("ROS Processor already set");
 			Processor = processor;
-			Processor.Print += outputBuffer.AddOutput;
-			Processor.PrintError += outputBuffer.AddError;
+			if (OutputBuffer != null)
+			{
+				Processor.Print += OutputBuffer.AddOutput;
+				Processor.PrintError += OutputBuffer.AddError;
+			}
 		}
 
-		// TODO: redesign Init
-		public override string GetImportString(string scriptname)
-			=> "run \"" + scriptname + "\"";
+		protected override void OnSetOutputBuffer(OutputBuffer value, OutputBuffer prev)
+		{
+			if (prev != null)
+			{
+				Processor.Print -= prev.AddOutput;
+				Processor.PrintError -= prev.AddError;
+			}
+			if (value != null)
+			{
+				Processor.Print += OutputBuffer.AddOutput;
+				Processor.PrintError += OutputBuffer.AddError;
+			}
+		}
+
+		/*
 		protected override MunThread CreateThread(string source, string path)
 			=> new RosThread(ExecPriority.MAIN, source, path, this);
 
@@ -91,7 +104,6 @@ namespace RedOnion.KSP.ROS
 				return new List<string>();
 			}
 		}
-
-
+		*/
 	}
 }

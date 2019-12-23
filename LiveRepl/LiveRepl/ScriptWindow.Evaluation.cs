@@ -4,7 +4,8 @@ using System.IO;
 using Kerbalua.Scripting;
 using Kerbalui.Controls;
 using LiveRepl.Execution;
-using MunOS.ProcessLayer;
+using MunOS;
+using MunOS.Repl;
 using RedOnion.KSP.API;
 using RedOnion.KSP.ROS;
 using RedOnion.KSP.Settings;
@@ -28,21 +29,23 @@ namespace LiveRepl
 
 
 
-		public bool ScriptRunning => currentEngineProcess.TotalThreadCount > 0;
+		// this needs some better logic because there is no way to know if there is some callback
+		public bool ScriptRunning => true;// currentEngineProcess.TotalThreadCount > 0;
+
 		public void SetCurrentEngineProcess(string engineName)
 		{
 			currentEngineProcess = engineProcesses[engineName];
 			uiparts.scriptEngineLabel.SetEngine(engineName);
 		}
 
-		Dictionary<string,EngineProcess> engineProcesses=new Dictionary<string, EngineProcess>();
-		public EngineProcess currentEngineProcess;
+		Dictionary<string, MunProcess> engineProcesses=new Dictionary<string, MunProcess>();
+		public MunProcess currentEngineProcess;
 
-		private EngineProcess GetEngineProcessByExtension(string extension)
+		private MunProcess GetEngineProcessByExtension(string extension)
 		{
 			foreach(var engineProcessEntry in engineProcesses)
 			{
-				if (engineProcessEntry.Value.Extension.ToLower()==extension.ToLower())
+				if (engineProcessEntry.Value.ScriptManager.Extension.ToLower()==extension.ToLower())
 				{
 					return engineProcessEntry.Value;
 				}
@@ -108,13 +111,13 @@ namespace LiveRepl
 
 		void InitEvaluation()
 		{
-			var rosProcess= new RosProcess();
+			var rosProcess = new RosProcess(MunCore.Default);
+			rosProcess.ScriptManager = new RosManager();
 			engineProcesses["ROS"] = rosProcess;
-			ProcessManager.Instance.Processes.Add(rosProcess);
 
-			var kerbaluaProcess= new KerbaluaProcess();
+			var kerbaluaProcess = new KerbaluaProcess();
+			kerbaluaProcess.ScriptManager = new KerbaluaManager();
 			engineProcesses["Lua"] = kerbaluaProcess;
-			ProcessManager.Instance.Processes.Add(kerbaluaProcess);
 
 			string lastEngineName = SavedSettings.LoadSetting("lastEngine", "Lua");
 			if (engineProcesses.ContainsKey(lastEngineName))

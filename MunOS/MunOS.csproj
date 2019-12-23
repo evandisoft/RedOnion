@@ -58,8 +58,7 @@
     <Compile Include="MunThread.cs" />
     <Compile Include="Repl\OutputBuffer.cs" />
     <Compile Include="MunOS\ProcessLayer\EngineProcess.cs" />
-    <Compile Include="MunOS\ProcessLayer\EngineThread.cs" />
-    <Compile Include="MunOS\ProcessLayer\ProcessManager.cs" />
+    <Compile Include="Repl\ScriptManager.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

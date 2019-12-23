@@ -25,12 +25,28 @@ namespace MunOS
 		/// </summary>
 		public bool AutoRemove { get; set; } = true;
 
+		private OutputBuffer _outputBuffer;
 		/// <summary>
 		/// This is used by REPL and may be null (but used if assigned).
 		/// </summary>
-		public OutputBuffer OutputBuffer { get; set; }
+		public OutputBuffer OutputBuffer
+		{
+			get => _outputBuffer;
+			set
+			{
+				if (value == _outputBuffer)
+					return;
+				var prev = _outputBuffer;
+				_outputBuffer = value;
+				OnSetOutputBuffer(value, prev);
+			}
+		}
+		/// <summary>
+		/// Associated script manager (if any - can be null).
+		/// </summary>
+		public ScriptManager ScriptManager { get; set; }
 
-		protected MunProcess(MunCore core, string name)
+		protected MunProcess(MunCore core, string name = null)
 		{
 			ID = MunID.GetPositive();
 			Name = name ?? ID.ToString();
@@ -114,6 +130,10 @@ namespace MunOS
 		/// </summary>
 		protected internal virtual void OnThreadDone(MunThread thread)
 			=> Remove(thread);
+
+		protected internal virtual void OnError(MunEvent err) { }
+
+		protected virtual void OnSetOutputBuffer(OutputBuffer value, OutputBuffer prev) { }
 
 		/// <summary>
 		/// Event invoked on every physics update (Unity FixedUpdate).

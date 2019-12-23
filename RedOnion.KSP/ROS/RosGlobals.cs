@@ -1,14 +1,10 @@
-using MunOS.Core;
-using MunOS.ProcessLayer;
+using MunOS;
 using RedOnion.KSP.API;
 using RedOnion.ROS;
 using RedOnion.ROS.Objects;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RedOnion.KSP.ROS
 {
@@ -22,16 +18,16 @@ namespace RedOnion.KSP.ROS
 			System.Add(typeof(PID));
 
 			var process = ((RosProcessor)Processor).Process;
-			System.Add("update", new Event(ExecPriority.REALTIME));
-			System.Add("idle", new Event(ExecPriority.IDLE));
-			System.Add("once", new Event(ExecPriority.ONESHOT));
+			System.Add("update", new Event(MunPriority.Realtime));
+			System.Add("idle", new Event(MunPriority.Idle));
+			System.Add("once", new Event(MunPriority.Callback));
 			System.Lock();
 		}
 
 		class Event : ICallable
 		{
-			public readonly ExecPriority priority;
-			public Event(ExecPriority priority)
+			public readonly MunPriority priority;
+			public Event(MunPriority priority)
 				=> this.priority = priority;
 
 			bool ICallable.Call(ref Value result, object self, Arguments args, bool create)
@@ -41,10 +37,8 @@ namespace RedOnion.KSP.ROS
 				var it = args[0];
 				if (!it.IsFunction)
 					return false;
-				var process = MunThread.ExecutingThread?.parentProcess as RosProcess;
-				var thread = new RosThread(priority, it.obj as Function, process);
-				process.EnqueueThread(priority, thread);
-				result = new Value(new Subscription(thread));
+				result = new Value(new Subscription(new RosThread(
+					MunProcess.Current as RosProcess, priority, it.obj as Function)));
 				return true;
 			}
 		}
@@ -76,7 +70,7 @@ namespace RedOnion.KSP.ROS
 			[Description("Remove this subscription from its list. (Ignored if already removed.)")]
 			public void Remove()
 			{
-				thread.Terminate();
+				thread.Kill();
 				autoRemove = false;
 				GC.SuppressFinalize(this);
 			}
@@ -85,7 +79,7 @@ namespace RedOnion.KSP.ROS
 			~Subscription()
 			{
 				if (autoRemove)
-					thread.TerminateAsync();
+					thread.KillAsync();
 			}
 		}
 

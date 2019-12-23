@@ -4,14 +4,13 @@ using System.IO;
 using Kerbalua.Completion;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Loaders;
-using MunOS.Core;
-using MunOS.ProcessLayer;
+using MunOS;
 using RedOnion.KSP.Settings;
 using UnityEngine;
 
 namespace Kerbalua.Scripting
 {
-	public class KerbaluaProcess:EngineProcess
+	public class KerbaluaProcess:MunProcess
 	{
 		public KerbaluaScript ScriptEngine { get; private set; }
 
@@ -37,8 +36,6 @@ namespace Kerbalua.Scripting
 
 			slb.ModulePaths = new string[] { SavedSettings.BaseScriptsPath+"/?.lua" };
 		}
-
-		public override string Extension => ".lua";
 
 		public override IList<string> GetCompletions(string source, int cursorPos, out int replaceStart, out int replaceEnd)
 		{

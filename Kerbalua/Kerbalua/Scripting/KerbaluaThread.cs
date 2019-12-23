@@ -1,31 +1,28 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using Kerbalua.Parsing;
 using MoonSharp.Interpreter;
-using MunOS.Core;
-using MunOS.ProcessLayer;
+using MunOS;
 using static RedOnion.Debugging.QueueLogger;
 
 namespace Kerbalua.Scripting
 {
-	public class KerbaluaThread:EngineThread
+	public class KerbaluaThread:MunThread
 	{
-		public KerbaluaProcess ScriptProcess => parentProcess as KerbaluaProcess;
+		public KerbaluaProcess ScriptProcess => Process as KerbaluaProcess;
 		KerbaluaScript ScriptEngine => ScriptProcess.ScriptEngine;
 		DynValue coroutine;
+		string source, path;
+		string[] includes;
 
 		public DynValue ReturnValue { get; private set; }
 
-		/// <summary>
-		/// This can throw an errorif the script syntax is incorrect.
-		/// </summary>
-		/// <param name="source">Source.</param>
-		/// <param name="path">Path.</param>
-		/// <param name="parentProcess">Parent process.</param>
-		public KerbaluaThread(string source, string path, KerbaluaProcess parentProcess) : base(source, path, parentProcess)
+		public KerbaluaThread(KerbaluaProcess process, MunPriority priority, string source, string path, string[] includes)
+			: base(process.Core, process, priority, path)
 		{
-			var mainFunction=CreateFunction(source);
-			coroutine = ScriptEngine.CreateCoroutine(mainFunction);
+			this.source = source;
+			this.path = path;
+			this.includes = includes;
 		}
 
 		DynValue CreateFunction(string scriptSource)
@@ -43,34 +40,32 @@ namespace Kerbalua.Scripting
 			coroutine = ScriptEngine.CreateCoroutine(f);
 		}
 
-		public override bool IsSleeping
-		{
-			get
-			{
-				if (sleepwatch.IsRunning)
-				{
-					if (sleepwatch.ElapsedMilliseconds < sleeptimeMillis)
-					{
-						return true;
-					}
-
-					sleepwatch.Reset();
-					sleeptimeMillis=0;
-				}
-				return false;
-			}
-		}
-
 		long sleeptimeMillis=0;
 		Stopwatch sleepwatch=new Stopwatch();
 
 		Stopwatch tickwatch=new Stopwatch();
 		int perIterationCounter=100;
-		protected override ExecStatus ProtectedExecute(long tickLimit)
+		protected override MunStatus Execute(long tickLimit)
 		{
-			if (IsSleeping)
+			if (coroutine == null)
 			{
-				return ExecStatus.SLEEPING;
+				coroutine = ScriptEngine.CreateCoroutine(CreateFunction(source));
+			}
+
+			if (Status == MunStatus.Sleeping)
+			{
+				if (sleepwatch.IsRunning)
+				{
+					if (sleepwatch.ElapsedMilliseconds < sleeptimeMillis)
+					{
+						return MunStatus.Sleeping;
+					}
+
+					sleepwatch.Reset();
+					sleeptimeMillis=0;
+				}
+
+				return MunStatus.Incomplete;
 			}
 
 			tickwatch.Reset();

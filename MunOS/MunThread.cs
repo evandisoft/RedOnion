@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using MunOS.Executors;
+using MunOS.Repl;
 using static RedOnion.Debugging.QueueLogger;
 
 namespace MunOS
