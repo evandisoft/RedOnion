@@ -56,7 +56,7 @@ namespace Kerbalua.Scripting
 							throw new Exception("Could not get current process in LuaEventDescriptor");
 						}
 
-						process.Execute(MunOS.Core.ExecPriority.ONESHOT, closure);
+						new KerbaluaThread(process, MunPriority.Callback, closure);
 					});
 				});
 		}

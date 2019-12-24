@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using UnityEngine;
 using System.Collections.Generic;
@@ -21,9 +21,9 @@ namespace LiveRepl.Parts {
 				//{
 				//	extension=uiparts.scriptWindow.currentReplEvaluator.Extension;
 				//}
-				if (uiparts.scriptWindow.currentEngineProcess!=null)
+				if (uiparts.scriptWindow.CurrentEngine!=null)
 				{
-					extension=uiparts.scriptWindow.currentEngineProcess.Extension;
+					extension=uiparts.scriptWindow.CurrentEngine.Extension;
 				}
 
 				return "untitled"+extension;

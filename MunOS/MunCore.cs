@@ -95,21 +95,15 @@ namespace MunOS
 		#region Instance
 
 		/// <summary>
-		/// Currently executing thread (if any).
-		/// </summary>
-		public MunThread Thread { get; protected internal set; }
-		/// <summary>
-		/// Current process (if any).
-		/// </summary>
-		public MunProcess Process => Thread?.Process;
-
-		/// <summary>
 		/// Event executed on unexpected exceptions.
 		/// </summary>
 		public event Action<MunEvent> Error;
 
 		protected internal virtual void OnError(MunEvent err)
-			=> Error?.Invoke(err);
+		{
+			MunLogger.DebugLog("MunCore.OnError: " + err.ToString());
+			Error?.Invoke(err);
+		}
 
 		/// <summary>
 		/// Time limit for one update (2ms = 2 * Frequency / 1000).
@@ -311,14 +305,34 @@ namespace MunOS
 
 		public void Kill(MunThread thread, bool hard = false)
 		{
-			if (!thread.Status.IsFinal())
-				thread.Status = hard ? MunStatus.Terminated : MunStatus.Terminating;
-			if (hard)
-				thread.RemoveFromExecutor();
-			// else ... maybe move to some cleanup executor
+			MunLogger.DebugLog($"Killing thread#{thread?.ID ?? MunID.Zero}, hard: {hard}");
+			try
+			{
+				if (!thread.Status.IsFinal())
+					thread.Status = hard ? MunStatus.Terminated : MunStatus.Terminating;
+				if (hard)
+				{
+					thread.RemoveFromExecutor();
+					thread.OnDone();
+				}
+				// else ... maybe move to some cleanup executor
+			}
+			catch (Exception ex)
+			{
+				var err = new MunEvent(this, ex);
+				thread.OnError(err);
+				if (!err.Handled)
+				{
+					OnError(err);
+					if (!err.Handled)
+						throw;
+				}
+			}
 		}
 		public void Kill(MunProcess process, bool hard = false)
-			=> process.Terminate(hard);
+		{
+			process.Terminate(hard);
+		}
 
 		public bool Kill(MunID id, bool hard = false)
 		{

@@ -29,21 +29,24 @@ namespace LiveRepl
 
 
 
-		// this needs some better logic because there is no way to know if there is some callback
-		public bool ScriptRunning => true;// currentEngineProcess.TotalThreadCount > 0;
+		// this needs some better logic because there is no way to know if there is any native callback (that may spawn a thread)
+		public bool ScriptRunning => CurrentProcess?.Count > 0;
 
 		public void SetCurrentEngineProcess(string engineName)
 		{
-			currentEngineProcess = engineProcesses[engineName];
+			CurrentEngine = engines[engineName];
 			uiparts.scriptEngineLabel.SetEngine(engineName);
 		}
 
-		Dictionary<string, MunProcess> engineProcesses=new Dictionary<string, MunProcess>();
-		public MunProcess currentEngineProcess;
+		Dictionary<string, ScriptManager> engines=new Dictionary<string, ScriptManager>();
+		public ScriptManager CurrentEngine { get; protected set; }
+		public MunProcess CurrentProcess => CurrentEngine?.Process;
+		public OutputBuffer CurrentBuffer => CurrentEngine?.OutputBuffer;
 
+		/* unused
 		private MunProcess GetEngineProcessByExtension(string extension)
 		{
-			foreach(var engineProcessEntry in engineProcesses)
+			foreach(var engineProcessEntry in engines)
 			{
 				if (engineProcessEntry.Value.ScriptManager.Extension.ToLower()==extension.ToLower())
 				{
@@ -52,6 +55,7 @@ namespace LiveRepl
 			}
 			return null;
 		}
+		*/
 
 		public bool DisableElements;
 		public void FixedUpdate()
@@ -111,22 +115,17 @@ namespace LiveRepl
 
 		void InitEvaluation()
 		{
-			var rosProcess = new RosProcess(MunCore.Default);
-			rosProcess.ScriptManager = new RosManager();
-			engineProcesses["ROS"] = rosProcess;
-
-			var kerbaluaProcess = new KerbaluaProcess();
-			kerbaluaProcess.ScriptManager = new KerbaluaManager();
-			engineProcesses["Lua"] = kerbaluaProcess;
+			engines["ROS"] = new RosManager();
+			engines["Lua"] = new KerbaluaManager();
 
 			string lastEngineName = SavedSettings.LoadSetting("lastEngine", "Lua");
-			if (engineProcesses.ContainsKey(lastEngineName))
+			if (engines.ContainsKey(lastEngineName))
 			{
 				SetCurrentEngineProcess(lastEngineName);
 			}
 			else
 			{
-				foreach (var engineName in engineProcesses.Keys)
+				foreach (var engineName in engines.Keys)
 				{
 					SetCurrentEngineProcess(engineName);
 					SavedSettings.SaveSetting("lastEngine", engineName);
@@ -134,7 +133,7 @@ namespace LiveRepl
 				}
 			}
 
-			foreach (var engineName in engineProcesses.Keys)
+			foreach (var engineName in engines.Keys)
 			{
 				uiparts.scriptEngineSelector.AddMinSized(new Button(engineName,() =>
 				{

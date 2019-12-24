@@ -1,9 +1,7 @@
 using MunOS;
-using MunOS.Repl;
 using RedOnion.ROS;
 using RedOnion.ROS.Objects;
-using System;
-using System.Diagnostics;
+using static RedOnion.Debugging.QueueLogger;
 
 namespace RedOnion.KSP.ROS
 {
@@ -18,20 +16,18 @@ namespace RedOnion.KSP.ROS
 		RosProcessor processor;
 		internal Core core;
 		string source, path;
-		string[] includes;
 		Function fn;
 
-		public RosThread(RosProcess process, MunPriority priority, string source, string path, string[] includes)
-			: base(process.Core, process, priority, path)
+		public RosThread(RosProcess process, MunPriority priority, string source, string path, bool start = true)
+			: base(process.Core, process, priority, path, start)
 		{
 			this.process = process;
 			processor = process.Processor;
 			this.source = source;
 			this.path = path;
-			this.includes = includes;
 		}
-		public RosThread(RosProcess process, MunPriority priority, Function fn)
-			: base(process.Core, process, priority, fn.Name)
+		public RosThread(RosProcess process, MunPriority priority, Function fn, bool start = true)
+			: base(process.Core, process, priority, fn.Name, start)
 		{
 			this.process = process;
 			processor = process.Processor;

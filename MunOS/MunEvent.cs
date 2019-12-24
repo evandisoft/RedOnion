@@ -1,11 +1,7 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
+using static RedOnion.Debugging.QueueLogger;
 
 namespace MunOS
 {
@@ -26,6 +22,7 @@ namespace MunOS
 			Core = core;
 			Exception = ex;
 			StackFrame = new StackFrame(1);
+			MunLogger.DebugLog($"MunEvent: {ex.GetType().Name} in {Method.DeclaringType.Name}.{Method.Name}");
 		}
 
 		public MunEvent(MunCore core, MunThread thread, Exception ex = null)
@@ -35,6 +32,8 @@ namespace MunOS
 			Thread = thread;
 			Exception = ex;
 			StackFrame = new StackFrame(1);
+			MunLogger.DebugLog($@"MunEvent: thread#{thread?.ID ?? MunID.Zero}, exception: {(
+				ex?.GetType().Name ?? "none")} in {Method.DeclaringType.Name}.{Method.Name}");
 		}
 
 		public MunEvent(MunCore core, MunProcess process, Exception ex = null)
@@ -43,6 +42,14 @@ namespace MunOS
 			Process = process;
 			Exception = ex;
 			StackFrame = new StackFrame(1);
+			MunLogger.DebugLog($@"MunEvent: process#{process?.ID ?? MunID.Zero}, exception: {(
+				ex?.GetType().Name ?? "none")} in {Method.DeclaringType.Name}.{Method.Name}");
 		}
+
+		public override string ToString()
+			=> FormattableString.Invariant($@"MunEvent: process#{Process?.ID ?? MunID.Zero
+				}, thread#{Thread?.ID ?? MunID.Zero}, exception: {(
+				Exception?.GetType().Name ?? "none")
+				} in {Method.DeclaringType.Name}.{Method.Name}");
 	}
 }

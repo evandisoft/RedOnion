@@ -134,7 +134,7 @@ namespace MunOS.Executors
 
 		protected virtual void Execute(MunThread thread, long tickLimit)
 		{
-			Core.Thread = thread;
+			MunThread.Current = thread;
 			try
 			{
 				var status = thread.Execute(tickLimit);
@@ -185,7 +185,7 @@ namespace MunOS.Executors
 			}
 			finally
 			{
-				Core.Thread = null;
+				MunThread.Current = null;
 			}
 		}
 	}

@@ -1,18 +1,17 @@
 using System;
-using MunOS.Core;
+using MunOS;
 
 namespace Kerbalua.Scripting
 {
 	public class KerbaluaReplThread : KerbaluaThread
 	{
-		public KerbaluaReplThread(string source, string path, KerbaluaProcess parentProcess) : base(source, path, parentProcess)
-		{
-		}
+		public KerbaluaReplThread(KerbaluaProcess process, string source, string path)
+			: base(process, MunPriority.Main, source, path) { }
 
-		protected override ExecStatus ProtectedExecute(long tickLimit)
+		protected override MunStatus Execute(long tickLimit)
 		{
-			var status=base.ProtectedExecute(tickLimit);
-			if (status==ExecStatus.FINISHED)
+			var status=base.Execute(tickLimit);
+			if (status==MunStatus.Finished)
 			{
 				if (ReturnValue==null)
 				{
@@ -20,7 +19,7 @@ namespace Kerbalua.Scripting
 				}
 
 				string retvalString=GetOutputString(ReturnValue);
-				parentProcess.outputBuffer.AddReturnValue(retvalString);
+				Process.OutputBuffer.AddReturnValue(retvalString);
 			}
 
 			return status;

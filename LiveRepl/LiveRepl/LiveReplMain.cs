@@ -48,9 +48,6 @@ namespace LiveRepl
             // particular scene. If ToggleGui was already set, it was with
             // a delegate from another scene.
             ToggleGui = LocalToggleGui;
-
-			CoreExecMgr.Initialize();
-			ProcessManager.Initialize();
         }
 
 		ScriptWindow scriptWindow;
@@ -83,9 +80,7 @@ namespace LiveRepl
 			scriptWindow?.FixedUpdate();
 
 			// first execute scripts
-			CoreExecMgr.Instance.FixedUpdate();
-			// then do the update (which may use new state created by scripts)
-			ProcessManager.Instance.FixedUpdate();
+			MunCore.Default.FixedUpdate();
 		}
 
 		void OnGUI()

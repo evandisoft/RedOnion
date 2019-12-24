@@ -1,10 +1,9 @@
+using Kerbalua.Completion;
 using MunOS;
 using MunOS.Repl;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using UnityEngine;
 
 namespace Kerbalua.Scripting
 {
@@ -12,9 +11,27 @@ namespace Kerbalua.Scripting
 	{
 		public override string Extension => ".lua";
 
-		public override MunProcess CreateProcess(MunCore core)
-			=> new KerbaluaProcess(core);
-		public override MunThread CreateThread(MunProcess process, string source, string path, string[] includes = null)
-			=> new KerbaluaThread((KerbaluaProcess)process, MunPriority.Main, source, path, includes);
+		public override MunProcess CreateProcess()
+			=> new KerbaluaProcess(this);
+		public override MunThread CreateThread(string source, string path,
+			MunProcess process = null, MunPriority priority = MunPriority.Main, bool start = true)
+			=> new KerbaluaThread((KerbaluaProcess)(process ?? Process), priority, source, path, start);
+
+		public override IList<string> GetCompletions(string source, int cursorPos, out int replaceStart, out int replaceEnd, MunProcess process = null)
+		{
+			try
+			{
+				return MoonSharpIntellisense.GetCompletions(
+					((KerbaluaProcess)(process ?? Process)).ScriptEngine.Globals,
+					source, cursorPos, out replaceStart, out replaceEnd);
+			}
+			catch (Exception e)
+			{
+				// TODO: use MunCore.OnError or at least RedOnion.Common logging
+				Debug.Log(e);
+				replaceStart = replaceEnd = cursorPos;
+				return new List<string>();
+			}
+		}
 	}
 }

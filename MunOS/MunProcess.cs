@@ -10,18 +10,16 @@ namespace MunOS
 {
 	public abstract class MunProcess : ICollection<MunThread>
 	{
-		public static MunProcess Current => MunCore.Current?.Process;
-		public static MunID CurrentID => MunCore.Current?.Process?.ID ?? MunID.Zero;
+		public static MunProcess Current => MunThread.Current?.Process;
+		public static MunID CurrentID => Current?.ID ?? MunID.Zero;
 
 		public MunID ID { get; internal set; }
 		public string Name { get; set; }
 		public MunCore Core { get; }
 
 		/// <summary>
-		/// Automatically remove the process from the core when it is terminated.
+		/// Automatically remove the process from the core when it is terminated (last foreground thread is terminated).
 		/// Set to false if you want to reuse the process - but you have to remove it yourself.
-		/// Note that adding any background thread when there is no foreground thread
-		/// will immediately terminate the process and disconnect it from the core if AutoRemove is true.
 		/// </summary>
 		public bool AutoRemove { get; set; } = true;
 
@@ -66,11 +64,13 @@ namespace MunOS
 		// but since it is public, consider other usage
 		public virtual void Add(MunThread thread)
 		{
+			MunLogger.DebugLog($"Adding thread#{thread?.ID ?? MunID.Zero} into process#{ID}");
 			if (thread.Process != null)
 				throw new InvalidOperationException(thread.Process == this
 					? $"Thread {thread} already is in process {thread.Process}"
 					: $"Thread {thread} belongs to process {thread.Process}, cannot add to {this}");
 			threads.Add(thread.ID, thread);
+			thread.Process = this;
 			if (thread.IsBackground)
 				++BackgroundCount;
 			else ++ForegroundCount;
@@ -80,9 +80,11 @@ namespace MunOS
 		// but since it is public, consider other usage
 		public virtual void Remove(MunThread thread)
 		{
+			MunLogger.DebugLog($"Removing thread#{thread?.ID ?? MunID.Zero} from process#{ID}");
 			if (thread.Process != this)
-				throw new InvalidOperationException($"Thread {thread} already is in process {thread.Process}");
+				throw new InvalidOperationException($"Thread {thread} does not belong to process {this}");
 			threads.Remove(thread.ID);
+			thread.Process = null;
 			if (thread.IsBackground)
 				--BackgroundCount;
 			else --ForegroundCount;
@@ -129,7 +131,13 @@ namespace MunOS
 		/// (really done executing - finished and not restarted or terminated).
 		/// </summary>
 		protected internal virtual void OnThreadDone(MunThread thread)
-			=> Remove(thread);
+		{
+			ThreadDone?.Invoke(thread);
+			if (thread.AutoRemove)
+				Remove(thread);
+		}
+
+		public event Action<MunThread> ThreadDone;
 
 		protected internal virtual void OnError(MunEvent err) { }
 
@@ -184,7 +192,7 @@ namespace MunOS
 					{
 						// TODO: hook to Core.OnError and similar
 						physicsUpdate -= handler;
-						MunLogger.DebugLogArray($"Exception in process #{ID} graphics update: {ex.Message}");
+						MunLogger.DebugLog($"Exception in process #{ID} graphics update: {ex.Message}");
 					}
 				}
 			}
@@ -201,7 +209,7 @@ namespace MunOS
 		{
 			// first notify all subscribers that this process is shutting down
 			var shutdown = this.shutdown;
-			MunLogger.DebugLogArray($"Process ID#{ID} terminating. (shutdown: {shutdown?.GetInvocationList().Length ?? 0})");
+			MunLogger.DebugLog($"Process#{ID} terminating. (shutdown: {shutdown?.GetInvocationList().Length ?? 0})");
 			if (shutdown != null)
 			{
 				this.shutdown = null;
@@ -214,20 +222,23 @@ namespace MunOS
 					catch (Exception ex)
 					{
 						// TODO: hook to Core.OnError and similar
-						MunLogger.DebugLogArray($"Exception in process #{ID} shutdown: {ex.Message}");
+						MunLogger.DebugLog($"Exception in process#{ID} shutdown: {ex.Message}");
 					}
 				}
 			}
 
 			foreach (var thread in threads.Values)
-				thread.Kill(hard);
+				thread.Terminate(hard);
 
-			MunLogger.DebugLogArray($"Process ID#{ID} terminated.");
+			MunLogger.DebugLog($"Process#{ID} terminated.");
 		}
 
 		void ICollection<MunThread>.Clear() => Terminate();
 		bool ICollection<MunThread>.Contains(MunThread thread) => thread.Process == this;
 		public void CopyTo(MunThread[] array, int arrayIndex) => threads.Values.CopyTo(array, arrayIndex);
+
+		public override string ToString()
+			=> string.IsNullOrWhiteSpace(Name) ? ID.ToString() : Name;
 
 		/// <summary>
 		/// Used to subscribe to <see cref="shutdown"/> but avoid direct hard-link
@@ -263,10 +274,10 @@ namespace MunOS
 
 			public ShutdownHook(T target)
 			{
+				MunLogger.DebugLog($"Creating ShutdownHook for process#{CurrentID} in thread#{MunThread.CurrentID}.");
 				_target = new WeakReference<T>(target);
 				process = Current;
 				process.shutdown += Shutdown;
-				MunLogger.DebugLogArray($"ShutdownHook for process ID#{process.ID} created.");
 			}
 			~ShutdownHook() => Dispose(false);
 			public void Dispose()
@@ -286,8 +297,8 @@ namespace MunOS
 			protected virtual void Shutdown()
 			{
 				var target = Target;
-				var tgtstr = target == null ? "target is null" : "disposing target";
-				MunLogger.DebugLogArray($"ShutdownHook invoked for process ID#{process.ID}, {tgtstr}.");
+				MunLogger.DebugLog($@"ShutdownHook invoked for process ID#{process.ID}, {(
+					target == null ? "target is null" : "disposing target")}.");
 				target?.Dispose();
 				Dispose();
 			}

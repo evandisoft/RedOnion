@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Kerbalui.Controls;
 using Kerbalui.Decorators;
 using Kerbalui.EditingChanges;
@@ -60,7 +60,7 @@ namespace LiveRepl.Parts
 		public IList<string> GetCompletionContent(out int replaceStart, out int replaceEnd)
 		{
 			//return uiparts.scriptWindow.currentReplEvaluator.GetDisplayableCompletions(Text, CursorIndex, out replaceStart, out replaceEnd);
-			return uiparts.scriptWindow.currentEngineProcess.GetDisplayableCompletions(Text, CursorIndex, out replaceStart, out replaceEnd);
+			return uiparts.scriptWindow.CurrentEngine.GetDisplayableCompletions(Text, CursorIndex, out replaceStart, out replaceEnd);
 		}
 
 		public override bool HorizontalScrollBarPresent { get => rect.width<editingArea.MinSize.x; }

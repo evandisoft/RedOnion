@@ -9,21 +9,25 @@ namespace Kerbalua.Scripting
 {
 	public class KerbaluaThread:MunThread
 	{
-		public KerbaluaProcess ScriptProcess => Process as KerbaluaProcess;
+		public KerbaluaProcess ScriptProcess => (KerbaluaProcess)Process;
 		KerbaluaScript ScriptEngine => ScriptProcess.ScriptEngine;
 		DynValue coroutine;
 		string source, path;
-		string[] includes;
 
 		public DynValue ReturnValue { get; private set; }
 
-		public KerbaluaThread(KerbaluaProcess process, MunPriority priority, string source, string path, string[] includes)
-			: base(process.Core, process, priority, path)
+		public KerbaluaThread(KerbaluaProcess process, MunPriority priority, string source, string path, bool start = true)
+			: base(process.Core, process, priority, path, start)
 		{
 			this.source = source;
 			this.path = path;
-			this.includes = includes;
 		}
+		public KerbaluaThread(KerbaluaProcess process, MunPriority priority, Closure f, bool start = true)
+			: base(process.Core, process, priority, "fn", start)
+		{
+			coroutine = ScriptEngine.CreateCoroutine(f);
+		}
+
 
 		DynValue CreateFunction(string scriptSource)
 		{
@@ -33,11 +37,6 @@ namespace Kerbalua.Scripting
 			}
 			DynValue mainFunction = ScriptProcess.ScriptEngine.DoString("return function () " + scriptSource + "\n end");
 			return mainFunction;
-		}
-
-		public KerbaluaThread(Closure f,KerbaluaProcess parentProcess) : base("fn", "", parentProcess)
-		{
-			coroutine = ScriptEngine.CreateCoroutine(f);
 		}
 
 		long sleeptimeMillis=0;
@@ -88,11 +87,11 @@ namespace Kerbalua.Scripting
 			if (state == CoroutineState.Dead)
 			{
 				ReturnValue=retval;
-				return ExecStatus.FINISHED;
+				return MunStatus.Finished;
 			}
 			if (state == CoroutineState.ForceSuspended)
 			{
-				return ExecStatus.INTERRUPTED;
+				return MunStatus.Incomplete;
 			}
 			if (state == CoroutineState.Suspended)
 			{
@@ -105,7 +104,7 @@ namespace Kerbalua.Scripting
 				}
 				if (retval.IsNil())
 				{
-					return ExecStatus.YIELDED;
+					return MunStatus.Yielded;
 				}
 				if (retval.Type!=DataType.Number)
 				{
@@ -115,7 +114,7 @@ namespace Kerbalua.Scripting
 				sleeptimeMillis=(long)(sleepSeconds*1000);
 				sleepwatch.Start();
 
-				return ExecStatus.YIELDED;
+				return MunStatus.Yielded;
 			}
 
 			throw new Exception("State of coroutine should not have been "+state);

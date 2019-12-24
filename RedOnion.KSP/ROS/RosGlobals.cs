@@ -70,7 +70,7 @@ namespace RedOnion.KSP.ROS
 			[Description("Remove this subscription from its list. (Ignored if already removed.)")]
 			public void Remove()
 			{
-				thread.Kill();
+				thread.Terminate(hard: true);
 				autoRemove = false;
 				GC.SuppressFinalize(this);
 			}
