@@ -15,7 +15,8 @@ namespace Kerbalua.Scripting
 			=> new KerbaluaProcess(this);
 		public override MunThread CreateThread(string source, string path,
 			MunProcess process = null, MunPriority priority = MunPriority.Main, bool start = true)
-			=> new KerbaluaThread((KerbaluaProcess)(process ?? Process), priority, source, path, start);
+			=> new KerbaluaThread((KerbaluaProcess)(process ?? Process), priority,
+				source ?? $"require(\"{path}\")", path, start);
 
 		public override void Evaluate(string source, string path, bool withHistory = false)
 		{

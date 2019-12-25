@@ -1,9 +1,7 @@
 using RedOnion.Collections;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using static RedOnion.Debugging.QueueLogger;
 
 namespace MunOS.Repl
 {
@@ -50,13 +48,21 @@ namespace MunOS.Repl
 		}
 		private void InitThreadDone(MunThread thread)
 		{
+			MunLogger.DebugLog($@"Init script done: {thread}, next: {(
+				thread.NextThread?.ToString() ?? "none")}, ex: {(
+				thread.Exception?.ToString() ?? "none")}");
 			if (thread.NextThread == null && thread.Exception == null)
 			{
+				MunLogger.DebugLog($"Waiting thread count: {waitingThreads.Count}");
 				foreach (var waiting in waitingThreads)
+				{
+					MunLogger.DebugLog($"Scheduling thread#{waiting.ID}");
 					Core.Schedule(waiting);
+				}
 				waitingThreads.Clear();
 				Initialized = true;
 				Process.ThreadDone -= InitThreadDone;
+				MunLogger.DebugLog("Initialized");
 			}
 		}
 

@@ -1,6 +1,5 @@
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+using static RedOnion.Debugging.QueueLogger;
 
 namespace MunOS.Executors
 {
@@ -150,6 +149,7 @@ namespace MunOS.Executors
 				case MunStatus.Finished:
 				{
 					var next = thread.NextThread;
+					MunLogger.DebugLog($@"Thread#{thread.ID} finished, next: {(next?.ToString() ?? "none")}");
 					if (next != null)
 					{
 						if (next == thread)

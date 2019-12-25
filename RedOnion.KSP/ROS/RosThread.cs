@@ -70,21 +70,21 @@ namespace RedOnion.KSP.ROS
 			case ExitCode.Countdown:
 				return MunStatus.Incomplete;
 			default:
-				if (path == null && fn == null)
+				MunLogger.DebugLog($"Thread#{ID} finished with Exit={core.Exit}");
+				if (path == null && fn == null && !resultReported)
 				{
-					if (!resultReported)
-					{
-						Process?.OutputBuffer?.AddReturnValue(processor.Result.ToString());
-						resultReported = true;
-					}
-					return MunStatus.Finished;
+					Process?.OutputBuffer?.AddReturnValue(processor.Result.ToString());
+					resultReported = true;
 				}
-				if (Priority == MunPriority.Callback || core.Exit == ExitCode.Exception)
-					return MunStatus.Finished;
-				if (fn != null)
-					core.Execute(fn, countdown: 0);
-				return MunStatus.Yielded;
+				return MunStatus.Finished;
 			}
+		}
+
+		protected override void OnRestart()
+		{
+			if (fn != null)
+				core.Execute(fn, 0);
+			base.OnRestart();
 		}
 	}
 }
