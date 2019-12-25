@@ -60,7 +60,7 @@ namespace MunOS
 		/// </summary>
 		public Exception Exception { get; protected internal set; }
 		/// <summary>
-		/// To be executed when threads is finished or terminated.
+		/// To be executed when thread is finished or terminated.
 		/// </summary>
 		public event Action<MunThread> Done;
 

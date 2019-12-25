@@ -60,6 +60,15 @@ namespace MunOS.Repl
 			}
 		}
 
+		public virtual void Evaluate(string source, string path, bool withHistory = false)
+		{
+			var thread = CreateThread(source, path, start: Initialized);
+			if (!Initialized)
+				waitingThreads.Add(thread);
+			if (withHistory)
+				History.Add(source);
+		}
+
 		public abstract MunProcess CreateProcess();
 		public abstract MunThread CreateThread(string source, string path,
 			MunProcess process = null, MunPriority priority = MunPriority.Main, bool start = true);
