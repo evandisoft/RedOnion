@@ -38,7 +38,8 @@ namespace RedOnion.KSP.ROS
 				if (!it.IsFunction)
 					return false;
 				result = new Value(new Subscription(new RosThread(
-					MunProcess.Current as RosProcess, priority, it.obj as Function)));
+					MunProcess.Current as RosProcess, priority, it.obj as Function),
+					repeating: priority == MunPriority.Realtime || priority == MunPriority.Idle));
 				return true;
 			}
 		}
@@ -48,12 +49,13 @@ namespace RedOnion.KSP.ROS
 		{
 			RosThread thread;
 			bool autoRemove;
-			internal Subscription(RosThread thread, bool autoRemove = true)
+			internal Subscription(RosThread thread, bool repeating, bool autoRemove = true)
 			{
 				this.thread = thread;
 				this.autoRemove = autoRemove;
 				thread.IsBackground = true;
-				thread.NextThread = thread;
+				if (repeating)
+					thread.NextThread = thread;
 			}
 
 			[Browsable(false)]
