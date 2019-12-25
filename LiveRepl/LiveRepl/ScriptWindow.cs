@@ -114,7 +114,7 @@ namespace LiveRepl
 			foreach(var engine in engines.Values)
 			{
 				//Debug.Log("[RedOnion] Terminating process "+engine.Process.ID);
-				engine.Terminate();
+				engine.Reset();
 			}
 		}
 	}

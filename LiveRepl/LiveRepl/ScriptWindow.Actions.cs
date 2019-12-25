@@ -140,6 +140,7 @@ namespace LiveRepl
 			{
 				LoadEditorText();
 			}
+			// TODO: may need to use direct thread creation not to confuse ROS (recycling context/threads)
 			Evaluate(uiparts.editor.Text, uiparts.scriptNameInputArea.Text);
 			CurrentBuffer.AddFileContent(uiparts.scriptNameInputArea.Text);
 		}

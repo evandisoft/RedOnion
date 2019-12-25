@@ -227,8 +227,13 @@ namespace MunOS
 				}
 			}
 
-			foreach (var thread in threads.Values)
-				thread.Terminate(hard);
+			if (threads.Count > 0)
+			{
+				var list = new MunThread[threads.Count];
+				threads.Values.CopyTo(list, 0);
+				foreach (var thread in list)
+					thread.Terminate(hard);
+			}
 
 			MunLogger.DebugLog($"Process#{ID} terminated.");
 		}
