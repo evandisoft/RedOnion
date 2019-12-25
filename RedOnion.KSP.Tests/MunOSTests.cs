@@ -1,8 +1,8 @@
 using System;
-using Kerbalua.Scripting;
 using MunOS;
 using NUnit.Framework;
 using RedOnion.KSP.ROS;
+using Kerbalua.Scripting;
 
 namespace RedOnion.KSP.Tests
 {
@@ -70,6 +70,17 @@ namespace RedOnion.KSP.Tests
 			Assert.AreEqual(MunStatus.Finished, thread.Status);
 			Assert.AreEqual(0, Count);
 			Assert.IsTrue(thread.DoneCalled);
+		}
+
+		[Test]
+		public void MUN_Core02_ProcessTerminate()
+		{
+			var pro = new MunProcess(this);
+			new SimpleThread(this, pro);
+			new SimpleThread(this, pro);
+			Assert.AreEqual(2, Count);
+			pro.Terminate();
+			Assert.AreEqual(0, Count);
 		}
 	}
 }

@@ -13,7 +13,17 @@ namespace RedOnion.KSP.ROS
 		//TODO: protected internal RosThread ReplThread { get; set; }
 
 		public RosProcess(MunCore core) : this(core, false) { }
-		public RosProcess(RosManager manager) : this(manager.Core, false) => ScriptManager = manager;
+		public RosProcess(RosManager manager, RosProcess shareWith = null)
+			: this(manager.Core, lateBind: shareWith != null)
+		{
+			ScriptManager = manager;
+			if (shareWith == null)
+				return;
+			SetProcessor(new RosProcessor(this)
+			{
+				Globals = shareWith.Processor?.Globals
+			});
+		}
 		public RosProcess(MunCore core, bool lateBind) : base(core)
 		{
 			if (!lateBind)

@@ -546,10 +546,10 @@ namespace RedOnion.KSP.API
 		public Vector3 world(Vector3 v)
 			=> native.transform.TransformDirection(v);
 
-		[WorkInProgress, Description("Get time at true anomaly (absolute time).")]
+		[WorkInProgress, Description("Get time at true anomaly (absolute time of angle from direction of periapsis).")]
 		public double timeAtTrueAnomaly(double trueAnomaly)
 			=> orbit.GetUTforTrueAnomaly(trueAnomaly * RosMath.Deg2Rad, 0.0);
-		[WorkInProgress, Description("Get time to true anomaly (relative time).")]
+		[WorkInProgress, Description("Get time to true anomaly (relative time of angle from direction of periapsis).")]
 		public double timeToTrueAnomaly(double trueAnomaly)
 			=> orbit.GetDTforTrueAnomaly(trueAnomaly * RosMath.Deg2Rad, 0.0);
 

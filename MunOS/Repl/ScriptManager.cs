@@ -7,10 +7,39 @@ namespace MunOS.Repl
 {
 	public abstract class ScriptManager
 	{
+		/// <summary>
+		/// File extension used by the scripting engine (including the dot - ".lua", ".ros", ...).
+		/// </summary>
 		public abstract string Extension { get; }
+		/// <summary>
+		/// Create new process (for the threads this manager spawns),
+		/// optionally sharing memory (Globals) with another process.
+		/// </summary>
+		/// <param name="shareWith">The process the new one should share memory/globals with, or null.</param>
+		public abstract MunProcess CreateProcess(MunProcess shareWith = null);
+		/// <summary>
+		/// Create new thread.
+		/// </summary>
+		/// <param name="source">Source code (the script). Can be null (use path).</param>
+		/// <param name="path">The path of the file (null for repl lines).</param>
+		/// <param name="process">The process it should belong to or null (in which case <see cref="Process"/> is to be used).</param>
+		/// <param name="priority">Execution priority of the thread (<see cref="MunPriority.Main"/> by default).</param>
+		/// <param name="start">Whether the thread shall be started immediately or not.</param>
+		public abstract MunThread CreateThread(string source, string path,
+			MunProcess process = null, MunPriority priority = MunPriority.Main, bool start = true);
 
+		/// <summary>
+		/// The core this manager is associated with (set in <see cref="Initialize(MunCore, IList{string})"/>.
+		/// </summary>
 		public MunCore Core { get; protected set; }
+		/// <summary>
+		/// Main process (used by REPL).
+		/// </summary>
 		public MunProcess Process { get; protected set; }
+		/// <summary>
+		/// Indicator that <see cref="Initialize(MunCore, IList{string})"/> has been called
+		/// and all init scripts finished executing.
+		/// </summary>
 		public bool Initialized { get; protected set; }
 
 		public OutputBuffer OutputBuffer { get; } = new OutputBuffer();
@@ -74,10 +103,6 @@ namespace MunOS.Repl
 			if (withHistory)
 				History.Add(source);
 		}
-
-		public abstract MunProcess CreateProcess();
-		public abstract MunThread CreateThread(string source, string path,
-			MunProcess process = null, MunPriority priority = MunPriority.Main, bool start = true);
 
 		public virtual void Terminate()
 			=> Process?.Terminate(false);

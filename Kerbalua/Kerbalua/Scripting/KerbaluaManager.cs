@@ -12,8 +12,8 @@ namespace Kerbalua.Scripting
 	{
 		public override string Extension => ".lua";
 
-		public override MunProcess CreateProcess()
-			=> new KerbaluaProcess(this);
+		public override MunProcess CreateProcess(MunProcess shareWith = null)
+			=> new KerbaluaProcess(this, shareWith as KerbaluaProcess);
 		public override MunThread CreateThread(string source, string path,
 			MunProcess process = null, MunPriority priority = MunPriority.Main, bool start = true)
 		{

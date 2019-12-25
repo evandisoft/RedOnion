@@ -8,7 +8,7 @@ using static RedOnion.Debugging.QueueLogger;
 
 namespace MunOS
 {
-	public abstract class MunProcess : ICollection<MunThread>
+	public class MunProcess : ICollection<MunThread>
 	{
 		public static MunProcess Current => MunThread.Current?.Process;
 		public static MunID CurrentID => Current?.ID ?? MunID.Zero;
@@ -18,10 +18,30 @@ namespace MunOS
 		public MunCore Core { get; }
 
 		/// <summary>
-		/// Automatically remove the process from the core when it is terminated (last foreground thread is terminated).
-		/// Set to false if you want to reuse the process - but you have to remove it yourself.
+		/// Every thread notifies the process when it is done executing
+		/// (really done executing - finished and not restarted or terminated).
+		/// Calls <see cref="Remove(MunThread)"/> if the thread has <see cref="MunThread.AutoRemove"/> set.
 		/// </summary>
-		public bool AutoRemove { get; set; } = true;
+		protected internal virtual void OnThreadDone(MunThread thread)
+		{
+			ThreadDone?.Invoke(thread);
+			if (thread.AutoRemove)
+				Remove(thread);
+		}
+		/// <summary>
+		/// Event that is called from <see cref="OnThreadDone"/>.
+		/// </summary>
+		public event Action<MunThread> ThreadDone;
+
+		/// <summary>
+		/// Called from <see cref="MunThread.OnError(MunEvent)"/>.
+		/// </summary>
+		protected internal virtual void OnError(MunEvent err) { }
+		/// <summary>
+		/// Called from <see cref="OutputBuffer"/> when this property is changed
+		/// (so that script engines can redirect their printing to the buffer).
+		/// </summary>
+		protected virtual void OnSetOutputBuffer(OutputBuffer value, OutputBuffer prev) { }
 
 		private OutputBuffer _outputBuffer;
 		/// <summary>
@@ -44,7 +64,13 @@ namespace MunOS
 		/// </summary>
 		public ScriptManager ScriptManager { get; set; }
 
-		protected MunProcess(MunCore core, string name = null)
+		/// <summary>
+		/// Automatically remove the process from the core when it is terminated (last foreground thread is terminated).
+		/// Set to false if you want to reuse the process - but you have to remove it yourself.
+		/// </summary>
+		public bool AutoRemove { get; set; } = true;
+
+		public MunProcess(MunCore core, string name = null)
 		{
 			ID = MunID.GetPositive();
 			Name = name ?? ID.ToString();
@@ -125,23 +151,6 @@ namespace MunOS
 				return;
 			Terminate();
 		}
-
-		/// <summary>
-		/// Every thread notifies the process when it is done executing
-		/// (really done executing - finished and not restarted or terminated).
-		/// </summary>
-		protected internal virtual void OnThreadDone(MunThread thread)
-		{
-			ThreadDone?.Invoke(thread);
-			if (thread.AutoRemove)
-				Remove(thread);
-		}
-
-		public event Action<MunThread> ThreadDone;
-
-		protected internal virtual void OnError(MunEvent err) { }
-
-		protected virtual void OnSetOutputBuffer(OutputBuffer value, OutputBuffer prev) { }
 
 		/// <summary>
 		/// Event invoked on every physics update (Unity FixedUpdate).

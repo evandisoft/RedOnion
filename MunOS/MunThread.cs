@@ -8,7 +8,7 @@ using static RedOnion.Debugging.QueueLogger;
 namespace MunOS
 {
 	//TODO: count how many ticks this thread consumed in some defined number of updates
-	//..... implement as cyclic buffer and keep counter of updates in MunCore,
+	//..... implement as cyclic buffer and use MunCore.Ticks and MunCore.UpdateCounter,
 	//..... so that we can insert zeros for skipped updates. (Maybe add another level - 10x10)
 
 	/// <summary>
@@ -16,16 +16,47 @@ namespace MunOS
 	/// </summary>
 	public abstract class MunThread
 	{
+		/// <summary>
+		/// Currently executing thread (set by <see cref="MunExecutor"/> when calling <see cref="Execute(long)"/>.
+		/// </summary>
 		public static MunThread Current { get; protected internal set; }
+		/// <summary>
+		/// <see cref="MunID"/> of currently executing thread or <see cref="MunID.Zero"/> if none.
+		/// </summary>
 		public static MunID CurrentID => Current?.ID ?? MunID.Zero;
 
+		/// <summary>
+		/// This method is called by the <see cref="Executor"/> and represents the work of the thread.
+		/// Sleeping threads should only test the condition and return new state (or MunStatus.Sleeping again).
+		/// </summary>
+		/// <param name="tickLimit">The number of ticks allocated (to be used with <see cref="MunCore.Ticks"/>).</param>
+		/// <returns>New state</returns>
 		protected internal abstract MunStatus Execute(long tickLimit);
 
-		protected internal virtual void OnError(MunEvent err) { }
-		protected internal virtual void OnRestart() { }
+		/// <summary>
+		/// Called when when some method (e.g. <see cref="Execute(long)"/>) throws exception.
+		/// Should call Process?.OnError(err) if not handled (which the base implementation does).
+		/// </summary>
+		protected internal virtual void OnError(MunEvent err)
+			=> Process?.OnError(err);
+		/// <summary>
+		/// Called when status is changed to <see cref="MunStatus.Terminating"/>
+		/// (by <see cref="Execute(long)"/>, <see cref="Terminate(bool)"/> or <see cref="MunCore.Kill(MunThread, bool)"/>).
+		/// Base implementation just changes the state to <see cref="MunStatus.Terminated"/>
+		/// to signal there is no cleanup needed.
+		/// </summary>
 		protected internal virtual void OnTerminating()
 			=> Status = MunStatus.Terminated;
-
+		/// <summary>
+		/// Called when executor is restarting a thread (which has <see cref="NextThread"/> == this).
+		/// Designed to do context-reset or whatever the scripting engine may need to do in such situation.
+		/// </summary>
+		protected internal virtual void OnRestart() { }
+		/// <summary>
+		/// Called when thread is done executing (<see cref="MunStatus.Finished"/> or <see cref="MunStatus.Terminated"/>)
+		/// and is not restarted (<see cref="NextThread"/> != this).
+		/// Base implementation calls <see cref="Done"/> and <see cref="MunProcess.OnThreadDone(MunThread)"/>.
+		/// </summary>
 		protected internal virtual void OnDone()
 		{
 			Done?.Invoke(this);

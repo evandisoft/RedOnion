@@ -15,7 +15,8 @@ namespace Kerbalua.Scripting
 	{
 		public KerbaluaScript ScriptEngine { get; private set; }
 
-		public KerbaluaProcess(KerbaluaManager manager) : this(manager.Core)
+		//TODO: implement process memory/globals sharing
+		public KerbaluaProcess(KerbaluaManager manager, KerbaluaProcess shareWith = null) : this(manager.Core)
 			=> ScriptManager = manager;
 		public KerbaluaProcess(MunCore core) : base(core)
 			=> InternalResetEngine();

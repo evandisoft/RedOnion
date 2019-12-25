@@ -10,8 +10,8 @@ namespace RedOnion.KSP.ROS
 	{
 		public override string Extension => ".ros";
 
-		public override MunProcess CreateProcess()
-			=> new RosProcess(this);
+		public override MunProcess CreateProcess(MunProcess shareWith = null)
+			=> new RosProcess(this, shareWith as RosProcess);
 		public override MunThread CreateThread(string source, string path,
 			MunProcess process = null, MunPriority priority = MunPriority.Main, bool start = true)
 			=> new RosThread((RosProcess)(process ?? Process), priority,

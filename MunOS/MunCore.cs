@@ -26,6 +26,8 @@ namespace MunOS
 
 		/// <summary>
 		/// Clock ticks used to measure time. Returns <see cref="Stopwatch.GetTimestamp()"/>.
+		/// Note that it may overflow, therefore should only be used in comparisions like
+		/// <code>var start = Ticks; while((Ticks - start) &lt; limit) ...</code>
 		/// </summary>
 		public static long Ticks => Stopwatch.GetTimestamp();
 		/// <summary>
@@ -240,6 +242,14 @@ namespace MunOS
 			return executor;
 		}
 
+		/// <summary>
+		/// Number of updates (incremented at the end of <see cref="FixedUpdate"/>).
+		/// </summary>
+		public ulong UpdateCounter { get; protected set; }
+
+		/// <summary>
+		/// To be called every physics update (Unity: FixedUpdate).
+		/// </summary>
 		public void FixedUpdate()
 		{
 			try
@@ -257,6 +267,7 @@ namespace MunOS
 			finally
 			{
 				Current = null;
+				UpdateCounter++;
 			}
 		}
 

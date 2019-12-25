@@ -38,7 +38,8 @@ namespace RedOnion.KSP.ROS
 				if (!it.IsFunction)
 					return false;
 				result = new Value(new Subscription(new RosThread(
-					MunProcess.Current as RosProcess, priority, it.obj as Function)));
+					MunProcess.Current as RosProcess, priority, it.obj as Function)
+				{	IsBackground = true	}));
 				return true;
 			}
 		}
