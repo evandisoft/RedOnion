@@ -34,7 +34,7 @@ namespace MunOS
 		protected internal abstract MunStatus Execute(long tickLimit);
 
 		/// <summary>
-		/// Called when when some method (e.g. <see cref="Execute(long)"/>) throws exception.
+		/// Called when some method (e.g. <see cref="Execute(long)"/>) throws exception.
 		/// Should call Process?.OnError(err) if not handled (which the base implementation does).
 		/// </summary>
 		protected internal virtual void OnError(MunEvent err)
