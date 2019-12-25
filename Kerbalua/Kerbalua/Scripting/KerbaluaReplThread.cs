@@ -5,8 +5,8 @@ namespace Kerbalua.Scripting
 {
 	public class KerbaluaReplThread : KerbaluaThread
 	{
-		public KerbaluaReplThread(KerbaluaProcess process, string source, string path)
-			: base(process, MunPriority.Main, source, path) { }
+		public KerbaluaReplThread(KerbaluaProcess process, string source, string path, bool start)
+			: base(process, MunPriority.Main, source, path, start) { }
 
 		protected override MunStatus Execute(long tickLimit)
 		{

@@ -309,8 +309,12 @@ namespace MunOS
 			try
 			{
 				if (!thread.Status.IsFinal())
+				{
 					thread.Status = hard ? MunStatus.Terminated : MunStatus.Terminating;
-				if (hard)
+					if (!hard)
+						thread.OnTerminating();
+				}
+				if (thread.Status.IsFinal() && thread.Executor != null)
 				{
 					thread.RemoveFromExecutor();
 					thread.OnDone();

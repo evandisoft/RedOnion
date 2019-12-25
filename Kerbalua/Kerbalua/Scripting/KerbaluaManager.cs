@@ -17,6 +17,15 @@ namespace Kerbalua.Scripting
 			MunProcess process = null, MunPriority priority = MunPriority.Main, bool start = true)
 			=> new KerbaluaThread((KerbaluaProcess)(process ?? Process), priority, source, path, start);
 
+		public override void Evaluate(string source, string path, bool withHistory = false)
+		{
+			var thread = new KerbaluaReplThread((KerbaluaProcess)Process, source, path, start: Initialized);
+			if (!Initialized)
+				waitingThreads.Add(thread);
+			if (withHistory)
+				History.Add(source);
+		}
+
 		public override IList<string> GetCompletions(string source, int cursorPos, out int replaceStart, out int replaceEnd, MunProcess process = null)
 		{
 			try

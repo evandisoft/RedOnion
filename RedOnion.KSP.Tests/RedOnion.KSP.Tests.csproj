@@ -70,6 +70,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MiscTests.cs" />
+    <Compile Include="MunOSTests.cs" />
     <Compile Include="SuggestTests.cs" />
     <Compile Include="VectorTests.cs" />
   </ItemGroup>
