@@ -9,7 +9,7 @@ using MoonSharp.Interpreter.DataStructs;
 using MoonSharp.Interpreter.Interop;
 using MoonSharp.Interpreter.Interop.BasicDescriptors;
 using MoonSharp.Interpreter.Interop.StandardDescriptors;
-using MunOS.ProcessLayer;
+using MunOS;
 using RedOnion.KSP.MoonSharp.Proxies;
 using RedOnion.KSP.Utilities;
 using UnityEngine;
@@ -305,7 +305,7 @@ namespace Kerbalua.Events
 					throw new Exception("Could not get current process in LuaEventDescriptor");
 				}
 
-				process.Execute(MunOS.Core.ExecPriority.ONESHOT,c);
+				new KerbaluaThread(process, MunPriority.Callback, c);
 			}
 		}
 

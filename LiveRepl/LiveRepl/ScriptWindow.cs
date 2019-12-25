@@ -111,10 +111,10 @@ namespace LiveRepl
 			SavedSettings.SaveToDisk();
 
 			Debug.Log("[RedOnion] Terminating processes");
-			foreach(var engineProcess in engineProcesses.Values)
+			foreach(var engine in engines.Values)
 			{
-				Debug.Log("[RedOnion] Terminating process "+engineProcess.ID);
-				engineProcess.Terminate();
+				//Debug.Log("[RedOnion] Terminating process "+engine.Process.ID);
+				engine.Terminate();
 			}
 		}
 	}

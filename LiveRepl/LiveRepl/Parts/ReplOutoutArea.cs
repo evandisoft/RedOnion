@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using Kerbalui.Controls;
 using Kerbalui.Decorators;
 using Kerbalui.Util;
@@ -81,7 +81,7 @@ namespace LiveRepl.Parts
 		{
 			InterceptMostInput();
 
-			editingArea.Text=uiparts.scriptWindow.currentEngineProcess.outputBuffer.GetString(out bool newOutput);
+			editingArea.Text=uiparts.scriptWindow.CurrentBuffer.GetString(out bool newOutput);
 			if (newOutput)
 			{
 				ResetScroll();

@@ -26,8 +26,7 @@ namespace RedOnion.Debugging
 		static public QueueLogger Complogger;
 		static public QueueLogger UILogger;
 		static public QueueLogger UndoLogger;
-
-		public static QueueLogger MunLogger;
+		static public QueueLogger MunLogger;
 
 		static public HashSet<string> RegisteredTags;
 
@@ -55,7 +54,7 @@ namespace RedOnion.Debugging
 					{
 						foreach (var str in logger.logQueue)
 						{
-							sb.Append(str);
+							sb.AppendLine(str);
 						}
 					}
 				}
@@ -181,7 +180,6 @@ namespace RedOnion.Debugging
 				}
 				first = false;
 			}
-			sb.Append("\n");
 			return sb.ToString();
 		}
 
@@ -201,7 +199,7 @@ namespace RedOnion.Debugging
 			StringBuilder sb = new StringBuilder();
 			foreach (var str in logQueue)
 			{
-				sb.Append(str);
+				sb.AppendLine(str);
 			}
 			return sb.ToString();
 		}

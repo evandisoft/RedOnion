@@ -4,7 +4,8 @@ using System.IO;
 using Kerbalua.Scripting;
 using Kerbalui.Controls;
 using LiveRepl.Execution;
-using MunOS.ProcessLayer;
+using MunOS;
+using MunOS.Repl;
 using RedOnion.KSP.API;
 using RedOnion.KSP.ROS;
 using RedOnion.KSP.Settings;
@@ -28,27 +29,33 @@ namespace LiveRepl
 
 
 
-		public bool ScriptRunning => currentEngineProcess.TotalThreadCount > 0;
+		// this needs some better logic because there is no way to know if there is any native callback (that may spawn a thread)
+		public bool ScriptRunning => CurrentProcess?.Count > 0;
+
 		public void SetCurrentEngineProcess(string engineName)
 		{
-			currentEngineProcess = engineProcesses[engineName];
+			CurrentEngine = engines[engineName];
 			uiparts.scriptEngineLabel.SetEngine(engineName);
 		}
 
-		Dictionary<string,EngineProcess> engineProcesses=new Dictionary<string, EngineProcess>();
-		public EngineProcess currentEngineProcess;
+		Dictionary<string, ScriptManager> engines=new Dictionary<string, ScriptManager>();
+		public ScriptManager CurrentEngine { get; protected set; }
+		public MunProcess CurrentProcess => CurrentEngine?.Process;
+		public OutputBuffer CurrentBuffer => CurrentEngine?.OutputBuffer;
 
-		private EngineProcess GetEngineProcessByExtension(string extension)
+		/* unused
+		private MunProcess GetEngineProcessByExtension(string extension)
 		{
-			foreach(var engineProcessEntry in engineProcesses)
+			foreach(var engineProcessEntry in engines)
 			{
-				if (engineProcessEntry.Value.Extension.ToLower()==extension.ToLower())
+				if (engineProcessEntry.Value.ScriptManager.Extension.ToLower()==extension.ToLower())
 				{
 					return engineProcessEntry.Value;
 				}
 			}
 			return null;
 		}
+		*/
 
 		public bool DisableElements;
 		public void FixedUpdate()
@@ -108,22 +115,17 @@ namespace LiveRepl
 
 		void InitEvaluation()
 		{
-			var rosProcess= new RosProcess();
-			engineProcesses["ROS"] = rosProcess;
-			ProcessManager.Instance.Processes.Add(rosProcess);
-
-			var kerbaluaProcess= new KerbaluaProcess();
-			engineProcesses["Lua"] = kerbaluaProcess;
-			ProcessManager.Instance.Processes.Add(kerbaluaProcess);
+			engines["ROS"] = new RosManager();
+			engines["Lua"] = new KerbaluaManager();
 
 			string lastEngineName = SavedSettings.LoadSetting("lastEngine", "Lua");
-			if (engineProcesses.ContainsKey(lastEngineName))
+			if (engines.ContainsKey(lastEngineName))
 			{
 				SetCurrentEngineProcess(lastEngineName);
 			}
 			else
 			{
-				foreach (var engineName in engineProcesses.Keys)
+				foreach (var engineName in engines.Keys)
 				{
 					SetCurrentEngineProcess(engineName);
 					SavedSettings.SaveSetting("lastEngine", engineName);
@@ -131,7 +133,7 @@ namespace LiveRepl
 				}
 			}
 
-			foreach (var engineName in engineProcesses.Keys)
+			foreach (var engineName in engines.Keys)
 			{
 				uiparts.scriptEngineSelector.AddMinSized(new Button(engineName,() =>
 				{

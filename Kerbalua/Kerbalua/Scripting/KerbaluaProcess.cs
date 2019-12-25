@@ -4,32 +4,25 @@ using System.IO;
 using Kerbalua.Completion;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Loaders;
-using MunOS.Core;
-using MunOS.ProcessLayer;
+using MunOS;
+using MunOS.Repl;
 using RedOnion.KSP.Settings;
 using UnityEngine;
 
 namespace Kerbalua.Scripting
 {
-	public class KerbaluaProcess:EngineProcess
+	public class KerbaluaProcess:MunProcess
 	{
 		public KerbaluaScript ScriptEngine { get; private set; }
 
-		public KerbaluaProcess()
-		{
-			InternalResetEngine();
-		}
-
-		protected override MunThread CreateThread(string source, string path)
-		{
-			return new KerbaluaThread(source, path, this);
-		}
+		public KerbaluaProcess(KerbaluaManager manager) : this(manager.Core)
+			=> ScriptManager = manager;
+		public KerbaluaProcess(MunCore core) : base(core)
+			=> InternalResetEngine();
 
 		void InternalResetEngine()
 		{
 			ScriptEngine=new KerbaluaScript(this);
-			ScriptEngine.Options.DebugPrint = outputBuffer.AddOutput;
-			ScriptEngine.PrintErrorAction = outputBuffer.AddError;
 
 			ScriptEngine.Options.ScriptLoader = new FileSystemScriptLoader();
 			var slb=ScriptEngine.Options.ScriptLoader as ScriptLoaderBase;
@@ -38,27 +31,37 @@ namespace Kerbalua.Scripting
 			slb.ModulePaths = new string[] { SavedSettings.BaseScriptsPath+"/?.lua" };
 		}
 
-		public override string Extension => ".lua";
-
-		public override IList<string> GetCompletions(string source, int cursorPos, out int replaceStart, out int replaceEnd)
+		protected override void OnSetOutputBuffer(OutputBuffer value, OutputBuffer prev)
 		{
-			try
+			ScriptEngine.Options.DebugPrint = null;
+			ScriptEngine.PrintErrorAction = null;
+			if (value != null)
 			{
-				return MoonSharpIntellisense.GetCompletions(ScriptEngine.Globals, source, cursorPos, out replaceStart, out replaceEnd);
-			}
-			catch (Exception e)
-			{
-				Debug.Log(e);
-				replaceStart = replaceEnd = cursorPos;
-				return new List<string>();
+				ScriptEngine.Options.DebugPrint = OutputBuffer.AddOutput;
+				ScriptEngine.PrintErrorAction = OutputBuffer.AddError;
 			}
 		}
 
-		public override IList<string> GetDisplayableCompletions(string source, int cursorPos, out int replaceStart, out int replaceEnd)
+		public void PrintException(Exception exception)
 		{
-			return GetCompletions(source, cursorPos, out replaceStart, out replaceEnd);
+			if (OutputBuffer != null)
+			{
+				if (exception is InterpreterException interExcept)
+				{
+					OutputBuffer.AddError(interExcept.DecoratedMessage);
+				}
+				else
+				{
+					OutputBuffer.AddError(exception.Message);
+				}
+			}
+
+			Debug.Log(exception);
 		}
 
+
+
+		/*
 		public override string GetImportString(string scriptname)
 		{
 			string basename = Path.GetFileNameWithoutExtension(scriptname);
@@ -106,20 +109,6 @@ namespace Kerbalua.Scripting
 			InternalResetEngine();
 		}
 
-		public void PrintException(Exception exception)
-		{
-			if (exception is InterpreterException interExcept)
-			{
-				outputBuffer.AddError(interExcept.DecoratedMessage);
-			}
-			else
-			{
-				outputBuffer.AddError(exception.Message);
-			}
-
-			Debug.Log(exception);
-		}
-
 		protected override void ThreadExecutionComplete(MunThread thread, Exception e)
 		{
 			if (e!=null)
@@ -127,5 +116,6 @@ namespace Kerbalua.Scripting
 				PrintException(e);
 			}
 		}
+		*/
 	}
 }

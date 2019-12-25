@@ -31,7 +31,7 @@ namespace RedOnion.KSP.Tests
 		[Test]
 		public void ROS_Suggest02_Property()
 		{
-			core.Execute("var a = [1,2]");
+			Processor.Execute("var a = [1,2]");
 			var list = GetCompletions("a.", 2, out var at, out var to);
 			AssertContains("length", list);
 

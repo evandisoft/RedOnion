@@ -14,8 +14,7 @@ using RedOnion.UI;
 using Kerbalua.Events;
 using System.IO;
 using RedOnion.KSP.Settings;
-using MunOS.ProcessLayer;
-using MunOS.Core;
+using MunOS;
 
 namespace Kerbalua.Scripting
 {
@@ -57,7 +56,7 @@ namespace Kerbalua.Scripting
 							throw new Exception("Could not get current process in LuaEventDescriptor");
 						}
 
-						process.Execute(MunOS.Core.ExecPriority.ONESHOT, closure);
+						new KerbaluaThread(process, MunPriority.Callback, closure);
 					});
 				});
 		}

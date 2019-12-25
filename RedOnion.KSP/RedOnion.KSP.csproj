@@ -92,6 +92,7 @@
     <Compile Include="Namespaces\Types.cs" />
     <Compile Include="Parts\PartChildren.cs" />
     <Compile Include="ROS\RosGlobals.cs" />
+    <Compile Include="ROS\RosManager.cs" />
     <Compile Include="ROS\RosProcess.cs" />
     <Compile Include="ROS\RosThread.cs" />
     <Compile Include="Utilities\InteropUtilities.cs" />

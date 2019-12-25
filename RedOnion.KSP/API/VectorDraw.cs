@@ -1,13 +1,8 @@
-using MoonSharp.Interpreter;
-using MunOS.ProcessLayer;
+using MunOS;
 using RedOnion.Attributes;
 using RedOnion.ROS;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading;
 using UnityEngine;
 
 namespace RedOnion.KSP.API
@@ -66,7 +61,7 @@ namespace RedOnion.KSP.API
 				if (_hooks != null)
 				{
 					Value.DebugLog("Disposing VectorDraw #{0} in process #{1} (original: #{2}, dispose: {3})",
-						id, MunProcess.CurrentID, _hooks?.process.ID ?? 0, disposing);
+						id, MunProcess.CurrentID, _hooks?.process.ID ?? MunID.Zero, disposing);
 					var hooks = _hooks;
 					_hooks = null;
 					hooks.Dispose();
