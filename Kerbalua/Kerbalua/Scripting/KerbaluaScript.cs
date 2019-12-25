@@ -63,6 +63,20 @@ namespace Kerbalua.Scripting
 
 		public readonly KerbaluaProcess kerbaluaProcess;
 
+		public const string LuaNew=@"
+return function(stat,...) 
+	if type(stat)~='userdata' then
+		error('First argument to `new` must be a CLR Static Class')
+	end
+	local args={...}
+	if #args>0 then
+		return stat.__new(...)
+	else
+		return stat.__new()
+	end
+end
+";
+
 		public KerbaluaScript(KerbaluaProcess kerbaluaProcess) : base(CoreModules.Preset_Complete)
 		{
 			this.kerbaluaProcess=kerbaluaProcess;
@@ -82,14 +96,7 @@ namespace Kerbalua.Scripting
 			//Globals.Remove("loadsafe");
 
 			// This is the simplest way to define "new" to use __new.
-			commonAPI["new"]=DoString(@"
-return function(stat,...) 
-	if type(stat)~='userdata' then
-		error('First argument to `new` must be a CLR Static Class')
-	end
-	return stat.__new(...) 
-end
-");
+			commonAPI["new"]=DoString(LuaNew);
 
 			//commonAPI["dofile"]=new Func<string, DynValue>(dofile);
 

@@ -189,7 +189,6 @@ namespace LiveRepl
 
 		public IList<string> GetAutorunScripts(string extensionToMatch)
 		{
-			// EvanTodo: Disabling autorun scripts for now
 			var allScriptNames = AutoRun.scripts();
 			var extensionScriptNames=new List<string>();
 			foreach (var scriptname in allScriptNames)

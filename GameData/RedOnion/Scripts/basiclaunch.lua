@@ -13,8 +13,8 @@ waitforfalling()
 print('falling')
 
 
-print('running experiments')
-runexps()
+--print('running experiments')
+--runexps()
 
 stage()
 

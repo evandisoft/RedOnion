@@ -113,8 +113,9 @@ namespace Kerbalua.Scripting
 				double sleepSeconds=retval.Number;
 				sleeptimeMillis=(long)(sleepSeconds*1000);
 				sleepwatch.Start();
+				
 
-				return MunStatus.Yielded;
+				return MunStatus.Sleeping;
 			}
 
 			throw new Exception("State of coroutine should not have been "+state);
