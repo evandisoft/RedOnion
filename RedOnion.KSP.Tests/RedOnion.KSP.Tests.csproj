@@ -51,6 +51,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Kerbalua\Kerbalua.csproj">
+      <Project>{F590B1DB-8F33-4986-8383-180952D63CDA}</Project>
+      <Name>Kerbalua</Name>
+    </ProjectReference>
     <ProjectReference Include="..\MunOS\MunOS.csproj">
       <Project>{A4C93278-A705-4AC2-B2A9-16B30C2E2C36}</Project>
       <Name>MunOS</Name>

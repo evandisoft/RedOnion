@@ -7,6 +7,7 @@ using RedOnion.ROS;
 
 namespace RedOnion.KSP.Tests
 {
+	[TestFixture]
 	public class ROS_Suggest : RosSuggest
 	{
 		public ROS_Suggest() : base(new ApiTestsBase()) { }
