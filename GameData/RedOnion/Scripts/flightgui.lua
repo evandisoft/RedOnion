@@ -35,5 +35,6 @@ end
 window.AddButton("countdown",countdown)
 window.AddButton("run experiments",runexps)
 window.AddButton("auto parachutes",autopara)
+window.AddButton("basic launch",basiclaunch)
 
 addScienceButtons()
