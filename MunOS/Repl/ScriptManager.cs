@@ -12,11 +12,10 @@ namespace MunOS.Repl
 		/// </summary>
 		public abstract string Extension { get; }
 		/// <summary>
-		/// Create new process (for the threads this manager spawns),
-		/// optionally sharing memory (Globals) with another process.
+		/// Create new process (for the threads this manager spawns).
+		/// One is created using this method from <see cref="Initialize(MunCore, IList{string})"/> and assigned to <see cref="Process"/>.
 		/// </summary>
-		/// <param name="shareWith">The process the new one should share memory/globals with, or null.</param>
-		public abstract MunProcess CreateProcess(MunProcess shareWith = null);
+		public abstract MunProcess CreateProcess();
 		/// <summary>
 		/// Create new thread.
 		/// </summary>
