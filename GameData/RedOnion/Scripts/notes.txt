@@ -1,0 +1,4 @@
+1. make sure valentina is in the kv2.
+2. make sure command pod is jettisonned
+3. make sure autopara has been activated
+4. transfer all data to kv2.

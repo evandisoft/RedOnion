@@ -5,7 +5,7 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using Ionic.Zip;
-using MunOS.ProcessLayer;
+using MunOS;
 using RedOnion.KSP.API;
 using RedOnion.ROS;
 using RedOnion.ROS.Objects;
@@ -19,7 +19,7 @@ namespace RedOnion.KSP.ROS
 		public RosProcess Process { get; }
 		public RosProcessor(RosProcess process) => Process = process;
 		public override void ExecuteLater(Function fn)
-			=> Process.EnqueueThread(MunOS.Core.ExecPriority.ONESHOT, new RosThread(MunOS.Core.ExecPriority.ONESHOT, fn, Process));
+			=> new RosThread(Process, MunPriority.Callback, fn);
 
 		protected override RedOnion.ROS.Objects.Globals GetGlobals()
 			=> new RosGlobals();

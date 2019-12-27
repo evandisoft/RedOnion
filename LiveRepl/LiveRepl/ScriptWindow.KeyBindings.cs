@@ -85,7 +85,7 @@ shift + space: Intellisense completion.
 ctrl + enter: Intellisense completion.
 ";
 
-			currentEngineProcess.outputBuffer.AddText(hotkeyText);
+			CurrentBuffer.AddText(hotkeyText);
 		}
 	}
 }

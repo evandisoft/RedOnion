@@ -1,7 +1,7 @@
 using System;
 using RedOnion.Attributes;
 using RedOnion.ROS;
-using MunOS.ProcessLayer;
+using MunOS;
 
 namespace RedOnion.KSP
 {
@@ -34,7 +34,7 @@ namespace RedOnion.KSP
 			if (_hooks != null)
 			{
 				Value.DebugLog("Disposing UI.Window #{0} in process #{1} (original: #{2}, dispose: {3})",
-					id, MunProcess.CurrentID, _hooks?.process.ID ?? 0, disposing);
+					id, MunProcess.CurrentID, _hooks?.process.ID ?? MunID.Zero, disposing);
 				var hooks = _hooks;
 				_hooks = null;
 				hooks.Dispose();

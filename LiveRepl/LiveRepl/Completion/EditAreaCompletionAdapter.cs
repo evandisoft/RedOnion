@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Kerbalui.Decorators;
 using Kerbalui.EditingChanges;
@@ -17,7 +17,7 @@ namespace LiveRepl.Completion {
 		{
 			UILogger.DebugLogArray("In EditAreaCompletionAdapter Complete for index "+index);
 			//var completions = uiparts.scriptWindow.currentReplEvaluator.GetCompletions(editingState.text, editingState.cursorIndex,out int replaceStart,out int replaceEnd);
-			var completions = uiparts.scriptWindow.currentEngineProcess.GetCompletions(editingState.text, editingState.cursorIndex,out int replaceStart,out int replaceEnd);
+			var completions = uiparts.scriptWindow.CurrentEngine.GetCompletions(editingState.text, editingState.cursorIndex,out int replaceStart,out int replaceEnd);
 			UILogger.DebugLogArray("CursorIndex", editingState.cursorIndex,"replaceStart",replaceStart,"replaceEnd",replaceEnd);
 			if (completions.Count > index) {
 				int partialLength = replaceEnd - replaceStart;

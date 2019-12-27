@@ -14,8 +14,7 @@ using RedOnion.UI;
 using Kerbalua.Events;
 using System.IO;
 using RedOnion.KSP.Settings;
-using MunOS.ProcessLayer;
-using MunOS.Core;
+using MunOS;
 
 namespace Kerbalua.Scripting
 {
@@ -57,12 +56,26 @@ namespace Kerbalua.Scripting
 							throw new Exception("Could not get current process in LuaEventDescriptor");
 						}
 
-						process.Execute(MunOS.Core.ExecPriority.ONESHOT, closure);
+						new KerbaluaThread(process, MunPriority.Callback, closure);
 					});
 				});
 		}
 
 		public readonly KerbaluaProcess kerbaluaProcess;
+
+		public const string LuaNew=@"
+return function(stat,...) 
+	if type(stat)~='userdata' then
+		error('First argument to `new` must be a CLR Static Class')
+	end
+	local args={...}
+	if #args>0 then
+		return stat.__new(...)
+	else
+		return stat.__new()
+	end
+end
+";
 
 		public KerbaluaScript(KerbaluaProcess kerbaluaProcess) : base(CoreModules.Preset_Complete)
 		{
@@ -83,14 +96,7 @@ namespace Kerbalua.Scripting
 			//Globals.Remove("loadsafe");
 
 			// This is the simplest way to define "new" to use __new.
-			commonAPI["new"]=DoString(@"
-return function(stat,...) 
-	if type(stat)~='userdata' then
-		error('First argument to `new` must be a CLR Static Class')
-	end
-	return stat.__new(...) 
-end
-");
+			commonAPI["new"]=DoString(LuaNew);
 
 			//commonAPI["dofile"]=new Func<string, DynValue>(dofile);
 

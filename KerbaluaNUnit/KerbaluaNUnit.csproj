@@ -70,6 +70,7 @@
     <Compile Include="HelperClasses\DummyAPI.cs" />
     <Compile Include="HelperClasses\ScriptTester.cs" />
     <Compile Include="HelperClasses\TestingUtil.cs" />
+    <Compile Include="MLUA_LuaNewTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Kerbalua\Kerbalua.csproj">

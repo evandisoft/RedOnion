@@ -4,8 +4,6 @@ using KSP.UI.Screens;
 using System.Collections.Generic;
 using MunOS;
 using System.Diagnostics;
-using MunOS.Core;
-using MunOS.ProcessLayer;
 
 namespace LiveRepl
 {
@@ -50,9 +48,6 @@ namespace LiveRepl
             // particular scene. If ToggleGui was already set, it was with
             // a delegate from another scene.
             ToggleGui = LocalToggleGui;
-
-			CoreExecMgr.Initialize();
-			ProcessManager.Initialize();
         }
 
 		ScriptWindow scriptWindow;
@@ -85,9 +80,12 @@ namespace LiveRepl
 			scriptWindow?.FixedUpdate();
 
 			// first execute scripts
-			CoreExecMgr.Instance.FixedUpdate();
-			// then do the update (which may use new state created by scripts)
-			ProcessManager.Instance.FixedUpdate();
+			MunCore.Default.FixedUpdate();
+		}
+
+		void Update()
+		{
+			MunCore.Default.Update();
 		}
 
 		void OnGUI()
