@@ -34,6 +34,10 @@ namespace MunOS
 		/// Method or constructor info where the error/event occured.
 		/// </summary>
 		public MethodBase Method => StackFrame.GetMethod();
+		/// <summary>
+		/// Method's declaring type name and name of the method.
+		/// </summary>
+		public string MethodName => $"{Method.DeclaringType.Name}.{Method.Name}";
 
 		/// <summary>
 		/// Signal that the error was handled (and should not be propagated further).

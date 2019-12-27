@@ -229,7 +229,6 @@ namespace MunOS
 
 		protected internal virtual MunExecutor Schedule(MunThread thread)
 		{
-			MunLogger.DebugLog($"MunCore.Schedule #{thread.ID}, status: {thread.Status}");
 			if (thread.Status.IsFinal())
 			{
 				Kill(thread, hard: true);
@@ -317,7 +316,6 @@ namespace MunOS
 
 		public void Kill(MunThread thread, bool hard = false)
 		{
-			MunLogger.DebugLog($"Killing thread#{thread?.ID ?? MunID.Zero}, hard: {hard}");
 			try
 			{
 				if (!thread.Status.IsFinal())

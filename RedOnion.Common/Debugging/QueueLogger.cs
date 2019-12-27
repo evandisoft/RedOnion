@@ -17,10 +17,10 @@ namespace RedOnion.Debugging
 		static QueueLogger()
 		{
 			RegisteredTags = new HashSet<string>();
-			Complogger = new QueueLogger("completion", 1000);
-			UILogger = new QueueLogger("ui", 1000);
-			UndoLogger = new QueueLogger("undoredo", 1000);
-			MunLogger = new QueueLogger("munos", 1000);
+			Complogger = new QueueLogger("completion");
+			UILogger = new QueueLogger("ui");
+			UndoLogger = new QueueLogger("undoredo");
+			MunLogger = new QueueLogger("munos");
 		}
 
 		static public QueueLogger Complogger;
@@ -44,19 +44,13 @@ namespace RedOnion.Debugging
 
 		static public string GetContentsByTag(string tag = "all")
 		{
-			FieldInfo[] fields = typeof(QueueLogger).GetFields(BindingFlags.Static | BindingFlags.Public);
-			StringBuilder sb=new StringBuilder();
-			foreach (var field in fields)
+			var sb = new StringBuilder();
+			foreach (var field in typeof(QueueLogger).GetFields(BindingFlags.Static | BindingFlags.Public))
 			{
 				if (field.GetValue(null) is QueueLogger logger)
 				{
 					if (logger.HasTag(tag))
-					{
-						foreach (var str in logger.logQueue)
-						{
-							sb.AppendLine(str);
-						}
-					}
+						logger.GetContents(sb);
 				}
 			}
 			return sb.ToString();
@@ -93,7 +87,20 @@ namespace RedOnion.Debugging
 		const int defaultQueueSize = 1000;
 		const string basePath = "Logs/Kerbalua/";
 
-		Queue<string> logQueue = new Queue<string>();
+		public readonly struct Line
+		{
+			public readonly DateTime time;
+			public readonly string message;
+			public Line(string message)
+			{
+				time = DateTime.Now;
+				this.message = message;
+			}
+			public override string ToString()
+				=> string.Format(Culture, FormatString, time, message);
+			public const string FormatString = "{0:HH:mm:ss.ff}: {1}";
+		}
+		Queue<Line> logQueue = new Queue<Line>();
 		HashSet<string> tags = new HashSet<string>();
 
 		string logpath;
@@ -153,7 +160,7 @@ namespace RedOnion.Debugging
 		{
 			if (logQueue.Count >= queueSize)
 				logQueue.Dequeue();
-			logQueue.Enqueue(msg);
+			logQueue.Enqueue(new Line(msg));
 		}
 
 		public void LogArray(params object[] args)
@@ -164,7 +171,7 @@ namespace RedOnion.Debugging
 
 		string ObjectArrayToString(object[] args)
 		{
-			StringBuilder sb = new StringBuilder();
+			var sb = new StringBuilder();
 			bool first = true;
 			foreach (var arg in args)
 			{
@@ -194,13 +201,18 @@ namespace RedOnion.Debugging
 		//    File.WriteAllText(logpath, sb.ToString());
 		//}
 
+		public void GetContents(StringBuilder sb)
+		{
+			foreach (var line in logQueue)
+			{
+				sb.AppendFormat(Line.FormatString, line.time, line.message);
+				sb.AppendLine();
+			}
+		}
 		public string GetContents()
 		{
-			StringBuilder sb = new StringBuilder();
-			foreach (var str in logQueue)
-			{
-				sb.AppendLine(str);
-			}
+			var sb = new StringBuilder();
+			GetContents(sb);
 			return sb.ToString();
 		}
 	}

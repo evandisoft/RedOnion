@@ -45,5 +45,14 @@ namespace RedOnion.KSP.ROS
 				Processor.PrintError += OutputBuffer.AddError;
 			}
 		}
+
+		protected override void OnError(MunEvent err)
+		{
+			if (!err.Printed && err.Exception != null && OutputBuffer != null)
+			{
+				Processor.PrintException(err.MethodName, err.Exception);
+				err.Printed = true;
+			}
+		}
 	}
 }

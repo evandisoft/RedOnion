@@ -86,11 +86,8 @@ namespace MunOS
 		public IEnumerator<MunThread> GetEnumerator() => threads.Values.GetEnumerator();
 		IEnumerator IEnumerable.GetEnumerator() => threads.Values.GetEnumerator();
 
-		// TODO: this is currently only called from MunThread constructor,
-		// but since it is public, consider other usage
 		public virtual void Add(MunThread thread)
 		{
-			MunLogger.DebugLog($"Adding thread#{thread?.ID ?? MunID.Zero} into process#{ID}");
 			if (thread.Process != null)
 				throw new InvalidOperationException(thread.Process == this
 					? $"Thread {thread} already is in process {thread.Process}"
@@ -106,15 +103,16 @@ namespace MunOS
 		// but since it is public, consider other usage
 		public virtual void Remove(MunThread thread)
 		{
-			MunLogger.DebugLog($"Removing thread#{thread?.ID ?? MunID.Zero} from process#{ID}");
 			if (thread.Process != this)
 				throw new InvalidOperationException($"Thread {thread} does not belong to process {this}");
+			var hadForeground = ForegroundCount > 0;
 			threads.Remove(thread.ID);
 			thread.Process = null;
 			if (thread.IsBackground)
 				--BackgroundCount;
 			else --ForegroundCount;
-			CheckForegroundCount();
+			if (hadForeground)
+				CheckForegroundCount();
 		}
 		bool ICollection<MunThread>.Remove(MunThread item)
 		{
@@ -173,9 +171,19 @@ namespace MunOS
 					}
 					catch (Exception ex)
 					{
-						// TODO: hook to Core.OnError and similar
-						physicsUpdate -= handler;
-						MunLogger.DebugLogArray($"Exception in process #{ID} physics update: {ex.Message}");
+						MunLogger.DebugLog($"Exception in process#{ID} physics update: {ex.Message}");
+
+						var err = new MunEvent(Core, this, ex);
+						OnError(err);
+						if (!err.Handled)
+						{
+							Core.OnError(err);
+							if (!err.Handled)
+								physicsUpdate -= handler;
+						}
+
+						if (!err.Printed)
+							OutputBuffer?.AddError(err.ToString());
 					}
 				}
 			}
@@ -199,9 +207,19 @@ namespace MunOS
 					}
 					catch (Exception ex)
 					{
-						// TODO: hook to Core.OnError and similar
-						physicsUpdate -= handler;
-						MunLogger.DebugLog($"Exception in process #{ID} graphics update: {ex.Message}");
+						MunLogger.DebugLog($"Exception in process#{ID} graphics update: {ex.Message}");
+
+						var err = new MunEvent(Core, this, ex);
+						OnError(err);
+						if (!err.Handled)
+						{
+							Core.OnError(err);
+							if (!err.Handled)
+								graphicsUpdate -= handler;
+						}
+
+						if (!err.Printed)
+							OutputBuffer?.AddError(err.ToString());
 					}
 				}
 			}
@@ -230,8 +248,15 @@ namespace MunOS
 					}
 					catch (Exception ex)
 					{
-						// TODO: hook to Core.OnError and similar
 						MunLogger.DebugLog($"Exception in process#{ID} shutdown: {ex.Message}");
+
+						var err = new MunEvent(Core, this, ex);
+						OnError(err);
+						if (!err.Handled)
+							Core.OnError(err);
+
+						if (!err.Printed)
+							OutputBuffer?.AddError(err.ToString());
 					}
 				}
 			}

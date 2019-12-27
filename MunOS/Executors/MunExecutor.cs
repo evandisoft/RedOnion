@@ -149,7 +149,6 @@ namespace MunOS.Executors
 				case MunStatus.Finished:
 				{
 					var next = thread.NextThread;
-					MunLogger.DebugLog($@"Thread#{thread.ID} finished, next: {(next?.ToString() ?? "none")}");
 					if (next != null)
 					{
 						if (next == thread)
