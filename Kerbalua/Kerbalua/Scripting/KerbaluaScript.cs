@@ -88,7 +88,7 @@ end
 
 			metatable["__index"]=commonAPI;
 			Globals.MetaTable=metatable;
-
+			
 			Globals.Remove("dofile");
 			//Globals.Remove("load");
 			Globals.Remove("loadfilesafe");
