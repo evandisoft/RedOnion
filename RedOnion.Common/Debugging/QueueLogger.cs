@@ -14,21 +14,23 @@ namespace RedOnion.Debugging
 	/// </summary>
 	public class QueueLogger
 	{
-		static QueueLogger()
-		{
-			RegisteredTags = new HashSet<string>();
-			Complogger = new QueueLogger("completion");
-			UILogger = new QueueLogger("ui");
-			UndoLogger = new QueueLogger("undoredo");
-			MunLogger = new QueueLogger("munos");
-		}
+		#region Static
 
-		static public QueueLogger Complogger;
-		static public QueueLogger UILogger;
-		static public QueueLogger UndoLogger;
-		static public QueueLogger MunLogger;
+		/// <summary>
+		/// Culture settings for formatting (invariant by default).
+		/// </summary>
+		public static CultureInfo Culture = CultureInfo.InvariantCulture;
 
-		static public HashSet<string> RegisteredTags;
+		// keep this above individual loggers!
+		protected static readonly HashSet<string> RegisteredTags = new HashSet<string>();
+
+		// keep these last (or use static .ctor)
+		public static readonly QueueLogger Complogger = new QueueLogger("completion");
+		public static readonly QueueLogger UILogger = new QueueLogger("ui");
+		public static readonly QueueLogger UndoLogger = new QueueLogger("undoredo");
+		public static readonly QueueLogger MunLogger = new QueueLogger("munos");
+		public static readonly QueueLogger RosLogger = new QueueLogger("ros");
+		public static readonly QueueLogger ApiLogger = new QueueLogger("api");
 
 		//static public void WriteTaggedToDisk(string tag = "all")
 		//{
@@ -79,6 +81,10 @@ namespace RedOnion.Debugging
 			return tags;
 		}
 
+		#endregion
+
+		#region Instance
+
 		public void Clear()
 		{
 			logQueue.Clear();
@@ -98,7 +104,7 @@ namespace RedOnion.Debugging
 			}
 			public override string ToString()
 				=> string.Format(Culture, FormatString, time, message);
-			public const string FormatString = "{0:HH:mm:ss.ff}: {1}";
+			public static string FormatString = "{0:HH:mm:ss.ff}: {1}";
 		}
 		Queue<Line> logQueue = new Queue<Line>();
 		HashSet<string> tags = new HashSet<string>();
@@ -141,10 +147,6 @@ namespace RedOnion.Debugging
 			return tags.Contains(tag.ToLower());
 		}
 
-		/// <summary>
-		/// Culture settings for formatting (invariant by default).
-		/// </summary>
-		public static CultureInfo Culture = CultureInfo.InvariantCulture;
 		public void Log(FormattableString msg)
 			=> Push(msg.ToString(Culture));
 		public void Log(StringWrapper msg, params object[] args)
@@ -215,5 +217,7 @@ namespace RedOnion.Debugging
 			GetContents(sb);
 			return sb.ToString();
 		}
+
+		#endregion
 	}
 }

@@ -7,7 +7,7 @@ using Kerbalua.Scripting;
 namespace RedOnion.KSP.Tests
 {
 	[TestFixture]
-	public class MunOSTests : MunCore
+	public class MUN_OSTests : MunCore
 	{
 		class SimpleThread : MunThread
 		{

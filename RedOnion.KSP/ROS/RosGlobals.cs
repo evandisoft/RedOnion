@@ -5,6 +5,7 @@ using RedOnion.ROS.Objects;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using static RedOnion.Debugging.QueueLogger;
 
 namespace RedOnion.KSP.ROS
 {
@@ -45,12 +46,14 @@ namespace RedOnion.KSP.ROS
 		}
 
 		[Description("The auto-remove subscription object returned by call to `system.update` or `idle` (or `once`).")]
-		public sealed class Subscription : IDisposable, IEquatable<Subscription>, IEquatable<Value>
+		public class Subscription : IDisposable, IEquatable<Subscription>, IEquatable<Value>
 		{
-			RosThread thread;
-			bool autoRemove;
+			protected RosThread thread;
+			protected bool autoRemove;
 			internal Subscription(RosThread thread, bool repeating, bool autoRemove = true)
 			{
+				RosLogger.DebugLog($"Creating subscription#{thread.ID}, priority: {thread.Priority}, repeating: {repeating}");
+
 				this.thread = thread;
 				this.autoRemove = autoRemove;
 				thread.IsBackground = true;
@@ -84,6 +87,16 @@ namespace RedOnion.KSP.ROS
 			{
 				if (autoRemove)
 					thread.KillAsync();
+			}
+
+			[Description("Replace current function with another function.")]
+			public void Replace(Value value)
+			{
+				if (!value.IsFunction)
+					throw InvalidOperation("Not a function");
+				thread.Function = value.obj as Function;
+				if (thread.Status.IsFinal())
+					thread.Restart();
 			}
 		}
 

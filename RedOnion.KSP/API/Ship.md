@@ -85,6 +85,6 @@ Note that it can change violently when facing up or down.
 - `world()`: [Vector](Vector.md), v [Vector](Vector.md)
   - Translate vector/direction into world coordinates (reverse the `local` transformation).
 - `timeAtTrueAnomaly()`: double, trueAnomaly double
-  - \[`WIP`\] Get time at true anomaly (absolute time).
+  - \[`WIP`\] Get time at true anomaly (absolute time of angle from direction of periapsis).
 - `timeToTrueAnomaly()`: double, trueAnomaly double
-  - \[`WIP`\] Get time to true anomaly (relative time).
+  - \[`WIP`\] Get time to true anomaly (relative time of angle from direction of periapsis).

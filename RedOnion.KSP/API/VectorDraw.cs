@@ -139,6 +139,8 @@ namespace RedOnion.KSP.API
 				}
 				if (_bodyObject == null)
 				{
+					Value.DebugLog("Showing VectorDraw #{0} in process #{1}", id, MunProcess.CurrentID);
+
 					// see https://github.com/GER-Space/Kerbal-Konstructs/wiki/Shaders-in-KSP
 					// + KSP 1.8: https://forum.kerbalspaceprogram.com/index.php?/topic/188933-180-modders-notes/
 					var shader = Shader.Find("Legacy Shaders/Particles/Additive");

@@ -269,6 +269,31 @@ namespace MunOS
 				UpdateCounter++;
 			}
 		}
+		/// <summary>
+		/// To be called every graphics update (Unity: Update).
+		/// </summary>
+		public void Update()
+		{
+			try
+			{
+				foreach (var process in processes.Values)
+				{
+					MunProcess.Current = process;
+					process.Update();
+				}
+			}
+			catch (Exception ex)
+			{
+				var err = new MunEvent(this, ex);
+				OnError(err);
+				if (!err.Handled)
+					throw;
+			}
+			finally
+			{
+				MunProcess.Current = null;
+			}
+		}
 
 		/// <summary>
 		/// Kill thread asynchronously. To be used from finalizers (or any other thread).
@@ -310,8 +335,18 @@ namespace MunOS
 				executor.Execute(startTicks);
 
 			// do the updates last (e.g. vector.draw - uses the state created by the scripts)
-			foreach (var process in processes.Values)
-				process.FixedUpdate();
+			try
+			{
+				foreach (var process in processes.Values)
+				{
+					MunProcess.Current = process;
+					process.FixedUpdate();
+				}
+			}
+			finally
+			{
+				MunProcess.Current = null;
+			}
 		}
 
 		public void Kill(MunThread thread, bool hard = false)
