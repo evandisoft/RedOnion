@@ -214,7 +214,7 @@ def control ship, target, x, y
       else if (time.since(warpDelay) >= 1 and d < 1
         and ship.angularVelocity.size < 0.1)
         warpDelay = null
-        time.warp.to time() + dt - (dt > 300 ? 300 : 15)
+        time.warp.to time() + dt - (dt > 300 ? 300 : 10)
       if report == null or time.since(report) >= 1
         report = time()
         print "DV: {0,4:F1} AD: {1,4:F1} AV: {2,5:F2}", dv.size, d, ship.angularVelocity.size
@@ -343,8 +343,10 @@ def control ship, target, x, y
     var sn = sv.cross sp // our normal
     var target = ship.target ?? self.target
     if target == null
-      di = i0
-      ta = ship.argumentOfPeriapsis
+      print "Incl.: {0,5:F1} Arg.: {1,5:F1}", i0, ship.argumentOfPeriapsis
+      //TODO: this only works 50% of the time, no neg works the other time - it is about AoP range
+      di = -i0
+      ta = -ship.argumentOfPeriapsis
     else
       var i1 = target.inclination
       var tp = target.position - body.position
