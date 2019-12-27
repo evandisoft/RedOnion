@@ -83,6 +83,11 @@ namespace LiveRepl
 			MunCore.Default.FixedUpdate();
 		}
 
+		void Update()
+		{
+			MunCore.Default.Update();
+		}
+
 		void OnGUI()
         {
 			if (!highResolution) return;

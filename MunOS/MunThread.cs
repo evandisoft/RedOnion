@@ -48,11 +48,6 @@ namespace MunOS
 		protected internal virtual void OnTerminating()
 			=> Status = MunStatus.Terminated;
 		/// <summary>
-		/// Called when executor is restarting a thread (which has <see cref="NextThread"/> == this).
-		/// Designed to do context-reset or whatever the scripting engine may need to do in such situation.
-		/// </summary>
-		protected internal virtual void OnRestart() { }
-		/// <summary>
 		/// Called when thread is done executing (<see cref="MunStatus.Finished"/> or <see cref="MunStatus.Terminated"/>)
 		/// and is not restarted (<see cref="NextThread"/> != this).
 		/// Base implementation calls <see cref="Done"/> and <see cref="MunProcess.OnThreadDone(MunThread)"/>.
@@ -85,7 +80,7 @@ namespace MunOS
 		/// <summary>
 		/// Execution status of this thread.
 		/// </summary>
-		public MunStatus Status { get; internal set; }
+		public MunStatus Status { get; protected internal set; }
 		/// <summary>
 		/// Exception which was the reason for hard termination (if that happened).
 		/// </summary>
@@ -164,6 +159,15 @@ namespace MunOS
 		{
 			if (!Status.IsFinal())
 				Core.KillAsync(ID);
+		}
+
+		/// <summary>
+		/// Called when executor is restarting a thread (which has <see cref="NextThread"/> == this).
+		/// Designed to do context-reset or whatever the scripting engine may need to do in such situation.
+		/// </summary>
+		public virtual void Restart()
+		{
+			Status = MunStatus.Incomplete;
 		}
 
 		public override string ToString()

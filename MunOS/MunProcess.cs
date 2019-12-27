@@ -10,7 +10,12 @@ namespace MunOS
 {
 	public class MunProcess : ICollection<MunThread>
 	{
-		public static MunProcess Current => MunThread.Current?.Process;
+		private static MunProcess _current;
+		public static MunProcess Current
+		{
+			get => _current ?? MunThread.Current?.Process;
+			protected internal set => _current = value;
+		}
 		public static MunID CurrentID => Current?.ID ?? MunID.Zero;
 
 		public MunID ID { get; internal set; }
@@ -75,6 +80,7 @@ namespace MunOS
 			ID = MunID.GetPositive();
 			Name = name ?? ID.ToString();
 			Core = core;
+			core.processes.Add(ID, this);
 		}
 
 		protected readonly Dictionary<MunID, MunThread> threads = new Dictionary<MunID, MunThread>();
@@ -236,7 +242,7 @@ namespace MunOS
 		{
 			// first notify all subscribers that this process is shutting down
 			var shutdown = this.shutdown;
-			MunLogger.DebugLog($"Process#{ID} terminating. (shutdown: {shutdown?.GetInvocationList().Length ?? 0})");
+			MunLogger.Log($"Process#{ID} terminating. (hard: {hard}; shutdown: {shutdown?.GetInvocationList().Length ?? 0})");
 			if (shutdown != null)
 			{
 				this.shutdown = null;
@@ -269,7 +275,8 @@ namespace MunOS
 					thread.Terminate(hard);
 			}
 
-			MunLogger.DebugLog($"Process#{ID} terminated.");
+			MunLogger.Log($"Process#{ID} terminated (hard: {hard}).");
+			if (AutoRemove && threads.Count == 0) Core.processes.Remove(ID);
 		}
 
 		void ICollection<MunThread>.Clear() => Terminate();

@@ -154,8 +154,7 @@ namespace MunOS.Executors
 						if (next == thread)
 						{
 							// restart the thread
-							thread.Status = MunStatus.Incomplete;
-							thread.OnRestart();
+							thread.Restart();
 							break;
 						}
 						// this is probably init-chain
