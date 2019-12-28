@@ -292,7 +292,7 @@ namespace RedOnion.KSP.API
 		public Orbit orbit => native.orbit;
 		[Description("Eccentricity of current orbit.")]
 		public double eccentricity => native.orbit.eccentricity;
-		[Description("Inclination of current orbit.")]
+		[Description("Inclination of current orbit [0, 180).")]
 		public double inclination => native.orbit.inclination;
 		[Description("Semi-major axis of current orbit.")]
 		public double semiMajorAxis => native.orbit.semiMajorAxis;
@@ -318,7 +318,7 @@ namespace RedOnion.KSP.API
 		public double meanAnomaly => RosMath.Deg.Clamp360(native.orbit.meanAnomaly * RosMath.Rad2Deg);
 		[Description("Longitude of ascending node.")]
 		public double lan => native.orbit.LAN;
-		[Description("Argument of periapsis.")]
+		[Description("Argument of periapsis. Angle from ascending node to periapsis.")]
 		public double argumentOfPeriapsis => native.orbit.argumentOfPeriapsis;
 
 		#endregion

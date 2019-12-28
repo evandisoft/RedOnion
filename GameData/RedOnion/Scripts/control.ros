@@ -344,7 +344,6 @@ def control ship, target, x, y
     var target = ship.target ?? self.target
     if target == null
       print "Incl.: {0,5:F1} Arg.: {1,5:F1}", i0, ship.argumentOfPeriapsis
-      //TODO: this only works 50% of the time, no neg works the other time - it is about AoP range
       di = -i0
       ta = -ship.argumentOfPeriapsis
     else
