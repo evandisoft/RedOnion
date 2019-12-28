@@ -222,6 +222,7 @@ def staging
     print "No operational engine"
     stage
     return
+  //todo: SRB's vs. Twin Boars (engine-tank combo)
   if stage.fuel <= 0.1
     print "Stage out of fuel"
     stage
