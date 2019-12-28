@@ -43,10 +43,11 @@ namespace Kerbalua.Scripting
 			}
 		}
 
-		public void PrintException(Exception exception)
+		protected override void OnError(MunEvent err)
 		{
-			if (OutputBuffer != null)
+			if (!err.Printed && err.Exception != null && OutputBuffer != null)
 			{
+				Exception exception=err.Exception;
 				if (exception is InterpreterException interExcept)
 				{
 					OutputBuffer.AddError(interExcept.DecoratedMessage);
@@ -55,12 +56,11 @@ namespace Kerbalua.Scripting
 				{
 					OutputBuffer.AddError(exception.Message);
 				}
+				err.Printed = true;
+
+				Debug.Log(exception);
 			}
-
-			Debug.Log(exception);
 		}
-
-
 
 		/*
 		public override string GetImportString(string scriptname)
