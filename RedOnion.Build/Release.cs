@@ -9,7 +9,7 @@ namespace RedOnion.Build
 		public static string[] scriptWhitelist=
 		{
 			// Whitelisted ROS scripts
-			"launch.ros","control.ros","vectors.ros",
+			"launch.ros","control.ros",
 			// Whitelisted LUA scripts
 			"majorMalfunction.lua","majorMalfunctionNative.lua","selfDestruct.lua","uibasics.lua",
 		};
