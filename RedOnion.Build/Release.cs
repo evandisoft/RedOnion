@@ -9,7 +9,7 @@ namespace RedOnion.Build
 		public static string[] scriptWhitelist=
 		{
 			// Whitelisted ROS scripts
-			"flight.ros","control.ros","vectors.ros",
+			"launch.ros","control.ros","vectors.ros",
 			// Whitelisted LUA scripts
 			"majorMalfunction.lua","majorMalfunctionNative.lua","selfDestruct.lua","uibasics.lua",
 		};
@@ -29,7 +29,6 @@ namespace RedOnion.Build
 					var reduced = resource.Substring(root);
 					if (whitelist!=null && whitelist.IndexOf(reduced)==-1)
 					{
-						Console.WriteLine(reduced+", is not in the whitelist");
 						continue;
 					}
 					Console.WriteLine("- " + reduced);
