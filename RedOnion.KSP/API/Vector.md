@@ -1,6 +1,6 @@
 ## Vector (Function)
 
-Function to create 3D vector / coordinate, also aliased as simple `V`. Receives either three arguments (x,y,z), two (x,y - z=0), or one (x=y=z). Can also convert array / list of numbers (`V([1,2,3])` becomes `V(1,2,3)`).
+Function to create 3D vector / coordinate. Receives either three arguments (x,y,z), two (x,y; z=0), or one (x=y=z). Can also convert array / list of numbers (`V([1,2,3])` becomes `V(1,2,3)`).
 
 
 **Types:**
@@ -61,7 +61,7 @@ Beware that multiplication is scaling, not cross product or dot - use appropriat
 - `angle()`: double, rhs Vector, axis Vector
   - Angle between this vector and another vector given point above the plane (-180..180). Note that the vectors are not projected onto the plane, the angle of cross product of the two and the third vector being above 90 makes the result negative.
 - `cross()`: Vector, rhs Vector
-  - Cross product of this vector with another vector.
+  - Cross product of this vector with another vector. Note that Unity uses left-handed coordinate system, so `ship.away.cross(ship.velocity)` points down (towards south pole) in prograde-orbit (which is the usual).
 - `projectOnVector()`: Vector, normal Vector
   - Project this vector onto another vector.
 - `projectOnPlane()`: Vector, normal Vector

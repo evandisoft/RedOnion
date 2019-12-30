@@ -8,8 +8,8 @@ using UnityEngine;
 
 namespace RedOnion.KSP.API
 {
-	[Description("Function to create 3D vector / coordinate, also aliased as simple `V`."
-		+ " Receives either three arguments (x,y,z), two (x,y - z=0), or one (x=y=z)."
+	[Description("Function to create 3D vector / coordinate."
+		+ " Receives either three arguments (x,y,z), two (x,y; z=0), or one (x=y=z)."
 		+ " Can also convert array / list of numbers (`V([1,2,3])` becomes `V(1,2,3)`).")]
 	public partial class VectorCreator : ICallable, IType
 	{

@@ -321,6 +321,10 @@ try
       var a = math.clamp(-tta, 0, 30)
       dir = ship.velocity.rotate a, ship.velocity.cross ship.away
       pwr = 1 + math.tan a
+    if maxThrottle <= 0.5 // almost there
+      var tan = ship.away.cross ship.velocity.cross ship.away
+      if tan.angle(dir) > 1 // fix the wobble
+        dir = tan.rotate(tan.angle(dir, ship.away.cross ship.velocity) >= 0 ? 1 : -1, ship.velocity.cross ship.away)
     if pitchDown != 0.0
       dir = dir.rotate pitchDown, ship.away.cross ship.velocity
     autopilot.direction = dir
@@ -407,7 +411,7 @@ try
     if dvMin < 0.2 or ship.eccentricity < 0.01
       if almost == null
         almost = time()
-        maxThrottle = 0.2
+        maxThrottle = 0.3
         print "AT1: {0,6:F1} DV: {1,6:F1} BT: {2,6:F1} E: {3,7:F5} PD: {4,3:F1}",
           tta, dvLast, stage.burnTime(dvLast), ship.eccentricity, pitchDown
         pitchDownFactor = 0.5
@@ -416,7 +420,7 @@ try
       if dvMin < 0.05 or ship.eccentricity < 0.001
         if almost2 == null
           almost2 = time()
-          maxThrottle = 0.025
+          maxThrottle = 0.1
           print "AT2: {0,6:F1} DV: {1,6:F1} BT: {2,6:F1} E: {3,7:F5} PD: {4,3:F1}",
             tta, dvLast, stage.burnTime(dvLast), ship.eccentricity, pitchDown
           pitchDownFactor = 0.1
