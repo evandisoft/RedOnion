@@ -8,14 +8,14 @@ However, this allows you to have a list of buttons which run various programs, w
 
 The Lua and ROS engines run in different **processes**, and now do not share an output buffer. This means that output your Lua threads have produced will not appear when you have the ROS engine selected.
 
-In the future we will give you the power to create multiple processes for the same engine.
-
 Clicking the **Terminate** button will kill all the threads from the currently selected process, and also all associated windows and vecdraws.
 
-### Managing Multithreading
-Even though multiple threads in MunOS are not running simultaneously with respect to the computer you are running (they are not using multiple cores or multiple OS threads), MunOS will be interrupting MunOS threads, which are going to be sharing time each update.
+For now there are only two processes: 1 Lua engine and 1 ROS engine, but in the future we will create both an api, and a user interface for creating/killing processes, allowing the user to create additional Lua/ROS processes and manage them.
 
-This can lead to issues when you want only one thread to use a particular resource at a time. Global variables are sharead between all threads in the same `process`. To manage these possible interactions you can create your own locking mechanisms using a feature both engines provide:
+### Managing Multithreading
+Even though multiple threads in MunOS are not running simultaneously with respect to the computer you are running (they are not using multiple cores or multiple OS threads), multiple threads will often be running in a particular update, with threads being interrupted by MunOS to give time to other threads for that update. (Script code will never be interrupted while it is executing native C# calls, and will only be interrupted between script code instructions.)
+
+This can lead to issues when you want only one thread to use a particular resource at a time. Global variables are shared between all threads in the same `process`. To manage these possible interactions you can create your own locking mechanisms using a feature both engines provide:
 
 **In general you are not going to be able to know when one of your "threads" will be interrupted to run another thread. But there is one exception: immediately after a `sleep` call in Lua, or a `yield` call in ROS, your thread will have at least 100 uninterruptible instructions.**
 
@@ -106,3 +106,5 @@ somelock=false
 And this will have every thread wait in the loop until their turn to run, and any time a thread returns from `sleep/yield`, it will immediately check somelock, and if it was false, it will break from the loop, and immediately set the lock to true before any other thread gets to interrupt it.
 
 Importantly, after whatever the thread was doing in `...` is completed, we set somelock to false again so that the next thread can escape the loop.
+
+In the future, explicit locking functionality may be added to make the implementation simpler.
