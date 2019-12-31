@@ -33,7 +33,7 @@ Active vessel
 - `body`: [SpaceBody](SpaceBody.md) - KSP API. Orbited body.
 - `orbit`: Orbit - \[`Unsafe`\] \[`WIP`\] KSP API. Orbit parameters. May get replaced by safe wrapper in the future.
 - `eccentricity`: double - Eccentricity of current orbit.
-- `inclination`: double - Inclination of current orbit.
+- `inclination`: double - Inclination of current orbit [0, 180).
 - `semiMajorAxis`: double - Semi-major axis of current orbit.
 - `semiMinorAxis`: double - Semi-minor axis of current orbit.
 - `apoapsis`: double - Height above ground of highest point of current orbit.
@@ -46,7 +46,7 @@ Active vessel
 - `trueAnomaly`: double - Angle in degrees between the direction of periapsis and the current position. Zero at periapsis, 180 at apoapsis.
 - `meanAnomaly`: double - Angle in degrees between the direction of periapsis and the current position extrapolated on circular orbit.
 - `lan`: double - Longitude of ascending node.
-- `argumentOfPeriapsis`: double - Argument of periapsis.
+- `argumentOfPeriapsis`: double - Argument of periapsis. Angle from ascending node to periapsis.
 - `position`: [Vector](Vector.md) - Center of mass relative to (CoM of) active ship (zero for active ship).
 - `velocity`: [Vector](Vector.md) - Current orbital velocity.
 - `surfaceVelocity`: [Vector](Vector.md) - Current surface velocity.

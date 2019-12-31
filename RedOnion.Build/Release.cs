@@ -6,6 +6,12 @@ namespace RedOnion.Build
 {
 	static class Release
 	{
+		/// <summary>
+		/// A list of scripts to be distributed with a release. This is to allow us to use test-scripts and
+		/// our own playthrough scripts without having to delete them every time we release.
+		/// 
+		/// No script will be distributed for release without being in this whitelist.
+		/// </summary>
 		public static string[] scriptWhitelist=
 		{
 			// Whitelisted ROS scripts
