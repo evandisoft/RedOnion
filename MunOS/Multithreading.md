@@ -15,9 +15,9 @@ Clicking the **Terminate** button will kill all the threads from the currently s
 ### Managing Multithreading
 Even though multiple threads in MunOS are not running simultaneously with respect to the computer you are running (they are not using multiple cores or multiple OS threads), MunOS will be interrupting MunOS threads, which are going to be sharing time each update.
 
-In general you are not going to be able to know when one of your "threads" will be interrupted to run another thread.
+This can lead to issues when you want only one thread to use a particular resource at a time. Global variables are sharead between all threads in the same `process`. To manage these possible interactions you can create your own locking mechanisms using a feature both engines provide:
 
-There is one exception: immediately after a `sleep` call in Lua, or a `yield` call in ROS, your thread will have at least 100 uninterruptible instructions.
+**In general you are not going to be able to know when one of your "threads" will be interrupted to run another thread. But there is one exception: immediately after a `sleep` call in Lua, or a `yield` call in ROS, your thread will have at least 100 uninterruptible instructions.**
 
 What 100 instructions will allow you to do is different for the two engines, but what it will _at least_ allow you to do is the following (in lua):
 ```
@@ -28,9 +28,15 @@ if not somelock then
 Or ROS:
 ```
 yield
-if !("somelock" in global)
-    globals.somelock=true
+if !("somelock" in globals)
+    globals.somelock=false
+
+yield
+if !somelock
+    somelock=true
 ```
+(In ROS, you have to set the global `somelock` before using it. And you will want to set it only one time, hence the use of `yield`.)
+
 Here `somelock` is a global variable. Immediately after the `sleep/yield`, you will be guaranteed to have enough instructions to test a global variable, and set it to a simple constant value like `true`. You will not be guaranteed to have enough instructions for something more expensive like
 ```
 sleep()
@@ -40,7 +46,7 @@ if not complicatedLogic() then
 
 Because the function `complicatedLogic` may take longer than the amount of instructions you have left.
 
-After you have tested `somelock` and set it to `true`, you can run anything inside the if statement and it won't be simultaneously running in any other thread.
+After you have tested `somelock` and set it to `true`, you can run anything inside the if statement and it won't be simultaneously running in any other thread that is running the same source code:
 
 Lua:
 ```
@@ -58,11 +64,13 @@ if !("somelock" in globals)
     globals.somelock=false
 
 yield
-if !globals.somelock
-    globals.somelock=true
+if !somelock
+    somelock=true
     ...
-    globals.somelock=false
+    somelock=false
 ```
+
+
 Don't forget to set the lock to false again before you exit the if statement.
 
 If you have multiple threads trying to run this exact same code at the same time, they will all reach the `sleep/yield` statement, and wait. The first thread to leave that statement will be guaranteed to at least check the lock (which we will assume starts out as `false` or `nil`), and then set it before any other thread can interrupt it.
@@ -89,10 +97,10 @@ if !("somelock" in globals)
 
 do
     yield
-until !globals.somelock
-globals.somelock=true
+until !somelock
+somelock=true
 ...
-globals.somelock=false
+somelock=false
 ```
 
 And this will have every thread wait in the loop until their turn to run, and any time a thread returns from `sleep/yield`, it will immediately check somelock, and if it was false, it will break from the loop, and immediately set the lock to true before any other thread gets to interrupt it.
