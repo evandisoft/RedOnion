@@ -18,8 +18,6 @@ General:
 Lua:
 - Fixed bug where new function passed null in when it should pass zero arguments.
 
-
-
 # 0.4
 ## 0.4.8
 ### ROS Changes:
