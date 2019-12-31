@@ -26,6 +26,9 @@ to compare it to one of the enum values in `ksp.GameScenes`.
 
 This will allow you to make your autorun scripts do different things depending on which scene you are in.
 
+## Multithreading
+Both engines allow you to [run multiple programs at a time](MunOS/Multithreading.md). And in version 0.5.0, the LiveRepl is no longer disabled when you run a script.
+
 ## Intellisense
 Both languages provide intellisense. It is very useful and fun to use.
 

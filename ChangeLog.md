@@ -7,13 +7,19 @@
 - Provide editors that can be used for editing files in contexts unrelated to our scripting engines.
 - More UI library features.
 
-## 0.5.0:
-- Working on some sort of system for running multiple scripts at a time. May not initially have a UI that can provide this feature to the user in full. That will probably come later.
-
 # Next Release
-Just had a release (0.4.8)
+Just had a release (0.5.0)
 
 # Current
+## 0.5.0:
+General:
+- Initial version of our system for running multiple scripts at a time, called [MunOS](MunOS/Multithreading.md).
+
+Lua:
+- Fixed bug where new function passed null in when it should pass zero arguments.
+
+
+
 # 0.4
 ## 0.4.8
 ### ROS Changes:
