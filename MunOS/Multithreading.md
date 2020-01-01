@@ -19,7 +19,7 @@ This can lead to issues when you want only one thread to use a particular resour
 
 **Immediately after a `sleep` call in Lua, or a `yield` call in ROS, your thread will have at least 100 uninterruptible instructions.**
 
-What 100 instructions will allow you to do is different for the two engines. And you are not expected to know how much script code will translate to 100 instructions. However, 100 instructions will _at least_ allow you to do the following:
+What 100 instructions will allow you to do is different for the two engines. And you are not expected to know how much script code will translate to 100 instructions. However, 100 instructions after a `sleep/yield` will _at least_ allow you to do the following:
 
 Lua:
 ```
