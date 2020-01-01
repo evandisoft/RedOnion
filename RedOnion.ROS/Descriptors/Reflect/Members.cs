@@ -126,7 +126,7 @@ namespace RedOnion.ROS
 				if (browsable.Length == 1 && !((BrowsableAttribute)browsable[0]).Browsable)
 					return;
 
-				Value.DebugLog("Processing nested type {0}.{1}", Type.Name, nested.Name);
+				Value.ExtraLog("Processing nested type {0}.{1}", Type.Name, nested.Name);
 
 				if (sdict == null)
 					sdict = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
@@ -149,7 +149,7 @@ namespace RedOnion.ROS
 				if (convertAttrs.Length == 1)
 					convert = ((ConvertAttribute)convertAttrs[0]).Type;
 
-				Value.DebugLog("Processing field {0}.{1} [instace: {2}, convert: {3}]",
+				Value.ExtraLog("Processing field {0}.{1} [instace: {2}, convert: {3}]",
 					Type.Name, f.Name, instance, convert?.Name ?? "False");
 
 				if (dict == null)
@@ -212,7 +212,7 @@ namespace RedOnion.ROS
 				if (convertAttrs.Length == 1)
 					convert = ((ConvertAttribute)convertAttrs[0]).Type;
 
-				Value.DebugLog("Processing property {0}.{1} [instace: {2}, convert: {3}]",
+				Value.ExtraLog("Processing property {0}.{1} [instace: {2}, convert: {3}]",
 					Type.Name, p.Name, instance, convert?.Name ?? "False");
 
 				var iargs = p.GetIndexParameters();
@@ -360,7 +360,7 @@ namespace RedOnion.ROS
 			{
 #if DEBUG
 				if (!m.IsSpecialName && !m.IsGenericMethod && !m.ReturnType.IsByRef)
-					Value.DebugLog("Processing method {0}.{1} [instace: {2}, args: {3}]",
+					Value.ExtraLog("Processing method {0}.{1} [instace: {2}, args: {3}]",
 						Type.Name, m.Name, instance, m.GetParameters().Length);
 #endif
 				var value = ReflectMethod(m);
@@ -385,20 +385,10 @@ namespace RedOnion.ROS
 				var args = c.GetParameters();
 				if (args.Length == 0 || args[0].RawDefaultValue != DBNull.Value)
 				{
-					Value.DebugLog("Found default {0}#ctor [args: {1}]",
+					Value.ExtraLog("Found default {0}#ctor [args: {1}]",
 						Type.Name, args.Length);
 					if (defaultCtor == null || c.GetParameters().Length < defaultCtor.GetParameters().Length)
 						defaultCtor = c;
-					return;
-				}
-				if (args[0].ParameterType == typeof(IProcessor)
-					&& (args.Length == 1 || args[1].RawDefaultValue != DBNull.Value)
-					&& !args[0].ParameterType.IsByRef && !args[0].IsOut)
-				{
-					Value.DebugLog("Found default {0}#ctor accepting processor [args: {1}]",
-						Type.Name, args.Length);
-					if (processorCtor == null || c.GetParameters().Length < processorCtor.GetParameters().Length)
-						processorCtor = c;
 					return;
 				}
 			}

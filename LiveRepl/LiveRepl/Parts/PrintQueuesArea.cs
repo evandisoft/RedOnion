@@ -1,7 +1,7 @@
 using System;
 using Kerbalui.Controls;
 using Kerbalui.Layout;
-using RedOnion.KSP.Debugging;
+using RedOnion.Debugging;
 using RedOnion.KSP.Settings;
 
 namespace LiveRepl.Parts
@@ -16,7 +16,7 @@ namespace LiveRepl.Parts
 
 			AddWeighted(1, new Button("Print", () =>
 			{
-				uiparts.replOutoutArea.AddText(QueueLogger.GetContentsByTag(uiparts.queueTagInputArea.Text));
+				uiparts.scriptWindow.CurrentBuffer.AddText(QueueLogger.GetContentsByTag(uiparts.queueTagInputArea.Text));
 			}));
 			AddWeighted(1, new Button("Clear", () =>
 			{

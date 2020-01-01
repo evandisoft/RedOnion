@@ -12,9 +12,9 @@ namespace RedOnion.KSP.ROS
 {
 	public class RosSuggest
 	{
-		protected RosProcessor core;
-		public RosSuggest(RosProcessor core)
-			=> this.core = core;
+		public RosProcessor Processor { get; set; }
+		public RosSuggest(RosProcessor processor = null)
+			=> Processor = processor;
 
 		protected bool Matches(string suggestion)
 		{
@@ -91,7 +91,7 @@ namespace RedOnion.KSP.ROS
 			}
 			catch (Exception ex)
 			{
-				core.DebugLog("{0} in completion: {1}", ex.GetType().Name, ex.Message);
+				Processor.DebugLog("{0} in completion: {1}", ex.GetType().Name, ex.Message);
 				replaceAt = at;
 				replaceTo = at;
 				return new string[0];
@@ -106,7 +106,7 @@ namespace RedOnion.KSP.ROS
 					AddSuggestion(name);
 				if (found.desc is Context)
 				{
-					foreach (var name in core.Globals.EnumerateProperties(core.Globals))
+					foreach (var name in Processor.Globals.EnumerateProperties(Processor.Globals))
 						AddSuggestion(name);
 				}
 				if (_suggestionsCount > 1)
@@ -185,7 +185,7 @@ namespace RedOnion.KSP.ROS
 				break;
 			}
 			replaceTo = j;
-			var obj = (Descriptor)core.Context ?? core.Globals;
+			var obj = (Descriptor)Processor.Context ?? Processor.Globals;
 			if (dotAt < 0)
 			{
 				found = new Value(obj);
@@ -204,9 +204,9 @@ namespace RedOnion.KSP.ROS
 				{
 					if (!(value.obj is Context))
 						return;
-					if ((index = core.Globals.Find(name)) < 0)
+					if ((index = Processor.Globals.Find(name)) < 0)
 						return;
-					if (!core.Globals.Get(ref value, index))
+					if (!Processor.Globals.Get(ref value, index))
 						return;
 				}
 				j = dotAt;

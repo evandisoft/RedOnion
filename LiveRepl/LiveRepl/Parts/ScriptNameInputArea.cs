@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using UnityEngine;
 using System.Collections.Generic;
@@ -17,9 +17,13 @@ namespace LiveRepl.Parts {
 			get
 			{
 				var extension=".lua";
-				if (uiparts.scriptWindow.currentReplEvaluator!=null)
+				//if (uiparts.scriptWindow.currentReplEvaluator!=null)
+				//{
+				//	extension=uiparts.scriptWindow.currentReplEvaluator.Extension;
+				//}
+				if (uiparts.scriptWindow.CurrentEngine!=null)
 				{
-					extension=uiparts.scriptWindow.currentReplEvaluator.Extension;
+					extension=uiparts.scriptWindow.CurrentEngine.Extension;
 				}
 
 				return "untitled"+extension;

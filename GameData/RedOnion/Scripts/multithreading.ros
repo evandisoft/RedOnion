@@ -1,0 +1,10 @@
+yield
+if !("somelock" in globals)
+    globals.somelock=false
+
+do
+    yield
+until !globals.somelock
+globals.somelock=true
+print "doing something"
+globals.somelock=false

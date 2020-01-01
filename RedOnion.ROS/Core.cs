@@ -147,7 +147,6 @@ namespace RedOnion.ROS
 		{
 			if (script == null) script = processor.ReadScript(path);
 			Code = processor.Compile(script, path);
-			if (Globals == null) Globals = new Globals();
 			return Execute(countdown);
 		}
 		/// <summary>
@@ -160,7 +159,6 @@ namespace RedOnion.ROS
 		public bool Execute(CompiledCode code, int countdown = 1000)
 		{
 			Code = code;
-			if (Globals == null) Globals = new Globals();
 			return Execute(countdown);
 		}
 		/// <summary>

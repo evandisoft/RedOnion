@@ -5,7 +5,7 @@ using RedOnion.ROS.Objects;
 
 namespace RedOnion.ROS.Tests
 {
-	public class CoreTests : Processor
+	public class CoreTests : Processor.WithEvents
 	{
 		public void Test(string script, int countdown = 1000)
 		{

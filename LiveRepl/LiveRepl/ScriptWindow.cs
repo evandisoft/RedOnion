@@ -69,7 +69,7 @@ namespace LiveRepl
 		{
 			SetOrReleaseInputLock();
 
-			if (ScriptRunning ) HandleInputWhenExecuting();
+			//if (ScriptRunning ) HandleInputWhenExecuting();
 			GUILibUtil.ConsumeMarkedCharEvent(Event.current);
 
 			GlobalKeyBindings.ExecuteAndConsumeIfMatched(Event.current);
@@ -109,9 +109,12 @@ namespace LiveRepl
 			SavedSettings.SaveSetting("lastQueueTag", uiparts.queueTagInputArea.Text);
 #endif
 			SavedSettings.SaveToDisk();
-			foreach(var repleval in replEvaluators.Values)
+
+			Debug.Log("[RedOnion] Terminating processes");
+			foreach(var engine in engines.Values)
 			{
-				repleval.Terminate();
+				//Debug.Log("[RedOnion] Terminating process "+engine.Process.ID);
+				engine.Reset();
 			}
 		}
 	}

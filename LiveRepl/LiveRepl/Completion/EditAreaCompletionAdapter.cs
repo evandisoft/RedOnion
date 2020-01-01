@@ -4,7 +4,7 @@ using Kerbalui.Decorators;
 using Kerbalui.EditingChanges;
 using Kerbalui.Interfaces;
 using LiveRepl.Interfaces;
-using static RedOnion.KSP.Debugging.QueueLogger;
+using static RedOnion.Debugging.QueueLogger;
 
 namespace LiveRepl.Completion {
 	/// <summary>
@@ -15,22 +15,23 @@ namespace LiveRepl.Completion {
 	public class CompletionHelper {
 		public static EditingState Complete(int index,ScriptWindowParts uiparts, EditingState editingState)
 		{
-			UILogger.Log("In EditAreaCompletionAdapter Complete for index "+index);
-			var completions = uiparts.scriptWindow.currentReplEvaluator.GetCompletions(editingState.text, editingState.cursorIndex,out int replaceStart,out int replaceEnd);
-			UILogger.Log("CursorIndex", editingState.cursorIndex,"replaceStart",replaceStart,"replaceEnd",replaceEnd);
+			UILogger.DebugLogArray("In EditAreaCompletionAdapter Complete for index "+index);
+			//var completions = uiparts.scriptWindow.currentReplEvaluator.GetCompletions(editingState.text, editingState.cursorIndex,out int replaceStart,out int replaceEnd);
+			var completions = uiparts.scriptWindow.CurrentEngine.GetCompletions(editingState.text, editingState.cursorIndex,out int replaceStart,out int replaceEnd);
+			UILogger.DebugLogArray("CursorIndex", editingState.cursorIndex,"replaceStart",replaceStart,"replaceEnd",replaceEnd);
 			if (completions.Count > index) {
 				int partialLength = replaceEnd - replaceStart;
-				UILogger.Log("PartialLength", partialLength);
+				UILogger.DebugLogArray("PartialLength", partialLength);
 				int partialStart = replaceStart;
-				UILogger.Log("PartialStart", partialStart);
+				UILogger.DebugLogArray("PartialStart", partialStart);
 				string textPriorToPartial =  editingState.text.Substring(0, partialStart);
 				//UILogger.Log("TextPriorToPartial", textPriorToPartial);
 				string completion = completions[index];
-				UILogger.Log("completion", completion);
+				UILogger.DebugLogArray("completion", completion);
 				int cursorChange = completion.Length - partialLength;
-				UILogger.Log("cursorChange", cursorChange);
+				UILogger.DebugLogArray("cursorChange", cursorChange);
 				int newCursor = replaceEnd+cursorChange; //editingArea.cursorIndex + cursorChange;
-				UILogger.Log("newCursor", newCursor);
+				UILogger.DebugLogArray("newCursor", newCursor);
 				string textAfterPartial = editingState.text.Substring(partialStart + partialLength);
 				string newText=textPriorToPartial + completion + textAfterPartial;
 				return new EditingState(newText, newCursor, newCursor);

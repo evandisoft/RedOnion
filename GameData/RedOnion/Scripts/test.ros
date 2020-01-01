@@ -1,0 +1,5 @@
+for var i = 0
+  var start = time.now
+  while time.since(start) < 1 do wait
+  print "test " + ++i
+  

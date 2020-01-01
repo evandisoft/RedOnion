@@ -13,6 +13,7 @@ Clickable button (or toggle-button).
   - Create new button with specified text and click-action.
 
 **Instance Properties:**
+- `Enabled`: bool - Enabled/Disabled (for clicks, Unity: `interactable`).
 - `Toggleable`: bool - Toggleable button (false by default).
 - `Pressed`: bool - Button is pressed (mainly for toggleable).
 - `Exclusive`: bool - Toggleable button is exclusive (other toggleable buttons get released when this one is pressed).

@@ -40,6 +40,7 @@ namespace RedOnion.KSP.API
 			_heading = double.NaN;
 			_roll = double.NaN;
 			_direction = new Vector(double.NaN, double.NaN, double.NaN);
+			_killRot = false;
 			Unhook();
 		}
 
@@ -124,24 +125,38 @@ namespace RedOnion.KSP.API
 		}
 		[Description("Target pitch/elevation [-180..+180]."
 			+ " Values outside -90..+90 flip heading."
-			+ "NaN for releasing the control.")]
+			+ " NaN for releasing the control.")]
 		public double pitch
 		{
 			get => _pitch;
 			set => Check(_pitch = RosMath.ClampS180(value));
 		}
 		[Description("Target roll/bank [-180..+180]."
-			+ "NaN for releasing the control.")]
+			+ " NaN for releasing the control.")]
 		public double roll
 		{
 			get => _roll;
 			set => Check(_roll = RosMath.ClampS180(value));
 		}
-
+		[Description("Fix the roll of the ship. Note that this is not SAS and currently does not allow user override.")]
 		public bool killRot
 		{
 			get => _killRot;
 			set => Check((_killRot = value) ? 1.0 : double.NaN);
+		}
+
+		[Description("SAS: Stability Assist System. This is stock alternative to `killRot` which allows user override."
+			+ " Can be used to allow user/player to adjust roll while autopilot controls direction.")]
+		public bool sas
+		{
+			get => _ship.sas;
+			set => _ship.sas = value;
+		}
+		[Description("RCS: Reaction Control System.")]
+		public bool rcs
+		{
+			get => _ship.rcs;
+			set => _ship.rcs = value;
 		}
 
 		public PIDs pids { get; } = new PIDs();
@@ -157,9 +172,9 @@ namespace RedOnion.KSP.API
 			public virtual void reset()
 			{
 				P = 1.0;    // direct control
-				I = 0.5;    // error-correcting, *dt
-				R = 0.4;    // cumulated change, *dt
-				D = 0.01;   // change-resisting, /dt
+				I = 0.3;    // error-correcting, *dt
+				R = 0.25;   // cumulated change, *dt
+				D = 0.05;   // change-resisting, /dt
 				outputChangeLimit = 5; //*dt => 10% per std. tick
 				targetChangeLimit = 5; //*dt => 10% per std. tick
 				accumulatorLimit = 0.5; // abs(accu) <= 50%
@@ -167,16 +182,16 @@ namespace RedOnion.KSP.API
 				time = 3.0;
 				angular = 10.0;
 			}
-			/*
+
 			internal class Roll : PidParams
 			{
 				public override void reset()
 				{
 					base.reset();
-					scale = 0.5;
+					I = 0.0;
+					R = 0.1;
 				}
 			}
-			*/
 		}
 		public class PID : API.PID<PidParams>
 		{
@@ -208,7 +223,7 @@ namespace RedOnion.KSP.API
 
 			protected internal PID _pitch = new PID();
 			protected internal PID _yaw = new PID();
-			protected internal PID _roll = new PID(/*new PidParams.Roll()*/);
+			protected internal PID _roll = new PID(new PidParams.Roll());
 
 			public PidParams pitch => _pitch.param;
 			public PidParams yaw => _yaw.param;

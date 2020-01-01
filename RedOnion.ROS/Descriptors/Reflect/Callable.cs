@@ -108,20 +108,17 @@ namespace RedOnion.ROS
 				ref Value result, object self, Arguments args)
 			{
 				var pars = method.GetParameters();
-				int parsFrom = 0;
-				if (pars.Length > 0 && pars[0].ParameterType == typeof(IProcessor))
-					parsFrom = 1;
-				if (pars.Length-parsFrom != args.Length)
+				if (pars.Length != args.Length)
 				{
-					if (pars.Length-parsFrom < args.Length)
+					if (pars.Length < args.Length)
 						return false;
-					if (pars[parsFrom+args.Length].RawDefaultValue == DBNull.Value)
+					if (pars[args.Length].RawDefaultValue == DBNull.Value)
 						return false;
 				}
 
 				for (int i = 0; i < args.Length; i++)
 				{
-					var param = pars[parsFrom+i];
+					var param = pars[i];
 					var arg = args[i];
 					var type = param.ParameterType;
 					if (type == typeof(string))
@@ -183,16 +180,14 @@ namespace RedOnion.ROS
 				}
 
 				var call = new object[pars.Length];
-				if (parsFrom > 0)
-					call[0] = args.Processor;
-				for (int i = parsFrom, j = 0; i < call.Length; i++, j++)
+				for (int i = 0; i < call.Length; i++)
 				{
 					var param = pars[i];
-					if (j >= args.Length)
+					if (i >= args.Length)
 						call[i] = param.DefaultValue;
 					else
 					{
-						var arg = args[j];
+						var arg = args[i];
 						var type = param.ParameterType;
 						if (type == typeof(string))
 							call[i] = arg.ToStr();

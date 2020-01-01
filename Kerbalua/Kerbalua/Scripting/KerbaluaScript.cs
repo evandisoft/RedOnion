@@ -9,12 +9,12 @@ using RedOnion.KSP.API;
 using RedOnion.KSP.MoonSharp.CommonAPI;
 using System.ComponentModel;
 using RedOnion.KSP.MoonSharp.MoonSharpAPI;
-using Process = RedOnion.KSP.OS.Process;
 using MoonSharp.Interpreter.Compatibility;
 using RedOnion.UI;
 using Kerbalua.Events;
 using System.IO;
 using RedOnion.KSP.Settings;
+using MunOS;
 
 namespace Kerbalua.Scripting
 {
@@ -26,56 +26,61 @@ namespace Kerbalua.Scripting
 		private const int defaultExecLimit=1000;
 		private const int execLimitMin=100;
 		private const int execLimitMax=5000;
-		static KerbaluaScript _instance;
-		public static KerbaluaScript Instance
+
+		static KerbaluaScript()
 		{
-			get
-			{
-				return _instance;
-			}
-		}
-
-		public static void Initialize()
-		{
-			_instance=new KerbaluaScript();
-		}
-
-		private KerbaluaScript() : base(CoreModules.Preset_Complete)
-		{
-			UserData.RegisterType<Button>(new LuaDescriptor(typeof(Button)));
-
-			UserData.RegistrationPolicy = InteropRegistrationPolicy.Automatic;
-
-			//GlobalOptions.CustomConverters
-				//.SetClrToScriptCustomConversion(
-					//(Script script, ModuleControlSurface m)
-					//	=> DynValue.FromObject(script, new LuaProxy(m)) //DynValue.NewTable(new ModuleControlSurfaceProxyTable(this, m))
-					//);
-
 			GlobalOptions.CustomConverters
 				.SetClrToScriptCustomConversion(
 					(Script script, Vector3d vector3d)
 						=> DynValue.FromObject(script, new Vector(vector3d)) //DynValue.NewTable(new ModuleControlSurfaceProxyTable(this, m))
 					);
+			UserData.RegisterType<Button>(new LuaDescriptor(typeof(Button)));
+
+			UserData.RegistrationPolicy = InteropRegistrationPolicy.Automatic;
 
 			GlobalOptions.CustomConverters
 				.SetScriptToClrCustomConversion(DataType.Function, typeof(Action<Button>), (f) =>
-				  {
-					  return new Action<Button>((button) =>
-					  {
-						  var script=this;
-						  var co = script.CreateCoroutine(f);
-						  co.Coroutine.AutoYieldCounter = 1000;
-						  co.Coroutine.Resume();
-						  if (co.Coroutine.State == CoroutineState.ForceSuspended)
-						  {
-							  script.PrintErrorAction?.Invoke("functions called in buttons must have a short runtime");
-						  }
-					  });
-				  });
+				{
+					return new Action<Button>((button) =>
+					{
+						var closure=f.Function;
+						var kerbaluaScript=closure.OwnerScript as KerbaluaScript;
+						if (kerbaluaScript==null)
+						{
+							throw new Exception("Ownerscript was not KerbaluaScript in LuaEventDescriptor");
+						}
 
+						var process=kerbaluaScript?.kerbaluaProcess;
+						if (process==null)
+						{
+							throw new Exception("Could not get current process in LuaEventDescriptor");
+						}
 
-			//UnityEngine.Debug.Log("sanity check");
+						new KerbaluaThread(process, MunPriority.Callback, closure);
+					});
+				});
+		}
+
+		public readonly KerbaluaProcess kerbaluaProcess;
+
+		public const string LuaNew=@"
+return function(stat,...) 
+	if type(stat)~='userdata' then
+		error('First argument to `new` must be a CLR Static Class')
+	end
+	local args={...}
+	if #args>0 then
+		return stat.__new(...)
+	else
+		return stat.__new()
+	end
+end
+";
+
+		public KerbaluaScript(KerbaluaProcess kerbaluaProcess) : base(CoreModules.Preset_Complete)
+		{
+			this.kerbaluaProcess=kerbaluaProcess;
+
 			var metatable=new Table(this);
 			var commonAPI=new CommonAPITable(this);
 			commonAPI.AddAPI(typeof(Globals));
@@ -83,7 +88,7 @@ namespace Kerbalua.Scripting
 
 			metatable["__index"]=commonAPI;
 			Globals.MetaTable=metatable;
-			Globals.Remove("coroutine");
+			
 			Globals.Remove("dofile");
 			//Globals.Remove("load");
 			Globals.Remove("loadfilesafe");
@@ -91,41 +96,20 @@ namespace Kerbalua.Scripting
 			//Globals.Remove("loadsafe");
 
 			// This is the simplest way to define "new" to use __new.
-			commonAPI["new"]=DoString(@"
-return function(stat,...) 
-	if type(stat)~='userdata' then
-		error('First argument to `new` must be a CLR Static Class')
-	end
-	return stat.__new(...) 
-end
-			");
+			commonAPI["new"]=DoString(LuaNew);
 
 			//commonAPI["dofile"]=new Func<string, DynValue>(dofile);
 
 			//commonAPI["new"]=new newdel(@new);
 
-			commonAPI["sleep"] = new Action<double>(sleep);
+			var coroutineTable=Globals["coroutine"] as Table;
+
+			var yield = coroutineTable["yield"];//new Action<double>(sleep);
+			Globals.Remove("coroutine");
 			//commonAPI["setexeclimit"] = new Action<double>(setexeclimit);
 
+			commonAPI["sleep"] = yield;
 		}
-
-
-		//DynValue dofile(string filename)
-		//{
-		//	return DoFile(Path.Combine(ProjectSettings.BaseScriptsDir, filename));
-		//}
-
-		//delegate object newdel(object obj, params DynValue[] args);
-		//object @new(object typeStaticOrObject, params DynValue[] args)
-		//{
-		//	Type type=typeStaticOrObject as Type;
-		//	if (type==null)
-		//	{
-		//		type=typeStaticOrObject.GetType();
-		//	}
-
-
-		//}
 
 		public void setexeclimit(double counterlimit)
 		{
@@ -151,7 +135,8 @@ end
 		Stopwatch sleepwatch=new Stopwatch();
 		delegate Table Importer(string name);
 		DynValue coroutine;
-		Process process;
+		//Process process;
+
 
 		public bool Evaluate(out DynValue result)
 		{
@@ -174,11 +159,8 @@ end
 				}
 			}
 
-			Process.current = process;
 			coroutine.Coroutine.AutoYieldCounter = execlimit;
 			result = coroutine.Coroutine.Resume();
-			process.UpdatePhysics();
-			Process.current = null;
 
 			bool isComplete = false;
 			if (coroutine.Coroutine.State == CoroutineState.Dead)
@@ -199,25 +181,11 @@ end
 			DynValue mainFunction = base.DoString("return function () " + source + "\n end");
 
 			coroutine = CreateCoroutine(mainFunction);
-			if (process == null)
-			{
-				process = new Process();
-				process.shutdown += Terminate;
-			}
 		}
 
 		public void Terminate()
 		{
 			coroutine = null;
-
-			// If SetCoroutine has an error, it is caught in MoonSharpReplEvaluator, which
-			// calls Terminate, and this means that process could, in that situation be null.
-			if (process!=null) 
-			{
-				process.shutdown -= Terminate;
-				process.terminate();
-				process = null;
-			}
 			sleepwatch.Reset();
 			sleeptimeMillis=0;
 		}

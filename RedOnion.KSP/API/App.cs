@@ -126,7 +126,7 @@ namespace RedOnion.KSP.API
 				}
 			}
 			var btn = new Button(null);
-			RosExecutor.Instance.StartCoroutine(CallbackUtil.WaitUntil(
+			UI.Collector.Coroutine(CallbackUtil.WaitUntil(
 			() => ApplicationLauncher.Ready && ApplicationLauncher.Instance != null,
 			() => btn.it = ApplicationLauncher.Instance.AddModApplication(
 				onTrue, onFalse,

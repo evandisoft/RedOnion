@@ -1,5 +1,7 @@
 [![Dynawing-Launch-Labelled.jpg](https://i.postimg.cc/5N92LpCd/Dynawing-Launch-Labelled.jpg)](https://postimg.cc/Lh7SMtDN)
 
+(Starting at version 0.5.0, parts of LiveRepl are no longer disabled when running a script because LiveRepl now allows you to run multiple scripts at a time.)
+
 **LiveRepl** is the main user interface for the project. It is used to write, load, and evaluate scripts that interact with KSP.
 
 **LiveRepl** is shown or hidden by clicking the LiveRepl Icon on the toolbar (which is just a small icon with the words "Live Repl")

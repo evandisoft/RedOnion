@@ -33,17 +33,20 @@ Active vessel
 - `body`: [SpaceBody](SpaceBody.md) - KSP API. Orbited body.
 - `orbit`: Orbit - \[`Unsafe`\] \[`WIP`\] KSP API. Orbit parameters. May get replaced by safe wrapper in the future.
 - `eccentricity`: double - Eccentricity of current orbit.
+- `inclination`: double - Inclination of current orbit [0, 180).
 - `semiMajorAxis`: double - Semi-major axis of current orbit.
 - `semiMinorAxis`: double - Semi-minor axis of current orbit.
-- `apoapsis`: double - Height above ground of highest point of current orbit).
-- `periapsis`: double - Height above ground of lowest point of current orbit).
+- `apoapsis`: double - Height above ground of highest point of current orbit.
+- `periapsis`: double - Height above ground of lowest point of current orbit.
 - `apocenter`: double - Highest distance between center of orbited body and any point of current orbit.
 - `pericenter`: double - Lowest distance between center of orbited body and any point of current orbit.
 - `timeToAp`: double - Eta to apoapsis in seconds.
 - `timeToPe`: double - Eta to periapsis in seconds.
 - `period`: double - Period of current orbit in seconds.
-- `trueAnomaly`: double - Angle in degrees between the direction of periapsis and the current position.
+- `trueAnomaly`: double - Angle in degrees between the direction of periapsis and the current position. Zero at periapsis, 180 at apoapsis.
 - `meanAnomaly`: double - Angle in degrees between the direction of periapsis and the current position extrapolated on circular orbit.
+- `lan`: double - Longitude of ascending node.
+- `argumentOfPeriapsis`: double - Argument of periapsis. Angle from ascending node to periapsis.
 - `position`: [Vector](Vector.md) - Center of mass relative to (CoM of) active ship (zero for active ship).
 - `velocity`: [Vector](Vector.md) - Current orbital velocity.
 - `surfaceVelocity`: [Vector](Vector.md) - Current surface velocity.
@@ -69,13 +72,19 @@ Note that it can change violently when facing up or down.
 - `maxVacuumTorque`: [Vector](Vector.md) - Maximal ship torque in vacuum [N⋅m⋅deg=deg⋅kg⋅m²/s²] (ignoring control surfaces).
 - `maxAngular`: [Vector](Vector.md) - Maximal angular acceleration (deg/s²)
 - `maxVacuumAngular`: [Vector](Vector.md) - Maximal angular acceleration in vacuum (ignoring control surfaces).
+- `sas`: bool - SAS: Stability Assist System.
+- `rcs`: bool - RCS: Reaction Control System.
 
 **Instance Methods:**
 - `positionAt()`: [Vector](Vector.md), time double
-  - Predicted position at specified time.
+  - \[`WIP`\] Predicted position at specified time.
 - `velocityAt()`: [Vector](Vector.md), time double
-  - Predicted velocity at specified time.
+  - \[`WIP`\] Predicted velocity at specified time.
 - `local()`: [Vector](Vector.md), v [Vector](Vector.md)
   - Translate vector/direction into ship-local coordinates (like looking at it from the cockpit).
 - `world()`: [Vector](Vector.md), v [Vector](Vector.md)
   - Translate vector/direction into world coordinates (reverse the `local` transformation).
+- `timeAtTrueAnomaly()`: double, trueAnomaly double
+  - \[`WIP`\] Get time at true anomaly (absolute time of angle from direction of periapsis).
+- `timeToTrueAnomaly()`: double, trueAnomaly double
+  - \[`WIP`\] Get time to true anomaly (relative time of angle from direction of periapsis).

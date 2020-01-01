@@ -120,13 +120,15 @@ have much higher priority/precedence in ROS than in C#/C++.
 All the usual statements can be found in ROS.
 Most of them come from C#, some from other languages.
 
-`var` is used to declare new (local) variable (`global` or `globals`
-can be used for global variables - like `global.x = 1` or `system.globals.x`).
+`var` is used to declare new (local) variable. `global` or `globals`
+can be used for global variables - like `global.x = 1` or `system.globals.x`.
+Such global variable can later be referenced simply as `x`,
+but must be created first (and any `var x` or `this.x` shadows it).
 Variable names are searched from the point of reference, up through all
 (non-function) blocks, then in `this` if function was executed as method,
-then in outer function or script and lastly in globals
-(notice that function `click` in example above modified script-local `x`
-when called as function, but `obj.x` when called as method).
+then in outer function or script and lastly in globals.
+Notice that function `click` in example above modified script-local `x`
+when called as function, but `obj.x` when called as method.
 
 `if/unless` is followed by a condition,
 optional `then`, colon (`:`) or semicolon (`;`).
@@ -293,19 +295,24 @@ if some other parallel function can do `obj = null`).
 ## Running other scripts
 
 Function `run` (`system.run` - but namespace `system`
-is automatically included in the scope) can execute other scripts.
+is automatically included in globals) can execute other scripts.
 
 * `run path` - calls a script like a function
   (suspends execution of current script until the one called exits).
-* `run.library path` - calls a script in current context, sharing script-local scope.
-  This is useful for libraries if you want to share script-local scope
-  (you would otherwise have to use `system.globals`).
+* `run.once path` - calls a script if it was not called by `run.once` before.
+* `run.include path` - calls a script in current context, sharing script-local scope.
+  This can be used for libraries, but it is advised to rather use `run.once`
+  and `system.globals` (e.g. `global.someFunc = def ...` to export something from a library).
 * `run.replace path` - terminates current script and replaces it with the one referenced.
   This is good for big switch in logic (e.g. launch - circularize - gen. control).
+  Beware that current implementation only replaces current thread/subscription,
+  which may get changed in the future. It is better used only from main script
+  (after proper cleanup and subscription removal), not from any `update`, `idle` or `once`
+  (so not even in button-click handlers).
 
 * `run.source string` - like `run path`, but parses the input string directly.
   This can be used to evaluate expressions or whole scripts created as text.
-* `run.library.source` and `run.replace.source` - like the respective *`run.xxx path`*
+* `run.include.source` and `run.replace.source` - like the respective *`run.xxx path`*
   but accepting text.
 
 *Future plan: creating new processors/processes and load monitoring.*

@@ -150,7 +150,9 @@ Beware that multiplication is scaling, not cross product or dot - use appropriat
 				a = -a;
 			return a;
 		}
-		[Description("Cross product of this vector with another vector.")]
+		[Description("Cross product of this vector with another vector."
+			+ " Note that Unity uses left-handed coordinate system, so `ship.away.cross(ship.velocity)`"
+			+ " points down (towards south pole) in prograde-orbit (which is the usual).")]
 		public Vector cross(Vector rhs)
 			=> new Vector(Vector3d.Cross(native, rhs));
 		[Description("Project this vector onto another vector.")]

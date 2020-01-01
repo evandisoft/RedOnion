@@ -1,10 +1,10 @@
-using System;
+﻿using System;
 using Kerbalui.Controls.Abstract;
 using Kerbalui.EditingChanges;
 using Kerbalui.EventHandling;
 using Kerbalui.Types;
 using Kerbalui.Util;
-using RedOnion.KSP.Debugging;
+using RedOnion.Debugging;
 using UnityEngine;
 
 namespace Kerbalui.Decorators

@@ -292,13 +292,15 @@ namespace RedOnion.KSP.API
 		public Orbit orbit => native.orbit;
 		[Description("Eccentricity of current orbit.")]
 		public double eccentricity => native.orbit.eccentricity;
+		[Description("Inclination of current orbit [0, 180).")]
+		public double inclination => native.orbit.inclination;
 		[Description("Semi-major axis of current orbit.")]
 		public double semiMajorAxis => native.orbit.semiMajorAxis;
 		[Description("Semi-minor axis of current orbit.")]
 		public double semiMinorAxis => native.orbit.semiMinorAxis;
-		[Description("Height above ground of highest point of current orbit).")]
+		[Description("Height above ground of highest point of current orbit.")]
 		public double apoapsis => native.orbit.ApA;
-		[Description("Height above ground of lowest point of current orbit).")]
+		[Description("Height above ground of lowest point of current orbit.")]
 		public double periapsis => native.orbit.PeA;
 		[Description("Highest distance between center of orbited body and any point of current orbit.")]
 		public double apocenter => native.orbit.ApR;
@@ -310,10 +312,14 @@ namespace RedOnion.KSP.API
 		public double timeToPe => native.orbit.timeToPe;
 		[Description("Period of current orbit in seconds.")]
 		public double period => native.orbit.period;
-		[Description("Angle in degrees between the direction of periapsis and the current position.")]
+		[Description("Angle in degrees between the direction of periapsis and the current position. Zero at periapsis, 180 at apoapsis.")]
 		public double trueAnomaly => RosMath.Deg.Clamp360(native.orbit.trueAnomaly * RosMath.Rad2Deg);
 		[Description("Angle in degrees between the direction of periapsis and the current position extrapolated on circular orbit.")]
-		public double meanAnomaly => native.orbit.meanAnomaly;
+		public double meanAnomaly => RosMath.Deg.Clamp360(native.orbit.meanAnomaly * RosMath.Rad2Deg);
+		[Description("Longitude of ascending node.")]
+		public double lan => native.orbit.LAN;
+		[Description("Argument of periapsis. Angle from ascending node to periapsis.")]
+		public double argumentOfPeriapsis => native.orbit.argumentOfPeriapsis;
 
 		#endregion
 
@@ -329,10 +335,10 @@ namespace RedOnion.KSP.API
 		public Vector srfVelocity => new Vector(native.srf_velocity);
 		[Description("Current surface velocity (Alias to `surfaceVelocity`).")]
 		public Vector srfvel => new Vector(native.srf_velocity);
-		[Description("Predicted position at specified time.")]
-		public Vector positionAt(double time) => new Vector(native.orbit.getPositionAtUT(time));
-		[Description("Predicted velocity at specified time.")]
-		public Vector velocityAt(double time) => new Vector(native.orbit.getOrbitalVelocityAtUT(time));
+		[WorkInProgress, Description("Predicted position at specified time.")]
+		public Vector positionAt(double time) => new Vector(native.orbit.getPositionAtUT(time) - FlightGlobals.ActiveVessel.CoMD);
+		[WorkInProgress, Description("Predicted velocity at specified time.")]
+		public Vector velocityAt(double time) => new Vector(native.orbit.getOrbitalVelocityAtUT(time).xzy);
 
 		[Description("Vector pointing forward (from cockpit - in the direction of the 'nose').")]
 		public Vector forward => new Vector(native.transform.up);
@@ -504,6 +510,24 @@ namespace RedOnion.KSP.API
 
 		#endregion
 
+		#region Action Groups, SAS, RCS, ...
+
+		[Description("SAS: Stability Assist System.")]
+		public bool sas
+		{
+			get => native.ActionGroups[KSPActionGroup.SAS];
+			set => native.ActionGroups.SetGroup(KSPActionGroup.SAS, value);
+		}
+
+		[Description("RCS: Reaction Control System.")]
+		public bool rcs
+		{
+			get => native.ActionGroups[KSPActionGroup.RCS];
+			set => native.ActionGroups.SetGroup(KSPActionGroup.RCS, value);
+		}
+
+		#endregion
+
 		#region Tools
 
 		[Description("Translate vector/direction into ship-local coordinates (like looking at it from the cockpit).")]
@@ -521,6 +545,13 @@ namespace RedOnion.KSP.API
 			=> native.transform.TransformDirection(v);
 		public Vector3 world(Vector3 v)
 			=> native.transform.TransformDirection(v);
+
+		[WorkInProgress, Description("Get time at true anomaly (absolute time of angle from direction of periapsis).")]
+		public double timeAtTrueAnomaly(double trueAnomaly)
+			=> orbit.GetUTforTrueAnomaly(trueAnomaly * RosMath.Deg2Rad, 0.0);
+		[WorkInProgress, Description("Get time to true anomaly (relative time of angle from direction of periapsis).")]
+		public double timeToTrueAnomaly(double trueAnomaly)
+			=> orbit.GetDTforTrueAnomaly(trueAnomaly * RosMath.Deg2Rad, 0.0);
 
 		#endregion
 	}

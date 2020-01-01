@@ -39,6 +39,8 @@ namespace RedOnion.KSP.API
 		public static readonly Type stage = typeof(Stage);
 		[Description("Current time and related functions.")]
 		public static readonly Type time = typeof(Time);
+		[WorkInProgress, Description("Maneuver node.")]
+		public static readonly Type node = typeof(Node);
 
 		[Description("PID regulator (alias to `system.pid` in ROS).")]
 		public static readonly Type PID = typeof(PID);
@@ -106,73 +108,6 @@ namespace RedOnion.KSP.API
 		public static SpaceBody.Atmosphere atmosphere => body?.atmosphere ?? SpaceBody.Atmosphere.none;
 
 		#endregion
-	}
-
-	public class RosGlobals : RedOnion.ROS.Objects.Globals
-	{
-		public override void Fill()
-		{
-			base.Fill();
-			System.Add(typeof(PID));
-		}
-
-		class ReflectedGlobals : Reflected
-		{
-			public ReflectedGlobals() : base(typeof(Globals)) { }
-			public int Count => prop.Count;
-			public ref Prop this[int idx] => ref prop.items[idx];
-			public IEnumerator<string> GetEnumerator()
-			{
-				for (int i = 0; i < prop.size; i++)
-					yield return prop.items[i].name;
-			}
-		}
-		const int mark = 0x7F000000;
-		static ReflectedGlobals reflected = new ReflectedGlobals();
-
-		public override int Find(string name)
-		{
-			int at = reflected.Find(null, name, false);
-			if (at >= 0) return at + mark;
-			return base.Find(name);
-		}
-		public override bool Get(ref Value self, int at)
-		{
-			if (at < mark)
-				return base.Get(ref self, at);
-			if ((at -= mark) >= reflected.Count)
-				return false;
-			ref var member = ref reflected[at];
-			if (member.read == null)
-				return false;
-			self = member.read(self.obj);
-			return true;
-		}
-		public override bool Set(ref Value self, int at, OpCode op, ref Value value)
-		{
-			if (at < mark)
-				return base.Set(ref self, at, op, ref value);
-			if ((at -= mark) >= reflected.Count)
-				return false;
-			ref var member = ref reflected[at];
-			if (member.write == null)
-				return false;
-			if (op != OpCode.Assign)
-				return false;
-			member.write(self.obj, value);
-			return true;
-		}
-		public override IEnumerable<string> EnumerateProperties(object self)
-		{
-			var seen = new HashSet<string>();
-			foreach (var member in reflected)
-			{
-				seen.Add(member);
-				yield return member;
-			}
-			foreach (var name in EnumerateProperties(self, seen))
-				yield return name;
-		}
 	}
 
 	public class LuaGlobals : Table, ICompletable

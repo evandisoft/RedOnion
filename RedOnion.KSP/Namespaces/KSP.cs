@@ -69,5 +69,7 @@ namespace RedOnion.KSP.Namespaces
 		public static readonly Type GameSettings = typeof(GameSettings);
 		[Description("[KSP API](https://kerbalspaceprogram.com/api/class_game_events.html): Various KSP events.")]
 		public static readonly Type GameEvents = typeof(GameEvents);
+		[Description("[KSP API](https://kerbalspaceprogram.com/api/class_game_variables.html): Various KSP variables.")]
+		public static GameVariables GameVariables => GameVariables.Instance;
 	}
 }

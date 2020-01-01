@@ -29,7 +29,7 @@ namespace RedOnion.Shell
 				Add(typeof(Encoding));
 			}
 		}
-		class ShellProcessor: Processor
+		class ShellProcessor: Processor.WithEvents
 		{
 			public ShellProcessor() => Globals = new ShellGlobals();
 			public bool Eof => Parser.Eof;

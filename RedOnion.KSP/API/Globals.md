@@ -11,6 +11,7 @@ Global variables, objects and functions common to all scripting languages.
 - `types`: [Types](../Namespaces/Types.md) - Types to be used with ROS: `is` operator; Lua: `isa` function.
 - `stage`: [Stage](Stage.md) - Staging logic.
 - `time`: [Time](Time.md) - Current time and related functions.
+- `node`: [Node](Node.md) - \[`WIP`\] Maneuver node.
 - `PID`: [PID](PID.md) - PID regulator (alias to `system.pid` in ROS).
 - `app`: [App](App.md) - \[`WIP`\] Safe API for KSP Application Launcher (toolbar/buttons). WIP
 

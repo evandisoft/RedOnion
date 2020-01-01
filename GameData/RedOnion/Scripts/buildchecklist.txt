@@ -1,0 +1,10 @@
+1. Sufficient antennae strength
+2. Sufficient power. Handle out of sunlight cases. Batteries/generator
+3. Proper staging
+4. Sufficient data storage
+5. Monopropellant
+6. Sufficient reaction wheel control
+7. Commonly used engines at high quality.
+8. For long duration missions, ensure proper quality/redundancy
+9. Abort action/scenario
+10. Lights.

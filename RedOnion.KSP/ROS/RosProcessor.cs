@@ -1,11 +1,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Text;
 using Ionic.Zip;
+using MunOS;
 using RedOnion.KSP.API;
 using RedOnion.ROS;
 using RedOnion.ROS.Objects;
@@ -14,57 +14,17 @@ using UE = UnityEngine;
 
 namespace RedOnion.KSP.ROS
 {
-	public class RosProcessor : Processor, IProcessor
+	public class RosProcessor : Processor
 	{
-		protected OS.Process _process;
-		public OS.Process Process
-		{
-			get
-			{
-				if (_process == null)
-				{
-					_process = new OS.Process();
-					_process.shutdown += Terminate;
-				}
-				return _process;
-			}
-		}
+		public RosProcess Process { get; }
+		public RosProcessor(RosProcess process) => Process = process;
+		public override void ExecuteLater(Function fn)
+			=> new RosThread(Process, MunPriority.Callback, fn);
 
 		protected override RedOnion.ROS.Objects.Globals GetGlobals()
 			=> new RosGlobals();
-		public override void Terminate()
-		{
-			if (_process != null)
-			{
-				_process.shutdown -= Terminate;
-				_process.terminate();
-				_process = null;
-			}
-			base.Terminate();
-		}
 		protected void ProcessorReset()
 			=> base.Reset();
-
-		public override bool Execute(int countdown = 1000)
-		{
-			OS.Process.current = Process;
-			var result = base.Execute(countdown);
-			OS.Process.current = null;
-			return result;
-		}
-		public override void UpdateGraphic()
-		{
-			OS.Process.current = Process;
-			base.UpdateGraphic();
-			OS.Process.current = null;
-		}
-		public override void UpdatePhysics()
-		{
-			OS.Process.current = Process;
-			base.UpdatePhysics();
-			_process.UpdatePhysics();
-			OS.Process.current = null;
-		}
 
 		public override void Log(string msg)
 			=> UE.Debug.Log("[RedOnion] " + msg);

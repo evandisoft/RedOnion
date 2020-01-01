@@ -45,7 +45,6 @@ namespace RedOnion.ROS
 			protected Func<object, string, Value> strIndexGet;
 			protected Action<object, string, Value> strIndexSet;
 			protected ConstructorInfo defaultCtor;
-			protected ConstructorInfo processorCtor;
 			protected string callableMemberName;
 
 			public Reflected(Type type) : this(type.Name, type) { }
@@ -134,9 +133,6 @@ namespace RedOnion.ROS
 				}
 				if (args.Count == 0)
 				{
-					if (processorCtor != null
-						&& Callable.TryCall(processorCtor, ref result, self, args))
-						return true;
 					if (defaultCtor != null
 						&& Callable.TryCall(defaultCtor, ref result, self, args))
 						return true;
@@ -261,7 +257,24 @@ namespace RedOnion.ROS
 				self = read(self.obj);
 				return true;
 			}
+#if DEBUG
 			public override bool Set(ref Value self, int at, OpCode op, ref Value value)
+			{
+				try
+				{
+					return InternalSet(ref self, at, op, ref value);
+				}
+				catch
+				{
+					Value.DebugLog($"Exception in {Name}.Set");
+					Value.DebugLog($"Self: {self}; at: {at}; op: {op}; value: {value}; prop: {NameOf(this, at)}");
+					throw;
+				}
+			}
+			private bool InternalSet(ref Value self, int at, OpCode op, ref Value value)
+#else
+			public override bool Set(ref Value self, int at, OpCode op, ref Value value)
+#endif
 			{
 				if (at == int.MaxValue)
 				{
