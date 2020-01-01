@@ -7,13 +7,26 @@
 - Provide editors that can be used for editing files in contexts unrelated to our scripting engines.
 - More UI library features.
 
-## 0.5.0:
-- Working on some sort of system for running multiple scripts at a time. May not initially have a UI that can provide this feature to the user in full. That will probably come later.
-
 # Next Release
-Just had a release (0.4.8)
+Just had a release (0.5.0)
 
 # Current
+## 0.5.0:
+MunOS:
+- Initial version of our system for running multiple scripts at a time, called [MunOS](https://evandisoft.github.io/RedOnion/MunOS/Multithreading).
+
+API:
+- autopilot.disable now also resets killRot to false (was often locking roll in control.ros)
+- api for maneuver nodes, sas, rcs and some other orbit-related properties
+
+Lua:
+- Fixed bug where new function passed null in when it should pass zero arguments.
+
+Scripts:
+- control.ros: maneuver executor, circularize, Hohmann planner, inclination match
+- control.ros: srf-retro throttle limiter (below 10km) as landing helper (full throttle makes the ship hover)
+- launch.ros: fixed the wobble at the end of circularization
+
 # 0.4
 ## 0.4.8
 ### ROS Changes:
