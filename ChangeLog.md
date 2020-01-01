@@ -20,7 +20,7 @@ Just had a release (0.5.0)
 - api for maneuver nodes, sas, rcs and some other orbit-related properties
 
 ### Lua:
-- Fixed bug where new function passed null in when it should pass zero arguments.
+- Fixed bug where the `new` function was causing errors when it recieved no argument except the type to instantiate.
 
 ### Scripts:
 - control.ros: maneuver executor, circularize, Hohmann planner, inclination match
