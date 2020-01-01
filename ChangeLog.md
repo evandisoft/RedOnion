@@ -19,8 +19,6 @@ API:
 - autopilot.disable now also resets killRot to false (was often locking roll in control.ros)
 - api for maneuver nodes, sas, rcs and some other orbit-related properties
 
-
-
 Lua:
 - Fixed bug where new function passed null in when it should pass zero arguments.
 
