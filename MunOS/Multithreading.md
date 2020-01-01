@@ -37,7 +37,7 @@ yield
 if !somelock
     somelock=true
 ```
-(In ROS, you have to set the global `somelock` before using it. And you will want to set it only one time, hence the use of `yield`.)
+(In ROS, you have to initialize the global `somelock` before using it. And you will want to initialize it only one time to prevent it from being set to false after another thread has already grabbed the lock, hence the use of `yield`.)
 
 Immediately after the `sleep/yield`, you will be guaranteed to have enough instructions to test a global variable, and set it to a simple constant value like `true`. You will not be guaranteed to have enough instructions for something more expensive like
 ```
@@ -71,7 +71,6 @@ if !somelock
     ...
     somelock=false
 ```
-
 
 Don't forget to set the lock to false again before you exit the if statement.
 
