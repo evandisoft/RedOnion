@@ -12,11 +12,22 @@ Just had a release (0.5.0)
 
 # Current
 ## 0.5.0:
-General:
+MunOS:
 - Initial version of our system for running multiple scripts at a time, called [MunOS](MunOS/Multithreading.md).
+
+API:
+- autopilot.disable now also resets killRot to false (was often locking roll in control.ros)
+- api for maneuver nodes, sas, rcs and some other orbit-related properties
+
+
 
 Lua:
 - Fixed bug where new function passed null in when it should pass zero arguments.
+
+Scripts:
+- control.ros: maneuver executor, circularize, Hohmann planner, inclination match
+- control.ros: srf-retro throttle limiter (below 10km) as landing helper (full throttle makes the ship hover)
+- launch.ros: fixed the wobble at the end of circularization
 
 # 0.4
 ## 0.4.8

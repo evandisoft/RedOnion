@@ -4,7 +4,7 @@ Prior to version 0.5.0, one was not able to run a long-running program in Lua fr
 
 0.5.0 brings a new execution system, called **MunOS**, which works for both our engines, and now creates new "threads" whenever you execute some code. (These "threads" are not real OS threads and will not speed up your computations.) 
 
-However, this allows you to have a list of buttons which run various programs, which you can press at any time, even while you are already running a script. You can also run a new script from LiveRepl even when you are currently running a script.
+This allows you to have a list of buttons which run various programs, which you can press at any time, even while you are already running a script. You can also run a new script from LiveRepl even when you are currently running a script.
 
 The Lua and ROS engines run in different **processes**, and now do not share an output buffer. This means that output your Lua threads have produced will not appear when you have the ROS engine selected.
 
@@ -13,7 +13,7 @@ Clicking the **Terminate** button will kill all the threads from the currently s
 For now there are only two processes: 1 Lua engine and 1 ROS engine, but in the future we will create both an api, and a user interface for creating/killing processes, allowing the user to create additional Lua/ROS processes and manage them.
 
 ### Managing Multithreading
-Even though multiple threads in MunOS are not running simultaneously with respect to the computer you are running (they are not using multiple cores or multiple OS threads), multiple threads will often be running in a particular update, with threads being interrupted by MunOS to give time to other threads for that update. (Script code will never be interrupted while it is executing native C# calls, and will only be interrupted between script code instructions.)
+Even though multiple threads in MunOS are not running simultaneously with respect to the computer you are running (they are not using multiple physical cores or multiple Linux/Windows threads), multiple MunOS threads will often be running in a particular update, with threads being interrupted by MunOS to give time to other threads for that update. (However, script code will never be interrupted during a native C# call.)
 
 This can lead to issues when you want only one thread to use a particular resource at a time. Global variables are shared between all threads in the same `process`. To manage these possible interactions you can create your own locking mechanisms using a feature both engines provide:
 
