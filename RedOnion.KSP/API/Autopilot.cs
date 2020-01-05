@@ -305,6 +305,15 @@ namespace RedOnion.KSP.API
 			if (!float.IsNaN(_throttle))
 				st.mainThrottle = RosMath.Clamp(_throttle, 0f, 1f);
 
+			// could probably use InputLockManager.lockStack.ContainsKey("TimeWarp") instead
+			if (TimeWarp.index > 0 && TimeWarp.high)
+			{
+				pitchPID.resetAccu();
+				yawPID.resetAccu();
+				rollPID.resetAccu();
+				return;
+			}
+
 			var angvel = _ship.angularVelocity;
 			var maxang = _ship.maxAngular;
 			if (!double.IsNaN(_direction.x)

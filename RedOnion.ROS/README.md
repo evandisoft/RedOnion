@@ -9,7 +9,7 @@ most features and operators come from C#,
 some ideas were taken from ActionScript (and Pascal) and first design was based on JavaScript,
 but ROS is on its own path now.
 
-For other documens see [Links](Docs/Links.md),
+For other documents see [Links](Docs/Links.md),
 [Vim syntax file here](redonion.vim).
 
 ```

@@ -54,7 +54,7 @@ namespace RedOnion.KSP.API
 		{
 			native = ship.native.patchedConicSolver.AddManeuverNode(time);
 			this.ship = ship;
-			native.DeltaV = new Vector3d(radial, normal, prograde);
+			nativeDeltaV = new Vector3d(radial, normal, prograde);
 		}
 
 		protected internal Node(Ship ship, double time, Vector deltav)
