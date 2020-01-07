@@ -44,7 +44,7 @@ namespace RedOnion.KSP.API
 			+ " `xparts.resources` reflect total amounts of fuels accessible to active engines,"
 			+ " but only in parts that will be separated by next decoupler."
 			+ " This includes liquid fuel and oxidizer and can be used for automated staging,"
-			+ " Especially so called Asparagus and any design throwing off tanks (with or without engiens).")]
+			+ " Especially so called Asparagus and any design throwing off tanks (with or without engines).")]
 		public static PartSet<PartBase> xparts { get; }
 			= new PartSet<PartBase>(null, Refresh);
 
@@ -135,7 +135,8 @@ namespace RedOnion.KSP.API
 				if (e.state != PartStates.ACTIVE)
 					continue;
 				engines.Add(e);
-				xparts.Add(e);
+				if (e.decoupledin >= nextDecoupler)
+					xparts.Add(e);
 				foreach (var crossPart in e.native.crossfeedPartSet.GetParts())
 				{
 					var part = shipParts[crossPart];

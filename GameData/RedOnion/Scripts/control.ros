@@ -254,11 +254,13 @@ def control ship, target, x, y
     if our.body != its.body
       if its.body != null and our.body.body == its.body
       //e.g. from Kerbin to Duna or from Mun to Minmus, calculate like if transfering Kerbin/Mun itself
-        set our to our.body
+        our = our.body
+        print "Warning: Assuming self as " + our.name
       else if its.body != null and its.body.body != null and our.body.body == its.body.body
       //e.g. Kerbin to Ike, redirect to Duna
-        set our to our.body
-        set its to its.body
+        our = our.body
+        its = its.body
+        print "Warning: Assuming self as {0} and it as {1}", our.name, its.name
       else
         print "Incompatible orbits"
         bAbort.press
@@ -324,6 +326,7 @@ def control ship, target, x, y
       t1 += ca/360*ship.period
       if ca > 180 and t1 - ship.period > mt
         t1 -= ship.period
+      print "Inter-body: {0}, {1}", t1, pb
       new node t1, pb
     
     if mMan.pressed
@@ -341,11 +344,14 @@ def control ship, target, x, y
     var sp = ship.position - body.position
     var sv = ship.velocity
     var sn = sv.cross sp // our normal
+    var sa = ship.trueAnomaly
     var target = ship.target ?? self.target
-    if target == null
+    if target == null or target == ship.body
       print "Incl.: {0,5:F1} Arg.: {1,5:F1}", i0, ship.argumentOfPeriapsis
       di = -i0
-      ta = -ship.argumentOfPeriapsis
+      ta = -ship.argumentOfPeriapsis - sa
+      if i0 >= 150 // retrograde orbit
+        di = 180-i0
     else
       var i1 = target.inclination
       var tp = target.position - body.position
@@ -355,12 +361,12 @@ def control ship, target, x, y
       di = tn.angle sn, ln // angle between normals
       ta = ln.angle sp, sn // angle to DN
       print "Our I: {0,5:F1} its: {1,5:F1}, diff: {2,5:F1}", i0, i1, di
-      print "To DN: {0,5:F1}, TA: {1,5:F1} PE-DN: {2,5:F1}", ta, ship.trueAnomaly, ta + ship.trueAnomaly
-      ta += ship.trueAnomaly
+      print "To DN: {0,5:F1}, SA: {1,5:F1} PE-DN: {2,5:F1}", ta, sa, ta+sa
     ta = math.clamp360 ta
-    if math.clamp360(ta-ship.trueAnomaly) > 180
-      ta = math.clamp360(ta+180)
+    if ta > 180
+      ta -= 180
       di = -di
+    ta = math.clamp360 ta+sa
     var dt = ship.timeToTrueAnomaly ta
     var t1 = t0 + dt
     var v1 = ship.velocityAt t1

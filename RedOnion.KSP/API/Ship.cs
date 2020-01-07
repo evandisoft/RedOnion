@@ -28,13 +28,13 @@ namespace RedOnion.KSP.API
 		{
 			get
 			{
-				if (!HighLogic.LoadedSceneIsFlight)
+				var vessel = HighLogic.LoadedSceneIsFlight ? FlightGlobals.ActiveVessel : null;
+				if (!vessel)
 				{
 					if (active != null)
 						ClearActive();
 					return null;
 				}
-				var vessel = FlightGlobals.ActiveVessel;
 				if (active?.native != vessel)
 				{
 					ClearActive();
@@ -530,28 +530,28 @@ namespace RedOnion.KSP.API
 
 		#region Tools
 
-		[Description("Translate vector/direction into ship-local coordinates (like looking at it from the cockpit).")]
+		[Description("Translate vector/direction into ship-local coordinates (like looking at it from the cockpit - or rather from the controlling part).")]
 		public Vector local(Vector v)
-			=> new Vector(native.transform.InverseTransformDirection(v));
+			=> new Vector(native.ReferenceTransform.InverseTransformDirection(v));
 		public Vector3d local(Vector3d v)
-			=> native.transform.InverseTransformDirection(v);
+			=> native.ReferenceTransform.InverseTransformDirection(v);
 		public Vector3 local(Vector3 v)
-			=> native.transform.InverseTransformDirection(v);
+			=> native.ReferenceTransform.InverseTransformDirection(v);
 
 		[Description("Translate vector/direction into world coordinates (reverse the `local` transformation).")]
 		public Vector world(Vector v)
-			=> new Vector(native.transform.TransformDirection(v));
+			=> new Vector(native.ReferenceTransform.TransformDirection(v));
 		public Vector3d world(Vector3d v)
-			=> native.transform.TransformDirection(v);
+			=> native.ReferenceTransform.TransformDirection(v);
 		public Vector3 world(Vector3 v)
-			=> native.transform.TransformDirection(v);
+			=> native.ReferenceTransform.TransformDirection(v);
 
 		[WorkInProgress, Description("Get time at true anomaly (absolute time of angle from direction of periapsis).")]
 		public double timeAtTrueAnomaly(double trueAnomaly)
 			=> orbit.GetUTforTrueAnomaly(trueAnomaly * RosMath.Deg2Rad, 0.0);
-		[WorkInProgress, Description("Get time to true anomaly (relative time of angle from direction of periapsis).")]
+		[WorkInProgress, Description("Get time to true anomaly (relative time of angle from direction of periapsis). [0, period)")]
 		public double timeToTrueAnomaly(double trueAnomaly)
-			=> orbit.GetDTforTrueAnomaly(trueAnomaly * RosMath.Deg2Rad, 0.0);
+			=> orbit.GetDTforTrueAnomaly(trueAnomaly * RosMath.Deg2Rad, 0.0) % orbit.period;
 
 		#endregion
 	}

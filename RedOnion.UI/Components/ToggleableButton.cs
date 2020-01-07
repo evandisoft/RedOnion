@@ -204,5 +204,19 @@ namespace RedOnion.UI.Components
 					Click?.Invoke(Button);
 			}
 		}
+		public override void OnPointerUp(PointerEventData eventData)
+		{
+			base.OnPointerUp(eventData);
+			var esys = EventSystem.current;
+			if (esys != null && esys.currentSelectedGameObject == gameObject)
+				esys.SetSelectedGameObject(null);
+		}
+		public override void OnPointerExit(PointerEventData eventData)
+		{
+			base.OnPointerExit(eventData);
+			var esys = EventSystem.current;
+			if (esys != null && esys.currentSelectedGameObject == gameObject)
+				esys.SetSelectedGameObject(null);
+		}
 	}
 }

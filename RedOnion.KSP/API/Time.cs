@@ -1,4 +1,5 @@
 using MoonSharp.Interpreter;
+using RedOnion.Attributes;
 using RedOnion.ROS;
 using RedOnion.ROS.Utilities;
 using System;
@@ -20,7 +21,7 @@ namespace RedOnion.KSP.API
 		public static double since(double time) => double.IsNaN(time) ? double.PositiveInfinity : now - time;
 
 		[Description("Seconds in one tick. (Script engine always runs in physics ticks.)")]
-		public static double tick => global::TimeWarp.fixedDeltaTime;
+		public static double tick => KSPTW.fixedDeltaTime;
 
 		public static readonly Type warp = typeof(TimeWarp);
 	}
@@ -28,19 +29,38 @@ namespace RedOnion.KSP.API
 	[Description("Time warping utilities")]
 	public static class TimeWarp
 	{
-		[Description("Indicator that warping utilities are ready for commands. (`to` will return false otherwise.)")]
-		public static bool ready
-			=> KSPTW.fetch?.setAutoWarp == false
-			&& !InputLockManager.lockStack.ContainsKey("TimeWarpLock")
-			&& !InputLockManager.lockStack.ContainsKey("TimeWarpTo");
+		[Description("Warp-to engaged / in progress. Looks for `TimeWarpTo` lock.")]
+		public static bool engaged => KSPTW.fetch.setAutoWarp || InputLockManager.lockStack.ContainsKey("TimeWarpTo");
 
-		[Description("Warp mode set to low aka physics warp. Note that it can only be changed on zero rate-index (and when `ready`).")]
+		[WorkInProgress, Description("Indicator that `warp.to` can be used.")]
+		public static bool ready
+		{
+			get
+			{
+				if (engaged)
+					return false;
+				var vessel = HighLogic.LoadedSceneIsFlight ? FlightGlobals.ActiveVessel : null;
+				if (!vessel)
+					return true;
+				if (vessel.LandedOrSplashed)
+					return true;
+				if (vessel.staticPressurekPa > 0.0)
+					return false;
+				if (vessel.geeForce > KSPTW.GThreshold)
+					return false;
+				if (KSPTW.fetch.GetMaxRateForAltitude(vessel.altitude, vessel.mainBody) == 0)
+					return false;
+				return true;
+			}
+		}
+
+		[Description("Warp mode set to low aka physics warp. Note that it can only be changed on zero rate-index (and when not `engaged`).")]
 		public static bool low
 		{
 			get => KSPTW.WarpMode == KSPTW.Modes.LOW;
 			set => setMode(KSPTW.Modes.LOW);
 		}
-		[Description("Warp mode set to high aka on-rails warp. Note that it can only be changed on zero rate-index (and when `ready`).")]
+		[Description("Warp mode set to high aka on-rails warp. Note that it can only be changed on zero rate-index (and when not `engaged`).")]
 		public static bool high
 		{
 			get => KSPTW.WarpMode == KSPTW.Modes.HIGH;
@@ -48,7 +68,7 @@ namespace RedOnion.KSP.API
 		}
 		private static void setMode(KSPTW.Modes mode)
 		{
-			if (!ready || KSPTW.fetch.Mode == mode || KSPTW.CurrentRateIndex > 0)
+			if (engaged || KSPTW.fetch.Mode == mode || KSPTW.CurrentRateIndex > 0)
 				return;
 			KSPTW.fetch.Mode = mode;
 		}
@@ -71,7 +91,7 @@ namespace RedOnion.KSP.API
 		[Description("Set rate index. Returns false if not possible now.")]
 		public static bool setIndex(int value)
 		{
-			if (!ready)
+			if (engaged)
 				return false;
 			var rates = TimeWarp.rates;
 			value = RosMath.Clamp(value, 0, rates.Length-1);
