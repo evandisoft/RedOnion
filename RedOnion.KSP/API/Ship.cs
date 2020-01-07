@@ -288,8 +288,8 @@ namespace RedOnion.KSP.API
 		[Description("KSP API. Orbited body.")]
 		public SpaceBody body => Bodies.Instance[native.mainBody];
 		ISpaceObject ISpaceObject.body => body;
-		[Unsafe, WorkInProgress, Description("KSP API. Orbit parameters. May get replaced by safe wrapper in the future.")]
-		public Orbit orbit => native.orbit;
+		[Unsafe, Description("Orbit parameters.")]
+		public OrbitInfo orbit => new OrbitInfo(native.orbit);
 		[Description("Eccentricity of current orbit.")]
 		public double eccentricity => native.orbit.eccentricity;
 		[Description("Inclination of current orbit [0, 180).")]
@@ -341,17 +341,17 @@ namespace RedOnion.KSP.API
 		public Vector velocityAt(double time) => new Vector(native.orbit.getOrbitalVelocityAtUT(time).xzy);
 
 		[Description("Vector pointing forward (from cockpit - in the direction of the 'nose').")]
-		public Vector forward => new Vector(native.transform.up);
+		public Vector forward => new Vector(native.ReferenceTransform.up);
 		[Description("Vector pointing backward (from cockpit - in the direction of the 'tail').")]
-		public Vector back => new Vector(-native.transform.up);
+		public Vector back => new Vector(-native.ReferenceTransform.up);
 		[Description("Vector pointing up (from cockpit).")]
-		public Vector up => new Vector(-native.transform.forward);
+		public Vector up => new Vector(-native.ReferenceTransform.forward);
 		[Description("Vector pointing down (from cockpit).")]
-		public Vector down => new Vector(native.transform.forward);
+		public Vector down => new Vector(native.ReferenceTransform.forward);
 		[Description("Vector pointing left (from cockpit).")]
-		public Vector left => new Vector(-native.transform.right);
+		public Vector left => new Vector(-native.ReferenceTransform.right);
 		[Description("Vector pointing right (from cockpit).")]
-		public Vector right => new Vector(native.transform.right);
+		public Vector right => new Vector(native.ReferenceTransform.right);
 
 		// see https://en.wikipedia.org/wiki/Axes_conventions#Ground_reference_frames_for_attitude_description
 		[Description("Vector pointing north in the plane that is tangent to sphere centered in orbited body.")]
@@ -548,10 +548,10 @@ namespace RedOnion.KSP.API
 
 		[WorkInProgress, Description("Get time at true anomaly (absolute time of angle from direction of periapsis).")]
 		public double timeAtTrueAnomaly(double trueAnomaly)
-			=> orbit.GetUTforTrueAnomaly(trueAnomaly * RosMath.Deg2Rad, 0.0);
+			=> native.orbit.GetUTforTrueAnomaly(trueAnomaly * RosMath.Deg2Rad, 0.0);
 		[WorkInProgress, Description("Get time to true anomaly (relative time of angle from direction of periapsis). [0, period)")]
 		public double timeToTrueAnomaly(double trueAnomaly)
-			=> orbit.GetDTforTrueAnomaly(trueAnomaly * RosMath.Deg2Rad, 0.0) % orbit.period;
+			=> native.orbit.GetDTforTrueAnomaly(trueAnomaly * RosMath.Deg2Rad, 0.0) % native.orbit.period;
 
 		#endregion
 	}
