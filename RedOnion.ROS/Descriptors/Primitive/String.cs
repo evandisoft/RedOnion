@@ -82,22 +82,23 @@ namespace RedOnion.ROS
 					return true;
 
 				case OpCode.Equals:
-					lhs = lhs.obj.ToString() == rhs.obj.ToString();
+					lhs = string.Compare(lhs.obj.ToString(), rhs.obj.ToString(), StringComparison.OrdinalIgnoreCase) == 0;
 					return true;
 				case OpCode.Differ:
-					lhs = lhs.obj.ToString() != rhs.obj.ToString();
+					lhs = string.Compare(lhs.obj.ToString(), rhs.obj.ToString(), StringComparison.OrdinalIgnoreCase) != 0;
 					return true;
+
 				case OpCode.Less:
-					lhs = string.CompareOrdinal(lhs.obj.ToString(), rhs.obj.ToString()) < 0;
+					lhs = string.Compare(lhs.obj.ToString(), rhs.obj.ToString(), StringComparison.OrdinalIgnoreCase) < 0;
 					return true;
 				case OpCode.More:
-					lhs = string.CompareOrdinal(lhs.obj.ToString(), rhs.obj.ToString()) > 0;
+					lhs = string.Compare(lhs.obj.ToString(), rhs.obj.ToString(), StringComparison.OrdinalIgnoreCase) > 0;
 					return true;
 				case OpCode.LessEq:
-					lhs = string.CompareOrdinal(lhs.obj.ToString(), rhs.obj.ToString()) <= 0;
+					lhs = string.Compare(lhs.obj.ToString(), rhs.obj.ToString(), StringComparison.OrdinalIgnoreCase) <= 0;
 					return true;
 				case OpCode.MoreEq:
-					lhs = string.CompareOrdinal(lhs.obj.ToString(), rhs.obj.ToString()) >= 0;
+					lhs = string.Compare(lhs.obj.ToString(), rhs.obj.ToString(), StringComparison.OrdinalIgnoreCase) >= 0;
 					return true;
 				}
 				return true;

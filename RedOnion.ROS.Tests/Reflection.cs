@@ -259,6 +259,9 @@ namespace RedOnion.ROS.Tests
 			Test(TestEnum.One, "(new enumTest).value");
 			Test(TestEnum.Two, "(new enumTest testEnum.two).value");
 			Test("hello", "(new enumTest \"hello\").name");
+
+			Test(true, "testEnum.zero == \"zero\"");
+			Test(false, "testEnum.one != \"ONE\"");
 		}
 
 		[Test]

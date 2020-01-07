@@ -618,6 +618,21 @@ namespace RedOnion.ROS
 					case OpCode.Sub:
 					case OpCode.Mul:
 					case OpCode.Div:
+					{
+						ref var lhs = ref vals.Top(-2);
+						if (lhs.IsReference && !lhs.desc.Get(ref lhs, lhs.num.Int))
+							throw CouldNotGet(ref lhs);
+						ref var rhs = ref vals.Top(-1);
+						if (rhs.IsReference && !rhs.desc.Get(ref rhs, rhs.num.Int))
+							throw CouldNotGet(ref rhs);
+						if (!lhs.desc.Binary(ref lhs, op, ref rhs)
+						&& !rhs.desc.Binary(ref lhs, op, ref rhs))
+							throw InvalidOperation(
+								"Binary operator '{0}' not supported on operands '{1}' and '{2}'",
+								op.Text(), lhs.desc.Name, rhs.desc.Name);
+						vals.Pop(1);
+						continue;
+					}
 					case OpCode.Equals:
 					case OpCode.Differ:
 					case OpCode.Less:
@@ -631,7 +646,8 @@ namespace RedOnion.ROS
 						ref var rhs = ref vals.Top(-1);
 						if (rhs.IsReference && !rhs.desc.Get(ref rhs, rhs.num.Int))
 							throw CouldNotGet(ref rhs);
-						if (!lhs.desc.Binary(ref lhs, op, ref rhs)
+						if ((rhs.desc.Primitive == ExCode.String
+						|| !lhs.desc.Binary(ref lhs, op, ref rhs))
 						&& !rhs.desc.Binary(ref lhs, op, ref rhs))
 							throw InvalidOperation(
 								"Binary operator '{0}' not supported on operands '{1}' and '{2}'",
@@ -684,7 +700,8 @@ namespace RedOnion.ROS
 						ref var rhs = ref vals.Top(-1);
 						if (rhs.IsReference && !rhs.desc.Get(ref rhs, rhs.num.Int))
 							throw CouldNotGet(ref rhs);
-						lhs = (lhs.desc == rhs.desc && lhs.obj == rhs.obj
+						lhs = (lhs.desc == rhs.desc && (lhs.desc.Primitive == ExCode.String
+							? (string)lhs.obj == (string)rhs.obj : lhs.obj == rhs.obj)
 							&& lhs.num.Long == rhs.num.Long) == (op == OpCode.Identity);
 						vals.Pop(1);
 						continue;
