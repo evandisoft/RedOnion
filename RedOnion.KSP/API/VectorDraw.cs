@@ -21,11 +21,13 @@ namespace RedOnion.KSP.API
 
 			[Description("Alias to `origin`.")]
 			public Vector from { get; set; }
-			[Description("End point (relative to reference, not starting point).")]
+			[Description("End point (`origin + direction`).")]
 			public Vector to { get => origin + direction; set => direction = value - origin; }
 
 			[Description("Alias to `origin`.")]
 			public Vector start { get => origin; set => origin = value; }
+			[Description("Alias to `origin`.")]
+			public Vector position { get => origin; set => origin = value; }
 			[Description("Alias to `direction`.")]
 			public Vector vector { get => direction; set => direction = value; }
 

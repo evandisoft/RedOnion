@@ -44,7 +44,7 @@ namespace RedOnion.KSP.Parts
 			+ " `types.engine` etc.")]
 		public virtual bool istype(string name) => false;
 
-		[WorkInProgress, Description("Position of the part.")]
+		[Description("Position of the part (relative to CoM of active ship/vessel).")]
 		public Vector position => new Vector(native.partTransform.position - FlightGlobals.ActiveVessel.CoMD);
 
 		[Description("Explode the part.")]

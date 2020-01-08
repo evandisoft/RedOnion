@@ -173,7 +173,7 @@ namespace RedOnion.KSP.API
 
 		#region Native, name and target
 
-		[Unsafe, Description("Native `Vessel` for unrestricted access to KSP API."
+		[Unsafe, Description("Native `Vessel` for unrestricted access to [KSP API](https://kerbalspaceprogram.com/api/class_vessel.html)."
 			+ " Same as `FlightGlobals.ActiveVessel` if accessed through global `ship`.")]
 		public Vessel native { get; private set; }
 
@@ -285,14 +285,26 @@ namespace RedOnion.KSP.API
 
 		#region Orbit - basic
 
-		[Description("KSP API. Orbited body.")]
+		[Description("Orbited body.")]
 		public SpaceBody body => Bodies.Instance[native.mainBody];
 		ISpaceObject ISpaceObject.body => body;
-		[Unsafe, Description("Orbit parameters.")]
-		public OrbitInfo orbit => new OrbitInfo(native.orbit);
-		[Description("Eccentricity of current orbit.")]
+
+		OrbitInfo _orbit;
+		[WorkInProgress, Description("Orbit parameters.")]
+		public OrbitInfo orbit
+		{
+			get
+			{
+				if (_orbit == null)
+					_orbit = new OrbitInfo(native.orbit);
+				else _orbit.native = native.orbit;
+				return _orbit;
+			}
+		}
+
+		[Description("Eccentricity of current orbit. \\[0, +inf)")]
 		public double eccentricity => native.orbit.eccentricity;
-		[Description("Inclination of current orbit [0, 180).")]
+		[Description("Inclination of current orbit. \\[0, 180)")]
 		public double inclination => native.orbit.inclination;
 		[Description("Semi-major axis of current orbit.")]
 		public double semiMajorAxis => native.orbit.semiMajorAxis;
@@ -302,9 +314,9 @@ namespace RedOnion.KSP.API
 		public double apoapsis => native.orbit.ApA;
 		[Description("Height above ground of lowest point of current orbit.")]
 		public double periapsis => native.orbit.PeA;
-		[Description("Highest distance between center of orbited body and any point of current orbit.")]
+		[Description("Highest distance between center of orbited body and any point of current orbit. `(1 + eccentricity) * semiMajorAxis`")]
 		public double apocenter => native.orbit.ApR;
-		[Description("Lowest distance between center of orbited body and any point of current orbit.")]
+		[Description("Lowest distance between center of orbited body and any point of current orbit. `(1 - eccentricity) * semiMajorAxis`")]
 		public double pericenter => native.orbit.PeR;
 		[Description("Eta to apoapsis in seconds.")]
 		public double timeToAp => native.orbit.timeToAp;
@@ -335,10 +347,6 @@ namespace RedOnion.KSP.API
 		public Vector srfVelocity => new Vector(native.srf_velocity);
 		[Description("Current surface velocity (Alias to `surfaceVelocity`).")]
 		public Vector srfvel => new Vector(native.srf_velocity);
-		[WorkInProgress, Description("Predicted position at specified time.")]
-		public Vector positionAt(double time) => new Vector(native.orbit.getPositionAtUT(time) - FlightGlobals.ActiveVessel.CoMD);
-		[WorkInProgress, Description("Predicted velocity at specified time.")]
-		public Vector velocityAt(double time) => new Vector(native.orbit.getOrbitalVelocityAtUT(time).xzy);
 
 		[Description("Vector pointing forward (from cockpit - in the direction of the 'nose').")]
 		public Vector forward => new Vector(native.ReferenceTransform.up);
@@ -529,6 +537,50 @@ namespace RedOnion.KSP.API
 		#endregion
 
 		#region Tools
+
+		[WorkInProgress, Description("Get orbit info relevant for given time.")]
+		public OrbitInfo orbitAt(double time)
+		{
+			var orbit = this.orbit;
+			while (time > orbit.endTime)
+			{
+				var next = orbit.next;
+				if (next == null)
+					break;
+				orbit = next;
+			}
+			return orbit;
+		}
+		[WorkInProgress, Description("Predicted position at specified time.")]
+		public Vector positionAt(double time)
+		{
+			var orbit = native.orbit.GetOrbitAt(time);
+			var pos = orbit.getPositionAtUT(time);
+			if (orbit.referenceBody != native.orbit.referenceBody)
+			{// need to adjust the position by the motion of the reference body
+				if (orbit.referenceBody.referenceBody == native.orbit.referenceBody)
+				{// target body is orbiting current body (e.g. from Kerbin to Mun)
+					pos += orbit.referenceBody.getPositionAtUT(time) - orbit.referenceBody.position;
+				}
+				// TODO: else... some other adjustment may be needed
+			}
+			return new Vector(pos - FlightGlobals.ActiveVessel.CoMD);
+		}
+		[WorkInProgress, Description("Predicted velocity at specified time.")]
+		public Vector velocityAt(double time)
+		{
+			var orbit = native.orbit.GetOrbitAt(time);
+			var vel = orbit.getOrbitalVelocityAtUT(time);
+			if (orbit.referenceBody != native.orbit.referenceBody)
+			{// need to adjust the position by the motion of the reference body
+				if (orbit.referenceBody.referenceBody == native.orbit.referenceBody)
+				{// target body is orbiting current body (e.g. from Kerbin to Mun)
+					vel += orbit.referenceBody.orbit.getOrbitalVelocityAtUT(time);
+				}
+				// TODO: else... some other adjustment may be needed
+			}
+			return new Vector(vel.xzy);
+		}
 
 		[Description("Translate vector/direction into ship-local coordinates (like looking at it from the cockpit - or rather from the controlling part).")]
 		public Vector local(Vector v)

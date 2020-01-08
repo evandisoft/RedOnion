@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using RedOnion.Attributes;
 using RedOnion.KSP.API;
 
 namespace RedOnion.KSP.Parts
@@ -20,6 +21,7 @@ Can also function as separator when staging is enabled.")]
 			|| name.Equals("dockingPort", StringComparison.OrdinalIgnoreCase)
 			|| base.istype(name);
 
+		[Unsafe, Description("[KSP API](https://kerbalspaceprogram.com/api/class_module_docking_node.html)")]
 		public ModuleDockingNode Module => module;
 		public float AcquireForce => module.acquireForce;
 		public float AcquireRange => module.acquireRange;

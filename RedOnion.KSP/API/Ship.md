@@ -4,7 +4,7 @@ Active vessel
 
 
 **Instance Properties:**
-- `native`: Vessel - \[`Unsafe`\] Native `Vessel` for unrestricted access to KSP API. Same as `FlightGlobals.ActiveVessel` if accessed through global `ship`.
+- `native`: Vessel - \[`Unsafe`\] Native `Vessel` for unrestricted access to [KSP API](https://kerbalspaceprogram.com/api/class_vessel.html). Same as `FlightGlobals.ActiveVessel` if accessed through global `ship`.
 - `name`: string - Name of the ship (vehicle/vessel).
 - `target`: Object - \[`WIP`\] Target of active ship. Null if none.
 - `autopilot`: [Autopilot](Autopilot.md) - Autopilot of this ship (vehicle/vessel).
@@ -30,16 +30,16 @@ Active vessel
 - `radarAltitude`: double - True height above ground in meters.
 - `dynamicPressure`: double - Dynamic pressure [atm = 101.325kPa]
 - `q`: double - Dynamic pressure [atm = 101.325kPa]
-- `body`: [SpaceBody](SpaceBody.md) - KSP API. Orbited body.
-- `orbit`: Orbit - \[`Unsafe`\] \[`WIP`\] KSP API. Orbit parameters. May get replaced by safe wrapper in the future.
-- `eccentricity`: double - Eccentricity of current orbit.
-- `inclination`: double - Inclination of current orbit [0, 180).
+- `body`: [SpaceBody](SpaceBody.md) - Orbited body.
+- `orbit`: [OrbitInfo](OrbitInfo.md) - \[`WIP`\] Orbit parameters.
+- `eccentricity`: double - Eccentricity of current orbit. \[0, +inf)
+- `inclination`: double - Inclination of current orbit. \[0, 180)
 - `semiMajorAxis`: double - Semi-major axis of current orbit.
 - `semiMinorAxis`: double - Semi-minor axis of current orbit.
 - `apoapsis`: double - Height above ground of highest point of current orbit.
 - `periapsis`: double - Height above ground of lowest point of current orbit.
-- `apocenter`: double - Highest distance between center of orbited body and any point of current orbit.
-- `pericenter`: double - Lowest distance between center of orbited body and any point of current orbit.
+- `apocenter`: double - Highest distance between center of orbited body and any point of current orbit. `(1 + eccentricity) * semiMajorAxis`
+- `pericenter`: double - Lowest distance between center of orbited body and any point of current orbit. `(1 - eccentricity) * semiMajorAxis`
 - `timeToAp`: double - Eta to apoapsis in seconds.
 - `timeToPe`: double - Eta to periapsis in seconds.
 - `period`: double - Period of current orbit in seconds.
@@ -76,15 +76,17 @@ Note that it can change violently when facing up or down.
 - `rcs`: bool - RCS: Reaction Control System.
 
 **Instance Methods:**
+- `orbitAt()`: [OrbitInfo](OrbitInfo.md), time double
+  - \[`WIP`\] Get orbit info relevant for given time.
 - `positionAt()`: [Vector](Vector.md), time double
   - \[`WIP`\] Predicted position at specified time.
 - `velocityAt()`: [Vector](Vector.md), time double
   - \[`WIP`\] Predicted velocity at specified time.
 - `local()`: [Vector](Vector.md), v [Vector](Vector.md)
-  - Translate vector/direction into ship-local coordinates (like looking at it from the cockpit).
+  - Translate vector/direction into ship-local coordinates (like looking at it from the cockpit - or rather from the controlling part).
 - `world()`: [Vector](Vector.md), v [Vector](Vector.md)
   - Translate vector/direction into world coordinates (reverse the `local` transformation).
 - `timeAtTrueAnomaly()`: double, trueAnomaly double
   - \[`WIP`\] Get time at true anomaly (absolute time of angle from direction of periapsis).
 - `timeToTrueAnomaly()`: double, trueAnomaly double
-  - \[`WIP`\] Get time to true anomaly (relative time of angle from direction of periapsis).
+  - \[`WIP`\] Get time to true anomaly (relative time of angle from direction of periapsis). [0, period)

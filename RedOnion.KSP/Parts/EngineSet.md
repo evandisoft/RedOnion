@@ -1,5 +1,7 @@
 ## EngineSet
 
+**Base Class:** [PartSet](PartSet.1.md)\[[Engine](Engine.md)\]
+
 Read-only set of engines.
 
 

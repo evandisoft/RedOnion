@@ -17,7 +17,7 @@ Part of the ship (vehicle/vessel).
 - `state`: PartStates - State of the part (IDLE, ACTIVE (e.g. engine), DEACTIVATED, DEAD, FAILED).
 - `name`: string - Name of the part (assigned by KSP).
 - `title`: string - Title of the part (assigned by KSP).
-- `position`: [Vector](../API/Vector.md) - \[`WIP`\] Position of the part.
+- `position`: [Vector](../API/Vector.md) - Position of the part (relative to CoM of active ship/vessel).
 
 **Instance Methods:**
 - `istype()`: bool, name string
