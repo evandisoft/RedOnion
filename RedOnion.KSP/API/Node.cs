@@ -75,8 +75,9 @@ namespace RedOnion.KSP.API
 			get => new Vector(native.GetBurnVector(ship.orbit));
 			set
 			{
-				var vel = ship.velocityAt(time);
-				var pos = ship.positionAt(time) - ship.body.position/*At(time)*/;
+				var orbit = ship.orbitAt(time);
+				var vel = orbit.velocityAt(time);
+				var pos = orbit.positionAt(time) - orbit.body.position;
 				var pro = vel.normalized;
 				var nrm = vel.cross(pos).normalized;
 				var rad = nrm.cross(vel).normalized;

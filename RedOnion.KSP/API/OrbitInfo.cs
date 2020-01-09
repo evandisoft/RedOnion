@@ -18,7 +18,7 @@ namespace RedOnion.KSP.API
 			? orbit.nextPatch : null;
 		public static Orbit GetOrbitAt(this Orbit orbit, double time)
 		{
-			while (time > orbit.EndUT)
+			while (time >= orbit.EndUT)
 			{
 				var next = orbit.GetNext();
 				if (next == null)
@@ -66,10 +66,21 @@ namespace RedOnion.KSP.API
 			}
 		}
 
-		[Description("Time of start of this patch, if it is continuation. Usually in the past for current orbit without a transition.")]
+		[Description("Time of start of this patch, if it is continuation. Usually a bit in the past for current orbit without a transition.")]
 		public double startTime => native.StartUT;
 		[Description("Time of end of this patch, if there is transition. `period = endTime - startTime` for current orbit without a transition.")]
 		public double endTime => native.EndUT;
+
+		[Description("Period of the orbit in seconds.")]
+		public double period => native.period;
+		[Description("Eta to apoapsis in seconds.")]
+		public double timeToAp => timeAtAp - Time.now;
+		[Description("Eta to periapsis in seconds.")]
+		public double timeToPe => timeAtPe - Time.now;
+		[Description("Time at apoapsis. `timeToAp + time.now`")]
+		public double timeAtAp => native.timeToAp + native.StartUT;
+		[Description("Time at periapsis. `timeAtPe + time.now`")]
+		public double timeAtPe => native.timeToPe + native.StartUT;
 
 		[Description("Eccentricity of current orbit. \\[0, +inf)")]
 		public double eccentricity => native.eccentricity;
@@ -89,13 +100,6 @@ namespace RedOnion.KSP.API
 		[Description("Lowest distance between center of orbited body and any point of current orbit. `(1 - eccentricity) * semiMajorAxis`")]
 		public double pericenter => native.PeR;
 
-		[Description("Eta to apoapsis in seconds.")]
-		public double timeToAp => native.timeToAp;
-		[Description("Eta to periapsis in seconds.")]
-		public double timeToPe => native.timeToPe;
-		[Description("Period of the orbit in seconds.")]
-		public double period => native.period;
-
 		[Description("Angle in degrees between the direction of periapsis and the current position. Zero at periapsis, 180 at apoapsis.")]
 		public double trueAnomaly => RosMath.Deg.Clamp360(native.trueAnomaly * RosMath.Rad2Deg);
 		[Description("Angle in degrees between the direction of periapsis and the current position extrapolated on circular orbit.")]
@@ -104,6 +108,8 @@ namespace RedOnion.KSP.API
 		public double lan => native.LAN;
 		[Description("Argument of periapsis. Angle from ascending node to periapsis.")]
 		public double argumentOfPeriapsis => native.argumentOfPeriapsis;
+		[Description("Argument of periapsis. Angle from ascending node to periapsis.")]
+		public double aop => native.argumentOfPeriapsis;
 
 		[WorkInProgress, Description("Predicted position at specified time.")]
 		public Vector positionAt(double time) => new Vector(native.getPositionAtUT(time) - FlightGlobals.ActiveVessel.CoMD);

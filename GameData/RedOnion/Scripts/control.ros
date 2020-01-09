@@ -231,13 +231,35 @@ def control ship, target, x, y
     while node.next != null
       node.next.remove
       wait
-    var tm = time() + (ship.apoapsis > 0 and ship.timeToPe > ship.timeToAp and ship.eccentricity > 0.001 ?
-      ship.timeToAp : ship.periapsis > math.max(atmosphere.height, 3000) and ship.eccentricity > 0.001 ?
-      ship.timeToPe : 0)
-    var pos = ship.positionAt(tm) - body.position
-    var vel = ship.velocityAt(tm)
-    var dv = math.sqrt(body.mu / pos.size) * pos.cross(vel.cross pos).normalized - vel
-    new node tm, dv
+    var orbit = ship.orbit
+    if orbit.encounter and ship.timeAtPe > orbit.endTime
+      orbit = orbit.next
+      var tm = orbit.timeAtPe
+      var body = orbit.body
+      var pos = orbit.positionAt(tm) - body.position
+      var vel = orbit.velocityAt(tm)
+      var dv = math.sqrt(body.mu / pos.size) * pos.cross(vel.cross pos).normalized - vel
+      new node tm, -dv.size
+      print "Encounter with {0} detected", body.name
+      print "ETA: {0}, UT: {1}", tm - time(), tm
+    else
+      var tm = time.now
+      var body = ship.body
+      if ship.eccentricity < 0.001
+        print "Eccentricity is {0:F6}, adjusting now", ship.eccentricity
+      else if ship.apoapsis > 0 and ship.timeToPe > ship.timeToAp
+        tm = ship.timeAtAp
+        print "Circularize at apoapsis: {0}m", ship.apoapsis
+      else if ship.periapsis > math.max(atmosphere.height, 3000) and ship.eccentricity > 0.001
+        tm = ship.timeAtPe
+        print "Circularize at periapsis: {0}m", ship.periapsis
+      else
+        print "Circularizing immediately"
+      var pos = ship.positionAt(tm) - body.position
+      var vel = ship.velocityAt(tm)
+      var dv = math.sqrt(body.mu / pos.size) * pos.cross(vel.cross pos).normalized - vel
+      new node tm, dv
+      print "ETA: {0}, UT: {1}", tm - time(), tm
     if mMan.pressed
       bExec.press
     else bAbort.press
