@@ -222,7 +222,6 @@ def staging
     print "No operational engine"
     stage
     return
-  //todo: SRB's vs. Twin Boars (engine-tank combo)
   if stage.fuel <= 0.1
     print "Stage out of fuel"
     stage
@@ -350,7 +349,7 @@ try
         time.warp.to prevEtaReport + eta - 10
     if eta <= 5 and not switched
       switched = true
-      time.warp.cancel()
+      time.warp.cancel
       ctlsub.remove
       tta = ship.timeToAp
       ctlsub = system.update circle

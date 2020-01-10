@@ -32,6 +32,11 @@ Active vessel
 - `q`: double - Dynamic pressure [atm = 101.325kPa]
 - `body`: [SpaceBody](SpaceBody.md) - Orbited body.
 - `orbit`: [OrbitInfo](OrbitInfo.md) - \[`WIP`\] Orbit parameters.
+- `period`: double - Period of current orbit in seconds.
+- `timeToAp`: double - Eta to apoapsis in seconds.
+- `timeToPe`: double - Eta to periapsis in seconds.
+- `timeAtAp`: double - Time at apoapsis. `timeToAp + time.now`
+- `timeAtPe`: double - Time at periapsis. `timeAtPe + time.now`
 - `eccentricity`: double - Eccentricity of current orbit. \[0, +inf)
 - `inclination`: double - Inclination of current orbit. \[0, 180)
 - `semiMajorAxis`: double - Semi-major axis of current orbit.
@@ -40,13 +45,11 @@ Active vessel
 - `periapsis`: double - Height above ground of lowest point of current orbit.
 - `apocenter`: double - Highest distance between center of orbited body and any point of current orbit. `(1 + eccentricity) * semiMajorAxis`
 - `pericenter`: double - Lowest distance between center of orbited body and any point of current orbit. `(1 - eccentricity) * semiMajorAxis`
-- `timeToAp`: double - Eta to apoapsis in seconds.
-- `timeToPe`: double - Eta to periapsis in seconds.
-- `period`: double - Period of current orbit in seconds.
 - `trueAnomaly`: double - Angle in degrees between the direction of periapsis and the current position. Zero at periapsis, 180 at apoapsis.
 - `meanAnomaly`: double - Angle in degrees between the direction of periapsis and the current position extrapolated on circular orbit.
 - `lan`: double - Longitude of ascending node.
 - `argumentOfPeriapsis`: double - Argument of periapsis. Angle from ascending node to periapsis.
+- `aop`: double - Argument of periapsis. Angle from ascending node to periapsis.
 - `position`: [Vector](Vector.md) - Center of mass relative to (CoM of) active ship (zero for active ship).
 - `velocity`: [Vector](Vector.md) - Current orbital velocity.
 - `surfaceVelocity`: [Vector](Vector.md) - Current surface velocity.
@@ -77,11 +80,11 @@ Note that it can change violently when facing up or down.
 
 **Instance Methods:**
 - `orbitAt()`: [OrbitInfo](OrbitInfo.md), time double
-  - \[`WIP`\] Get orbit info relevant for given time.
+  - \[`WIP`\] Get orbit info relevant for given time. See [orbit.png](orbit.png).
 - `positionAt()`: [Vector](Vector.md), time double
-  - \[`WIP`\] Predicted position at specified time.
+  - \[`WIP`\] Predicted position at specified time. Includes the movement of moons (e.g. Mun) when ship is currently orbiting the planet (e.g. Kerbin). Use `orbitAt(time).positionAt(time)` if that is not desired. See [orbit.png](orbit.png).
 - `velocityAt()`: [Vector](Vector.md), time double
-  - \[`WIP`\] Predicted velocity at specified time.
+  - \[`WIP`\] Predicted velocity at specified time. Includes the movement of moons (e.g. Mun) when ship is currently orbiting the planet (e.g. Kerbin). Use `orbitAt(time).velocityAt(time)` if that is not desired. See [orbit.png](orbit.png).
 - `local()`: [Vector](Vector.md), v [Vector](Vector.md)
   - Translate vector/direction into ship-local coordinates (like looking at it from the cockpit - or rather from the controlling part).
 - `world()`: [Vector](Vector.md), v [Vector](Vector.md)

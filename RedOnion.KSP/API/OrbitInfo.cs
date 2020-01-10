@@ -111,7 +111,11 @@ namespace RedOnion.KSP.API
 		[Description("Argument of periapsis. Angle from ascending node to periapsis.")]
 		public double aop => native.argumentOfPeriapsis;
 
-		[WorkInProgress, Description("Predicted position at specified time.")]
+		[WorkInProgress, Description(
+			"Predicted position at specified time."
+			+ " Does not includes the movement of celestial bodies"
+			+ " (like Mun when ship is still in Kerbin's SOI)."
+			+ " See [orbit.png](orbit.png).")]
 		public Vector positionAt(double time) => new Vector(native.getPositionAtUT(time) - FlightGlobals.ActiveVessel.CoMD);
 		[WorkInProgress, Description("Predicted velocity at specified time.")]
 		public Vector velocityAt(double time) => new Vector(native.getOrbitalVelocityAtUT(time).xzy);

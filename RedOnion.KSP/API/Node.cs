@@ -37,10 +37,10 @@ namespace RedOnion.KSP.API
 		[Description("Ship the node belongs to.")]
 		public Ship ship { get; private set; }
 
-		[Description("Create new maneuver node for active ship, specifying time.")]
+		[Description("Create new maneuver node for active ship, specifying time and optionally prograde, normal and radial delta-v (unspecified are zero).")]
 		public Node(double time, double prograde = 0.0, double normal = 0.0, double radial = 0.0)
 			: this(Ship.Active, time, prograde, normal, radial) { }
-		[Description("Create new maneuver node for active ship.")]
+		[Description("Create new maneuver node for active ship, specifying time and burn vector. See [`deltav` property](#deltav) for more details.")]
 		public Node(double time, Vector deltav)
 			: this(Ship.Active, time, deltav) { }
 
@@ -69,7 +69,16 @@ namespace RedOnion.KSP.API
 		[Description("Seconds until the maneuver.")]
 		public double eta => native.UT - Time.now;
 
-		[Description("Direction and amount of velocity change needed.")]
+		[Description("Direction and amount of velocity change needed (aka burn-vector)."
+			+ " Note that the vector is relative to the SOI where the node is (not where the ship currently is)."
+			+ " That means that the vector will be relative to the current position of the Mun"
+			+ " not relative to future position of the Mun (when the node is for example "
+			+ " at the periapsis = closest enounter with the Mun"
+			+ " and is retrograde with the right amount for circularization,"
+			+ " but the ship is currently still in Kerbin's SOI)."
+			+ " Therefore [`ship.orbitAt(time).velocityAt(time)`](Ship.md#orbitAt)"
+			+ " shall be used rather than [`ship.velocityAt(time)`](Ship.md#velocityAt)"
+			+ " when planning nodes in different SOI (both work the same when in same SOI).")]
 		public Vector deltav
 		{
 			get => new Vector(native.GetBurnVector(ship.orbit));

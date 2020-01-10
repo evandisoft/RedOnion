@@ -547,7 +547,7 @@ namespace RedOnion.KSP.API
 
 		#region Tools
 
-		[WorkInProgress, Description("Get orbit info relevant for given time.")]
+		[WorkInProgress, Description("Get orbit info relevant for given time. See [orbit.png](orbit.png).")]
 		public OrbitInfo orbitAt(double time)
 		{
 			var orbit = this.orbit;
@@ -560,7 +560,11 @@ namespace RedOnion.KSP.API
 			}
 			return orbit;
 		}
-		[WorkInProgress, Description("Predicted position at specified time.")]
+		[WorkInProgress, Description(
+			"Predicted position at specified time."
+			+ " Includes the movement of moons (e.g. Mun) when ship is currently orbiting the planet (e.g. Kerbin)."
+			+ " Use `orbitAt(time).positionAt(time)` if that is not desired."
+			+ " See [orbit.png](orbit.png).")]
 		public Vector positionAt(double time)
 		{
 			var orbit = native.orbit.GetOrbitAt(time);
@@ -575,7 +579,11 @@ namespace RedOnion.KSP.API
 			}
 			return new Vector(pos - FlightGlobals.ActiveVessel.CoMD);
 		}
-		[WorkInProgress, Description("Predicted velocity at specified time.")]
+		[WorkInProgress, Description(
+			"Predicted velocity at specified time."
+			+ " Includes the movement of moons (e.g. Mun) when ship is currently orbiting the planet (e.g. Kerbin)."
+			+ " Use `orbitAt(time).velocityAt(time)` if that is not desired."
+			+ " See [orbit.png](orbit.png).")]
 		public Vector velocityAt(double time)
 		{
 			var orbit = native.orbit.GetOrbitAt(time);
