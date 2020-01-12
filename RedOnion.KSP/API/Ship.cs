@@ -303,15 +303,15 @@ namespace RedOnion.KSP.API
 		}
 
 		[Description("Period of current orbit in seconds.")]
-		public double period => native.orbit.period;
+		public TimeDelta period => new TimeDelta(native.orbit.period);
 		[Description("Eta to apoapsis in seconds.")]
-		public double timeToAp => timeAtAp - Time.now;
+		public TimeDelta timeToAp => timeAtAp - Time.now;
 		[Description("Eta to periapsis in seconds.")]
-		public double timeToPe => timeAtPe - Time.now;
+		public TimeDelta timeToPe => timeAtPe - Time.now;
 		[Description("Time at apoapsis. `timeToAp + time.now`")]
-		public double timeAtAp => native.orbit.timeToAp + native.orbit.StartUT;
+		public TimeStamp timeAtAp => new TimeStamp(native.orbit.timeToAp + native.orbit.StartUT);
 		[Description("Time at periapsis. `timeAtPe + time.now`")]
-		public double timeAtPe => native.orbit.timeToPe + native.orbit.StartUT;
+		public TimeStamp timeAtPe => new TimeStamp(native.orbit.timeToPe + native.orbit.StartUT);
 
 		[Description("Eccentricity of current orbit. \\[0, +inf)")]
 		public double eccentricity => native.orbit.eccentricity;
@@ -382,7 +382,7 @@ namespace RedOnion.KSP.API
 
 		#region Pitch, heading and roll
 
-		[Description("Current pitch / elevation (the angle between forward vector and tangent plane) [-90..+90]")]
+		[Description("Current pitch / elevation (the angle between forward vector and tangent plane) \\[-90..+90]")]
 		public double pitch
 		{
 			get => 90.0 - Vector3d.Angle(forward, away);
@@ -394,7 +394,7 @@ namespace RedOnion.KSP.API
 			}
 		}
 		[Description("Current heading / yaw (the angle between forward and north vectors"
-			+ " in tangent plane) [0..360]. Note that it can change violently around the poles.")]
+			+ " in tangent plane) \\[0..360]. Note that it can change violently around the poles.")]
 		public double heading
 		{
 			get
@@ -417,7 +417,7 @@ namespace RedOnion.KSP.API
 			}
 		}
 		[Description("Current roll / bank (the angle between up and away vectors"
-			+ " in the plane perpendicular to forward vector) [-180..+180]."
+			+ " in the plane perpendicular to forward vector) \\[-180..+180]."
 			+ " \nNote that it can change violently when facing up or down.")]
 		public double roll
 		{
@@ -445,14 +445,14 @@ namespace RedOnion.KSP.API
 
 		#region Properties for autopilot
 
-		[Description("Angular velocity (ω, deg/s), how fast the ship rotates")]
+		[Description("Angular velocity \\[ω, deg/s], how fast the ship rotates")]
 		public Vector angularVelocity => new Vector(native.angularVelocityD * RosMath.Rad2Deg);
-		[Description("Angular momentum (L = Iω, kg⋅m²⋅deg/s=N⋅m⋅s⋅deg) aka moment of momentum or rotational momentum.")]
+		[Description("Angular momentum \\[L = Iω, kg⋅m²⋅deg/s=N⋅m⋅s⋅deg] aka moment of momentum or rotational momentum.")]
 		public Vector angularMomentum => new Vector((Vector3d)native.angularMomentum * RosMath.Rad2Deg);
-		[Description("Moment of inertia (I, kg⋅m²=N⋅m⋅s²) aka angular mass or rotational inertia.")]
+		[Description("Moment of inertia \\[I, kg⋅m²=N⋅m⋅s²] aka angular mass or rotational inertia.")]
 		public Vector3d momentOfInertia => new Vector(native.MOI);
 
-		protected double _torqueStamp;
+		protected TimeStamp _torqueStamp;
 		protected Vector _maxTorque, _maxVacuumTorque;
 		protected Vector _maxAngular, _maxVacuumAngular;
 		protected void UpdateTorque()
@@ -484,7 +484,7 @@ namespace RedOnion.KSP.API
 			_maxVacuumAngular = new Vector(VectorCreator.shrink(_maxVacuumTorque, momentOfInertia));
 		}
 
-		[Description("Maximal ship torque [N⋅m⋅deg=deg⋅kg⋅m²/s²] (aka moment of force or turning effect, maximum of positive and negative).")]
+		[Description("Maximal ship torque \\[N⋅m⋅deg=deg⋅kg⋅m²/s²] (aka moment of force or turning effect, maximum of positive and negative).")]
 		public Vector maxTorque
 		{
 			get
@@ -494,7 +494,7 @@ namespace RedOnion.KSP.API
 				return _maxTorque;
 			}
 		}
-		[Description("Maximal ship torque in vacuum [N⋅m⋅deg=deg⋅kg⋅m²/s²] (ignoring control surfaces).")]
+		[Description("Maximal ship torque in vacuum \\[N⋅m⋅deg=deg⋅kg⋅m²/s²] (ignoring control surfaces).")]
 		public Vector maxVacuumTorque
 		{
 			get
@@ -504,7 +504,7 @@ namespace RedOnion.KSP.API
 				return _maxVacuumTorque;
 			}
 		}
-		[Description("Maximal angular acceleration (deg/s²)")]
+		[Description("Maximal angular acceleration. \\[deg/s²]")]
 		public Vector maxAngular
 		{
 			get
@@ -548,7 +548,7 @@ namespace RedOnion.KSP.API
 		#region Tools
 
 		[WorkInProgress, Description("Get orbit info relevant for given time. See [orbit.png](orbit.png).")]
-		public OrbitInfo orbitAt(double time)
+		public OrbitInfo orbitAt(TimeStamp time)
 		{
 			var orbit = this.orbit;
 			while (time >= orbit.endTime)
@@ -565,7 +565,7 @@ namespace RedOnion.KSP.API
 			+ " Includes the movement of moons (e.g. Mun) when ship is currently orbiting the planet (e.g. Kerbin)."
 			+ " Use `orbitAt(time).positionAt(time)` if that is not desired."
 			+ " See [orbit.png](orbit.png).")]
-		public Vector positionAt(double time)
+		public Vector positionAt(TimeStamp time)
 		{
 			var orbit = native.orbit.GetOrbitAt(time);
 			var pos = orbit.getPositionAtUT(time);
@@ -584,7 +584,7 @@ namespace RedOnion.KSP.API
 			+ " Includes the movement of moons (e.g. Mun) when ship is currently orbiting the planet (e.g. Kerbin)."
 			+ " Use `orbitAt(time).velocityAt(time)` if that is not desired."
 			+ " See [orbit.png](orbit.png).")]
-		public Vector velocityAt(double time)
+		public Vector velocityAt(TimeStamp time)
 		{
 			var orbit = native.orbit.GetOrbitAt(time);
 			var vel = orbit.getOrbitalVelocityAtUT(time);
@@ -616,11 +616,11 @@ namespace RedOnion.KSP.API
 			=> native.ReferenceTransform.TransformDirection(v);
 
 		[WorkInProgress, Description("Get time at true anomaly (absolute time of angle from direction of periapsis).")]
-		public double timeAtTrueAnomaly(double trueAnomaly)
-			=> native.orbit.GetUTforTrueAnomaly(trueAnomaly * RosMath.Deg2Rad, 0.0);
+		public TimeStamp timeAtTrueAnomaly(double trueAnomaly)
+			=> Time.now + timeToTrueAnomaly(trueAnomaly);
 		[WorkInProgress, Description("Get time to true anomaly (relative time of angle from direction of periapsis). [0, period)")]
-		public double timeToTrueAnomaly(double trueAnomaly)
-			=> native.orbit.GetDTforTrueAnomaly(trueAnomaly * RosMath.Deg2Rad, 0.0) % native.orbit.period;
+		public TimeDelta timeToTrueAnomaly(double trueAnomaly)
+			=> new TimeDelta(native.orbit.GetDTforTrueAnomaly(trueAnomaly * RosMath.Deg2Rad, 0.0) % native.orbit.period);
 
 		#endregion
 	}

@@ -78,6 +78,8 @@ namespace RedOnion.ROS
 			return false;
 		}
 
+		// TODO: ConvertFrom or CreateFrom and maybe CanCreateFrom - for argument matching
+
 		public virtual int Find(object self, string name, bool add = false) => -1;
 		public virtual string NameOf(object self, int at) => null;
 		public virtual bool Get(ref Value self, int at) => false;

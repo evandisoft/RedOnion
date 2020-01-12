@@ -61,7 +61,7 @@ namespace RedOnion.KSP.API
 		public static double fuel => solidfuel + liquidfuel;
 
 		[Description("Estimate burn time for given delta-v.")]
-		public static double burntime(double deltaV) => engines.burnTime(deltaV);
+		public static TimeDelta burntime(double deltaV) => engines.burnTime(deltaV);
 		// TODO: burnTime even if current stage cannot handle it
 
 

@@ -123,7 +123,7 @@ namespace RedOnion.KSP.Parts
 
 		public static double g0 = 9.81;
 		[Description("Estimate burn time for given delta-v (assuming it can be done without staging).")]
-		public double burnTime(double deltaV)
+		public TimeDelta burnTime(double deltaV)
 		{
 			var thrust = 0.0;
 			var flow = 0.0;
@@ -139,9 +139,9 @@ namespace RedOnion.KSP.Parts
 				flow += eth / isp;
 			}
 			if (flow <= 0.0001)
-				return double.NaN;
+				return TimeDelta.none;
 			var stdIsp = g0 * thrust / flow;
-			return stdIsp * _ship.mass * (1.0 - Math.Pow(Math.E, -deltaV / stdIsp)) / thrust;
+			return new TimeDelta(stdIsp * _ship.mass * (1.0 - Math.Pow(Math.E, -deltaV / stdIsp)) / thrust);
 		}
 	}
 

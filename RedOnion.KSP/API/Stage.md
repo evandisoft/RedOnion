@@ -16,5 +16,5 @@ Used to activate next stage and/or get various information about stage(s). Retur
 
 **Static Methods:**
 - `activate()`: bool - Activate next stage (can call the stage object as a function as well (stage() instead of stage.activate())
-- `burntime()`: double, deltaV double
+- `burntime()`: [TimeDelta](TimeDelta.md), deltaV double
   - Estimate burn time for given delta-v.

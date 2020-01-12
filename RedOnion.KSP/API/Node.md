@@ -8,12 +8,20 @@ Maneuver node.
   - Create new maneuver node for active ship, specifying time and optionally prograde, normal and radial delta-v (unspecified are zero).
 - `Node()`: time double, deltav [Vector](Vector.md)
   - Create new maneuver node for active ship, specifying time and burn vector. See [`deltav` property](#deltav) for more details.
+- `Node()`: time [TimeStamp](TimeStamp.md), prograde double, normal double, radial double
+  - Create new maneuver node for active ship, specifying time and optionally prograde, normal and radial delta-v (unspecified are zero).
+- `Node()`: time [TimeStamp](TimeStamp.md), deltav [Vector](Vector.md)
+  - Create new maneuver node for active ship, specifying time and burn vector. See [`deltav` property](#deltav) for more details.
+- `Node()`: eta [TimeDelta](TimeDelta.md), prograde double, normal double, radial double
+  - Create new maneuver node for active ship, specifying eta and optionally prograde, normal and radial delta-v (unspecified are zero).
+- `Node()`: eta [TimeDelta](TimeDelta.md), deltav [Vector](Vector.md)
+  - Create new maneuver node for active ship, specifying eta and burn vector. See [`deltav` property](#deltav) for more details.
 
 **Instance Properties:**
 - `native`: ManeuverNode - \[`Unsafe`\] KSP API.
 - `ship`: [Ship](Ship.md) - Ship the node belongs to.
-- `time`: double - Planned time for the maneuver.
-- `eta`: double - Seconds until the maneuver.
+- `time`: [TimeStamp](TimeStamp.md) - Planned time for the maneuver.
+- `eta`: [TimeDelta](TimeDelta.md) - Seconds until the maneuver.
 - `deltav`: [Vector](Vector.md) - Direction and amount of velocity change needed (aka burn-vector). Note that the vector is relative to the SOI where the node is (not where the ship currently is). That means that the vector will be relative to the current position of the Mun not relative to future position of the Mun (when the node is for example  at the periapsis = closest enounter with the Mun and is retrograde with the right amount for circularization, but the ship is currently still in Kerbin's SOI). Therefore [`ship.orbitAt(time).velocityAt(time)`](Ship.md#orbitAt) shall be used rather than [`ship.velocityAt(time)`](Ship.md#velocityAt) when planning nodes in different SOI (both work the same when in same SOI).
 - `nativeDeltaV`: Vector3d - \[`Unsafe`\] KSP API. Setting it also calls `patchedConicSolver.UpdateFlightPlan()`.
 - `prograde`: double - Amount of velocity change in prograde direction.

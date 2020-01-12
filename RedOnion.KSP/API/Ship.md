@@ -32,11 +32,11 @@ Active vessel
 - `q`: double - Dynamic pressure [atm = 101.325kPa]
 - `body`: [SpaceBody](SpaceBody.md) - Orbited body.
 - `orbit`: [OrbitInfo](OrbitInfo.md) - \[`WIP`\] Orbit parameters.
-- `period`: double - Period of current orbit in seconds.
-- `timeToAp`: double - Eta to apoapsis in seconds.
-- `timeToPe`: double - Eta to periapsis in seconds.
-- `timeAtAp`: double - Time at apoapsis. `timeToAp + time.now`
-- `timeAtPe`: double - Time at periapsis. `timeAtPe + time.now`
+- `period`: [TimeDelta](TimeDelta.md) - Period of current orbit in seconds.
+- `timeToAp`: [TimeDelta](TimeDelta.md) - Eta to apoapsis in seconds.
+- `timeToPe`: [TimeDelta](TimeDelta.md) - Eta to periapsis in seconds.
+- `timeAtAp`: [TimeStamp](TimeStamp.md) - Time at apoapsis. `timeToAp + time.now`
+- `timeAtPe`: [TimeStamp](TimeStamp.md) - Time at periapsis. `timeAtPe + time.now`
 - `eccentricity`: double - Eccentricity of current orbit. \[0, +inf)
 - `inclination`: double - Inclination of current orbit. \[0, 180)
 - `semiMajorAxis`: double - Semi-major axis of current orbit.
@@ -64,32 +64,32 @@ Active vessel
 - `north`: [Vector](Vector.md) - Vector pointing north in the plane that is tangent to sphere centered in orbited body.
 - `east`: [Vector](Vector.md) - Vector pointing east (tangent to sphere centered in orbited body).
 - `away`: [Vector](Vector.md) - Vector pointing away from orbited body (aka *up*, but we use `up` for cockpit-up).
-- `pitch`: double - Current pitch / elevation (the angle between forward vector and tangent plane) [-90..+90]
-- `heading`: double - Current heading / yaw (the angle between forward and north vectors in tangent plane) [0..360]. Note that it can change violently around the poles.
-- `roll`: double - Current roll / bank (the angle between up and away vectors in the plane perpendicular to forward vector) [-180..+180]. 
+- `pitch`: double - Current pitch / elevation (the angle between forward vector and tangent plane) \[-90..+90]
+- `heading`: double - Current heading / yaw (the angle between forward and north vectors in tangent plane) \[0..360]. Note that it can change violently around the poles.
+- `roll`: double - Current roll / bank (the angle between up and away vectors in the plane perpendicular to forward vector) \[-180..+180]. 
 Note that it can change violently when facing up or down.
-- `angularVelocity`: [Vector](Vector.md) - Angular velocity (ω, deg/s), how fast the ship rotates
-- `angularMomentum`: [Vector](Vector.md) - Angular momentum (L = Iω, kg⋅m²⋅deg/s=N⋅m⋅s⋅deg) aka moment of momentum or rotational momentum.
-- `momentOfInertia`: Vector3d - Moment of inertia (I, kg⋅m²=N⋅m⋅s²) aka angular mass or rotational inertia.
-- `maxTorque`: [Vector](Vector.md) - Maximal ship torque [N⋅m⋅deg=deg⋅kg⋅m²/s²] (aka moment of force or turning effect, maximum of positive and negative).
-- `maxVacuumTorque`: [Vector](Vector.md) - Maximal ship torque in vacuum [N⋅m⋅deg=deg⋅kg⋅m²/s²] (ignoring control surfaces).
-- `maxAngular`: [Vector](Vector.md) - Maximal angular acceleration (deg/s²)
+- `angularVelocity`: [Vector](Vector.md) - Angular velocity \[ω, deg/s], how fast the ship rotates
+- `angularMomentum`: [Vector](Vector.md) - Angular momentum \[L = Iω, kg⋅m²⋅deg/s=N⋅m⋅s⋅deg] aka moment of momentum or rotational momentum.
+- `momentOfInertia`: Vector3d - Moment of inertia \[I, kg⋅m²=N⋅m⋅s²] aka angular mass or rotational inertia.
+- `maxTorque`: [Vector](Vector.md) - Maximal ship torque \[N⋅m⋅deg=deg⋅kg⋅m²/s²] (aka moment of force or turning effect, maximum of positive and negative).
+- `maxVacuumTorque`: [Vector](Vector.md) - Maximal ship torque in vacuum \[N⋅m⋅deg=deg⋅kg⋅m²/s²] (ignoring control surfaces).
+- `maxAngular`: [Vector](Vector.md) - Maximal angular acceleration. \[deg/s²]
 - `maxVacuumAngular`: [Vector](Vector.md) - Maximal angular acceleration in vacuum (ignoring control surfaces).
 - `sas`: bool - SAS: Stability Assist System.
 - `rcs`: bool - RCS: Reaction Control System.
 
 **Instance Methods:**
-- `orbitAt()`: [OrbitInfo](OrbitInfo.md), time double
+- `orbitAt()`: [OrbitInfo](OrbitInfo.md), time [TimeStamp](TimeStamp.md)
   - \[`WIP`\] Get orbit info relevant for given time. See [orbit.png](orbit.png).
-- `positionAt()`: [Vector](Vector.md), time double
+- `positionAt()`: [Vector](Vector.md), time [TimeStamp](TimeStamp.md)
   - \[`WIP`\] Predicted position at specified time. Includes the movement of moons (e.g. Mun) when ship is currently orbiting the planet (e.g. Kerbin). Use `orbitAt(time).positionAt(time)` if that is not desired. See [orbit.png](orbit.png).
-- `velocityAt()`: [Vector](Vector.md), time double
+- `velocityAt()`: [Vector](Vector.md), time [TimeStamp](TimeStamp.md)
   - \[`WIP`\] Predicted velocity at specified time. Includes the movement of moons (e.g. Mun) when ship is currently orbiting the planet (e.g. Kerbin). Use `orbitAt(time).velocityAt(time)` if that is not desired. See [orbit.png](orbit.png).
 - `local()`: [Vector](Vector.md), v [Vector](Vector.md)
   - Translate vector/direction into ship-local coordinates (like looking at it from the cockpit - or rather from the controlling part).
 - `world()`: [Vector](Vector.md), v [Vector](Vector.md)
   - Translate vector/direction into world coordinates (reverse the `local` transformation).
-- `timeAtTrueAnomaly()`: double, trueAnomaly double
+- `timeAtTrueAnomaly()`: [TimeStamp](TimeStamp.md), trueAnomaly double
   - \[`WIP`\] Get time at true anomaly (absolute time of angle from direction of periapsis).
-- `timeToTrueAnomaly()`: double, trueAnomaly double
+- `timeToTrueAnomaly()`: [TimeDelta](TimeDelta.md), trueAnomaly double
   - \[`WIP`\] Get time to true anomaly (relative time of angle from direction of periapsis). [0, period)

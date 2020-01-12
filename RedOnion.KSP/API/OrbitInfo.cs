@@ -67,20 +67,20 @@ namespace RedOnion.KSP.API
 		}
 
 		[Description("Time of start of this patch, if it is continuation. Usually a bit in the past for current orbit without a transition.")]
-		public double startTime => native.StartUT;
+		public TimeStamp startTime => new TimeStamp(native.StartUT);
 		[Description("Time of end of this patch, if there is transition. `period = endTime - startTime` for current orbit without a transition.")]
-		public double endTime => native.EndUT;
+		public TimeStamp endTime => new TimeStamp(native.EndUT);
 
 		[Description("Period of the orbit in seconds.")]
-		public double period => native.period;
+		public TimeDelta period => new TimeDelta(native.period);
 		[Description("Eta to apoapsis in seconds.")]
-		public double timeToAp => timeAtAp - Time.now;
+		public TimeDelta timeToAp => timeAtAp - Time.now;
 		[Description("Eta to periapsis in seconds.")]
-		public double timeToPe => timeAtPe - Time.now;
+		public TimeDelta timeToPe => timeAtPe - Time.now;
 		[Description("Time at apoapsis. `timeToAp + time.now`")]
-		public double timeAtAp => native.timeToAp + native.StartUT;
+		public TimeStamp timeAtAp => new TimeStamp(native.timeToAp + native.StartUT);
 		[Description("Time at periapsis. `timeAtPe + time.now`")]
-		public double timeAtPe => native.timeToPe + native.StartUT;
+		public TimeStamp timeAtPe => new TimeStamp(native.timeToPe + native.StartUT);
 
 		[Description("Eccentricity of current orbit. \\[0, +inf)")]
 		public double eccentricity => native.eccentricity;
@@ -113,11 +113,12 @@ namespace RedOnion.KSP.API
 
 		[WorkInProgress, Description(
 			"Predicted position at specified time."
-			+ " Does not includes the movement of celestial bodies"
-			+ " (like Mun when ship is still in Kerbin's SOI)."
+			+ " Does not include the movement of celestial bodies."
 			+ " See [orbit.png](orbit.png).")]
 		public Vector positionAt(double time) => new Vector(native.getPositionAtUT(time) - FlightGlobals.ActiveVessel.CoMD);
-		[WorkInProgress, Description("Predicted velocity at specified time.")]
+		[WorkInProgress, Description(
+			"Predicted velocity at specified time."
+			+ " Does not include the movement of celestial bodies.")]
 		public Vector velocityAt(double time) => new Vector(native.getOrbitalVelocityAtUT(time).xzy);
 	}
 }

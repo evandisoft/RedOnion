@@ -44,6 +44,20 @@ namespace RedOnion.KSP.API
 		public Node(double time, Vector deltav)
 			: this(Ship.Active, time, deltav) { }
 
+		[Description("Create new maneuver node for active ship, specifying time and optionally prograde, normal and radial delta-v (unspecified are zero).")]
+		public Node(TimeStamp time, double prograde = 0.0, double normal = 0.0, double radial = 0.0)
+			: this(Ship.Active, time, prograde, normal, radial) { }
+		[Description("Create new maneuver node for active ship, specifying time and burn vector. See [`deltav` property](#deltav) for more details.")]
+		public Node(TimeStamp time, Vector deltav)
+			: this(Ship.Active, time, deltav) { }
+
+		[Description("Create new maneuver node for active ship, specifying eta and optionally prograde, normal and radial delta-v (unspecified are zero).")]
+		public Node(TimeDelta eta, double prograde = 0.0, double normal = 0.0, double radial = 0.0)
+			: this(Ship.Active, Time.now + eta, prograde, normal, radial) { }
+		[Description("Create new maneuver node for active ship, specifying eta and burn vector. See [`deltav` property](#deltav) for more details.")]
+		public Node(TimeDelta eta, Vector deltav)
+			: this(Ship.Active, Time.now + eta, deltav) { }
+
 		protected internal Node(Ship ship, ManeuverNode native)
 		{
 			this.native = native;
@@ -65,9 +79,9 @@ namespace RedOnion.KSP.API
 		}
 
 		[Description("Planned time for the maneuver.")]
-		public double time => native.UT;
+		public TimeStamp time => new TimeStamp(native.UT);
 		[Description("Seconds until the maneuver.")]
-		public double eta => native.UT - Time.now;
+		public TimeDelta eta => time - Time.now;
 
 		[Description("Direction and amount of velocity change needed (aka burn-vector)."
 			+ " Note that the vector is relative to the SOI where the node is (not where the ship currently is)."

@@ -139,7 +139,7 @@ autopilot.pids.roll.D = 0.05
 //*/
 
 var minSpeed = null
-var prevSteerReport = -inf
+var prevSteerReport = nan
 def steer
   if ship.altitude <= narrowAltitude
     autopilot.pitch = startAngle
@@ -332,7 +332,7 @@ try
     autopilot.throttle = pwr * e * math.min maxThrottle,
       dvMin * ship.mass / math.max 1, ship.engines.getThrust()
 
-  var prevEtaReport = -10
+  var prevEtaReport = nan
   var switched = false
   var warped = false
   for
@@ -341,7 +341,7 @@ try
     var eta = dt()-0.5*bt
     if time.since(prevEtaReport) >= (eta > 10 and warped ? 10 : eta > 5 ? 2 : 1)
       prevEtaReport = time.now
-      print "ETA: {0:F1}s", eta
+      print "ETA: " + eta
       if eta > 20 and !warped and time.warp.ready
         warped = true
         time.warp.index = 0
@@ -362,7 +362,7 @@ try
   var choked = null
   var warned = 0
   var maxHeight = ship.apoapsis*1.1+1000
-  var prevReport = 0
+  var prevReport = nan
   var lastTta = null
   var pitchDownFactor = 1.0
   print "Burn!"

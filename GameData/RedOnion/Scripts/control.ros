@@ -145,7 +145,8 @@ def control ship, target, x, y
       if dv.size >= 0.01
         var d = dv.angle ship.forward // direction / face-angle error
         var e = d <= 1 ? 1 : math.deg.cos math.min 89.4, d^2.0 // min 0.0105
-        autopilot.throttle = e * math.min ship == global.ship ? user.throttle : 0.5,
+        autopilot.throttle = ship != global.ship ? nan :
+          e * math.min ship == global.ship ? user.throttle : 0.5,
           dv.size * ship.mass / math.max 1, ship.engines.getThrust()
       else
         if ship == global.ship
@@ -204,7 +205,7 @@ def control ship, target, x, y
       return vector.none
     var dv = nde.deltav
     var xt = 0.5 * stage.burnTime dv.size
-    var dt = nde.time - time() - xt
+    var dt = nde.eta - xt
     var d = dv.angle ship.forward // direction / face-angle error
     var e = d <= 1 ? 1 : math.deg.cos math.min 89.4, d^2.0 // min 0.0105
     if dt > 30 and time.warp.ready
