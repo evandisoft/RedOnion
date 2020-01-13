@@ -291,6 +291,10 @@ def control ship, target, x, y
     while node.next != null
       node.next.remove
       wait
+    if our.eccentricity > 0.01
+      print "Warning: our e={0:F5}", our.eccentricity
+    if its.eccentricity > 0.01
+      print "Warning: its e={0:F5}", its.eccentricity
     var r1 = our.semiMajorAxis
     var r2 = its.semiMajorAxis
     var pt = 0.5 * ((r1+r2) / (2*r2))^1.5
@@ -320,6 +324,8 @@ def control ship, target, x, y
     var v1 = our.velocityAt t1
     var p1 = our.positionAt(t1)-our.body.position
     var r1 = p1.size
+  //https://en.wikipedia.org/wiki/Semi-major_and_semi-minor_axes#Orbital_period
+    var r2 = (its.positionAt(t1 + math.pi*math.sqrt(math.max(r1,r2)^3.0/its.body.mu))-its.body.position).size
   //https://en.wikipedia.org/wiki/Orbital_speed#Precise_orbital_speed
     var nv = p1.cross(v1.cross p1).normalized
     var v2 = math.sqrt(our.body.mu*(2/r1-2/(r1+r2))) * nv
@@ -369,6 +375,9 @@ def control ship, target, x, y
     var sn = sv.cross sp // our normal
     var sa = ship.trueAnomaly
     var target = ship.target ?? self.target
+    if target is types.ship and target.landed
+      print "TODO: Incline to landed, Incl.: {0,5:F1}", math.atan 2*math.tan target.latitude
+      target = null
     if target == null or target == ship.body
       print "Incl.: {0,5:F1} Arg.: {1,5:F1}", i0, ship.argumentOfPeriapsis
       di = -i0
