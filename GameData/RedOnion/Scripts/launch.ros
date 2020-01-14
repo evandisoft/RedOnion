@@ -338,7 +338,7 @@ try
   for
     var bt = stage.burnTime dv().size
     if bt != bt; bt = 120 // bt != bt is test for nan
-    var eta = dt()-0.5*bt
+    var eta = time.delta dt()-0.5*bt
     if time.since(prevEtaReport) >= (eta > 10 and warped ? 10 : eta > 5 ? 2 : 1)
       prevEtaReport = time.now
       print "ETA: " + eta

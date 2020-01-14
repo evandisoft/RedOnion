@@ -16,6 +16,6 @@ Time warping utilities
   - Set rate index. Returns false if not possible now.
 - `setRate()`: bool, value float
   - Set rate. Returns false if not possible now.
-- `to()`: bool, time double
+- `to()`: bool, time [TimeStamp](TimeStamp.md)
   - Warp to specified time. Returns true if engaged, false if not ready.
 - `cancel()`: bool - Cancel any warp-to in progress. Returns true if it was canceled, false if no warp was in progress.

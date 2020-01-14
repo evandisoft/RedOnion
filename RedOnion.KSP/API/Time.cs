@@ -20,9 +20,9 @@ namespace RedOnion.KSP.API
 		public static TimeStamp now => new TimeStamp(Planetarium.GetUniversalTime());
 		[Description("No time (contains `NaN`). Useful for initialization of time-stamp variables as `since(none) = inf`.")]
 		public static TimeStamp none => TimeStamp.none;
-
 		[Description("The simulation time in seconds, since the game or this save was started. For pure computation (same as `now.seconds`).")]
 		public static double seconds => Planetarium.GetUniversalTime();
+
 		[Description("Time delta/span since some previous time.  Returns `infinite` if `time` is `none`. (Use `.seconds` on the result or `secondsSince` function if you want pure `double` value).")]
 		public static TimeDelta since(TimeStamp time)
 			=> new TimeDelta(double.IsNaN(time.seconds)
@@ -38,6 +38,11 @@ namespace RedOnion.KSP.API
 			=> double.IsNaN(time.seconds)
 			? double.PositiveInfinity
 			: now.seconds - time.seconds;
+		[Description("Version of `secondsSince` accepting double - for compatibility and variables initialized to `NaN` or `-inf`.")]
+		public static double secondsSince(double time)
+			=> double.IsNaN(time)
+			? double.PositiveInfinity
+			: now.seconds - time;
 
 		[Description("Time delta/span of one tick. (Script engine always runs in physics ticks.)")]
 		public static TimeDelta tick => new TimeDelta(KSPTW.fixedDeltaTime);
@@ -165,6 +170,8 @@ namespace RedOnion.KSP.API
 	{
 		[Description("The contained value - seconds since start of the game (or save).")]
 		public double seconds;
+		[Description("Shortcut for `seconds`.")]
+		public double s { get => seconds; set => seconds = value; }
 		public TimeStamp(double seconds) => this.seconds = seconds;
 		public static implicit operator double(TimeStamp stamp) => stamp.seconds;
 		public static explicit operator TimeStamp(double seconds) => new TimeStamp(seconds);
@@ -172,7 +179,7 @@ namespace RedOnion.KSP.API
 		[Description("The time-stamp separated into parts (second, hour, ...).")]
 		public TimeParts parts => new TimeParts(seconds);
 
-		[Description("No time (contains `NaN`). Useful for initialization of time-stamp variables as `time.since(none) = inf`.")]
+		[Description("No time (contains `NaN`). Useful for initialization of time-stamp variables because `time.since(none) = inf`.")]
 		public static readonly TimeStamp none = new TimeStamp(double.NaN);
 
 		public static TimeStamp operator +(TimeStamp stamp, TimeDelta delta) => new TimeStamp(stamp.seconds + delta.seconds);
@@ -292,6 +299,8 @@ namespace RedOnion.KSP.API
 	{
 		[Description("The contained value - total seconds.")]
 		public double seconds;
+		[Description("Shortcut for `seconds`.")]
+		public double s { get => seconds; set => seconds = value; }
 		[Description("Create new time-delta/span given seconds.")]
 		public TimeDelta(double seconds) => this.seconds = seconds;
 		public static implicit operator double(TimeDelta span) => span.seconds;
@@ -310,14 +319,26 @@ namespace RedOnion.KSP.API
 		[Description("Total minutes (`seconds / 60`).")]
 		public double minutes
 		{
-			get => seconds * (1.0/60.0);
-			set => seconds = value * 60.0;
+			get => seconds * (1.0/60);
+			set => seconds = value * 60;
 		}
 		[Description("Total hours (`seconds / 3600`).")]
 		public double hours
 		{
-			get => seconds * (1.0/3600.0);
-			set => seconds = value * 3600.0;
+			get => seconds * (1.0/3600);
+			set => seconds = value * 3600;
+		}
+		[Description("Total days (`hours / 6` - Kerbal day has only 6 hours).")]
+		public double days
+		{
+			get => seconds * (1.0/21600);
+			set => seconds = value * 21600;
+		}
+		[Description("Total days (`days / 426` - Kerbal year has 426 days).")]
+		public double years
+		{
+			get => seconds * (1.0/9201600);
+			set => seconds = value * 9201600;
 		}
 
 		public static TimeDelta operator +(TimeDelta delta) => delta;
@@ -347,11 +368,11 @@ namespace RedOnion.KSP.API
 		public static bool operator >(double seconds, TimeDelta delta) => seconds > delta.seconds;
 		public static bool operator <(double seconds, TimeDelta delta) => seconds < delta.seconds;
 
-		public static TimeDelta operator +(TimeDelta delta, double seconds) => new TimeDelta(delta.seconds + seconds);
-		public static TimeDelta operator -(TimeDelta delta, double seconds) => new TimeDelta(delta.seconds - seconds);
-		public static TimeDelta operator *(TimeDelta delta, double seconds) => new TimeDelta(delta.seconds * seconds);
-		public static TimeDelta operator /(TimeDelta delta, double seconds) => new TimeDelta(delta.seconds / seconds);
-		public static TimeDelta operator %(TimeDelta delta, double seconds) => new TimeDelta(delta.seconds % seconds);
+		public static double operator +(TimeDelta delta, double seconds) => delta.seconds + seconds;
+		public static double operator -(TimeDelta delta, double seconds) => delta.seconds - seconds;
+		public static double operator *(TimeDelta delta, double seconds) => delta.seconds * seconds;
+		public static double operator /(TimeDelta delta, double seconds) => delta.seconds / seconds;
+		public static double operator %(TimeDelta delta, double seconds) => delta.seconds % seconds;
 
 		public static double operator +(double seconds, TimeDelta delta) => seconds + delta.seconds;
 		public static double operator -(double seconds, TimeDelta delta) => seconds - delta.seconds;
@@ -389,14 +410,10 @@ namespace RedOnion.KSP.API
 		bool IOperators.Binary(ref Value lhs, OpCode op, ref Value rhs)
 		{
 			double a, b;
-			bool second = false;
 			if (lhs.desc.Type == typeof(TimeDelta))
 				a = ((TimeDelta)lhs.obj).seconds;
 			else if (lhs.desc.IsNumber)
-			{
 				a = lhs.ToDouble();
-				second = true;
-			}
 			else return false;
 			if (rhs.desc.Type == typeof(TimeDelta))
 				b = ((TimeDelta)rhs.obj).seconds;
@@ -406,23 +423,23 @@ namespace RedOnion.KSP.API
 			switch (op)
 			{
 			case OpCode.Add:
-				lhs = second ? new Value(a + b) : new Value(lhs.desc, new TimeDelta(a + b));
+				lhs = a + b;
 				return true;
 			case OpCode.Sub:
-				lhs = second ? new Value(a - b) : new Value(lhs.desc, new TimeDelta(a - b));
+				lhs = a - b;
 				return true;
 			case OpCode.Mul:
-				lhs = second ? new Value(a * b) : new Value(lhs.desc, new TimeDelta(a * b));
+				lhs = a * b;
 				return true;
 			case OpCode.Div:
-				lhs = second ? new Value(a / b) : new Value(lhs.desc, new TimeDelta(a / b));
+				lhs = a / b;
 				return true;
 			case OpCode.Mod:
-				lhs = second ? new Value(a % b) : new Value(lhs.desc, new TimeDelta(a % b));
+				lhs = a % b;
 				return true;
 			case OpCode.Power:
 			case OpCode.BitXor:
-				lhs = second ? new Value(Math.Pow(a, b)) : new Value(lhs.desc, new TimeDelta(Math.Pow(a, b)));
+				lhs = Math.Pow(a, b);
 				return true;
 
 			case OpCode.Equals:
