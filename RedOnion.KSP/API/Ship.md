@@ -32,11 +32,11 @@ Active vessel
 - `q`: double - Dynamic pressure [atm = 101.325kPa]
 - `body`: [SpaceBody](SpaceBody.md) - Orbited body.
 - `orbit`: [OrbitInfo](OrbitInfo.md) - \[`WIP`\] Orbit parameters.
-- `period`: [TimeDelta](TimeDelta.md) - Period of current orbit in seconds.
-- `timeToAp`: [TimeDelta](TimeDelta.md) - Eta to apoapsis in seconds.
-- `timeToPe`: [TimeDelta](TimeDelta.md) - Eta to periapsis in seconds.
-- `timeAtAp`: [TimeStamp](TimeStamp.md) - Time at apoapsis. `timeToAp + time.now`
-- `timeAtPe`: [TimeStamp](TimeStamp.md) - Time at periapsis. `timeAtPe + time.now`
+- `period`: [TimeDelta](TimeDelta.md) - Period of current orbit in seconds. Alias to `orbit.period`.
+- `timeToAp`: [TimeDelta](TimeDelta.md) - Eta to apoapsis in seconds. Alias to `orbit.timeToAp`.
+- `timeToPe`: [TimeDelta](TimeDelta.md) - Eta to periapsis in seconds. Alias to `orbit.timeToPe`.
+- `timeAtAp`: [TimeStamp](TimeStamp.md) - Time at apoapsis. Alias to `orbit.timeAtAp`.
+- `timeAtPe`: [TimeStamp](TimeStamp.md) - Time at periapsis. Alias to `orbit.timeAtPe`.
 - `eccentricity`: double - Eccentricity of current orbit. \[0, +inf)
 - `inclination`: double - Inclination of current orbit. \[0, 180)
 - `semiMajorAxis`: double - Semi-major axis of current orbit.

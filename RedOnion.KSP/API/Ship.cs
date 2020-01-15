@@ -302,16 +302,16 @@ namespace RedOnion.KSP.API
 			}
 		}
 
-		[Description("Period of current orbit in seconds.")]
+		[Description("Period of current orbit in seconds. Alias to `orbit.period`.")]
 		public TimeDelta period => new TimeDelta(native.orbit.period);
-		[Description("Eta to apoapsis in seconds.")]
-		public TimeDelta timeToAp => timeAtAp - Time.now;
-		[Description("Eta to periapsis in seconds.")]
-		public TimeDelta timeToPe => timeAtPe - Time.now;
-		[Description("Time at apoapsis. `timeToAp + time.now`")]
-		public TimeStamp timeAtAp => new TimeStamp(native.orbit.timeToAp + native.orbit.StartUT);
-		[Description("Time at periapsis. `timeAtPe + time.now`")]
-		public TimeStamp timeAtPe => new TimeStamp(native.orbit.timeToPe + native.orbit.StartUT);
+		[Description("Eta to apoapsis in seconds. Alias to `orbit.timeToAp`.")]
+		public TimeDelta timeToAp => orbit.timeToAp;
+		[Description("Eta to periapsis in seconds. Alias to `orbit.timeToPe`.")]
+		public TimeDelta timeToPe => orbit.timeToPe;
+		[Description("Time at apoapsis. Alias to `orbit.timeAtAp`.")]
+		public TimeStamp timeAtAp => orbit.timeAtAp;
+		[Description("Time at periapsis. Alias to `orbit.timeAtPe`.")]
+		public TimeStamp timeAtPe => orbit.timeAtPe;
 
 		[Description("Eccentricity of current orbit. \\[0, +inf)")]
 		public double eccentricity => native.orbit.eccentricity;

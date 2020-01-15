@@ -9,13 +9,13 @@ Orbit/patch parameters.
 - `encounter`: bool - \[`WIP`\] This orbit-patch ends by encounter with another celestial body.
 - `escape`: bool - \[`WIP`\] This orbit-patch ends by escaping the SOI.
 - `next`: OrbitInfo - Next patch if there is some transition (null otherwise).
-- `startTime`: [TimeStamp](TimeStamp.md) - Time of start of this patch, if it is continuation. Usually a bit in the past for current orbit without a transition.
-- `endTime`: [TimeStamp](TimeStamp.md) - Time of end of this patch, if there is transition. `period = endTime - startTime` for current orbit without a transition.
+- `startTime`: [TimeStamp](TimeStamp.md) - Time of start of this patch, if it is continuation, `time.now` otherwise (can be one tick old - 0.02s in the past).
+- `endTime`: [TimeStamp](TimeStamp.md) - Time of end of this patch, if there is transition. `endTime = startTime + period` for current orbit without a transition.
 - `period`: [TimeDelta](TimeDelta.md) - Period of the orbit in seconds.
-- `timeToAp`: [TimeDelta](TimeDelta.md) - Eta to apoapsis in seconds.
-- `timeToPe`: [TimeDelta](TimeDelta.md) - Eta to periapsis in seconds.
+- `timeToAp`: [TimeDelta](TimeDelta.md) - Eta to apoapsis in seconds. `timeAtAp - time.now`
+- `timeToPe`: [TimeDelta](TimeDelta.md) - Eta to periapsis in seconds. `timeAtPe - time.now`
 - `timeAtAp`: [TimeStamp](TimeStamp.md) - Time at apoapsis. `timeToAp + time.now`
-- `timeAtPe`: [TimeStamp](TimeStamp.md) - Time at periapsis. `timeAtPe + time.now`
+- `timeAtPe`: [TimeStamp](TimeStamp.md) - Time at periapsis. `timeToPe + time.now`
 - `eccentricity`: double - Eccentricity of current orbit. \[0, +inf)
 - `inclination`: double - Inclination of current orbit. \[0, 180)
 - `semiMajorAxis`: double - Semi-major axis of current orbit.
@@ -32,6 +32,6 @@ Orbit/patch parameters.
 
 **Instance Methods:**
 - `positionAt()`: [Vector](Vector.md), time double
-  - \[`WIP`\] Predicted position at specified time. Does not include the movement of celestial bodies. See [orbit.png](orbit.png).
+  - Predicted position at specified time. Does not include the movement of celestial bodies. See [orbit.png](orbit.png).
 - `velocityAt()`: [Vector](Vector.md), time double
-  - \[`WIP`\] Predicted velocity at specified time. Does not include the movement of celestial bodies.
+  - Predicted velocity at specified time. Does not include the movement of celestial bodies.

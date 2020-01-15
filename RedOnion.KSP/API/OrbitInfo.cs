@@ -27,6 +27,10 @@ namespace RedOnion.KSP.API
 			}
 			return orbit;
 		}
+		public static double GetTime(this Orbit orbit, TimeStamp time)
+			=> GetTime(orbit, time.seconds);
+		public static double GetTime(this Orbit orbit, double utime)
+			=> double.IsNaN(utime) || double.IsInfinity(utime) ? utime : orbit.getObtAtUT(utime);
 	}
 
 	[WorkInProgress, Description("Orbit/patch parameters.")]
@@ -66,21 +70,31 @@ namespace RedOnion.KSP.API
 			}
 		}
 
-		[Description("Time of start of this patch, if it is continuation. Usually a bit in the past for current orbit without a transition.")]
-		public TimeStamp startTime => new TimeStamp(native.StartUT);
-		[Description("Time of end of this patch, if there is transition. `period = endTime - startTime` for current orbit without a transition.")]
-		public TimeStamp endTime => new TimeStamp(native.EndUT);
+		[Description("Time of start of this patch, if it is continuation, `time.now` otherwise (can be one tick old - 0.02s in the past).")]
+		public TimeStamp startTime
+		{
+			get
+			{
+				var ut = native.StartUT;
+				if (ut == 0.0) // solver probably not attached, can be early stage before patches are visible
+					ut = Planetarium.GetUniversalTime();
+				return new TimeStamp(ut);
+			}
+		}
+		[Description("Time of end of this patch, if there is transition. `endTime = startTime + period` for current orbit without a transition.")]
+		public TimeStamp endTime
+			=> native.StartUT == 0.0 ? Time.now + native.period : new TimeStamp(native.EndUT);
 
 		[Description("Period of the orbit in seconds.")]
 		public TimeDelta period => new TimeDelta(native.period);
-		[Description("Eta to apoapsis in seconds.")]
+		[Description("Eta to apoapsis in seconds. `timeAtAp - time.now`")]
 		public TimeDelta timeToAp => timeAtAp - Time.now;
-		[Description("Eta to periapsis in seconds.")]
+		[Description("Eta to periapsis in seconds. `timeAtPe - time.now`")]
 		public TimeDelta timeToPe => timeAtPe - Time.now;
 		[Description("Time at apoapsis. `timeToAp + time.now`")]
-		public TimeStamp timeAtAp => new TimeStamp(native.timeToAp + native.StartUT);
-		[Description("Time at periapsis. `timeAtPe + time.now`")]
-		public TimeStamp timeAtPe => new TimeStamp(native.timeToPe + native.StartUT);
+		public TimeStamp timeAtAp => startTime + native.timeToAp;
+		[Description("Time at periapsis. `timeToPe + time.now`")]
+		public TimeStamp timeAtPe => endTime + native.GetTimeToPeriapsis();
 
 		[Description("Eccentricity of current orbit. \\[0, +inf)")]
 		public double eccentricity => native.eccentricity;
@@ -111,12 +125,12 @@ namespace RedOnion.KSP.API
 		[Description("Argument of periapsis. Angle from ascending node to periapsis.")]
 		public double aop => native.argumentOfPeriapsis;
 
-		[WorkInProgress, Description(
+		[Description(
 			"Predicted position at specified time."
 			+ " Does not include the movement of celestial bodies."
 			+ " See [orbit.png](orbit.png).")]
 		public Vector positionAt(double time) => new Vector(native.getPositionAtUT(time) - FlightGlobals.ActiveVessel.CoMD);
-		[WorkInProgress, Description(
+		[Description(
 			"Predicted velocity at specified time."
 			+ " Does not include the movement of celestial bodies.")]
 		public Vector velocityAt(double time) => new Vector(native.getOrbitalVelocityAtUT(time).xzy);
