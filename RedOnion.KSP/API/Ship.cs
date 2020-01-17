@@ -562,39 +562,63 @@ namespace RedOnion.KSP.API
 		}
 		[WorkInProgress, Description(
 			"Predicted position at specified time."
-			+ " Includes the movement of moons (e.g. Mun) when ship is currently orbiting the planet (e.g. Kerbin)."
-			+ " Use `orbitAt(time).positionAt(time)` if that is not desired."
+			+ " Includes the movement of bodies (e.g. Mun or Ike) when ship is currently orbiting the (grand)parent (e.g. Kerbin or Sun/Kerbol)."
+			+ " This method is trying to be reasonably smooth/continuous, use `orbitAt(time).positionAt(time)` if that is not desired."
 			+ " See [orbit.png](orbit.png).")]
 		public Vector positionAt(TimeStamp time)
 		{
 			var orbit = native.orbit.GetOrbitAt(time);
 			var pos = orbit.getPositionAtUT(time);
-			if (orbit.referenceBody != native.orbit.referenceBody)
+			var our = native.orbit.referenceBody;
+			var its = orbit.referenceBody;
+			if (our != its)
 			{// need to adjust the position by the motion of the reference body
-				if (orbit.referenceBody.referenceBody == native.orbit.referenceBody)
+			 // note: Sun/Kerbol's reference body may be itself, the logic accounts for this
+				var inner = its.referenceBody;
+				if (inner == our)
 				{// target body is orbiting current body (e.g. from Kerbin to Mun)
-					pos += orbit.referenceBody.getPositionAtUT(time) - orbit.referenceBody.position;
+					pos += its.getPositionAtUT(time) - its.position;
 				}
-				// TODO: else... some other adjustment may be needed
+				else if (inner != null)
+				{
+					var deep = inner.referenceBody;
+					if (deep == our)
+					{// target body is orbiting a body that is orbitin current body (e.g. Ike or Gilly when still in Sun/Kerbol's SOI)
+						pos += its.getPositionAtUT(time) - its.position;
+						pos += deep.getPositionAtUT(time) - deep.position;
+					}
+				}
 			}
 			return new Vector(pos - FlightGlobals.ActiveVessel.CoMD);
 		}
 		[WorkInProgress, Description(
 			"Predicted velocity at specified time."
-			+ " Includes the movement of moons (e.g. Mun) when ship is currently orbiting the planet (e.g. Kerbin)."
-			+ " Use `orbitAt(time).velocityAt(time)` if that is not desired."
+			+ " Includes the movement of bodies (e.g. Mun or Ike) when ship is currently orbiting the (grand)parent (e.g. Kerbin or Sun/Kerbol)."
+			+ " This method is trying to be reasonably smooth/continuous, use `orbitAt(time).velocityAt(time)` if that is not desired."
 			+ " See [orbit.png](orbit.png).")]
 		public Vector velocityAt(TimeStamp time)
 		{
 			var orbit = native.orbit.GetOrbitAt(time);
 			var vel = orbit.getOrbitalVelocityAtUT(time);
-			if (orbit.referenceBody != native.orbit.referenceBody)
-			{// need to adjust the position by the motion of the reference body
-				if (orbit.referenceBody.referenceBody == native.orbit.referenceBody)
+			var our = native.orbit.referenceBody;
+			var its = orbit.referenceBody;
+			if (our != its)
+			{// need to adjust the velocity by the motion of the reference body
+			 // note: Sun/Kerbol's reference body may be itself, the logic accounts for this
+				var inner = its.referenceBody;
+				if (inner == our)
 				{// target body is orbiting current body (e.g. from Kerbin to Mun)
-					vel += orbit.referenceBody.orbit.getOrbitalVelocityAtUT(time);
+					vel += its.orbit.getOrbitalVelocityAtUT(time);
 				}
-				// TODO: else... some other adjustment may be needed
+				else if (inner != null)
+				{
+					var deep = inner.referenceBody;
+					if (deep == our)
+					{// target body is orbiting a body that is orbitin current body (e.g. Ike or Gilly when still in Sun/Kerbol's SOI)
+						vel += its.orbit.getOrbitalVelocityAtUT(time);
+						vel += deep.orbit.getOrbitalVelocityAtUT(time);
+					}
+				}
 			}
 			return new Vector(vel.xzy);
 		}

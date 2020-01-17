@@ -94,7 +94,7 @@ namespace RedOnion.KSP.API
 		[Description("Time at apoapsis. `timeToAp + time.now`")]
 		public TimeStamp timeAtAp => startTime + native.timeToAp;
 		[Description("Time at periapsis. `timeToPe + time.now`")]
-		public TimeStamp timeAtPe => endTime + native.GetTimeToPeriapsis();
+		public TimeStamp timeAtPe => startTime + native.timeToPe;
 
 		[Description("Eccentricity of current orbit. \\[0, +inf)")]
 		public double eccentricity => native.eccentricity;
@@ -129,10 +129,10 @@ namespace RedOnion.KSP.API
 			"Predicted position at specified time."
 			+ " Does not include the movement of celestial bodies."
 			+ " See [orbit.png](orbit.png).")]
-		public Vector positionAt(double time) => new Vector(native.getPositionAtUT(time) - FlightGlobals.ActiveVessel.CoMD);
+		public Vector positionAt(TimeStamp time) => new Vector(native.getPositionAtUT(time) - FlightGlobals.ActiveVessel.CoMD);
 		[Description(
 			"Predicted velocity at specified time."
 			+ " Does not include the movement of celestial bodies.")]
-		public Vector velocityAt(double time) => new Vector(native.getOrbitalVelocityAtUT(time).xzy);
+		public Vector velocityAt(TimeStamp time) => new Vector(native.getOrbitalVelocityAtUT(time).xzy);
 	}
 }

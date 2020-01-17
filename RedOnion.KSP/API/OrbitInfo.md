@@ -31,7 +31,7 @@ Orbit/patch parameters.
 - `aop`: double - Argument of periapsis. Angle from ascending node to periapsis.
 
 **Instance Methods:**
-- `positionAt()`: [Vector](Vector.md), time double
+- `positionAt()`: [Vector](Vector.md), time [TimeStamp](TimeStamp.md)
   - Predicted position at specified time. Does not include the movement of celestial bodies. See [orbit.png](orbit.png).
-- `velocityAt()`: [Vector](Vector.md), time double
+- `velocityAt()`: [Vector](Vector.md), time [TimeStamp](TimeStamp.md)
   - Predicted velocity at specified time. Does not include the movement of celestial bodies.

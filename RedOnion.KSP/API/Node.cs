@@ -66,22 +66,42 @@ namespace RedOnion.KSP.API
 
 		protected internal Node(Ship ship, double time, double prograde = 0.0, double normal = 0.0, double radial = 0.0)
 		{
-			native = ship.native.patchedConicSolver.AddManeuverNode(time);
+			native = ship.native.patchedConicSolver.AddManeuverNode(CheckTime(time));
 			this.ship = ship;
 			nativeDeltaV = new Vector3d(radial, normal, prograde);
 		}
 
 		protected internal Node(Ship ship, double time, Vector deltav)
 		{
-			native = ship.native.patchedConicSolver.AddManeuverNode(time);
+			native = ship.native.patchedConicSolver.AddManeuverNode(CheckTime(time));
 			this.ship = ship;
 			this.deltav = deltav;
 		}
 
+		protected double CheckTime(double time)
+			=> double.IsNaN(time) ? throw new InvalidOperationException("Node time cannot be NaN")
+			: double.IsInfinity(time) ? throw new InvalidOperationException("Node time cannot be Inf")
+			: time;
+
 		[Description("Planned time for the maneuver.")]
-		public TimeStamp time => new TimeStamp(native.UT);
+		public TimeStamp time
+		{
+			get => new TimeStamp(native.UT);
+			set
+			{
+				var s = CheckTime(value);
+				native.UT = value;
+				if (native.attachedGizmo != null)
+					native.attachedGizmo.UT = s;
+				ship.native.patchedConicSolver.UpdateFlightPlan();
+			}
+		}
 		[Description("Seconds until the maneuver.")]
-		public TimeDelta eta => time - Time.now;
+		public TimeDelta eta
+		{
+			get => time - Time.now;
+			set => time = Time.now + value;
+		}
 
 		[Description("Direction and amount of velocity change needed (aka burn-vector)."
 			+ " Note that the vector is relative to the SOI where the node is (not where the ship currently is)."
@@ -152,5 +172,18 @@ namespace RedOnion.KSP.API
 		}
 		[Description("Remove/delete the node.")]
 		public void delete() => remove();
+
+		OrbitInfo _orbit;
+		[WorkInProgress, Description("Orbit parameters after the node.")]
+		public OrbitInfo orbit
+		{
+			get
+			{
+				if (_orbit == null)
+					_orbit = new OrbitInfo(native.nextPatch);
+				else _orbit.native = native.nextPatch;
+				return _orbit;
+			}
+		}
 	}
 }

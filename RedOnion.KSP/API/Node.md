@@ -27,6 +27,7 @@ Maneuver node.
 - `prograde`: double - Amount of velocity change in prograde direction.
 - `normal`: double - Amount of velocity change in normal direction.
 - `radial`: double - Amount of velocity change in radial-out direction.
+- `orbit`: [OrbitInfo](OrbitInfo.md) - \[`WIP`\] Orbit parameters after the node.
 
 **Static Properties:**
 - `next`: Node - Next maneuver node of active ship. Null if none or in wrong scene.

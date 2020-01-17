@@ -82,9 +82,9 @@ Note that it can change violently when facing up or down.
 - `orbitAt()`: [OrbitInfo](OrbitInfo.md), time [TimeStamp](TimeStamp.md)
   - \[`WIP`\] Get orbit info relevant for given time. See [orbit.png](orbit.png).
 - `positionAt()`: [Vector](Vector.md), time [TimeStamp](TimeStamp.md)
-  - \[`WIP`\] Predicted position at specified time. Includes the movement of moons (e.g. Mun) when ship is currently orbiting the planet (e.g. Kerbin). Use `orbitAt(time).positionAt(time)` if that is not desired. See [orbit.png](orbit.png).
+  - \[`WIP`\] Predicted position at specified time. Includes the movement of bodies (e.g. Mun or Ike) when ship is currently orbiting the (grand)parent (e.g. Kerbin or Sun/Kerbol). This method is trying to be reasonably smooth/continuous, use `orbitAt(time).positionAt(time)` if that is not desired. See [orbit.png](orbit.png).
 - `velocityAt()`: [Vector](Vector.md), time [TimeStamp](TimeStamp.md)
-  - \[`WIP`\] Predicted velocity at specified time. Includes the movement of moons (e.g. Mun) when ship is currently orbiting the planet (e.g. Kerbin). Use `orbitAt(time).velocityAt(time)` if that is not desired. See [orbit.png](orbit.png).
+  - \[`WIP`\] Predicted velocity at specified time. Includes the movement of bodies (e.g. Mun or Ike) when ship is currently orbiting the (grand)parent (e.g. Kerbin or Sun/Kerbol). This method is trying to be reasonably smooth/continuous, use `orbitAt(time).velocityAt(time)` if that is not desired. See [orbit.png](orbit.png).
 - `local()`: [Vector](Vector.md), v [Vector](Vector.md)
   - Translate vector/direction into ship-local coordinates (like looking at it from the cockpit - or rather from the controlling part).
 - `world()`: [Vector](Vector.md), v [Vector](Vector.md)
