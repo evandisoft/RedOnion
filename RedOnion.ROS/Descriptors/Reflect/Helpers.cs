@@ -175,6 +175,8 @@ namespace RedOnion.ROS
 			return null;
 		}
 
+		internal static readonly MethodInfo ValueToObject
+			= typeof(Value).GetMethod("Box");
 		internal static readonly MethodInfo ValueToInt
 			= typeof(Value).GetMethod("ToInt");
 		internal static readonly MethodInfo ValueToUInt
@@ -222,11 +224,8 @@ namespace RedOnion.ROS
 					return GetConvertExpression(Expression.Call(expr, ValueToInt), type);
 			}
 			if (type == typeof(object))
-				return Expression.Field(expr, "obj");
-			return GetConvertExpression(type.IsAssignableFrom(expr.Type)
-				? (Expression)Expression.Field(expr, "obj")
-				: Expression.Call(expr, ValueToType, Expression.Constant(type)),
-				type);
+				return Expression.Call(expr, ValueToObject);
+			return GetConvertExpression(Expression.Call(expr, ValueToType, Expression.Constant(type)), type);
 		}
 
 		internal static readonly ParameterExpression SelfParameter

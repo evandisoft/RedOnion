@@ -23,6 +23,8 @@ namespace RedOnion.KSP.API
 		[Description("The simulation time in seconds, since the game or this save was started. For pure computation (same as `now.seconds`).")]
 		public static double seconds => Planetarium.GetUniversalTime();
 
+		/* this would currently cause problems in MunSharp as it cannot handle overloads in this kind of API (static class)
+
 		[Description("Time delta/span since some previous time.  Returns `infinite` if `time` is `none`. (Use `.seconds` on the result or `secondsSince` function if you want pure `double` value).")]
 		public static TimeDelta since(TimeStamp time)
 			=> new TimeDelta(double.IsNaN(time.seconds)
@@ -33,16 +35,16 @@ namespace RedOnion.KSP.API
 			=> new TimeDelta(double.IsNaN(time)
 			? double.PositiveInfinity
 			: now.seconds - time);
-		[Description("Seconds since some previous time. Returns `+Inf` if `time` is `NaN`.")]
-		public static double secondsSince(TimeStamp time)
-			=> double.IsNaN(time.seconds)
-			? double.PositiveInfinity
-			: now.seconds - time.seconds;
-		[Description("Version of `secondsSince` accepting double - for compatibility and variables initialized to `NaN` or `-inf`.")]
-		public static double secondsSince(double time)
-			=> double.IsNaN(time)
-			? double.PositiveInfinity
-			: now.seconds - time;
+
+		so we handle it differently: */
+		[Description("Time delta/span since some previous time (`TimeStamp` or `double`). Returns `infinite` if `time` is `none`. (Use `.s` or `.seconds` on the result if you want pure `double` value).")]
+		public static TimeDelta since(object time)
+		{
+			if (!(time is IConvertible convertible))
+				throw new ArgumentException("Not convertible (expected TimeStamp or double).", nameof(time));
+			var seconds = convertible.ToDouble(Value.Culture);
+			return new TimeDelta(double.IsNaN(seconds) ? double.PositiveInfinity : now.seconds - seconds);
+		}
 
 		[Description("Time delta/span of one tick. (Script engine always runs in physics ticks.)")]
 		public static TimeDelta tick => new TimeDelta(KSPTW.fixedDeltaTime);
@@ -166,7 +168,7 @@ namespace RedOnion.KSP.API
 	}
 
 	[Description("Absolute time (and date). (Like `DateTime`)")]
-	public struct TimeStamp : IEquatable<TimeStamp>, IComparable<TimeStamp>, IConvert, IOperators
+	public struct TimeStamp : IEquatable<TimeStamp>, IComparable<TimeStamp>, IConvert, IOperators, IConvertible
 	{
 		[Description("The contained value - seconds since start of the game (or save).")]
 		public double seconds;
@@ -293,9 +295,27 @@ namespace RedOnion.KSP.API
 			int year = p.negative ? -p.year-1 : p.year+1;
 			return Value.Format($"{year:D2}/{p.day+1:D3} {p.hour:D2}:{p.minute:D2}:{p.second:D2}");
 		}
+
+		double IConvertible.ToDouble(IFormatProvider provider) => seconds;
+		TypeCode IConvertible.GetTypeCode() => TypeCode.Double;
+		bool IConvertible.ToBoolean(IFormatProvider provider) => ((IConvertible)seconds).ToBoolean(provider);
+		char IConvertible.ToChar(IFormatProvider provider) => ((IConvertible)seconds).ToChar(provider);
+		sbyte IConvertible.ToSByte(IFormatProvider provider) => ((IConvertible)seconds).ToSByte(provider);
+		byte IConvertible.ToByte(IFormatProvider provider) => ((IConvertible)seconds).ToByte(provider);
+		short IConvertible.ToInt16(IFormatProvider provider) => ((IConvertible)seconds).ToInt16(provider);
+		ushort IConvertible.ToUInt16(IFormatProvider provider) => ((IConvertible)seconds).ToUInt16(provider);
+		int IConvertible.ToInt32(IFormatProvider provider) => ((IConvertible)seconds).ToInt32(provider);
+		uint IConvertible.ToUInt32(IFormatProvider provider) => ((IConvertible)seconds).ToUInt32(provider);
+		long IConvertible.ToInt64(IFormatProvider provider) => ((IConvertible)seconds).ToInt64(provider);
+		ulong IConvertible.ToUInt64(IFormatProvider provider) => ((IConvertible)seconds).ToUInt64(provider);
+		float IConvertible.ToSingle(IFormatProvider provider) => ((IConvertible)seconds).ToSingle(provider);
+		decimal IConvertible.ToDecimal(IFormatProvider provider) => ((IConvertible)seconds).ToDecimal(provider);
+		DateTime IConvertible.ToDateTime(IFormatProvider provider) => ((IConvertible)seconds).ToDateTime(provider);
+		string IConvertible.ToString(IFormatProvider provider) => seconds.ToString(provider);
+		object IConvertible.ToType(Type conversionType, IFormatProvider provider) => ((IConvertible)seconds).ToType(conversionType, provider);
 	}
 	[Description("Relative time. (Like `TimeSpan`)")]
-	public struct TimeDelta : IEquatable<TimeDelta>, IComparable<TimeDelta>, IFormattable, IConvert, IOperators
+	public struct TimeDelta : IEquatable<TimeDelta>, IComparable<TimeDelta>, IFormattable, IConvert, IOperators, IConvertible
 	{
 		[Description("The contained value - total seconds.")]
 		public double seconds;
@@ -520,6 +540,24 @@ namespace RedOnion.KSP.API
 			}
 			return ToString();
 		}
+
+		double IConvertible.ToDouble(IFormatProvider provider) => seconds;
+		TypeCode IConvertible.GetTypeCode() => TypeCode.Double;
+		bool IConvertible.ToBoolean(IFormatProvider provider) => ((IConvertible)seconds).ToBoolean(provider);
+		char IConvertible.ToChar(IFormatProvider provider) => ((IConvertible)seconds).ToChar(provider);
+		sbyte IConvertible.ToSByte(IFormatProvider provider) => ((IConvertible)seconds).ToSByte(provider);
+		byte IConvertible.ToByte(IFormatProvider provider) => ((IConvertible)seconds).ToByte(provider);
+		short IConvertible.ToInt16(IFormatProvider provider) => ((IConvertible)seconds).ToInt16(provider);
+		ushort IConvertible.ToUInt16(IFormatProvider provider) => ((IConvertible)seconds).ToUInt16(provider);
+		int IConvertible.ToInt32(IFormatProvider provider) => ((IConvertible)seconds).ToInt32(provider);
+		uint IConvertible.ToUInt32(IFormatProvider provider) => ((IConvertible)seconds).ToUInt32(provider);
+		long IConvertible.ToInt64(IFormatProvider provider) => ((IConvertible)seconds).ToInt64(provider);
+		ulong IConvertible.ToUInt64(IFormatProvider provider) => ((IConvertible)seconds).ToUInt64(provider);
+		float IConvertible.ToSingle(IFormatProvider provider) => ((IConvertible)seconds).ToSingle(provider);
+		decimal IConvertible.ToDecimal(IFormatProvider provider) => ((IConvertible)seconds).ToDecimal(provider);
+		DateTime IConvertible.ToDateTime(IFormatProvider provider) => ((IConvertible)seconds).ToDateTime(provider);
+		string IConvertible.ToString(IFormatProvider provider) => seconds.ToString(provider);
+		object IConvertible.ToType(Type conversionType, IFormatProvider provider) => ((IConvertible)seconds).ToType(conversionType, provider);
 	}
 
 	[Description("TimeSpan or TimeDelta converted to its parts - hours, minutes, seconds etc.")]

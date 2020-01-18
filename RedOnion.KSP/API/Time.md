@@ -16,11 +16,5 @@ The simulation time, in seconds, since the game or this save was started. Return
 - `tick`: [TimeDelta](TimeDelta.md) - Time delta/span of one tick. (Script engine always runs in physics ticks.)
 
 **Static Methods:**
-- `since()`: [TimeDelta](TimeDelta.md), time [TimeStamp](TimeStamp.md)
-  - Time delta/span since some previous time.  Returns `infinite` if `time` is `none`. (Use `.seconds` on the result or `secondsSince` function if you want pure `double` value).
-- `since()`: [TimeDelta](TimeDelta.md), time double
-  - Version of `since(TimeStamp)` accepting double - for compatibility and variables initialized to `NaN` or `-inf`.
-- `secondsSince()`: double, time [TimeStamp](TimeStamp.md)
-  - Seconds since some previous time. Returns `+Inf` if `time` is `NaN`.
-- `secondsSince()`: double, time double
-  - Version of `secondsSince` accepting double - for compatibility and variables initialized to `NaN` or `-inf`.
+- `since()`: [TimeDelta](TimeDelta.md), time Object
+  - Time delta/span since some previous time (`TimeStamp` or `double`). Returns `infinite` if `time` is `none`. (Use `.s` or `.seconds` on the result if you want pure `double` value).
