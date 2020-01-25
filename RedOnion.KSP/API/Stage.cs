@@ -6,6 +6,7 @@ using RedOnion.KSP.Parts;
 using System.Collections.Generic;
 using System.ComponentModel;
 using RedOnion.KSP.Utilities;
+using RedOnion.Attributes;
 
 namespace RedOnion.KSP.API
 {
@@ -48,14 +49,38 @@ namespace RedOnion.KSP.API
 		public static PartSet<PartBase> xparts { get; }
 			= new PartSet<PartBase>(null, Refresh);
 
-		[Description("Amount of solid fuel available in active engines."
+		[WorkInProgress, Description("Amount of solid fuel available in active engines."
 			+ " Shortcut to `engines.resources.getAmountOf(\"SolidFuel\")`.")]
 		public static double solidfuel
 			=> engines.resources.getAmountOf("SolidFuel");
-		[Description("Amount of liquid fuel available in tanks of current stage to active engines."
-			+ " Shortcut to `xparts.resources.getAmountOf(\"LiquidFuel\")`.")]
+
+		private static bool stockFuelsOnly = false;
+		private static List<string> liquidFuels;
+		[WorkInProgress, Description("Amount of liquid fuel available in tanks of current stage to active engines."
+			+ " Shortcut to `xparts.resources.getAmountOf(\"LiquidFuel\")`. Also includes \"Karbonite\" if present (USI).")]
 		public static double liquidfuel
-			=> xparts.resources.getAmountOf("LiquidFuel");
+			=> stockFuelsOnly ? xparts.resources.getAmountOf("LiquidFuel") : GetLiquidFuels();
+		private static double GetLiquidFuels()
+		{
+			if (liquidFuels == null)
+			{
+				var defs = PartResourceLibrary.Instance?.resourceDefinitions;
+				if (defs != null)
+				{
+					var karbonite = defs.Contains("Karbonite");
+					if (karbonite)
+					{
+						liquidFuels = new List<string>()
+						{
+							"LiquidFuel",
+							"Karbonite"
+						};
+					}
+					else stockFuelsOnly = true;
+				}
+			}
+			return liquidFuels == null ? xparts.resources.getAmountOf("LiquidFuel") : xparts.resources.getAmountOf(liquidFuels);
+		}
 
 		[Description("Total amount of fuel avialable for active engines in current stage.")]
 		public static double fuel => solidfuel + liquidfuel;

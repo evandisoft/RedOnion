@@ -80,6 +80,14 @@ namespace RedOnion.KSP.Parts
 		[Description("Get number of parts that can store the named resource. Returns zero for non-existent resources.")]
 		public int getPartCountOf(string name)
 			=> this[name]?.partCount ?? 0;
+
+		public double getAmountOf(IEnumerable<string> names)
+		{
+			double sum = 0.0;
+			foreach (var name in names)
+				sum += getAmountOf(name);
+			return sum;
+		}
 	}
 	[Description("Resource like LiquidFuel etc.")]
 	public class Resource
