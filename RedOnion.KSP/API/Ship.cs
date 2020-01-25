@@ -262,12 +262,16 @@ namespace RedOnion.KSP.API
 		public VesselType vesseltype => native.vesselType;
 		[Description("Total mass of the ship (vehicle/vessel). [tons = 1000 kg]")]
 		public float mass => native.GetTotalMass();
+
 		[Description("Wheter the ship is still packed (reduced physics).")]
 		public bool packed => native.packed;
 		[Description("Wheter the ship is landed (on the ground or on/in water).")]
 		public bool landed => native.Landed;
 		[Description("Wheter the ship is in water.")]
 		public bool splashed => native.Splashed;
+		// examine this first
+		//public Vessel.Situations situation => native.situation;
+
 		[Description("Longitude of current position in degrees.")]
 		public double longitude => native.longitude;
 		[Description("Latitude of current position in degrees.")]

@@ -9,8 +9,8 @@ var maxSpeed       = .9   // target escape speed (fraction of minimal or in m/s 
 var safeAltitude   = 1 + math.max atmosphere.depth/1000, 7 // safe altitude above atmosphere and mountains
 var startAngle     = math.round(ship.pitch,1) // usually 90 but e.g. DynaWing starts with 81.2
 var firstAngle     = 60   // angle upto which to use simple ratio
-var firstAltitude  = math.max safeAltitude/10, 3 // altitude (in km) of first phase (to reach pitch=firstAngle)
-var narrowAltitude = 100  // altitude (in m) upto which to go straight up
+var firstAltitude  = math.max safeAltitude/10, math.max 3, ship.altitude/1000+2 // altitude (in km) of first phase (to reach pitch=firstAngle)
+var narrowAltitude = 10*math.round ship.altitude/10+10 // altitude (in m) upto which to go straight up
 
 if startAngle > 89
   startAngle = 90

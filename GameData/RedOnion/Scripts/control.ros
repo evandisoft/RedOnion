@@ -85,20 +85,26 @@ def control ship, target, x, y
     if mObt.pressed
       return -ship.velocity
   //landing assist
-    var rv = -ship.srfvel
-    if rv.size < 1 then rv = ship.away
+    var dir = -ship.srfvel
     if ship.altitude >= 10000 or ship.periapsis >= 0
       autopilot.throttle = nan
-      return rv
+      return dir
     var acc = ship.engines.getThrust() / ship.mass
-    if acc <= 0.001
+    var grav = ship.body.mu / (ship.body.radius + ship.altitude) ^ 2
+    if acc <= grav+0.001
       autopilot.throttle = nan
-      return rv
-    if rv.angle(ship.away) > 120
-      autopilot.throttle = 0
-      return rv
-    autopilot.throttle = math.min user.throttle, rv.size / acc
-    return rv
+      return dir
+    var vec = dir
+    var mag = vec.size
+    var lim = math.min 90, mag+1
+    var ang = ship.away.angle dir
+    var cos = math.deg.cos ang
+    if ang > lim
+      dir = ship.away.rotate lim, ship.away.cross dir
+      cos = math.deg.cos lim
+    autopilot.throttle = math.min user.throttle, cos*grav/acc + (ang > 120 ?
+      (-mag - 0.5) : (mag - 0.5)) / (acc-grav)
+    return dir
 
   row = blk1.addHorizontal()
   var bNormal = xbtn row, "Normal", def => ship.velocity.cross ship.away
@@ -170,6 +176,7 @@ def control ship, target, x, y
         rq.y = wnd.y + wnd.height * 2 < unity.screen.height ?
           wnd.y + wnd.height : wnd.y - wnd.height
         reqs.push rq
+        print "Control " + target.name
     prevTgtBtn.press
     return vector.none
   bControlTarget.flexWidth = 1
