@@ -19,13 +19,11 @@ namespace RedOnion.KSP.Parts
 		protected internal ResourceList(PartBase part)
 			=> this.part = part;
 		protected internal ResourceList(IPartSet partSet)
-			=> (this.partSet = partSet).Refresh += SetDirty;
+			=> this.partSet = partSet;
 
 		protected override void DoRefresh()
 		{
 			// TODO: reuse
-			list.Clear();
-			cache.Clear();
 			Update(Time.now);
 			base.DoRefresh();
 		}

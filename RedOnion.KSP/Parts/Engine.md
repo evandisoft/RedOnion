@@ -17,6 +17,9 @@ Engine of a ship (vehicle/vessel).
 - `hasGimbal`: bool - Has gimbal module.
 - `thrust`: double - Current thrust [kN] (at current pressure, with current `thrustPercentage` and current throttle).
 - `thrustPercentage`: double - Thrust limiter in percents.
+- `Propellants`: [PropellantList](PropellantList.md) - \[`WIP`\] List of propellants used by the engine (by currently active mode).
+- `Propellants1`: [PropellantList](PropellantList.md) - \[`WIP`\] List of propellants used by first mode.
+- `Propellants2`: [PropellantList](PropellantList.md) - \[`WIP`\] List of propellants used by second mode (null for single-mode engines).
 
 **Instance Methods:**
 - `istype()`: bool, name string

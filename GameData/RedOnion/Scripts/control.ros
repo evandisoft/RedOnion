@@ -102,8 +102,9 @@ def control ship, target, x, y
     if ang > lim
       dir = ship.away.rotate lim, ship.away.cross dir
       cos = math.deg.cos lim
-    autopilot.throttle = math.min user.throttle, cos*grav/acc + (ang > 120 ?
+    autopilot.throttle = math.min user.throttle, grav/acc/cos + (ang > 120 ?
       (-mag - 0.5) : (mag - 0.5)) / (acc-grav)
+    //todo: add user controls
     return dir
 
   row = blk1.addHorizontal()
@@ -190,6 +191,9 @@ def control ship, target, x, y
   var prevTgtBtn = unlock2
 
 //maneuvers
+//todo: join "MAN" and "NDE" into one by keeping button pressed together with EXEC
+//..... possibly doing more in that state (like auto-incline after hohmann)
+//todo: add new mode-button for options like limiting auto-staging
   var blk3 = btns.addVertical()
   blk3.visible = false
   row = blk3.addHorizontal()
@@ -470,7 +474,7 @@ def control ship, target, x, y
     var nextDecoupler = ship.parts.nextDecoupler
     if nextDecoupler == null
         return
-    if nextDecoupler.isType "LaunchClamp"
+    if nextDecoupler.type == "LaunchClamp"
     //not releasing launch clamps in this script
       return
     if !stage.engines.anyOperational

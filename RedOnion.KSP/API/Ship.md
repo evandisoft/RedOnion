@@ -11,16 +11,18 @@ Active vessel
 - `throttle`: float - Current throttle (assign redirects to `Autopilot`, reads control state if autopilot disabled)
 - `parts`: [ShipPartSet](../Parts/ShipPartSet.md) - All parts of this ship/vessel/vehicle.
 - `root`: [Part](../Parts/PartBase.md) - Root part (same as `parts.root`).
-- `nextDecoupler`: [Decoupler](../Parts/Decoupler.md) - One of the decouplers that will get activated by nearest stage. (Same as `Parts.NextDecoupler`.)
+- `nextDecoupler`: [DecouplerBase](../Parts/DecouplerBase.md) - One of the decouplers that will get activated by nearest stage. (Same as `Parts.NextDecoupler`.)
 - `nextDecouplerStage`: int - Stage number of the nearest decoupler or -1. (Same as `Parts.NextDecouplerStage`.)
-- `decouplers`: [ReadOnlyList](ReadOnlyList.1.md)\[[Decoupler](../Parts/Decoupler.md)\] - List of all decouplers, separators, launch clamps and docks with staging. (Docking ports without staging enabled not included.)
+- `currentStage`: int - Current stage number. (Same as `stage.number` if active ship.)
+- `stages`: [Stages](../Parts/Stages.md) - \[`WIP`\] Parts per stage (by `decoupledin+1`).
+- `decouplers`: [ReadOnlyList](ReadOnlyList.1.md)\[[DecouplerBase](../Parts/DecouplerBase.md)\] - List of all decouplers, separators, launch clamps and docks with staging. (Docking ports without staging enabled not included.)
 - `dockingports`: [ReadOnlyList](ReadOnlyList.1.md)\[[DockingPort](../Parts/DockingPort.md)\] - List of all docking ports (regardless of staging).
 - `engines`: [EngineSet](../Parts/EngineSet.md) - All engines (regardless of state).
 - `sensors`: [ReadOnlyList](ReadOnlyList.1.md)\[[Sensor](../Parts/Sensor.md)\] - All sensors.
 - `id`: Guid - Unique identifier of the ship (vehicle/vessel). Can change when docking/undocking.
 - `persistentId`: uint - Unique identifier of the ship (vehicle/vessel). Should be same as it was before docking (after undocking).
 - `vesseltype`: VesselType - KSP API. Vessel type as selected by user (or automatically).
-- `mass`: float - Total mass of the ship (vehicle/vessel). [tons = 1000 kg]
+- `mass`: double - Total mass of the ship (vehicle/vessel). [tons = 1000 kg]
 - `packed`: bool - Wheter the ship is still packed (reduced physics).
 - `landed`: bool - Wheter the ship is landed (on the ground or on/in water).
 - `splashed`: bool - Wheter the ship is in water.

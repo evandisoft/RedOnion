@@ -23,13 +23,17 @@ namespace RedOnion.KSP.Parts
 		protected Ship _ship;
 
 		protected internal Stages(Ship ship, Action refresh) : base(refresh) => _ship = ship;
-		protected internal override void SetDirty()
+		protected internal override void SetDirty(bool value)
 		{
-			if (Dirty)
-				return;
-			base.SetDirty();
-			foreach (var stage in this)
-				stage.SetDirty();
+			base.SetDirty(value);
+			foreach (var stage in list)
+				stage.Dirty = value;
+		}
+		protected internal override void Clear()
+		{
+			foreach (var stage in list)
+				stage.Clear();
+			//base.Clear(); - don't clear the list here, items reused
 		}
 	}
 	[WorkInProgress, Description("Parts with same value of `decoupledin`.")]
@@ -40,12 +44,10 @@ namespace RedOnion.KSP.Parts
 
 		protected internal StagePartSet(Ship ship, Action refresh) : base(ship, refresh)
 			=> activeEngines = new EngineSet(ship, refresh);
-		protected internal override void SetDirty()
+		protected internal override void SetDirty(bool value)
 		{
-			if (Dirty)
-				return;
-			base.SetDirty();
-			activeEngines.SetDirty();
+			activeEngines.SetDirty(value);
+			base.SetDirty(value);
 		}
 		protected internal override void Clear()
 		{

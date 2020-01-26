@@ -8,6 +8,8 @@ using System.ComponentModel;
 using RedOnion.KSP.Utilities;
 using RedOnion.Attributes;
 
+//TODO: redirect these to new `ship.stages` API
+
 namespace RedOnion.KSP.API
 {
 	[Callable("activate")]
@@ -50,45 +52,18 @@ namespace RedOnion.KSP.API
 			= new PartSet<PartBase>(null, Refresh);
 
 		[WorkInProgress, Description("Amount of solid fuel available in active engines."
-			+ " Shortcut to `engines.resources.getAmountOf(\"SolidFuel\")`.")]
+			+ " Shortcut to `engines.resources.getAmountOf(engines.propellants.namesOfSolid)`.")]
 		public static double solidfuel
-			=> engines.resources.getAmountOf("SolidFuel");
-
-		private static bool stockFuelsOnly = false;
-		private static List<string> liquidFuels;
+			=> engines.resources.getAmountOf(engines.propellants.namesOfSolid);
 		[WorkInProgress, Description("Amount of liquid fuel available in tanks of current stage to active engines."
-			+ " Shortcut to `xparts.resources.getAmountOf(\"LiquidFuel\")`. Also includes \"Karbonite\" if present (USI).")]
+			+ " Shortcut to `xparts.resources.getAmountOf(engines.propellants.namesOfLiquid)`.")]
 		public static double liquidfuel
-			=> stockFuelsOnly ? xparts.resources.getAmountOf("LiquidFuel") : GetLiquidFuels();
-		private static double GetLiquidFuels()
-		{
-			if (liquidFuels == null)
-			{
-				var defs = PartResourceLibrary.Instance?.resourceDefinitions;
-				if (defs != null)
-				{
-					var karbonite = defs.Contains("Karbonite");
-					if (karbonite)
-					{
-						liquidFuels = new List<string>()
-						{
-							"LiquidFuel",
-							"Karbonite"
-						};
-					}
-					else stockFuelsOnly = true;
-				}
-			}
-			return liquidFuels == null ? xparts.resources.getAmountOf("LiquidFuel") : xparts.resources.getAmountOf(liquidFuels);
-		}
-
-		[Description("Total amount of fuel avialable for active engines in current stage.")]
+			=> xparts.resources.getAmountOf(engines.propellants.namesOfLiquid);
+		[WorkInProgress, Description("Total amount of fuel avialable for active engines in current stage. `solidfuel + liquidfuel` - designed for staging logic.")]
 		public static double fuel => solidfuel + liquidfuel;
-
-		[Description("Estimate burn time for given delta-v.")]
+		[WorkInProgress, Description("Estimate burn time for given delta-v.")]
 		public static TimeDelta burntime(double deltaV) => engines.burnTime(deltaV);
 		// TODO: burnTime even if current stage cannot handle it
-
 
 		static internal bool Dirty { get; private set; } = true;
 		static internal void SetDirty(string reason = null)
@@ -103,12 +78,9 @@ namespace RedOnion.KSP.API
 			GameEvents.StageManager.OnGUIStageAdded.Remove(hooks.StagesChanged);
 			GameEvents.StageManager.OnGUIStageRemoved.Remove(hooks.StagesChanged);
 			Dirty = true;
-			parts.SetDirty();
-			xparts.SetDirty();
-			engines.SetDirty();
-			parts.Clear();
-			xparts.Clear();
-			engines.Clear();
+			parts.SetDirty(true);
+			xparts.SetDirty(true);
+			engines.SetDirty(true);
 
 		}
 		static readonly Hooks hooks = new Hooks();
@@ -130,9 +102,6 @@ namespace RedOnion.KSP.API
 
 		static void Refresh()
 		{
-			parts.Clear();
-			xparts.Clear();
-			engines.Clear();
 			var ship = Ship.Active;
 			if (ship == null)
 			{
@@ -166,7 +135,11 @@ namespace RedOnion.KSP.API
 				{
 					var part = shipParts[crossPart];
 					if (part.decoupledin >= nextDecoupler)
+					{
+						Value.DebugLog($"Part {part} added to xparts.");
 						xparts.Add(part);
+					}
+					else Value.DebugLog($"Part {part} not added to xparts: {part.decoupledin} < {nextDecoupler}");
 				}
 			}
 			Dirty = false;
@@ -180,7 +153,7 @@ namespace RedOnion.KSP.API
 			GameEvents.StageManager.OnStagingSeparationIndices.Add(hooks.StagingSeparationIndices);
 			GameEvents.StageManager.OnGUIStageAdded.Add(hooks.StagesChanged);
 			GameEvents.StageManager.OnGUIStageRemoved.Add(hooks.StagesChanged);
-			Value.DebugLog("Stage Refreshed (Decouple: {0}, Engines: {1})", nextDecoupler, engines.count);
+			Value.DebugLog($"Stage #{ship.currentStage} Refreshed (Decouple: {nextDecoupler}, Engines: {engines.count}, Parts: {parts.count}/{xparts.count})");
 		}
 	}
 }

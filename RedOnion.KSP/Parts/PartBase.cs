@@ -20,12 +20,14 @@ namespace RedOnion.KSP.Parts
 		Decoupler,
 		[Description("Separator (both-ways).")]
 		Separator,
+		[Description("Engine plate (EP-nn).")]
+		EnginePlate,
 		[Description("Launch clamp.")]
 		LaunchClamp
 	}
 
 	[DisplayName("Part"), Description("Part of the ship (vehicle/vessel).")]
-	[DocBuild(typeof(Engine), typeof(Sensor), typeof(DecouplerBase), typeof(DockingPort), typeof(LaunchClamp))]
+	[DocBuild(typeof(Engine), typeof(Sensor), typeof(DecouplerBase))]
 	public class PartBase
 	{
 		[Unsafe, Description("Native `Part` - KSP API.")]

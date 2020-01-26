@@ -1,3 +1,4 @@
+#define DEBUG_PARTS_REFRESH
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -8,6 +9,7 @@ using MoonSharp.Interpreter;
 using KSP.UI.Screens;
 using static RedOnion.Debugging.QueueLogger;
 using RedOnion.Attributes;
+using System.Text;
 
 namespace RedOnion.KSP.Parts
 {
@@ -29,11 +31,10 @@ namespace RedOnion.KSP.Parts
 		public ResourceList resources => _resources ?? (_resources = new ResourceList(this));
 		protected ResourceList _resources;
 
-		protected internal override void SetDirty()
+		protected internal override void SetDirty(bool value)
 		{
-			base.SetDirty();
-			if (_resources != null)
-				_resources.SetDirty();
+			if (value) _resources?.SetDirty(value);
+			base.SetDirty(value);
 		}
 
 		[Description("Ship (vessel/vehicle) this list of parts belongs to.")]
@@ -55,7 +56,7 @@ namespace RedOnion.KSP.Parts
 		int IReadOnlyCollection<PartBase>.Count => count;
 		int ICollection<PartBase>.Count => count;
 		bool ICollection<PartBase>.IsReadOnly => true;
-		void IPartSet.SetDirty() => SetDirty();
+		void IPartSet.SetDirty() => Dirty = true;
 		event Action IPartSet.Refresh
 		{
 			add => Refresh += value;
@@ -111,11 +112,27 @@ namespace RedOnion.KSP.Parts
 				return null;
 			}
 		}
+
+		public override string ToString()
+		{
+			if (Dirty) DoRefresh();
+			bool first = true;
+			var sb = new StringBuilder();
+			sb.Append("[");
+			foreach (var part in list)
+			{
+				if (!first) sb.Append(", ");
+				first = false;
+				sb.Append(part.name);
+			}
+			sb.Append("]");
+			return sb.ToString();
+		}
 	}
 	[Description("Collection of all the parts in one ship/vessel.")]
 	public class ShipPartSet : PartSet<PartBase>, IDisposable
 	{
-		protected Dictionary<Part, PartBase> prevCache;
+		protected Dictionary<Part, PartBase> prevCache = new Dictionary<Part, PartBase>();
 
 		protected PartBase _root;
 		[Description("Root part.")]
@@ -161,23 +178,40 @@ namespace RedOnion.KSP.Parts
 			sensors = new ReadOnlyList<Sensor>(DoRefresh);
 			stages = new Stages(ship, DoRefresh);
 		}
-		protected internal override void SetDirty()
+		protected internal override void SetDirty(bool value)
 		{
-			if (Dirty) return;
-			RedOnion.ROS.Value.DebugLog("Ship Parts Dirty");
-			GameEvents.onVesselWasModified.Remove(VesselModified);
-			base.SetDirty();
-			decouplers.SetDirty();
-			dockingports.SetDirty();
-			engines.SetDirty();
-			sensors.SetDirty();
-			stages.SetDirty();
-			if (_ship == Ship.Active)
-				Stage.SetDirty();
+#if DEBUG && DEBUG_PARTS_REFRESH
+			Value.DebugLog($"Ship Parts Dirty = {value}");
+#endif
+			if (value)
+			{
+				GameEvents.onVesselWasModified.Remove(VesselModified);
+				if (_ship == Ship.Active)
+					Stage.SetDirty();
+			}
+			decouplers.Dirty = value;
+			dockingports.Dirty = value;
+			engines.Dirty = value;
+			sensors.Dirty = value;
+			stages.Dirty = value;
+			base.SetDirty(value);
+		}
+		protected internal override void Clear()
+		{
+			var prev = prevCache;
+			prevCache = cache;
+			cache = prev ?? new Dictionary<Part, PartBase>();
+			//not needed, cleared as part of SetDirty
+			//decouplers.Clear();
+			//dockingports.Clear();
+			//engines.Clear();
+			//sensors.Clear();
+			//stages.Clear();
+			base.Clear();
 		}
 		void VesselModified(Vessel vessel)
 		{
-#if DEBUG
+#if DEBUG && DEBUG_PARTS_REFRESH
 			if (_ship == null)
 			{
 				Value.DebugLog("VesselModified: ship not assigned");
@@ -185,7 +219,7 @@ namespace RedOnion.KSP.Parts
 			}
 #endif
 			if (vessel == _ship.native)
-				SetDirty();
+				Dirty = true;
 		}
 
 		~ShipPartSet() => Dispose(false);
@@ -214,6 +248,7 @@ namespace RedOnion.KSP.Parts
 			dockingports.Clear();
 			engines.Clear();
 			sensors.Clear();
+			stages.Clear();
 			decouplers = null;
 			dockingports = null;
 			engines = null;
@@ -222,48 +257,37 @@ namespace RedOnion.KSP.Parts
 			prevCache = null;
 		}
 
-/*#if DEBUG
+#if DEBUG && DEBUG_PARTS_REFRESH
 		bool refreshing;
-#endif*/
+#endif
 		protected override void DoRefresh()
 		{
-/*#if DEBUG
+#if DEBUG && DEBUG_PARTS_REFRESH
 			Value.DebugLog($"Refreshing Ship Parts, Guid: {_ship.id}");
 			if (refreshing)
 				throw new InvalidOperationException("Already refreshing");
+			if (!Dirty)
+				throw new InvalidOperationException("Not dirty");
 			refreshing = true;
-#endif*/
+#endif
+			Dirty = false;
 			_root = null;
 			_nextDecoupler = null;
-			decouplers.Clear();
-			dockingports.Clear();
-			engines.Clear();
-			sensors.Clear();
-			list.Clear();
-			var prev = prevCache;
-			prevCache = cache;
-			cache = prev ?? new Dictionary<Part, PartBase>();
-			cache.Clear();
-			decouplers.Dirty = false;
-			dockingports.Dirty = false;
-			engines.Dirty = false;
-			stages.Dirty = false;
-			foreach (var stage in stages.list)
-			{
-				stage.Clear();
-				stage.Dirty = false;
-			}
 			while (stages.list.Count <= _ship.currentStage)
 				stages.list.Add(new StagePartSet(_ship, DoRefresh));
+			stages.list.Count = _ship.currentStage + 1;
+
 			Construct(_ship.native.rootPart, null, null);
-			base.DoRefresh();
+
 			prevCache.Clear();
+			Refresh?.Invoke();
 			GameEvents.onVesselWasModified.Add(VesselModified);
 			ApiLogger.Log($"Ship Parts Refreshed: {list.Count}, Engines: {engines.count}, Guid: {_ship.id}");
-/*#if DEBUG
-			Value.DebugLog($"Ship Parts Refreshed: {list.Count}, Engines: {engines.count}, Guid: {_ship.id}");
+
+#if DEBUG && DEBUG_PARTS_REFRESH
+			Value.DebugLog($"Ship Parts Refreshed: {list.Count}/{cache.Count}, Engines: {engines.count}, Guid: {_ship.id}");
 			refreshing = false;
-#endif*/
+#endif
 		}
 		protected void Construct(Part part, PartBase parent, DecouplerBase decoupler)
 		{
@@ -274,7 +298,9 @@ namespace RedOnion.KSP.Parts
 			Engine engine = null;
 			if (prevCache.TryGetValue(part, out var self))
 			{
-				Value.DebugLog($"Wrapper for part {part} taken from cache");
+#if DEBUG && DEBUG_PARTS_REFRESH
+				Value.DebugLog($"Wrapper for part {part} taken from cache, decoupler: {decoupler}/{decoupler?.stage??-1}");
+#endif
 				self.decoupler = decoupler;
 				if (self is Engine eng)
 					engine = eng;
@@ -286,6 +312,9 @@ namespace RedOnion.KSP.Parts
 					{
 						decoupler = dec;
 						decouplers.Add(dec);
+#if DEBUG && DEBUG_PARTS_REFRESH
+						Value.DebugLog($"Part {part} is decoupler");
+#endif
 
 						if ((_nextDecoupler == null || decoupler.stage > _nextDecoupler.stage)
 							&& decoupler.stage < _ship.native.currentStage)
@@ -297,7 +326,9 @@ namespace RedOnion.KSP.Parts
 			}
 			else
 			{
-				Value.DebugLog($"Creating wrapper for part {part}");
+#if DEBUG && DEBUG_PARTS_REFRESH
+				Value.DebugLog($"Creating wrapper for part {part}, decoupler: {decoupler}/{decoupler?.stage??-1}");
+#endif
 				foreach (var module in part.Modules)
 				{
 					if (module is IEngineStatus)
@@ -339,9 +370,12 @@ namespace RedOnion.KSP.Parts
 							else // ModuleServiceModule ?
 								continue; // rather continue the search
 						}
+#if DEBUG && DEBUG_PARTS_REFRESH
+						Value.DebugLog($"Part {part} is decoupler");
+#endif
 						decouplers.Add(decoupler);
 						// ignore leftover decouplers
-						if (decoupler.native.inverseStage >= _ship.native.currentStage)
+						if (decoupler.stage >= _ship.currentStage)
 							break;
 						// check if we just created closer decoupler
 						if (_nextDecoupler == null || decoupler.stage > _nextDecoupler.stage)

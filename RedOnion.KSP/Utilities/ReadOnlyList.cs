@@ -13,8 +13,22 @@ namespace RedOnion.KSP.API
 	{
 		protected internal ListCore<T> list;
 		protected internal Action Refresh;
-		protected internal bool Dirty { get; set; } = true;
-		protected internal virtual void SetDirty() => Dirty = true;
+
+		bool _dirty = true;
+		protected internal bool Dirty
+		{
+			get => _dirty;
+			set
+			{
+				if (_dirty != value)
+					SetDirty(value);
+			}
+		}
+		protected internal virtual void SetDirty(bool value)
+		{
+			_dirty = value;
+			if (value) Clear();
+		}
 
 		[Browsable(false), MoonSharpHidden]
 		public void EnsureValid()
@@ -73,7 +87,8 @@ namespace RedOnion.KSP.API
 			list.CopyTo(array, index);
 		}
 
-		protected internal virtual void Clear() => list.Clear();
+		protected internal virtual void Clear()
+			=> list.Clear();
 		protected internal virtual bool Add(T item)
 		{
 			list.Add(item);
