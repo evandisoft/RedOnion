@@ -180,7 +180,7 @@ namespace RedOnion.KSP.API
 			GameEvents.StageManager.OnStagingSeparationIndices.Add(hooks.StagingSeparationIndices);
 			GameEvents.StageManager.OnGUIStageAdded.Add(hooks.StagesChanged);
 			GameEvents.StageManager.OnGUIStageRemoved.Add(hooks.StagesChanged);
-			Value.DebugLog("Stage Refreshed (Decouple: {0}, Engines: {1})", nextDecoupler, engines.Count);
+			Value.DebugLog("Stage Refreshed (Decouple: {0}, Engines: {1})", nextDecoupler, engines.count);
 		}
 	}
 }

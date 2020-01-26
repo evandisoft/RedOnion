@@ -9,9 +9,9 @@ namespace RedOnion.KSP.API
 {
 	[Description("Read-only list (or set). Enumerable (can be used in `foreach`)."
 		+ "\nUsed e.g. for parts and all lists and sets you are not allowed to modify.")]
-	public class ReadOnlyList<T> : IList<T>
+	public class ReadOnlyList<T> : IList<T>, IReadOnlyList<T>
 	{
-		protected ListCore<T> list;
+		protected internal ListCore<T> list;
 		protected internal Action Refresh;
 		protected internal bool Dirty { get; set; } = true;
 		protected internal virtual void SetDirty() => Dirty = true;
@@ -33,9 +33,7 @@ namespace RedOnion.KSP.API
 		protected internal ReadOnlyList(Action refresh) => Refresh = refresh;
 
 		[Description("Number of elements in the list (or set).")]
-		public int count => Count;
-		[Browsable(false), MoonSharpHidden]
-		public int Count
+		public int count
 		{
 			get
 			{
@@ -90,6 +88,8 @@ namespace RedOnion.KSP.API
 			return list.GetEnumerator();
 		}
 
+		int IReadOnlyCollection<T>.Count => count;
+		int ICollection<T>.Count => count;
 		bool ICollection<T>.IsReadOnly => true;
 		T IList<T>.this[int index]
 		{

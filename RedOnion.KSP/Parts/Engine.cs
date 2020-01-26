@@ -171,8 +171,8 @@ namespace RedOnion.KSP.Parts
 		public override bool istype(string name)
 			=> name.Equals("engine", StringComparison.OrdinalIgnoreCase);
 
-		protected internal Engine(Ship ship, Part part, PartBase parent, Decoupler decoupler)
-			: base(ship, part, parent, decoupler)
+		protected internal Engine(Ship ship, Part part, PartBase parent, DecouplerBase decoupler)
+			: base(PartType.Engine, ship, part, parent, decoupler)
 		{
 			foreach (var module in part.Modules)
 			{

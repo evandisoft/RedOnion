@@ -236,13 +236,17 @@ namespace RedOnion.KSP.API
 		[Description("Root part (same as `parts.root`).")]
 		public PartBase root => parts.root;
 		[Description("One of the decouplers that will get activated by nearest stage. (Same as `Parts.NextDecoupler`.)")]
-		public Decoupler nextDecoupler => parts.nextDecoupler;
+		public DecouplerBase nextDecoupler => parts.nextDecoupler;
 		[Description("Stage number of the nearest decoupler or -1. (Same as `Parts.NextDecouplerStage`.)")]
 		public int nextDecouplerStage => parts.nextDecouplerStage;
+		[Description("Current stage number. (Same as `stage.number` if active ship.)")]
+		public int currentStage => native.currentStage;
+		[WorkInProgress, Description("Parts per stage (by `decoupledin+1`).")]
+		public Stages stages => parts.stages;
 
 		[Description("List of all decouplers, separators, launch clamps and docks with staging."
 			+ " (Docking ports without staging enabled not included.)")]
-		public ReadOnlyList<Decoupler> decouplers => parts.decouplers;
+		public ReadOnlyList<DecouplerBase> decouplers => parts.decouplers;
 		[Description("List of all docking ports (regardless of staging).")]
 		public ReadOnlyList<DockingPort> dockingports => parts.dockingports;
 		[Description("All engines (regardless of state).")]
@@ -261,7 +265,7 @@ namespace RedOnion.KSP.API
 		[Description("KSP API. Vessel type as selected by user (or automatically).")]
 		public VesselType vesseltype => native.vesselType;
 		[Description("Total mass of the ship (vehicle/vessel). [tons = 1000 kg]")]
-		public float mass => native.GetTotalMass();
+		public double mass => native.totalMass;
 
 		[Description("Wheter the ship is still packed (reduced physics).")]
 		public bool packed => native.packed;
