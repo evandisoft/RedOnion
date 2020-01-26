@@ -155,7 +155,7 @@ namespace RedOnion.KSP.Parts
 		public ResourceFlowMode flowMode => native.GetFlowMode();
 		[WorkInProgress, Description("No flow propellant - usually solid fuel, bound to SRB.")]
 		public bool solid => flowMode == ResourceFlowMode.NO_FLOW;
-		[WorkInProgress, Description("Flowing propellant. Should include liquid fuel but not monopropellant or electricity.")]
+		[WorkInProgress, Description("Flowing propellant. May include electricity (if consumed by the engine, e.g. Ion Drive).")]
 		public bool liquid
 		{
 			get

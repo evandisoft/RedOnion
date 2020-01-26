@@ -264,12 +264,12 @@ namespace RedOnion.KSP.Parts
 		public double mixtureDensity => activeModule.mixtureDensity;
 		public double mixtureDensityRecip => activeModule.mixtureDensityRecip;
 
-		PropellantList propellants, propellants2;
+		PropellantList _propellants, _propellants2;
 		[WorkInProgress, Description("List of propellants used by the engine (by currently active mode).")]
-		public PropellantList Propellants => firstIsActive ? Propellants1 : Propellants2;
+		public PropellantList propellants => firstIsActive ? propellants1 : propellants2;
 		[WorkInProgress, Description("List of propellants used by first mode.")]
-		public PropellantList Propellants1 => propellants ?? (propellants = new PropellantList(firstModule));
+		public PropellantList propellants1 => _propellants ?? (_propellants = new PropellantList(firstModule));
 		[WorkInProgress, Description("List of propellants used by second mode (null for single-mode engines).")]
-		public PropellantList Propellants2 => propellants2 ?? (multiMode ? propellants2 = new PropellantList(secondModule) : null);
+		public PropellantList propellants2 => _propellants2 ?? (multiMode ? _propellants2 = new PropellantList(secondModule) : null);
 	}
 }

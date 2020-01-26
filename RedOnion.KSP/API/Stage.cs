@@ -52,9 +52,24 @@ namespace RedOnion.KSP.API
 			= new PartSet<PartBase>(null, Refresh);
 
 		[WorkInProgress, Description("Amount of solid fuel available in active engines."
-			+ " Shortcut to `engines.resources.getAmountOf(engines.propellants.namesOfSolid)`.")]
+			+ " Similar to `engines.resources.getAmountOf(engines.propellants.namesOfSolid)`"
+			+ " but ignores engines/boosters not separated in next stage."
+			+ " Useful when using central booster with smaller side-boosters (decoupled first).")]
 		public static double solidfuel
-			=> engines.resources.getAmountOf(engines.propellants.namesOfSolid);
+		{
+			get
+			{
+				var ship = Ship.Active;
+				if (ship == null)
+					return 0.0;
+				double sum = 0.0;
+				var nextDecoupler = ship.parts.nextDecouplerStage;
+				foreach (var e in engines) // maybe add `xengines` or rather `boosters` (the later really only containing SRB's)
+					if (e.decoupledin >= nextDecoupler)
+						sum += e.resources.getAmountOf(e.propellants.namesOfSolid);
+				return sum;
+			}
+		}
 		[WorkInProgress, Description("Amount of liquid fuel available in tanks of current stage to active engines."
 			+ " Shortcut to `xparts.resources.getAmountOf(engines.propellants.namesOfLiquid)`.")]
 		public static double liquidfuel
