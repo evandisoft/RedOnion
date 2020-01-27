@@ -945,7 +945,7 @@ namespace RedOnion.ROS
 						{
 							ref var evar = ref vals.Top(-2);
 							if (!evar.IsReference)
-								throw InvalidOperation("Enumeration variable is not a reference"); ;
+								throw InvalidOperation("Enumeration variable is not a reference");
 							ref var list = ref vals.Top(-1);
 							if (list.IsReference && !list.desc.Get(ref list, list.num.Int))
 								throw CouldNotGet(ref list);

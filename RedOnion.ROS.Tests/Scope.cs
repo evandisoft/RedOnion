@@ -356,5 +356,23 @@ obj.getTotal    // returns 1
 				"return x");
 			Assert.AreEqual(0, Update.Count);
 		}
+
+		[Test]
+		public void ROS_Scope13_Shadow()
+		{
+			Lines(2.7,
+				"var x = 2.7",
+				"for var x in [1]",
+				"  continue",
+				"return x");
+			Reset();
+			Lines(0.5,
+				"var x = 0.2",
+				"var y = 0.3",
+				"for var x in [1,2]",
+				"  for var y in [3,4]",
+				"    continue",
+				"return x + y");
+		}
 	}
 }
