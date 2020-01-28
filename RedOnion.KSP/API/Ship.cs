@@ -236,7 +236,7 @@ namespace RedOnion.KSP.API
 		[Description("Root part (same as `parts.root`).")]
 		public PartBase root => parts.root;
 		[Description("One of the decouplers that will get activated by nearest stage. (Same as `Parts.NextDecoupler`.)")]
-		public DecouplerBase nextDecoupler => parts.nextDecoupler;
+		public LinkPart nextDecoupler => parts.nextDecoupler;
 		[Description("Stage number of the nearest decoupler or -1. (Same as `Parts.NextDecouplerStage`.)")]
 		public int nextDecouplerStage => parts.nextDecouplerStage;
 		[Description("Current stage number. (Same as `stage.number` if active ship.)")]
@@ -246,7 +246,7 @@ namespace RedOnion.KSP.API
 
 		[Description("List of all decouplers, separators, launch clamps and docks with staging."
 			+ " (Docking ports without staging enabled not included.)")]
-		public ReadOnlyList<DecouplerBase> decouplers => parts.decouplers;
+		public ReadOnlyList<LinkPart> decouplers => parts.decouplers;
 		[Description("List of all docking ports (regardless of staging).")]
 		public ReadOnlyList<DockingPort> dockingports => parts.dockingports;
 		[Description("All engines (regardless of state).")]

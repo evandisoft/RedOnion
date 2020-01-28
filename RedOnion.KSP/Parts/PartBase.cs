@@ -27,7 +27,7 @@ namespace RedOnion.KSP.Parts
 	}
 
 	[DisplayName("Part"), Description("Part of the ship (vehicle/vessel).")]
-	[DocBuild(typeof(Engine), typeof(Sensor), typeof(DecouplerBase))]
+	[DocBuild(typeof(Engine), typeof(Sensor), typeof(LinkPart))]
 	public class PartBase
 	{
 		[Unsafe, Description("Native `Part` - KSP API.")]
@@ -44,7 +44,7 @@ namespace RedOnion.KSP.Parts
 		PartChildren _children;
 
 		[Description("Decoupler that will decouple this part when staged.")]
-		public DecouplerBase decoupler { get; internal set; }
+		public LinkPart decoupler { get; internal set; }
 		[Description("Stage number as provided by KSP API. (`native.inverseStage` - activating stage for engines, decouplers etc.)")]
 		public int stage => native.inverseStage;
 		[Description("Stage number where this part will be decoupled or -1. (`decoupler?.stage ?? -1`)")]
@@ -76,7 +76,7 @@ namespace RedOnion.KSP.Parts
 		public override string ToString()
 			=> native.ToString();
 
-		protected internal PartBase(PartType type, Ship ship, Part native, PartBase parent, DecouplerBase decoupler)
+		protected internal PartBase(PartType type, Ship ship, Part native, PartBase parent, LinkPart decoupler)
 		{
 			this.type = type;
 			this.ship = ship;

@@ -38,7 +38,7 @@ namespace RedOnion.ROS
 		public static string Format(FormattableString msg)
 			=> msg.ToString(Culture);
 		public static string Format(StringWrapper msg, params object[] args)
-			=> string.Format(Culture, msg.String, args);
+			=> args?.Length > 0 ? string.Format(Culture, msg.String, args) : msg.String;
 
 		public static Action<string> LogListener;
 

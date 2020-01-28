@@ -172,7 +172,7 @@ namespace RedOnion.KSP.Parts
 		public override bool istype(string name)
 			=> name.Equals("engine", StringComparison.OrdinalIgnoreCase);
 
-		protected internal Engine(Ship ship, Part part, PartBase parent, DecouplerBase decoupler)
+		protected internal Engine(Ship ship, Part part, PartBase parent, LinkPart decoupler)
 			: base(PartType.Engine, ship, part, parent, decoupler)
 		{
 			foreach (var module in part.Modules)
@@ -202,6 +202,18 @@ namespace RedOnion.KSP.Parts
 				var second = firstModule;
 				firstModule = secondModule;
 				secondModule = second;
+			}
+			var propellants = activeModule?.propellants;
+			if (propellants != null)
+			{
+				foreach (var propellant in propellants)
+				{
+					if (propellant.GetFlowMode() == ResourceFlowMode.NO_FLOW)
+					{
+						booster = true;
+						break;
+					}
+				}
 			}
 		}
 
@@ -263,6 +275,7 @@ namespace RedOnion.KSP.Parts
 		public double ratioSum => activeModule.ratioSum;
 		public double mixtureDensity => activeModule.mixtureDensity;
 		public double mixtureDensityRecip => activeModule.mixtureDensityRecip;
+		public double ignitionThreshold => activeModule.ignitionThreshold;
 
 		PropellantList _propellants, _propellants2;
 		[WorkInProgress, Description("List of propellants used by the engine (by currently active mode).")]
@@ -271,5 +284,8 @@ namespace RedOnion.KSP.Parts
 		public PropellantList propellants1 => _propellants ?? (_propellants = new PropellantList(firstModule));
 		[WorkInProgress, Description("List of propellants used by second mode (null for single-mode engines).")]
 		public PropellantList propellants2 => _propellants2 ?? (multiMode ? _propellants2 = new PropellantList(secondModule) : null);
+
+		[WorkInProgress, Description("Indicator that the engines is (probably) solid rocket booster (contains propellant that does not flow).")]
+		public bool booster { get; }
 	}
 }

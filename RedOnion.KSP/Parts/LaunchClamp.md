@@ -1,6 +1,6 @@
 ## LaunchClamp
 
-**Base Class:** [DecouplerBase](DecouplerBase.md)
+**Base Class:** [LinkPart](LinkPart.md)
 
 Launch Clamp
 

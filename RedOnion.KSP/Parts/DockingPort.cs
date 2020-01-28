@@ -8,10 +8,10 @@ namespace RedOnion.KSP.Parts
 	[Description(
 @"Docking port. Used to dock a ship in a station or to join various parts together.
 Can also function as separator when staging is enabled.")]
-	public class DockingPort : DecouplerBase
+	public class DockingPort : LinkPart
 	{
 		protected readonly ModuleDockingNode module;
-		protected internal DockingPort(Ship ship, Part part, PartBase parent, DecouplerBase decoupler, ModuleDockingNode module)
+		protected internal DockingPort(Ship ship, Part part, PartBase parent, LinkPart decoupler, ModuleDockingNode module)
 			: base(PartType.DockingPort, ship, part, parent, decoupler)
 			=> this.module = module;
 

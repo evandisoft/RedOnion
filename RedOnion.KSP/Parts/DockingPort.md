@@ -1,6 +1,6 @@
 ## DockingPort
 
-**Base Class:** [DecouplerBase](DecouplerBase.md)
+**Base Class:** [LinkPart](LinkPart.md)
 
 Docking port. Used to dock a ship in a station or to join various parts together.
 Can also function as separator when staging is enabled.

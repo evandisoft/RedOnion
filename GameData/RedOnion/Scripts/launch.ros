@@ -210,7 +210,6 @@ def staging
   //nothing to separate
     if stage.pending
     //but there appears to be inactive engine
-    //TODO: add a check like stage.next.containsType("engine")
       print "Pending last stage"
       stage
     return
@@ -218,12 +217,8 @@ def staging
     print "Releasing launch clamps"
     stage
     return
-  if not stage.engines.anyOperational
-    print "No operational engine"
-    stage
-    return
-  if stage.fuel <= 0.1
-    print "Stage out of fuel"
+  if stage.nofuel
+    print stage.engines.anyOperational ? "Stage out of fuel" : "No operational engine"
     stage
     return
 

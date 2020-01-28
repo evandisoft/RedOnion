@@ -477,12 +477,8 @@ def control ship, target, x, y
     if nextDecoupler.type == "LaunchClamp"
     //not releasing launch clamps in this script
       return
-    if !stage.engines.anyOperational
-      print "No operational engine"
-      stage
-      return
-    if stage.fuel <= 0.1
-      print "Stage out of fuel"
+    if stage.nofuel
+      print stage.engines.anyOperational ? "Stage out of fuel" : "No operational engine"
       stage
       return
 

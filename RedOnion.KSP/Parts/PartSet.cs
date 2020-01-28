@@ -1,4 +1,5 @@
-#define DEBUG_PARTS_REFRESH
+//#define DEBUG_PARTS_REFRESH
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -145,9 +146,9 @@ namespace RedOnion.KSP.Parts
 			}
 		}
 
-		protected DecouplerBase _nextDecoupler;
+		protected LinkPart _nextDecoupler;
 		[Description("One of the decouplers that will get activated by nearest stage.")]
-		public DecouplerBase nextDecoupler
+		public LinkPart nextDecoupler
 		{
 			get
 			{
@@ -160,7 +161,7 @@ namespace RedOnion.KSP.Parts
 
 		[Description("List of all decouplers, separators, launch clamps and docks with staging enabled."
 			+ " (Docking ports without staging enabled not included.)")]
-		public ReadOnlyList<DecouplerBase> decouplers { get; protected set; }
+		public ReadOnlyList<LinkPart> decouplers { get; protected set; }
 		[Description("List of all docking ports (regardless of staging).")]
 		public ReadOnlyList<DockingPort> dockingports { get; protected set; }
 		[Description("All engines (regardless of state).")]
@@ -172,7 +173,7 @@ namespace RedOnion.KSP.Parts
 
 		protected internal ShipPartSet(Ship ship) : base(ship)
 		{
-			decouplers = new ReadOnlyList<DecouplerBase>(DoRefresh);
+			decouplers = new ReadOnlyList<LinkPart>(DoRefresh);
 			dockingports = new ReadOnlyList<DockingPort>(DoRefresh);
 			engines = new EngineSet(ship, DoRefresh);
 			sensors = new ReadOnlyList<Sensor>(DoRefresh);
@@ -200,7 +201,7 @@ namespace RedOnion.KSP.Parts
 		{
 			var prev = prevCache;
 			prevCache = cache;
-			cache = prev ?? new Dictionary<Part, PartBase>();
+			cache = prev;
 			//not needed, cleared as part of SetDirty
 			//decouplers.Clear();
 			//dockingports.Clear();
@@ -289,7 +290,7 @@ namespace RedOnion.KSP.Parts
 			refreshing = false;
 #endif
 		}
-		protected void Construct(Part part, PartBase parent, DecouplerBase decoupler)
+		protected void Construct(Part part, PartBase parent, LinkPart decoupler)
 		{
 			if (part.State == PartStates.DEAD || part.transform == null)
 				return;
@@ -304,7 +305,7 @@ namespace RedOnion.KSP.Parts
 				self.decoupler = decoupler;
 				if (self is Engine eng)
 					engine = eng;
-				else if (self is DecouplerBase dec)
+				else if (self is LinkPart dec)
 				{
 					if (dec is DockingPort port)
 						dockingports.Add(port);

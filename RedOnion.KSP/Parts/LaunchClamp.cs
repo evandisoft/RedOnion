@@ -9,10 +9,10 @@ using System.Text;
 namespace RedOnion.KSP.Parts
 {
 	[Description("Launch Clamp")]
-	public class LaunchClamp : DecouplerBase
+	public class LaunchClamp : LinkPart
 	{
 		protected internal global::LaunchClamp module;
-		protected internal LaunchClamp(Ship ship, Part part, PartBase parent, DecouplerBase decoupler, global::LaunchClamp module)
+		protected internal LaunchClamp(Ship ship, Part part, PartBase parent, LinkPart decoupler, global::LaunchClamp module)
 			: base(PartType.LaunchClamp, ship, part, parent, decoupler) => this.module = module;
 
 		[Description("Accepts `clamp`, `launchClamp`, `decoupler` and `separator`. (Case insensitive)")]
