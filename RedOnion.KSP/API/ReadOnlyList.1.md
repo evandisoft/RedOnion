@@ -7,6 +7,7 @@ Used e.g. for parts and all lists and sets you are not allowed to modify.
 
 
 **Instance Properties:**
+- `version`: int - Version counter. Each update of the collection increments this. Can be used to detect changes mid-enumeration.
 - `count`: int - Number of elements in the list (or set).
 - `[index int]`: T - Get element by index. Will throw exception if index is out of range.
 

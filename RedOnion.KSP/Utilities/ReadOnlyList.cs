@@ -14,6 +14,9 @@ namespace RedOnion.KSP.API
 		protected internal ListCore<T> list;
 		protected internal Action Refresh;
 
+		[Description("Version counter. Each update of the collection increments this. Can be used to detect changes mid-enumeration.")]
+		public int version { get; protected set; }
+
 		bool _dirty = true;
 		protected internal bool Dirty
 		{
@@ -27,14 +30,11 @@ namespace RedOnion.KSP.API
 		protected internal virtual void SetDirty(bool value)
 		{
 			_dirty = value;
-			if (value) Clear();
-		}
-
-		[Browsable(false), MoonSharpHidden]
-		public void EnsureValid()
-		{
-			if (Dirty)
-				DoRefresh();
+			if (value)
+			{
+				version++;
+				Clear();
+			}
 		}
 
 		protected virtual void DoRefresh()
