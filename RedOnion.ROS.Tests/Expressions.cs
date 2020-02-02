@@ -190,9 +190,7 @@ namespace RedOnion.ROS.Tests
 
 			// property existence tests (comes from JavaScript)
 			Test(true, "\"length\" in s");
-			Test(true, "\"length\" in string");
 			Test(false, "\"blah\" in s");
-			Test(false, "\"blah\" in string");
 		}
 
 		[Test]
@@ -262,6 +260,18 @@ namespace RedOnion.ROS.Tests
 		public void ROS_Expr10_Print()
 		{
 			Test("3.14", @"print ""{0:F2}"", math.pi");
+		}
+
+		[Test]
+		public void ROS_Expr11_Strings()
+		{
+			Test(true, "\"x\".contains \"x\"");
+			Test(true, "\"xyz\".contains \"y\"");
+			Test(true, "\"xyz\".contains \"yz\"");
+			Test(false, "\"xyz\".contains \"a\"");
+
+			Test("yz", "\"xyz\".substr 1");
+			Test("y", "\"xyz\".substring 1, 1");
 		}
 	}
 }
