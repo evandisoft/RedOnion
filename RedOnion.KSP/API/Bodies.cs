@@ -144,51 +144,54 @@ and elements are also properties (`bodies.kerbin`, `bodies.mun`).")]
 			}
 		}
 
-		[Description("Period of current orbit in seconds. Alias to `orbit.period`.")]
-		public TimeDelta period => new TimeDelta(native.orbit.period);
-		[Description("Eta to apoapsis in seconds. Alias to `orbit.timeToAp`.")]
-		public TimeDelta timeToAp => orbit.timeToAp;
-		[Description("Eta to periapsis in seconds. Alias to `orbit.timeToPe`.")]
-		public TimeDelta timeToPe => orbit.timeToPe;
-		[Description("Time at apoapsis. Alias to `orbit.timeAtAp`.")]
-		public TimeStamp timeAtAp => orbit.timeAtAp;
-		[Description("Time at periapsis. Alias to `orbit.timeAtPe`.")]
-		public TimeStamp timeAtPe => orbit.timeAtPe;
+		[Description("Period of current orbit in seconds. Alias to `orbit.period`. `NaN/none` for Sun/Kerbol.")]
+		public TimeDelta period => new TimeDelta(native.orbit?.period ?? double.NaN);
+		[Description("Eta to apoapsis in seconds. Alias to `orbit.timeToAp`. `NaN/none` for Sun/Kerbol.")]
+		public TimeDelta timeToAp => orbit?.timeToAp ?? TimeDelta.none;
+		[Description("Eta to periapsis in seconds. Alias to `orbit.timeToPe`. `NaN/none` for Sun/Kerbol.")]
+		public TimeDelta timeToPe => orbit?.timeToPe ?? TimeDelta.none;
+		[Description("Time at apoapsis. Alias to `orbit.timeAtAp`. `NaN/none` for Sun/Kerbol.")]
+		public TimeStamp timeAtAp => orbit?.timeAtAp ?? TimeStamp.none;
+		[Description("Time at periapsis. Alias to `orbit.timeAtPe`. `NaN/none` for Sun/Kerbol.")]
+		public TimeStamp timeAtPe => orbit?.timeAtPe ?? TimeStamp.none;
 
-		[Description("Eccentricity of the orbit. \\[0, +inf)")]
-		public double eccentricity => native.orbit.eccentricity;
-		[Description("Inclination of the orbit.")]
-		public double inclination => native.orbit.inclination;
-		[Description("Semi-major axis of the orbit.")]
-		public double semiMajorAxis => native.orbit.semiMajorAxis;
-		[Description("Semi-minor axis of the orbit.")]
-		public double semiMinorAxis => native.orbit.semiMinorAxis;
+		[Description("Eccentricity of the orbit. \\[0, +inf) `NaN` for Sun/Kerbol.")]
+		public double eccentricity => native.orbit?.eccentricity ?? double.NaN;
+		[Description("Inclination of the orbit. `NaN` for Sun/Kerbol.")]
+		public double inclination => native.orbit?.inclination ?? double.NaN;
+		[Description("Semi-major axis of the orbit. `NaN` for Sun/Kerbol.")]
+		public double semiMajorAxis => native.orbit?.semiMajorAxis ?? double.NaN;
+		[Description("Semi-minor axis of the orbit. `NaN` for Sun/Kerbol.")]
+		public double semiMinorAxis => native.orbit?.semiMinorAxis ?? double.NaN;
 
-		[Description("Height above ground of highest point of the orbit.")]
-		public double apoapsis => native.orbit.ApA;
-		[Description("Height above ground of lowest point of the orbit.")]
-		public double periapsis => native.orbit.PeA;
-		[Description("Highest distance between center of orbited body and any point of the orbit.")]
-		public double apocenter => native.orbit.ApR;
-		[Description("Lowest distance between center of orbited body and any point of the orbit.")]
-		public double pericenter => native.orbit.PeR;
+		[Description("Height above ground of highest point of the orbit. `NaN` for Sun/Kerbol.")]
+		public double apoapsis => native.orbit?.ApA ?? double.NaN;
+		[Description("Height above ground of lowest point of the orbit. `NaN` for Sun/Kerbol.")]
+		public double periapsis => native.orbit?.PeA ?? double.NaN;
+		[Description("Highest distance between center of orbited body and any point of the orbit. `NaN` for Sun/Kerbol.")]
+		public double apocenter => native.orbit?.ApR ?? double.NaN;
+		[Description("Lowest distance between center of orbited body and any point of the orbit. `NaN` for Sun/Kerbol.")]
+		public double pericenter => native.orbit?.PeR ?? double.NaN;
 
-		[Description("Angle in degrees between the direction of periapsis and the current position. Zero at periapsis, 180 at apoapsis.")]
-		public double trueAnomaly => RosMath.Deg.Clamp360(native.orbit.trueAnomaly * RosMath.Rad2Deg);
-		[Description("Angle in degrees between the direction of periapsis and the current position extrapolated on circular orbit.")]
-		public double meanAnomaly => RosMath.Deg.Clamp360(native.orbit.meanAnomaly * RosMath.Rad2Deg);
-		[Description("Longitude of ascending node.")]
-		public double lan => native.orbit.LAN;
-		[Description("Argument of periapsis. Angle from ascending node to periapsis.")]
-		public double argumentOfPeriapsis => native.orbit.argumentOfPeriapsis;
-		[Description("Argument of periapsis. Angle from ascending node to periapsis.")]
-		public double aop => native.orbit.argumentOfPeriapsis;
+		[Description("Angle in degrees between the direction of periapsis and the current position. Zero at periapsis, 180 at apoapsis. `NaN` for Sun/Kerbol.")]
+		public double trueAnomaly => native.orbit == null ? double.NaN :
+			RosMath.Deg.Clamp360(native.orbit.trueAnomaly * RosMath.Rad2Deg);
+		[Description("Angle in degrees between the direction of periapsis and the current position extrapolated on circular orbit. `NaN` for Sun/Kerbol.")]
+		public double meanAnomaly => native.orbit == null ? double.NaN :
+			RosMath.Deg.Clamp360(native.orbit.meanAnomaly * RosMath.Rad2Deg);
+		[Description("Longitude of ascending node. `NaN` for Sun/Kerbol.")]
+		public double lan => native.orbit?.LAN ?? double.NaN;
+		[Description("Argument of periapsis. Angle from ascending node to periapsis. `NaN` for Sun/Kerbol.")]
+		public double argumentOfPeriapsis => native.orbit?.argumentOfPeriapsis ?? double.NaN;
+		[Description("Argument of periapsis. Angle from ascending node to periapsis. `NaN` for Sun/Kerbol.")]
+		public double aop => native.orbit?.argumentOfPeriapsis ?? double.NaN;
 
-		[WorkInProgress, Description("Get time at true anomaly (absolute time of angle from direction of periapsis).")]
+		[WorkInProgress, Description("Get time at true anomaly (absolute time of angle from direction of periapsis). `NaN/none` for Sun/Kerbol.")]
 		public TimeStamp timeAtTrueAnomaly(double trueAnomaly)
 			=> Time.now + timeToTrueAnomaly(trueAnomaly);
-		[WorkInProgress, Description("Get time to true anomaly (relative time of angle from direction of periapsis). [0, period)")]
+		[WorkInProgress, Description("Get time to true anomaly (relative time of angle from direction of periapsis). [0, period) `NaN/none` for Sun/Kerbol.")]
 		public TimeDelta timeToTrueAnomaly(double trueAnomaly)
-			=> new TimeDelta(native.orbit.GetDTforTrueAnomaly(trueAnomaly * RosMath.Deg2Rad, 0.0) % native.orbit.period);
+			=> native.orbit == null ? TimeDelta.none : new TimeDelta(
+				native.orbit.GetDTforTrueAnomaly(trueAnomaly * RosMath.Deg2Rad, 0.0) % native.orbit.period);
 	}
 }

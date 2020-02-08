@@ -20,24 +20,24 @@ Celestial body. (`SpaceBody` selected not to conflict with KSP `CelestialBody`.)
 - `atmosphere`: [SpaceBody.Atmosphere](SpaceBody.Atmosphere.md) - Atmosphere parameters of the body.
 - `atm`: [SpaceBody.Atmosphere](SpaceBody.Atmosphere.md) - Atmosphere parameters of the body. (Alias to `atmosphere`)
 - `orbit`: [OrbitInfo](OrbitInfo.md) - \[`WIP`\] Orbit parameters. Null for Sun/Kerbol.
-- `period`: [TimeDelta](TimeDelta.md) - Period of current orbit in seconds. Alias to `orbit.period`.
-- `timeToAp`: [TimeDelta](TimeDelta.md) - Eta to apoapsis in seconds. Alias to `orbit.timeToAp`.
-- `timeToPe`: [TimeDelta](TimeDelta.md) - Eta to periapsis in seconds. Alias to `orbit.timeToPe`.
-- `timeAtAp`: [TimeStamp](TimeStamp.md) - Time at apoapsis. Alias to `orbit.timeAtAp`.
-- `timeAtPe`: [TimeStamp](TimeStamp.md) - Time at periapsis. Alias to `orbit.timeAtPe`.
-- `eccentricity`: double - Eccentricity of the orbit. \[0, +inf)
-- `inclination`: double - Inclination of the orbit.
-- `semiMajorAxis`: double - Semi-major axis of the orbit.
-- `semiMinorAxis`: double - Semi-minor axis of the orbit.
-- `apoapsis`: double - Height above ground of highest point of the orbit.
-- `periapsis`: double - Height above ground of lowest point of the orbit.
-- `apocenter`: double - Highest distance between center of orbited body and any point of the orbit.
-- `pericenter`: double - Lowest distance between center of orbited body and any point of the orbit.
-- `trueAnomaly`: double - Angle in degrees between the direction of periapsis and the current position. Zero at periapsis, 180 at apoapsis.
-- `meanAnomaly`: double - Angle in degrees between the direction of periapsis and the current position extrapolated on circular orbit.
-- `lan`: double - Longitude of ascending node.
-- `argumentOfPeriapsis`: double - Argument of periapsis. Angle from ascending node to periapsis.
-- `aop`: double - Argument of periapsis. Angle from ascending node to periapsis.
+- `period`: [TimeDelta](TimeDelta.md) - Period of current orbit in seconds. Alias to `orbit.period`. `NaN/none` for Sun/Kerbol.
+- `timeToAp`: [TimeDelta](TimeDelta.md) - Eta to apoapsis in seconds. Alias to `orbit.timeToAp`. `NaN/none` for Sun/Kerbol.
+- `timeToPe`: [TimeDelta](TimeDelta.md) - Eta to periapsis in seconds. Alias to `orbit.timeToPe`. `NaN/none` for Sun/Kerbol.
+- `timeAtAp`: [TimeStamp](TimeStamp.md) - Time at apoapsis. Alias to `orbit.timeAtAp`. `NaN/none` for Sun/Kerbol.
+- `timeAtPe`: [TimeStamp](TimeStamp.md) - Time at periapsis. Alias to `orbit.timeAtPe`. `NaN/none` for Sun/Kerbol.
+- `eccentricity`: double - Eccentricity of the orbit. \[0, +inf) `NaN` for Sun/Kerbol.
+- `inclination`: double - Inclination of the orbit. `NaN` for Sun/Kerbol.
+- `semiMajorAxis`: double - Semi-major axis of the orbit. `NaN` for Sun/Kerbol.
+- `semiMinorAxis`: double - Semi-minor axis of the orbit. `NaN` for Sun/Kerbol.
+- `apoapsis`: double - Height above ground of highest point of the orbit. `NaN` for Sun/Kerbol.
+- `periapsis`: double - Height above ground of lowest point of the orbit. `NaN` for Sun/Kerbol.
+- `apocenter`: double - Highest distance between center of orbited body and any point of the orbit. `NaN` for Sun/Kerbol.
+- `pericenter`: double - Lowest distance between center of orbited body and any point of the orbit. `NaN` for Sun/Kerbol.
+- `trueAnomaly`: double - Angle in degrees between the direction of periapsis and the current position. Zero at periapsis, 180 at apoapsis. `NaN` for Sun/Kerbol.
+- `meanAnomaly`: double - Angle in degrees between the direction of periapsis and the current position extrapolated on circular orbit. `NaN` for Sun/Kerbol.
+- `lan`: double - Longitude of ascending node. `NaN` for Sun/Kerbol.
+- `argumentOfPeriapsis`: double - Argument of periapsis. Angle from ascending node to periapsis. `NaN` for Sun/Kerbol.
+- `aop`: double - Argument of periapsis. Angle from ascending node to periapsis. `NaN` for Sun/Kerbol.
 
 **Instance Methods:**
 - `positionAt()`: [Vector](Vector.md), time [TimeStamp](TimeStamp.md)
@@ -45,6 +45,6 @@ Celestial body. (`SpaceBody` selected not to conflict with KSP `CelestialBody`.)
 - `velocityAt()`: [Vector](Vector.md), time [TimeStamp](TimeStamp.md)
   - \[`WIP`\] Predicted velocity at specified time.
 - `timeAtTrueAnomaly()`: [TimeStamp](TimeStamp.md), trueAnomaly double
-  - \[`WIP`\] Get time at true anomaly (absolute time of angle from direction of periapsis).
+  - \[`WIP`\] Get time at true anomaly (absolute time of angle from direction of periapsis). `NaN/none` for Sun/Kerbol.
 - `timeToTrueAnomaly()`: [TimeDelta](TimeDelta.md), trueAnomaly double
-  - \[`WIP`\] Get time to true anomaly (relative time of angle from direction of periapsis). [0, period)
+  - \[`WIP`\] Get time to true anomaly (relative time of angle from direction of periapsis). [0, period) `NaN/none` for Sun/Kerbol.

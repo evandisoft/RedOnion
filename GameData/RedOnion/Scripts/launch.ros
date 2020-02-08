@@ -274,7 +274,12 @@ try
   ctlsub = null
   user.throttle = 0
   autopilot.disable
-  print "Safe altitude reached"
+  if ship.altitude >= safeAltitude
+    print "Safe altitude reached"
+  else if ship.timeToAp > ship.timeToPe
+    print "Emergency circularization"
+  else
+    print "Uknown reason for circularization"
   vd[3].hide //srfvel
 
 //: CIRCULARIZE

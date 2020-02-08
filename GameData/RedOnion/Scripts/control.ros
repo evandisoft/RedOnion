@@ -20,6 +20,7 @@ def control ship, target, x, y
   wnd.closed.add def
     self.terminate = true
   var autopilot = ship.autopilot
+  var report = nan
 
 //mode vs. the rest
   var split = wnd.addHorizontal()
@@ -84,6 +85,9 @@ def control ship, target, x, y
   var bRetro  = xbtn row, "Retro.", def
     if mObt.pressed
       return -ship.velocity
+    if ship.splashed or ship.landed
+      autopilot.throttle = 0
+      return ship.away
   //landing assist
     var dir = -ship.srfvel
     if ship.altitude >= 10000 or ship.periapsis >= 0
@@ -96,15 +100,22 @@ def control ship, target, x, y
       return dir
     var vec = dir
     var mag = vec.size
-    var lim = math.min 90, mag+1
+    var lim = math.min 90, mag + math.max(1, mag-grav)^1.4
     var ang = ship.away.angle dir
     var cos = math.deg.cos ang
+    var hrz = vec.project(ship.away).size
+    if ang > 90
+      hrz = -hrz
     if ang > lim
       dir = ship.away.rotate lim, ship.away.cross dir
       cos = math.deg.cos lim
-    autopilot.throttle = math.min user.throttle, grav/acc/cos + (ang > 120 ?
-      (-mag - 0.5) : (mag - 0.5)) / (acc-grav)
+    autopilot.throttle = math.min user.throttle, (grav - 0.5)/acc/cos +
+      (hrz < 0 ? hrz : mag) / (acc-grav)
     //todo: add user controls
+    //todo: add button for hovering
+    if time.since(report) >= 1
+      report = time()
+      print "V: {0,5:F1}/{1,5:F1} A: {2,5:F1}/{3,4:F1} C: {4:F4}", mag, hrz, acc, grav, 1-cos
     return dir
 
   row = blk1.addHorizontal()
@@ -174,10 +185,9 @@ def control ship, target, x, y
         rq.ship = target
         rq.target = ship
         rq.x = wnd.x
-        rq.y = wnd.y + wnd.height * 2 < unity.screen.height ?
-          wnd.y + wnd.height : wnd.y - wnd.height
+        rq.y = wnd.y > unity.screen.height/2 ?
+          wnd.y - wnd.height : wnd.y + wnd.height
         reqs.push rq
-        print "Control " + target.name
     prevTgtBtn.press
     return vector.none
   bControlTarget.flexWidth = 1
@@ -198,11 +208,10 @@ def control ship, target, x, y
   blk3.visible = false
   row = blk3.addHorizontal()
   var warpDelay
-  var report
   var dvMin
   def execInit
     warpDelay = null
-    report = null
+    report = nan
     dvMin = inf
     ship.sas = true
   def execSteer
@@ -227,7 +236,7 @@ def control ship, target, x, y
         and ship.angularVelocity.size < 0.1)
         warpDelay = null
         time.warp.to time() + dt - (dt > 300 ? 300 : 10)
-      if report == null or time.since(report) >= 1
+      if time.since(report) >= 1
         report = time()
         print "DV: {0,4:F1} AD: {1,4:F1} AV: {2,5:F2}", dv.size, d, ship.angularVelocity.size
     autopilot.throttle = dt >= 1 ? 0 : (dt <= 0 ? 1 : 1-dt) * e *
@@ -295,14 +304,22 @@ def control ship, target, x, y
       //e.g. Mun to Kerbin, Kerbin to Duna or Mun to Minmus, calculate like if transfering the body itself
         ret = our.body.body == its
         our = our.body
-        print "Warning: Assuming self as " + our.name
+        print "Assuming self as " + our.name
+        if its.body == null
+          print "Trying to hit the Sun/Kerbol?"
+          bAbort.press
+          return
       else if its.body != null and its.body.body != null and our.body.body == its.body.body
       //e.g. Kerbin to Ike, redirect to Duna
         our = our.body
         its = its.body
-        print "Warning: Assuming self as {0} and it as {1}", our.name, its.name
+        print "Assuming self as {0} and it as {1}", our.name, its.name
+      else if its is types.ship and its.body.body == our.body
+      //e.g. Kerbin to Mun Station
+        its = its.body
+        print "Targeting {0} first, press again when done", its.name
       else
-        print "Incompatible orbits: {0} to {1}", our.body, its.body
+        print "Incompatible orbits: {0} to {1}/{2}", our.body, its.body, its.name
         bAbort.press
         return
     while node.next != null
@@ -350,8 +367,26 @@ def control ship, target, x, y
     r1 = p1.size
     if ret; r1 -= ship.semiMajorAxis
   //https://en.wikipedia.org/wiki/Semi-major_and_semi-minor_axes#Orbital_period
+    var t2 = t1 + math.pi*math.sqrt (0.5*(r1+r2))^3.0/its.body.mu
     var s2 = r2
-    if !ret; r2 = r3 + (its.positionAt(t1 + math.pi*math.sqrt(math.max(r1,r2)^3.0/its.body.mu))-its.body.position).size
+    if !ret; for var guard = 0; guard < 10; guard++
+    //this loop is mainly for highly eccentric targets like rescue missions
+      var p2 = its.positionAt(t2)-its.body.position
+      r2 = r3 + p2.size
+      var p3 = p1.normalized * -r2
+      var ad = p2.angle p3, ship.north
+      if r2 < r1; ad = -ad
+      var d2 = ad*our.period/360
+      var d3 = math.abs d2
+      if d3 <= 0.5; break
+      //todo: we may go into the past with this, would need to add one period
+      dt += d2
+      t1 += d2
+      v1 = our.velocityAt(t1).size
+      p1 = our.positionAt(t1)-our.body.position
+      r1 = p1.size
+      t2 = t1 + math.pi*math.sqrt (0.5*(r1+r2))^3.0/its.body.mu
+      print "AD: {0,7:F3} D2: {1,7:F1} {2}", ad, d2, time.delta dt
   //https://en.wikipedia.org/wiki/Orbital_speed#Precise_orbital_speed
     var v2 = math.sqrt our.body.mu*(2/r1-2/(r1+r2))
     var dv = v2 - v1
@@ -366,7 +401,7 @@ def control ship, target, x, y
     //correction for optimal angle
       var sa = ship.velocityAt(t1).angle body.velocityAt(t1), ship.north
       var da = math.deg.asin(1/(1+ship.semiMajorAxis*dv^2/body.mu))
-      if r2 < r1 then da += 180
+      if r2 < r1; da += 180
       var ca = math.clamp360 -da-sa
     //finalize eta and add node
       var t2 = t1
@@ -530,7 +565,13 @@ try
       if guis[i].main(); i++
     if reqs.count > 0
       var rq = reqs.pop()
-      control rq.ship, rq.target, rq.x, rq.y
+      var have = false
+      for var j = 0; j < guis.count
+        if guis[i].ship == rq.ship
+          have = true
+          break
+      if !have
+        control rq.ship, rq.target, rq.x, rq.y
     wait
 finally
   for var gui in guis
