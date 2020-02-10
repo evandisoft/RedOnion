@@ -146,6 +146,16 @@ namespace RedOnion.KSP.Parts
 			}
 		}
 
+		[Description("Controlling part.")]
+		public PartBase control
+		{
+			get
+			{
+				var ctl = ship.native.GetReferenceTransformPart();
+				return ctl == null ? root : this[ctl];
+			}
+		}
+
 		protected LinkPart _nextDecoupler;
 		[Description("One of the decouplers that will get activated by nearest stage.")]
 		public LinkPart nextDecoupler

@@ -7,6 +7,7 @@ Collection of all the parts in one ship/vessel.
 
 **Instance Properties:**
 - `root`: [Part](PartBase.md) - Root part.
+- `control`: [Part](PartBase.md) - Controlling part.
 - `nextDecoupler`: [LinkPart](LinkPart.md) - One of the decouplers that will get activated by nearest stage.
 - `nextDecouplerStage`: int - Stage number of the nearest decoupler or -1. (`nextDecoupler?.stage ?? -1`)
 - `decouplers`: [ReadOnlyList](../API/ReadOnlyList.1.md)\[[LinkPart](LinkPart.md)\] - List of all decouplers, separators, launch clamps and docks with staging enabled. (Docking ports without staging enabled not included.)

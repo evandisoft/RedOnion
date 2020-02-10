@@ -138,6 +138,9 @@ def control ship, target, x, y
     prevTgtBtn = bTowards
     var target = ship.target ?? self.target
     if target != null
+      var ctl = ship.controlPart
+      if ctl is types.dock
+        return target.position - ship.position - ctl.position
       return target.position - ship.position
     autopilot.killRot = true
     return vector.none
@@ -375,9 +378,8 @@ def control ship, target, x, y
       var p3 = p1.normalized * -r2
       var ad = p2.angle p3, ship.north
       if r2 < r1; ad = -ad
-      var d2 = ad*our.period/360
+      var d2 = ad/(360/math.min(its.period,our.period) - 360/math.max(its.period,our.period))
       var d3 = math.abs d2
-      if d3 <= 0.5; break
       //todo: we may go into the past with this, would need to add one period
       dt += d2
       t1 += d2
@@ -386,6 +388,7 @@ def control ship, target, x, y
       r1 = p1.size
       t2 = t1 + math.pi*math.sqrt (0.5*(r1+r2))^3.0/its.body.mu
       print "AD: {0,7:F3} D2: {1,7:F1} {2}", ad, d2, time.delta dt
+      if d3 <= 0.5; break
   //https://en.wikipedia.org/wiki/Orbital_speed#Precise_orbital_speed
     var v2 = math.sqrt our.body.mu*(2/r1-2/(r1+r2))
     var dv = v2 - v1

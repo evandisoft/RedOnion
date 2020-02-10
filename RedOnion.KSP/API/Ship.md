@@ -11,6 +11,7 @@ Active vessel
 - `throttle`: float - Current throttle (assign redirects to `Autopilot`, reads control state if autopilot disabled)
 - `parts`: [ShipPartSet](../Parts/ShipPartSet.md) - All parts of this ship/vessel/vehicle.
 - `root`: [Part](../Parts/PartBase.md) - Root part (same as `parts.root`).
+- `controlPart`: [Part](../Parts/PartBase.md) - Controlling part (same as `parts.control`).
 - `nextDecoupler`: [LinkPart](../Parts/LinkPart.md) - One of the decouplers that will get activated by nearest stage. (Same as `Parts.NextDecoupler`.)
 - `nextDecouplerStage`: int - Stage number of the nearest decoupler or -1. (Same as `Parts.NextDecouplerStage`.)
 - `currentStage`: int - Current stage number. (Same as `stage.number` if active ship.)
@@ -26,6 +27,8 @@ Active vessel
 - `packed`: bool - Wheter the ship is still packed (reduced physics).
 - `landed`: bool - Wheter the ship is landed (on the ground or on/in water).
 - `splashed`: bool - Wheter the ship is in water.
+- `prelaunch`: bool - Ship is on launch-pad.
+- `situation`: Situations - KSP API. Current situation.
 - `longitude`: double - Longitude of current position in degrees.
 - `latitude`: double - Latitude of current position in degrees.
 - `altitude`: double - Altitude of current position (above sea level) in meters.
