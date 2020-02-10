@@ -185,8 +185,7 @@ def control ship, target, x, y
         rq.ship = target
         rq.target = ship
         rq.x = wnd.x
-        rq.y = wnd.y > unity.screen.height/2 ?
-          wnd.y - wnd.height : wnd.y + wnd.height
+        rq.y = wnd.y >= 0 ? wnd.y - wnd.height : wnd.y + wnd.height
         reqs.push rq
     prevTgtBtn.press
     return vector.none
@@ -566,7 +565,7 @@ try
     if reqs.count > 0
       var rq = reqs.pop()
       var have = false
-      for var j = 0; j < guis.count
+      for var i = 0; i < guis.count; i++
         if guis[i].ship == rq.ship
           have = true
           break

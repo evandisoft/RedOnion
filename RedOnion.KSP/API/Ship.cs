@@ -273,8 +273,10 @@ namespace RedOnion.KSP.API
 		public bool landed => native.Landed;
 		[Description("Wheter the ship is in water.")]
 		public bool splashed => native.Splashed;
-		// examine this first
-		//public Vessel.Situations situation => native.situation;
+		[Description("Ship is on launch-pad.")]
+		public bool prelaunch => situation == Vessel.Situations.PRELAUNCH;
+		[Description("KSP API. Current situation.")]
+		public Vessel.Situations situation => native.situation;
 
 		[Description("Longitude of current position in degrees.")]
 		public double longitude => native.longitude;

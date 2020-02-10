@@ -1,0 +1,7 @@
+if ship == null
+  return
+if ship.parts.count == 1
+//probably ground experiment
+  return
+//TODO: run.main/async with script path
+system.main def => run ship.prelaunch ? "launch.ros" : "control.ros"
