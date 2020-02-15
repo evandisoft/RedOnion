@@ -237,13 +237,17 @@ def control ship, target, x, y
       else if (time.since(warpDelay) >= 1 and d < 1
         and ship.angularVelocity.size < 0.1)
         warpDelay = null
-        time.warp.to time() + dt - (dt > 300 ? 300 : 10)
-      if time.since(report) >= 1
-        report = time()
-        print "DV: {0,4:F1} AD: {1,4:F1} AV: {2,5:F2}", dv.size, d, ship.angularVelocity.size
-    autopilot.throttle = dt >= 1 ? 0 : (dt <= 0 ? 1 : 1-dt) * e *
+        var to = time() + dt - (dt > 300 ? 300 : 10)
+        time.warp.to to
+        print "Warping to {0}", to
+    var th = dt >= 1 ? 0 : (dt <= 0 ? 1 : 1-dt) * e *
       dv.size * ship.mass / math.max 1, ship.engines.getThrust()
+    autopilot.throttle = th
     dvMin = math.min dvMin, dv.size
+    if time.sinceReal(report) >= 1
+      report = time.real
+      print "DV: {0,4:F1} AD: {1,4:F1} AV: {2,5:F2} DT: {3}",
+        dv.size, d, ship.angularVelocity.size, dt
     if dvMin < 0.05
       nde.remove
       bAbort.press

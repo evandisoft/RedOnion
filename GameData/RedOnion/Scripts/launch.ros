@@ -265,7 +265,7 @@ var vdraws = system.update vectors
 try
   print "Target apoapsis: " + targetAltitude
   print "Safe altitude:   " + safeAltitude
-  until ship.altitude >= safeAltitude/2 and (
+  until ship.altitude >= narrowAltitude+(safeAltitude-narrowAltitude)/2 and (
     ship.altitude >= safeAltitude and ship.apoapsis >= targetAltitude*.99
     or ship.timeToAp > ship.timeToPe) // this is here until I find better way for weak orbital engines (TODO: use stage.burntime)
     wait

@@ -49,6 +49,12 @@ namespace RedOnion.KSP.API
 		[Description("Time delta/span of one tick. (Script engine always runs in physics ticks.)")]
 		public static TimeDelta tick => new TimeDelta(KSPTW.fixedDeltaTime);
 
+		[Description("Real time since startup in seconds. (Good for printing reports e.g. every second.)")]
+		public static double real => UnityEngine.Time.realtimeSinceStartup;
+		[Description("Real time since previous point. Returns infinity if input is `nan`.")]
+		public static double sinceReal(double real)
+			=> double.IsNaN(real) ? double.PositiveInfinity : UnityEngine.Time.realtimeSinceStartup - real;
+
 		public static readonly Type warp = typeof(TimeWarp);
 		public static readonly Type stamp = typeof(TimeStamp);
 		public static readonly Type delta = typeof(TimeDelta);

@@ -626,7 +626,7 @@ namespace RedOnion.KSP.API
 				{
 					var deep = inner.referenceBody;
 					if (deep == our)
-					{// target body is orbiting a body that is orbitin current body (e.g. Ike or Gilly when still in Sun/Kerbol's SOI)
+					{// target body is orbiting a body that is orbiting current body (e.g. Ike or Gilly when still in Sun/Kerbol's SOI)
 						vel += its.orbit.getOrbitalVelocityAtUT(time);
 						vel += deep.orbit.getOrbitalVelocityAtUT(time);
 					}

@@ -14,7 +14,10 @@ The simulation time, in seconds, since the game or this save was started. Return
 - `none`: [TimeStamp](TimeStamp.md) - No time (contains `NaN`). Useful for initialization of time-stamp variables as `since(none) = inf`.
 - `seconds`: double - The simulation time in seconds, since the game or this save was started. For pure computation (same as `now.seconds`).
 - `tick`: [TimeDelta](TimeDelta.md) - Time delta/span of one tick. (Script engine always runs in physics ticks.)
+- `real`: double - Real time since startup in seconds. (Good for printing reports e.g. every second.)
 
 **Static Methods:**
 - `since()`: [TimeDelta](TimeDelta.md), time Object
   - Time delta/span since some previous time (`TimeStamp` or `double`). Returns `infinite` if `time` is `none`. (Use `.s` or `.seconds` on the result if you want pure `double` value).
+- `sinceReal()`: double, real double
+  - Real time since previous point. Returns infinity if input is `nan`.

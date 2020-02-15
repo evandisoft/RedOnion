@@ -264,7 +264,7 @@ namespace RedOnion.KSP.API
 #endif
 			foreach (var e in ship.engines)
 			{
-				if (e.state != PartStates.ACTIVE)
+				if (!e.operational)
 					continue;
 				engines.Add(e);
 				if (e.decoupledin >= nextDecoupler && e.native.Resources.Count > 0)
