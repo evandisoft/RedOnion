@@ -389,5 +389,17 @@ namespace RedOnion.KSP.API
 			pid.input = 10 * (angle + stop) / accel;
 			return pid.update();
 		}
+
+		public void resetSAS()
+		{
+			var ap = _ship.native.Autopilot;
+			if (ap == null) return;
+			ap.SAS.ResetAllPIDS();
+			if (ap.Enabled)
+			{
+				ap.Disable();
+				ap.Enable();
+			}
+		}
 	}
 }
