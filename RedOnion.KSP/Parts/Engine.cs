@@ -112,33 +112,35 @@ namespace RedOnion.KSP.Parts
 				if (!e.operational)
 					continue;
 				var isp = e.isp;
-				if (isp <= 0.001)
+				if (isp <= minIsp)
 					continue;
 				var eth = e.getThrust(atm) * e.thrustPercentage * 0.01;
 				thrust += eth;
 				flow += eth / isp;
 			}
-			return flow <= 0.001 ? 0.0 : thrust/flow;
+			return flow <= minFlow ? 0.0 : thrust/flow;
 		}
 
 		public static double g0 = 9.81;
+		internal const double minIsp = 0.001;
+		internal const double minFlow = 0.0001;
 		[Description("Estimate burn time for given delta-v (assuming it can be done without staging).")]
-		public TimeDelta burnTime(double deltaV, double mass = double.NaN)
-		{
+		public TimeDelta burntime(double deltaV, double mass = double.NaN)
+		{// see Stage.UpdateBurnTime
 			var thrust = 0.0;
 			var flow = 0.0;
 			foreach (var e in this)
 			{
 				if (!e.operational)
 					continue;
-				var isp = e.isp;
-				if (isp <= 0.001)
+				var eisp = e.isp;
+				if (eisp < minIsp)
 					continue;
-				var eth = e.getThrust() * e.thrustPercentage * 0.01;
-				thrust += eth;
-				flow += eth / isp;
+				var ethr = e.getThrust() * e.thrustPercentage * 0.01;
+				thrust += ethr;
+				flow += ethr / eisp;
 			}
-			if (flow <= 0.0001)
+			if (flow < minFlow)
 				return TimeDelta.none;
 			var stdIsp = g0 * thrust / flow;
 			if (double.IsNaN(mass)) mass = _ship.mass;
@@ -217,17 +219,16 @@ namespace RedOnion.KSP.Parts
 			}
 		}
 
-		[DisplayName("Whether engine is operational (ignited and not flameout).")]
+		[Description("Whether engine is operational (ignited and not flameout).")]
 		public bool operational => activeModule.isOperational;
-		[DisplayName("Wheter engine is ignited.")]
+		[Description("Wheter engine is ignited.")]
 		public bool ignited => activeModule.EngineIgnited;
-		[DisplayName("Wheter engine flamed out.")]
+		[Description("Wheter engine flamed out.")]
 		public bool flameout => activeModule.flameout;
-		[DisplayName("Wheter engine is staged (activated by staging).")]
-		public bool staged => activeModule.staged;
-		[DisplayName("Activate the engine.")]
+
+		[Description("Activate the engine.")]
 		public void activate() => activeModule.Activate();
-		[DisplayName("Shutdown / deactivate the engine.")]
+		[Description("Shutdown / deactivate the engine.")]
 		public void shutdown() => activeModule.Shutdown();
 
 		[Description("Get specific impulse [kN] at atmospheric pressure"
@@ -249,19 +250,11 @@ namespace RedOnion.KSP.Parts
 				RosMath.Clamp((float)throttle, 0f, 1f));
 		}
 
-		[DisplayName("Current ISP. (Specific impulse)")]
+		[Description("Current ISP. (Specific impulse)")]
 		public double isp => activeModule.realIsp;
-		[DisplayName("Vacuum ISP.")]
-		public double visp => activeModule.atmosphereCurve.Evaluate(0f);
-		[DisplayName("Sea-level ISP.")]
-		public double gisp => activeModule.atmosphereCurve.Evaluate(1f);
-		[DisplayName("Sea-level ISP.")]
-		public double slisp => activeModule.atmosphereCurve.Evaluate(1f);
-		[DisplayName("Vacuum ISP.")]
+		[Description("Vacuum ISP.")]
 		public double vacuumIsp => activeModule.atmosphereCurve.Evaluate(0f);
-		[DisplayName("Sea-level ISP.")]
-		public double groundIsp => activeModule.atmosphereCurve.Evaluate(1f);
-		[DisplayName("Sea-level ISP.")]
+		[Description("Sea-level ISP.")]
 		public double seaLevelIsp => activeModule.atmosphereCurve.Evaluate(1f);
 
 		[Description("Current thrust [kN] (at current pressure, with current `thrustPercentage` and current throttle).")]

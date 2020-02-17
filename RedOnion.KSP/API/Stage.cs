@@ -1,17 +1,15 @@
-//#define DEBUG_STAGE_NOFUEL
+#define DEBUG_STAGE_NOFUEL
+#define DEBUG_STAGE_XPARTS
 
 using System;
-using RedOnion.ROS;
 using KSP.UI.Screens;
-using MoonSharp.Interpreter;
+using RedOnion.Attributes;
 using RedOnion.KSP.Parts;
+using RedOnion.ROS;
 using System.Collections.Generic;
 using System.ComponentModel;
-using RedOnion.KSP.Utilities;
-using RedOnion.Attributes;
-using System.Linq;
-using RedOnion.Collections;
 using System.Text;
+using System.Linq;
 
 //TODO: redirect these to new `ship.stages` API
 
@@ -72,7 +70,7 @@ namespace RedOnion.KSP.API
 					var nextDecoupler = ship.parts.nextDecouplerStage;
 					foreach (var e in engines)
 					{
-						if (e.flameout || !e.booster || e.decoupledin < nextDecoupler)
+						if (!e.booster || e.decoupledin < nextDecoupler)
 							continue;
 						var res = e.native.Resources["SolidFuel"];
 						if (res != null)
@@ -99,7 +97,7 @@ namespace RedOnion.KSP.API
 					var nextDecoupler = ship.parts.nextDecouplerStage;
 					foreach (var e in engines)
 					{
-						if (e.flameout || !e.booster || e.decoupledin < nextDecoupler)
+						if (!e.booster || e.decoupledin < nextDecoupler)
 							continue;
 						foreach (var propellant in e.activeModule.propellants)
 						{
@@ -119,10 +117,10 @@ namespace RedOnion.KSP.API
 		public static double liquidfuel
 			=> xparts.resources.getAmountOf("LiquidFuel");
 
-		static HashSet<ResourceID> liquidFuels = new HashSet<ResourceID>();
+		static readonly HashSet<ResourceID> liquidFuels = new HashSet<ResourceID>();
 		[WorkInProgress, Description("Amount of liquid fuel available in tanks of current stage to active engines."
-			+ " Similar to `xparts.resources.getAmountOf(engines.propellants.namesOfLiquid)`"
-			+ " but also ignores flameout engines.")]
+			+ " Similar to `xparts.resources.getAmountOf(engines.propellants.namesOfLiquid)`."
+			+ " Universal version (should be compatible with mods - e.g. Karbonite and CryoEngiens).")]
 		public static double liquidlike
 		{
 			get
@@ -130,7 +128,7 @@ namespace RedOnion.KSP.API
 				liquidFuels.Clear();
 				foreach (var e in engines)
 				{
-					if (e.flameout || e.booster)
+					if (e.booster)
 						continue;
 					foreach (var propellant in e.activeModule.propellants)
 					{
@@ -142,63 +140,168 @@ namespace RedOnion.KSP.API
 			}
 		}
 
-		static HashSet<ResourceID> flowingFuels = new HashSet<ResourceID>();
 		[WorkInProgress, Description("Total amount of fuel avialable for active engines in current stage."
 			+ " Designed with Ion and Monopropellant engines as well as mods in mind,"
 			+ " use `solidfuel + liquidfuel` as fallback, if this does not work.")]
-		public static double fuel
-		{
-			get
-			{
-				var ship = Ship.Active;
-				var sum = 0.0;
-				if (ship != null)
-				{
-					var nextDecoupler = ship.parts.nextDecouplerStage;
-					flowingFuels.Clear();
-					foreach (var e in engines)
-					{
-						if (e.flameout)
-							continue;
-						if (e.booster)
-						{
-							if (e.decoupledin >= nextDecoupler)
-							{
-								foreach (var propellant in e.activeModule.propellants)
-									if (propellant.GetFlowMode() == ResourceFlowMode.NO_FLOW)
-										sum += propellant.totalResourceAvailable;
-							}
-							continue;
-						}
-						foreach (var propellant in e.activeModule.propellants)
-							if (propellant.GetFlowMode() != ResourceFlowMode.NO_FLOW)
-								flowingFuels.Add(new ResourceID(propellant.id));
-					}
-					sum += xparts.resources.getAmountOf(flowingFuels);
-#if DEBUG && DEBUG_STAGE_NOFUEL
-					if (sum == 0.0)
-					{
-						Value.DebugLog($"No Fuel. Flowing Fuels: {flowingFuels.Count}, XParts: {xparts.count}");
-						foreach (var ff in flowingFuels)
-						{
-							var name = PartResourceLibrary.Instance.GetDefinition(ff).name;
-							Value.DebugLog($"{name}: {xparts.resources.getAmountOf(ff):F2}/{xparts.resources.getAmountOf(name):F2}");
-						}
-						Value.DebugLog("All resources:");
-						foreach (var res in xparts.resources)
-							Value.DebugLog($"{res.name}: {res.amount:F2}/{res.maxAmount:F2}");
-					}
-#endif
-				}
-				return sum;
-			}
-		}
+		public static double fuel { get { UpdateBurnTime(); return _fuel; } }
 		[WorkInProgress, Description("Indicator for staging - `fuel == 0.0`. Note that it could be better to use `fuel < 0.1` instead.")]
 		public static bool nofuel => fuel == 0.0;
 
+		static readonly Dictionary<ResourceID, PartResourceDefinition>
+			flowingFuels = new Dictionary<ResourceID, PartResourceDefinition>();
+		static double _isp, _sisp, _flow, _thrust, _fuel, _fuelMass, _dryMass, _deltaV;
+		static double _nextStdIsp, _nextThrust, _nextMass;
+		static TimeDelta _burnTime;
+		public static double isp { get { UpdateBurnTime(); return _isp; } }
+		public static double flow { get { UpdateBurnTime(); return _flow; } }
+		public static double thrust { get { UpdateBurnTime(); return _thrust; } }
+		public static double fuelMass { get { UpdateBurnTime(); return _fuelMass; } }
+		public static double dryMass { get { UpdateBurnTime(); return _dryMass; } }
+		public static double currDeltaV { get { UpdateBurnTime(); return _deltaV; } }
+		public static TimeDelta currBurnTime { get { UpdateBurnTime(); return _burnTime; } }
+
+		static TimeStamp burnTimeUpdate = Time.never;
+		static TimeStamp burnTimeUpdate2 = Time.never;
+		static TimeDelta burnTimeUpdateDelta = new TimeDelta(0.2);
+		static void UpdateBurnTime()
+		{
+			if (Dirty)
+				Refresh();
+			var now = Time.now;
+			if (now - burnTimeUpdate < burnTimeUpdateDelta)
+				return;
+			burnTimeUpdate = now;
+			_isp = 0;
+			_sisp = 0;
+			_flow = 0;
+			_thrust = 0;
+			_fuel = 0;
+			_fuelMass = 0;
+			_dryMass = 0;
+			_deltaV = 0;
+			_burnTime = TimeDelta.none;
+			flowingFuels.Clear();
+			var ship = Ship.Active;
+			if (ship == null)
+				return;
+			var nextDecoupler = ship.parts.nextDecouplerStage;
+			foreach (var e in engines)
+			{// see EngineSet.burntime
+				var eisp = e.isp;
+				if (eisp < EngineSet.minIsp)
+					continue;
+				var ethr = e.getThrust() * e.thrustPercentage * 0.01;
+				_thrust += ethr;
+				_flow += ethr / eisp;
+
+				if (!e.booster)
+				{
+					foreach (var propellant in e.activeModule.propellants)
+						if (propellant.GetFlowMode() != ResourceFlowMode.NO_FLOW)
+							flowingFuels[new ResourceID(propellant.id)] = propellant.resourceDef;
+				}
+				else if (e.decoupledin >= nextDecoupler)
+				{
+					foreach (var propellant in e.activeModule.propellants)
+					{
+						if (propellant.GetFlowMode() != ResourceFlowMode.NO_FLOW)
+							continue;
+						var amount = propellant.totalResourceAvailable;
+						_fuel += amount;
+						_fuelMass += amount * propellant.resourceDef.density;
+					}
+				}
+			}
+			_isp = _flow < EngineSet.minFlow ? 0.0 : _thrust / _flow;
+			foreach (var flowing in flowingFuels)
+			{
+				var amount = xparts.resources.getAmountOf(flowing.Key);
+				_fuel += amount;
+				_fuelMass += amount * flowing.Value.density;
+			}
+			// rather update the mass right now
+			ship.native.GetTotalMass();
+			_dryMass = Math.Max(0.0, ship.mass - _fuelMass);
+			if (_isp >= EngineSet.minIsp)
+			{
+				_sisp = EngineSet.g0 * _isp;
+				_deltaV = _sisp * Math.Log(ship.mass / _dryMass);
+				_burnTime = new TimeDelta(_sisp * _fuelMass / _thrust);
+			}
+
+#if DEBUG && DEBUG_STAGE_NOFUEL
+			if (_fuel == 0.0)
+			{
+				Value.DebugLog($"No Fuel. Flowing Fuels: {flowingFuels.Count}, XParts: {xparts.count}");
+				foreach (var ff in flowingFuels)
+				{
+					var name = ff.Value.name;
+					Value.DebugLog($"{name}: {xparts.resources.getAmountOf(ff.Key):F2}/{xparts.resources.getAmountOf(name):F2}");
+				}
+				Value.DebugLog("All resources:");
+				foreach (var res in xparts.resources)
+					Value.DebugLog($"{res.name}: {res.amount:F2}/{res.maxAmount:F2}");
+			}
+#endif
+		}
+
 		[WorkInProgress, Description("Estimate burn time for given delta-v.")]
-		public static TimeDelta burntime(double deltaV) => engines.burnTime(deltaV);
-		// TODO: burnTime even if current stage cannot handle it
+		public static TimeDelta burntime(double deltaV)
+		{
+			if (!(deltaV >= 0.0) || double.IsInfinity(deltaV))
+				return TimeDelta.none; // !(deltaV >= 0.0) checks for NaN as well
+			if (deltaV == 0.0)
+				return TimeDelta.zero;
+			UpdateBurnTime();
+			if (_isp < EngineSet.minIsp)
+				return TimeDelta.none;
+			if (deltaV > _deltaV)
+			{
+				//could do the following recursively but this should do for now
+				var now = Time.now;
+				if (now - burnTimeUpdate2 >= burnTimeUpdateDelta)
+				{
+					burnTimeUpdate2 = now;
+					var ship = Ship.Active;
+					_nextStdIsp = 0;
+					_nextThrust = 0;
+					_nextMass = 0;
+					double nxflow = 0;
+					double nxstage = ship.nextDecouplerStage;
+					foreach (var e in ship.engines)
+					{
+						if (e.stage < nxstage)
+							continue;
+						if (e.decoupledin >= nxstage)
+							continue;
+						var eisp = e.vacuumIsp; // assume vacuum for next stage
+						if (eisp < EngineSet.minIsp)
+							continue;
+						var ethr = e.getThrust(atm: 0.0) * e.thrustPercentage * 0.01;
+						//Value.DebugLog($"BT2: {e.name} thrust={ethr}, isp={eisp}");
+						_nextThrust += ethr;
+						nxflow += ethr / eisp;
+					}
+					if (nxflow >= EngineSet.minFlow)
+					{
+						_nextStdIsp = _nextThrust/nxflow * EngineSet.g0;
+						foreach (var p in ship.parts)
+						{
+							if (p.decoupledin < nxstage)
+								_nextMass += p.mass;
+						}
+					}
+				}
+				if (_nextStdIsp > 0 && _nextMass > 0 && _nextThrust > 0)
+					return new TimeDelta(_burnTime + 0.5 + _nextMass * _nextStdIsp *
+						(1.0 - Math.Pow(Math.E, -(deltaV - _deltaV) / _nextStdIsp)) / _nextThrust);
+/*#if DEBUG
+				if (burnTimeUpdate2 == now)
+					Value.DebugLog($"BT2: sisp={_nextStdIsp}, mass={_nextMass}, thrust={_nextThrust}");
+#endif*/
+			}
+			return new TimeDelta(Ship.Active.mass * _sisp * (1.0 - Math.Pow(Math.E, -deltaV / _sisp)) / _thrust);
+		}
 
 		static internal bool Dirty { get; private set; } = true;
 		static internal void SetDirty(string reason = null)
@@ -259,7 +362,7 @@ namespace RedOnion.KSP.API
 				if (p.decoupledin >= nextDecoupler)
 					parts.Add(p);
 			}
-#if DEBUG
+#if DEBUG && DEBUG_STAGE_XPARTS
 			var sb = new StringBuilder();
 #endif
 			foreach (var e in ship.engines)
@@ -276,7 +379,7 @@ namespace RedOnion.KSP.API
 					var part = shipParts[crossPart];
 					if (part.decoupledin >= nextDecoupler && xparts.Add(part))
 					{
-#if DEBUG
+#if DEBUG && DEBUG_STAGE_XPARTS
 						sb.AppendFormat("Part {0} added to xparts. [", part.name);
 						var first = true;
 						foreach (var res in crossPart.Resources)
@@ -291,6 +394,8 @@ namespace RedOnion.KSP.API
 					}
 				}
 			}
+			burnTimeUpdate = Time.never;
+			burnTimeUpdate2 = Time.never;
 			Dirty = false;
 			parts.Dirty = false;
 			xparts.Dirty = false;

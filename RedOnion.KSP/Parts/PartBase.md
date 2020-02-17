@@ -19,6 +19,8 @@ Part of the ship (vehicle/vessel).
 - `name`: string - Name of the part (assigned by KSP).
 - `title`: string - Title of the part (assigned by KSP).
 - `position`: [Vector](../API/Vector.md) - Position of the part (relative to CoM of active ship/vessel).
+- `mass`: double - Mass of the part including resources.
+- `resourceMass`: double - Mass of the resources contained.
 
 **Instance Methods:**
 - `istype()`: bool, name string

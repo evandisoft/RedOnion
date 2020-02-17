@@ -414,7 +414,7 @@ namespace RedOnion.KSP.Parts
 			if (engine != null)
 			{
 				engines.Add(engine);
-				int upto = engine.ignited ? ship.currentStage : engine.staged ? engine.stage : 0;
+				int upto = engine.ignited ? ship.currentStage : engine.stage;
 				for (int i = decoupledin + 1; i >= upto; i--)
 					stages.list[i].activeEngines.Add(engine);
 			}

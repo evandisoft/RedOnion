@@ -70,6 +70,11 @@ namespace RedOnion.KSP.Parts
 		[Description("Position of the part (relative to CoM of active ship/vessel).")]
 		public Vector position => new Vector(native.partTransform.position - FlightGlobals.ActiveVessel.CoMD);
 
+		[Description("Mass of the part including resources.")]
+		public double mass => native.mass + native.GetResourceMass();
+		[Description("Mass of the resources contained.")]
+		public double resourceMass => native.GetResourceMass();
+
 		[Description("Explode the part.")]
 		public void explode() => native.explode();
 

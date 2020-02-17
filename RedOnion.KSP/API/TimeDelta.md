@@ -11,6 +11,7 @@ Relative time. (Like `TimeSpan`)
 - `seconds`: double - The contained value - total seconds.
 
 **Static Fields:**
+- `zero`: TimeDelta - Zero time-delta/span.
 - `none`: TimeDelta - No time-delta/span (contains `NaN`).
 - `infinite`: TimeDelta - Infinite time-delta/span (contains `+Inf`).
 
