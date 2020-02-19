@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace RedOnion.KSP.API
 {
-	[WorkInProgress, Description("Maneuver node.")]
+	[Description("Maneuver node.")]
 	public class Node
 	{
 		static Node cachedNext;
