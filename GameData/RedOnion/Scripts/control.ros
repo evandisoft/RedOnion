@@ -531,6 +531,8 @@ def control ship, target, x, y
     var nextDecoupler = ship.parts.nextDecoupler
     if nextDecoupler == null
         return
+    if nextDecoupler.tags.has "noauto"
+      return
     if nextDecoupler.type == "LaunchClamp"
     //not releasing launch clamps in this script
       return
