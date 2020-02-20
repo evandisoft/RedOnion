@@ -9,8 +9,8 @@ var maxSpeed       = .9   // target escape speed (fraction of minimal or in m/s 
 var safeAltitude   = 1 + math.max atmosphere.depth/1000, 7 // safe altitude above atmosphere and mountains
 var startAngle     = math.round(ship.pitch,1) // usually 90 but e.g. DynaWing starts with 81.2
 var firstAngle     = 60   // angle upto which to use simple ratio
-var firstAltitude  = math.max safeAltitude/10, 3 // altitude (in km) of first phase (to reach pitch=firstAngle)
-var narrowAltitude = 100  // altitude (in m) upto which to go straight up
+var firstAltitude  = math.max safeAltitude/10, math.max 3, ship.altitude/1000+2 // altitude (in km) of first phase (to reach pitch=firstAngle)
+var narrowAltitude = 10*math.round ship.altitude/10+10 // altitude (in m) upto which to go straight up
 
 if startAngle > 89
   startAngle = 90
@@ -139,7 +139,7 @@ autopilot.pids.roll.D = 0.05
 //*/
 
 var minSpeed = null
-var prevSteerReport = -inf
+var prevSteerReport = nan
 def steer
   if ship.altitude <= narrowAltitude
     autopilot.pitch = startAngle
@@ -210,21 +210,15 @@ def staging
   //nothing to separate
     if stage.pending
     //but there appears to be inactive engine
-    //TODO: add a check like stage.next.containsType("engine")
       print "Pending last stage"
       stage
     return
-  if nextDecoupler.isType "LaunchClamp"
+  if nextDecoupler.type == "LaunchClamp"
     print "Releasing launch clamps"
     stage
     return
-  if not stage.engines.anyOperational
-    print "No operational engine"
-    stage
-    return
-  //todo: SRB's vs. Twin Boars (engine-tank combo)
-  if stage.fuel <= 0.1
-    print "Stage out of fuel"
+  if stage.nofuel
+    print stage.engines.anyOperational ? "Stage out of fuel" : "No operational engine"
     stage
     return
 
@@ -271,7 +265,7 @@ var vdraws = system.update vectors
 try
   print "Target apoapsis: " + targetAltitude
   print "Safe altitude:   " + safeAltitude
-  until ship.altitude >= safeAltitude/2 and (
+  until ship.altitude >= narrowAltitude+(safeAltitude-narrowAltitude)/2 and (
     ship.altitude >= safeAltitude and ship.apoapsis >= targetAltitude*.99
     or ship.timeToAp > ship.timeToPe) // this is here until I find better way for weak orbital engines (TODO: use stage.burntime)
     wait
@@ -280,7 +274,12 @@ try
   ctlsub = null
   user.throttle = 0
   autopilot.disable
-  print "Safe altitude reached"
+  if ship.altitude >= safeAltitude
+    print "Safe altitude reached"
+  else if ship.timeToAp > ship.timeToPe
+    print "Emergency circularization"
+  else
+    print "Uknown reason for circularization"
   vd[3].hide //srfvel
 
 //: CIRCULARIZE
@@ -333,16 +332,16 @@ try
     autopilot.throttle = pwr * e * math.min maxThrottle,
       dvMin * ship.mass / math.max 1, ship.engines.getThrust()
 
-  var prevEtaReport = -10
+  var prevEtaReport = nan
   var switched = false
   var warped = false
   for
     var bt = stage.burnTime dv().size
     if bt != bt; bt = 120 // bt != bt is test for nan
-    var eta = dt()-0.5*bt
+    var eta = time.delta dt()-0.5*bt
     if time.since(prevEtaReport) >= (eta > 10 and warped ? 10 : eta > 5 ? 2 : 1)
       prevEtaReport = time.now
-      print "ETA: {0:F1}s", eta
+      print "ETA: " + eta
       if eta > 20 and !warped and time.warp.ready
         warped = true
         time.warp.index = 0
@@ -350,7 +349,7 @@ try
         time.warp.to prevEtaReport + eta - 10
     if eta <= 5 and not switched
       switched = true
-      time.warp.cancel()
+      time.warp.cancel
       ctlsub.remove
       tta = ship.timeToAp
       ctlsub = system.update circle
@@ -363,7 +362,7 @@ try
   var choked = null
   var warned = 0
   var maxHeight = ship.apoapsis*1.1+1000
-  var prevReport = 0
+  var prevReport = nan
   var lastTta = null
   var pitchDownFactor = 1.0
   print "Burn!"

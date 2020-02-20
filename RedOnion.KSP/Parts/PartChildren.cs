@@ -1,14 +1,13 @@
+using MoonSharp.Interpreter;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using RedOnion.KSP.API;
-using RedOnion.ROS;
 
 namespace RedOnion.KSP.Parts
 {
 	[Description("List of parts attached to parent part.")]
-	public class PartChildren : IList<PartBase>
+	public class PartChildren : IList<PartBase>, IReadOnlyList<PartBase>
 	{
 		[Description("The parent part owning this list.")]
 		public PartBase parent { get; }
@@ -29,6 +28,7 @@ namespace RedOnion.KSP.Parts
 
 		public PartBase this[int index] => parent.ship.parts[parent.native.children[index]];
 
+		int IReadOnlyCollection<PartBase>.Count => count;
 		int ICollection<PartBase>.Count => count;
 		bool ICollection<PartBase>.IsReadOnly => true;
 

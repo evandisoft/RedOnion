@@ -167,12 +167,6 @@ namespace RedOnion.ROS
 				case OpCode.Differ:
 					lhs = lhs.obj?.Equals(rhs.Box()) != true;
 					return true;
-				case OpCode.Identity:
-					lhs = ReferenceEquals(lhs.obj, rhs.obj);
-					return true;
-				case OpCode.NotIdentity:
-					lhs = !ReferenceEquals(lhs.obj, rhs.obj);
-					return true;
 				}
 				return false;
 			}

@@ -12,14 +12,14 @@ namespace RedOnion.KSP.Parts
 		protected internal EngineSet(Ship ship) : base(ship) { }
 		protected internal EngineSet(Ship ship, Action refresh) : base(ship, refresh) { }
 
-		public PropellantList Propellants => propellants ?? (propellants = new PropellantList(this));
-		protected PropellantList propellants;
+		[WorkInProgress, Description("Propellantes consumed by the engines.")]
+		public PropellantList propellants => _propellants ?? (_propellants = new PropellantList(this));
+		protected PropellantList _propellants;
 
-		protected internal override void SetDirty()
+		protected internal override void SetDirty(bool value)
 		{
-			base.SetDirty();
-			if (propellants != null)
-				propellants.SetDirty();
+			if (value) _propellants?.SetDirty(value);
+			base.SetDirty(value);
 		}
 
 		[Description("Whether any engine in the set is operational.")]
@@ -97,7 +97,7 @@ namespace RedOnion.KSP.Parts
 			foreach (var e in this)
 			{
 				if (e.operational)
-					thrust += (double)e.getThrust(atm, throttle) * e.thrustPercentage * 0.01;
+					thrust += e.getThrust(atm, throttle) * e.thrustPercentage * 0.01;
 			}
 			return thrust;
 		}
@@ -123,7 +123,7 @@ namespace RedOnion.KSP.Parts
 
 		public static double g0 = 9.81;
 		[Description("Estimate burn time for given delta-v (assuming it can be done without staging).")]
-		public double burnTime(double deltaV)
+		public TimeDelta burnTime(double deltaV, double mass = double.NaN)
 		{
 			var thrust = 0.0;
 			var flow = 0.0;
@@ -139,9 +139,10 @@ namespace RedOnion.KSP.Parts
 				flow += eth / isp;
 			}
 			if (flow <= 0.0001)
-				return double.NaN;
+				return TimeDelta.none;
 			var stdIsp = g0 * thrust / flow;
-			return stdIsp * _ship.mass * (1.0 - Math.Pow(Math.E, -deltaV / stdIsp)) / thrust;
+			if (double.IsNaN(mass)) mass = _ship.mass;
+			return new TimeDelta(stdIsp * mass * (1.0 - Math.Pow(Math.E, -deltaV / stdIsp)) / thrust);
 		}
 	}
 
@@ -171,8 +172,8 @@ namespace RedOnion.KSP.Parts
 		public override bool istype(string name)
 			=> name.Equals("engine", StringComparison.OrdinalIgnoreCase);
 
-		protected internal Engine(Ship ship, Part part, PartBase parent, Decoupler decoupler)
-			: base(ship, part, parent, decoupler)
+		protected internal Engine(Ship ship, Part part, PartBase parent, LinkPart decoupler)
+			: base(PartType.Engine, ship, part, parent, decoupler)
 		{
 			foreach (var module in part.Modules)
 			{
@@ -201,6 +202,18 @@ namespace RedOnion.KSP.Parts
 				var second = firstModule;
 				firstModule = secondModule;
 				secondModule = second;
+			}
+			var propellants = activeModule?.propellants;
+			if (propellants != null)
+			{
+				foreach (var propellant in propellants)
+				{
+					if (propellant.GetFlowMode() == ResourceFlowMode.NO_FLOW)
+					{
+						booster = true;
+						break;
+					}
+				}
 			}
 		}
 
@@ -262,10 +275,17 @@ namespace RedOnion.KSP.Parts
 		public double ratioSum => activeModule.ratioSum;
 		public double mixtureDensity => activeModule.mixtureDensity;
 		public double mixtureDensityRecip => activeModule.mixtureDensityRecip;
+		public double ignitionThreshold => activeModule.ignitionThreshold;
 
-		ReadOnlyList<Propellant> propellants, propellants2;
-		public ReadOnlyList<Propellant> Propellants => firstIsActive ? Propellants1 : Propellants2;
-		public ReadOnlyList<Propellant> Propellants1 => propellants ?? (propellants = new ReadOnlyList<Propellant>());
-		public ReadOnlyList<Propellant> Propellants2 => propellants2 ?? (multiMode ? propellants2 = new ReadOnlyList<Propellant>() : null);
+		PropellantList _propellants, _propellants2;
+		[WorkInProgress, Description("List of propellants used by the engine (by currently active mode).")]
+		public PropellantList propellants => firstIsActive ? propellants1 : propellants2;
+		[WorkInProgress, Description("List of propellants used by first mode.")]
+		public PropellantList propellants1 => _propellants ?? (_propellants = new PropellantList(firstModule));
+		[WorkInProgress, Description("List of propellants used by second mode (null for single-mode engines).")]
+		public PropellantList propellants2 => _propellants2 ?? (multiMode ? _propellants2 = new PropellantList(secondModule) : null);
+
+		[WorkInProgress, Description("Indicator that the engines is (probably) solid rocket booster (contains propellant that does not flow).")]
+		public bool booster { get; }
 	}
 }

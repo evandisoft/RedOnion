@@ -9,18 +9,32 @@ namespace RedOnion.KSP.API
 {
 	[Description("Read-only list (or set). Enumerable (can be used in `foreach`)."
 		+ "\nUsed e.g. for parts and all lists and sets you are not allowed to modify.")]
-	public class ReadOnlyList<T> : IList<T>
+	public class ReadOnlyList<T> : IList<T>, IReadOnlyList<T>
 	{
-		protected ListCore<T> list;
+		protected internal ListCore<T> list;
 		protected internal Action Refresh;
-		protected internal bool Dirty { get; set; } = true;
-		protected internal virtual void SetDirty() => Dirty = true;
 
-		[Browsable(false), MoonSharpHidden]
-		public void EnsureValid()
+		[Description("Version counter. Each update of the collection increments this. Can be used to detect changes mid-enumeration.")]
+		public int version { get; protected set; }
+
+		bool _dirty = true;
+		protected internal bool Dirty
 		{
-			if (Dirty)
-				DoRefresh();
+			get => _dirty;
+			set
+			{
+				if (_dirty != value)
+					SetDirty(value);
+			}
+		}
+		protected internal virtual void SetDirty(bool value)
+		{
+			_dirty = value;
+			if (value)
+			{
+				version++;
+				Clear();
+			}
 		}
 
 		protected virtual void DoRefresh()
@@ -33,9 +47,7 @@ namespace RedOnion.KSP.API
 		protected internal ReadOnlyList(Action refresh) => Refresh = refresh;
 
 		[Description("Number of elements in the list (or set).")]
-		public int count => Count;
-		[Browsable(false), MoonSharpHidden]
-		public int Count
+		public int count
 		{
 			get
 			{
@@ -75,7 +87,8 @@ namespace RedOnion.KSP.API
 			list.CopyTo(array, index);
 		}
 
-		protected internal virtual void Clear() => list.Clear();
+		protected internal virtual void Clear()
+			=> list.Clear();
 		protected internal virtual bool Add(T item)
 		{
 			list.Add(item);
@@ -90,6 +103,8 @@ namespace RedOnion.KSP.API
 			return list.GetEnumerator();
 		}
 
+		int IReadOnlyCollection<T>.Count => count;
+		int ICollection<T>.Count => count;
 		bool ICollection<T>.IsReadOnly => true;
 		T IList<T>.this[int index]
 		{

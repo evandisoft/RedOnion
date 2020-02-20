@@ -14,20 +14,21 @@ namespace RedOnion.KSP.API
 		{
 			[Description("Reference for coordinate system (origin at zero if null).")]
 			public ISpaceObject reference { get; set; }
+
 			[Description("Starting point of the vector (relative to reference).")]
 			public Vector origin { get; set; }
 			[Description("Direction of the vector (from starting point).")]
 			public Vector direction { get; set; }
 
 			[Description("Alias to `origin`.")]
-			public Vector from { get; set; }
-			[Description("End point (relative to reference, not starting point).")]
-			public Vector to { get => origin + direction; set => direction = value - origin; }
-
-			[Description("Alias to `origin`.")]
-			public Vector start { get => origin; set => origin = value; }
+			public Vector position { get => origin; set => origin = value; }
 			[Description("Alias to `direction`.")]
 			public Vector vector { get => direction; set => direction = value; }
+
+			[Description("Alias to `origin`.")]
+			public Vector from { get => origin; set => origin = value; }
+			[Description("End point (`origin + direction`).")]
+			public Vector to { get => origin + direction; set => direction = value - origin; }
 
 			[Description("Color of the arrow.")]
 			public Color color { get; set; } = Color.white;

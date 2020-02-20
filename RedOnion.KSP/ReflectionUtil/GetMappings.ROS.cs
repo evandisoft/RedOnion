@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using RedOnion.KSP.Completion;
 using RedOnion.KSP.ROS;
 using RedOnion.ROS;
 
@@ -16,6 +17,8 @@ namespace RedOnion.KSP.ReflectionUtil
 				=> ((GetMappings)self).RosFind(name);
 			public override bool Get(ref Value self, int at)
 				=> ((GetMappings)self.obj).RosGet(ref self, at);
+			public override IEnumerable<string> EnumerateProperties(object self)
+				=> ((ICompletable)self).PossibleCompletions;
 		}
 		RosProps ros;
 		internal int RosFind(string name)

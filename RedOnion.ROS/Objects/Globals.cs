@@ -68,7 +68,7 @@ namespace RedOnion.ROS.Objects
 			System.Add("sbyte", new Value(Descriptor.SByte));
 			System.Add("byte", new Value(Descriptor.Byte));
 			System.Add("char", new Value(Descriptor.Char));
-			System.Add("string", new Value(Descriptor.String, null));
+			System.Add("string", new Value(Descriptor.String));
 
 			System.Lock();
 			Lock();

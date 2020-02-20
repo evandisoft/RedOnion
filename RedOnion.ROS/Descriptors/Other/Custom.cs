@@ -7,7 +7,7 @@ namespace RedOnion.ROS
 {
 	public partial class Descriptor
 	{
-		public class Simple : Descriptor
+		public class Custom : Descriptor
 		{
 			public delegate bool Read(ref Value self);
 			public delegate bool Write(ref Value self, ref Value value);
@@ -15,22 +15,29 @@ namespace RedOnion.ROS
 			public readonly struct Prop
 			{
 				public readonly string name;
-				public readonly Value value;
+				public readonly Read   read;
+				public readonly Write  write;
 				public override string ToString()
 					=> name;
+				public Prop(string name, Read read, Write write = null)
+				{
+					this.name = name;
+					this.read = read;
+					this.write = write;
+				}
 				public Prop(string name, Value value)
 				{
 					this.name = name;
-					this.value = value;
+					read = (ref Value self) => { self = value; return true; };
+					write = null;
 				}
-				public static Prop Method<T>(string name, Func<T, Value, Value> fn)
-					=> new Prop(name, new Value(new Method1<string>(name), fn));
 			}
 			public class Props
 			{
 				internal Prop[] items, sitems;
 				internal Dictionary<string, int> index, sindex;
-				public Props(Prop[] items, Prop[] sitems = null)
+				public Props(Prop[] items) : this(null, items) { }
+				public Props(Prop[] items, Prop[] sitems)
 				{
 					if (sitems != null)
 					{
@@ -76,23 +83,23 @@ namespace RedOnion.ROS
 			}
 			readonly Prop[] props, sprops;
 			readonly Dictionary<string, int> index, sindex;
-			public Simple(string name, Props props)
-				: this(name, typeof(Custom), props) { }
-			public Simple(string name, Type type, Props props)
+			public Custom(string name, Props props, Props sprops = null)
+				: this(name, typeof(Custom), props, sprops) { }
+			public Custom(string name, Type type, Props props, Props sprops = null)
 				: base(name, type)
 			{
-				this.props = props.items;
-				index = props.index;
-				sprops = props.sitems;
-				sindex = props.sindex;
+				this.props = props?.items;
+				index = props?.index;
+				this.sprops = sprops?.items;
+				sindex = sprops?.index;
 			}
-			internal Simple(string name, Type type, ExCode primitive, TypeCode typeCode, Props props)
+			internal Custom(string name, Type type, ExCode primitive, TypeCode typeCode, Props props, Props sprops = null)
 				: base(name, type, primitive, typeCode)
 			{
-				this.props = props.items;
-				index = props.index;
-				sprops = props.sitems;
-				sindex = props.sindex;
+				this.props = props?.items;
+				index = props?.index;
+				this.sprops = sprops?.items;
+				sindex = sprops?.index;
 			}
 
 			public override int Find(object self, string name, bool add = false)
@@ -113,16 +120,67 @@ namespace RedOnion.ROS
 			}
 			public override bool Get(ref Value self, int at)
 			{
+				var props = this.props;
 				if (self.obj == this)
 				{
-					if (sprops == null || at < 0 || at >= sprops.Length)
+					if (sprops == null)
 						return false;
-					self = sprops[at].value;
-					return true;
+					props = sprops;
 				}
 				if (at < 0 || at >= props.Length)
 					return false;
-				self = props[at].value;
+				var read = props[at].read;
+				if (read == null)
+					return false;
+				return read(ref self);
+			}
+			public override bool Set(ref Value self, int at, OpCode op, ref Value value)
+			{
+				var props = this.props;
+				var index = this.index;
+				if (self.obj == this)
+				{
+					if (sprops == null)
+						return false;
+					props = sprops;
+					index = sindex;
+				}
+				if (at < 0 || at >= props.Length)
+					return false;
+				ref var prop = ref props[at];
+				var write = prop.write;
+				if (write == null)
+					return false;
+				if (op == OpCode.Assign)
+					return write(ref self, ref value);
+				var read = prop.read;
+				if (read == null)
+					return false;
+				var it = self;
+				if (!read(ref it))
+					return false;
+				if (op.Kind() == OpKind.Assign)
+				{
+					if (!it.desc.Binary(ref it, op + 0x10, ref value)
+						&& !value.desc.Binary(ref it, op + 0x10, ref value))
+						return false;
+					write(ref self, ref it);
+					return true;
+				}
+				if (op.Kind() != OpKind.PreOrPost)
+					return false;
+				if (op >= OpCode.Inc)
+				{
+					if (!it.desc.Unary(ref it, op))
+						return false;
+					write(ref self, ref it);
+					return true;
+				}
+				var tmp = it;
+				if (!it.desc.Unary(ref it, op + 0x08))
+					return false;
+				write(ref self, ref it);
+				self = tmp;
 				return true;
 			}
 		}

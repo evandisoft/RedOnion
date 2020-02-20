@@ -52,8 +52,8 @@ namespace RedOnion.ROS
 			var hdr = where == null ? "Exception: " + ex.Message :
 				Value.Format("Exception in {0}: {1}", where, ex.Message);
 			Log(hdr);
-			if (where != null)
-				print?.Invoke(hdr);
+			if (where != null && print != null)
+				print(ex.Message);
 			var err = ex as Error;
 			var re = err as RuntimeError;
 			if (err != null)
@@ -69,7 +69,12 @@ namespace RedOnion.ROS
 				var str = Value.Format(line == null ? "Error at line {0}."
 					: "Error at line {0}: {1}", err.LineNumber + 1, line);
 				Log(str);
-				print?.Invoke(str);
+				if (print != null)
+				{
+					print(str);
+					if (where != null)
+						print("Exception in " + where);
+				}
 				ex = ex.InnerException;
 			}
 			var trace = ex?.StackTrace;

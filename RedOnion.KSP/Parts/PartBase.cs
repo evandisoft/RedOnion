@@ -5,12 +5,35 @@ using RedOnion.KSP.API;
 
 namespace RedOnion.KSP.Parts
 {
+	[Description("Type of part.")]
+	public enum PartType
+	{
+		[Description("Uknown type.")]
+		Unknown,
+		[Description("Engine.")]
+		Engine,
+		[Description("Sensor.")]
+		Sensor,
+		[Description("Docking port.")]
+		DockingPort,
+		[Description("Decoupler (one-way).")]
+		Decoupler,
+		[Description("Separator (both-ways).")]
+		Separator,
+		[Description("Engine plate (EP-nn).")]
+		EnginePlate,
+		[Description("Launch clamp.")]
+		LaunchClamp
+	}
+
 	[DisplayName("Part"), Description("Part of the ship (vehicle/vessel).")]
-	[DocBuild(typeof(Decoupler), typeof(DockingPort), typeof(LaunchClamp), typeof(Engine), typeof(Sensor))]
+	[DocBuild(typeof(Engine), typeof(Sensor), typeof(LinkPart))]
 	public class PartBase
 	{
 		[Unsafe, Description("Native `Part` - KSP API.")]
 		public Part native { get; }
+		[Description("Type of the part.")]
+		public PartType type { get; }
 
 		[Description("Ship (vehicle/vessel) this part belongs to.")]
 		public Ship ship { get; }
@@ -21,10 +44,10 @@ namespace RedOnion.KSP.Parts
 		PartChildren _children;
 
 		[Description("Decoupler that will decouple this part when staged.")]
-		public Decoupler decoupler { get; }
-		[Description("Stage number as provided by KSP API. (`Native.inverseStage`)")]
+		public LinkPart decoupler { get; internal set; }
+		[Description("Stage number as provided by KSP API. (`native.inverseStage` - activating stage for engines, decouplers etc.)")]
 		public int stage => native.inverseStage;
-		[Description("Stage number where this part will be decoupled or -1. (`Decoupler?.Stage ?? -1`)")]
+		[Description("Stage number where this part will be decoupled or -1. (`decoupler?.stage ?? -1`)")]
 		public int decoupledin => decoupler?.stage ?? -1;
 
 		[Description("Resources contained within this part.")]
@@ -44,19 +67,18 @@ namespace RedOnion.KSP.Parts
 			+ " `types.engine` etc.")]
 		public virtual bool istype(string name) => false;
 
-		[WorkInProgress, Description("Position of the part.")]
+		[Description("Position of the part (relative to CoM of active ship/vessel).")]
 		public Vector position => new Vector(native.partTransform.position - FlightGlobals.ActiveVessel.CoMD);
 
 		[Description("Explode the part.")]
 		public void explode() => native.explode();
 
 		public override string ToString()
-		{
-			return native.ToString();
-		}
+			=> native.ToString();
 
-		protected internal PartBase(Ship ship, Part native, PartBase parent, Decoupler decoupler)
+		protected internal PartBase(PartType type, Ship ship, Part native, PartBase parent, LinkPart decoupler)
 		{
+			this.type = type;
 			this.ship = ship;
 			this.native = native;
 			this.parent = parent;

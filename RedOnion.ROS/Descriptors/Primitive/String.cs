@@ -1,13 +1,14 @@
 using System;
+using System.Collections.Generic;
 
 namespace RedOnion.ROS
 {
 	public partial class Descriptor
 	{
-		internal class OfString : Descriptor
+		internal class OfString : Simple
 		{
 			public OfString()
-				: base("string", typeof(string), ExCode.String, TypeCode.String) { }
+				: base("string", typeof(string), ExCode.String, TypeCode.String, props) { }
 			public override string ToString(ref Value self, string format, IFormatProvider provider, bool debug)
 				=> self.obj.ToString();
 
@@ -82,44 +83,66 @@ namespace RedOnion.ROS
 					return true;
 
 				case OpCode.Equals:
-					lhs = lhs.obj.ToString() == rhs.obj.ToString();
+					lhs = string.Compare(lhs.obj.ToString(), rhs.obj.ToString(), StringComparison.OrdinalIgnoreCase) == 0;
 					return true;
 				case OpCode.Differ:
-					lhs = lhs.obj.ToString() != rhs.obj.ToString();
+					lhs = string.Compare(lhs.obj.ToString(), rhs.obj.ToString(), StringComparison.OrdinalIgnoreCase) != 0;
 					return true;
+
 				case OpCode.Less:
-					lhs = string.CompareOrdinal(lhs.obj.ToString(), rhs.obj.ToString()) < 0;
+					lhs = string.Compare(lhs.obj.ToString(), rhs.obj.ToString(), StringComparison.OrdinalIgnoreCase) < 0;
 					return true;
 				case OpCode.More:
-					lhs = string.CompareOrdinal(lhs.obj.ToString(), rhs.obj.ToString()) > 0;
+					lhs = string.Compare(lhs.obj.ToString(), rhs.obj.ToString(), StringComparison.OrdinalIgnoreCase) > 0;
 					return true;
 				case OpCode.LessEq:
-					lhs = string.CompareOrdinal(lhs.obj.ToString(), rhs.obj.ToString()) <= 0;
+					lhs = string.Compare(lhs.obj.ToString(), rhs.obj.ToString(), StringComparison.OrdinalIgnoreCase) <= 0;
 					return true;
 				case OpCode.MoreEq:
-					lhs = string.CompareOrdinal(lhs.obj.ToString(), rhs.obj.ToString()) >= 0;
+					lhs = string.Compare(lhs.obj.ToString(), rhs.obj.ToString(), StringComparison.OrdinalIgnoreCase) >= 0;
 					return true;
 				}
 				return true;
 			}
 
-			public override int Find(object self, string name, bool add)
+			static readonly Props props = new StringProps();
+			class StringProps : Props
 			{
-				if (string.Compare(name, "length", StringComparison.OrdinalIgnoreCase) == 0)
-					return 0;
-				return -1;
-			}
+				static Prop M(string name, Func<string, Value, Value> fn)
+					=> new Prop(name, new Value(new Method1<string>(name), fn));
+				public StringProps() : base(new Prop[]
+				{
+					new Prop("length", new Value(0)),
+					new Prop("substring", new Value(new Substring())),
+					M("compare", (it, arg) => it.CompareTo(arg.ToStr())),
+					M("equals", (it, arg) => it.Equals(arg.ToStr())),
+					M("contains", (it, arg) => it.Contains(arg.ToStr()))
+				}, new Prop[] {
+					new Prop("format", new Value(new Format()))
+				})
+				{
+					Alias("count", 0);
+					Alias("substr", 1);
+					Alias("compareTo", 2);
+				}
+			};
+
 			public override bool Get(ref Value self, int at)
 			{
-				switch (at)
+				if (self.obj != this)
 				{
-				case 0:
-					self = self.obj.ToString().Length;
-					return true;
-				default:
-					self = self.obj.ToString()[at-0x100];
-					return true;
+					if (at == 0)
+					{
+						self = self.obj.ToString().Length;
+						return true;
+					}
+					if (at >= 0x100)
+					{
+						self = self.obj.ToString()[at-0x100];
+						return true;
+					}
 				}
+				return base.Get(ref self, at);
 			}
 
 			public override int IndexFind(ref Value self, Arguments args)
@@ -144,6 +167,71 @@ namespace RedOnion.ROS
 				if (!Get(ref self, at))
 					return -1;
 				return self.desc.IndexFind(ref self, new Arguments(args, args.Length-1));
+			}
+			public override IEnumerable<Value> Enumerate(object self)
+			{
+				foreach (var c in self.ToString())
+					yield return new Value(c);
+			}
+
+			class Substring : Descriptor
+			{
+				public override bool Call(ref Value result, object self, Arguments args, bool create = false)
+				{
+					var str = self.ToString();
+					if (args.Length == 0)
+					{
+						result = str;
+						return true;
+					}
+					var arg = args[0].ToInt();
+					if (args.Length == 1)
+					{
+						result = str.Substring(arg);
+						return true;
+					}
+					var arg2 = args[1].ToInt();
+					result = str.Substring(arg, arg2);
+					return true;
+				}
+			}
+			class Format : Descriptor
+			{
+				public override bool Call(ref Value result, object self, Arguments args, bool create = false)
+				{
+					if (self == Descriptor.String)
+					{
+						if (args.Length == 0)
+							return false;
+						var msg = args[0].ToStr();
+						if (args.Length == 1)
+						{
+							result = msg;
+							return true;
+						}
+						var call = new object[args.Length-1];
+						for (int i = 1; i < args.Length; i++)
+							call[i-1] = args[i].Box();
+						msg = string.Format(Value.Culture, msg, call);
+						result = msg;
+						return true;
+					}
+					else
+					{
+						var msg = self.ToString();
+						if (args.Length == 0)
+						{
+							result = msg;
+							return true;
+						}
+						var call = new object[args.Length];
+						for (int i = 0; i < args.Length; i++)
+							call[i] = args[i].Box();
+						msg = string.Format(Value.Culture, msg, call);
+						result = msg;
+						return true;
+					}
+				}
 			}
 		}
 	}

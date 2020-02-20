@@ -173,7 +173,7 @@ namespace RedOnion.KSP.API
 
 		#region Native, name and target
 
-		[Unsafe, Description("Native `Vessel` for unrestricted access to KSP API."
+		[Unsafe, Description("Native `Vessel` for unrestricted access to [KSP API](https://kerbalspaceprogram.com/api/class_vessel.html)."
 			+ " Same as `FlightGlobals.ActiveVessel` if accessed through global `ship`.")]
 		public Vessel native { get; private set; }
 
@@ -235,14 +235,20 @@ namespace RedOnion.KSP.API
 		public ShipPartSet parts { get; private set; }
 		[Description("Root part (same as `parts.root`).")]
 		public PartBase root => parts.root;
+		[Description("Controlling part (same as `parts.control`).")]
+		public PartBase controlPart => parts.control;
 		[Description("One of the decouplers that will get activated by nearest stage. (Same as `Parts.NextDecoupler`.)")]
-		public Decoupler nextDecoupler => parts.nextDecoupler;
+		public LinkPart nextDecoupler => parts.nextDecoupler;
 		[Description("Stage number of the nearest decoupler or -1. (Same as `Parts.NextDecouplerStage`.)")]
 		public int nextDecouplerStage => parts.nextDecouplerStage;
+		[Description("Current stage number. (Same as `stage.number` if active ship.)")]
+		public int currentStage => native.currentStage;
+		[WorkInProgress, Description("Parts per stage (by `decoupledin+1`).")]
+		public Stages stages => parts.stages;
 
 		[Description("List of all decouplers, separators, launch clamps and docks with staging."
 			+ " (Docking ports without staging enabled not included.)")]
-		public ReadOnlyList<Decoupler> decouplers => parts.decouplers;
+		public ReadOnlyList<LinkPart> decouplers => parts.decouplers;
 		[Description("List of all docking ports (regardless of staging).")]
 		public ReadOnlyList<DockingPort> dockingports => parts.dockingports;
 		[Description("All engines (regardless of state).")]
@@ -261,13 +267,19 @@ namespace RedOnion.KSP.API
 		[Description("KSP API. Vessel type as selected by user (or automatically).")]
 		public VesselType vesseltype => native.vesselType;
 		[Description("Total mass of the ship (vehicle/vessel). [tons = 1000 kg]")]
-		public float mass => native.GetTotalMass();
+		public double mass => native.totalMass;
+
 		[Description("Wheter the ship is still packed (reduced physics).")]
 		public bool packed => native.packed;
 		[Description("Wheter the ship is landed (on the ground or on/in water).")]
 		public bool landed => native.Landed;
 		[Description("Wheter the ship is in water.")]
 		public bool splashed => native.Splashed;
+		[Description("Ship is on launch-pad.")]
+		public bool prelaunch => situation == Vessel.Situations.PRELAUNCH;
+		[Description("KSP API. Current situation.")]
+		public Vessel.Situations situation => native.situation;
+
 		[Description("Longitude of current position in degrees.")]
 		public double longitude => native.longitude;
 		[Description("Latitude of current position in degrees.")]
@@ -285,33 +297,52 @@ namespace RedOnion.KSP.API
 
 		#region Orbit - basic
 
-		[Description("KSP API. Orbited body.")]
+		[Description("Orbited body.")]
 		public SpaceBody body => Bodies.Instance[native.mainBody];
 		ISpaceObject ISpaceObject.body => body;
-		[Unsafe, WorkInProgress, Description("KSP API. Orbit parameters. May get replaced by safe wrapper in the future.")]
-		public Orbit orbit => native.orbit;
-		[Description("Eccentricity of current orbit.")]
+
+		OrbitInfo _orbit;
+		[WorkInProgress, Description("Orbit parameters.")]
+		public OrbitInfo orbit
+		{
+			get
+			{
+				if (_orbit == null)
+					_orbit = new OrbitInfo(native.orbit);
+				else _orbit.native = native.orbit;
+				return _orbit;
+			}
+		}
+
+		[Description("Period of current orbit in seconds. Alias to `orbit.period`.")]
+		public TimeDelta period => new TimeDelta(native.orbit.period);
+		[Description("Eta to apoapsis in seconds. Alias to `orbit.timeToAp`.")]
+		public TimeDelta timeToAp => orbit.timeToAp;
+		[Description("Eta to periapsis in seconds. Alias to `orbit.timeToPe`.")]
+		public TimeDelta timeToPe => orbit.timeToPe;
+		[Description("Time at apoapsis. Alias to `orbit.timeAtAp`.")]
+		public TimeStamp timeAtAp => orbit.timeAtAp;
+		[Description("Time at periapsis. Alias to `orbit.timeAtPe`.")]
+		public TimeStamp timeAtPe => orbit.timeAtPe;
+
+		[Description("Eccentricity of current orbit. \\[0, +inf)")]
 		public double eccentricity => native.orbit.eccentricity;
-		[Description("Inclination of current orbit [0, 180).")]
+		[Description("Inclination of current orbit. \\[0, 180)")]
 		public double inclination => native.orbit.inclination;
 		[Description("Semi-major axis of current orbit.")]
 		public double semiMajorAxis => native.orbit.semiMajorAxis;
 		[Description("Semi-minor axis of current orbit.")]
 		public double semiMinorAxis => native.orbit.semiMinorAxis;
+
 		[Description("Height above ground of highest point of current orbit.")]
 		public double apoapsis => native.orbit.ApA;
 		[Description("Height above ground of lowest point of current orbit.")]
 		public double periapsis => native.orbit.PeA;
-		[Description("Highest distance between center of orbited body and any point of current orbit.")]
+		[Description("Highest distance between center of orbited body and any point of current orbit. `(1 + eccentricity) * semiMajorAxis`")]
 		public double apocenter => native.orbit.ApR;
-		[Description("Lowest distance between center of orbited body and any point of current orbit.")]
+		[Description("Lowest distance between center of orbited body and any point of current orbit. `(1 - eccentricity) * semiMajorAxis`")]
 		public double pericenter => native.orbit.PeR;
-		[Description("Eta to apoapsis in seconds.")]
-		public double timeToAp => native.orbit.timeToAp;
-		[Description("Eta to periapsis in seconds.")]
-		public double timeToPe => native.orbit.timeToPe;
-		[Description("Period of current orbit in seconds.")]
-		public double period => native.orbit.period;
+
 		[Description("Angle in degrees between the direction of periapsis and the current position. Zero at periapsis, 180 at apoapsis.")]
 		public double trueAnomaly => RosMath.Deg.Clamp360(native.orbit.trueAnomaly * RosMath.Rad2Deg);
 		[Description("Angle in degrees between the direction of periapsis and the current position extrapolated on circular orbit.")]
@@ -320,6 +351,8 @@ namespace RedOnion.KSP.API
 		public double lan => native.orbit.LAN;
 		[Description("Argument of periapsis. Angle from ascending node to periapsis.")]
 		public double argumentOfPeriapsis => native.orbit.argumentOfPeriapsis;
+		[Description("Argument of periapsis. Angle from ascending node to periapsis.")]
+		public double aop => native.orbit.argumentOfPeriapsis;
 
 		#endregion
 
@@ -335,23 +368,19 @@ namespace RedOnion.KSP.API
 		public Vector srfVelocity => new Vector(native.srf_velocity);
 		[Description("Current surface velocity (Alias to `surfaceVelocity`).")]
 		public Vector srfvel => new Vector(native.srf_velocity);
-		[WorkInProgress, Description("Predicted position at specified time.")]
-		public Vector positionAt(double time) => new Vector(native.orbit.getPositionAtUT(time) - FlightGlobals.ActiveVessel.CoMD);
-		[WorkInProgress, Description("Predicted velocity at specified time.")]
-		public Vector velocityAt(double time) => new Vector(native.orbit.getOrbitalVelocityAtUT(time).xzy);
 
 		[Description("Vector pointing forward (from cockpit - in the direction of the 'nose').")]
-		public Vector forward => new Vector(native.transform.up);
+		public Vector forward => new Vector(native.ReferenceTransform.up);
 		[Description("Vector pointing backward (from cockpit - in the direction of the 'tail').")]
-		public Vector back => new Vector(-native.transform.up);
+		public Vector back => new Vector(-native.ReferenceTransform.up);
 		[Description("Vector pointing up (from cockpit).")]
-		public Vector up => new Vector(-native.transform.forward);
+		public Vector up => new Vector(-native.ReferenceTransform.forward);
 		[Description("Vector pointing down (from cockpit).")]
-		public Vector down => new Vector(native.transform.forward);
+		public Vector down => new Vector(native.ReferenceTransform.forward);
 		[Description("Vector pointing left (from cockpit).")]
-		public Vector left => new Vector(-native.transform.right);
+		public Vector left => new Vector(-native.ReferenceTransform.right);
 		[Description("Vector pointing right (from cockpit).")]
-		public Vector right => new Vector(native.transform.right);
+		public Vector right => new Vector(native.ReferenceTransform.right);
 
 		// see https://en.wikipedia.org/wiki/Axes_conventions#Ground_reference_frames_for_attitude_description
 		[Description("Vector pointing north in the plane that is tangent to sphere centered in orbited body.")]
@@ -365,7 +394,7 @@ namespace RedOnion.KSP.API
 
 		#region Pitch, heading and roll
 
-		[Description("Current pitch / elevation (the angle between forward vector and tangent plane) [-90..+90]")]
+		[Description("Current pitch / elevation (the angle between forward vector and tangent plane) \\[-90..+90]")]
 		public double pitch
 		{
 			get => 90.0 - Vector3d.Angle(forward, away);
@@ -377,7 +406,7 @@ namespace RedOnion.KSP.API
 			}
 		}
 		[Description("Current heading / yaw (the angle between forward and north vectors"
-			+ " in tangent plane) [0..360]. Note that it can change violently around the poles.")]
+			+ " in tangent plane) \\[0..360]. Note that it can change violently around the poles.")]
 		public double heading
 		{
 			get
@@ -400,7 +429,7 @@ namespace RedOnion.KSP.API
 			}
 		}
 		[Description("Current roll / bank (the angle between up and away vectors"
-			+ " in the plane perpendicular to forward vector) [-180..+180]."
+			+ " in the plane perpendicular to forward vector) \\[-180..+180]."
 			+ " \nNote that it can change violently when facing up or down.")]
 		public double roll
 		{
@@ -428,14 +457,14 @@ namespace RedOnion.KSP.API
 
 		#region Properties for autopilot
 
-		[Description("Angular velocity (ω, deg/s), how fast the ship rotates")]
+		[Description("Angular velocity \\[ω, deg/s], how fast the ship rotates")]
 		public Vector angularVelocity => new Vector(native.angularVelocityD * RosMath.Rad2Deg);
-		[Description("Angular momentum (L = Iω, kg⋅m²⋅deg/s=N⋅m⋅s⋅deg) aka moment of momentum or rotational momentum.")]
+		[Description("Angular momentum \\[L = Iω, kg⋅m²⋅deg/s=N⋅m⋅s⋅deg] aka moment of momentum or rotational momentum.")]
 		public Vector angularMomentum => new Vector((Vector3d)native.angularMomentum * RosMath.Rad2Deg);
-		[Description("Moment of inertia (I, kg⋅m²=N⋅m⋅s²) aka angular mass or rotational inertia.")]
+		[Description("Moment of inertia \\[I, kg⋅m²=N⋅m⋅s²] aka angular mass or rotational inertia.")]
 		public Vector3d momentOfInertia => new Vector(native.MOI);
 
-		protected double _torqueStamp;
+		protected TimeStamp _torqueStamp;
 		protected Vector _maxTorque, _maxVacuumTorque;
 		protected Vector _maxAngular, _maxVacuumAngular;
 		protected void UpdateTorque()
@@ -467,7 +496,7 @@ namespace RedOnion.KSP.API
 			_maxVacuumAngular = new Vector(VectorCreator.shrink(_maxVacuumTorque, momentOfInertia));
 		}
 
-		[Description("Maximal ship torque [N⋅m⋅deg=deg⋅kg⋅m²/s²] (aka moment of force or turning effect, maximum of positive and negative).")]
+		[Description("Maximal ship torque \\[N⋅m⋅deg=deg⋅kg⋅m²/s²] (aka moment of force or turning effect, maximum of positive and negative).")]
 		public Vector maxTorque
 		{
 			get
@@ -477,7 +506,7 @@ namespace RedOnion.KSP.API
 				return _maxTorque;
 			}
 		}
-		[Description("Maximal ship torque in vacuum [N⋅m⋅deg=deg⋅kg⋅m²/s²] (ignoring control surfaces).")]
+		[Description("Maximal ship torque in vacuum \\[N⋅m⋅deg=deg⋅kg⋅m²/s²] (ignoring control surfaces).")]
 		public Vector maxVacuumTorque
 		{
 			get
@@ -487,7 +516,7 @@ namespace RedOnion.KSP.API
 				return _maxVacuumTorque;
 			}
 		}
-		[Description("Maximal angular acceleration (deg/s²)")]
+		[Description("Maximal angular acceleration. \\[deg/s²]")]
 		public Vector maxAngular
 		{
 			get
@@ -530,28 +559,95 @@ namespace RedOnion.KSP.API
 
 		#region Tools
 
+		[WorkInProgress, Description("Get orbit info relevant for given time. See [orbit.png](orbit.png).")]
+		public OrbitInfo orbitAt(TimeStamp time)
+		{
+			var orbit = this.orbit;
+			while (time >= orbit.endTime)
+			{
+				var next = orbit.next;
+				if (next == null)
+					break;
+				orbit = next;
+			}
+			return orbit;
+		}
+		[WorkInProgress, Description(
+			"Predicted position at specified time."
+			+ " Includes the movement of bodies (e.g. Mun or Ike) when ship is currently orbiting the (grand)parent (e.g. Kerbin or Sun/Kerbol)."
+			+ " This method is trying to be reasonably smooth/continuous, use `orbitAt(time).positionAt(time)` if that is not desired."
+			+ " See [orbit.png](orbit.png).")]
+		public Vector positionAt(TimeStamp time)
+		{
+			var orbit = native.orbit.GetOrbitAt(time);
+			var pos = orbit.getPositionAtUT(time);
+			var our = native.orbit.referenceBody;
+			var its = orbit.referenceBody;
+			if (our != its)
+			{// need to adjust the position by the motion of the reference body
+			 // note: Sun/Kerbol's reference body may be itself, the logic accounts for this
+				var inner = its.referenceBody;
+				if (inner == our)
+				{// target body is orbiting current body (e.g. from Kerbin to Mun)
+					pos += its.getPositionAtUT(time) - its.position;
+				}
+				else if (inner != null)
+				{
+					var deep = inner.referenceBody;
+					if (deep == our)
+					{// target body is orbiting a body that is orbitin current body (e.g. Ike or Gilly when still in Sun/Kerbol's SOI)
+						pos += its.getPositionAtUT(time) - its.position;
+						pos += deep.getPositionAtUT(time) - deep.position;
+					}
+				}
+			}
+			return new Vector(pos - FlightGlobals.ActiveVessel.CoMD);
+		}
+		[WorkInProgress, Description(
+			"Predicted velocity at specified time."
+			+ " Includes the movement of bodies (e.g. Mun or Ike) when ship is currently orbiting the (grand)parent (e.g. Kerbin or Sun/Kerbol)."
+			+ " This method is trying to be reasonably smooth/continuous, use `orbitAt(time).velocityAt(time)` if that is not desired."
+			+ " See [orbit.png](orbit.png).")]
+		public Vector velocityAt(TimeStamp time)
+		{
+			var orbit = native.orbit.GetOrbitAt(time);
+			var vel = orbit.getOrbitalVelocityAtUT(time);
+			var our = native.orbit.referenceBody;
+			var its = orbit.referenceBody;
+			if (our != its)
+			{// need to adjust the velocity by the motion of the reference body
+			 // note: Sun/Kerbol's reference body may be itself, the logic accounts for this
+				var inner = its.referenceBody;
+				if (inner == our)
+				{// target body is orbiting current body (e.g. from Kerbin to Mun)
+					vel += its.orbit.getOrbitalVelocityAtUT(time);
+				}
+				else if (inner != null)
+				{
+					var deep = inner.referenceBody;
+					if (deep == our)
+					{// target body is orbiting a body that is orbiting current body (e.g. Ike or Gilly when still in Sun/Kerbol's SOI)
+						vel += its.orbit.getOrbitalVelocityAtUT(time);
+						vel += deep.orbit.getOrbitalVelocityAtUT(time);
+					}
+				}
+			}
+			return new Vector(vel.xzy);
+		}
+
 		[Description("Translate vector/direction into ship-local coordinates (like looking at it from the cockpit - or rather from the controlling part).")]
 		public Vector local(Vector v)
 			=> new Vector(native.ReferenceTransform.InverseTransformDirection(v));
-		public Vector3d local(Vector3d v)
-			=> native.ReferenceTransform.InverseTransformDirection(v);
-		public Vector3 local(Vector3 v)
-			=> native.ReferenceTransform.InverseTransformDirection(v);
-
 		[Description("Translate vector/direction into world coordinates (reverse the `local` transformation).")]
 		public Vector world(Vector v)
 			=> new Vector(native.ReferenceTransform.TransformDirection(v));
-		public Vector3d world(Vector3d v)
-			=> native.ReferenceTransform.TransformDirection(v);
-		public Vector3 world(Vector3 v)
-			=> native.ReferenceTransform.TransformDirection(v);
 
 		[WorkInProgress, Description("Get time at true anomaly (absolute time of angle from direction of periapsis).")]
-		public double timeAtTrueAnomaly(double trueAnomaly)
-			=> orbit.GetUTforTrueAnomaly(trueAnomaly * RosMath.Deg2Rad, 0.0);
+		public TimeStamp timeAtTrueAnomaly(double trueAnomaly)
+			=> Time.now + timeToTrueAnomaly(trueAnomaly);
 		[WorkInProgress, Description("Get time to true anomaly (relative time of angle from direction of periapsis). [0, period)")]
-		public double timeToTrueAnomaly(double trueAnomaly)
-			=> orbit.GetDTforTrueAnomaly(trueAnomaly * RosMath.Deg2Rad, 0.0) % orbit.period;
+		public TimeDelta timeToTrueAnomaly(double trueAnomaly)
+			=> new TimeDelta(native.orbit.GetDTforTrueAnomaly(trueAnomaly * RosMath.Deg2Rad, 0.0) % native.orbit.period);
 
 		#endregion
 	}
