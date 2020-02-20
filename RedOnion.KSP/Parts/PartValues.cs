@@ -119,7 +119,9 @@ namespace RedOnion.KSP.Parts
 						list.Add(new KeyValuePair<string, string>(name, null));
 					}
 					start = ++at;
+					continue;
 				}
+				at++;
 			}
 		}
 		public bool has(string tag)
