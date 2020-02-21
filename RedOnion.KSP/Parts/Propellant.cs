@@ -15,10 +15,18 @@ namespace RedOnion.KSP.Parts
 		protected Dictionary<string, Propellant> dict = new Dictionary<string, Propellant>();
 		protected ModuleEngines engine;
 		protected ReadOnlyList<Engine> engines;
+		protected IPartSet engineset;
+
 		protected internal PropellantList(ModuleEngines engine)
 			=> this.engine = engine;
 		protected internal PropellantList(ReadOnlyList<Engine> engines)
-			=> this.engines = engines;
+			=> this.engineset = (this.engines = engines) as IPartSet;
+
+		protected override void Update()
+		{
+			engineset?.Update();
+			base.Update();
+		}
 
 		protected override void DoRefresh()
 		{
@@ -61,7 +69,7 @@ namespace RedOnion.KSP.Parts
 		{
 			get
 			{
-				if (Dirty) DoRefresh();
+				Update();
 				return dict.TryGetValue(name, out var it) ? it : null;
 			}
 		}
@@ -72,7 +80,7 @@ namespace RedOnion.KSP.Parts
 
 		public override string ToString()
 		{
-			if (Dirty) DoRefresh();
+			Update();
 			bool first = true;
 			var sb = new StringBuilder();
 			sb.Append("[");

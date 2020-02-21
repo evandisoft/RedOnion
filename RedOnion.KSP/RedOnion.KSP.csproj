@@ -91,6 +91,7 @@
     <Compile Include="API\Node.cs" />
     <Compile Include="API\OrbitInfo.cs" />
     <Compile Include="Namespaces\Types.cs" />
+    <Compile Include="Parts\EngineSet.cs" />
     <Compile Include="Parts\PartChildren.cs" />
     <Compile Include="Parts\PartValues.cs" />
     <Compile Include="Parts\Stages.cs" />

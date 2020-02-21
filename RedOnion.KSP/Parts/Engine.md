@@ -18,9 +18,9 @@ Engine of a ship (vehicle/vessel).
 - `operational`: bool - Whether engine is operational (ignited and not flameout).
 - `ignited`: bool - Wheter engine is ignited.
 - `flameout`: bool - Wheter engine flamed out.
-- `isp`: double - Current ISP. (Specific impulse)
-- `vacuumIsp`: double - Vacuum ISP.
-- `seaLevelIsp`: double - Sea-level ISP.
+- `isp`: double - Current ISP (Specific impulse). \[seconds]
+- `vacuumIsp`: double - Vacuum ISP. \[seconds]
+- `seaLevelIsp`: double - Sea-level ISP. \[seconds]
 - `thrust`: double - Current thrust [kN] (at current pressure, with current `thrustPercentage` and current throttle).
 - `thrustPercentage`: double - Thrust limiter in percents.
 - `propellants`: [PropellantList](PropellantList.md) - \[`WIP`\] List of propellants used by the engine (by currently active mode).
@@ -34,6 +34,6 @@ Engine of a ship (vehicle/vessel).
 - `activate()`: void - Activate the engine.
 - `shutdown()`: void - Shutdown / deactivate the engine.
 - `getIsp()`: double, atm double
-  - Get specific impulse [kN] at atmospheric pressure (0 = vacuum, 1 = Kerbin sea-level pressure, NaN = current pressure).
+  - Get specific impulse \[kN] at atmospheric pressure (0 = vacuum, 1 = Kerbin sea-level pressure, default NaN = current pressure).
 - `getThrust()`: double, atm double, throttle double
-  - Get thrust [kN] at atmospheric pressure (0 = vacuum, 1 = Kerbin sea-level pressure, NaN = current pressure) and throttle (default 1 = full throttle). Ignores `thrustPercentage`.
+  - Get thrust \[kN] at atmospheric pressure (0 = vacuum, 1 = Kerbin sea-level pressure, default NaN = current pressure) and throttle (default 1 = full throttle). Ignores `thrustPercentage`.

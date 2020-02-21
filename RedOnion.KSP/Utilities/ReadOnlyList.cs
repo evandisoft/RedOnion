@@ -36,7 +36,11 @@ namespace RedOnion.KSP.API
 				Clear();
 			}
 		}
-
+		protected virtual void Update()
+		{
+			if (Dirty)
+				DoRefresh();
+		}
 		protected virtual void DoRefresh()
 		{
 			Dirty = false;
@@ -51,7 +55,7 @@ namespace RedOnion.KSP.API
 		{
 			get
 			{
-				if (Dirty) DoRefresh();
+				Update();
 				return list.Count;
 			}
 		}
@@ -60,7 +64,7 @@ namespace RedOnion.KSP.API
 		{
 			get
 			{
-				if (Dirty) DoRefresh();
+				Update();
 				return list[index];
 			}
 		}
@@ -69,7 +73,7 @@ namespace RedOnion.KSP.API
 		[Browsable(false), MoonSharpHidden]
 		public int IndexOf(T item)
 		{
-			if (Dirty) DoRefresh();
+			Update();
 			return list.IndexOf(item);
 		}
 		[Description("Test wether the list (or set) contains specified element.")]
@@ -77,13 +81,13 @@ namespace RedOnion.KSP.API
 		[Browsable(false), MoonSharpHidden]
 		public virtual bool Contains(T item)
 		{
-			if (Dirty) DoRefresh();
+			Update();
 			return list.Contains(item);
 		}
 		[Browsable(false), MoonSharpHidden]
 		public void CopyTo(T[] array, int index)
 		{
-			if (Dirty) DoRefresh();
+			Update();
 			list.CopyTo(array, index);
 		}
 
@@ -99,7 +103,7 @@ namespace RedOnion.KSP.API
 		[Browsable(false), MoonSharpHidden]
 		public virtual IEnumerator<T> GetEnumerator()
 		{
-			if (Dirty) DoRefresh();
+			Update();
 			return list.GetEnumerator();
 		}
 

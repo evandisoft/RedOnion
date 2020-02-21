@@ -1,6 +1,7 @@
 using RedOnion.Collections;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,12 +11,13 @@ namespace RedOnion.KSP.Parts
 {
 	public class RedOnionPartValues : PartModule
 	{
-		[KSPField(guiName = "Tags", groupName = "RedOnion", groupDisplayName = "Red Onion", groupStartCollapsed = true,
+		[KSPField(guiName = "Tags", groupName = "RedOnion",
+			groupDisplayName = "Red Onion", groupStartCollapsed = true,
 			isPersistant = true, guiActive = true, guiActiveEditor = true)]
 		public string values = "";
 
-		[KSPEvent(guiName = "Change Script Tags/Values", groupName = "RedOnion", groupDisplayName = "Red Onion", groupStartCollapsed = true,
-			guiActive = true, guiActiveEditor = true)]
+		[KSPEvent(guiName = "Change Script Tags/Values",
+			groupName = "RedOnion", guiActive = true, guiActiveEditor = true)]
 		public void EditTags()
 		{
 			editor?.Close();
@@ -47,6 +49,8 @@ namespace RedOnion.KSP.Parts
 				GameEvents.onPartDestroyed.Add(CheckPart);
 				GameEvents.onPartDie.Add(CheckPart);
 			}
+			public void Update(string text)
+				=> box.Text = text;
 			void Closed(UI.Window window)
 			{
 				if (window != this.window)
@@ -55,6 +59,9 @@ namespace RedOnion.KSP.Parts
 				GameEvents.onPartDestroyed.Remove(CheckPart);
 				GameEvents.onPartDie.Remove(CheckPart);
 				window.Dispose();
+				enabled = false;
+				Destroy(this);
+				module.editor = null;
 			}
 			public void Close()
 				=> window?.Close();
@@ -84,7 +91,22 @@ namespace RedOnion.KSP.Parts
 				return;
 			this.values = values;
 			list.Clear();
-			parsed = false;
+			Parse();
+			Update();
+		}
+		void Update()
+		{
+			var sb = new StringBuilder();
+			foreach (var pair in list)
+			{
+				if (sb.Length > 0)
+					sb.Append(' ');
+				if (pair.Value == null)
+					sb.Append(pair.Key);
+				else sb.Append(pair.Key).Append('=').Append(pair.Value);
+			}
+			values = sb.ToString();
+			editor?.Update(values);
 		}
 		void Parse()
 		{
@@ -142,24 +164,65 @@ namespace RedOnion.KSP.Parts
 					return pair.Value;
 			return null;
 		}
+		public void set(string tag, string value = null)
+		{
+			if (!parsed)
+				Parse();
+			for (int i = 0; i < list.size; i++)
+			{
+				ref var pair = ref list.items[i];
+				if (!pair.Key.Equals(tag, StringComparison.OrdinalIgnoreCase))
+					continue;
+				pair = new KeyValuePair<string, string>(tag, value);
+				Update();
+				return;
+			}
+			list.Add(new KeyValuePair<string, string>(tag, value));
+			Update();
+		}
+		public bool add(string tag, string value = null)
+		{
+			if (!parsed)
+				Parse();
+			for (int i = 0; i < list.size; i++)
+			{
+				if (list.items[i].Key.Equals(tag, StringComparison.OrdinalIgnoreCase))
+					return false;
+			}
+			list.Add(new KeyValuePair<string, string>(tag, value));
+			Update();
+			return true;
+		}
 	}
 
+	[Description("Tags and values that can be attached to a part (in editor or flight).")]
 	public class PartValues
 	{
 		internal readonly RedOnionPartValues values;
 		internal PartValues(PartBase part)
 			=> values = part.native.GetComponent<RedOnionPartValues>();
 
+		[Description("Test for existence of a tag or key-value pair.")]
 		public bool has(string tag)
 			=> values?.has(tag) ?? false;
+		[Description("Test for existence of a tag or key-value pair.")]
 		public bool contains(string tag)
 			=> values?.has(tag) ?? false;
+		[Description("Get the value associated with a key ('null' for tags and non-existing).")]
 		public string get(string tag)
 			=> values?.get(tag) ?? null;
+		[Description("Set the value associated with a key (default 'null' for tags).")]
+		public void set(string tag, string value = null)
+			=> values?.set(tag, value);
+		[Description("Add new tag or key-value pair (default 'null' for tags).")]
+		public bool add(string tag, string value = null)
+			=> values?.add(tag, value) ?? false;
+		[Description("Get or set the value associated with a key ('null' for tags and non-existing).")]
 		public string this[string tag]
-			=> values?.get(tag) ?? null;
-
-		//TODO: make it script-modifiable
+		{
+			get => values?.get(tag) ?? null;
+			set => values?.set(tag, value);
+		}
 
 		public override string ToString()
 			=> values?.values ?? "";

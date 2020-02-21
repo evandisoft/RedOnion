@@ -49,7 +49,7 @@ namespace RedOnion.KSP.API
 			if (active == null)
 				return;
 			GameEvents.onVesselChange.Remove(active.VesselChange);
-			Stage.SetDirty();
+			Stage.SetDirty("Ship.ClearActive");
 			active = null;
 		}
 		void VesselChange(Vessel vessel)

@@ -1,5 +1,5 @@
-#define DEBUG_STAGE_NOFUEL
-#define DEBUG_STAGE_XPARTS
+//#define DEBUG_STAGE_NOFUEL
+//#define DEBUG_STAGE_XPARTS
 
 using System;
 using KSP.UI.Screens;
@@ -41,18 +41,53 @@ namespace RedOnion.KSP.API
 		[Description("Parts that will be separated by next decoupler")]
 		public static PartSet<PartBase> parts { get; }
 			= new PartSet<PartBase>(null, Refresh);
+
 		[Description("Active engines (regardless of decouplers)."
 			+ " `Engines.Resources` reflect total amounts of fuels"
 			+ " inside boosters with fuel that cannot flow (like solid fuel).")]
 		public static EngineSet engines { get; }
-			= new EngineSet(null, Refresh);
+			= new StageEngineSet();
+		//NOTE: checks for operational engines can still be seen in this file
+		//..... even though we now use CheckFlameout(), that is for sure
+		//..... and because we may choose to do the check less often
+		class StageEngineSet : EngineSet
+		{
+			public StageEngineSet() : base(null, Stage.Refresh) { }
+			protected override void Update()
+			{
+				CheckFlameout();
+				base.Update();
+			}
+		}
+		static TimeStamp lastFlameoutCheck = TimeStamp.never;
+		internal static void CheckFlameout(bool force = false)
+		{
+			if (Dirty)
+				return;
+			var now = Time.now;
+			if (!force && lastFlameoutCheck == now)
+				return;
+			lastFlameoutCheck = now;
+			if (engines.anyFlameout)
+				SetDirty("Flameout");
+		}
+
 		[Description("All accessible tanks upto next decoupler that can contain propellants."
 			+ " `xparts.resources` reflect total amounts of fuels accessible to active engines,"
 			+ " but only in parts that will be separated by next decoupler."
 			+ " This includes liquid fuel and oxidizer and can be used for automated staging,"
 			+ " Especially so called Asparagus and any design throwing off tanks (with or without engines).")]
 		public static PartSet<PartBase> xparts { get; }
-			= new PartSet<PartBase>(null, Refresh);
+			= new StageCrossFeedParts();
+		class StageCrossFeedParts : PartSet<PartBase>
+		{
+			public StageCrossFeedParts() : base(null, Stage.Refresh) { }
+			protected override void Update()
+			{
+				CheckFlameout();
+				base.Update();
+			}
+		}
 
 		[Description("Amount of solid fuel available in active engines."
 			+ " Similar to `engines.resources.getAmountOf(\"SolidFuel\")`"
@@ -70,7 +105,7 @@ namespace RedOnion.KSP.API
 					var nextDecoupler = ship.parts.nextDecouplerStage;
 					foreach (var e in engines)
 					{
-						if (!e.booster || e.decoupledin < nextDecoupler)
+						if (!e.booster || !e.operational || e.decoupledin < nextDecoupler)
 							continue;
 						var res = e.native.Resources["SolidFuel"];
 						if (res != null)
@@ -97,7 +132,7 @@ namespace RedOnion.KSP.API
 					var nextDecoupler = ship.parts.nextDecouplerStage;
 					foreach (var e in engines)
 					{
-						if (!e.booster || e.decoupledin < nextDecoupler)
+						if (!e.booster || !e.operational || e.decoupledin < nextDecoupler)
 							continue;
 						foreach (var propellant in e.activeModule.propellants)
 						{
@@ -128,7 +163,7 @@ namespace RedOnion.KSP.API
 				liquidFuels.Clear();
 				foreach (var e in engines)
 				{
-					if (e.booster)
+					if (e.booster || !e.operational)
 						continue;
 					foreach (var propellant in e.activeModule.propellants)
 					{
@@ -165,8 +200,8 @@ namespace RedOnion.KSP.API
 		static TimeDelta burnTimeUpdateDelta = new TimeDelta(0.2);
 		static void UpdateBurnTime()
 		{
-			if (Dirty)
-				Refresh();
+			CheckFlameout();
+			if (Dirty) Refresh();
 			var now = Time.now;
 			if (now - burnTimeUpdate < burnTimeUpdateDelta)
 				return;
@@ -187,6 +222,8 @@ namespace RedOnion.KSP.API
 			var nextDecoupler = ship.parts.nextDecouplerStage;
 			foreach (var e in engines)
 			{// see EngineSet.burntime
+				if (!e.operational)
+					continue;
 				var eisp = e.isp;
 				if (eisp < EngineSet.minIsp)
 					continue;
@@ -304,10 +341,10 @@ namespace RedOnion.KSP.API
 		}
 
 		static internal bool Dirty { get; private set; } = true;
-		static internal void SetDirty(string reason = null)
+		static internal void SetDirty(string reason)
 		{
 			if (Dirty) return;
-			Value.DebugLog(reason == null ? "Stage Dirty" : "Stage Dirty: " + reason);
+			Value.DebugLog("Stage Dirty: " + reason);
 			GameEvents.onEngineActiveChange.Remove(hooks.EngineChange);
 			GameEvents.onStageActivate.Remove(hooks.StageActivated);
 			GameEvents.onStageSeparation.Remove(hooks.StageSeparation);
@@ -394,6 +431,7 @@ namespace RedOnion.KSP.API
 					}
 				}
 			}
+			lastFlameoutCheck = Time.now;
 			burnTimeUpdate = Time.never;
 			burnTimeUpdate2 = Time.never;
 			Dirty = false;

@@ -42,9 +42,9 @@ namespace RedOnion.KSP.Parts
 		[Description("Parts attached to this part.")]
 		public PartChildren children => _children ?? (_children = new PartChildren(this));
 		PartChildren _children;
-		[Description("Custom values attached to this part.")]
+		[Description("Custom values and tags attached to this part.")]
 		public PartValues values => _values ?? (_values = new PartValues(this));
-		[Description("Custom values attached to this part. (alias to `values`)")]
+		[Description("Custom values and tags attached to this part. (alias to `values`)")]
 		public PartValues tags => _values ?? (_values = new PartValues(this));
 		PartValues _values;
 
