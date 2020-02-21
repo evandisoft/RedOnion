@@ -679,6 +679,7 @@ namespace RedOnion.ROS
 							throw CouldNotGet(ref lhs);
 						var test = lhs;
 						if (test.desc.Primitive != ExCode.Bool
+							&& test.desc.Primitive != ExCode.Null
 							&& !test.desc.Convert(ref test, Descriptor.Bool))
 							throw InvalidOperation("Could not convert '{0}' to boolean", test.Name);
 						int sz = Int(code, at);
