@@ -11,6 +11,8 @@ Part of the ship (vehicle/vessel).
 - `ship`: [Ship](../API/Ship.md) - Ship (vehicle/vessel) this part belongs to.
 - `parent`: Part - Parent part (this part is attached to).
 - `children`: [PartChildren](PartChildren.md) - Parts attached to this part.
+- `values`: [PartValues](PartValues.md) - Custom values and tags attached to this part.
+- `tags`: [PartValues](PartValues.md) - Custom values and tags attached to this part. (alias to `values`)
 - `decoupler`: [LinkPart](LinkPart.md) - Decoupler that will decouple this part when staged.
 - `stage`: int - Stage number as provided by KSP API. (`native.inverseStage` - activating stage for engines, decouplers etc.)
 - `decoupledin`: int - Stage number where this part will be decoupled or -1. (`decoupler?.stage ?? -1`)
@@ -19,6 +21,8 @@ Part of the ship (vehicle/vessel).
 - `name`: string - Name of the part (assigned by KSP).
 - `title`: string - Title of the part (assigned by KSP).
 - `position`: [Vector](../API/Vector.md) - Position of the part (relative to CoM of active ship/vessel).
+- `mass`: double - Mass of the part including resources.
+- `resourceMass`: double - Mass of the resources contained.
 
 **Instance Methods:**
 - `istype()`: bool, name string

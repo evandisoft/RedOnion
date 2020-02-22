@@ -18,9 +18,12 @@ namespace RedOnion.KSP.API
 	{
 		[Description("The simulation time, since the game or this save was started. Suitable for measuring time and printing.")]
 		public static TimeStamp now => new TimeStamp(Planetarium.GetUniversalTime());
-		[Description("No time (contains `NaN`). Useful for initialization of time-stamp variables as `since(none) = inf`.")]
+		[Description("Infinitely in the past (`-inf`). Useful for initialization of time-stamp variables.")]
+		public static TimeStamp never => TimeStamp.never;
+		[Description("No time (contains `NaN`). Note that `time.since(none) = inf` but `now - none` is still `none`.")]
 		public static TimeStamp none => TimeStamp.none;
-		[Description("The simulation time in seconds, since the game or this save was started. For pure computation (same as `now.seconds`).")]
+
+		[Description("The simulation time in seconds, since the game or this save was started. For pure computation (same as `now.seconds` or `now.s`).")]
 		public static double seconds => Planetarium.GetUniversalTime();
 
 		/* this would currently cause problems in MunSharp as it cannot handle overloads in this kind of API (static class)
@@ -187,7 +190,9 @@ namespace RedOnion.KSP.API
 		[Description("The time-stamp separated into parts (second, hour, ...).")]
 		public TimeParts parts => new TimeParts(seconds);
 
-		[Description("No time (contains `NaN`). Useful for initialization of time-stamp variables because `time.since(none) = inf`.")]
+		[Description("Infinitely in the past (`-inf`). Useful for initialization of time-stamp variables.")]
+		public static readonly TimeStamp never = new TimeStamp(double.NegativeInfinity);
+		[Description("No time (contains `NaN`). Note that `time.since(none) = inf` but `now - none` is still `none`.")]
 		public static readonly TimeStamp none = new TimeStamp(double.NaN);
 
 		public static TimeStamp operator +(TimeStamp stamp, TimeDelta delta) => new TimeStamp(stamp.seconds + delta.seconds);
@@ -337,6 +342,8 @@ namespace RedOnion.KSP.API
 		[Description("The time-delta/span separated into parts (second, hour, ...).")]
 		public TimeParts parts => new TimeParts(seconds);
 
+		[Description("Zero time-delta/span.")]
+		public static readonly TimeDelta zero = new TimeDelta(0);
 		[Description("No time-delta/span (contains `NaN`).")]
 		public static readonly TimeDelta none = new TimeDelta(double.NaN);
 		[Description("Infinite time-delta/span (contains `+Inf`).")]

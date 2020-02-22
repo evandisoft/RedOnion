@@ -25,6 +25,12 @@ namespace RedOnion.KSP.Parts
 		protected internal ResourceList(IPartSet partSet)
 			=> this.partSet = partSet;
 
+		protected override void Update()
+		{
+			partSet?.Update();
+			base.Update();
+		}
+
 		protected internal override void Clear()
 		{
 			var prev = prevCache;
@@ -90,7 +96,7 @@ namespace RedOnion.KSP.Parts
 		{
 			get
 			{
-				if (Dirty) DoRefresh();
+				Update();
 				return cache.TryGetValue(id, out var it) ? it : null;
 			}
 		}
@@ -133,7 +139,7 @@ namespace RedOnion.KSP.Parts
 
 		public override string ToString()
 		{
-			if (Dirty) DoRefresh();
+			Update();
 			bool first = true;
 			var sb = new StringBuilder();
 			sb.Append("[");

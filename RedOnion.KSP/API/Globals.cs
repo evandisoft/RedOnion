@@ -39,8 +39,12 @@ namespace RedOnion.KSP.API
 		public static readonly Type stage = typeof(Stage);
 		[Description("Current time and related functions.")]
 		public static readonly Type time = typeof(Time);
-		[WorkInProgress, Description("Maneuver node.")]
+		[Description("Maneuver node.")]
 		public static readonly Type node = typeof(Node);
+		[WorkInProgress, Description("User/player controls.")]
+		public static readonly Type player = typeof(Player);
+		[WorkInProgress, Description("User/player controls.")]
+		public static readonly Type user = typeof(Player);
 
 		[Description("PID regulator (alias to `system.pid` in ROS).")]
 		public static readonly Type PID = typeof(PID);
@@ -58,10 +62,6 @@ namespace RedOnion.KSP.API
 		public static Ship ship => Ship.Active;
 		[Description("Autopilot for active vessel. (`null` if no ship)")]
 		public static Autopilot autopilot => ship?.autopilot;
-		[Description("User/player controls.")]
-		public static Player player => Player.Instance;
-		[Description("User/player controls.")]
-		public static Player user => Player.Instance;
 
 		[Description("A collection of space/celestial bodies. (Safe API)")]
 		public static Bodies bodies => Bodies.Instance;

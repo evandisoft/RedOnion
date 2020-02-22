@@ -15,7 +15,7 @@ namespace RedOnion.KSP.API
 
 		public override bool Contains(T item)
 		{
-			if (Dirty) DoRefresh();
+			Update();
 			return hset.Contains(item);
 		}
 

@@ -213,6 +213,8 @@ def staging
       print "Pending last stage"
       stage
     return
+  if nextDecoupler.tags.has "noauto"
+    return
   if nextDecoupler.type == "LaunchClamp"
     print "Releasing launch clamps"
     stage

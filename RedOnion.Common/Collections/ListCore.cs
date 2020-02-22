@@ -179,6 +179,14 @@ namespace RedOnion.Collections
 				items[index] = value;
 			}
 		}
+		public ref T GetRef(int index)
+		{
+			if (index < 0)
+				ThrowNegative(index);
+			if (index >= size)
+				ThrowGreater(index);
+			return ref items[index];
+		}
 		public T GetOrDefault(int index)
 			=> index >= 0 && index < size ? items[index] : default;
 

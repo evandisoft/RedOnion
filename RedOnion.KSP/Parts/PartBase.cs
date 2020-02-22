@@ -42,6 +42,11 @@ namespace RedOnion.KSP.Parts
 		[Description("Parts attached to this part.")]
 		public PartChildren children => _children ?? (_children = new PartChildren(this));
 		PartChildren _children;
+		[Description("Custom values and tags attached to this part.")]
+		public PartValues values => _values ?? (_values = new PartValues(this));
+		[Description("Custom values and tags attached to this part. (alias to `values`)")]
+		public PartValues tags => _values ?? (_values = new PartValues(this));
+		PartValues _values;
 
 		[Description("Decoupler that will decouple this part when staged.")]
 		public LinkPart decoupler { get; internal set; }
@@ -69,6 +74,11 @@ namespace RedOnion.KSP.Parts
 
 		[Description("Position of the part (relative to CoM of active ship/vessel).")]
 		public Vector position => new Vector(native.partTransform.position - FlightGlobals.ActiveVessel.CoMD);
+
+		[Description("Mass of the part including resources.")]
+		public double mass => native.mass + native.GetResourceMass();
+		[Description("Mass of the resources contained.")]
+		public double resourceMass => native.GetResourceMass();
 
 		[Description("Explode the part.")]
 		public void explode() => native.explode();

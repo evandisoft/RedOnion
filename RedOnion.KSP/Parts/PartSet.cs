@@ -18,6 +18,7 @@ namespace RedOnion.KSP.Parts
 	{
 		bool Dirty { get; }
 		void SetDirty();
+		void Update();
 		event Action Refresh;
 	}
 	[Description("Collection of ship-parts.")]
@@ -43,7 +44,7 @@ namespace RedOnion.KSP.Parts
 		{
 			get
 			{
-				if (Dirty) DoRefresh();
+				Update();
 				return _ship;
 			}
 			protected internal set => _ship = value;
@@ -53,11 +54,12 @@ namespace RedOnion.KSP.Parts
 		protected internal PartSet(Ship ship) => this.ship = ship;
 		protected internal PartSet(Ship ship, Action refresh) : base(refresh) => this.ship = ship;
 
-		bool IPartSet.Dirty => Dirty;
 		int IReadOnlyCollection<PartBase>.Count => count;
 		int ICollection<PartBase>.Count => count;
 		bool ICollection<PartBase>.IsReadOnly => true;
+		bool IPartSet.Dirty => Dirty;
 		void IPartSet.SetDirty() => Dirty = true;
+		void IPartSet.Update() => Update();
 		event Action IPartSet.Refresh
 		{
 			add => Refresh += value;
@@ -73,7 +75,7 @@ namespace RedOnion.KSP.Parts
 		bool ICollection<PartBase>.Remove(PartBase item) => throw new NotImplementedException();
 		bool ICollection<PartBase>.Contains(PartBase item)
 		{
-			if (Dirty) DoRefresh();
+			Update();
 			return cache.ContainsKey(item.native);
 		}
 		void ICollection<PartBase>.CopyTo(PartBase[] array, int index)
@@ -84,7 +86,7 @@ namespace RedOnion.KSP.Parts
 
 		public override bool Contains(Part item)
 		{
-			if (Dirty) DoRefresh();
+			Update();
 			return cache.ContainsKey(item.native);
 		}
 
@@ -106,7 +108,7 @@ namespace RedOnion.KSP.Parts
 		{
 			get
 			{
-				if (Dirty) DoRefresh();
+				Update();
 				if (cache.TryGetValue(part, out var it))
 					return it;
 				ApiLogger.Log($"Could not find part {part.persistentId}/{part.name} in ship {ship.id}/{ship.persistentId}/{ship.name}");
@@ -116,7 +118,7 @@ namespace RedOnion.KSP.Parts
 
 		public override string ToString()
 		{
-			if (Dirty) DoRefresh();
+			Update();
 			bool first = true;
 			var sb = new StringBuilder();
 			sb.Append("[");
@@ -141,7 +143,7 @@ namespace RedOnion.KSP.Parts
 		{
 			get
 			{
-				if (Dirty) DoRefresh();
+				Update();
 				return _root;
 			}
 		}
@@ -162,7 +164,7 @@ namespace RedOnion.KSP.Parts
 		{
 			get
 			{
-				if (Dirty) DoRefresh();
+				Update();
 				return _nextDecoupler;
 			}
 		}
@@ -198,7 +200,7 @@ namespace RedOnion.KSP.Parts
 			{
 				GameEvents.onVesselWasModified.Remove(VesselModified);
 				if (_ship == Ship.Active)
-					Stage.SetDirty();
+					Stage.SetDirty("PartSet Dirty");
 			}
 			decouplers.Dirty = value;
 			dockingports.Dirty = value;
@@ -414,7 +416,7 @@ namespace RedOnion.KSP.Parts
 			if (engine != null)
 			{
 				engines.Add(engine);
-				int upto = engine.ignited ? ship.currentStage : engine.staged ? engine.stage : 0;
+				int upto = engine.ignited ? ship.currentStage : engine.stage;
 				for (int i = decoupledin + 1; i >= upto; i--)
 					stages.list[i].activeEngines.Add(engine);
 			}

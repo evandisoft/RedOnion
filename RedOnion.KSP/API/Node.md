@@ -1,4 +1,4 @@
-## \[`WIP`\] Node
+## Node
 
 Maneuver node.
 

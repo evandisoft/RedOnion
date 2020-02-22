@@ -15,7 +15,7 @@ namespace RedOnion.KSP.Parts
 		{
 			get
 			{
-				if (Dirty) DoRefresh();
+				Update();
 				return _ship;
 			}
 			protected internal set => _ship = value;

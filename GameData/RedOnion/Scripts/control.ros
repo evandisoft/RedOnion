@@ -20,6 +20,7 @@ def control ship, target, x, y
   wnd.closed.add def
     self.terminate = true
   var autopilot = ship.autopilot
+  var autoStage = false
   var report = nan
 
 //mode vs. the rest
@@ -52,6 +53,8 @@ def control ship, target, x, y
       self.dirsubs.remove
       self.dirsubs = null
     autopilot.disable
+    autopilot.resetSAS
+    autoStage = false
     if fn != null and (btn == null || btn.pressed)
       self.dirsubs = system.update def
         autopilot.direction = fn()
@@ -73,6 +76,8 @@ def control ship, target, x, y
         self.dirsubs.remove
         self.dirsubs = null
       autopilot.disable
+      autopilot.resetSAS
+      autoStage = false
       if fn != null and (btn == null || btn.pressed)
         fn()
     btn.width = 80
@@ -81,8 +86,11 @@ def control ship, target, x, y
 //orbital/surface buttons
   var blk1 = btns.addVertical()
   var row = blk1.addHorizontal()
-  var bProgr  = xbtn row, "Progr.", def => mSrf.pressed ? ship.srfvel : ship.velocity
+  var bProgr  = xbtn row, "Progr.", def
+    autoStage = user.throttle > 0
+    return mSrf.pressed ? ship.srfvel : ship.velocity
   var bRetro  = xbtn row, "Retro.", def
+    autoStage = user.throttle > 0
     if mObt.pressed
       return -ship.velocity
     if ship.splashed or ship.landed
@@ -119,11 +127,19 @@ def control ship, target, x, y
     return dir
 
   row = blk1.addHorizontal()
-  var bNormal = xbtn row, "Normal", def => ship.velocity.cross ship.away
-  var bAntiN  = xbtn row, "Anti-N", def => -ship.velocity.cross ship.away
+  var bNormal = xbtn row, "Normal", def
+    autoStage = user.throttle > 0
+    return ship.velocity.cross ship.away
+  var bAntiN  = xbtn row, "Anti-N", def
+    autoStage = user.throttle > 0
+    return -ship.velocity.cross ship.away
   row = blk1.addHorizontal()
-  var bRadOut = xbtn row, "Rad-OUT", def => ship.velocity.cross ship.away.cross ship.velocity
-  var bRadIn  = xbtn row, "Rad-IN", def => -ship.velocity.cross ship.away.cross ship.velocity
+  var bRadOut = xbtn row, "Rad-OUT", def
+    autoStage = user.throttle > 0
+    return ship.velocity.cross ship.away.cross ship.velocity
+  var bRadIn  = xbtn row, "Rad-IN", def =>
+    autoStage = user.throttle > 0
+    return -ship.velocity.cross ship.away.cross ship.velocity
   row = blk1.addHorizontal()
   var unlock = row.addExclusive2 "UNLOCK", lockdir.bind null
   unlock.flexWidth = 1
@@ -136,6 +152,7 @@ def control ship, target, x, y
   row = blk2.addHorizontal()
   var bTowards = xbtn row, "Towards", def
     prevTgtBtn = bTowards
+    autoStage = user.throttle > 0
     var target = ship.target ?? self.target
     if target != null
       var ctl = ship.controlPart
@@ -146,6 +163,7 @@ def control ship, target, x, y
     return vector.none
   var bAway = xbtn row, "Away Fr.", def
     prevTgtBtn = bAway
+    autoStage = user.throttle > 0
     var target = ship.target ?? self.target
     if target != null
       return ship.position - target.position
@@ -155,6 +173,7 @@ def control ship, target, x, y
   row = blk2.addHorizontal()
   var bMatchSpeed = xbtn row, "Match Speed", def
     prevTgtBtn = bMatchSpeed
+    autoStage = user.throttle > 0
     var dv = vector.none
     var target = ship.target ?? self.target
     if target == null
@@ -225,6 +244,7 @@ def control ship, target, x, y
     if nde == null
       bAbort.press
       return vector.none
+    autoStage = true
     var dv = nde.deltav
     var xt = 0.5 * stage.burnTime dv.size
     var dt = nde.eta - xt
@@ -239,7 +259,7 @@ def control ship, target, x, y
         warpDelay = null
         var to = time() + dt - (dt > 300 ? 300 : 10)
         time.warp.to to
-        print "Warping to {0}", to
+        print "Warping to {0} ({1})", to, to - time()
     var th = dt >= 1 ? 0 : (dt <= 0 ? 1 : 1-dt) * e *
       dv.size * ship.mass / math.max 1, ship.engines.getThrust()
     autopilot.throttle = th
@@ -247,7 +267,7 @@ def control ship, target, x, y
     if time.sinceReal(report) >= 1
       report = time.real
       print "DV: {0,4:F1} AD: {1,4:F1} AV: {2,5:F2} DT: {3}",
-        dv.size, d, ship.angularVelocity.size, dt
+        dv.size, d, ship.angularVelocity.size, time.delta dt
     if dvMin < 0.05
       nde.remove
       bAbort.press
@@ -502,19 +522,17 @@ def control ship, target, x, y
 
 //staging
   self.stgsubs = system.idle def
-    if ship != global.ship
-      return
-    if !stage.ready
-      return
-    if stage.pending
-    //not using that in this script
-      return
-    if ship.engines.count == 0
-    //no point in staging if there is no engine
+    if (not autoStage
+      or ship != global.ship
+      or !stage.ready
+      or stage.pending //not using that in this script
+      or ship.engines.count == 0) //no point in staging if there is no engine
       return
     var nextDecoupler = ship.parts.nextDecoupler
     if nextDecoupler == null
         return
+    if nextDecoupler.tags.has "noauto"
+      return
     if nextDecoupler.type == "LaunchClamp"
     //not releasing launch clamps in this script
       return
