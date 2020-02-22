@@ -188,6 +188,8 @@ namespace RedOnion.ROS.Tests
 			Test(true,		"\"a\" === \"a\"");	// identity with strings
 			Test(false,		"\"a\" === \"b\"");
 			Test(true,		"\"a\" !== \"b\"");
+			Test(true,		"\"a\" == \"A\"");	// equality is case insensitive
+			Test(false,		"\"a\" === \"A\"");	// identity is case sensitive
 
 			// this was causing some problems (fixed)
 			Test("var s = \"hello\"");
