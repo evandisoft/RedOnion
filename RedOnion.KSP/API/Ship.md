@@ -9,6 +9,7 @@ Active vessel
 - `target`: Object - \[`WIP`\] Target of active ship. Null if none.
 - `autopilot`: [Autopilot](Autopilot.md) - Autopilot of this ship (vehicle/vessel).
 - `throttle`: float - Current throttle (assign redirects to `Autopilot`, reads control state if autopilot disabled)
+- `controllable`: bool - Indicator that ship is controllable.
 - `parts`: [ShipPartSet](../Parts/ShipPartSet.md) - All parts of this ship/vessel/vehicle.
 - `root`: [Part](../Parts/PartBase.md) - Root part (same as `parts.root`).
 - `controlPart`: [Part](../Parts/PartBase.md) - Controlling part (same as `parts.control`).
