@@ -46,219 +46,229 @@ namespace RedOnion.ROS.Parsing
 			}
 			switch (Curr)
 			{
-				case '0':
-				case '1':
-				case '2':
-				case '3':
-				case '4':
-				case '5':
-				case '6':
-				case '7':
-				case '8':
-				case '9':
-				case '"':   // parser will switch that to string/char
-				case '\'':  // here 'number' actually means literal
-					ExCode = ExCode.Number;
+			case '0':
+			case '1':
+			case '2':
+			case '3':
+			case '4':
+			case '5':
+			case '6':
+			case '7':
+			case '8':
+			case '9':
+			case '"':   // parser will switch that to string/char
+			case '\'':  // here 'number' actually means literal
+				ExCode = ExCode.Number;
+				return;
+			case '.':
+				ExCode = ExCode.Dot;
+				return;
+			case '?':
+				if (Peek == '?')
+				{
+					End++;
+					ExCode = ExCode.NullCol;
 					return;
-				case '.':
-					ExCode = ExCode.Dot;
-					return;
-				case '?':
-					if (Peek == '?')
+				}
+				if (Peek == '.')
+				{
+					End++;
+					ExCode = ExCode.NullDot;
+					if (Peek == '(')
 					{
 						End++;
-						ExCode = ExCode.NullCol;
-						return;
+						ExCode = ExCode.NullCall;
 					}
-					if (Peek == '.')
-					{
-						End++;
-						ExCode = ExCode.NullDot;
-						if (Peek == '(')
-						{
-							End++;
-							ExCode = ExCode.NullCall;
-						}
-						return;
-					}
-					ExCode = ExCode.Ternary;
 					return;
-				case '=':
-					if (Peek == '>')
-					{
-						End++;
-						ExCode = ExCode.Lambda;
-						return;
-					}
+				}
+				ExCode = ExCode.Ternary;
+				return;
+			case '=':
+				if (Peek == '>')
+				{
+					End++;
+					ExCode = ExCode.Lambda;
+					return;
+				}
+				if (Peek == '=')
+				{
+					End++;
+					ExCode = ExCode.Equals;
 					if (Peek == '=')
 					{
 						End++;
-						ExCode = ExCode.Equals;
-						return;
+						ExCode = ExCode.Identity;
 					}
-					ExCode = ExCode.Assign;
 					return;
-				case '|':
+				}
+				ExCode = ExCode.Assign;
+				return;
+			case '|':
+				if (Peek == '=')
+				{
+					End++;
+					ExCode = ExCode.OrAssign;
+					return;
+				}
+				if (Peek == '|')
+				{
+					End++;
+					ExCode = ExCode.LogicOr;
+					return;
+				}
+				ExCode = ExCode.BitOr;
+				return;
+			case '^':
+				if (Peek == '=')
+				{
+					End++;
+					ExCode = ExCode.XorAssign;
+					return;
+				}
+				ExCode = ExCode.BitXor;
+				return;
+			case '&':
+				if (Peek == '=')
+				{
+					End++;
+					ExCode = ExCode.AndAssign;
+					return;
+				}
+				if (Peek == '&')
+				{
+					End++;
+					ExCode = ExCode.LogicAnd;
+					return;
+				}
+				ExCode = ExCode.BitAnd;
+				return;
+			case '<':
+				if (Peek == '<')
+				{
+					End++;
 					if (Peek == '=')
 					{
 						End++;
-						ExCode = ExCode.OrAssign;
+						ExCode = ExCode.LshAssign;
 						return;
 					}
-					if (Peek == '|')
-					{
-						End++;
-						ExCode = ExCode.LogicOr;
-						return;
-					}
-					ExCode = ExCode.BitOr;
+					ExCode = ExCode.ShiftLeft;
 					return;
-				case '^':
+				}
+				if (Peek == '=')
+				{
+					End++;
+					ExCode = ExCode.LessEq;
+					return;
+				}
+				ExCode = ExCode.Less;
+				return;
+			case '>':
+				if (Peek == '>')
+				{
+					End++;
 					if (Peek == '=')
 					{
 						End++;
-						ExCode = ExCode.XorAssign;
+						ExCode = ExCode.RshAssign;
 						return;
 					}
-					ExCode = ExCode.BitXor;
+					ExCode = ExCode.ShiftRight;
 					return;
-				case '&':
+				}
+				if (Peek == '=')
+				{
+					End++;
+					ExCode = ExCode.MoreEq;
+					return;
+				}
+				ExCode = ExCode.More;
+				return;
+			case '+':
+				if (Peek == '=')
+				{
+					End++;
+					ExCode = ExCode.AddAssign;
+					return;
+				}
+				if (Peek == '+')
+				{
+					End++;
+					ExCode = ExCode.Inc;
+					return;
+				}
+				ExCode = ExCode.Add;
+				return;
+			case '-':
+				if (Peek == '=')
+				{
+					End++;
+					ExCode = ExCode.SubAssign;
+					return;
+				}
+				if (Peek == '-')
+				{
+					End++;
+					ExCode = ExCode.Dec;
+					return;
+				}
+				ExCode = ExCode.Sub;
+				return;
+			case '*':
+				if (Peek == '=')
+				{
+					End++;
+					ExCode = ExCode.MulAssign;
+					return;
+				}
+				if (Peek == '*')
+				{
+					End++;
+					ExCode = ExCode.Power;
 					if (Peek == '=')
 					{
 						End++;
-						ExCode = ExCode.AndAssign;
-						return;
+						ExCode = ExCode.PwrAssign;
 					}
-					if (Peek == '&')
-					{
-						End++;
-						ExCode = ExCode.LogicAnd;
-						return;
-					}
-					ExCode = ExCode.BitAnd;
 					return;
-				case '<':
-					if (Peek == '<')
-					{
-						End++;
-						if (Peek == '=')
-						{
-							End++;
-							ExCode = ExCode.LshAssign;
-							return;
-						}
-						ExCode = ExCode.ShiftLeft;
-						return;
-					}
+				}
+				ExCode = ExCode.Mul;
+				return;
+			case '/':
+				if (Peek == '=')
+				{
+					End++;
+					ExCode = ExCode.DivAssign;
+					return;
+				}
+				ExCode = ExCode.Div;
+				return;
+			case '%':
+				if (Peek == '=')
+				{
+					End++;
+					ExCode = ExCode.ModAssign;
+					return;
+				}
+				ExCode = ExCode.Mod;
+				return;
+			case '!':
+				if (Peek == '=')
+				{
+					End++;
+					ExCode = ExCode.Differ;
 					if (Peek == '=')
 					{
 						End++;
-						ExCode = ExCode.LessEq;
-						return;
+						ExCode = ExCode.NotIdentity;
 					}
-					ExCode = ExCode.Less;
 					return;
-				case '>':
-					if (Peek == '>')
-					{
-						End++;
-						if (Peek == '=')
-						{
-							End++;
-							ExCode = ExCode.RshAssign;
-							return;
-						}
-						ExCode = ExCode.ShiftRight;
-						return;
-					}
-					if (Peek == '=')
-					{
-						End++;
-						ExCode = ExCode.MoreEq;
-						return;
-					}
-					ExCode = ExCode.More;
-					return;
-				case '+':
-					if (Peek == '=')
-					{
-						End++;
-						ExCode = ExCode.AddAssign;
-						return;
-					}
-					if (Peek == '+')
-					{
-						End++;
-						ExCode = ExCode.Inc;
-						return;
-					}
-					ExCode = ExCode.Add;
-					return;
-				case '-':
-					if (Peek == '=')
-					{
-						End++;
-						ExCode = ExCode.SubAssign;
-						return;
-					}
-					if (Peek == '-')
-					{
-						End++;
-						ExCode = ExCode.Dec;
-						return;
-					}
-					ExCode = ExCode.Sub;
-					return;
-				case '*':
-					if (Peek == '=')
-					{
-						End++;
-						ExCode = ExCode.MulAssign;
-						return;
-					}
-					if (Peek == '*')
-					{
-						End++;
-						ExCode = ExCode.Power;
-						if (Peek == '=')
-						{
-							End++;
-							ExCode = ExCode.PwrAssign;
-						}
-						return;
-					}
-					ExCode = ExCode.Mul;
-					return;
-				case '/':
-					if (Peek == '=')
-					{
-						End++;
-						ExCode = ExCode.DivAssign;
-						return;
-					}
-					ExCode = ExCode.Div;
-					return;
-				case '%':
-					if (Peek == '=')
-					{
-						End++;
-						ExCode = ExCode.ModAssign;
-						return;
-					}
-					ExCode = ExCode.Mod;
-					return;
-				case '!':
-					if (Peek == '=')
-					{
-						End++;
-						ExCode = ExCode.Differ;
-						return;
-					}
-					ExCode = ExCode.Not;
-					return;
-				case '~':
-					ExCode = ExCode.Flip;
-					return;
+				}
+				ExCode = ExCode.Not;
+				return;
+			case '~':
+				ExCode = ExCode.Flip;
+				return;
 			}
 			ExCode = ExCode.Unknown;
 		}
@@ -295,7 +305,7 @@ namespace RedOnion.ROS.Parsing
 			{ "as",         ExCode.As },
 			{ "and",        ExCode.LogicAnd },
 			{ "or",         ExCode.LogicOr },
-			{ "not",		ExCode.Not },
+			{ "not",        ExCode.Not },
 			{ "typeof",     ExCode.TypeOf },
 			{ "nameof",     ExCode.NameOf },
 			{ "var",        ExCode.Var },

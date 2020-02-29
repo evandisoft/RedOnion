@@ -159,22 +159,37 @@ namespace RedOnion.ROS.Tests
 		[Test]
 		public void ROS_Expr06_Logic()
 		{
-			Test(true,		"1 < 2");       // integers
-			Test(true,		"1 > .1");      // integer vs. double - less
-			Test(true,		"1 == 1.0");    // integer vs. double - equal
-			Test(true,		"true || false");
+			Test(true,		"1 < 2");			// integers
+			Test(true,		"1 > .1");			// integer vs. double - less
+			Test(true,		"1 == 1.0");		// integer vs. double - equal
+
+			Test(true,		"true || false");	// logic or
 			Test(true,		"false || true");
-			Test(false,		"true && false");
+			Test(false,		"true && false");	// logic and
 			Test(false,		"false and true");
 			Test(true,		"true && true");
-			Test(true,      "null ?? true");
+
+			Test(true,      "null ?? true");    // null-coalescing operator
 			Test(false,		"false ?? true");
-			Test(1,			"0 or 1");
+
+			Test(1,			"0 or 1");			// or with number
 			Test(1,			"1 || 2");
-			Test(false,		"not true");
+			Test("me",		"null or \"me\"");  // or with null
+			Test(null,		"null and \"me\""); // and with null
+
+			Test(false,		"not true");		// logic not
 			Test(true,		"not false");
 			Test(true,		"not 0");
 			Test(false,		"not 1");
+
+			Test(true,		"1 === 1");			// identity with numbers
+			Test(false,		"1 !== 1");
+			Test(false,		"1 === 2");
+			Test(true,		"\"a\" === \"a\"");	// identity with strings
+			Test(false,		"\"a\" === \"b\"");
+			Test(true,		"\"a\" !== \"b\"");
+			Test(true,		"\"a\" == \"A\"");	// equality is case insensitive
+			Test(false,		"\"a\" === \"A\"");	// identity is case sensitive
 
 			// this was causing some problems (fixed)
 			Test("var s = \"hello\"");
@@ -190,9 +205,7 @@ namespace RedOnion.ROS.Tests
 
 			// property existence tests (comes from JavaScript)
 			Test(true, "\"length\" in s");
-			Test(true, "\"length\" in string");
 			Test(false, "\"blah\" in s");
-			Test(false, "\"blah\" in string");
 		}
 
 		[Test]
@@ -262,6 +275,18 @@ namespace RedOnion.ROS.Tests
 		public void ROS_Expr10_Print()
 		{
 			Test("3.14", @"print ""{0:F2}"", math.pi");
+		}
+
+		[Test]
+		public void ROS_Expr11_Strings()
+		{
+			Test(true, "\"x\".contains \"x\"");
+			Test(true, "\"xyz\".contains \"y\"");
+			Test(true, "\"xyz\".contains \"yz\"");
+			Test(false, "\"xyz\".contains \"a\"");
+
+			Test("yz", "\"xyz\".substr 1");
+			Test("y", "\"xyz\".substring 1, 1");
 		}
 	}
 }

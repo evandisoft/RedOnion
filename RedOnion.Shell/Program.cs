@@ -111,8 +111,12 @@ namespace RedOnion.Shell
 				var statement = code.Code?.Length > 0
 					&& code.Code[0] >= (byte)OpKind.Statement
 					&& code.Code[0] != (byte)OpCode.Autocall;
-				if (statement && line != "" && line != "return" && line != "break")
+				if (statement && line != "")
+				{
+					if (line == "return" || line == "break")
+						return;
 					continue;
+				}
 				sb.Length = 0;
 				try
 				{

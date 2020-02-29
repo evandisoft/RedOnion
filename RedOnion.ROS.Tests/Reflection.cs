@@ -40,11 +40,19 @@ namespace RedOnion.ROS.Tests
 			{
 				name = null;
 				Integer = 0;
+				number = 0;
 				Action = null;
 				Action2 = null;
 			}
 			public static MyAction GetAction() => Action;
 			public static MyAction2 GetAction2() => Action2;
+			public static double SetNumber(object value)
+			{
+				if (!(value is IConvertible convertible))
+					throw new ArgumentException("Not convertible", nameof(value));
+				number = convertible.ToInt32(Value.Culture);
+				return number;
+			}
 		}
 		public class InstanceTest
 		{
@@ -73,6 +81,13 @@ namespace RedOnion.ROS.Tests
 			public int number { get; set; }
 			public MyAction GetAction() => Action;
 			public MyAction2 GetAction2() => Action2;
+			public double SetNumber(object value)
+			{
+				if (!(value is IConvertible convertible))
+					throw new ArgumentException("Not convertible", nameof(value));
+				number = convertible.ToInt32(Value.Culture);
+				return number;
+			}
 		}
 		public class MixedTest
 		{
@@ -185,6 +200,9 @@ namespace RedOnion.ROS.Tests
 			Test(333, "it.integer");
 			Test("hello", "test.defaultArg2 \"hello\"; test.name");
 			Test("hello", "it.defaultArg2 \"hello\"; it.name");
+
+			Test(1.0, "test.setNumber 1.1");
+			Test(1.0, "it.setNumber 1.1");
 		}
 
 		public struct Point
@@ -259,6 +277,9 @@ namespace RedOnion.ROS.Tests
 			Test(TestEnum.One, "(new enumTest).value");
 			Test(TestEnum.Two, "(new enumTest testEnum.two).value");
 			Test("hello", "(new enumTest \"hello\").name");
+
+			Test(true, "testEnum.zero == \"zero\"");
+			Test(false, "testEnum.one != \"ONE\"");
 		}
 
 		[Test]
@@ -410,6 +431,7 @@ namespace RedOnion.ROS.Tests
 		{
 			Globals = new Globals();
 			Globals.Add(typeof(StaticTest));
+			StaticTest.Reset();
 			Test(0.0, "staticTest.number");
 			Test(1.1, "staticTest.number = 1.1");
 			Test(1.0, "staticTest.number");

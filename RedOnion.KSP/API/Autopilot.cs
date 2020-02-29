@@ -1,4 +1,5 @@
 using MoonSharp.Interpreter;
+using RedOnion.Attributes;
 using RedOnion.ROS;
 using RedOnion.ROS.Utilities;
 using System;
@@ -10,7 +11,7 @@ using UnityEngine;
 
 namespace RedOnion.KSP.API
 {
-	[Description("Autopilot (throttle and steering) for a ship (vehicle/vessel).")]
+	[WorkInProgress, Description("Autopilot (throttle and steering) for a ship (vehicle/vessel).")]
 	public class Autopilot : IDisposable
 	{
 		protected Ship _ship;
@@ -18,6 +19,7 @@ namespace RedOnion.KSP.API
 
 		// inputs
 		protected float _throttle, _rawPitch, _rawYaw, _rawRoll;
+		protected float _userFactor, _userPitch, _userYaw, _userRoll;
 		protected double _pitch, _heading, _roll;
 		protected Vector _direction;
 		protected bool _killRot;
@@ -46,7 +48,13 @@ namespace RedOnion.KSP.API
 
 		[Description("Reset the autopilot to default settings.")]
 		public void reset()
-			=> pids.reset();
+		{
+			pids.reset();
+			_userFactor = 1f;
+			_userPitch = float.NaN;
+			_userYaw = float.NaN;
+			_userRoll = float.NaN;
+		}
 
 		~Autopilot() => Dispose(false);
 		[Browsable(false), MoonSharpHidden]
@@ -159,10 +167,38 @@ namespace RedOnion.KSP.API
 			set => _ship.rcs = value;
 		}
 
+		[Description("General strength of user override/correction of controls. \\[0, 2] 1 by default.")]
+		public float userFactor
+		{
+			get => _userFactor;
+			set => _userFactor = float.IsNaN(value) ? 0f : RosMath.Clamp(value, 0f, 2f);
+		}
+		[Description("Strength of user pitch-override/correction. \\[0, 2] or `nan` - `userFactor` used if `nan` (which is by default).")]
+		public float userPitchFactor
+		{
+			get => _userPitch;
+			set => _userPitch = RosMath.Clamp(value, 0f, 2f);
+		}
+		[Description("Strength of user yaw-override/correction. \\[0, 2] or `nan` - `userFactor` used if `nan` (which is by default).")]
+		public float userYawFactor
+		{
+			get => _userYaw;
+			set => _userYaw = RosMath.Clamp(value, 0f, 2f);
+		}
+		[Description("Strength of user roll-override/correction. \\[0, 2] or `nan` - `userFactor` used if `nan` (which is by default).")]
+		public float userRollFactor
+		{
+			get => _userRoll;
+			set => _userRoll = RosMath.Clamp(value, 0f, 2f);
+		}
+
+		[WorkInProgress, Description("Set of PID(R) controllers used by the autopilot.")]
 		public PIDs pids { get; } = new PIDs();
+
 		protected PID pitchPID => pids._pitch;
 		protected PID yawPID => pids._yaw;
 		protected PID rollPID => pids._roll;
+
 		public class PidParams : API.PidParams
 		{
 			// todo: maximal angular velocity and maximal stopping time
@@ -217,6 +253,7 @@ namespace RedOnion.KSP.API
 				set => param.time = value;
 			}
 		}
+		[Description("Set of PID(R) controllers used by the autopilot.")]
 		public class PIDs
 		{
 			protected internal PIDs() { }
@@ -225,8 +262,11 @@ namespace RedOnion.KSP.API
 			protected internal PID _yaw = new PID();
 			protected internal PID _roll = new PID(new PidParams.Roll());
 
+			[Description("Pitch control PID(R) parameters.")]
 			public PidParams pitch => _pitch.param;
+			[Description("Yaw control PID(R) parameters.")]
 			public PidParams yaw => _yaw.param;
+			[Description("Roll control PID(R) parameters.")]
 			public PidParams roll => _roll.param;
 
 			double combine(double a, double b)
@@ -234,26 +274,33 @@ namespace RedOnion.KSP.API
 			double combine(double a, double b, double c)
 				=> a == b && b == c ? c : double.NaN;
 
+			[Description("Proportional factor (strength of direct control) for all three angles (`NaN` if not same).")]
 			public double P
 			{
 				get => combine(pitch.P, yaw.P, roll.P);
 				set => roll.P = yaw.P = pitch.P = value;
 			}
+			[Description("Integral factor (dynamic error-correction, causes oscillation as side-effect) for all three angles (`NaN` if not same).")]
 			public double I
 			{
 				get => combine(pitch.I, yaw.I, roll.I);
 				set => roll.I = yaw.I = pitch.I = value;
 			}
+			[Description("Derivative factor (dampening - applied to output, reduces the oscillation) for all three angles (`NaN` if not same).")]
 			public double D
 			{
 				get => combine(pitch.D, yaw.D, roll.D);
 				set => roll.D = yaw.D = pitch.D = value;
 			}
+			[Description("Reduction factor for accumulator for all three angles (`NaN` if not same;"
+				+ "dampening - applied to accumulator used by integral factor,"
+				+ " works well against both oscillation and windup).")]
 			public double R
 			{
 				get => combine(pitch.R, yaw.R, roll.R);
 				set => roll.R = yaw.R = pitch.R = value;
 			}
+
 			public double time
 			{
 				get => combine(pitch.time, yaw.time, roll.time);
@@ -305,6 +352,15 @@ namespace RedOnion.KSP.API
 			if (!float.IsNaN(_throttle))
 				st.mainThrottle = RosMath.Clamp(_throttle, 0f, 1f);
 
+			// could probably use InputLockManager.lockStack.ContainsKey("TimeWarp") instead
+			if (TimeWarp.rate > 1.1f && TimeWarp.high)
+			{
+				pitchPID.resetAccu();
+				yawPID.resetAccu();
+				rollPID.resetAccu();
+				return;
+			}
+
 			var angvel = _ship.angularVelocity;
 			var maxang = _ship.maxAngular;
 			if (!double.IsNaN(_direction.x)
@@ -321,24 +377,24 @@ namespace RedOnion.KSP.API
 				var pitchDiff = RosMath.Deg.Atan2(-want.z, want.y);
 				var yawDiff = RosMath.Deg.Atan2(want.x, want.y);
 				// compute control inputs (X=pitch, Z=yaw - the one not used in the atan2 above)
-				var pitch = (float)AngularControl(pitchPID, pitchDiff, angvel.x, maxang.x);
-				var yaw = (float)AngularControl(yawPID, yawDiff, angvel.z, maxang.z);
+				var pitch = AngularControl(pitchPID, pitchDiff, angvel.x, maxang.x, _userPitch, Player.pitch);
+				var yaw = AngularControl(yawPID, yawDiff, angvel.z, maxang.z, _userYaw, Player.yaw);
 				// set the controls
-				if (!float.IsNaN(pitch))
-					st.pitch = RosMath.Clamp(pitch, -1f, +1f);
-				if (!float.IsNaN(yaw))
-					st.yaw = RosMath.Clamp(yaw, -1f, +1f);
+				if (!double.IsNaN(pitch))
+					st.pitch = ControlValue(pitch, _userPitch, Player.pitch);
+				if (!double.IsNaN(yaw))
+					st.yaw = ControlValue(yaw, _userYaw, Player.yaw);
 			}
 			else if (killRot)
 			{
 				// compute control inputs
-				var pitch = (float)AngularControl(pitchPID, 0, angvel.x, maxang.x);
-				var yaw = (float)AngularControl(yawPID, 0, angvel.z, maxang.z);
+				var pitch = AngularControl(pitchPID, 0, angvel.x, maxang.x, _userPitch, Player.pitch);
+				var yaw = AngularControl(yawPID, 0, angvel.z, maxang.z, _userYaw, Player.yaw);
 				// set the controls
-				if (!float.IsNaN(pitch))
-					st.pitch = RosMath.Clamp(pitch, -1f, +1f);
-				if (!float.IsNaN(yaw))
-					st.yaw = RosMath.Clamp(yaw, -1f, +1f);
+				if (!double.IsNaN(pitch))
+					st.pitch = ControlValue(pitch, _userPitch, Player.pitch);
+				if (!double.IsNaN(yaw))
+					st.yaw = ControlValue(yaw, _userYaw, Player.yaw);
 			}
 			if (!double.IsNaN(_roll) || killRot)
 			{
@@ -351,17 +407,25 @@ namespace RedOnion.KSP.API
 						rollDiff = RosMath.ClampS180(_roll - 180.0
 							- _ship.up.angle(_ship.north.rotate(_heading, _ship.away), _ship.away));
 				}
-				var roll = (float)AngularControl(rollPID, rollDiff, angvel.y, maxang.y);
-				if (!float.IsNaN(roll))
-					st.roll = RosMath.Clamp(roll, -1f, +1f);
+				var roll = AngularControl(rollPID, rollDiff, angvel.y, maxang.y, _userRoll, Player.roll);
+				if (!double.IsNaN(roll))
+					st.roll = ControlValue(roll, _userRoll, Player.roll);
 			}
 			if (!float.IsNaN(_rawPitch))
-				st.pitch = RosMath.Clamp(_rawPitch, -1f, +1f);
+				st.pitch = ControlValue(_rawPitch, _userPitch, Player.pitch);
 			if (!float.IsNaN(_rawYaw))
-				st.yaw = RosMath.Clamp(_rawYaw, -1f, +1f);
+				st.yaw = ControlValue(_rawYaw, _userYaw, Player.yaw);
 			if (!float.IsNaN(_rawRoll))
-				st.roll = RosMath.Clamp(_rawRoll, -1f, +1f);
+				st.roll = ControlValue(_rawRoll, _userRoll, Player.roll);
 		}
+
+		protected virtual float ControlValue(double input, double factor, double user)
+		{
+			if (double.IsNaN(factor))
+				factor = _userFactor;
+			return (float)RosMath.Clamp(input + factor * user, -1.0, +1.0);
+		}
+
 		/// <summary>
 		/// Calculate PYR control input for given parameters. 
 		/// </summary>
@@ -370,15 +434,29 @@ namespace RedOnion.KSP.API
 		/// <param name="speed">Angular speed (deg/s, signed).</param>
 		/// <param name="accel">Angular acceleration (deg/s/s, unsigned) at full control.</param>
 		/// <returns>New control fraction (0-100%).</returns>
-		protected virtual double AngularControl(PID pid, double angle, double speed, double accel)
+		protected virtual double AngularControl(PID pid, double angle, double speed, double accel, double factor, double user)
 		{
 			// double the angle we will still travel if we try to stop immediately.
 			// abs(speed)/accel is the time needed, 0.5*speed would be average speed,
 			// we use double of that because we always add the angle difference.
 			var stop = speed * (Math.Abs(speed)/accel + 0.3 + 10 * pid.dt);
-			// TODO: recheck the signs and what they mean, should be angle-stop
-			pid.input = 10 * (angle + stop) / accel;
+
+			if (double.IsNaN(factor))
+				factor = _userFactor;
+			pid.input = 10 * (angle + stop) / accel + factor * user;
 			return pid.update();
+		}
+
+		public void resetSAS()
+		{
+			var ap = _ship.native.Autopilot;
+			if (ap == null) return;
+			ap.SAS.ResetAllPIDS();
+			if (ap.Enabled)
+			{
+				ap.Disable();
+				ap.Enable();
+			}
 		}
 	}
 }

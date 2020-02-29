@@ -225,13 +225,22 @@ namespace RedOnion.ROS.Objects
 			var shadow = top.shadow;
 			if (shadow == null)
 				return;
+			var locked = new ListCore<KeyValuePair<string, int>>();
 			foreach (var pair in shadow)
 			{
 				if (pair.Value < prop.Count)
+				{
+					locked.Add(pair);
 					continue;
+				}
 				dict[pair.Key] = pair.Value;
 			}
 			shadow.Clear();
+			if (locked.size > 0)
+			{// e.g. loop variable is shadowing
+				foreach (var pair in locked)
+					shadow[pair.Key] = pair.Value;
+			}
 		}
 		/// <summary>
 		/// Pop/remove one block.

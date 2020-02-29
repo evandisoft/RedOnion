@@ -1,35 +1,42 @@
-using RedOnion.ROS.Utilities;
+//#define DEBUG_PARTS_REFRESH
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using RedOnion.ROS;
 using RedOnion.KSP.API;
 using System.ComponentModel;
 using MoonSharp.Interpreter;
 using KSP.UI.Screens;
-using RedOnion.ROS;
+using static RedOnion.Debugging.QueueLogger;
+using RedOnion.Attributes;
+using System.Text;
 
 namespace RedOnion.KSP.Parts
 {
-	public interface IPartSet : ICollection<PartBase>
+	public interface IPartSet : ICollection<PartBase>, IReadOnlyCollection<PartBase>
 	{
 		bool Dirty { get; }
 		void SetDirty();
+		void Update();
 		event Action Refresh;
 	}
+	[Description("Collection of ship-parts.")]
 	public class PartSet<Part>
 		: ReadOnlyList<Part>
 		, IPartSet
 		where Part : PartBase
 	{
 		protected Dictionary<global::Part, Part> cache = new Dictionary<global::Part, Part>();
-		public ResourceList resources => protectedResources ?? (protectedResources = new ResourceList(this));
-		protected ResourceList protectedResources;
 
-		protected internal override void SetDirty()
+		[Description("Resource collection of all the parts in this set.")]
+		public ResourceList resources => _resources ?? (_resources = new ResourceList(this));
+		protected ResourceList _resources;
+
+		protected internal override void SetDirty(bool value)
 		{
-			base.SetDirty();
-			if (protectedResources != null)
-				protectedResources.SetDirty();
+			if (value) _resources?.SetDirty(value);
+			base.SetDirty(value);
 		}
 
 		[Description("Ship (vessel/vehicle) this list of parts belongs to.")]
@@ -37,7 +44,7 @@ namespace RedOnion.KSP.Parts
 		{
 			get
 			{
-				if (Dirty) DoRefresh();
+				Update();
 				return _ship;
 			}
 			protected internal set => _ship = value;
@@ -47,9 +54,12 @@ namespace RedOnion.KSP.Parts
 		protected internal PartSet(Ship ship) => this.ship = ship;
 		protected internal PartSet(Ship ship, Action refresh) : base(refresh) => this.ship = ship;
 
-		bool IPartSet.Dirty => Dirty;
+		int IReadOnlyCollection<PartBase>.Count => count;
+		int ICollection<PartBase>.Count => count;
 		bool ICollection<PartBase>.IsReadOnly => true;
-		void IPartSet.SetDirty() => SetDirty();
+		bool IPartSet.Dirty => Dirty;
+		void IPartSet.SetDirty() => Dirty = true;
+		void IPartSet.Update() => Update();
 		event Action IPartSet.Refresh
 		{
 			add => Refresh += value;
@@ -65,7 +75,7 @@ namespace RedOnion.KSP.Parts
 		bool ICollection<PartBase>.Remove(PartBase item) => throw new NotImplementedException();
 		bool ICollection<PartBase>.Contains(PartBase item)
 		{
-			if (Dirty) DoRefresh();
+			Update();
 			return cache.ContainsKey(item.native);
 		}
 		void ICollection<PartBase>.CopyTo(PartBase[] array, int index)
@@ -76,7 +86,7 @@ namespace RedOnion.KSP.Parts
 
 		public override bool Contains(Part item)
 		{
-			if (Dirty) DoRefresh();
+			Update();
 			return cache.ContainsKey(item.native);
 		}
 
@@ -98,76 +108,131 @@ namespace RedOnion.KSP.Parts
 		{
 			get
 			{
-				if (Dirty) DoRefresh();
+				Update();
 				if (cache.TryGetValue(part, out var it))
 					return it;
-				Value.DebugLog("Could not find part {0}/{1} in ship {1}/{2}/{3}",
-					part.persistentId, part.name, ship.id, ship.persistentId, ship.name);
+				ApiLogger.Log($"Could not find part {part.persistentId}/{part.name} in ship {ship.id}/{ship.persistentId}/{ship.name}");
 				return null;
 			}
+		}
+
+		public override string ToString()
+		{
+			Update();
+			bool first = true;
+			var sb = new StringBuilder();
+			sb.Append("[");
+			foreach (var part in list)
+			{
+				if (!first) sb.Append(", ");
+				first = false;
+				sb.Append(part.name);
+			}
+			sb.Append("]");
+			return sb.ToString();
 		}
 	}
 	[Description("Collection of all the parts in one ship/vessel.")]
 	public class ShipPartSet : PartSet<PartBase>, IDisposable
 	{
-		protected PartBase protectedRoot;
+		protected Dictionary<Part, PartBase> prevCache = new Dictionary<Part, PartBase>();
+
+		protected PartBase _root;
 		[Description("Root part.")]
 		public PartBase root
 		{
 			get
 			{
-				if (Dirty) DoRefresh();
-				return protectedRoot;
+				Update();
+				return _root;
 			}
 		}
 
-		protected Decoupler protectedNextDecoupler;
-		[Description("One of the decouplers that will get activated by nearest stage. (Same as `Parts.NextDecoupler`.)")]
-		public Decoupler nextDecoupler
+		[Description("Controlling part.")]
+		public PartBase control
 		{
 			get
 			{
-				if (Dirty) DoRefresh();
-				return protectedNextDecoupler;
+				var ctl = ship.native.GetReferenceTransformPart();
+				return ctl == null ? root : this[ctl];
 			}
 		}
-		[Description("Stage number of the nearest decoupler or -1. (`NextDecoupler?.Stage ?? -1`)")]
+
+		protected LinkPart _nextDecoupler;
+		[Description("One of the decouplers that will get activated by nearest stage.")]
+		public LinkPart nextDecoupler
+		{
+			get
+			{
+				Update();
+				return _nextDecoupler;
+			}
+		}
+		[Description("Stage number of the nearest decoupler or -1. (`nextDecoupler?.stage ?? -1`)")]
 		public int nextDecouplerStage => nextDecoupler?.stage ?? -1;
 
 		[Description("List of all decouplers, separators, launch clamps and docks with staging enabled."
 			+ " (Docking ports without staging enabled not included.)")]
-		public ReadOnlyList<Decoupler> decouplers { get; protected set; }
+		public ReadOnlyList<LinkPart> decouplers { get; protected set; }
 		[Description("List of all docking ports (regardless of staging).")]
 		public ReadOnlyList<DockingPort> dockingports { get; protected set; }
 		[Description("All engines (regardless of state).")]
 		public EngineSet engines { get; protected set; }
 		[Description("All sensors.")]
 		public ReadOnlyList<Sensor> sensors { get; protected set; }
+		[WorkInProgress, Description("Parts per stage (by `decoupledin+1`).")]
+		public Stages stages { get; protected set; }
 
 		protected internal ShipPartSet(Ship ship) : base(ship)
 		{
-			decouplers = new ReadOnlyList<Decoupler>(DoRefresh);
+			decouplers = new ReadOnlyList<LinkPart>(DoRefresh);
 			dockingports = new ReadOnlyList<DockingPort>(DoRefresh);
 			engines = new EngineSet(ship, DoRefresh);
 			sensors = new ReadOnlyList<Sensor>(DoRefresh);
+			stages = new Stages(ship, DoRefresh);
 		}
-		protected internal override void SetDirty()
+		protected internal override void SetDirty(bool value)
 		{
-			if (Dirty) return;
-			RedOnion.ROS.Value.DebugLog("Ship Parts Dirty");
-			GameEvents.onVesselWasModified.Remove(VesselModified);
-			base.SetDirty();
-			decouplers.SetDirty();
-			dockingports.SetDirty();
-			engines.SetDirty();
-			sensors.SetDirty();
-			if (_ship == Ship.Active)
-				Stage.SetDirty();
+#if DEBUG && DEBUG_PARTS_REFRESH
+			Value.DebugLog($"Ship Parts Dirty = {value}");
+#endif
+			if (value)
+			{
+				GameEvents.onVesselWasModified.Remove(VesselModified);
+				if (_ship == Ship.Active)
+					Stage.SetDirty("PartSet Dirty");
+			}
+			decouplers.Dirty = value;
+			dockingports.Dirty = value;
+			engines.Dirty = value;
+			sensors.Dirty = value;
+			stages.Dirty = value;
+			base.SetDirty(value);
+		}
+		protected internal override void Clear()
+		{
+			var prev = prevCache;
+			prevCache = cache;
+			cache = prev;
+			//not needed, cleared as part of SetDirty
+			//decouplers.Clear();
+			//dockingports.Clear();
+			//engines.Clear();
+			//sensors.Clear();
+			//stages.Clear();
+			base.Clear();
 		}
 		void VesselModified(Vessel vessel)
 		{
+#if DEBUG && DEBUG_PARTS_REFRESH
+			if (_ship == null)
+			{
+				Value.DebugLog("VesselModified: ship not assigned");
+				return;
+			}
+#endif
 			if (vessel == _ship.native)
-				SetDirty();
+				Dirty = true;
 		}
 
 		~ShipPartSet() => Dispose(false);
@@ -189,112 +254,172 @@ namespace RedOnion.KSP.Parts
 			GameEvents.onVesselWasModified.Remove(VesselModified);
 			cache = null;
 			_ship = null;
-			protectedRoot = null;
-			protectedNextDecoupler = null;
+			_root = null;
+			_nextDecoupler = null;
 			list.Clear();
 			decouplers.Clear();
 			dockingports.Clear();
 			engines.Clear();
 			sensors.Clear();
+			stages.Clear();
 			decouplers = null;
 			dockingports = null;
 			engines = null;
 			sensors = null;
+			stages = null;
+			prevCache = null;
 		}
 
-		//TODO: reuse wrappers
+#if DEBUG && DEBUG_PARTS_REFRESH
+		bool refreshing;
+#endif
 		protected override void DoRefresh()
 		{
-			protectedRoot = null;
-			protectedNextDecoupler = null;
-			decouplers.Clear();
-			dockingports.Clear();
-			engines.Clear();
-			sensors.Clear();
-			list.Clear();
-			cache?.Clear();
+#if DEBUG && DEBUG_PARTS_REFRESH
+			Value.DebugLog($"Refreshing Ship Parts, Guid: {_ship.id}");
+			if (refreshing)
+				throw new InvalidOperationException("Already refreshing");
+			if (!Dirty)
+				throw new InvalidOperationException("Not dirty");
+			refreshing = true;
+#endif
+			Dirty = false;
+			_root = null;
+			_nextDecoupler = null;
+			while (stages.list.Count <= _ship.currentStage)
+				stages.list.Add(new StagePartSet(_ship, DoRefresh));
+			stages.list.Count = _ship.currentStage + 1;
+
 			Construct(_ship.native.rootPart, null, null);
-			base.DoRefresh();
-			decouplers.Dirty = false;
-			dockingports.Dirty = false;
-			engines.Dirty = false;
+
+			prevCache.Clear();
+			Refresh?.Invoke();
 			GameEvents.onVesselWasModified.Add(VesselModified);
-			RedOnion.ROS.Value.DebugLog("Ship Parts Refreshed (Parts: {0}, Engines: {1})", list.Count, engines.Count);
+			ApiLogger.Log($"Ship Parts Refreshed: {list.Count}, Engines: {engines.count}, Guid: {_ship.id}");
+
+#if DEBUG && DEBUG_PARTS_REFRESH
+			Value.DebugLog($"Ship Parts Refreshed: {list.Count}/{cache.Count}, Engines: {engines.count}, Guid: {_ship.id}");
+			refreshing = false;
+#endif
 		}
-		protected void Construct(Part part, PartBase parent, Decoupler decoupler)
+		protected void Construct(Part part, PartBase parent, LinkPart decoupler)
 		{
 			if (part.State == PartStates.DEAD || part.transform == null)
 				return;
 
-			PartBase self = null;
-			foreach (var module in part.Modules)
+			//TODO: consider change of StagingEnabled - some parts may get improperly categorized
+			Engine engine = null;
+			if (prevCache.TryGetValue(part, out var self))
 			{
-				if (module is IEngineStatus)
+#if DEBUG && DEBUG_PARTS_REFRESH
+				Value.DebugLog($"Wrapper for part {part} taken from cache, decoupler: {decoupler}/{decoupler?.stage??-1}");
+#endif
+				self.decoupler = decoupler;
+				if (self is Engine eng)
+					engine = eng;
+				else if (self is LinkPart dec)
 				{
-					var engine = new Engine(_ship, part, parent, decoupler);
-					engines.Add(engine);
-					self = engine;
-					break;
-				}
-				if (module is IStageSeparator)
-				{
-					var dock = module as ModuleDockingNode;
-					if (dock != null)
-					{
-						var port = new DockingPort(_ship, part, parent, decoupler, dock);
+					if (dec is DockingPort port)
 						dockingports.Add(port);
-						self = port;
-						if (!module.StagingEnabled())
-							break;
-						decoupler = port;
-					}
-					else
+					if (dec.staged)
 					{
-						// ignore anything with staging disabled and continue the search
-						// this can e.g. be heat shield or some sensor with integrated decoupler
-						if (!module.StagingEnabled())
-							continue;
-						if (module is global::LaunchClamp)
-						{
-							var clamp = new LaunchClamp(_ship, part, parent, decoupler);
-							self = clamp;
-							decoupler = clamp;
-						}
-						else if (module is ModuleDecouple || module is ModuleAnchoredDecoupler)
-						{
-							var separator = new Decoupler(_ship, part, parent, decoupler);
-							self = separator;
-							decoupler = separator;
-						}
-						else // ModuleServiceModule ?
-							continue; // rather continue the search
+						decoupler = dec;
+						decouplers.Add(dec);
+#if DEBUG && DEBUG_PARTS_REFRESH
+						Value.DebugLog($"Part {part} is decoupler");
+#endif
+
+						if ((_nextDecoupler == null || decoupler.stage > _nextDecoupler.stage)
+							&& decoupler.stage < _ship.native.currentStage)
+							_nextDecoupler = decoupler;
 					}
-					decouplers.Add(decoupler);
-					// ignore leftover decouplers
-					if (decoupler.native.inverseStage >= StageManager.CurrentStage)
-						break;
-					// check if we just created closer decoupler (see StageValues.CreatePartSet)
-					if (protectedNextDecoupler == null || decoupler.native.inverseStage > protectedNextDecoupler.native.inverseStage)
-						protectedNextDecoupler = decoupler;
-					break;
 				}
-				var sensor = module as ModuleEnviroSensor;
-				if (sensor != null)
-				{
-					var sense = new Sensor(_ship, part, parent, decoupler, sensor);
-					sensors.Add(sense);
-					self = sense;
-					break;
-				}
+				else if (self is Sensor sensor)
+					sensors.Add(sensor);
 			}
-			if (self == null)
-				self = new PartBase(_ship, part, parent, decoupler);
-			if (protectedRoot == null)
-				protectedRoot = self;
-			if (cache == null)
-				cache = new Dictionary<Part, PartBase>();
+			else
+			{
+#if DEBUG && DEBUG_PARTS_REFRESH
+				Value.DebugLog($"Creating wrapper for part {part}, decoupler: {decoupler}/{decoupler?.stage??-1}");
+#endif
+				foreach (var module in part.Modules)
+				{
+					if (module is IEngineStatus)
+					{
+						engine = new Engine(_ship, part, parent, decoupler);
+						self = engine;
+						break;
+					}
+					if (module is IStageSeparator)
+					{
+						var dock = module as ModuleDockingNode;
+						if (dock != null)
+						{
+							var port = new DockingPort(_ship, part, parent, decoupler, dock);
+							dockingports.Add(port);
+							self = port;
+							if (!module.StagingEnabled())
+								break;
+							decoupler = port;
+						}
+						else
+						{
+							// ignore anything with staging disabled and continue the search
+							// this can e.g. be heat shield or some sensor with integrated decoupler
+							if (!module.StagingEnabled())
+								continue;
+							if (module is global::LaunchClamp calmpModule)
+							{
+								var clamp = new LaunchClamp(_ship, part, parent, decoupler, calmpModule);
+								self = clamp;
+								decoupler = clamp;
+							}
+							else if (module is ModuleDecouplerBase decouplerBase)
+							{
+								var separator = new Decoupler(_ship, part, parent, decoupler, decouplerBase);
+								self = separator;
+								decoupler = separator;
+							}
+							else // ModuleServiceModule ?
+								continue; // rather continue the search
+						}
+#if DEBUG && DEBUG_PARTS_REFRESH
+						Value.DebugLog($"Part {part} is decoupler");
+#endif
+						decouplers.Add(decoupler);
+						// ignore leftover decouplers
+						if (decoupler.stage >= _ship.currentStage)
+							break;
+						// check if we just created closer decoupler
+						if (_nextDecoupler == null || decoupler.stage > _nextDecoupler.stage)
+							_nextDecoupler = decoupler;
+						break;
+					}
+					var sensor = module as ModuleEnviroSensor;
+					if (sensor != null)
+					{
+						var sense = new Sensor(_ship, part, parent, decoupler, sensor);
+						sensors.Add(sense);
+						self = sense;
+						break;
+					}
+				}
+				if (self == null)
+					self = new PartBase(PartType.Unknown, _ship, part, parent, decoupler);
+			}
+			if (_root == null)
+				_root = self;
 			cache[part] = self;
 			list.Add(self);
+			var decoupledin = self.decoupledin;
+			stages.list[decoupledin + 1].Add(self);
+			if (engine != null)
+			{
+				engines.Add(engine);
+				int upto = engine.ignited ? ship.currentStage : engine.stage;
+				for (int i = decoupledin + 1; i >= upto; i--)
+					stages.list[i].activeEngines.Add(engine);
+			}
 			foreach (var child in part.children)
 				Construct(child, self, decoupler);
 		}

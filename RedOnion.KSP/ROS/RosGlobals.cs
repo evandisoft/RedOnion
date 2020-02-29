@@ -18,10 +18,12 @@ namespace RedOnion.KSP.ROS
 			base.Fill();
 			System.Add(typeof(PID));
 
+			//TODO: link all non-main to some main to simulate process-like thread group
 			var process = ((RosProcessor)Processor).Process;
 			System.Add("update", new Event(MunPriority.Realtime));
 			System.Add("idle", new Event(MunPriority.Idle));
 			System.Add("once", new Event(MunPriority.Callback));
+			System.Add("main", new Event(MunPriority.Main));
 			System.Lock();
 		}
 
@@ -40,7 +42,8 @@ namespace RedOnion.KSP.ROS
 					return false;
 				result = new Value(new Subscription(new RosThread(
 					MunProcess.Current as RosProcess, priority, it.obj as Function),
-					repeating: priority == MunPriority.Realtime || priority == MunPriority.Idle));
+					repeating: priority == MunPriority.Realtime || priority == MunPriority.Idle,
+					autoRemove: priority != MunPriority.Main));
 				return true;
 			}
 		}

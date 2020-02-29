@@ -1,7 +1,10 @@
-## Autopilot
+## \[`WIP`\] Autopilot
 
 Autopilot (throttle and steering) for a ship (vehicle/vessel).
 
+
+**Types:**
+- `PIDs`: [Autopilot.PIDs](Autopilot.PIDs.md)
 
 **Instance Properties:**
 - `throttle`: float - Throttle control (0..1). NaN for releasing the control.
@@ -15,6 +18,11 @@ Autopilot (throttle and steering) for a ship (vehicle/vessel).
 - `killRot`: bool - Fix the roll of the ship. Note that this is not SAS and currently does not allow user override.
 - `sas`: bool - SAS: Stability Assist System. This is stock alternative to `killRot` which allows user override. Can be used to allow user/player to adjust roll while autopilot controls direction.
 - `rcs`: bool - RCS: Reaction Control System.
+- `userFactor`: float - General strength of user override/correction of controls. \[0, 2] 1 by default.
+- `userPitchFactor`: float - Strength of user pitch-override/correction. \[0, 2] or `nan` - `userFactor` used if `nan` (which is by default).
+- `userYawFactor`: float - Strength of user yaw-override/correction. \[0, 2] or `nan` - `userFactor` used if `nan` (which is by default).
+- `userRollFactor`: float - Strength of user roll-override/correction. \[0, 2] or `nan` - `userFactor` used if `nan` (which is by default).
+- `pids`: [Autopilot.PIDs](Autopilot.PIDs.md) - \[`WIP`\] Set of PID(R) controllers used by the autopilot.
 
 **Instance Methods:**
 - `disable()`: void - Disable the autopilot, setting all values to NaN.

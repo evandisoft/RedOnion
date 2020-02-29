@@ -11,7 +11,9 @@ Global variables, objects and functions common to all scripting languages.
 - `types`: [Types](../Namespaces/Types.md) - Types to be used with ROS: `is` operator; Lua: `isa` function.
 - `stage`: [Stage](Stage.md) - Staging logic.
 - `time`: [Time](Time.md) - Current time and related functions.
-- `node`: [Node](Node.md) - \[`WIP`\] Maneuver node.
+- `node`: [Node](Node.md) - Maneuver node.
+- `player`: [Player](Player.md) - \[`WIP`\] User/player controls.
+- `user`: [Player](Player.md) - \[`WIP`\] User/player controls.
 - `PID`: [PID](PID.md) - PID regulator (alias to `system.pid` in ROS).
 - `app`: [App](App.md) - \[`WIP`\] Safe API for KSP Application Launcher (toolbar/buttons). WIP
 
@@ -23,8 +25,6 @@ Global variables, objects and functions common to all scripting languages.
 - `vector()`: [Vector](Vector.md) - Function for creating 3D vector / coordinate.
 - `ship`: [Ship](Ship.md) - Active vessel (in flight only, null otherwise).
 - `autopilot`: [Autopilot](Autopilot.md) - Autopilot for active vessel. (`null` if no ship)
-- `player`: Player - User/player controls.
-- `user`: Player - User/player controls.
 - `bodies`: [Bodies](Bodies.md) - A collection of space/celestial bodies. (Safe API)
 - `target`: Object - \[`WIP`\] Target of active ship. Null if none.
 - `altitude`: double - Alias to `ship.altitude`. (`NaN` if no ship.)

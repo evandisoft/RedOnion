@@ -83,6 +83,7 @@ ctrl + o: focus scriptNameTextArea
 ctrl + p: focus completion/ intellisense box
 shift + space: Intellisense completion.
 ctrl + enter: Intellisense completion.
+control + shift + c: Terminate current process' threads
 ";
 
 			CurrentBuffer.AddText(hotkeyText);

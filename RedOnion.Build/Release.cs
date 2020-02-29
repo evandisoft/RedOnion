@@ -11,13 +11,15 @@ namespace RedOnion.Build
 		/// our own playthrough scripts without having to delete them every time we release.
 		/// 
 		/// No script will be distributed for release without being in this whitelist.
+		/// 
+		/// Small scripts that are just for tutorials should just have their code be in the tutorial text, 
+		/// which can be copy-pasted in to run it, rather than being whitelisted here.
 		/// </summary>
 		public static string[] scriptWhitelist=
 		{
 			// Whitelisted ROS scripts
 			"launch.ros","control.ros",
 			// Whitelisted LUA scripts
-			"majorMalfunction.lua","majorMalfunctionNative.lua","selfDestruct.lua","uibasics.lua",
 		};
 
 		internal static void Exec()

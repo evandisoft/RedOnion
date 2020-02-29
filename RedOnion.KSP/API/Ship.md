@@ -4,49 +4,58 @@ Active vessel
 
 
 **Instance Properties:**
-- `native`: Vessel - \[`Unsafe`\] Native `Vessel` for unrestricted access to KSP API. Same as `FlightGlobals.ActiveVessel` if accessed through global `ship`.
+- `native`: Vessel - \[`Unsafe`\] Native `Vessel` for unrestricted access to [KSP API](https://kerbalspaceprogram.com/api/class_vessel.html). Same as `FlightGlobals.ActiveVessel` if accessed through global `ship`.
 - `name`: string - Name of the ship (vehicle/vessel).
 - `target`: Object - \[`WIP`\] Target of active ship. Null if none.
 - `autopilot`: [Autopilot](Autopilot.md) - Autopilot of this ship (vehicle/vessel).
 - `throttle`: float - Current throttle (assign redirects to `Autopilot`, reads control state if autopilot disabled)
+- `controllable`: bool - Indicator that ship is controllable.
 - `parts`: [ShipPartSet](../Parts/ShipPartSet.md) - All parts of this ship/vessel/vehicle.
 - `root`: [Part](../Parts/PartBase.md) - Root part (same as `parts.root`).
-- `nextDecoupler`: [Decoupler](../Parts/Decoupler.md) - One of the decouplers that will get activated by nearest stage. (Same as `Parts.NextDecoupler`.)
+- `controlPart`: [Part](../Parts/PartBase.md) - Controlling part (same as `parts.control`).
+- `nextDecoupler`: [LinkPart](../Parts/LinkPart.md) - One of the decouplers that will get activated by nearest stage. (Same as `Parts.NextDecoupler`.)
 - `nextDecouplerStage`: int - Stage number of the nearest decoupler or -1. (Same as `Parts.NextDecouplerStage`.)
-- `decouplers`: [ReadOnlyList](ReadOnlyList.1.md)\[[Decoupler](../Parts/Decoupler.md)\] - List of all decouplers, separators, launch clamps and docks with staging. (Docking ports without staging enabled not included.)
+- `currentStage`: int - Current stage number. (Same as `stage.number` if active ship.)
+- `stages`: [Stages](../Parts/Stages.md) - \[`WIP`\] Parts per stage (by `decoupledin+1`).
+- `decouplers`: [ReadOnlyList](ReadOnlyList.1.md)\[[LinkPart](../Parts/LinkPart.md)\] - List of all decouplers, separators, launch clamps and docks with staging. (Docking ports without staging enabled not included.)
 - `dockingports`: [ReadOnlyList](ReadOnlyList.1.md)\[[DockingPort](../Parts/DockingPort.md)\] - List of all docking ports (regardless of staging).
 - `engines`: [EngineSet](../Parts/EngineSet.md) - All engines (regardless of state).
 - `sensors`: [ReadOnlyList](ReadOnlyList.1.md)\[[Sensor](../Parts/Sensor.md)\] - All sensors.
 - `id`: Guid - Unique identifier of the ship (vehicle/vessel). Can change when docking/undocking.
 - `persistentId`: uint - Unique identifier of the ship (vehicle/vessel). Should be same as it was before docking (after undocking).
 - `vesseltype`: VesselType - KSP API. Vessel type as selected by user (or automatically).
-- `mass`: float - Total mass of the ship (vehicle/vessel). [tons = 1000 kg]
+- `mass`: double - Total mass of the ship (vehicle/vessel). [tons = 1000 kg]
 - `packed`: bool - Wheter the ship is still packed (reduced physics).
 - `landed`: bool - Wheter the ship is landed (on the ground or on/in water).
 - `splashed`: bool - Wheter the ship is in water.
+- `prelaunch`: bool - Ship is on launch-pad.
+- `situation`: Situations - KSP API. Current situation.
 - `longitude`: double - Longitude of current position in degrees.
 - `latitude`: double - Latitude of current position in degrees.
 - `altitude`: double - Altitude of current position (above sea level) in meters.
 - `radarAltitude`: double - True height above ground in meters.
 - `dynamicPressure`: double - Dynamic pressure [atm = 101.325kPa]
 - `q`: double - Dynamic pressure [atm = 101.325kPa]
-- `body`: [SpaceBody](SpaceBody.md) - KSP API. Orbited body.
-- `orbit`: Orbit - \[`Unsafe`\] \[`WIP`\] KSP API. Orbit parameters. May get replaced by safe wrapper in the future.
-- `eccentricity`: double - Eccentricity of current orbit.
-- `inclination`: double - Inclination of current orbit [0, 180).
+- `body`: [SpaceBody](SpaceBody.md) - Orbited body.
+- `orbit`: [OrbitInfo](OrbitInfo.md) - \[`WIP`\] Orbit parameters.
+- `period`: [TimeDelta](TimeDelta.md) - Period of current orbit in seconds. Alias to `orbit.period`.
+- `timeToAp`: [TimeDelta](TimeDelta.md) - Eta to apoapsis in seconds. Alias to `orbit.timeToAp`.
+- `timeToPe`: [TimeDelta](TimeDelta.md) - Eta to periapsis in seconds. Alias to `orbit.timeToPe`.
+- `timeAtAp`: [TimeStamp](TimeStamp.md) - Time at apoapsis. Alias to `orbit.timeAtAp`.
+- `timeAtPe`: [TimeStamp](TimeStamp.md) - Time at periapsis. Alias to `orbit.timeAtPe`.
+- `eccentricity`: double - Eccentricity of current orbit. \[0, +inf)
+- `inclination`: double - Inclination of current orbit. \[0, 180)
 - `semiMajorAxis`: double - Semi-major axis of current orbit.
 - `semiMinorAxis`: double - Semi-minor axis of current orbit.
 - `apoapsis`: double - Height above ground of highest point of current orbit.
 - `periapsis`: double - Height above ground of lowest point of current orbit.
-- `apocenter`: double - Highest distance between center of orbited body and any point of current orbit.
-- `pericenter`: double - Lowest distance between center of orbited body and any point of current orbit.
-- `timeToAp`: double - Eta to apoapsis in seconds.
-- `timeToPe`: double - Eta to periapsis in seconds.
-- `period`: double - Period of current orbit in seconds.
+- `apocenter`: double - Highest distance between center of orbited body and any point of current orbit. `(1 + eccentricity) * semiMajorAxis`
+- `pericenter`: double - Lowest distance between center of orbited body and any point of current orbit. `(1 - eccentricity) * semiMajorAxis`
 - `trueAnomaly`: double - Angle in degrees between the direction of periapsis and the current position. Zero at periapsis, 180 at apoapsis.
 - `meanAnomaly`: double - Angle in degrees between the direction of periapsis and the current position extrapolated on circular orbit.
 - `lan`: double - Longitude of ascending node.
 - `argumentOfPeriapsis`: double - Argument of periapsis. Angle from ascending node to periapsis.
+- `aop`: double - Argument of periapsis. Angle from ascending node to periapsis.
 - `position`: [Vector](Vector.md) - Center of mass relative to (CoM of) active ship (zero for active ship).
 - `velocity`: [Vector](Vector.md) - Current orbital velocity.
 - `surfaceVelocity`: [Vector](Vector.md) - Current surface velocity.
@@ -61,30 +70,32 @@ Active vessel
 - `north`: [Vector](Vector.md) - Vector pointing north in the plane that is tangent to sphere centered in orbited body.
 - `east`: [Vector](Vector.md) - Vector pointing east (tangent to sphere centered in orbited body).
 - `away`: [Vector](Vector.md) - Vector pointing away from orbited body (aka *up*, but we use `up` for cockpit-up).
-- `pitch`: double - Current pitch / elevation (the angle between forward vector and tangent plane) [-90..+90]
-- `heading`: double - Current heading / yaw (the angle between forward and north vectors in tangent plane) [0..360]. Note that it can change violently around the poles.
-- `roll`: double - Current roll / bank (the angle between up and away vectors in the plane perpendicular to forward vector) [-180..+180]. 
+- `pitch`: double - Current pitch / elevation (the angle between forward vector and tangent plane) \[-90..+90]
+- `heading`: double - Current heading / yaw (the angle between forward and north vectors in tangent plane) \[0..360]. Note that it can change violently around the poles.
+- `roll`: double - Current roll / bank (the angle between up and away vectors in the plane perpendicular to forward vector) \[-180..+180]. 
 Note that it can change violently when facing up or down.
-- `angularVelocity`: [Vector](Vector.md) - Angular velocity (ω, deg/s), how fast the ship rotates
-- `angularMomentum`: [Vector](Vector.md) - Angular momentum (L = Iω, kg⋅m²⋅deg/s=N⋅m⋅s⋅deg) aka moment of momentum or rotational momentum.
-- `momentOfInertia`: Vector3d - Moment of inertia (I, kg⋅m²=N⋅m⋅s²) aka angular mass or rotational inertia.
-- `maxTorque`: [Vector](Vector.md) - Maximal ship torque [N⋅m⋅deg=deg⋅kg⋅m²/s²] (aka moment of force or turning effect, maximum of positive and negative).
-- `maxVacuumTorque`: [Vector](Vector.md) - Maximal ship torque in vacuum [N⋅m⋅deg=deg⋅kg⋅m²/s²] (ignoring control surfaces).
-- `maxAngular`: [Vector](Vector.md) - Maximal angular acceleration (deg/s²)
+- `angularVelocity`: [Vector](Vector.md) - Angular velocity \[ω, deg/s], how fast the ship rotates
+- `angularMomentum`: [Vector](Vector.md) - Angular momentum \[L = Iω, kg⋅m²⋅deg/s=N⋅m⋅s⋅deg] aka moment of momentum or rotational momentum.
+- `momentOfInertia`: Vector3d - Moment of inertia \[I, kg⋅m²=N⋅m⋅s²] aka angular mass or rotational inertia.
+- `maxTorque`: [Vector](Vector.md) - Maximal ship torque \[N⋅m⋅deg=deg⋅kg⋅m²/s²] (aka moment of force or turning effect, maximum of positive and negative).
+- `maxVacuumTorque`: [Vector](Vector.md) - Maximal ship torque in vacuum \[N⋅m⋅deg=deg⋅kg⋅m²/s²] (ignoring control surfaces).
+- `maxAngular`: [Vector](Vector.md) - Maximal angular acceleration. \[deg/s²]
 - `maxVacuumAngular`: [Vector](Vector.md) - Maximal angular acceleration in vacuum (ignoring control surfaces).
 - `sas`: bool - SAS: Stability Assist System.
 - `rcs`: bool - RCS: Reaction Control System.
 
 **Instance Methods:**
-- `positionAt()`: [Vector](Vector.md), time double
-  - \[`WIP`\] Predicted position at specified time.
-- `velocityAt()`: [Vector](Vector.md), time double
-  - \[`WIP`\] Predicted velocity at specified time.
+- `orbitAt()`: [OrbitInfo](OrbitInfo.md), time [TimeStamp](TimeStamp.md)
+  - \[`WIP`\] Get orbit info relevant for given time. See [orbit.png](orbit.png).
+- `positionAt()`: [Vector](Vector.md), time [TimeStamp](TimeStamp.md)
+  - \[`WIP`\] Predicted position at specified time. Includes the movement of bodies (e.g. Mun or Ike) when ship is currently orbiting the (grand)parent (e.g. Kerbin or Sun/Kerbol). This method is trying to be reasonably smooth/continuous, use `orbitAt(time).positionAt(time)` if that is not desired. See [orbit.png](orbit.png).
+- `velocityAt()`: [Vector](Vector.md), time [TimeStamp](TimeStamp.md)
+  - \[`WIP`\] Predicted velocity at specified time. Includes the movement of bodies (e.g. Mun or Ike) when ship is currently orbiting the (grand)parent (e.g. Kerbin or Sun/Kerbol). This method is trying to be reasonably smooth/continuous, use `orbitAt(time).velocityAt(time)` if that is not desired. See [orbit.png](orbit.png).
 - `local()`: [Vector](Vector.md), v [Vector](Vector.md)
-  - Translate vector/direction into ship-local coordinates (like looking at it from the cockpit).
+  - Translate vector/direction into ship-local coordinates (like looking at it from the cockpit - or rather from the controlling part).
 - `world()`: [Vector](Vector.md), v [Vector](Vector.md)
   - Translate vector/direction into world coordinates (reverse the `local` transformation).
-- `timeAtTrueAnomaly()`: double, trueAnomaly double
+- `timeAtTrueAnomaly()`: [TimeStamp](TimeStamp.md), trueAnomaly double
   - \[`WIP`\] Get time at true anomaly (absolute time of angle from direction of periapsis).
-- `timeToTrueAnomaly()`: double, trueAnomaly double
-  - \[`WIP`\] Get time to true anomaly (relative time of angle from direction of periapsis).
+- `timeToTrueAnomaly()`: [TimeDelta](TimeDelta.md), trueAnomaly double
+  - \[`WIP`\] Get time to true anomaly (relative time of angle from direction of periapsis). [0, period)

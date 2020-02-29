@@ -8,8 +8,8 @@ namespace RedOnion.KSP.Parts
 	public class Sensor : PartBase
 	{
 		protected readonly ModuleEnviroSensor module;
-		protected internal Sensor(Ship ship, Part part, PartBase parent, Decoupler decoupler, ModuleEnviroSensor module)
-			: base(ship, part, parent, decoupler)
+		protected internal Sensor(Ship ship, Part part, PartBase parent, LinkPart decoupler, ModuleEnviroSensor module)
+			: base(PartType.Sensor, ship, part, parent, decoupler)
 			=> this.module = module;
 
 		[Description("Accepts `sensor`. (Case insensitive)")]

@@ -85,7 +85,8 @@ namespace RedOnion.KSP.API
 	public class PID<Params> where Params : PidParams
 	{
 		protected Params _param;
-		protected double _stamp, _input, _target, _output, _accu;
+		protected TimeStamp _stamp;
+		protected double _input, _target, _output, _accu;
 
 		[Description("All the parameters.")]
 		public Params param => _param;
@@ -172,7 +173,7 @@ namespace RedOnion.KSP.API
 		[Description("Reset internal state of the regulator (won't change PIDR and limits).")]
 		public void reset()
 		{
-			_stamp = double.NaN;
+			_stamp = TimeStamp.none;
 			_input = double.NaN;
 			_target = double.NaN;
 			_output = double.NaN;

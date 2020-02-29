@@ -89,8 +89,12 @@
     <Compile Include="API\Autopilot.cs" />
     <Compile Include="API\Globals.cs" />
     <Compile Include="API\Node.cs" />
+    <Compile Include="API\OrbitInfo.cs" />
     <Compile Include="Namespaces\Types.cs" />
+    <Compile Include="Parts\EngineSet.cs" />
     <Compile Include="Parts\PartChildren.cs" />
+    <Compile Include="Parts\PartValues.cs" />
+    <Compile Include="Parts\Stages.cs" />
     <Compile Include="ROS\RosGlobals.cs" />
     <Compile Include="ROS\RosManager.cs" />
     <Compile Include="ROS\RosProcess.cs" />
@@ -184,10 +188,6 @@
       <Name>MunOS</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
-  <ItemGroup />
-  <ItemGroup />
-  <ItemGroup />
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace RedOnion.KSP.API
 {
-	[WorkInProgress, Description("Maneuver node.")]
+	[Description("Maneuver node.")]
 	public class Node
 	{
 		static Node cachedNext;
@@ -37,12 +37,26 @@ namespace RedOnion.KSP.API
 		[Description("Ship the node belongs to.")]
 		public Ship ship { get; private set; }
 
-		[Description("Create new maneuver node for active ship, specifying time.")]
+		[Description("Create new maneuver node for active ship, specifying time and optionally prograde, normal and radial delta-v (unspecified are zero).")]
 		public Node(double time, double prograde = 0.0, double normal = 0.0, double radial = 0.0)
 			: this(Ship.Active, time, prograde, normal, radial) { }
-		[Description("Create new maneuver node for active ship.")]
+		[Description("Create new maneuver node for active ship, specifying time and burn vector. See [`deltav` property](#deltav) for more details.")]
 		public Node(double time, Vector deltav)
 			: this(Ship.Active, time, deltav) { }
+
+		[Description("Create new maneuver node for active ship, specifying time and optionally prograde, normal and radial delta-v (unspecified are zero).")]
+		public Node(TimeStamp time, double prograde = 0.0, double normal = 0.0, double radial = 0.0)
+			: this(Ship.Active, time, prograde, normal, radial) { }
+		[Description("Create new maneuver node for active ship, specifying time and burn vector. See [`deltav` property](#deltav) for more details.")]
+		public Node(TimeStamp time, Vector deltav)
+			: this(Ship.Active, time, deltav) { }
+
+		[Description("Create new maneuver node for active ship, specifying eta and optionally prograde, normal and radial delta-v (unspecified are zero).")]
+		public Node(TimeDelta eta, double prograde = 0.0, double normal = 0.0, double radial = 0.0)
+			: this(Ship.Active, Time.now + eta, prograde, normal, radial) { }
+		[Description("Create new maneuver node for active ship, specifying eta and burn vector. See [`deltav` property](#deltav) for more details.")]
+		public Node(TimeDelta eta, Vector deltav)
+			: this(Ship.Active, Time.now + eta, deltav) { }
 
 		protected internal Node(Ship ship, ManeuverNode native)
 		{
@@ -52,31 +66,61 @@ namespace RedOnion.KSP.API
 
 		protected internal Node(Ship ship, double time, double prograde = 0.0, double normal = 0.0, double radial = 0.0)
 		{
-			native = ship.native.patchedConicSolver.AddManeuverNode(time);
+			native = ship.native.patchedConicSolver.AddManeuverNode(CheckTime(time));
 			this.ship = ship;
-			native.DeltaV = new Vector3d(radial, normal, prograde);
+			nativeDeltaV = new Vector3d(radial, normal, prograde);
 		}
 
 		protected internal Node(Ship ship, double time, Vector deltav)
 		{
-			native = ship.native.patchedConicSolver.AddManeuverNode(time);
+			native = ship.native.patchedConicSolver.AddManeuverNode(CheckTime(time));
 			this.ship = ship;
 			this.deltav = deltav;
 		}
 
-		[Description("Planned time for the maneuver.")]
-		public double time => native.UT;
-		[Description("Seconds until the maneuver.")]
-		public double eta => native.UT - Time.now;
+		protected double CheckTime(double time)
+			=> double.IsNaN(time) ? throw new InvalidOperationException("Node time cannot be NaN")
+			: double.IsInfinity(time) ? throw new InvalidOperationException("Node time cannot be Inf")
+			: time;
 
-		[Description("Direction and amount of velocity change needed.")]
+		[Description("Planned time for the maneuver.")]
+		public TimeStamp time
+		{
+			get => new TimeStamp(native.UT);
+			set
+			{
+				var s = CheckTime(value);
+				native.UT = value;
+				if (native.attachedGizmo != null)
+					native.attachedGizmo.UT = s;
+				ship.native.patchedConicSolver.UpdateFlightPlan();
+			}
+		}
+		[Description("Seconds until the maneuver.")]
+		public TimeDelta eta
+		{
+			get => time - Time.now;
+			set => time = Time.now + value;
+		}
+
+		[Description("Direction and amount of velocity change needed (aka burn-vector)."
+			+ " Note that the vector is relative to the SOI where the node is (not where the ship currently is)."
+			+ " That means that the vector will be relative to the current position of the Mun"
+			+ " not relative to future position of the Mun (when the node is for example "
+			+ " at the periapsis = closest enounter with the Mun"
+			+ " and is retrograde with the right amount for circularization,"
+			+ " but the ship is currently still in Kerbin's SOI)."
+			+ " Therefore [`ship.orbitAt(time).velocityAt(time)`](Ship.md#orbitAt)"
+			+ " shall be used rather than [`ship.velocityAt(time)`](Ship.md#velocityAt)"
+			+ " when planning nodes in different SOI (both work the same when in same SOI).")]
 		public Vector deltav
 		{
 			get => new Vector(native.GetBurnVector(ship.orbit));
 			set
 			{
-				var vel = ship.velocityAt(time);
-				var pos = ship.positionAt(time) - ship.body.position/*At(time)*/;
+				var orbit = ship.orbitAt(time);
+				var vel = orbit.velocityAt(time);
+				var pos = orbit.positionAt(time) - orbit.body.position;
 				var pro = vel.normalized;
 				var nrm = vel.cross(pos).normalized;
 				var rad = nrm.cross(vel).normalized;
@@ -128,5 +172,18 @@ namespace RedOnion.KSP.API
 		}
 		[Description("Remove/delete the node.")]
 		public void delete() => remove();
+
+		OrbitInfo _orbit;
+		[WorkInProgress, Description("Orbit parameters after the node.")]
+		public OrbitInfo orbit
+		{
+			get
+			{
+				if (_orbit == null)
+					_orbit = new OrbitInfo(native.nextPatch);
+				else _orbit.native = native.nextPatch;
+				return _orbit;
+			}
+		}
 	}
 }

@@ -3,19 +3,30 @@ using RedOnion.Collections;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using RedOnion.Attributes;
+using System.Text;
+using RedOnion.ROS;
 
 namespace RedOnion.KSP.Parts
 {
-	[Description("List/set of propellants of single engine or list/set of engines.")]
+	[WorkInProgress, Description("List/set of propellants of single engine or list/set of engines.")]
 	public class PropellantList : ReadOnlyList<Propellant>
 	{
 		protected Dictionary<string, Propellant> dict = new Dictionary<string, Propellant>();
 		protected ModuleEngines engine;
 		protected ReadOnlyList<Engine> engines;
+		protected IPartSet engineset;
+
 		protected internal PropellantList(ModuleEngines engine)
 			=> this.engine = engine;
 		protected internal PropellantList(ReadOnlyList<Engine> engines)
-			=> this.engines = engines;
+			=> this.engineset = (this.engines = engines) as IPartSet;
+
+		protected override void Update()
+		{
+			engineset?.Update();
+			base.Update();
+		}
 
 		protected override void DoRefresh()
 		{
@@ -39,7 +50,7 @@ namespace RedOnion.KSP.Parts
 						if (dict.TryGetValue(p.name, out var it))
 						{
 							it.list.Add(p);
-							it.Minimal = Math.Min(it.Minimal, p.minResToLeave);
+							it.minimal = Math.Min(it.minimal, p.minResToLeave);
 						}
 						else
 						{
@@ -58,15 +69,77 @@ namespace RedOnion.KSP.Parts
 		{
 			get
 			{
-				if (Dirty) DoRefresh();
+				Update();
 				return dict.TryGetValue(name, out var it) ? it : null;
 			}
 		}
 
 		// this turned out not to be what I was searching for
 		public double getMinimalOf(string name)
-			=> this[name]?.Minimal ?? 0.0;
+			=> this[name]?.minimal ?? 0.0;
+
+		public override string ToString()
+		{
+			Update();
+			bool first = true;
+			var sb = new StringBuilder();
+			sb.Append("[");
+			foreach (var prop in list)
+			{
+				if (!first) sb.Append(", ");
+				first = false;
+				sb.Append(prop.name);
+			}
+			sb.Append("]");
+			return sb.ToString();
+		}
+
+		public IEnumerable<string> names
+		{
+			get
+			{
+				foreach (var prop in this)
+					yield return prop.name;
+			}
+		}
+		public IEnumerable<Propellant> solid
+		{
+			get
+			{
+				foreach (var prop in this)
+					if (prop.solid)
+						yield return prop;
+			}
+		}
+		public IEnumerable<Propellant> liquid
+		{
+			get
+			{
+				foreach (var prop in this)
+					if (prop.liquid)
+						yield return prop;
+			}
+		}
+		public IEnumerable<string> namesOfSolid
+		{
+			get
+			{
+				foreach (var prop in this)
+					if (prop.solid)
+						yield return prop.name;
+			}
+		}
+		public IEnumerable<string> namesOfLiquid
+		{
+			get
+			{
+				foreach (var prop in this)
+					if (prop.liquid)
+						yield return prop.name;
+			}
+		}
 	}
+	[WorkInProgress, Description("Propellant consumed by engine.")]
 	public class Propellant
 	{
 		protected internal ListCore<global::Propellant> list;
@@ -74,12 +147,25 @@ namespace RedOnion.KSP.Parts
 		protected internal Propellant(global::Propellant p)
 		{
 			list.Add(p);
-			Minimal = p.minResToLeave;
+			minimal = p.minResToLeave;
 		}
 
-		[Description("Name of the propelant (like `LiquidFuel').")]
-		public string Name => list[0].name;
+		[Description("Name of the propellant (like `LiquidFuel').")]
+		public string name => list[0].name;
 		// not what I was searching for, we need Engine.ignitionThreshold or something like that
-		public double Minimal { get; protected internal set; }
+		public double minimal { get; protected internal set; }
+
+		[Unsafe, Description("[KSP API](https://kerbalspaceprogram.com/api/class_propellant.html). First in the list if aggregate.")]
+		public global::Propellant native => list[0];
+		[Unsafe, Description("[KSP API](https://kerbalspaceprogram.com/api/class_part_resource_definition.html). First in the list if aggregate.")]
+		public PartResourceDefinition resourceDef => native.resourceDef;
+		[Description("Flow mode of the propellant. First in the list if aggregate, which works for most propellants, but may be random when you combine e.g. Karbonite SRB's with normal engines.")]
+		public ResourceFlowMode flowMode => native.GetFlowMode();
+		[WorkInProgress, Description("No flow propellant - usually solid fuel, bound to SRB.")]
+		public bool solid => flowMode == ResourceFlowMode.NO_FLOW;
+		[WorkInProgress, Description("Flowing propellant - liquid fuel and oxidizer, does not include Monopropellant, Xenon Gas or electricity.")]
+		public bool liquid => flowMode == ResourceFlowMode.STACK_PRIORITY_SEARCH;
+
+		public override string ToString() => name;
 	}
 }

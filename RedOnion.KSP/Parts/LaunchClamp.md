@@ -1,9 +1,12 @@
 ## LaunchClamp
 
-**Base Class:** [Decoupler](Decoupler.md)
+**Base Class:** [LinkPart](LinkPart.md)
 
 Launch Clamp
 
+
+**Instance Properties:**
+- `Module`: LaunchClamp - \[`Unsafe`\] [KSP API](https://kerbalspaceprogram.com/api/class_launch_clamp.html)
 
 **Instance Methods:**
 - `istype()`: bool, name string

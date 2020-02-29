@@ -43,6 +43,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Descriptors\Other\Custom.cs" />
     <Compile Include="Descriptors\Other\Simple.cs" />
     <Compile Include="Descriptors\Reflect\Callable.cs" />
     <Compile Include="Descriptors\Reflect\MethodGroup.cs" />

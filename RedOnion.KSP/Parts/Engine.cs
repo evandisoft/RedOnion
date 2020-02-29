@@ -6,145 +6,6 @@ using RedOnion.ROS.Utilities;
 
 namespace RedOnion.KSP.Parts
 {
-	[Description("Read-only set of engines.")]
-	public class EngineSet : PartSet<Engine>
-	{
-		protected internal EngineSet(Ship ship) : base(ship) { }
-		protected internal EngineSet(Ship ship, Action refresh) : base(ship, refresh) { }
-
-		public PropellantList Propellants => propellants ?? (propellants = new PropellantList(this));
-		protected PropellantList propellants;
-
-		protected internal override void SetDirty()
-		{
-			base.SetDirty();
-			if (propellants != null)
-				propellants.SetDirty();
-		}
-
-		[Description("Whether any engine in the set is operational.")]
-		public bool anyOperational
-		{
-			get
-			{
-				foreach (var e in this)
-				{
-					if (e.operational)
-						return true;
-				}
-				return false;
-			}
-		}
-		[Description("Whether all the engines in the set are operational.")]
-		public bool allOperational
-		{
-			get
-			{
-				foreach (var e in this)
-				{
-					if (!e.operational)
-						return false;
-				}
-				return true;
-			}
-		}
-		[Description("Wheter any engine in the set flamed out.")]
-		public bool anyFlameout
-		{
-			get
-			{
-				foreach (var e in this)
-				{
-					if (e.flameout)
-						return true;
-				}
-				return false;
-			}
-		}
-		[Description("Wheter all engines in the set flamed out.")]
-		public bool allFlameout
-		{
-			get
-			{
-				foreach (var e in this)
-				{
-					if (!e.flameout)
-						return false;
-				}
-				return true;
-			}
-		}
-		[Description("Current thrust [kN] (at current pressure, with current `thrustPercentage` and current throttle).")]
-		public double thrust
-		{
-			get
-			{
-				var thrust = 0.0;
-				foreach (var e in this)
-				{
-					if (e.operational)
-						thrust += (double)e.thrust * e.thrustPercentage * 0.01;
-				}
-				return thrust;
-			}
-		}
-		[Description("Get thrust [kN] of all operational engines at atmospheric pressure"
-			+ " (0 = vacuum, 1 = Kerbin sea-level pressure, NaN = current pressure)"
-			+ " and throttle (default 1 = full throttle).")]
-		public double getThrust(float atm = float.NaN, float throttle = 1f)
-		{
-			var thrust = 0.0;
-			foreach (var e in this)
-			{
-				if (e.operational)
-					thrust += (double)e.getThrust(atm, throttle) * e.thrustPercentage * 0.01;
-			}
-			return thrust;
-		}
-		[Description("Get average specific impulse [kN] of operational engines at atmospheric pressure"
-			+ " (0 = vacuum, 1 = Kerbin sea-level pressure, NaN = current pressure).")]
-		public double getIsp(double atm = double.NaN)
-		{
-			var thrust = 0.0;
-			var flow = 0.0;
-			foreach (var e in this)
-			{
-				if (!e.operational)
-					continue;
-				var isp = e.isp;
-				if (isp <= 0.001)
-					continue;
-				var eth = e.getThrust(atm) * e.thrustPercentage * 0.01;
-				thrust += eth;
-				flow += eth / isp;
-			}
-			return flow <= 0.001 ? 0.0 : thrust/flow;
-		}
-
-		public static double g0 = 9.81;
-		[Description("Estimate burn time for given delta-v (assuming it can be done without staging).")]
-		public double burnTime(double deltaV)
-		{
-			var thrust = 0.0;
-			var flow = 0.0;
-			foreach (var e in this)
-			{
-				if (!e.operational)
-					continue;
-				var isp = e.isp;
-				if (isp <= 0.001)
-					continue;
-				var eth = e.getThrust() * e.thrustPercentage * 0.01;
-				thrust += eth;
-				flow += eth / isp;
-			}
-			if (flow <= 0.0001)
-				return double.NaN;
-			var stdIsp = g0 * thrust / flow;
-			return stdIsp * _ship.mass * (1.0 - Math.Pow(Math.E, -deltaV / stdIsp)) / thrust;
-		}
-	}
-
 	[Description("Engine of a ship (vehicle/vessel).")]
 	public class Engine : PartBase
 	{
@@ -171,8 +32,8 @@ namespace RedOnion.KSP.Parts
 		public override bool istype(string name)
 			=> name.Equals("engine", StringComparison.OrdinalIgnoreCase);
 
-		protected internal Engine(Ship ship, Part part, PartBase parent, Decoupler decoupler)
-			: base(ship, part, parent, decoupler)
+		protected internal Engine(Ship ship, Part part, PartBase parent, LinkPart decoupler)
+			: base(PartType.Engine, ship, part, parent, decoupler)
 		{
 			foreach (var module in part.Modules)
 			{
@@ -202,29 +63,40 @@ namespace RedOnion.KSP.Parts
 				firstModule = secondModule;
 				secondModule = second;
 			}
+			var propellants = activeModule?.propellants;
+			if (propellants != null)
+			{
+				foreach (var propellant in propellants)
+				{
+					if (propellant.GetFlowMode() == ResourceFlowMode.NO_FLOW)
+					{
+						booster = true;
+						break;
+					}
+				}
+			}
 		}
 
-		[DisplayName("Whether engine is operational (ignited and not flameout).")]
+		[Description("Whether engine is operational (ignited and not flameout).")]
 		public bool operational => activeModule.isOperational;
-		[DisplayName("Wheter engine is ignited.")]
+		[Description("Wheter engine is ignited.")]
 		public bool ignited => activeModule.EngineIgnited;
-		[DisplayName("Wheter engine flamed out.")]
+		[Description("Wheter engine flamed out.")]
 		public bool flameout => activeModule.flameout;
-		[DisplayName("Wheter engine is staged (activated by staging).")]
-		public bool staged => activeModule.staged;
-		[DisplayName("Activate the engine.")]
+
+		[Description("Activate the engine.")]
 		public void activate() => activeModule.Activate();
-		[DisplayName("Shutdown / deactivate the engine.")]
+		[Description("Shutdown / deactivate the engine.")]
 		public void shutdown() => activeModule.Shutdown();
 
-		[Description("Get specific impulse [kN] at atmospheric pressure"
-			+ " (0 = vacuum, 1 = Kerbin sea-level pressure, NaN = current pressure).")]
+		[Description("Get specific impulse \\[kN] at atmospheric pressure"
+			+ " (0 = vacuum, 1 = Kerbin sea-level pressure, default NaN = current pressure).")]
 		public double getIsp(double atm = double.NaN)
 			=> activeModule.atmosphereCurve.Evaluate((float)(
 				double.IsNaN(atm) ? activeModule.part.staticPressureAtm : atm));
 
-		[Description("Get thrust [kN] at atmospheric pressure"
-			+ " (0 = vacuum, 1 = Kerbin sea-level pressure, NaN = current pressure)"
+		[Description("Get thrust \\[kN] at atmospheric pressure"
+			+ " (0 = vacuum, 1 = Kerbin sea-level pressure, default NaN = current pressure)"
 			+ " and throttle (default 1 = full throttle). Ignores `thrustPercentage`.")]
 		public double getThrust(double atm = float.NaN, double throttle = 1f)
 		{
@@ -236,19 +108,11 @@ namespace RedOnion.KSP.Parts
 				RosMath.Clamp((float)throttle, 0f, 1f));
 		}
 
-		[DisplayName("Current ISP. (Specific impulse)")]
+		[Description("Current ISP (Specific impulse). \\[seconds]")]
 		public double isp => activeModule.realIsp;
-		[DisplayName("Vacuum ISP.")]
-		public double visp => activeModule.atmosphereCurve.Evaluate(0f);
-		[DisplayName("Sea-level ISP.")]
-		public double gisp => activeModule.atmosphereCurve.Evaluate(1f);
-		[DisplayName("Sea-level ISP.")]
-		public double slisp => activeModule.atmosphereCurve.Evaluate(1f);
-		[DisplayName("Vacuum ISP.")]
+		[Description("Vacuum ISP. \\[seconds]")]
 		public double vacuumIsp => activeModule.atmosphereCurve.Evaluate(0f);
-		[DisplayName("Sea-level ISP.")]
-		public double groundIsp => activeModule.atmosphereCurve.Evaluate(1f);
-		[DisplayName("Sea-level ISP.")]
+		[Description("Sea-level ISP. \\[seconds]")]
 		public double seaLevelIsp => activeModule.atmosphereCurve.Evaluate(1f);
 
 		[Description("Current thrust [kN] (at current pressure, with current `thrustPercentage` and current throttle).")]
@@ -262,10 +126,17 @@ namespace RedOnion.KSP.Parts
 		public double ratioSum => activeModule.ratioSum;
 		public double mixtureDensity => activeModule.mixtureDensity;
 		public double mixtureDensityRecip => activeModule.mixtureDensityRecip;
+		public double ignitionThreshold => activeModule.ignitionThreshold;
 
-		ReadOnlyList<Propellant> propellants, propellants2;
-		public ReadOnlyList<Propellant> Propellants => firstIsActive ? Propellants1 : Propellants2;
-		public ReadOnlyList<Propellant> Propellants1 => propellants ?? (propellants = new ReadOnlyList<Propellant>());
-		public ReadOnlyList<Propellant> Propellants2 => propellants2 ?? (multiMode ? propellants2 = new ReadOnlyList<Propellant>() : null);
+		PropellantList _propellants, _propellants2;
+		[WorkInProgress, Description("List of propellants used by the engine (by currently active mode).")]
+		public PropellantList propellants => firstIsActive ? propellants1 : propellants2;
+		[WorkInProgress, Description("List of propellants used by first mode.")]
+		public PropellantList propellants1 => _propellants ?? (_propellants = new PropellantList(firstModule));
+		[WorkInProgress, Description("List of propellants used by second mode (null for single-mode engines).")]
+		public PropellantList propellants2 => _propellants2 ?? (multiMode ? _propellants2 = new PropellantList(secondModule) : null);
+
+		[WorkInProgress, Description("Indicator that the engines is (probably) solid rocket booster (contains propellant that does not flow).")]
+		public bool booster { get; }
 	}
 }

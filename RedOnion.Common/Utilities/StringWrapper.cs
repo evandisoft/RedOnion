@@ -12,6 +12,8 @@ namespace RedOnion.Utilities
 		public readonly string String;
 		public StringWrapper(string it) => String = it;
 		public override string ToString() => String;
+		public static implicit operator string(StringWrapper it)
+			=> it.String;
 
 		public static implicit operator StringWrapper(string it)
 			=> new StringWrapper(it);
