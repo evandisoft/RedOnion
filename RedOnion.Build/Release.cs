@@ -40,7 +40,8 @@ namespace RedOnion.Build
 						continue;
 					}
 					Console.WriteLine("- " + reduced);
-					var entry = zip.CreateEntry(reduced);
+					// the replace is needed for compatibility with linux when building this on windows
+					var entry = zip.CreateEntry(reduced.Replace('\\', '/'));
 					using (var write = entry.Open())
 					using (var read = new FileStream(resource, FileMode.Open))
 						read.CopyTo(write);
