@@ -227,6 +227,8 @@ namespace RedOnion.KSP.API
 				autopilot.throttle = value;
 			}
 		}
+		[Description("Indicator that ship is controllable.")]
+		public bool controllable => native.IsControllable;
 		#endregion
 
 		#region Parts

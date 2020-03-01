@@ -8,10 +8,31 @@
 - More UI library features.
 
 # Next Release
-Just had a release (0.5.0)
+Just had a release (0.5.1)
 
 # Current
 # 0.5
+## 0.5.1
+### New Dependency:
+- ModuleManager required for part-values/tags to work
+
+### API:
+- user can now override/correct the autopilot (`autopilot.userFactor`)
+- universal staging logic (mono, ion, LH2, ...), resources and propellants
+- `OrbitInfo`, `orbitAt` and changes to `positionAt` and `velocityAt`
+- `TimeStamp` and `TimeDelta`
+
+### Scripts:
+- launch.ros and control.ros: decouplers marked with `noauto` tag won't be auto-staged
+- control.ros: auto-staging disabled until throttling or executing node
+- control.ros: srf-retro landing assist and hohmann improved, can now circularize in different SOI
+
+### ROS Changes:
+- fixed shadowing by loop variable (`var i; for var i...`)
+- string comparision is case-insensitive, new identity operator (`===`) added for case-sensitive compare
+- comparing anything to string first converts it to string (including enums)
+- strings now have `.format`, `.substring`, `.equals`, `.compare` and `.contains` methods (case-sensitive)
+
 ## 0.5.0
 ### MunOS:
 - Initial version of our system for running multiple scripts at a time, called [MunOS](MunOS/Multithreading.md).

@@ -353,7 +353,7 @@ namespace RedOnion.KSP.API
 				st.mainThrottle = RosMath.Clamp(_throttle, 0f, 1f);
 
 			// could probably use InputLockManager.lockStack.ContainsKey("TimeWarp") instead
-			if (TimeWarp.index > 0 && TimeWarp.high)
+			if (TimeWarp.rate > 1.1f && TimeWarp.high)
 			{
 				pitchPID.resetAccu();
 				yawPID.resetAccu();
