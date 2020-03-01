@@ -7,6 +7,9 @@ using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UUI = UnityEngine.UI;
 
+//NOTE: Any attempt to derive Window from Panel would undermine the auto-collection mechanism,
+//..... becase there will almost always be a chain of links from e.g. button to the window
+
 namespace RedOnion.UI
 {
 	[Description(
@@ -28,11 +31,11 @@ It may get garbage-collected otherwise, but that can take time and is rather bac
 			public SceneFlags Scenes { get; set; }
 
 			// weak reference to main window to allow auto-dispose when there is no hard-reference to it
-			protected readonly WeakReference window;
+			protected readonly WeakReference<Window> window;
 
 			public FramePanel(Window window, bool visible = true)
 			{
-				this.window = new WeakReference(window);
+				this.window = new WeakReference<Window>(window);
 				Scenes = (SceneFlags)(1 << (int)HighLogic.LoadedScene);
 				Visible = visible;
 				GameObject.transform.SetParent(UIMasterController.Instance.dialogCanvas.transform, false);
@@ -80,8 +83,10 @@ It may get garbage-collected otherwise, but that can take time and is rather bac
 					return;
 				GameEvents.onGameSceneLoadRequested.Remove(SceneChange);
 				base.Dispose(disposing);
-				(window?.Target as Window)?.Dispose();
-				window.Target = null;
+				if (!window.TryGetTarget(out var wnd))
+					return;
+				window.SetTarget(null);
+				wnd.Dispose();
 			}
 			// this is here and not in window to not have any reference to the window from game-events
 			void SceneChange(GameScenes scene)
@@ -92,8 +97,8 @@ It may get garbage-collected otherwise, but that can take time and is rather bac
 			}
 			void CloseWindow(Button button)
 			{
-				var wnd = window?.Target as Window;
-				if (wnd != null) wnd.Close();
+				if (window.TryGetTarget(out var wnd))
+					wnd.Close();
 				else Dispose();
 			}
 		}

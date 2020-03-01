@@ -115,8 +115,8 @@ namespace RedOnion.KSP.API
 			[Description("Dispose the vector. (Cannot be shown again after that.)")]
 			public void dispose()
 			{
-				GC.SuppressFinalize(this);
 				Dispose(true);
+				GC.SuppressFinalize(this);
 			}
 
 			// see https://wiki.kerbalspaceprogram.com/wiki/API:Layers

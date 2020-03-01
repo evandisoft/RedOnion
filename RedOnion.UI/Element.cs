@@ -1,3 +1,4 @@
+using RedOnion.Attributes;
 using RedOnion.UI.Components;
 using System;
 using System.ComponentModel;
@@ -16,8 +17,16 @@ namespace RedOnion.UI
 		+ " All elements must ultimately be hosted inside [`UI.Window`](Window.md).")]
 	public abstract partial class Element : IDisposable
 	{
-		protected internal GameObject GameObject { get; private set; }
-		protected internal RectTransform RectTransform { get; private set; }
+		[Unsafe, Description("[Unity API](https://docs.unity3d.com/ScriptReference/GameObject.html)"
+			+ " Game object of the content.")]
+		public GameObject GameObject { get; protected set; }
+		[Unsafe, Description("[Unity API](https://docs.unity3d.com/ScriptReference/GameObject.html)"
+			+ " Root game object that will be added as a child when adding this element to another element."
+			+ " Same as `GameObject` for simple elements.")]
+		public GameObject RootObject { get; protected set; }
+		[Unsafe, Description("[Unity API](https://docs.unity3d.com/ScriptReference/RectTransform.html)"
+			+ "RectTransform of `RootObject` (which is the same as `GameObject` for simple elements.")]
+		public RectTransform RectTransform { get; set; }
 
 		[Description("Parent element (inside which this element is).")]
 		public Element Parent { get; internal set; }
@@ -26,7 +35,7 @@ namespace RedOnion.UI
 
 		protected Element()
 		{
-			GameObject = new GameObject() { layer = UILayer };
+			RootObject = GameObject = new GameObject() { layer = UILayer };
 			RectTransform = GameObject.AddComponent<RectTransform>();
 			RectTransform.pivot = new Vector2(.5f, .5f);
 			RectTransform.anchorMin = new Vector2(.5f, .5f);
@@ -36,24 +45,24 @@ namespace RedOnion.UI
 		[Description("Optional name of the element/control. Returns type name if not assigned (null).")]
 		public string Name
 		{
-			get => GameObject.name ?? GetType().FullName;
-			set => GameObject.name = value;
+			get => RootObject.name ?? GetType().FullName;
+			set => RootObject.name = value;
 		}
 		[Description("Element is set to be visible/active."
-			+ " [`GameObject.activeSelf`](https://docs.unity3d.com/ScriptReference/GameObject-activeSelf.html),"
-			+ " [`GameObject.SetActive`](https://docs.unity3d.com/ScriptReference/GameObject.SetActive.html)")]
+			+ " [`RootObject.activeSelf`](https://docs.unity3d.com/ScriptReference/GameObject-activeSelf.html),"
+			+ " [`RootObject.SetActive`](https://docs.unity3d.com/ScriptReference/GameObject.SetActive.html)")]
 		public bool Active
 		{
-			get => GameObject.activeSelf;
-			set => GameObject.SetActive(value);
+			get => RootObject.activeSelf;
+			set => RootObject.SetActive(value);
 		}
 		[Description("Element is visible (and all parents are)."
-			+ " [`GameObject.activeInHierarchy`](https://docs.unity3d.com/ScriptReference/GameObject-activeInHierarchy.html),"
-			+ " [`GameObject.SetActive`](https://docs.unity3d.com/ScriptReference/GameObject.SetActive.html)")]
+			+ " [`RootObject.activeInHierarchy`](https://docs.unity3d.com/ScriptReference/GameObject-activeInHierarchy.html),"
+			+ " [`RootObject.SetActive`](https://docs.unity3d.com/ScriptReference/GameObject.SetActive.html)")]
 		public bool Visible
 		{
-			get => GameObject.activeInHierarchy;
-			set => GameObject.SetActive(value);
+			get => RootObject.activeInHierarchy;
+			set => RootObject.SetActive(value);
 		}
 
 		// virtual so that we can later redirect it in Window (to content panel)
@@ -61,14 +70,14 @@ namespace RedOnion.UI
 		{
 			if (element.Parent != null)
 				element.Parent.Remove(element);
-			element.GameObject.transform.SetParent(GameObject.transform, false);
+			element.RootObject.transform.SetParent(GameObject.transform, false);
 			element.Parent = this;
 		}
 		protected virtual void RemoveElement(Element element)
 		{
 			if (element.Parent == this)
 			{
-				element.GameObject.transform.SetParent(null);
+				element.RootObject.transform.SetParent(null);
 				element.Parent = null;
 			}
 		}
@@ -108,8 +117,8 @@ namespace RedOnion.UI
 		~Element() => Dispose(false);
 		public void Dispose()
 		{
-			GC.SuppressFinalize(this);
 			Dispose(true);
+			GC.SuppressFinalize(this);
 		}
 		protected virtual void Dispose(bool disposing)
 		{
@@ -143,7 +152,7 @@ namespace RedOnion.UI
 				{
 					if (GameObject == null)
 						throw new ObjectDisposedException(Name);
-					layoutElement = GameObject.AddComponent<UUI.LayoutElement>();
+					layoutElement = RootObject.AddComponent<UUI.LayoutElement>();
 					layoutElement.layoutPriority = 3;
 				}
 				return layoutElement;

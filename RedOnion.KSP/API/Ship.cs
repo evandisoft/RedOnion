@@ -74,8 +74,8 @@ namespace RedOnion.KSP.API
 			~Hooks() => Dispose(false);
 			public void Dispose()
 			{
-				GC.SuppressFinalize(this);
 				Dispose(true);
+				GC.SuppressFinalize(this);
 			}
 			protected virtual void Dispose(bool disposing)
 			{
@@ -143,8 +143,8 @@ namespace RedOnion.KSP.API
 		[Browsable(false), MoonSharpHidden]
 		public void Dispose()
 		{
-			GC.SuppressFinalize(this);
 			Dispose(true);
+			GC.SuppressFinalize(this);
 		}
 		protected virtual void Dispose(bool disposing)
 		{

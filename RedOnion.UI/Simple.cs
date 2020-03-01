@@ -1,3 +1,4 @@
+using RedOnion.Attributes;
 using RedOnion.UI.Components;
 using System;
 using System.ComponentModel;
@@ -16,6 +17,7 @@ It is meant mainly for internal usage, for implementation of other composite con
 		public Simple(Layout layout) : base() => Layout = layout;
 
 		protected UUI.RawImage rawImage;
+		[Unsafe]
 		public UUI.RawImage RawImage
 		{
 			get
@@ -39,8 +41,9 @@ It is meant mainly for internal usage, for implementation of other composite con
 			}
 		}
 
-		protected BackgroundImage image;
-		public BackgroundImage Image
+		protected UUI.Image image;
+		[Unsafe]
+		public UUI.Image Image
 		{
 			get
 			{

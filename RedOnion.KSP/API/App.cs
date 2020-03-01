@@ -73,8 +73,8 @@ namespace RedOnion.KSP.API
 			~Button() => Dispose(false);
 			void IDisposable.Dispose()
 			{
-				GC.SuppressFinalize(this);
 				Dispose(true);
+				GC.SuppressFinalize(this);
 			}
 			void Dispose(bool disposing)
 			{

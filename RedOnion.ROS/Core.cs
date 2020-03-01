@@ -122,7 +122,11 @@ namespace RedOnion.ROS
 			=> Log(string.Format(Value.Culture, msg, args));
 
 		~Core() => Dispose(false);
-		public void Dispose() => Dispose(true);
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
 		protected virtual void Dispose(bool disposing) { }
 
 		public void ResetContext()

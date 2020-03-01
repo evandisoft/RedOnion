@@ -26,7 +26,6 @@ namespace RedOnion.UI
 		}
 
 		static Collector instance;
-		Collector() { }
 
 		void Awake()
 		{

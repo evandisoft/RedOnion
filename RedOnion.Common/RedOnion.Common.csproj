@@ -45,9 +45,5 @@
     <Compile Include="Utilities\StringWrapper.cs" />
     <Compile Include="Debugging\QueueLogger.cs" />
   </ItemGroup>
-  <ItemGroup />
-  <ItemGroup>
-    <Folder Include="Debugging\" />
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
