@@ -37,7 +37,7 @@ namespace Kerbalua.Scripting
 			UserData.RegisterType<Button>(new LuaDescriptor(typeof(Button)));
 
 			UserData.RegistrationPolicy = InteropRegistrationPolicy.Automatic;
-
+			
 			GlobalOptions.CustomConverters
 				.SetScriptToClrCustomConversion(DataType.Function, typeof(Action<Button>), (f) =>
 				{

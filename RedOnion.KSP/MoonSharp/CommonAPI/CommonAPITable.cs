@@ -35,6 +35,7 @@ namespace RedOnion.KSP.MoonSharp.CommonAPI
 			if (callable!=null)
 			{
 				var methodInfo=type.GetMethod(callable.Name,publicStatic);
+
 				if (methodInfo==null)
 				{
 					methodInfo=type.GetMethod("get_"+callable.Name);
