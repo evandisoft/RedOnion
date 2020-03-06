@@ -443,7 +443,8 @@ namespace RedOnion.KSP.API
 
 			if (double.IsNaN(factor))
 				factor = _userFactor;
-			pid.input = 10 * (angle + stop) / accel + factor * user;
+			pid.input = RosMath.Clamp(13.0 - 2.0*TimeWarp.rate, 0.0, 10.0)
+				* (angle + stop) / accel + factor * user;
 			return pid.update();
 		}
 
