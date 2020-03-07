@@ -54,6 +54,37 @@ namespace RedOnion.UI
 			BoxImage.type = UUI.Image.Type.Sliced;
 
 			Layout = layout;
+			ScrollRect.horizontal = layout != Layout.Vertical;
+			ScrollRect.vertical = layout != Layout.Horizontal;
+		}
+
+		public bool horizontal
+		{
+			get => ScrollRect.horizontal;
+			set => ScrollRect.horizontal = value;
+		}
+		public bool vertical
+		{
+			get => ScrollRect.vertical;
+			set => ScrollRect.vertical = value;
+		}
+		public bool elastic
+		{
+			get => ScrollRect.movementType == UUI.ScrollRect.MovementType.Elastic;
+			set
+			{
+				if (value) ScrollRect.movementType = UUI.ScrollRect.MovementType.Elastic;
+				else if (elastic) ScrollRect.movementType = UUI.ScrollRect.MovementType.Clamped;
+			}
+		}
+		public bool clamped
+		{
+			get => ScrollRect.movementType == UUI.ScrollRect.MovementType.Clamped;
+			set
+			{
+				if (value) ScrollRect.movementType = UUI.ScrollRect.MovementType.Clamped;
+				else if (clamped) ScrollRect.movementType = UUI.ScrollRect.MovementType.Unrestricted;
+			}
 		}
 	}
 }
