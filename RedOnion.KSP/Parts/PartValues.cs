@@ -1,4 +1,5 @@
 using RedOnion.Collections;
+using RedOnion.ROS;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -18,7 +19,8 @@ namespace RedOnion.KSP.Parts
 		public string values = "";
 
 		[KSPEvent(guiName = "Change Script Tags/Values",
-			groupName = "RedOnion", guiActive = true, guiActiveEditor = true)]
+			groupName = "RedOnion",
+			guiActive = true, guiActiveEditor = true)]
 		public void EditTags()
 		{
 			editor?.Close();
@@ -90,10 +92,12 @@ namespace RedOnion.KSP.Parts
 				values = "";
 			if (values == this.values)
 				return;
+			Value.DebugLog("SetValues: " + values);
 			this.values = values;
 			list.Clear();
 			ParseValues();
 			UpdateList();
+			Value.DebugLog("Updated: " + this.values);
 		}
 		//NOTE: don't even think about renaming this to Update! Unity!!
 		internal void UpdateList()
@@ -103,7 +107,7 @@ namespace RedOnion.KSP.Parts
 			{
 				if (sb.Length > 0)
 					sb.Append(' ');
-				if (pair.Value == null)
+				if (string.IsNullOrWhiteSpace(pair.Value))
 					sb.Append(pair.Key);
 				else sb.Append(pair.Key).Append('=').Append(pair.Value);
 			}
@@ -116,9 +120,21 @@ namespace RedOnion.KSP.Parts
 			var full = values;
 			if (full == null || full.Length == 0)
 				return;
-			for (int at = 0, start = 0; at < full.Length;)
+			for (int at = 0, start = 0;;)
 			{
-				char c = full[at];
+				char c = at < full.Length ? full[at] : '\0';
+				if (c == '\0' || char.IsWhiteSpace(c))
+				{
+					if (at != start)
+					{
+						var name = full.Substring(start, at-start);
+						list.Add(new KeyValuePair<string, string>(name, ""));
+					}
+					if (c == '\0')
+						break;
+					start = ++at;
+					continue;
+				}
 				if (c == '=')
 				{
 					var name = full.Substring(start, at-start);
@@ -132,16 +148,6 @@ namespace RedOnion.KSP.Parts
 						//TODO: quotes
 					}
 					list.Add(new KeyValuePair<string, string>(name, full.Substring(start, at-start)));
-					start = ++at;
-					continue;
-				}
-				if (char.IsWhiteSpace(c))
-				{
-					if (at != start)
-					{
-						var name = full.Substring(start, at-start);
-						list.Add(new KeyValuePair<string, string>(name, ""));
-					}
 					start = ++at;
 					continue;
 				}
