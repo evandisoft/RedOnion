@@ -400,9 +400,10 @@ def control ship, target, x, y
       var p2 = its.positionAt(t2)-its.body.position
       r2 = r3 + p2.size
       var p3 = p1.normalized * -r2
-      var ad = p2.angle p3, ship.north
+      var ad = p2.angle p3, ship.velocity.cross ship.away
       if r2 < r1; ad = -ad
       var d2 = ad/(360/math.min(its.period,our.period) - 360/math.max(its.period,our.period))
+      if guard > 3; d2 *= 1.3 - 0.1*guard
       var d3 = math.abs d2
       //todo: we may go into the past with this, would need to add one period
       dt += d2
