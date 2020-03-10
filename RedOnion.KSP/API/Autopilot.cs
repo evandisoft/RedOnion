@@ -50,7 +50,7 @@ namespace RedOnion.KSP.API
 		public void reset()
 		{
 			pids.reset();
-			_userFactor = 1f;
+			_userFactor = 0.8f;
 			_userPitch = float.NaN;
 			_userYaw = float.NaN;
 			_userRoll = float.NaN;
@@ -167,29 +167,29 @@ namespace RedOnion.KSP.API
 			set => _ship.rcs = value;
 		}
 
-		[Description("General strength of user override/correction of controls. \\[0, 2] 1 by default.")]
+		[Description("General strength of user override/correction of controls. \\[0, 1] 0.8 by default.")]
 		public float userFactor
 		{
 			get => _userFactor;
-			set => _userFactor = float.IsNaN(value) ? 0f : RosMath.Clamp(value, 0f, 2f);
+			set => _userFactor = float.IsNaN(value) ? 0f : RosMath.Clamp(value, 0f, 1f);
 		}
-		[Description("Strength of user pitch-override/correction. \\[0, 2] or `nan` - `userFactor` used if `nan` (which is by default).")]
+		[Description("Strength of user pitch-override/correction. \\[0, 1] or `nan` - `userFactor` used if `nan` (which is by default).")]
 		public float userPitchFactor
 		{
 			get => _userPitch;
-			set => _userPitch = RosMath.Clamp(value, 0f, 2f);
+			set => _userPitch = RosMath.Clamp(value, 0f, 1f);
 		}
-		[Description("Strength of user yaw-override/correction. \\[0, 2] or `nan` - `userFactor` used if `nan` (which is by default).")]
+		[Description("Strength of user yaw-override/correction. \\[0, 1] or `nan` - `userFactor` used if `nan` (which is by default).")]
 		public float userYawFactor
 		{
 			get => _userYaw;
-			set => _userYaw = RosMath.Clamp(value, 0f, 2f);
+			set => _userYaw = RosMath.Clamp(value, 0f, 1f);
 		}
-		[Description("Strength of user roll-override/correction. \\[0, 2] or `nan` - `userFactor` used if `nan` (which is by default).")]
+		[Description("Strength of user roll-override/correction. \\[0, 1] or `nan` - `userFactor` used if `nan` (which is by default).")]
 		public float userRollFactor
 		{
 			get => _userRoll;
-			set => _userRoll = RosMath.Clamp(value, 0f, 2f);
+			set => _userRoll = RosMath.Clamp(value, 0f, 1f);
 		}
 
 		[WorkInProgress, Description("Set of PID(R) controllers used by the autopilot.")]
@@ -443,8 +443,11 @@ namespace RedOnion.KSP.API
 
 			if (double.IsNaN(factor))
 				factor = _userFactor;
-			pid.input = RosMath.Clamp(13.0 - 2.0*TimeWarp.rate, 0.0, 10.0)
-				* (angle + stop) / accel + factor * user;
+			user *= factor;
+			pid.input = RosMath.Clamp(
+				RosMath.Clamp(13.0 - 2.0*TimeWarp.rate, 0.0, 10.0)
+				* (angle + stop) / accel * (1.0 - Math.Abs(user)),
+				-1.0, +1.0) + user;
 			return pid.update();
 		}
 

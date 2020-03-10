@@ -110,20 +110,19 @@ def control ship, target, x, y
     var mag = vec.size
     var lim = math.min 90, mag + math.max(1, mag-grav)^1.4
     var ang = ship.away.angle dir
-    var cos = math.deg.cos ang
-    var hrz = vec.project(ship.away).size
+    var vrt = vec.project(ship.away).size
     if ang > 90
-      hrz = -hrz
+      vrt = -vrt
     if ang > lim
       dir = ship.away.rotate lim, ship.away.cross dir
-      cos = math.deg.cos lim
-    autopilot.throttle = math.min user.throttle, (grav - 0.5)/acc/cos +
-      (hrz < 0 ? hrz : mag) / (acc-grav)
-    //todo: add user controls
-    //todo: add button for hovering
-    if time.since(report) >= 1
+    var cos = math.deg.cos ship.away.angle ship.forward
+    var prev = autopilot.throttle
+    autopilot.throttle = math.min user.throttle,
+      ((grav - 0.5)/acc + vrt/(acc-grav))/cos
+    if time.since(report) >= 1 or math.abs(prev-autopilot.throttle) >= 0.1
       report = time()
-      print "V: {0,5:F1}/{1,5:F1} A: {2,5:F1}/{3,4:F1} C: {4:F4}", mag, hrz, acc, grav, 1-cos
+      print "V:{0,5:F1}/{1,5:F1} A:{2,5:F1}/{3,4:F1} C:{4:F4} T:{5:F2}/{6:F2}",
+        mag, vrt, acc, grav, 1-cos, autopilot.throttle, prev
     return dir
 
   row = blk1.addHorizontal()
@@ -137,9 +136,10 @@ def control ship, target, x, y
   var bRadOut = xbtn row, "Rad-OUT", def
     autoStage = user.throttle > 0
     return ship.velocity.cross ship.away.cross ship.velocity
-  var bRadIn  = xbtn row, "Rad-IN", def =>
+  var bRadIn  = xbtn row, "Rad-IN", def
     autoStage = user.throttle > 0
     return -ship.velocity.cross ship.away.cross ship.velocity
+
   row = blk1.addHorizontal()
   var unlock = row.addExclusive2 "UNLOCK", lockdir.bind null
   unlock.flexWidth = 1
