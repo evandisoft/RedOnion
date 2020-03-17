@@ -122,20 +122,20 @@ if safeAltitude + 1000 >= targetAltitude
 
 //: STEERING
 
-autopilot.reset
+//autopilot.reset
 autopilot.killRot = true
 
-/* change params for all three pids at once
+/*/ change params for all three pids at once
 autopilot.pids.P = 1.0
-autopilot.pids.I = 0.3
-autopilot.pids.R = 0.25
-autopilot.pids.D = 0.05
+autopilot.pids.I = 0.05
+autopilot.pids.D = 0.02
+autopilot.pids.R = 0.02
 //*/
 /* change roll pid params
 autopilot.pids.roll.P = 1.0
-autopilot.pids.roll.I = 0.0
-autopilot.pids.roll.R = 0.1
-autopilot.pids.roll.D = 0.05
+autopilot.pids.roll.I = 0.1
+autopilot.pids.roll.D = 0.2
+autopilot.pids.roll.R = 0.3
 //*/
 
 var minSpeed = null
@@ -355,6 +355,8 @@ try
       ctlsub.remove
       tta = ship.timeToAp
       ctlsub = system.update circle
+    if eta <= 3
+      maxThrottle = 0.5*(3-eta)
     if eta <= 1; break
     wait
   maxThrottle = 1.0
@@ -439,7 +441,7 @@ finally
   vd = null
   user.throttle = 0
   autopilot.disable
-  autopilot.reset
+  //autopilot.reset
 
 print "DONE! e={0:F5} Ap:{1:F3} Pe:{2:F3}", ship.eccentricity, ship.apoapsis*0.001, ship.periapsis*0.001
 global.control_dir = "obt.prograde"

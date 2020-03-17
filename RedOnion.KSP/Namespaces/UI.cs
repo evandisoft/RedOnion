@@ -53,7 +53,9 @@ namespace RedOnion.KSP.Namespaces
 		[Description("UnityEngine.UI.Image.Type")]
 		public static readonly Type ImageType = typeof(UnityEngine.UI.Image.Type);
 
-		[WorkInProgress]
+		[WorkInProgress, Description("Scrollable panel.")]
 		public static readonly Type ScrollBox = typeof(UI.ScrollBox);
+		[WorkInProgress, Description("Scroll bar / slider.")]
+		public static readonly Type Scrollbar = typeof(UI.Scrollbar);
 	}
 }

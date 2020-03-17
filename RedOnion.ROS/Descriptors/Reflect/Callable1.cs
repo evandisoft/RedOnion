@@ -33,7 +33,7 @@ namespace RedOnion.ROS
 					result = Value.Void;
 					return true;
 				}
-				if (MinArgs > 0 || Params?.Length != 1)
+				if (args.Length > 1 || MinArgs > 0 || Params?.Length != 1)
 					return false;
 				// TODO: optimize this by preparing the Value in the constructor (or lazy-create and store)
 				((Action<Value>)result.obj)(new Value(Params[0].DefaultValue));
@@ -75,7 +75,7 @@ namespace RedOnion.ROS
 					result = ((Func<Value, Value>)result.obj)(args[0]);
 					return true;
 				}
-				if (MinArgs > 0 || Params?.Length != 1)
+				if (args.Length > 1 || MinArgs > 0 || Params?.Length != 1)
 					return false;
 				result = ((Func<Value, Value>)result.obj)(new Value(Params[0].DefaultValue));
 				return true;
@@ -101,7 +101,7 @@ namespace RedOnion.ROS
 					result = Value.Void;
 					return true;
 				}
-				if (MinArgs > 0 || IsDelegate || Params?.Length != 1)
+				if (args.Length > 1 || MinArgs > 0 || IsDelegate || Params?.Length != 1)
 					return false;
 				((Action<T, Value>)result.obj)((T)self, new Value(Params[0].DefaultValue));
 				result = Value.Void;
@@ -127,7 +127,7 @@ namespace RedOnion.ROS
 					result = ((Func<T, Value, Value>)result.obj)((T)self, args[0]);
 					return true;
 				}
-				if (MinArgs > 0 || IsDelegate || Params?.Length != 1)
+				if (args.Length > 1 || MinArgs > 0 || IsDelegate || Params?.Length != 1)
 					return false;
 				result = ((Func<T, Value, Value>)result.obj)((T)self, new Value(Params[0].DefaultValue));
 				return true;

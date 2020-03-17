@@ -52,11 +52,15 @@ def control ship, target, x, y
     if self.dirsubs != null
       self.dirsubs.remove
       self.dirsubs = null
+    autoStage = false
     autopilot.disable
     autopilot.resetSAS
-    autoStage = false
+    autopilot.userRollFactor = nan
     if fn != null and (btn == null || btn.pressed)
+      autopilot.userRollFactor = 1
       self.dirsubs = system.update def
+        autoStage = user.throttle > 0
+        autopilot.killRot = autopilot.SAS
         autopilot.direction = fn()
 //create button that controls direction
   def xbtn parent, text, initOrSteer, steer
@@ -75,9 +79,10 @@ def control ship, target, x, y
       if self.dirsubs != null
         self.dirsubs.remove
         self.dirsubs = null
+      autoStage = false
       autopilot.disable
       autopilot.resetSAS
-      autoStage = false
+      autopilot.userRollFactor = nan
       if fn != null and (btn == null || btn.pressed)
         fn()
     btn.width = 80
@@ -87,10 +92,8 @@ def control ship, target, x, y
   var blk1 = btns.addVertical()
   var row = blk1.addHorizontal()
   var bProgr  = xbtn row, "Progr.", def
-    autoStage = user.throttle > 0
     return mSrf.pressed ? ship.srfvel : ship.velocity
   var bRetro  = xbtn row, "Retro.", def
-    autoStage = user.throttle > 0
     if mObt.pressed
       return -ship.velocity
     if ship.splashed or ship.landed
@@ -127,17 +130,13 @@ def control ship, target, x, y
 
   row = blk1.addHorizontal()
   var bNormal = xbtn row, "Normal", def
-    autoStage = user.throttle > 0
     return ship.velocity.cross ship.away
   var bAntiN  = xbtn row, "Anti-N", def
-    autoStage = user.throttle > 0
     return -ship.velocity.cross ship.away
   row = blk1.addHorizontal()
   var bRadOut = xbtn row, "Rad-OUT", def
-    autoStage = user.throttle > 0
     return ship.velocity.cross ship.away.cross ship.velocity
   var bRadIn  = xbtn row, "Rad-IN", def
-    autoStage = user.throttle > 0
     return -ship.velocity.cross ship.away.cross ship.velocity
 
   row = blk1.addHorizontal()
@@ -152,7 +151,6 @@ def control ship, target, x, y
   row = blk2.addHorizontal()
   var bTowards = xbtn row, "Towards", def
     prevTgtBtn = bTowards
-    autoStage = user.throttle > 0
     var target = ship.target ?? self.target
     if target != null
       var ctl = ship.controlPart
@@ -163,7 +161,6 @@ def control ship, target, x, y
     return vector.none
   var bAway = xbtn row, "Away Fr.", def
     prevTgtBtn = bAway
-    autoStage = user.throttle > 0
     var target = ship.target ?? self.target
     if target != null
       return ship.position - target.position
@@ -173,12 +170,9 @@ def control ship, target, x, y
   row = blk2.addHorizontal()
   var bMatchSpeed = xbtn row, "Match Speed", def
     prevTgtBtn = bMatchSpeed
-    autoStage = user.throttle > 0
     var dv = vector.none
     var target = ship.target ?? self.target
-    if target == null
-      autopilot.killRot = true
-    else
+    if target != null
       if target is types.part
         target = target.ship
       dv = target.velocity-ship.velocity
@@ -234,7 +228,8 @@ def control ship, target, x, y
     warpDelay = null
     report = nan
     dvMin = inf
-    ship.sas = true
+    autopilot.killRot = true
+    autopilot.userRollFactor = 1
   def execSteer
     if bAbort.pressed
       return vector.none
@@ -245,6 +240,7 @@ def control ship, target, x, y
       bAbort.press
       return vector.none
     autoStage = true
+    autopilot.killRot = true
     var dv = nde.deltav
     var xt = 0.5 * stage.burnTime dv.size
     var dt = nde.eta - xt
@@ -253,9 +249,8 @@ def control ship, target, x, y
     if dt > 30 and time.warp.ready
       if warpDelay == null
         warpDelay = time()
-        ship.sas = true
       else if (time.since(warpDelay) >= 1 and d < 1
-        and ship.angularVelocity.size < 0.1)
+        and ship.angularVelocity.size < 0.3)
         warpDelay = null
         var to = time() + dt - (dt > 300 ? 300 : 10)
         time.warp.to to

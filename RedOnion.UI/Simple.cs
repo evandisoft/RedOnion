@@ -17,7 +17,7 @@ It is meant mainly for internal usage, for implementation of other composite con
 		public Simple(Layout layout) : base() => Layout = layout;
 
 		protected UUI.RawImage rawImage;
-		[Unsafe]
+		[Unsafe, Description("UnityEngine.UI.RawImage component (auto-created on access).")]
 		public UUI.RawImage RawImage
 		{
 			get
@@ -42,7 +42,7 @@ It is meant mainly for internal usage, for implementation of other composite con
 		}
 
 		protected UUI.Image image;
-		[Unsafe]
+		[Unsafe, Description("UnityEngine.UI.Image component (auto-created on access).")]
 		public UUI.Image Image
 		{
 			get
@@ -103,38 +103,38 @@ It is meant mainly for internal usage, for implementation of other composite con
 			=> Add(new Panel(Layout.Vertical));
 
 		[Description("Add new label with specified text.")]
-		public Label AddLabel(string text)
+		public Label AddLabel(string text = "")
 			=> Add(new Label(text));
 
-		public TextBox AddText(string text)
+		public TextBox AddText(string text = "")
 			=> Add(new TextBox(text));
 		[Description("Add new label with specified text.")]
-		public TextBox AddTextBox(string text)
+		public TextBox AddTextBox(string text = "")
 			=> Add(new TextBox(text));
 
 		[Description("Add new button with specified text.")]
-		public Button AddButton(string text)
+		public Button AddButton(string text = "")
 			=> Add(new Button(text));
 		[Description("Add new button with specified text and click-action.")]
 		public Button AddButton(string text, Action<Button> click)
 			=> Add(new Button(text, click));
 
 		[Description("Add new toggle-button with specified text.")]
-		public Button AddToggle(string text)
+		public Button AddToggle(string text = "")
 			=> Add(new Button(text) { Toggleable = true });
 		[Description("Add new toggle-button with specified text and click-action.")]
 		public Button AddToggle(string text, Action<Button> click)
 			=> Add(new Button(text, click) { Toggleable = true });
 
 		[Description("Add new exclusive toggle-button (radio button) with specified text.")]
-		public Button AddExclusive(string text)
+		public Button AddExclusive(string text = "")
 			=> Add(new Button(text) { Exclusive = true });
 		[Description("Add new exclusive toggle-button with specified text and click-action.")]
 		public Button AddExclusive(string text, Action<Button> click)
 			=> Add(new Button(text, click) { Exclusive = true });
 
 		[Description("Add new toggle-button exclusive in parent of this panel with specified text.")]
-		public Button AddExclusive2(string text)
+		public Button AddExclusive2(string text = "")
 			=> Add(new Button(text) { ExclusiveLevel = 2 });
 		[Description("Add new toggle-button exclusive in parent of this panel with specified text and click-action.")]
 		public Button AddExclusive2(string text, Action<Button> click)
@@ -146,11 +146,13 @@ It is meant mainly for internal usage, for implementation of other composite con
 			get => rawImage?.color ?? new Color();
 			set => RawImage.color = value;
 		}
+		[Unsafe, Description("UnityEngine.Texture of integrated UnityEngine.UI.RawImage.")]
 		public Texture Texture
 		{
 			get => rawImage?.texture;
 			set => RawImage.texture = value;
 		}
+		[Unsafe, Description("UnityEngine.Sprite of integrated UnityEngine.UI.Image.")]
 		public Sprite Sprite
 		{
 			get => image?.sprite;
@@ -160,6 +162,7 @@ It is meant mainly for internal usage, for implementation of other composite con
 				Image.type = UUI.Image.Type.Sliced;
 			}
 		}
+		[Unsafe, Description("UnityEngine.UI.Image.Type of integrated UnityEngine.UI.Image. (Sliced by default)")]
 		public UUI.Image.Type ImageType
 		{
 			get => image?.type ?? UUI.Image.Type.Sliced;

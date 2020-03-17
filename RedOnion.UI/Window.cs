@@ -261,31 +261,31 @@ It may get garbage-collected otherwise, but that can take time and is rather bac
 			=> Content.AddVertical();
 
 		[Description("Add new label with specified text.")]
-		public Label AddLabel(string text)
+		public Label AddLabel(string text = "")
 			=> Content.AddLabel(text);
 
-		public TextBox AddText(string text)
+		public TextBox AddText(string text = "")
 			=> Content.AddText(text);
 		[Description("Add new label with specified text.")]
-		public TextBox AddTextBox(string text)
+		public TextBox AddTextBox(string text = "")
 			=> Content.AddTextBox(text);
 
 		[Description("Add new button with specified text.")]
-		public Button AddButton(string text)
+		public Button AddButton(string text = "")
 			=> Content.AddButton(text);
 		[Description("Add new button with specified text and click-action.")]
 		public Button AddButton(string text, Action<Button> click)
 			=> Content.AddButton(text, click);
 
 		[Description("Add new toggle-button with specified text.")]
-		public Button AddToggle(string text)
+		public Button AddToggle(string text = "")
 			=> Content.AddToggle(text);
 		[Description("Add new toggle-button with specified text and click-action.")]
 		public Button AddToggle(string text, Action<Button> click)
 			=> Content.AddToggle(text, click);
 
 		[Description("Add new exclusive toggle-button (radio button) with specified text.")]
-		public Button AddExclusive(string text)
+		public Button AddExclusive(string text = "")
 			=> Content.AddExclusive(text);
 		[Description("Add new exclusive toggle-button with specified text and click-action.")]
 		public Button AddExclusive(string text, Action<Button> click)

@@ -88,6 +88,8 @@ namespace RedOnion.ROS.Tests
 				number = convertible.ToInt32(Value.Culture);
 				return number;
 			}
+			public void Overload(string v = "overload") => name = v;
+			public void Overload(string x, string y) => name = x + y;
 		}
 		public class MixedTest
 		{
@@ -203,6 +205,8 @@ namespace RedOnion.ROS.Tests
 
 			Test(1.0, "test.setNumber 1.1");
 			Test(1.0, "it.setNumber 1.1");
+
+			Test("xy", "it.overload \"x\", \"y\"; return it.name");
 		}
 
 		public struct Point

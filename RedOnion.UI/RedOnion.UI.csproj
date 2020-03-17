@@ -50,6 +50,7 @@
     <Compile Include="Element.cs" />
     <Compile Include="Enums.cs" />
     <Compile Include="Components\LayoutComponent.cs" />
+    <Compile Include="Scrollbar.cs" />
     <Compile Include="ScrollBox.cs" />
     <Compile Include="Simple.cs" />
     <Compile Include="Structures\Anchors.cs" />

@@ -2,7 +2,20 @@
 
 **Derived:** [PID](PID.md)
 
-PID(R) regulator (with extra parameters).
+PID(R) regulator (with extra parameters). Used to overcome certain problems of direct control.
+P-only regulator is pass-through (doing nothing), but other features like ouput-change-limiting
+can help smooth the control signal. But that alone could stop regulating near the target,
+when there is some minimal threshold for action to be taken. Rotation controll (roll, killRot)
+with P-only regulator could settle with small but non-zero offset, keeping the vessel/ship
+rotating by small amount indefinitely. PI-regulator overcomes this by accumulating the error
+and increasing the control signal until effect can be observed (rotation speed / angular velocity changes).
+But that has its own problem - induced oscillation (and wind-up).
+Two other factors - `R` and `D` - can be used to overcome that oscillation.
+`D` directly lowers output signal when effects are observed
+(decrease raw-roll control signal when observing change in angular velocity)
+and `R` lowers the accumulator used by `I` to dampen the oscillation
+(reducing both oscillation/overshooting and wind-up caused by big changes in input signal).
+Both also react to outside disturbances (like drag).
 
 
 **Instance Properties:**
@@ -13,7 +26,7 @@ PID(R) regulator (with extra parameters).
 - `R`: double - Reduction factor for accumulator (dampening - applied to accumulator used by integral factor, works well against both oscillation and windup).
 - `scale`: double - Difference scaling factor.
 - `targetChangeLimit`: double - Maximal abs(target - previous target) per second. NaN or +Inf means no limit (which is default). This can make the output smoother (more human-like control) and help prevent oscillation after target change (windup).
-- `outputChangeLimit`: double - Maximal abs(output-input) and also abs(target-input) for integral and reduction factors). Helps preventing overshooting especially after change of Target (windup). NaN or +Inf means no limit (which is default).
+- `outputChangeLimit`: double - Maximal abs(output-input) and also abs(target-input) for integral and reduction factors. Helps preventing overshooting especially after change of Target (windup). NaN or +Inf means no limit (which is default).
 - `errorLimit`: double - Limit of abs(target-input) used by P and I factors. Prevents over-reactions and also reducing windup.
 - `accumulatorLimit`: double - Limit of abs(accumulator) used by I and R factors. Another anti-windup measure to prevent overshooting.
 - `input`: double - Feedback (true state - e.g. current pitch; error/difference if Target is NaN).

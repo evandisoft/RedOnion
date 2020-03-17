@@ -6,7 +6,7 @@ User interface, see [RedOnion.UI](../../RedOnion.UI/README.md)
 **Types:**
 - `Color`: Color - UnityEngine.Color
 - `Window`: [Window](../../RedOnion.UI/Window.md) - Window - all elements must belong to some window.
-- `SceneFlags`: [SceneFlags](../../RedOnion.UI/SceneFlags.md) - Scene flags for limiting life-span of windows when switching scenes. (KSP)
+- `SceneFlags`: [SceneFlags](../../RedOnion.UI/SceneFlags.md) - Scene flags for limiting life-span of windows when switching scenes.
 - `Anchors`: [Anchors](../../RedOnion.UI/Anchors.md) - Anchors for specifying where to place elements (fill, center, ...)
 - `Padding`: [Padding](../../RedOnion.UI/Padding.md) - Padding - empty space inside an element / around contained elements.
 - `Layout`: [Layout](../../RedOnion.UI/Layout.md) - Layout - horizontal/vertical
@@ -21,3 +21,5 @@ User interface, see [RedOnion.UI](../../RedOnion.UI/README.md)
 - `TextBox`: [TextBox](../../RedOnion.UI/TextBox.md) - Line of editable text (or multi-line text editor).
 - `Image`: Image - Image / Icon.
 - `ImageType`: Type - UnityEngine.UI.Image.Type
+- `ScrollBox`: [ScrollBox](../../RedOnion.UI/ScrollBox.md) - \[`WIP`\] Scrollable panel.
+- `Scrollbar`: [Scrollbar](../../RedOnion.UI/Scrollbar.md) - \[`WIP`\] Scroll bar / slider.

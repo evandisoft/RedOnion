@@ -167,25 +167,25 @@ namespace RedOnion.KSP.API
 			set => _ship.rcs = value;
 		}
 
-		[Description("General strength of user override/correction of controls. \\[0, 1] 0.8 by default.")]
+		[WorkInProgress, Description("General strength of user override/correction of controls. \\[0, 1] 0.8 by default.")]
 		public float userFactor
 		{
 			get => _userFactor;
 			set => _userFactor = float.IsNaN(value) ? 0f : RosMath.Clamp(value, 0f, 1f);
 		}
-		[Description("Strength of user pitch-override/correction. \\[0, 1] or `nan` - `userFactor` used if `nan` (which is by default).")]
+		[WorkInProgress, Description("Strength of user pitch-override/correction. \\[0, 1] or `nan` - `userFactor` used if `nan` (which is by default).")]
 		public float userPitchFactor
 		{
 			get => _userPitch;
 			set => _userPitch = RosMath.Clamp(value, 0f, 1f);
 		}
-		[Description("Strength of user yaw-override/correction. \\[0, 1] or `nan` - `userFactor` used if `nan` (which is by default).")]
+		[WorkInProgress, Description("Strength of user yaw-override/correction. \\[0, 1] or `nan` - `userFactor` used if `nan` (which is by default).")]
 		public float userYawFactor
 		{
 			get => _userYaw;
 			set => _userYaw = RosMath.Clamp(value, 0f, 1f);
 		}
-		[Description("Strength of user roll-override/correction. \\[0, 1] or `nan` - `userFactor` used if `nan` (which is by default).")]
+		[WorkInProgress, Description("Strength of user roll-override/correction. \\[0, 1] or `nan` - `userFactor` used if `nan` (which is by default).")]
 		public float userRollFactor
 		{
 			get => _userRoll;
@@ -201,32 +201,38 @@ namespace RedOnion.KSP.API
 
 		public class PidParams : API.PidParams
 		{
+			public double strength { get; set; }
 			// todo: maximal angular velocity and maximal stopping time
 			public double angular { get; set; }
 			public double time { get; set; }
+
 			protected internal PidParams() => reset();
 			public virtual void reset()
 			{
-				P = 1.0;    // direct control
-				I = 0.3;    // error-correcting, *dt
-				R = 0.25;   // cumulated change, *dt
-				D = 0.05;   // change-resisting, /dt
-				outputChangeLimit = 5; //*dt => 10% per std. tick
-				targetChangeLimit = 5; //*dt => 10% per std. tick
-				accumulatorLimit = 0.5; // abs(accu) <= 50%
+				P = 1.00; // direct control        (better leave that as 1.0 for fast responses)
+				I = 0.10; // error-correcting, *dt (this can be small but not zero)
+				D = 0.03; // change-resisting, /dt (R&D can be zero, but at least one should not)
+				R = 0.02; // cumulated change
+				outputChangeLimit = 5; //*dt => 100% in 1/5s
+				targetChangeLimit = 5; //*dt => 100% in 1/5s
+				accumulatorLimit = 0.2; // abs(accu) <= 20%
 				errorLimit = 1; // abs(err) <= 100%
-				time = 3.0;
+				strength = 4.0;
 				angular = 10.0;
+				time = 3.0;
 			}
 
 			internal class Roll : PidParams
 			{
+				/*
 				public override void reset()
 				{
 					base.reset();
-					I = 0.0;
-					R = 0.1;
+					I = 0.1;
+					D = 0.05;
+					R = 0.05;
 				}
+				*/
 			}
 		}
 		public class PID : API.PID<PidParams>
@@ -242,6 +248,11 @@ namespace RedOnion.KSP.API
 				minOutput = -1.0;
 				reset();
 			}
+			public double strength
+			{
+				get => param.strength;
+				set => param.strength = value;
+			}
 			public double angular
 			{
 				get => param.angular;
@@ -253,7 +264,11 @@ namespace RedOnion.KSP.API
 				set => param.time = value;
 			}
 		}
-		[Description("Set of PID(R) controllers used by the autopilot.")]
+		[WorkInProgress, Description(
+@"Set of PID(R) controllers used by the autopilot. Simple PI-regulator with small `I`
+would do (some non-zero `I` is needed to eliminate final offset, especially for roll)
+as these are used to modify raw controls (-1..+1). Other parameters were itegrated,
+the most important probably being `strength` which determines how aggressive the autopilot is.")]
 		public class PIDs
 		{
 			protected internal PIDs() { }
@@ -300,7 +315,17 @@ namespace RedOnion.KSP.API
 				get => combine(pitch.R, yaw.R, roll.R);
 				set => roll.R = yaw.R = pitch.R = value;
 			}
-
+			[Description("Common strength/aggressiveness of control (`NaN` if not same`).")]
+			public double strength
+			{
+				get => combine(pitch.strength, yaw.strength, roll.strength);
+				set => roll.strength = yaw.strength = pitch.strength = value;
+			}
+			public double angular
+			{
+				get => combine(pitch.angular, yaw.angular, roll.angular);
+				set => roll.angular = yaw.angular = pitch.angular = value;
+			}
 			public double time
 			{
 				get => combine(pitch.time, yaw.time, roll.time);
@@ -398,14 +423,27 @@ namespace RedOnion.KSP.API
 			}
 			if (!double.IsNaN(_roll) || killRot)
 			{
-				var rollDiff = 0.0;
+				var rollDiff = -0.1*angvel.y;
 				if (!double.IsNaN(_roll))
 				{
-					if (Math.Abs(_ship.pitch) <= 89.0)
-						rollDiff = RosMath.ClampS180(_roll - _ship.roll);
-					else if (!double.IsNaN(_heading))
-						rollDiff = RosMath.ClampS180(_roll - 180.0
-							- _ship.up.angle(_ship.north.rotate(_heading, _ship.away), _ship.away));
+					var apitch = Math.Abs(_ship.pitch);
+					var sroll = apitch <= 89.0 ? _ship.roll : double.NaN;
+					if (!double.IsNaN(_heading) && apitch >= 30.0)
+					{
+						var hroll = RosMath.ClampS180(180.0 +
+							_ship.up.exclude(_ship.away).angle(
+							_ship.north.rotate(_heading, _ship.away), _ship.away));
+						if (apitch >= 60.0)
+							sroll = hroll;
+						else
+						{
+							if (Math.Abs(sroll - hroll) > 180.0)
+								hroll = RosMath.ClampS180(hroll + 180.0);
+							sroll = ((apitch-30.0)*hroll + (60.0-apitch)*sroll) / 30.0;
+						}
+					}
+					if (!double.IsNaN(sroll))
+						rollDiff = RosMath.ClampS180(_roll - sroll);
 				}
 				var roll = AngularControl(rollPID, rollDiff, angvel.y, maxang.y, _userRoll, Player.roll);
 				if (!double.IsNaN(roll))
@@ -421,9 +459,15 @@ namespace RedOnion.KSP.API
 
 		protected virtual float ControlValue(double input, double factor, double user)
 		{
-			if (double.IsNaN(factor))
-				factor = _userFactor;
-			return (float)RosMath.Clamp(input + factor * user, -1.0, +1.0);
+			if (_ship.native != FlightGlobals.ActiveVessel)
+				user = 0.0;
+			else
+			{
+				if (double.IsNaN(factor))
+					factor = _userFactor;
+				user *= factor;
+			}
+			return (float)RosMath.Clamp(input + user, -1.0, +1.0);
 		}
 
 		/// <summary>
@@ -441,14 +485,18 @@ namespace RedOnion.KSP.API
 			// we use double of that because we always add the angle difference.
 			var stop = speed * (Math.Abs(speed)/accel + 0.3 + 10 * pid.dt);
 
-			if (double.IsNaN(factor))
-				factor = _userFactor;
-			user *= factor;
-			pid.input = RosMath.Clamp(
-				RosMath.Clamp(13.0 - 2.0*TimeWarp.rate, 0.0, 10.0)
-				* (angle + stop) / accel * (1.0 - Math.Abs(user)),
-				-1.0, +1.0) + user;
-			return pid.update();
+			if (_ship.native != FlightGlobals.ActiveVessel)
+				user = 0.0;
+			else
+			{
+				if (double.IsNaN(factor))
+					factor = _userFactor;
+				user *= factor;
+			}
+			pid.input = RosMath.Clamp(pid.strength
+				* (angle + stop) / accel, pid.minInput, pid.maxInput)
+				* (1.0 - Math.Abs(user)) + user;
+			return pid.update() - user;
 		}
 
 		public void resetSAS()

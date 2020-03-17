@@ -4,17 +4,21 @@ using System.ComponentModel;
 using UnityEngine;
 using UUI = UnityEngine.UI;
 
+// TODO: custom layout for view-port margin
+
 namespace RedOnion.UI
 {
-	[WorkInProgress]
+	[WorkInProgress, Description("Scrollable panel")]
 	public class ScrollBox : Panel
 	{
+		[Unsafe, Description("Game object of the view port.")]
 		public GameObject ViewPort { get; }
-		public UUI.Image ViewImage { get; }
-		public UUI.Mask ViewMask { get; }
-		public UUI.ScrollRect ScrollRect { get; }
-		public UUI.ContentSizeFitter SizeFitter { get; }
-		public UUI.Image BoxImage { get; }
+
+		protected UUI.Image ViewImage { get; }
+		protected UUI.Mask ViewMask { get; }
+		protected UUI.ScrollRect ScrollRect { get; }
+		protected UUI.ContentSizeFitter SizeFitter { get; }
+		protected UUI.Image BoxImage { get; }
 
 		public ScrollBox(Layout layout = Layout.Vertical)
 		{
@@ -58,16 +62,19 @@ namespace RedOnion.UI
 			ScrollRect.vertical = layout != Layout.Horizontal;
 		}
 
+		[Description("Horizontally scrollable.")]
 		public bool horizontal
 		{
 			get => ScrollRect.horizontal;
 			set => ScrollRect.horizontal = value;
 		}
+		[Description("Vertocally scrollable.")]
 		public bool vertical
 		{
 			get => ScrollRect.vertical;
 			set => ScrollRect.vertical = value;
 		}
+		[Description("Elastic drag (can be dragged outside of normal bounds). Setting this to `false` switches to clamped mode (if previously `true`).")]
 		public bool elastic
 		{
 			get => ScrollRect.movementType == UUI.ScrollRect.MovementType.Elastic;
@@ -77,6 +84,7 @@ namespace RedOnion.UI
 				else if (elastic) ScrollRect.movementType = UUI.ScrollRect.MovementType.Clamped;
 			}
 		}
+		[Description("Clamped mode (cannot be dragged outside of bounds). Setting this to `false` switches to unrestricted mode (if previously `true`).")]
 		public bool clamped
 		{
 			get => ScrollRect.movementType == UUI.ScrollRect.MovementType.Clamped;
