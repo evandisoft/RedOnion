@@ -22,7 +22,9 @@ namespace RedOnion.KSP.API
 		protected float _userFactor, _userPitch, _userYaw, _userRoll;
 		protected double _pitch, _heading, _roll;
 		protected Vector _direction;
-		protected bool _killRot;
+		protected bool _killRot, _pylink;
+		protected TimeStamp _lastUpdate = TimeStamp.never;
+		protected TimeStamp _warpLock = TimeStamp.never;
 
 		protected internal Autopilot(Ship ship)
 		{
@@ -54,6 +56,7 @@ namespace RedOnion.KSP.API
 			_userPitch = float.NaN;
 			_userYaw = float.NaN;
 			_userRoll = float.NaN;
+			_pylink = true;
 		}
 
 		~Autopilot() => Dispose(false);
@@ -151,6 +154,12 @@ namespace RedOnion.KSP.API
 		{
 			get => _killRot;
 			set => Check((_killRot = value) ? 1.0 : double.NaN);
+		}
+		[Description("Limit pitch/yaw by their ratio needed to achieve direction.")]
+		public bool pylink
+		{
+			get => _pylink;
+			set => _pylink = value;
 		}
 
 		[Description("SAS: Stability Assist System. This is stock alternative to `killRot` which allows user override."
@@ -351,6 +360,8 @@ the most important probably being `strength` which determines how aggressive the
 			pitchPID.reset();
 			yawPID.reset();
 			rollPID.reset();
+			_lastUpdate = TimeStamp.never;
+			_warpLock = TimeStamp.never;
 		}
 		protected void Unhook()
 		{
@@ -377,14 +388,14 @@ the most important probably being `strength` which determines how aggressive the
 			if (!float.IsNaN(_throttle))
 				st.mainThrottle = RosMath.Clamp(_throttle, 0f, 1f);
 
-			// could probably use InputLockManager.lockStack.ContainsKey("TimeWarp") instead
-			if (TimeWarp.rate > 1.1f && TimeWarp.high)
+			if (Time.since(_lastUpdate) > 0.2)
 			{
 				pitchPID.resetAccu();
 				yawPID.resetAccu();
 				rollPID.resetAccu();
-				return;
+				_warpLock = Time.now;
 			}
+			_lastUpdate = Time.now;
 
 			var angvel = _ship.angularVelocity;
 			var maxang = _ship.maxAngular;
@@ -401,9 +412,28 @@ the most important probably being `strength` which determines how aggressive the
 				// ship.up      => (0,0,-1) <= -transform.forward
 				var pitchDiff = RosMath.Deg.Atan2(-want.z, want.y);
 				var yawDiff = RosMath.Deg.Atan2(want.x, want.y);
+				// try to keep the ratio
+				var pitchScale = 1.0;
+				var yawScale = 1.0;
+				if (_pylink)
+				{
+					var pr = Math.Abs(pitchDiff + angvel.x/maxang.x);
+					var yr = Math.Abs(yawDiff   + angvel.z/maxang.z);
+					if (pr >= 0.5 && yr >= 0.5)
+					{
+						var ratio = Math.Pow(RosMath.Clamp(pr / yr, 0.1, 10.0),
+							0.95 - 0.25/Math.Max(pr, yr));
+						var smooth = 2.0*Math.Min(pr, yr) - 1.0;
+						if (smooth < 1.0)
+							ratio = 1.0 + (ratio - 1.0) * smooth;
+						if (ratio < 1.0)
+							pitchScale = ratio;
+						else yawScale = 1.0/ratio;
+					}
+				}
 				// compute control inputs (X=pitch, Z=yaw - the one not used in the atan2 above)
-				var pitch = AngularControl(pitchPID, pitchDiff, angvel.x, maxang.x, _userPitch, Player.pitch);
-				var yaw = AngularControl(yawPID, yawDiff, angvel.z, maxang.z, _userYaw, Player.yaw);
+				var pitch = AngularControl(pitchPID, pitchDiff, angvel.x, maxang.x, _userPitch, Player.pitch, pitchScale);
+				var yaw = AngularControl(yawPID, yawDiff, angvel.z, maxang.z, _userYaw, Player.yaw, yawScale);
 				// set the controls
 				if (!double.IsNaN(pitch))
 					st.pitch = ControlValue(pitch, _userPitch, Player.pitch);
@@ -423,7 +453,9 @@ the most important probably being `strength` which determines how aggressive the
 			}
 			if (!double.IsNaN(_roll) || killRot)
 			{
-				var rollDiff = -0.1*angvel.y;
+				// a bit of control to speed-up killRot stabilization (through damped oscillation)
+				var rollDiff = 0.02*angvel.y;
+
 				if (!double.IsNaN(_roll))
 				{
 					var apitch = Math.Abs(_ship.pitch);
@@ -478,7 +510,11 @@ the most important probably being `strength` which determines how aggressive the
 		/// <param name="speed">Angular speed (deg/s, signed).</param>
 		/// <param name="accel">Angular acceleration (deg/s/s, unsigned) at full control.</param>
 		/// <returns>New control fraction (0-100%).</returns>
-		protected virtual double AngularControl(PID pid, double angle, double speed, double accel, double factor, double user)
+		protected virtual double AngularControl(
+			PID pid, double angle,
+			double speed, double accel,
+			double factor, double user,
+			double scale = 1.0)
 		{
 			// double the angle we will still travel if we try to stop immediately.
 			// abs(speed)/accel is the time needed, 0.5*speed would be average speed,
@@ -493,9 +529,12 @@ the most important probably being `strength` which determines how aggressive the
 					factor = _userFactor;
 				user *= factor;
 			}
+			var warpDelta = Time.since(_warpLock);
+			if (warpDelta < 0.2)
+				scale = warpDelta <= 0.1 ? 0.0 : scale * (warpDelta - 0.1);
 			pid.input = RosMath.Clamp(pid.strength
 				* (angle + stop) / accel, pid.minInput, pid.maxInput)
-				* (1.0 - Math.Abs(user)) + user;
+				* scale * (1.0 - Math.Abs(user)) + user;
 			return pid.update() - user;
 		}
 

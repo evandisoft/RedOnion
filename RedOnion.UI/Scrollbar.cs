@@ -40,9 +40,10 @@ namespace RedOnion.UI
 			SliderObject.transform.SetParent(RootObject.transform, false);
 			HandleObject.transform.SetParent(SliderObject.transform, false);
 
-			MainImage = RootObject.AddComponent<Components.BackgroundImage>();
-			MainImage.sprite = Skin.horizontalSlider.normal.background;
-			MainImage.type = UUI.Image.Type.Sliced;
+			var img = RootObject.AddComponent<ScrollbarImage>();
+			img.sprite = Skin.horizontalSlider.normal.background;
+			img.type = UUI.Image.Type.Sliced;
+			MainImage = img;
 
 			HandleImage = HandleObject.AddComponent<Components.BackgroundImage>();
 			HandleImage.sprite = Skin.horizontalSliderThumb.normal.background;
@@ -52,6 +53,20 @@ namespace RedOnion.UI
 			Component.handleRect = handleRect;
 			Component.targetGraphic = HandleImage;
 			Component.direction = direction;
+			img.Scrollbar = Component;
+		}
+
+		class ScrollbarImage : UUI.Image
+		{
+			public UUI.Scrollbar Scrollbar;
+			public bool vertical => Scrollbar != null
+				&& (Scrollbar.direction == UUI.Scrollbar.Direction.BottomToTop
+				|| Scrollbar.direction == UUI.Scrollbar.Direction.TopToBottom);
+			public bool horizontal => Scrollbar != null
+				&& (Scrollbar.direction == UUI.Scrollbar.Direction.LeftToRight
+				|| Scrollbar.direction == UUI.Scrollbar.Direction.RightToLeft);
+			public override float preferredWidth => vertical ? 80f : 16f;
+			public override float preferredHeight => horizontal ? 80f : 16f;
 		}
 	}
 }

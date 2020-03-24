@@ -123,6 +123,7 @@ if safeAltitude + 1000 >= targetAltitude
 //: STEERING
 
 //autopilot.reset
+autopilot.sas = true
 autopilot.killRot = true
 
 /*/ change params for all three pids at once
