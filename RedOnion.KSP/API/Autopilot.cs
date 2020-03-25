@@ -417,8 +417,8 @@ the most important probably being `strength` which determines how aggressive the
 				var yawScale = 1.0;
 				if (_pylink)
 				{
-					var pr = Math.Abs(pitchDiff + angvel.x/maxang.x);
-					var yr = Math.Abs(yawDiff   + angvel.z/maxang.z);
+					var pr = Math.Abs(pitchDiff + angvel.x*Math.Abs(angvel.x)/maxang.x);
+					var yr = Math.Abs(yawDiff   + angvel.z*Math.Abs(angvel.z)/maxang.z);
 					if (pr >= 0.5 && yr >= 0.5)
 					{
 						var ratio = Math.Pow(RosMath.Clamp(pr / yr, 0.1, 10.0),
@@ -454,7 +454,7 @@ the most important probably being `strength` which determines how aggressive the
 			if (!double.IsNaN(_roll) || killRot)
 			{
 				// a bit of control to speed-up killRot stabilization (through damped oscillation)
-				var rollDiff = 0.02*angvel.y;
+				var rollDiff = angvel.y;
 
 				if (!double.IsNaN(_roll))
 				{
