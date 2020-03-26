@@ -23,7 +23,7 @@ namespace RedOnion.UI
 
 		[Description("Create horizontal (default) or vertical scroll bar.")]
 		public Scrollbar(bool vertical = false)
-			: this(vertical ? UUI.Scrollbar.Direction.TopToBottom : UUI.Scrollbar.Direction.LeftToRight)
+			: this(vertical ? UUI.Scrollbar.Direction.BottomToTop : UUI.Scrollbar.Direction.LeftToRight)
 		{ }
 		public Scrollbar(UUI.Scrollbar.Direction direction)
 		{
@@ -65,8 +65,8 @@ namespace RedOnion.UI
 			public bool horizontal => Scrollbar != null
 				&& (Scrollbar.direction == UUI.Scrollbar.Direction.LeftToRight
 				|| Scrollbar.direction == UUI.Scrollbar.Direction.RightToLeft);
-			public override float preferredWidth => vertical ? 80f : 16f;
-			public override float preferredHeight => horizontal ? 80f : 16f;
+			public override float preferredWidth => horizontal ? 80f : 12f;
+			public override float preferredHeight => vertical ? 80f : 12f;
 		}
 	}
 }

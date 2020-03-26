@@ -231,17 +231,18 @@ namespace RedOnion.KSP.API
 				time = 3.0;
 			}
 
+			// not that it would be so important, simple PI would do,
+			// but we want roll-pid to stabilize a bit quicker
+			// (albeit through little damped oscillation)
 			internal class Roll : PidParams
 			{
-				/*
 				public override void reset()
 				{
 					base.reset();
-					I = 0.1;
-					D = 0.05;
-					R = 0.05;
+					I = 0.2;
+					D = 0.1;
+					R = 0.15;
 				}
-				*/
 			}
 		}
 		public class PID : API.PID<PidParams>
@@ -454,7 +455,7 @@ the most important probably being `strength` which determines how aggressive the
 			if (!double.IsNaN(_roll) || killRot)
 			{
 				// a bit of control to speed-up killRot stabilization (through damped oscillation)
-				var rollDiff = angvel.y;
+				var rollDiff = 0.5*angvel.y;
 
 				if (!double.IsNaN(_roll))
 				{

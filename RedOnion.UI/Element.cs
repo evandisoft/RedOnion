@@ -122,9 +122,11 @@ namespace RedOnion.UI
 		}
 		protected virtual void Dispose(bool disposing)
 		{
-			if (!disposing || GameObject == null)
+			if (!disposing || RootObject == null)
 				return;
-			GameObject.DestroyGameObject();
+			Parent?.RemoveElement(this);
+			RootObject.DestroyGameObject();
+			RootObject = null;
 			GameObject = null;
 			RectTransform = null;
 			layoutElement = null;

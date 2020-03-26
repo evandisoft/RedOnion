@@ -79,7 +79,7 @@ It may get garbage-collected otherwise, but that can take time and is rather bac
 			}
 			protected override void Dispose(bool disposing)
 			{
-				if (!disposing || GameObject == null)
+				if (!disposing || RootObject == null)
 					return;
 				GameEvents.onGameSceneLoadRequested.Remove(SceneChange);
 				base.Dispose(disposing);

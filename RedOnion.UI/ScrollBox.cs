@@ -62,17 +62,92 @@ namespace RedOnion.UI
 			ScrollRect.vertical = layout != Layout.Horizontal;
 		}
 
-		[Description("Horizontally scrollable.")]
-		public bool horizontal
+		public enum Scroll
 		{
-			get => ScrollRect.horizontal;
-			set => ScrollRect.horizontal = value;
+			No = -2,
+			Hide = -1,
+			Show = UUI.ScrollRect.ScrollbarVisibility.Permanent,
+			Auto = UUI.ScrollRect.ScrollbarVisibility.AutoHide,
+			Size = UUI.ScrollRect.ScrollbarVisibility.AutoHideAndExpandViewport,
 		}
-		[Description("Vertocally scrollable.")]
-		public bool vertical
+
+		protected Scrollbar hscroll, vscroll;
+
+		[Description("Horizontally scrollable.")]
+		public Scroll horizontal
 		{
-			get => ScrollRect.vertical;
-			set => ScrollRect.vertical = value;
+			get => !ScrollRect.horizontal ? Scroll.No : hscroll == null ? Scroll.Hide : (Scroll)ScrollRect.horizontalScrollbarVisibility;
+			set
+			{
+				if (value == Scroll.No)
+				{
+					if (!ScrollRect.horizontal)
+						return;
+					ScrollRect.horizontal = false;
+					if (hscroll == null)
+						return;
+					ScrollRect.horizontalScrollbar = null;
+					hscroll.Dispose();
+					hscroll = null;
+					return;
+				}
+				ScrollRect.horizontal = true;
+				if (value == Scroll.Hide)
+				{
+					if (hscroll == null)
+						return;
+					ScrollRect.horizontalScrollbar = null;
+					hscroll.Dispose();
+					hscroll = null;
+					return;
+				}
+				if (hscroll == null)
+				{
+					hscroll = new Scrollbar(vertical: false);
+					hscroll.RootObject.transform.SetParent(RootObject.transform, false);
+					hscroll.Parent = this;
+					ScrollRect.horizontalScrollbar = hscroll.Component;
+				}
+				ScrollRect.horizontalScrollbarVisibility = (UUI.ScrollRect.ScrollbarVisibility)value;
+			}
+		}
+		[Description("Vertically scrollable.")]
+		public Scroll vertical
+		{
+			get => !ScrollRect.horizontal ? Scroll.No : vscroll == null ? Scroll.Hide : (Scroll)ScrollRect.verticalScrollbarVisibility;
+			set
+			{
+				if (value == Scroll.No)
+				{
+					if (!ScrollRect.vertical)
+						return;
+					ScrollRect.vertical = false;
+					if (vscroll == null)
+						return;
+					ScrollRect.verticalScrollbar = null;
+					vscroll.Dispose();
+					vscroll = null;
+					return;
+				}
+				ScrollRect.vertical = true;
+				if (value == Scroll.Hide)
+				{
+					if (vscroll == null)
+						return;
+					ScrollRect.verticalScrollbar = null;
+					vscroll.Dispose();
+					vscroll = null;
+					return;
+				}
+				if (vscroll == null)
+				{
+					vscroll = new Scrollbar(vertical: true);
+					vscroll.RootObject.transform.SetParent(RootObject.transform, false);
+					vscroll.Parent = this;
+					ScrollRect.verticalScrollbar = vscroll.Component;
+				}
+				ScrollRect.horizontalScrollbarVisibility = (UUI.ScrollRect.ScrollbarVisibility)value;
+			}
 		}
 		[Description("Elastic drag (can be dragged outside of normal bounds). Setting this to `false` switches to clamped mode (if previously `true`).")]
 		public bool elastic

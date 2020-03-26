@@ -68,7 +68,7 @@ It is meant mainly for internal usage, for implementation of other composite con
 
 		protected override void Dispose(bool disposing)
 		{
-			if (!disposing || GameObject == null)
+			if (!disposing || RootObject == null)
 				return;
 			RawImage = null;
 			Image = null;

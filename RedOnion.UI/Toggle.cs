@@ -59,7 +59,7 @@ namespace RedOnion.UI
 
 		protected override void Dispose(bool disposing)
 		{
-			if (!disposing || GameObject == null)
+			if (!disposing || RootObject == null)
 				return;
 			ToggleFrame.Dispose();
 			ImageCore.Dispose();
