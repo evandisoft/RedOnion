@@ -1,6 +1,14 @@
 global.wnd = new ui.window "ScrollBox Test"
-global.box = wnd.add new ui.scrollBox
-for var text in ["one","two","three","four","five","six"]
+var nums = ["one","two","three","four","five","six"]
+
+global.box = wnd.add new ui.scrollbox
+for var text in nums
   box.addButton text
 box.height = 80
 box.vertical = ui.scrollbox.scroll.show
+
+global.box2 = wnd.add new ui.scrollbox ui.layout.horizontal
+for var text in nums
+  box2.addButton text
+box2.width = 80
+box2.horizontal = ui.scrollbox.scroll.show

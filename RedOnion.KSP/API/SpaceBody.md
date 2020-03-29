@@ -7,7 +7,7 @@ Celestial body. (`SpaceBody` selected not to conflict with KSP `CelestialBody`.)
 - `Atmosphere`: [SpaceBody.Atmosphere](SpaceBody.Atmosphere.md)
 
 **Instance Properties:**
-- `native`: CelestialBody - \[`Unsafe`\] KSP API. Native `CelestialBody`.
+- `native`: CelestialBody - \[`Unsafe`\] [KSP API](https://kerbalspaceprogram.com/api/class_celestial_body.html)
 - `name`: string - Name of the body.
 - `body`: SpaceBody - Celestial body this body is orbiting.
 - `position`: [Vector](Vector.md) - Position of the body (relative to active ship).

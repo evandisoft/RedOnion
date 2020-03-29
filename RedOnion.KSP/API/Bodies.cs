@@ -60,7 +60,7 @@ and elements are also properties (`bodies.kerbin`, `bodies.mun`).")]
 	[Description("Celestial body. (`SpaceBody` selected not to conflict with KSP `CelestialBody`.)")]
 	public class SpaceBody : ISpaceObject
 	{
-		[Unsafe, Description("KSP API. Native `CelestialBody`.")]
+		[Unsafe, Description("[KSP API](https://kerbalspaceprogram.com/api/class_celestial_body.html)")]
 		public CelestialBody native { get; private set; }
 		protected internal SpaceBody(CelestialBody body)
 		{

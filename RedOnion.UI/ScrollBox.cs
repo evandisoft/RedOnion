@@ -20,6 +20,8 @@ namespace RedOnion.UI
 		protected UUI.ContentSizeFitter SizeFitter { get; }
 		protected UUI.Image BoxImage { get; }
 
+		protected Scrollbar hscroll, vscroll;
+
 		public ScrollBox(Layout layout = Layout.Vertical)
 		{
 			var content = RectTransform;
@@ -62,19 +64,23 @@ namespace RedOnion.UI
 			ScrollRect.vertical = layout != Layout.Horizontal;
 		}
 
+		[Description("Scrolling and bar visibility.")]
 		public enum Scroll
 		{
+			[Description("No scrolling in that direction.")]
 			No = -2,
+			[Description("Scrolling without scrollbar.")]
 			Hide = -1,
+			[Description("Scrolling with permanently visible scrollbar.")]
 			Show = UUI.ScrollRect.ScrollbarVisibility.Permanent,
+			[Description("Scrolling with auto-hiding scrollbar.")]
 			Auto = UUI.ScrollRect.ScrollbarVisibility.AutoHide,
+			[Description("Scrolling with auto-hiding scrollbar and view-port expand/shrink.")]
 			Size = UUI.ScrollRect.ScrollbarVisibility.AutoHideAndExpandViewport,
 		}
 
-		protected Scrollbar hscroll, vscroll;
-
 		[Description("Horizontally scrollable.")]
-		public Scroll horizontal
+		public Scroll Horizontal
 		{
 			get => !ScrollRect.horizontal ? Scroll.No : hscroll == null ? Scroll.Hide : (Scroll)ScrollRect.horizontalScrollbarVisibility;
 			set
@@ -112,7 +118,7 @@ namespace RedOnion.UI
 			}
 		}
 		[Description("Vertically scrollable.")]
-		public Scroll vertical
+		public Scroll Vertical
 		{
 			get => !ScrollRect.horizontal ? Scroll.No : vscroll == null ? Scroll.Hide : (Scroll)ScrollRect.verticalScrollbarVisibility;
 			set
@@ -150,23 +156,44 @@ namespace RedOnion.UI
 			}
 		}
 		[Description("Elastic drag (can be dragged outside of normal bounds). Setting this to `false` switches to clamped mode (if previously `true`).")]
-		public bool elastic
+		public bool Elastic
 		{
 			get => ScrollRect.movementType == UUI.ScrollRect.MovementType.Elastic;
 			set
 			{
 				if (value) ScrollRect.movementType = UUI.ScrollRect.MovementType.Elastic;
-				else if (elastic) ScrollRect.movementType = UUI.ScrollRect.MovementType.Clamped;
+				else if (Elastic) ScrollRect.movementType = UUI.ScrollRect.MovementType.Clamped;
 			}
 		}
 		[Description("Clamped mode (cannot be dragged outside of bounds). Setting this to `false` switches to unrestricted mode (if previously `true`).")]
-		public bool clamped
+		public bool Clamped
 		{
 			get => ScrollRect.movementType == UUI.ScrollRect.MovementType.Clamped;
 			set
 			{
 				if (value) ScrollRect.movementType = UUI.ScrollRect.MovementType.Clamped;
-				else if (clamped) ScrollRect.movementType = UUI.ScrollRect.MovementType.Unrestricted;
+				else if (Clamped) ScrollRect.movementType = UUI.ScrollRect.MovementType.Unrestricted;
+			}
+		}
+
+		public Vector2 BarSpacing
+		{
+			get => new Vector2(-ScrollRect.verticalScrollbarSpacing, -ScrollRect.horizontalScrollbarSpacing);
+			set
+			{
+				ScrollRect.verticalScrollbarSpacing = -value.x;
+				ScrollRect.horizontalScrollbarSpacing = -value.y;
+			}
+		}
+		public Vector2 BarWidth
+		{
+			get => new Vector2(vscroll?.Width ?? 0f, hscroll?.Height ?? 0f);
+			set
+			{
+				if (vscroll != null)
+					vscroll.Width = value.x;
+				if (hscroll != null)
+					hscroll.Height = value.y;
 			}
 		}
 	}

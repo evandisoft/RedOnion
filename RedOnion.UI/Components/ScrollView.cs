@@ -8,11 +8,13 @@ namespace RedOnion.UI.Components
 		public override float preferredWidth
 			=> UUI.LayoutUtility.GetPreferredWidth(content)
 			+ (verticalScrollbar ? UUI.LayoutUtility.GetPreferredWidth(
-				(RectTransform)verticalScrollbar.transform) : 0f);
+				(RectTransform)verticalScrollbar.transform)
+			- verticalScrollbarSpacing : 0f);
 		public override float preferredHeight
 			=> UUI.LayoutUtility.GetPreferredHeight(content)
 			+ (horizontalScrollbar ? UUI.LayoutUtility.GetPreferredHeight(
-				(RectTransform)horizontalScrollbar.transform) : 0f);
+				(RectTransform)horizontalScrollbar.transform)
+			- horizontalScrollbarSpacing : 0f);
 
 		//note: we should split this to SetLayoutHorizontal and SetLayoutVertical
 		public override void SetLayoutHorizontal()

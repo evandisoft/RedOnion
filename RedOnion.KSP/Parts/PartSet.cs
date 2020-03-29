@@ -180,6 +180,8 @@ namespace RedOnion.KSP.Parts
 		public EngineSet engines { get; protected set; }
 		[Description("All sensors.")]
 		public ReadOnlyList<Sensor> sensors { get; protected set; }
+		[WorkInProgress, Description("All science modules.")]
+		public ReadOnlyList<Science> science { get; protected set; }
 		[WorkInProgress, Description("Parts per stage (by `decoupledin+1`).")]
 		public Stages stages { get; protected set; }
 
@@ -189,8 +191,20 @@ namespace RedOnion.KSP.Parts
 			dockingports = new ReadOnlyList<DockingPort>(DoRefresh);
 			engines = new EngineSet(ship, DoRefresh);
 			sensors = new ReadOnlyList<Sensor>(DoRefresh);
+			science = new ReadOnlyList<Science>(FindScience);
 			stages = new Stages(ship, DoRefresh);
 		}
+
+		private void FindScience()
+		{
+			foreach (var part in this)
+			{
+				var sci = part.science;
+				if (sci != null)
+					science.Add(sci);
+			}
+		}
+
 		protected internal override void SetDirty(bool value)
 		{
 #if DEBUG && DEBUG_PARTS_REFRESH
@@ -199,6 +213,7 @@ namespace RedOnion.KSP.Parts
 			if (value)
 			{
 				GameEvents.onVesselWasModified.Remove(VesselModified);
+				science.Dirty = true;
 				if (_ship == Ship.Active)
 					Stage.SetDirty("PartSet Dirty");
 			}

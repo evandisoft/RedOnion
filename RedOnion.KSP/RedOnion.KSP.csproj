@@ -94,6 +94,7 @@
     <Compile Include="Parts\EngineSet.cs" />
     <Compile Include="Parts\PartChildren.cs" />
     <Compile Include="Parts\PartValues.cs" />
+    <Compile Include="Parts\Science.cs" />
     <Compile Include="Parts\Stages.cs" />
     <Compile Include="ROS\RosGlobals.cs" />
     <Compile Include="ROS\RosManager.cs" />

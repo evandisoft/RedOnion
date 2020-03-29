@@ -257,6 +257,8 @@ namespace RedOnion.KSP.API
 		public EngineSet engines => parts.engines;
 		[Description("All sensors.")]
 		public ReadOnlyList<Sensor> sensors => parts.sensors;
+		[WorkInProgress, Description("All science modules.")]
+		public ReadOnlyList<Science> science => parts.science;
 
 		#endregion
 

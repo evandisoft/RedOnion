@@ -24,6 +24,7 @@ namespace RedOnion.ROS
 		public static readonly Descriptor UShort = new OfUShort();
 		public static readonly Descriptor SByte = new OfSByte();
 		public static readonly Descriptor Byte = new OfByte();
+		public static readonly Descriptor Bool = new OfBool();
 		public static readonly Descriptor Char = new OfChar();
 		public static readonly Descriptor String = new OfString();
 
@@ -53,6 +54,7 @@ namespace RedOnion.ROS
 			{ typeof(ushort), UShort },
 			{ typeof(sbyte),  SByte },
 			{ typeof(byte),   Byte },
+			{ typeof(bool),   Bool },
 			{ typeof(char),   Char },
 			{ typeof(string), String },
 		};

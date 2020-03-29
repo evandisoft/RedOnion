@@ -71,6 +71,7 @@ namespace RedOnion.ROS.Tests
 			public event MyAction2 Event2 { add => Action2 += value; remove => Action2 -= value; }
 			public void AddAction2(MyAction2 add) => Action2 += add;
 			public void CallAction2(string v) => Action2?.Invoke(v);
+			public bool DefaultBool(bool v = true) => v;
 			public void DefaultArg(string v = "default") => name = v;
 			public void DefaultArg2(string v = "test", int i = 333)
 			{
@@ -195,6 +196,7 @@ namespace RedOnion.ROS.Tests
 
 			Test("default", "test.defaultArg; test.name");
 			Test("default", "it.defaultArg; it.name");
+			Test(true, "it.defaultbool");
 
 			Test("test", "test.defaultArg2; test.name");
 			Test(333, "test.integer");

@@ -32,7 +32,7 @@ namespace RedOnion.KSP.API
 			}
 		}
 
-		[Unsafe, Description("KSP API.")]
+		[Unsafe, Description("[KSP API](https://kerbalspaceprogram.com/api/class_maneuver_node.html)")]
 		public ManeuverNode native { get; private set; }
 		[Description("Ship the node belongs to.")]
 		public Ship ship { get; private set; }

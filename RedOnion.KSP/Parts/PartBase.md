@@ -6,8 +6,9 @@ Part of the ship (vehicle/vessel).
 
 
 **Instance Properties:**
-- `native`: Part - \[`Unsafe`\] Native `Part` - KSP API.
-- `type`: [PartType](PartType.md) - Type of the part.
+- `native`: Part - \[`Unsafe`\] [KSP API](https://kerbalspaceprogram.com/api/class_part.html)
+- `type`: [PartType](PartType.md) - \[`WIP`\] Type of the part.
+- `science`: [Science](Science.md) - Science available through this part, `null` if none.
 - `ship`: [Ship](../API/Ship.md) - Ship (vehicle/vessel) this part belongs to.
 - `parent`: Part - Parent part (this part is attached to).
 - `children`: [PartChildren](PartChildren.md) - Parts attached to this part.
@@ -26,5 +27,5 @@ Part of the ship (vehicle/vessel).
 
 **Instance Methods:**
 - `istype()`: bool, name string
-  - Method to test the type of the part (e.g. `.istype("LaunchClamp")`). Note that ROS has `is` operator and Lua has `isa` function that can be used togehter with `types.engine` etc.
+  - Method to test the type of the part (e.g. `.istype("LaunchClamp")`). Note that ROS has `is` operator and Lua has `isa` function that can be used togehter with `types.engine` etc. Another classification is through `type` property.
 - `explode()`: void - Explode the part.
