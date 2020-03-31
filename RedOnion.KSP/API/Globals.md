@@ -14,6 +14,7 @@ Global variables, objects and functions common to all scripting languages.
 - `node`: [Node](Node.md) - Maneuver node.
 - `player`: [Player](Player.md) - \[`WIP`\] User/player controls.
 - `user`: [Player](Player.md) - \[`WIP`\] User/player controls.
+- `science`: [Science](Science.md) - \[`WIP`\] Science tools.
 - `PID`: [PID](PID.md) - PID regulator (alias to `system.pid` in ROS).
 - `app`: [App](App.md) - \[`WIP`\] Safe API for KSP Application Launcher (toolbar/buttons). WIP
 

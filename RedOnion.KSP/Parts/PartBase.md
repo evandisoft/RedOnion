@@ -8,7 +8,7 @@ Part of the ship (vehicle/vessel).
 **Instance Properties:**
 - `native`: Part - \[`Unsafe`\] [KSP API](https://kerbalspaceprogram.com/api/class_part.html)
 - `type`: [PartType](PartType.md) - \[`WIP`\] Type of the part.
-- `science`: [Science](Science.md) - Science available through this part, `null` if none.
+- `science`: [PartScience](PartScience.md) - Science available through this part, `null` if none.
 - `ship`: [Ship](../API/Ship.md) - Ship (vehicle/vessel) this part belongs to.
 - `parent`: Part - Parent part (this part is attached to).
 - `children`: [PartChildren](PartChildren.md) - Parts attached to this part.

@@ -363,6 +363,16 @@ namespace RedOnion.ROS
 					Value.ExtraLog("Processing method {0}.{1} [instace: {2}, args: {3}]",
 						Type.Name, m.Name, instance, m.GetParameters().Length);
 #endif
+				if (m.Name == "op_Implicit")
+				{
+					implConvert.Add(new KeyValuePair<Type, Func<object, object>>(
+						m.ReturnType, Expression.Lambda<Func<object, object>>(
+							Expression.Convert(Expression.Convert(
+								Expression.Convert(SelfParameter, Type),
+								m.ReturnType, m), typeof(object)),
+							SelfParameter).Compile()));
+					return;
+				}
 				var value = ReflectMethod(m);
 				if (value.IsVoid)
 					return;

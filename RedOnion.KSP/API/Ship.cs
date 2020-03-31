@@ -176,6 +176,7 @@ namespace RedOnion.KSP.API
 		[Unsafe, Description("Native `Vessel` for unrestricted access to [KSP API](https://kerbalspaceprogram.com/api/class_vessel.html)."
 			+ " Same as `FlightGlobals.ActiveVessel` if accessed through global `ship`.")]
 		public Vessel native { get; private set; }
+		public static implicit operator Vessel(Ship ship) => ship?.native;
 
 		[Description("Name of the ship (vehicle/vessel).")]
 		public string name
@@ -258,7 +259,7 @@ namespace RedOnion.KSP.API
 		[Description("All sensors.")]
 		public ReadOnlyList<Sensor> sensors => parts.sensors;
 		[WorkInProgress, Description("All science modules.")]
-		public ReadOnlyList<Science> science => parts.science;
+		public ReadOnlyList<PartScience> science => parts.science;
 
 		#endregion
 

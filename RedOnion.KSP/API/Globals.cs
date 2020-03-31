@@ -45,6 +45,8 @@ namespace RedOnion.KSP.API
 		public static readonly Type player = typeof(Player);
 		[WorkInProgress, Description("User/player controls.")]
 		public static readonly Type user = typeof(Player);
+		[WorkInProgress, Description("Science tools.")]
+		public static readonly Type science = typeof(Science);
 
 		[Description("PID regulator (alias to `system.pid` in ROS).")]
 		public static readonly Type PID = typeof(PID);

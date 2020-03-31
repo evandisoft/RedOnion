@@ -46,6 +46,7 @@ namespace RedOnion.ROS
 			protected Action<object, string, Value> strIndexSet;
 			protected ConstructorInfo defaultCtor;
 			protected string callableMemberName;
+			protected ListCore<KeyValuePair<Type, Func<object, object>>> implConvert;
 
 			public Reflected(Type type) : this(type.Name, type) { }
 			public Reflected(string name, Type type) : base(name, type)
@@ -171,8 +172,19 @@ namespace RedOnion.ROS
 				return false;
 			}
 			public override bool Convert(ref Value self, Descriptor to)
-				=> self.obj is IConvert cvt && cvt.Convert(ref self, to)
-				|| base.Convert(ref self, to);
+			{
+				if (self.obj is IConvert cvt && cvt.Convert(ref self, to))
+					return true;
+				foreach (var mtd in implConvert)
+				{
+					if (to.Type == mtd.Key)
+					{
+						self = new Value(mtd.Value(self.Box()));
+						return true;
+					}
+				}
+				return base.Convert(ref self, to);
+			}
 
 			public override int Find(object self, string name, bool add)
 			{

@@ -181,7 +181,7 @@ namespace RedOnion.KSP.Parts
 		[Description("All sensors.")]
 		public ReadOnlyList<Sensor> sensors { get; protected set; }
 		[WorkInProgress, Description("All science modules.")]
-		public ReadOnlyList<Science> science { get; protected set; }
+		public ReadOnlyList<PartScience> science { get; protected set; }
 		[WorkInProgress, Description("Parts per stage (by `decoupledin+1`).")]
 		public Stages stages { get; protected set; }
 
@@ -191,7 +191,7 @@ namespace RedOnion.KSP.Parts
 			dockingports = new ReadOnlyList<DockingPort>(DoRefresh);
 			engines = new EngineSet(ship, DoRefresh);
 			sensors = new ReadOnlyList<Sensor>(DoRefresh);
-			science = new ReadOnlyList<Science>(FindScience);
+			science = new ReadOnlyList<PartScience>(FindScience);
 			stages = new Stages(ship, DoRefresh);
 		}
 

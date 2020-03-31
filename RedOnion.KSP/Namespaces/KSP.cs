@@ -25,6 +25,9 @@ namespace RedOnion.KSP.Namespaces
 		[Description("Vector utilities.")]
 		public static readonly Vec Vec = new Vec();
 
+		[Description("A map of planet names to planet bodies. (Unsafe API)")]
+		public static BodiesDictionary bodies => BodiesDictionary.Instance;
+
 		[Description("[KSP API](https://kerbalspaceprogram.com/api/class_vessel.html): Vessel (class).")]
 		public static readonly Type Vessel = typeof(Vessel);
 		[Description("[KSP API](https://kerbalspaceprogram.com/api/_vessel_8cs.html#afa39c7ec7cc0926b332fcd2d77425edb): Vessel Type (enum).")]
@@ -42,12 +45,17 @@ namespace RedOnion.KSP.Namespaces
 		[Description("[KSP API](https://kerbalspaceprogram.com/api/class_k_s_p_1_1_u_i_1_1_screens_1_1_stage_manager.html): Staging logic.")]
 		public static readonly Type StageManager = typeof(StageManager);
 
-		[Description("A map of planet names to planet bodies. (Unsafe API)")]
-		public static BodiesDictionary bodies => BodiesDictionary.Instance;
-		[Description("[KSP API](https://kerbalspaceprogram.com/api/class_high_logic.html): LoadedScene indicator and other global state.")]
-		public static HighLogic HighLogic => HighLogic.fetch;
 		[Description("[KSP API](https://kerbalspaceprogram.com/api/_high_logic_8cs.html#a0687e907db3af3681f90377d69f32090): Game scenes (enum).")]
 		public static readonly Type GameScenes = typeof(GameScenes);
+		[Description("[KSP API](https://kerbalspaceprogram.com/api/class_high_logic.html): LoadedScene indicator and other global state.")]
+		public static HighLogic HighLogic => HighLogic.fetch;
+		[Description("[KSP API](https://kerbalspaceprogram.com/api/class_game.html): State of the game.")]
+		public static Game CurrentGame => HighLogic.CurrentGame;
+		[Description("[KSP API](https://kerbalspaceprogram.com/api/class_game_parameters.html): Parameters of the game.")]
+		public static GameParameters GameParameters => CurrentGame.Parameters;
+
+		[Description("[KSP API](https://kerbalspaceprogram.com/api/class_game_parameters_1_1_career_params.html): Career parameters.")]
+		public static GameParameters.CareerParams Career => GameParameters.Career;
 
 		[Description("[KSP API](https://kerbalspaceprogram.com/api/class_editor_logic.html): For use in editor (VAB/SPH).")]
 		public static readonly Type EditorLogic = typeof(EditorLogic);
@@ -71,5 +79,14 @@ namespace RedOnion.KSP.Namespaces
 		public static readonly Type GameEvents = typeof(GameEvents);
 		[Description("[KSP API](https://kerbalspaceprogram.com/api/class_game_variables.html): Various KSP variables.")]
 		public static GameVariables GameVariables => GameVariables.Instance;
+
+		[Description("[KSP API](https://kerbalspaceprogram.com/api/class_research_and_development.html): Science stuff.")]
+		public static ResearchAndDevelopment ResearchAndDevelopment => ResearchAndDevelopment.Instance;
+		[Description("[KSP API](https://kerbalspaceprogram.com/api/class_research_and_development.html): Science stuff.")]
+		public static ResearchAndDevelopment RnD => ResearchAndDevelopment.Instance;
+		[Description("[KSP API](https://kerbalspaceprogram.com/api/class_science_util.html): Science utilities.")]
+		public static readonly Type ScienceUtil = typeof(ScienceUtil);
+		[Description("[KSP API](https://kerbalspaceprogram.com/api/_science_8cs.html): Experiment situation flags.")]
+		public static readonly Type ExperimentSituations = typeof(ExperimentSituations);
 	}
 }

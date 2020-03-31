@@ -32,18 +32,19 @@ namespace RedOnion.KSP.Parts
 	{
 		[Unsafe, Description("[KSP API](https://kerbalspaceprogram.com/api/class_part.html)")]
 		public Part native { get; }
+		public static implicit operator Part(PartBase it) => it?.native;
 		[WorkInProgress, Description("Type of the part.")]
 		public PartType type { get; }
 
 		[Description("Science available through this part, `null` if none.")]
-		public Science science => scienceQueried ? _science : _science = FindScience();
+		public PartScience science => scienceQueried ? _science : _science = FindScience();
 		private bool scienceQueried;
-		private Science _science;
-		private Science FindScience()
+		private PartScience _science;
+		private PartScience FindScience()
 		{
 			scienceQueried = true;
 			var mod = native.FindModuleImplementing<ModuleScienceExperiment>();
-			return mod == null ? null : Science.Create(this, mod);
+			return mod == null ? null : PartScience.Create(this, mod);
 		}
 
 		[Description("Ship (vehicle/vessel) this part belongs to.")]

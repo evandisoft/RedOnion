@@ -62,6 +62,8 @@ and elements are also properties (`bodies.kerbin`, `bodies.mun`).")]
 	{
 		[Unsafe, Description("[KSP API](https://kerbalspaceprogram.com/api/class_celestial_body.html)")]
 		public CelestialBody native { get; private set; }
+		public static implicit operator CelestialBody(SpaceBody body) => body?.native;
+
 		protected internal SpaceBody(CelestialBody body)
 		{
 			native = body;
