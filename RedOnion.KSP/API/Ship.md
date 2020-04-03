@@ -77,7 +77,7 @@ Active vessel
 Note that it can change violently when facing up or down.
 - `angularVelocity`: [Vector](Vector.md) - Angular velocity \[ω, deg/s], how fast the ship rotates
 - `angularMomentum`: [Vector](Vector.md) - Angular momentum \[L = Iω, kg⋅m²⋅deg/s=N⋅m⋅s⋅deg] aka moment of momentum or rotational momentum.
-- `momentOfInertia`: Vector3d - Moment of inertia \[I, kg⋅m²=N⋅m⋅s²] aka angular mass or rotational inertia.
+- `momentOfInertia`: [Vector](Vector.md) - Moment of inertia \[I, kg⋅m²=N⋅m⋅s²] aka angular mass or rotational inertia.
 - `maxTorque`: [Vector](Vector.md) - Maximal ship torque \[N⋅m⋅deg=deg⋅kg⋅m²/s²] (aka moment of force or turning effect, maximum of positive and negative).
 - `maxVacuumTorque`: [Vector](Vector.md) - Maximal ship torque in vacuum \[N⋅m⋅deg=deg⋅kg⋅m²/s²] (ignoring control surfaces).
 - `maxAngular`: [Vector](Vector.md) - Maximal angular acceleration. \[deg/s²]

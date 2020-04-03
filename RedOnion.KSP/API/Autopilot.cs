@@ -149,26 +149,38 @@ namespace RedOnion.KSP.API
 			get => _roll;
 			set => Check(_roll = RosMath.ClampS180(value));
 		}
-		[Description("Fix the roll of the ship. Note that this is not SAS and currently does not allow user override.")]
+		[Description("Stop ship rotation. (A bit stronger alternative to stock SAS.)")]
 		public bool killRot
 		{
 			get => _killRot;
 			set => Check((_killRot = value) ? 1.0 : double.NaN);
 		}
-		[Description("Limit pitch/yaw by their ratio needed to achieve direction.")]
+		[Description("Limit pitch/yaw by their ratio needed to achieve direction. This leads to better 2D/3D behaviour.")]
 		public bool pylink
 		{
 			get => _pylink;
 			set => _pylink = value;
 		}
 
-		[Description("SAS: Stability Assist System. This is stock alternative to `killRot` which allows user override."
-			+ " Can be used to allow user/player to adjust roll while autopilot controls direction.")]
+		[Description("SAS: Stability Assist System. This is stock (weaker) alternative to `killRot`.")]
 		public bool sas
 		{
 			get => _ship.sas;
 			set => _ship.sas = value;
 		}
+		[Description("Reset stock SAS - resets its PIDs and quickly disables and re-enables it if it is currently enabled.")]
+		public void resetSAS()
+		{
+			var ap = _ship.native.Autopilot;
+			if (ap == null) return;
+			ap.SAS.ResetAllPIDS();
+			if (ap.Enabled)
+			{
+				ap.Disable();
+				ap.Enable();
+			}
+		}
+
 		[Description("RCS: Reaction Control System.")]
 		public bool rcs
 		{
@@ -382,6 +394,10 @@ the most important probably being `strength` which determines how aggressive the
 				Unhook();
 		}
 
+		/// <summary>
+		/// Here is where all the magic happens.
+		/// </summary>
+		/// <param name="st">Vessel control state (in-out).</param>
 		protected virtual void Callback(FlightCtrlState st)
 		{
 			if (_hooked == null)
@@ -390,7 +406,7 @@ the most important probably being `strength` which determines how aggressive the
 				st.mainThrottle = RosMath.Clamp(_throttle, 0f, 1f);
 
 			if (Time.since(_lastUpdate) > 0.2)
-			{
+			{// note that this callback is not executed during on-rails warp
 				pitchPID.resetAccu();
 				yawPID.resetAccu();
 				rollPID.resetAccu();
@@ -408,22 +424,22 @@ the most important probably being `strength` which determines how aggressive the
 				// (like if we were looking at the vector from cockpit)
 				var want = _ship.local(direction).normalized;
 				// now get the angles in respective planes and feed it into the PIDs
-				// ship.forward => (0,1,0)  <= transform.up
-				// ship.right   => (1,0,0)  <= transform.right
-				// ship.up      => (0,0,-1) <= -transform.forward
+				// ship.forward => (0,1,0)  <= transform.up       (up in VAB is future forward)
+				// ship.right   => (1,0,0)  <= transform.right    (right is as it should be)
+				// ship.up      => (0,0,-1) <= -transform.forward (future up/above is towards the screen in VAB, but Z is away - left-handed coords)
 				var pitchDiff = RosMath.Deg.Atan2(-want.z, want.y);
 				var yawDiff = RosMath.Deg.Atan2(want.x, want.y);
 				// try to keep the ratio
 				var pitchScale = 1.0;
 				var yawScale = 1.0;
 				if (_pylink)
-				{
+				{// look into AngularControl for why these equations
 					var pr = Math.Abs(pitchDiff + angvel.x*Math.Abs(angvel.x)/maxang.x);
 					var yr = Math.Abs(yawDiff   + angvel.z*Math.Abs(angvel.z)/maxang.z);
 					if (pr >= 0.5 && yr >= 0.5)
-					{
+					{// use the ratio-based limiter only after certain threshold
 						var ratio = Math.Pow(RosMath.Clamp(pr / yr, 0.1, 10.0),
-							0.95 - 0.25/Math.Max(pr, yr));
+							0.95 - 0.25/Math.Max(pr, yr)); // + smooth transition
 						var smooth = 2.0*Math.Min(pr, yr) - 1.0;
 						if (smooth < 1.0)
 							ratio = 1.0 + (ratio - 1.0) * smooth;
@@ -537,18 +553,6 @@ the most important probably being `strength` which determines how aggressive the
 				* (angle + stop) / accel, pid.minInput, pid.maxInput)
 				* scale * (1.0 - Math.Abs(user)) + user;
 			return pid.update() - user;
-		}
-
-		public void resetSAS()
-		{
-			var ap = _ship.native.Autopilot;
-			if (ap == null) return;
-			ap.SAS.ResetAllPIDS();
-			if (ap.Enabled)
-			{
-				ap.Disable();
-				ap.Enable();
-			}
 		}
 	}
 }

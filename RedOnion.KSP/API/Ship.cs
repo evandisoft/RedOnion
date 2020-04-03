@@ -467,7 +467,7 @@ namespace RedOnion.KSP.API
 		[Description("Angular momentum \\[L = Iω, kg⋅m²⋅deg/s=N⋅m⋅s⋅deg] aka moment of momentum or rotational momentum.")]
 		public Vector angularMomentum => new Vector((Vector3d)native.angularMomentum * RosMath.Rad2Deg);
 		[Description("Moment of inertia \\[I, kg⋅m²=N⋅m⋅s²] aka angular mass or rotational inertia.")]
-		public Vector3d momentOfInertia => new Vector(native.MOI);
+		public Vector momentOfInertia => new Vector(native.MOI);
 
 		protected TimeStamp _torqueStamp;
 		protected Vector _maxTorque, _maxVacuumTorque;

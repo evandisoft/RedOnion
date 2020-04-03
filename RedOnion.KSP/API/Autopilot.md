@@ -15,9 +15,9 @@ Autopilot (throttle and steering) for a ship (vehicle/vessel).
 - `heading`: double - Target heading [0..360]. NaN for releasing the control.
 - `pitch`: double - Target pitch/elevation [-180..+180]. Values outside -90..+90 flip heading. NaN for releasing the control.
 - `roll`: double - Target roll/bank [-180..+180]. NaN for releasing the control.
-- `killRot`: bool - Fix the roll of the ship. Note that this is not SAS and currently does not allow user override.
-- `pylink`: bool - Limit pitch/yaw by their ratio needed to achieve direction.
-- `sas`: bool - SAS: Stability Assist System. This is stock alternative to `killRot` which allows user override. Can be used to allow user/player to adjust roll while autopilot controls direction.
+- `killRot`: bool - Stop ship rotation. (A bit stronger alternative to stock SAS.)
+- `pylink`: bool - Limit pitch/yaw by their ratio needed to achieve direction. This leads to better 2D/3D behaviour.
+- `sas`: bool - SAS: Stability Assist System. This is stock (weaker) alternative to `killRot`.
 - `rcs`: bool - RCS: Reaction Control System.
 - `userFactor`: float - \[`WIP`\] General strength of user override/correction of controls. \[0, 1] 0.8 by default.
 - `userPitchFactor`: float - \[`WIP`\] Strength of user pitch-override/correction. \[0, 1] or `nan` - `userFactor` used if `nan` (which is by default).
@@ -28,3 +28,4 @@ Autopilot (throttle and steering) for a ship (vehicle/vessel).
 **Instance Methods:**
 - `disable()`: void - Disable the autopilot, setting all values to NaN.
 - `reset()`: void - Reset the autopilot to default settings.
+- `resetSAS()`: void - Reset stock SAS - resets its PIDs and quickly disables and re-enables it if it is currently enabled.

@@ -108,9 +108,16 @@ namespace RedOnion.KSP.MoonSharp.CommonAPI
 		{
 			foreach (var methodInfo in methodInfos)
 			{
-				if (!methodInfo.IsSpecialName)
+				if (methodInfo.IsSpecialName)
+					continue;
+				try
 				{
-					this[methodInfo.Name]=GetDelegateFromMethodInfo(methodInfo);
+					var it = GetDelegateFromMethodInfo(methodInfo);
+					this[methodInfo.Name] = it;
+				}
+				catch (Exception ex)
+				{
+					Value.Log($"LUA: Could not reflect {methodInfo.DeclaringType.Name}.{methodInfo.Name}: {ex}");
 				}
 			}
 		}

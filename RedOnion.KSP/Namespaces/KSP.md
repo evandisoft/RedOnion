@@ -22,6 +22,7 @@ Unsafe KSP API - see [CommonScriptApi](../../CommonScriptApi.md)
 - `GameEvents`: GameEvents - [KSP API](https://kerbalspaceprogram.com/api/class_game_events.html): Various KSP events.
 - `ScienceUtil`: ScienceUtil - [KSP API](https://kerbalspaceprogram.com/api/class_science_util.html): Science utilities.
 - `ExperimentSituations`: ExperimentSituations - [KSP API](https://kerbalspaceprogram.com/api/_science_8cs.html): Experiment situation flags.
+- `AssemblyLoader`: AssemblyLoader - [KSP API](https://kerbalspaceprogram.com/api/class_assembly_loader.html): Assembly loader, list of assemblies and types.
 
 **Static Fields:**
 - `Scalar`: Scalar - Math utilities.

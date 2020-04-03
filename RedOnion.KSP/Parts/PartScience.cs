@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -51,7 +52,10 @@ namespace RedOnion.KSP.Parts
 		}
 		internal static PartScience Create(PartBase part, ModuleScienceExperiment module)
 			=> module.ClassName == "DMModuleScienceAnimate"
-			? new DMagic(part, module) : new PartScience(part, module);
+			? new DMagic(part, module, DMagic.API1(module))
+			: module.ClassName == "DMModuleScienceAnimateGeneric"
+			? new DMagic(part, module, DMagic.API2(module))
+			: new PartScience(part, module);
 
 		public override string ToString()
 			=> Value.Format($"{part.name}/{native.experimentID}");
@@ -126,47 +130,59 @@ namespace RedOnion.KSP.Parts
 
 		protected class DMagic : PartScience
 		{
-			protected static Type _moduleType;
-			protected static Func<ModuleScienceExperiment, bool> _canConduct;
-			protected static Action<ModuleScienceExperiment, bool> _gatherScienceData;
-
-			public DMagic(PartBase part, ModuleScienceExperiment module)
-				: base(part, module)
+			public class API
 			{
-				if (_moduleType == null)
-				{
-					_moduleType = module.GetType();
+				public readonly Type type;
+				public readonly Func<ModuleScienceExperiment, bool> canConduct;
+				public readonly Action<ModuleScienceExperiment, bool> gatherScienceData;
 
-					var nativeParameter = Expression.Parameter(
-						typeof(ModuleScienceExperiment), "native");
+				public API(Type type)
+				{
+					this.type = type;
+					const BindingFlags flags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy;
+					var module = Expression.Parameter(
+						typeof(ModuleScienceExperiment), "module");
 					try
 					{
-						_canConduct = Expression.Lambda<Func<ModuleScienceExperiment, bool>>(
-							Expression.Call(Expression.Convert(nativeParameter, _moduleType),
-							_moduleType.GetMethod("canConduct")),
-							nativeParameter).Compile();
-
+						canConduct = Expression.Lambda<Func<ModuleScienceExperiment, bool>>(
+							Expression.Call(Expression.Convert(module, type),
+							type.GetMethod("canConduct", flags, null, new Type[0], null)),
+							module).Compile();
 					}
 					catch (Exception ex)
 					{
-						Value.Log("Could not reflect DMagic's `canConduct`: " + ex.ToString());
-						return;
+						Value.Log($"Could not reflect DMagic's `canConduct` in {type.Name}: {ex}");
 					}
 
-					var silentParameter = Expression.Parameter(
+					var silent = Expression.Parameter(
 						typeof(bool), "silent");
 					try
 					{
-						_gatherScienceData = Expression.Lambda<Action<ModuleScienceExperiment, bool>>(
-							Expression.Call(Expression.Convert(nativeParameter, _moduleType),
-							_moduleType.GetMethod("gatherScienceData"), silentParameter),
-							nativeParameter, silentParameter).Compile();
+						gatherScienceData = Expression.Lambda<Action<ModuleScienceExperiment, bool>>(
+							Expression.Call(Expression.Convert(module, type),
+							type.GetMethod("gatherScienceData", flags, null, new Type[] { typeof(bool) }, null),
+							silent), module, silent).Compile();
 					}
 					catch (Exception ex)
 					{
-						Value.Log("Could not reflect DMagic's `gatherScienceData`: " + ex.ToString());
+						Value.Log($"Could not reflect DMagic's `gatherScienceData` in {type.Name}: {ex}");
 					}
 				}
+			}
+			protected static API api1, api2;
+			public static API API1(ModuleScienceExperiment module)
+				=> api1 ?? (api1 = new API(module.GetType()));
+			public static API API2(ModuleScienceExperiment module)
+				=> api2 ?? (api2 = new API(module.GetType()));
+
+			protected readonly Func<ModuleScienceExperiment, bool> _canConduct;
+			protected readonly Action<ModuleScienceExperiment, bool> _gatherScienceData;
+
+			public DMagic(PartBase part, ModuleScienceExperiment module, API api)
+				: base(part, module)
+			{
+				_canConduct = api.canConduct;
+				_gatherScienceData = api.gatherScienceData;
 			}
 
 			public override ScienceState state
