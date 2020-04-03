@@ -110,6 +110,9 @@ namespace RedOnion.KSP.MoonSharp.CommonAPI
 			{
 				if (methodInfo.IsSpecialName)
 					continue;
+				// TODO: try to convert simple GetByType<T>() to GetByType(Type)
+				if (methodInfo.IsGenericMethod)
+					continue;
 				try
 				{
 					var it = GetDelegateFromMethodInfo(methodInfo);
