@@ -20,9 +20,9 @@ Unsafe KSP API - see [CommonScriptApi](../../CommonScriptApi.md)
 - `InputLock`: InputLockManager - Alias to `InputLockManager`.
 - `GameSettings`: GameSettings - [KSP API](https://kerbalspaceprogram.com/api/class_game_settings.html): Various KSP settings.
 - `GameEvents`: GameEvents - [KSP API](https://kerbalspaceprogram.com/api/class_game_events.html): Various KSP events.
+- `AssemblyLoader`: AssemblyLoader - [KSP API](https://kerbalspaceprogram.com/api/class_assembly_loader.html): Assembly loader, list of assemblies and types.
 - `ScienceUtil`: ScienceUtil - [KSP API](https://kerbalspaceprogram.com/api/class_science_util.html): Science utilities.
 - `ExperimentSituations`: ExperimentSituations - [KSP API](https://kerbalspaceprogram.com/api/_science_8cs.html): Experiment situation flags.
-- `AssemblyLoader`: AssemblyLoader - [KSP API](https://kerbalspaceprogram.com/api/class_assembly_loader.html): Assembly loader, list of assemblies and types.
 
 **Static Fields:**
 - `Scalar`: Scalar - Math utilities.
@@ -39,5 +39,6 @@ Unsafe KSP API - see [CommonScriptApi](../../CommonScriptApi.md)
 - `Career`: CareerParams - [KSP API](https://kerbalspaceprogram.com/api/class_game_parameters_1_1_career_params.html): Career parameters.
 - `PartResourceLibrary`: PartResourceLibrary - [KSP API](https://kerbalspaceprogram.com/api/class_part_resource_library.html)
 - `GameVariables`: GameVariables - [KSP API](https://kerbalspaceprogram.com/api/class_game_variables.html): Various KSP variables.
+- `GameDatabase`: GameDatabase - [KSP API](https://kerbalspaceprogram.com/api/class_game_database.html)
 - `ResearchAndDevelopment`: ResearchAndDevelopment - [KSP API](https://kerbalspaceprogram.com/api/class_research_and_development.html): Science stuff.
 - `RnD`: ResearchAndDevelopment - [KSP API](https://kerbalspaceprogram.com/api/class_research_and_development.html): Science stuff.
