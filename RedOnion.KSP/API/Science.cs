@@ -125,7 +125,7 @@ namespace RedOnion.KSP.API
 				var body = Science.body;
 				var situation = Science.situation;
 				var biomeId = Science.biomeId;
-				var id = FormattableString.Invariant(
+				var id = Invariant(
 					$"{experiment.id}@{body.name}{situation}{biomeId}");
 				if (id == this.id)
 					return;

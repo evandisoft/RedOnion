@@ -38,6 +38,30 @@ namespace RedOnion.KSP.Tests
 			foreach (var e in list)
 			{
 				Assert.AreEqual(v, e);
+				if (v == 4)
+					list.remove(e);
+				v += 2;
+			}
+			Assert.AreEqual(1, list.count);
+			foreach (var e in list)
+			{
+				Assert.AreEqual(2, e);
+				list.remove(e);
+			}
+			Assert.AreEqual(0, list.count);
+			list.add(1);
+			list.add(2);
+			list.add(3);
+			list.add(4);
+			list.add(5);
+			foreach (var e in list)
+				if ((e & 1) == 0)
+					list.remove(e);
+			Assert.AreEqual(3, list.count);
+			v = 1;
+			foreach (var e in list)
+			{
+				Assert.AreEqual(v, e);
 				v += 2;
 			}
 		}

@@ -13,7 +13,8 @@ using System.Threading.Tasks;
 namespace RedOnion.KSP.Utilities
 {
 	[Callable("subscribe")]
-	[Description("Designed for events with auto-remove on process shutdown, but can be used with any type of elements.")]
+	[Description("Designed for events with auto-remove on process shutdown, but can be used with any type of elements."
+		+ " Removing elements during enumeration is allowed (for current element of the enumerator).")]
 	public class AutoRemoveList<T> : IOperators, IEnumerable<T>
 	{
 		protected Dictionary<T, Subscription> hooks;
@@ -142,12 +143,10 @@ namespace RedOnion.KSP.Utilities
 				=> remove();
 			public void remove()
 			{
-				if (next == prev)
-				{
-					if (next == null)
-						return;
+				if (next == null)
+					return;
+				if (next == this)
 					owner.first = null;
-				}
 				else
 				{
 					if (owner.first == this)
