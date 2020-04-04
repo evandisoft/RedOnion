@@ -1,5 +1,6 @@
 using KSP.Localization;
 using RedOnion.Attributes;
+using RedOnion.KSP.Utilities;
 using RedOnion.ROS;
 using System;
 using System.Collections.Generic;
@@ -53,7 +54,8 @@ namespace RedOnion.KSP.API
 					biomeName = biome;
 			}
 			situationId = body.name + situation.ToString() + biomeId;
-			situationChanged?.Invoke();
+			foreach (var action in situationChanged)
+				action.Invoke();
 			return;
 		clear:
 			body = null;
@@ -70,7 +72,7 @@ namespace RedOnion.KSP.API
 		public static string situationId { get; private set; }
 
 		[Description("Event executed when `situationId` changes.")]
-		public static event Action situationChanged;
+		public static readonly AutoRemoveList<Action> situationChanged = new AutoRemoveList<Action>();
 
 		[Description("Current biome (display name).")]
 		public static string biomeName { get; private set; }

@@ -1,3 +1,4 @@
+using RedOnion.Debugging;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -13,6 +14,11 @@ namespace RedOnion.UI
 	[KSPAddon(KSPAddon.Startup.Instantly, true)]
 	public sealed class Collector : MonoBehaviour
 	{
+		static Collector()
+		{
+			MainLogger.LogListener = msg => Debug.Log("[RedOnion] " + msg);
+		}
+
 		public static void Add(IDisposable item)
 		{
 			lock (queueLock)

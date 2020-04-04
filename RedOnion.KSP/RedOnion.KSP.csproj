@@ -104,6 +104,7 @@
     <Compile Include="Utilities\InteropUtilities.cs" />
     <Compile Include="API\VectorUtils.cs" />
     <Compile Include="Utilities\MultiValueDictionary.cs" />
+    <Compile Include="Utilities\AutoRemoveList.cs" />
     <Compile Include="Utilities\Properties.cs" />
     <Compile Include="Utilities\ReadOnlyList.cs" />
     <Compile Include="Utilities\ReadOnlySet.cs" />

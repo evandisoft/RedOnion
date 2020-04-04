@@ -235,18 +235,44 @@ namespace MunOS
 		/// Process terminated.
 		/// Subscribers can use <see cref="ShutdownHook{T}" /> to avoid hard-links.
 		/// All subscriptions are removed prior to executing the handlers.
+		/// This event was optimized for fast removal.
 		/// </summary>
-		public Action shutdown;
+		public event Action shutdown
+		{
+			add
+			{
+				if (shutdownDict == null)
+				{
+					shutdownList = new LinkedList<Action>();
+					shutdownDict = new Dictionary<Action, LinkedListNode<Action>>();
+				}
+				else if (shutdownDict.ContainsKey(value))
+					return;
+				shutdownDict[value] = shutdownList.AddLast(value);
+			}
+			remove
+			{
+				if (shutdownDict == null)
+					return;
+				if (!shutdownDict.TryGetValue(value, out var node))
+					return;
+				shutdownDict.Remove(value);
+				shutdownList.Remove(node);
+			}
+		}
+		protected Dictionary<Action, LinkedListNode<Action>> shutdownDict;
+		protected LinkedList<Action> shutdownList;
 
 		public virtual void Terminate(bool hard = false)
 		{
+			MunLogger.Log($"Process#{ID} terminating. (hard: {hard}; shutdown: {shutdownDict?.Count ?? 0})");
 			// first notify all subscribers that this process is shutting down
-			var shutdown = this.shutdown;
-			MunLogger.Log($"Process#{ID} terminating. (hard: {hard}; shutdown: {shutdown?.GetInvocationList().Length ?? 0})");
+			var shutdown = shutdownList;
 			if (shutdown != null)
 			{
-				this.shutdown = null;
-				foreach (var fn in shutdown.GetInvocationList())
+				shutdownList = null;
+				shutdownDict = null;
+				foreach (var fn in shutdown)
 				{
 					try
 					{

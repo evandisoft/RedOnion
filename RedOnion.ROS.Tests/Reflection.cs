@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using NUnit.Framework;
+using RedOnion.Attributes;
 using RedOnion.ROS.Objects;
 
 namespace RedOnion.ROS.Tests

@@ -6,6 +6,10 @@ Available science through one part.
 **Instance Properties:**
 - `part`: [Part](PartBase.md) - The part this science belongs to.
 - `native`: ModuleScienceExperiment - \[`Unsafe`\] [KSP API](https://kerbalspaceprogram.com/api/class_module_science_experiment.html)
+- `experiment`: ScienceExperiment - \[`Unsafe`\] [KSP API](https://kerbalspaceprogram.com/api/class_science_experiment.html)
+- `experimentId`: string - Experiment ID.
+- `experimentTitle`: string - Experiment title.
+- `subject`: [Science.Subject](../API/Science.Subject.md) - \[`WIP`\] Science subject for the experiment and current situation.
 - `ready`: bool - \[`WIP`\] Ready to perform experiment.
 - `state`: [ScienceState](ScienceState.md) - \[`WIP`\] State of science module.
 

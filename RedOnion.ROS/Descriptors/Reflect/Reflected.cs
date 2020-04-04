@@ -1,4 +1,6 @@
+using RedOnion.Attributes;
 using RedOnion.Collections;
+using RedOnion.Debugging;
 using RedOnion.ROS.Objects;
 using System;
 using System.Collections;
@@ -60,7 +62,7 @@ namespace RedOnion.ROS
 					}
 					catch (Exception ex)
 					{
-						Value.Log("Exception {0} when processing static {1}.{2}: {3}",
+						MainLogger.Log("Exception {0} when processing static {1}.{2}: {3}",
 							ex.GetType(), Type.Name, member.Name, ex.Message);
 					}
 				}
@@ -72,7 +74,7 @@ namespace RedOnion.ROS
 					}
 					catch (Exception ex)
 					{
-						Value.Log("Exception {0} when processing {1}.{2}: {3}",
+						MainLogger.Log("Exception {0} when processing {1}.{2}: {3}",
 							ex.GetType(), Type.Name, member.Name, ex.Message);
 					}
 				}
@@ -84,7 +86,7 @@ namespace RedOnion.ROS
 					}
 					catch (Exception ex)
 					{
-						Value.Log("Exception {0} when processing {1}.{2}: {3}",
+						MainLogger.Log("Exception {0} when processing {1}.{2}: {3}",
 							ex.GetType(), Type.Name, nested.Name, ex.Message);
 					}
 				}
@@ -272,8 +274,8 @@ namespace RedOnion.ROS
 				}
 				catch
 				{
-					Value.DebugLog($"Exception in {Name}.Set");
-					Value.DebugLog($"Self: {self}; at: {at}; op: {op}; value: {value}; prop: {NameOf(this, at)}");
+					MainLogger.DebugLog($"Exception in {Name}.Set");
+					MainLogger.DebugLog($"Self: {self}; at: {at}; op: {op}; value: {value}; prop: {NameOf(this, at)}");
 					throw;
 				}
 			}
@@ -315,6 +317,7 @@ namespace RedOnion.ROS
 					if (op != OpCode.AddAssign && op != OpCode.SubAssign)
 						return false;
 					var evt = (IEventProxy)p.read(self.obj).obj;
+					self = value;
 					return op == OpCode.AddAssign ? evt.Add(ref value) : evt.Remove(ref value);
 				}
 				if (op == OpCode.Assign)

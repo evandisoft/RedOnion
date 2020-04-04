@@ -10,6 +10,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using RedOnion.Debugging;
 
 namespace RedOnion.KSP.Parts
 {
@@ -171,7 +172,7 @@ namespace RedOnion.KSP.Parts
 					}
 					catch (Exception ex)
 					{
-						Value.Log($"Could not reflect DMagic's `canConduct` in {type.Name}: {ex}");
+						MainLogger.Log($"Could not reflect DMagic's `canConduct` in {type.Name}: {ex}");
 					}
 
 					var silent = Expression.Parameter(
@@ -185,7 +186,7 @@ namespace RedOnion.KSP.Parts
 					}
 					catch (Exception ex)
 					{
-						Value.Log($"Could not reflect DMagic's `gatherScienceData` in {type.Name}: {ex}");
+						MainLogger.Log($"Could not reflect DMagic's `gatherScienceData` in {type.Name}: {ex}");
 					}
 				}
 			}

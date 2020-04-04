@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
 using MoonSharp.Interpreter;
-using RedOnion.KSP.API;
-using RedOnion.ROS;
+using RedOnion.Attributes;
+using RedOnion.Debugging;
 
 namespace RedOnion.KSP.MoonSharp.CommonAPI
 {
@@ -120,7 +120,7 @@ namespace RedOnion.KSP.MoonSharp.CommonAPI
 				}
 				catch (Exception ex)
 				{
-					Value.Log($"LUA: Could not reflect {methodInfo.DeclaringType.Name}.{methodInfo.Name}: {ex}");
+					MainLogger.Log($"LUA: Could not reflect {methodInfo.DeclaringType.Name}.{methodInfo.Name}: {ex}");
 				}
 			}
 		}

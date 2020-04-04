@@ -9,6 +9,7 @@ using KSP.Localization;
 using System.Collections.Generic;
 using RedOnion.ROS;
 using RedOnion.Collections;
+using RedOnion.Debugging;
 
 namespace RedOnion.KSP.API
 {
@@ -115,7 +116,7 @@ namespace RedOnion.KSP.API
 				{
 					active = ship;
 					GameEvents.onVesselChange.Add(ship.VesselChange);
-					Value.DebugLog("Reusing active vessel {0}/{1} named {2}.", ship.native.id, ship.native.persistentId, ship.name);
+					MainLogger.DebugLog("Reusing active vessel {0}/{1} named {2}.", ship.native.id, ship.native.persistentId, ship.name);
 				}
 				return ship;
 			}
@@ -131,10 +132,10 @@ namespace RedOnion.KSP.API
 
 			if (FlightGlobals.ActiveVessel != native)
 			{
-				Value.DebugLog("Creating Ship for vessel id {0}/{1} named {2}.", native.id, native.persistentId, name);
+				MainLogger.DebugLog("Creating Ship for vessel id {0}/{1} named {2}.", native.id, native.persistentId, name);
 				return;
 			}
-			Value.DebugLog("Creating Ship for active vessel {0}/{1} named {2}.", native.id, native.persistentId, name);
+			MainLogger.DebugLog("Creating Ship for active vessel {0}/{1} named {2}.", native.id, native.persistentId, name);
 			active = this;
 			GameEvents.onVesselChange.Add(VesselChange);
 		}
@@ -153,7 +154,7 @@ namespace RedOnion.KSP.API
 				UI.Collector.Add(this);
 				return;
 			}
-			Value.DebugLog("Disposing Ship for vessel id {0}/{1} named {2}.", native.id, native.persistentId, name);
+			MainLogger.DebugLog("Disposing Ship for vessel id {0}/{1} named {2}.", native.id, native.persistentId, name);
 			cache.Remove(native);
 			if (ReferenceEquals(active, this))
 				ClearActive();

@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using RedOnion.Debugging;
 
 namespace RedOnion.KSP.Utilities
 {
@@ -46,7 +47,7 @@ discovered assemblies, namespaces, classes etc.")]
 				{
 					var prev = list[at].Key;
 					var overwrite = string.CompareOrdinal(name, prev) > 0;
-					Value.DebugLog("Properties conflict: {0} vs. {1}, overwrite: {2}", name, prev, overwrite);
+					MainLogger.DebugLog("Properties conflict: {0} vs. {1}, overwrite: {2}", name, prev, overwrite);
 					if (overwrite)
 						dict[name] = list.size;
 				}
@@ -70,7 +71,7 @@ discovered assemblies, namespaces, classes etc.")]
 			{
 				var prev = list[at].Key;
 				var overwrite = string.CompareOrdinal(name, prev) > 0;
-				Value.DebugLog("Properties conflict: {0} vs. {1}, overwrite: {2}", name, prev, overwrite);
+				MainLogger.DebugLog("Properties conflict: {0} vs. {1}, overwrite: {2}", name, prev, overwrite);
 				if (overwrite)
 					dict[name] = list.size;
 			}

@@ -1,4 +1,5 @@
 using RedOnion.Collections;
+using RedOnion.Debugging;
 using RedOnion.ROS;
 using System;
 using System.Collections;
@@ -92,12 +93,12 @@ namespace RedOnion.KSP.Parts
 				values = "";
 			if (values == this.values)
 				return;
-			Value.DebugLog("SetValues: " + values);
+			MainLogger.DebugLog("SetValues: " + values);
 			this.values = values;
 			list.Clear();
 			ParseValues();
 			UpdateList();
-			Value.DebugLog("Updated: " + this.values);
+			MainLogger.DebugLog("Updated: " + this.values);
 		}
 		//NOTE: don't even think about renaming this to Update! Unity!!
 		internal void UpdateList()

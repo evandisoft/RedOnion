@@ -4,9 +4,6 @@ namespace RedOnion.ROS
 {
 	public partial class Descriptor
 	{
-		public static readonly Descriptor Null = new OfNull();
-		internal static readonly Descriptor NullSelf = new OfNullSelf();
-
 		/// <summary>
 		/// Represents empty reference
 		/// and will cause errors on attemt to use it in most operations.

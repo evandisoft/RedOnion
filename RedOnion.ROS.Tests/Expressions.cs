@@ -1,12 +1,22 @@
 using System;
 using System.Collections;
 using NUnit.Framework;
+using RedOnion.Debugging;
 using RedOnion.ROS.Objects;
 
 namespace RedOnion.ROS.Tests
 {
 	public class CoreTests : Processor.WithEvents
 	{
+		public CoreTests()
+		{
+			MainLogger.LogListener = LogListener;
+		}
+		public static void LogListener(string msg)
+			=> System.Diagnostics.Debug.WriteLine(msg);
+		public override void Log(string msg)
+			=> System.Diagnostics.Debug.WriteLine(msg);
+
 		public void Test(string script, int countdown = 1000)
 		{
 			try
