@@ -17,27 +17,25 @@ namespace RedOnion.KSP.Utilities
 		+ " Removing elements during enumeration is allowed (for current element of the enumerator).")]
 	public class AutoRemoveList<T> : IOperators, IEnumerable<T>
 	{
-		protected Dictionary<T, Subscription> hooks;
-		protected Subscription first;
+		Dictionary<T, Subscription> hooks;
+		Subscription first;
 
 		[Description("Number of subscription.")]
 		public int count => hooks.Count;
 
 		[Description("Subscribe to the list. Similar to `add` but returns auto-remove subscription.")]
-		public Subscription subscribe(T value)
+		public AutoSubscription subscribe(T value)
 		{
 			var hook = add(value);
-			if (hook != null)
-				hook.auto = true;
-			return hook;
+			return hook == null ? null : new AutoSubscription(hook);
 		}
 
-		[Description("Add new item. Returns subscribtion with auto-remove disabled (or null for duplicit item).")]
-		public virtual Subscription add(T value)
+		[Description("Add new item. Returns pure subscribtion (or null for duplicit item).")]
+		public Subscription add(T value)
 		{
 			if (first == null)
 			{
-				var hook = new Subscription(value, this);
+				var hook = CreateSubscription(value);
 				hook.next = hook;
 				hook.prev = hook;
 				first = hook;
@@ -50,7 +48,7 @@ namespace RedOnion.KSP.Utilities
 				return null;
 			else
 			{
-				var hook = new Subscription(value, this);
+				var hook = CreateSubscription(value);
 				hook.next = first;
 				hook.prev = first.prev;
 				hook.prev.next = hook;
@@ -59,10 +57,8 @@ namespace RedOnion.KSP.Utilities
 				return hook;
 			}
 		}
-		protected static Subscription next(Subscription hook) => hook.next;
-		protected static Subscription prev(Subscription hook) => hook.prev;
-		protected static Subscription next(Subscription hook, Subscription next) => hook.next = next;
-		protected static Subscription prev(Subscription hook, Subscription prev) => hook.prev = prev;
+		protected virtual Subscription CreateSubscription(T value)
+			=> new Subscription(value, this);
 
 		[Description("Remove item. Returns the subscription on success, null if not found.")]
 		public Subscription remove(T value)
@@ -109,38 +105,23 @@ namespace RedOnion.KSP.Utilities
 		public class Subscription : IDisposable
 		{
 			internal Subscription next, prev;
-			[Description("The action")]
-			public T item;
-			protected AutoRemoveList<T> owner;
-			protected MunProcess process;
+			protected internal T item { get; private set; }
+			protected AutoRemoveList<T> owner { get; private set; }
+			protected MunProcess process { get; private set; }
+			internal WeakReference<AutoSubscription> auto;
 
-			bool _auto;
-			public bool auto
+			protected internal Subscription(T item, AutoRemoveList<T> owner)
 			{
-				get => _auto;
-				set
-				{
-					if (_auto == value)
-						return;
-					_auto = value;
-					if (value)
-						GC.ReRegisterForFinalize(this);
-					else GC.SuppressFinalize(this);
-				}
-			}
-
-			internal Subscription(T action, AutoRemoveList<T> owner)
-			{
-				this.item = action;
+				this.item = item;
 				this.owner = owner;
 				if ((process = MunProcess.Current) == null)
 					return;
 				process.shutdown += remove;
-				GC.SuppressFinalize(this);
 			}
-			~Subscription() => UI.Collector.Add(this);
 			void IDisposable.Dispose()
 				=> remove();
+
+			[Description("Remove the item.")]
 			public void remove()
 			{
 				if (next == null)
@@ -158,12 +139,46 @@ namespace RedOnion.KSP.Utilities
 				prev = null;
 				owner.hooks.Remove(item);
 				owner = null;
-				if (auto)
-					GC.SuppressFinalize(this);
-				if (process == null)
-					return;
-				process.shutdown -= remove;
-				process = null;
+				item = default;
+				if (process != null)
+				{
+					process.shutdown -= remove;
+					process = null;
+				}
+				if (auto != null)
+				{
+					if (auto.TryGetTarget(out var sub))
+					{
+						sub.cleanup();
+						auto.SetTarget(null);
+					}
+					auto = null;
+				}
+			}
+		}
+
+		// this level of wrapping is necessary, because subscriptions are in list and dictionary
+
+		[Description("Subscription with auto-remove (when no reference).")]
+		public class AutoSubscription : IDisposable
+		{
+			protected Subscription it { get; private set; }
+			internal AutoSubscription(Subscription it)
+				=> (this.it = it).auto = new WeakReference<AutoSubscription>(this);
+			~AutoSubscription()
+			{
+				if (it?.next != null)
+					UI.Collector.Add(this);
+			}
+			void IDisposable.Dispose()
+				=> remove();
+			[Description("Remove the item.")]
+			public void remove()
+				=> it?.remove();
+			internal void cleanup()
+			{
+				it = null;
+				GC.SuppressFinalize(this);
 			}
 		}
 	}

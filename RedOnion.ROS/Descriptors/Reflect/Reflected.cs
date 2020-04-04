@@ -119,6 +119,7 @@ namespace RedOnion.ROS
 						ref var it = ref prop.items[at];
 						if (it.read == null)
 							throw InvalidOperation("{0}.{1} is not readable", Name, callableMemberName);
+						self = result.obj;
 						result = it.read(result.obj);
 						switch (it.kind)
 						{

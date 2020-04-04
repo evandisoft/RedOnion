@@ -27,9 +27,6 @@ namespace RedOnion.KSP.ROS
 		protected void ProcessorReset()
 			=> base.Reset();
 
-		public override void Log(string msg)
-			=> MainLogger.Log("[RedOnion] " + msg);
-
 		private static Ionic.Zip.ZipFile ScriptsZip;
 		public static string LoadScript(string path)
 		{
