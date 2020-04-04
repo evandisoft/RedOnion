@@ -7,85 +7,128 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.FormattableString;
 
 namespace RedOnion.KSP.API
 {
 	[WorkInProgress, Description("Science tools.")]
 	public static class Science
 	{
-		internal static Vessel vessel
+		static string landedAt;
+		internal static void update()
 		{
-			get
+			if (!HighLogic.LoadedSceneIsFlight)
+				goto clear;
+			var active = FlightGlobals.ActiveVessel;
+			if (!active) goto clear;
+			var v = active.EVALadderVessel;
+			var mbody = v.mainBody;
+			if (!mbody) goto clear;
+			var sit = ScienceUtil.GetExperimentSituation(v);
+			var bio = ScienceUtil.GetExperimentBiome(mbody, v.latitude, v.longitude);
+			var at = v.landedAt;
+			if (body?.native == mbody && sit == situation && bio == mainBiome && at == landedAt)
+				return;
+			body = Bodies.Instance[mbody];
+			situation = sit;
+			mainBiome = bio;
+			mainBiomeId = mainBiome.Replace(" ", "");
+			landedAt = at;
+			if (at?.Length > 0)
 			{
-				var vessel = FlightGlobals.ActiveVessel;
-				return vessel ? vessel.EVALadderVessel : null;
+				biome = subBiome = Vessel.GetLandedAtString(at);
+				biomeId = subBiomeId = subBiome.Replace(" ", "");
+				biomeName = Localizer.Format(v.displaylandedAt);
+				if (biomeName == null || biomeName.Length == 0)
+					biomeName = at;
 			}
+			else
+			{
+				biome = mainBiome;
+				biomeId = mainBiomeId;
+				subBiome = null;
+				subBiomeId = null;
+				biomeName = ScienceUtil.GetBiomedisplayName(mbody, biome);
+				if (biomeName == null || biomeName.Length == 0)
+					biomeName = biome;
+			}
+			situationId = body.name + situation.ToString() + biomeId;
+			situationChanged?.Invoke();
+			return;
+		clear:
+			body = null;
+			situation = 0;
+			biome = null;
+			biomeId = null;
 		}
 
+		[Description("Current space/celestial body.")]
+		public static SpaceBody body { get; private set; }
 		[Description("Current science situation.")]
-		public static ExperimentSituations situation
-		{
-			get
-			{
-				var v = vessel;
-				return v ? ScienceUtil.GetExperimentSituation(v) : 0;
-			}
-		}
-		[Description("Current biome (tag, returns subBiome if landed).")]
-		public static string biome
-		{
-			get
-			{
-				var v = vessel;
-				return v ? v.landedAt?.Length > 0
-					? Vessel.GetLandedAtString(v.landedAt)
-					: ScienceUtil.GetExperimentBiome(
-					v.mainBody, v.latitude, v.longitude)
-					: null;
-			}
-		}
+		public static ExperimentSituations situation { get; private set; }
+		[Description("Current situation ID (`{body}{situation}{biomeId}`).")]
+		public static string situationId { get; private set; }
+
+		[Description("Event executed when `situationId` changes.")]
+		public static event Action situationChanged;
+
 		[Description("Current biome (display name).")]
-		public static string biomeName
-		{
-			get
-			{
-				var v = vessel;
-				if (!v) return null;
-				if (v.landedAt?.Length > 0)
-				{
-					var name = Localizer.Format(v.displaylandedAt);
-					return name?.Length > 0 ? name : v.landedAt;
-				}
-				else
-				{
-					var biome = ScienceUtil.GetExperimentBiome(
-						v.mainBody, v.latitude, v.longitude);
-					var name = ScienceUtil.GetBiomedisplayName(
-						v.mainBody, biome);
-					return name?.Length > 0 ? name : biome;
-				}
-			}
-		}
+		public static string biomeName { get; private set; }
+
+		[Description("Current biome (tag, returns subBiome if landed).")]
+		public static string biome { get; private set; }
+		[Description("Current biome ID (spaces removed).")]
+		public static string biomeId { get; private set; }
+
 		[Description("Current main biome (tag, ignores landed).")]
-		public static string mainBiome
-		{
-			get
-			{
-				var v = vessel;
-				return v ? ScienceUtil.GetExperimentBiome(
-					v.mainBody, v.latitude, v.longitude)
-					: null;
-			}
-		}
+		public static string mainBiome { get; private set; }
+		[Description("Current main biome ID (spaces removed).")]
+		public static string mainBiomeId { get; private set; }
+
 		[Description("Current sub-biome (tag, valid only if landed).")]
-		public static string subBiome
+		public static string subBiome { get; private set; }
+		[Description("Current sub-biome ID (spaces removed).")]
+		public static string subBiomeId { get; private set; }
+
+		[Description("Science subject.")]
+		public class Subject
 		{
-			get
+			[Unsafe, Description("[KSP API](https://kerbalspaceprogram.com/api/class_science_subject.html)")]
+			public ScienceSubject native { get; private set; }
+			public static implicit operator ScienceSubject(Subject sub) => sub?.native;
+
+			[Description("Subject ID.")]
+			public string id => native.id;
+
+			[Unsafe, Description("[KSP API](https://kerbalspaceprogram.com/api/class_science_experiment.html)")]
+			public ScienceExperiment experiment { get; }
+
+			[Description("Subject space/celestial body.")]
+			public SpaceBody body { get; private set; }
+			[Description("Subject situation.")]
+			public ExperimentSituations situation { get; private set; }
+			[Description("Subject biome.")]
+			public string biome { get; private set; }
+
+			internal Subject(ScienceExperiment exp)
 			{
-				var v = vessel;
-				return v && v.landedAt?.Length > 0
-					? Vessel.GetLandedAtString(v.landedAt)
-					: null;
+				experiment = exp;
+				body = Science.body;
+				situation = Science.situation;
+				biome = Science.biome;
+				native = new ScienceSubject(exp, situation, body, biome, biomeName);
+			}
+			internal void Update()
+			{
+				var body = Science.body;
+				var situation = Science.situation;
+				var biomeId = Science.biomeId;
+				var id = FormattableString.Invariant(
+					$"{experiment.id}@{body.name}{situation}{biomeId}");
+				if (id == this.id)
+					return;
+				// maybe copy this to the previous, or update ourselves
+				native = new ScienceSubject(experiment, situation, body, Science.biome, Science.biomeName);
 			}
 		}
 	}

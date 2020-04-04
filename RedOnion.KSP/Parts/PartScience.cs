@@ -1,6 +1,7 @@
 using Experience.Effects;
 using RedOnion.Attributes;
 using RedOnion.ROS;
+using RedOnion.KSP.API;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -43,6 +44,25 @@ namespace RedOnion.KSP.Parts
 		[Unsafe, Description("[KSP API](https://kerbalspaceprogram.com/api/class_module_science_experiment.html)")]
 		public ModuleScienceExperiment native { get; }
 		public static implicit operator ModuleScienceExperiment(PartScience sci) => sci?.native;
+		[Unsafe, Description("[KSP API](https://kerbalspaceprogram.com/api/class_science_experiment.html)")]
+		public ScienceExperiment experiment => native.experiment;
+		[Description("Experiment ID.")]
+		public string experimentId => experiment.id;
+		[Description("Experiment title.")]
+		public string experimentTitle => experiment.experimentTitle;
+
+		Science.Subject _subject;
+		[WorkInProgress, Description("Science subject for the experiment and current situation.")]
+		public Science.Subject subject
+		{
+			get
+			{
+				if (_subject == null)
+					_subject = new Science.Subject(experiment);
+				else _subject.Update();
+				return _subject;
+			}
+		}
 
 		// note: may need to create linked list for multiple modules
 		protected PartScience(PartBase part, ModuleScienceExperiment module)

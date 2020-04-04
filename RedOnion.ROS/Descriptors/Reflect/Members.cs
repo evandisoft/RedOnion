@@ -334,6 +334,7 @@ namespace RedOnion.ROS
 				ref var it = ref prop.Add();
 				it.name = name;
 				it.kind = Prop.Kind.Event;
+				// TODO: cache these (by type - e.DeclaringType/null, e.EventHandlerType pair)
 				it.read = instance
 					// self => new Value(new EventProxy<T,E>(self, e))
 					? Expression.Lambda<Func<object, Value>>(

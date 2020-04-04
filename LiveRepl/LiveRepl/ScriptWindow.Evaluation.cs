@@ -115,6 +115,7 @@ namespace LiveRepl
 
 		void InitEvaluation()
 		{
+			ApiInit.Init();
 			engines["ROS"] = new RosManager();
 			engines["Lua"] = new KerbaluaManager();
 

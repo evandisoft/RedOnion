@@ -315,12 +315,7 @@ namespace RedOnion.ROS
 					if (op != OpCode.AddAssign && op != OpCode.SubAssign)
 						return false;
 					var evt = (IEventProxy)p.read(self.obj).obj;
-					if (!value.desc.Convert(ref value, evt.DelegateDescriptor))
-						return false;
-					if (op == OpCode.AddAssign)
-						evt.Add(ref value);
-					else evt.Remove(ref value);
-					return true;
+					return op == OpCode.AddAssign ? evt.Add(ref value) : evt.Remove(ref value);
 				}
 				if (op == OpCode.Assign)
 				{

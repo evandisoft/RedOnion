@@ -167,7 +167,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Target Name="AfterBuild">
-    <ZipDirectory SourceDirectory="..\GameData\RedOnion\Resources" Overwrite="True" DestinationFile="..\GameData\RedOnion\Resources.zip" />
+    <ZipDirectory SourceDirectory="..\Resources" Overwrite="True" DestinationFile="..\GameData\RedOnion\Resources.zip" />
     <ItemGroup>
       <OutputFiles Include="$(OutDir)**\*.dll" />
       <OutputFiles Include="$(OutDir)**\*.so" />
