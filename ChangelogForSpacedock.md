@@ -26,6 +26,7 @@ Just had a release (0.5.1)
 - launch.ros and control.ros: decouplers marked with `noauto` tag won't be auto-staged
 - control.ros: auto-staging disabled until throttling or executing node
 - control.ros: srf-retro landing assist and hohmann improved, can now circularize in different SOI
+- lua tutorial scripts removed: This was done to remove clutter. You can copy in the tutorial code if you want the tutorials back.
 
 ### ROS Changes:
 - fixed shadowing by loop variable (`var i; for var i...`)

@@ -93,6 +93,10 @@
       <Project>{7A943166-A67E-420A-BCA0-5231D57A18BD}</Project>
       <Name>Kerbalui</Name>
     </ProjectReference>
+    <ProjectReference Include="..\RedOnion.Common\RedOnion.Common.csproj">
+      <Project>{2D34D879-1A21-4F8F-BF49-38CED2B40406}</Project>
+      <Name>RedOnion.Common</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

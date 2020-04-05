@@ -147,15 +147,15 @@ namespace KerbaluaNUnit
 			//Assert.AreEqual(11, completions.Count);
 		}
 
-		[Test()]
-		public void MLUA_IntellisenseTest_LuaGlobalsMetatableCompletion()
-		{
-			Setup();
-			globals.MetaTable = RedOnion.KSP.API.LuaGlobals.Instance;
-			string source = "native";
-			var completions = GetCompletions(source);
-			Assert.AreEqual(1, completions.Count);
-		}
+		//[Test()]
+		//public void MLUA_IntellisenseTest_LuaGlobalsMetatableCompletion()
+		//{
+		//	Setup();
+		//	globals.MetaTable = RedOnion.KSP.API.LuaGlobals.Instance;
+		//	string source = "native";
+		//	var completions = GetCompletions(source);
+		//	Assert.AreEqual(1, completions.Count);
+		//}
 
 		[Test()]
 		public void MLUA_IntellisenseTest_NestedTablesCompletion()
@@ -243,15 +243,15 @@ namespace KerbaluaNUnit
 		//	//Assert.AreEqual(11, completions.Count);
 		//}
 
-		[Test()]
-		public void MLUA_IntellisenseTest_Bodies()
-		{
-			Setup();
-			globals.MetaTable = RedOnion.KSP.API.LuaGlobals.Instance;
-			string source = "ksp.bodies";
-			var completions = GetCompletions(source);
-			Assert.AreEqual(1, completions.Count);
-		}
+		//[Test()]
+		//public void MLUA_IntellisenseTest_Bodies()
+		//{
+		//	Setup();
+		//	globals.MetaTable = RedOnion.KSP.API.LuaGlobals.Instance;
+		//	string source = "ksp.bodies";
+		//	var completions = GetCompletions(source);
+		//	Assert.AreEqual(1, completions.Count);
+		//}
 
 		//[Test()]
 		//public void MLUA_IntellisenseTest_Bodies2()

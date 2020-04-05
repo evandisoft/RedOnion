@@ -89,7 +89,10 @@ namespace LiveRepl
 			}
 		}
 
-		//TODO: Button for complete reset - call ApiMain.Reset()
+		public void ResetAll()
+		{
+			ApiMain.Reset();
+		}
 
 		public void Terminate()
 		{
