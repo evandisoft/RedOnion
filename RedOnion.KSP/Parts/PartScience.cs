@@ -56,17 +56,38 @@ namespace RedOnion.KSP.Parts
 		public string experimentTitle => experiment.experimentTitle;
 
 		Science.Subject _subject;
+		TimeStamp _subjectUpdate = TimeStamp.never;
 		[WorkInProgress, Description("Science subject for the experiment and current situation.")]
 		public Science.Subject subject
 		{
 			get
 			{
 				if (_subject == null)
+				{
 					_subject = new Science.Subject(experiment);
-				else _subject.Update();
+					_subjectUpdate = Time.now;
+				}
+				else
+				{
+					var now = Time.now;
+					if (Time.now > _subjectUpdate)
+					{
+						_subjectUpdate = now;
+						_subject.Update();
+					}
+				}
 				return _subject;
 			}
 		}
+
+		[Description("Science returned to KSC.")]
+		public double completed => subject.completed;
+		[Description("Total obtainable science.")]
+		public double capacity => subject.capacity;
+		[Description("Science value (when returned to KSC).")]
+		public double value => subject.value;
+		[Description("Next science value (when returned to KSC).")]
+		public double nextValue => subject.nextValue;
 
 		// note: may need to create linked list for multiple modules
 		protected PartScience(PartBase part, ModuleScienceExperiment module)

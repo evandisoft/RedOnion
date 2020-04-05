@@ -92,6 +92,9 @@ namespace RedOnion.KSP.API
 		[Description("Current sub-biome ID (spaces removed).")]
 		public static string subBiomeId { get; private set; }
 
+		[Description("Career gain factor.")]
+		public static double gain => HighLogic.CurrentGame.Parameters.Career.ScienceGainMultiplier;
+
 		[Description("Science subject.")]
 		public class Subject
 		{
@@ -104,6 +107,9 @@ namespace RedOnion.KSP.API
 
 			[Unsafe, Description("[KSP API](https://kerbalspaceprogram.com/api/class_science_experiment.html)")]
 			public ScienceExperiment experiment { get; }
+
+			[Description("Title of the experiment")]
+			public string title => experiment.experimentTitle;
 
 			[Description("Subject space/celestial body.")]
 			public SpaceBody body { get; private set; }
@@ -118,7 +124,10 @@ namespace RedOnion.KSP.API
 				body = Science.body;
 				situation = Science.situation;
 				biome = Science.biome;
-				native = new ScienceSubject(exp, situation, body, biome, biomeName);
+				var id = Invariant(
+					$"{experiment.id}@{body.name}{situation}{biomeId}");
+				native = ResearchAndDevelopment.GetSubjectByID(id) ??
+					new ScienceSubject(exp, situation, body, biome, biomeName);
 			}
 			internal void Update()
 			{
@@ -129,9 +138,24 @@ namespace RedOnion.KSP.API
 					$"{experiment.id}@{body.name}{situation}{biomeId}");
 				if (id == this.id)
 					return;
-				// maybe copy this to the previous, or update ourselves
-				native = new ScienceSubject(experiment, situation, body, Science.biome, Science.biomeName);
+				native = ResearchAndDevelopment.GetSubjectByID(id) ??
+					new ScienceSubject(experiment, situation, body, Science.biome, Science.biomeName);
 			}
+
+			[Description("Science returned to KSC.")]
+			public double completed => native.science * gain;
+			[Description("Total obtainable science.")]
+			public double capacity => native.scienceCap * gain;
+			[Description("Science value (when returned to KSC).")]
+			public double value => gain * ResearchAndDevelopment.GetScienceValue(
+				experiment.baseValue * experiment.dataScale, this);
+			[Description("Next science value (when returned to KSC).")]
+			public double nextValue => gain * ResearchAndDevelopment.GetNextScienceValue(
+				experiment.baseValue * experiment.dataScale, this);
+
+			public override string ToString() => Value.Format(
+				$@"{completed,4:F1}/{capacity,4:F1}; {value,4:F1}|{nextValue,4:F1}: {
+					title}, {body.name}, {situation}, {biomeName}");
 		}
 	}
 }
