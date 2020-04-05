@@ -13,9 +13,13 @@ using RedOnion.KSP.ReflectionUtil;
 
 namespace RedOnion.KSP.API
 {
-	public static class ApiInit
+	public static class ApiMain
 	{
 		static bool done;
+		/// <summary>
+		/// To be called at least once before using <see cref="Globals"/>.
+		/// </summary>
+		/// <param name="core">Core to be used, <see cref="MunCore.Default"/> if null.</param>
 		public static void Init(MunOS.MunCore core = null)
 		{
 			if (done)
@@ -24,6 +28,14 @@ namespace RedOnion.KSP.API
 				core = MunOS.MunCore.Default;
 			core.BeforeExecute += Science.update;
 			done = true;
+		}
+		/// <summary>
+		/// Reset API - disable autopiloat, clear all subscriptions.
+		/// </summary>
+		public static void Reset()
+		{
+			Ship.DisableAutopilot();
+			Science.situationChanged.clear();
 		}
 	}
 

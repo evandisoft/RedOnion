@@ -64,6 +64,8 @@ namespace RedOnion.KSP.Tests
 				Assert.AreEqual(v, e);
 				v += 2;
 			}
+			list.clear();
+			Assert.AreEqual(0, list.count);
 		}
 	}
 }

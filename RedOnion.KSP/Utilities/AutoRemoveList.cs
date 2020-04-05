@@ -23,14 +23,16 @@ namespace RedOnion.KSP.Utilities
 		[Description("Number of subscription.")]
 		public int count => hooks.Count;
 
-		[Description("Subscribe to the list. Similar to `add` but returns auto-remove subscription.")]
+		[Description("Subscribe to the list. Similar to `add` but returns auto-remove subscription."
+			+ " This is default member and will be used when you call the object.")]
 		public AutoSubscription subscribe(T value)
 		{
 			var hook = add(value);
 			return hook == null ? null : new AutoSubscription(hook);
 		}
 
-		[Description("Add new item. Returns pure subscribtion (or null for duplicit item).")]
+		[Description("Add new item. Returns pure subscribtion (or null for duplicit item)." +
+			" Can also be accessed via `+=` operator in ROS.")]
 		public Subscription add(T value)
 		{
 			if (first == null)
@@ -60,7 +62,8 @@ namespace RedOnion.KSP.Utilities
 		protected virtual Subscription CreateSubscription(T value)
 			=> new Subscription(value, this);
 
-		[Description("Remove item. Returns the subscription on success, null if not found.")]
+		[Description("Remove item. Returns the subscription on success, null if not found." +
+			" Can also be accessed via `-=` operator in ROS.")]
 		public Subscription remove(T value)
 		{
 			if (first == null)
@@ -85,6 +88,31 @@ namespace RedOnion.KSP.Utilities
 				if (last) break;            // we know if it was last
 				it = next;                  // and next item did not change
 			}
+		}
+
+		[Description("Enumerate all subscriptions.")]
+		public IEnumerable<Subscription> subscriptions
+		{
+			get
+			{
+				if (first == null)
+					yield break;
+				for (var it = first; ;)
+				{//	subscribers can safely remove themselves when called
+					var next = it.next;         // because we prefetch the next item
+					var last = next == first;   // and pre-check termination
+					yield return it;            // so even if this leads to calling remove()
+					if (last) break;            // we know if it was last
+					it = next;                  // and next item did not change
+				}
+			}
+		}
+
+		[Description("Remove all subscriptions.")]
+		public void clear()
+		{
+			foreach (var sub in subscriptions)
+				sub.remove();
 		}
 
 		// to support += and -= syntax

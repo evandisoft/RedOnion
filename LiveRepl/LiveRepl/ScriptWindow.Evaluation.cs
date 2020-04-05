@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using Kerbalua.Scripting;
 using Kerbalui.Controls;
-using LiveRepl.Execution;
 using MunOS;
 using MunOS.Repl;
 using RedOnion.KSP.API;
@@ -15,20 +14,6 @@ namespace LiveRepl
 {
 	public partial class ScriptWindow
 	{
-		//public bool ScriptRunning => evaluationList.Count!=0;
-
-
-		//List<Evaluation> evaluationList = new List<Evaluation>();
-		//public void SetCurrentEvaluator(string evaluatorName)
-		//{
-		//	currentReplEvaluator = replEvaluators[evaluatorName];
-		//	uiparts.scriptEngineLabel.SetEngine(evaluatorName);
-		//}
-		//Dictionary<string,ReplEvaluator> replEvaluators=new Dictionary<string, ReplEvaluator>();
-		//public ReplEvaluator currentReplEvaluator;
-
-
-
 		// this needs some better logic because there is no way to know if there is any native callback (that may spawn a thread)
 		public bool ScriptRunning => CurrentProcess?.Count > 0;
 
@@ -115,7 +100,7 @@ namespace LiveRepl
 
 		void InitEvaluation()
 		{
-			ApiInit.Init();
+			ApiMain.Init();
 			engines["ROS"] = new RosManager();
 			engines["Lua"] = new KerbaluaManager();
 
