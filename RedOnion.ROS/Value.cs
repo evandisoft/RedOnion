@@ -167,7 +167,7 @@ namespace RedOnion.ROS
 		}
 
 		public Value(string s)
-			: this(Descriptor.String, s) { }
+			: this(s == null ? Descriptor.Null : Descriptor.String, s) { }
 		public override string ToString()
 			=> DebugString;
 		public string ToString(string format, IFormatProvider provider)
@@ -206,6 +206,14 @@ namespace RedOnion.ROS
 			=> lhs.desc.Equals(ref lhs, rhs);
 		public static bool operator !=(Value lhs, Value rhs)
 			=> !lhs.desc.Equals(ref lhs, rhs);
+		public static bool operator ==(Value lhs, object rhs)
+			=> lhs.desc.Equals(ref lhs, rhs);
+		public static bool operator !=(Value lhs, object rhs)
+			=> !lhs.desc.Equals(ref lhs, rhs);
+		public static bool operator ==(object lhs, Value rhs)
+			=> rhs.desc.Equals(ref rhs, lhs);
+		public static bool operator !=(object lhs, Value rhs)
+			=> !rhs.desc.Equals(ref rhs, lhs);
 		public override bool Equals(object obj)
 			=> desc.Equals(ref this, obj);
 		public override int GetHashCode()

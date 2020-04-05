@@ -233,6 +233,7 @@ namespace RedOnion.ROS.Tests
 			Assert.IsTrue(new Value(1.0) == new Value(1));
 			Assert.IsTrue(new Value("a") == new Value("a"));
 			Assert.IsTrue(new Value("a") != new Value("b"));
+			Assert.IsTrue(Value.Null == null);
 		}
 
 		[Test]
