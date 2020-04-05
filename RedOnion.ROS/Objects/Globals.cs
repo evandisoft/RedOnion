@@ -84,5 +84,23 @@ namespace RedOnion.ROS.Objects
 			Run?.Reset();
 			Object?.Reset();
 		}
+		public override bool Call(ref Value result, object self, Arguments args, bool create)
+		{
+			if (args.Length < 1 || args.Length > 3)
+				return false;
+			var name = args[0].ToStr();
+			var at = Find(name);
+			if (at < 0)
+			{
+				result = args.Length == 1 ? Value.Void : args[1];
+				Add(name, ref result);
+				return true;
+			}
+			ref var it = ref prop.items[at].value;
+			if (args.Length == 3 && it == args[2])
+				it = args[1];
+			result = it;
+			return true;
+		}
 	}
 }

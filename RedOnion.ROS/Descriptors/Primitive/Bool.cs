@@ -10,8 +10,6 @@ namespace RedOnion.ROS
 				: base("bool", typeof(bool), ExCode.Bool, TypeCode.Boolean) { }
 			public override object Box(ref Value self)
 				=> self.num.Bool;
-			public override bool Equals(ref Value self, object obj)
-				=> self.num.Bool.Equals(obj);
 			public override int GetHashCode(ref Value self)
 				=> self.num.Bool.GetHashCode();
 			public override string ToString(ref Value self, string format, IFormatProvider provider, bool debug)
@@ -37,6 +35,20 @@ namespace RedOnion.ROS
 					return true;
 				}
 				return false;
+			}
+
+			public override bool Equals(ref Value self, object obj)
+			{
+				if (!(obj is Value rhs))
+					return self.num.Bool.Equals(obj);
+				if (rhs.desc == this)
+					return self.num.Bool == rhs.num.Bool;
+				var rtype = rhs.desc.Primitive;
+				if (!rtype.IsNumberOrChar())
+					return false;
+				if (rtype != ExCode.Bool)
+					rhs.desc.Convert(ref rhs, Bool);
+				return self.num.Bool == rhs.num.Bool;
 			}
 		}
 	}

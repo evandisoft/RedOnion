@@ -202,6 +202,10 @@ namespace RedOnion.ROS
 		public static implicit operator Value(ushort v) => new Value(v);
 		public static implicit operator Value(ulong v) => new Value(v);
 
+		public static bool operator ==(Value lhs, Value rhs)
+			=> lhs.desc.Equals(ref lhs, rhs);
+		public static bool operator !=(Value lhs, Value rhs)
+			=> !lhs.desc.Equals(ref lhs, rhs);
 		public override bool Equals(object obj)
 			=> desc.Equals(ref this, obj);
 		public override int GetHashCode()
