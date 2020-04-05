@@ -97,6 +97,35 @@ print "{0} and {1} {2}", (abs start-now), (sum x, y), "seconds"
 ```
 
 
+## Variables
+
+Local variables are declared using `var x` or `var x = 1` syntax,
+global variables can either be directly assigned using `global.x = 1`
+(and can then be accessed as `x` without the `global` prefix)
+or by a call to `global` (or `globals` which is alias).
+First argument shall be name of the variable,
+second (optional) the value to assign to it if it does not exist yet
+(`void` if not provided) and optional third argument
+can be used to test for specific value if it already exists,
+to overwrite that value (only if it is same or does not exist).
+That can be used to create locks:
+
+```
+global.x = 1    // assign
+if x == 1       // access as any other variable
+  global "y", 2 // create new global variable, unless it already exists
+if "y" in globals // test existence of a property = global variable here
+  var x = 2     // shadow global.x
+  print x       // prints 2
+print x         // prints 1
+
+// lock - wait until we can change it from "none" to "me" or it did not exist
+until global("lock", "me", "none") == "me" do wait
+do_what_only_me_can_do
+lock = "none"   // unlock
+```
+
+
 ## Number types
 
 Beware that ROS distinguishes between various types of numbers,

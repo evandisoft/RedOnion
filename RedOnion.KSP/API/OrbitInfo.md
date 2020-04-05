@@ -4,7 +4,7 @@ Orbit/patch parameters.
 
 
 **Instance Properties:**
-- `native`: Orbit - \[`Unsafe`\] [KSP API](https://kerbalspaceprogram.com/api/class_orbit.html): Orbit parameters.
+- `native`: Orbit - \[`Unsafe`\] [KSP API](https://kerbalspaceprogram.com/api/class_orbit.html)
 - `body`: [SpaceBody](SpaceBody.md) - Orbited body.
 - `encounter`: bool - \[`WIP`\] This orbit-patch ends by encounter with another celestial body.
 - `escape`: bool - \[`WIP`\] This orbit-patch ends by escaping the SOI.

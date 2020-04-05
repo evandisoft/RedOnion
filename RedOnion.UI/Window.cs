@@ -7,6 +7,9 @@ using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UUI = UnityEngine.UI;
 
+//NOTE: Any attempt to derive Window from Panel would undermine the auto-collection mechanism,
+//..... becase there will almost always be a chain of links from e.g. button to the window
+
 namespace RedOnion.UI
 {
 	[Description(
@@ -28,11 +31,11 @@ It may get garbage-collected otherwise, but that can take time and is rather bac
 			public SceneFlags Scenes { get; set; }
 
 			// weak reference to main window to allow auto-dispose when there is no hard-reference to it
-			protected readonly WeakReference window;
+			protected readonly WeakReference<Window> window;
 
 			public FramePanel(Window window, bool visible = true)
 			{
-				this.window = new WeakReference(window);
+				this.window = new WeakReference<Window>(window);
 				Scenes = (SceneFlags)(1 << (int)HighLogic.LoadedScene);
 				Visible = visible;
 				GameObject.transform.SetParent(UIMasterController.Instance.dialogCanvas.transform, false);
@@ -76,12 +79,14 @@ It may get garbage-collected otherwise, but that can take time and is rather bac
 			}
 			protected override void Dispose(bool disposing)
 			{
-				if (!disposing || GameObject == null)
+				if (!disposing || RootObject == null)
 					return;
 				GameEvents.onGameSceneLoadRequested.Remove(SceneChange);
 				base.Dispose(disposing);
-				(window?.Target as Window)?.Dispose();
-				window.Target = null;
+				if (!window.TryGetTarget(out var wnd))
+					return;
+				window.SetTarget(null);
+				wnd.Dispose();
 			}
 			// this is here and not in window to not have any reference to the window from game-events
 			void SceneChange(GameScenes scene)
@@ -92,8 +97,8 @@ It may get garbage-collected otherwise, but that can take time and is rather bac
 			}
 			void CloseWindow(Button button)
 			{
-				var wnd = window?.Target as Window;
-				if (wnd != null) wnd.Close();
+				if (window.TryGetTarget(out var wnd))
+					wnd.Close();
 				else Dispose();
 			}
 		}
@@ -256,31 +261,31 @@ It may get garbage-collected otherwise, but that can take time and is rather bac
 			=> Content.AddVertical();
 
 		[Description("Add new label with specified text.")]
-		public Label AddLabel(string text)
+		public Label AddLabel(string text = "")
 			=> Content.AddLabel(text);
 
-		public TextBox AddText(string text)
+		public TextBox AddText(string text = "")
 			=> Content.AddText(text);
 		[Description("Add new label with specified text.")]
-		public TextBox AddTextBox(string text)
+		public TextBox AddTextBox(string text = "")
 			=> Content.AddTextBox(text);
 
 		[Description("Add new button with specified text.")]
-		public Button AddButton(string text)
+		public Button AddButton(string text = "")
 			=> Content.AddButton(text);
 		[Description("Add new button with specified text and click-action.")]
 		public Button AddButton(string text, Action<Button> click)
 			=> Content.AddButton(text, click);
 
 		[Description("Add new toggle-button with specified text.")]
-		public Button AddToggle(string text)
+		public Button AddToggle(string text = "")
 			=> Content.AddToggle(text);
 		[Description("Add new toggle-button with specified text and click-action.")]
 		public Button AddToggle(string text, Action<Button> click)
 			=> Content.AddToggle(text, click);
 
 		[Description("Add new exclusive toggle-button (radio button) with specified text.")]
-		public Button AddExclusive(string text)
+		public Button AddExclusive(string text = "")
 			=> Content.AddExclusive(text);
 		[Description("Add new exclusive toggle-button with specified text and click-action.")]
 		public Button AddExclusive(string text, Action<Button> click)

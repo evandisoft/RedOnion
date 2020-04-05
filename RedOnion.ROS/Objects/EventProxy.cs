@@ -10,8 +10,8 @@ namespace RedOnion.ROS.Objects
 	public interface IEventProxy
 	{
 		Descriptor DelegateDescriptor { get; }
-		void Add(ref Value value);
-		void Remove(ref Value value);
+		bool Add(ref Value value);
+		bool Remove(ref Value value);
 	}
 
 	/// <summary>
@@ -47,8 +47,32 @@ namespace RedOnion.ROS.Objects
 		public void Remove(Fn value) => _remove(Owner, value);
 
 		Descriptor IEventProxy.DelegateDescriptor => DelegateDescriptor;
-		void IEventProxy.Add(ref Value value) => Add((Fn)value.obj);
-		void IEventProxy.Remove(ref Value value) => Remove((Fn)value.obj);
+		bool IEventProxy.Add(ref Value value)
+		{
+			if (!value.desc.Convert(ref value, DelegateDescriptor))
+				return false;
+			Add((Fn)value.obj);
+			return true;
+		}
+		bool IEventProxy.Remove(ref Value value)
+		{
+			if (!value.desc.Convert(ref value, DelegateDescriptor))
+				return false;
+			Remove((Fn)value.obj);
+			return true;
+		}
+
+		public override bool Call(ref Value result, object self, Arguments args, bool create)
+		{
+			if (create || args.Length != 1)
+				return false;
+			var it = args[0];
+			if (!it.desc.Convert(ref it, DelegateDescriptor))
+				return false;
+			result = Value.Void;
+			Add((Fn)it.obj);
+			return true;
+		}
 
 		public override int Find(object self, string name, bool add = false)
 		{
@@ -142,8 +166,32 @@ namespace RedOnion.ROS.Objects
 		public void Remove(Fn value) => _remove(value);
 
 		Descriptor IEventProxy.DelegateDescriptor => DelegateDescriptor;
-		void IEventProxy.Add(ref Value value) => Add((Fn)value.obj);
-		void IEventProxy.Remove(ref Value value) => Remove((Fn)value.obj);
+		bool IEventProxy.Add(ref Value value)
+		{
+			if (!value.desc.Convert(ref value, DelegateDescriptor))
+				return false;
+			Add((Fn)value.obj);
+			return true;
+		}
+		bool IEventProxy.Remove(ref Value value)
+		{
+			if (!value.desc.Convert(ref value, DelegateDescriptor))
+				return false;
+			Remove((Fn)value.obj);
+			return true;
+		}
+
+		public override bool Call(ref Value result, object self, Arguments args, bool create)
+		{
+			if (create || args.Length != 1)
+				return false;
+			var it = args[0];
+			if (!it.desc.Convert(ref it, DelegateDescriptor))
+				return false;
+			result = Value.Void;
+			Add((Fn)it.obj);
+			return true;
+		}
 
 		public override int Find(object self, string name, bool add = false)
 		{

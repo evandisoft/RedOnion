@@ -9,6 +9,7 @@ using KSP.Localization;
 using System.Collections.Generic;
 using RedOnion.ROS;
 using RedOnion.Collections;
+using RedOnion.Debugging;
 
 namespace RedOnion.KSP.API
 {
@@ -74,8 +75,8 @@ namespace RedOnion.KSP.API
 			~Hooks() => Dispose(false);
 			public void Dispose()
 			{
-				GC.SuppressFinalize(this);
 				Dispose(true);
+				GC.SuppressFinalize(this);
 			}
 			protected virtual void Dispose(bool disposing)
 			{
@@ -115,7 +116,7 @@ namespace RedOnion.KSP.API
 				{
 					active = ship;
 					GameEvents.onVesselChange.Add(ship.VesselChange);
-					Value.DebugLog("Reusing active vessel {0}/{1} named {2}.", ship.native.id, ship.native.persistentId, ship.name);
+					MainLogger.DebugLog("Reusing active vessel {0}/{1} named {2}.", ship.native.id, ship.native.persistentId, ship.name);
 				}
 				return ship;
 			}
@@ -131,10 +132,10 @@ namespace RedOnion.KSP.API
 
 			if (FlightGlobals.ActiveVessel != native)
 			{
-				Value.DebugLog("Creating Ship for vessel id {0}/{1} named {2}.", native.id, native.persistentId, name);
+				MainLogger.DebugLog("Creating Ship for vessel id {0}/{1} named {2}.", native.id, native.persistentId, name);
 				return;
 			}
-			Value.DebugLog("Creating Ship for active vessel {0}/{1} named {2}.", native.id, native.persistentId, name);
+			MainLogger.DebugLog("Creating Ship for active vessel {0}/{1} named {2}.", native.id, native.persistentId, name);
 			active = this;
 			GameEvents.onVesselChange.Add(VesselChange);
 		}
@@ -143,8 +144,8 @@ namespace RedOnion.KSP.API
 		[Browsable(false), MoonSharpHidden]
 		public void Dispose()
 		{
-			GC.SuppressFinalize(this);
 			Dispose(true);
+			GC.SuppressFinalize(this);
 		}
 		protected virtual void Dispose(bool disposing)
 		{
@@ -153,7 +154,7 @@ namespace RedOnion.KSP.API
 				UI.Collector.Add(this);
 				return;
 			}
-			Value.DebugLog("Disposing Ship for vessel id {0}/{1} named {2}.", native.id, native.persistentId, name);
+			MainLogger.DebugLog("Disposing Ship for vessel id {0}/{1} named {2}.", native.id, native.persistentId, name);
 			cache.Remove(native);
 			if (ReferenceEquals(active, this))
 				ClearActive();
@@ -176,6 +177,7 @@ namespace RedOnion.KSP.API
 		[Unsafe, Description("Native `Vessel` for unrestricted access to [KSP API](https://kerbalspaceprogram.com/api/class_vessel.html)."
 			+ " Same as `FlightGlobals.ActiveVessel` if accessed through global `ship`.")]
 		public Vessel native { get; private set; }
+		public static implicit operator Vessel(Ship ship) => ship?.native;
 
 		[Description("Name of the ship (vehicle/vessel).")]
 		public string name
@@ -257,6 +259,8 @@ namespace RedOnion.KSP.API
 		public EngineSet engines => parts.engines;
 		[Description("All sensors.")]
 		public ReadOnlyList<Sensor> sensors => parts.sensors;
+		[WorkInProgress, Description("All science modules.")]
+		public ReadOnlyList<PartScience> science => parts.science;
 
 		#endregion
 
@@ -464,7 +468,7 @@ namespace RedOnion.KSP.API
 		[Description("Angular momentum \\[L = Iω, kg⋅m²⋅deg/s=N⋅m⋅s⋅deg] aka moment of momentum or rotational momentum.")]
 		public Vector angularMomentum => new Vector((Vector3d)native.angularMomentum * RosMath.Rad2Deg);
 		[Description("Moment of inertia \\[I, kg⋅m²=N⋅m⋅s²] aka angular mass or rotational inertia.")]
-		public Vector3d momentOfInertia => new Vector(native.MOI);
+		public Vector momentOfInertia => new Vector(native.MOI);
 
 		protected TimeStamp _torqueStamp;
 		protected Vector _maxTorque, _maxVacuumTorque;

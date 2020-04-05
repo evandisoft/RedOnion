@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using RedOnion.Debugging;
 using RedOnion.ROS.Objects;
 using RedOnion.ROS.Parsing;
 using RedOnion.ROS.Utilities;
@@ -397,7 +398,7 @@ namespace RedOnion.ROS
 					AvgCount = _avgCount / _avgSamples;
 					MaxMilli = _peakMilli;
 					MaxCount = _peakCount;
-					Value.DebugLog($"AVG: {AvgMilli,5:F2}ms {AvgCount,4:F2}i MAX: {MaxMilli,5:F2}ms {MaxCount,4:F2}i");
+					MainLogger.DebugLog($"AVG: {AvgMilli,5:F2}ms {AvgCount,4:F2}i MAX: {MaxMilli,5:F2}ms {MaxCount,4:F2}i");
 					_avgMilli = 0;
 					_avgCount = 0;
 					_avgSamples = 0;
@@ -422,7 +423,7 @@ namespace RedOnion.ROS
 						{
 							var countdown = Math.Min(StepCountdown, TotalCountdown);
 #if DEBUG
-							if (_debug) Value.DebugLog($"{loop.name}: {countdown}/{TotalCountdown} {CountdownPercent}/{UpdatePercent}/{downtoPercent}");
+							if (_debug) MainLogger.DebugLog($"{loop.name}: {countdown}/{TotalCountdown} {CountdownPercent}/{UpdatePercent}/{downtoPercent}");
 #endif
 							if (e.Core == null)
 							{
@@ -436,7 +437,7 @@ namespace RedOnion.ROS
 						} while (e.Core.Exit == ExitCode.Countdown
 						&& CountdownPercent > downtoPercent && UpdatePercent > downtoPercent);
 #if DEBUG
-						if (_debug) Value.DebugLog($"{loop.name}: {e.Core.Exit} {TotalCountdown} {CountdownPercent}/{UpdatePercent}/{downtoPercent}");
+						if (_debug) MainLogger.DebugLog($"{loop.name}: {e.Core.Exit} {TotalCountdown} {CountdownPercent}/{UpdatePercent}/{downtoPercent}");
 #endif
 						if (!e.Core.Paused)
 						{

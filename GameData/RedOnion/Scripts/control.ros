@@ -52,11 +52,15 @@ def control ship, target, x, y
     if self.dirsubs != null
       self.dirsubs.remove
       self.dirsubs = null
+    autoStage = false
     autopilot.disable
     autopilot.resetSAS
-    autoStage = false
+    autopilot.userRollFactor = nan
     if fn != null and (btn == null || btn.pressed)
+      autopilot.userRollFactor = 1
       self.dirsubs = system.update def
+        autoStage = user.throttle > 0
+        autopilot.killRot = autopilot.SAS
         autopilot.direction = fn()
 //create button that controls direction
   def xbtn parent, text, initOrSteer, steer
@@ -75,9 +79,10 @@ def control ship, target, x, y
       if self.dirsubs != null
         self.dirsubs.remove
         self.dirsubs = null
+      autoStage = false
       autopilot.disable
       autopilot.resetSAS
-      autoStage = false
+      autopilot.userRollFactor = nan
       if fn != null and (btn == null || btn.pressed)
         fn()
     btn.width = 80
@@ -87,10 +92,8 @@ def control ship, target, x, y
   var blk1 = btns.addVertical()
   var row = blk1.addHorizontal()
   var bProgr  = xbtn row, "Progr.", def
-    autoStage = user.throttle > 0
     return mSrf.pressed ? ship.srfvel : ship.velocity
   var bRetro  = xbtn row, "Retro.", def
-    autoStage = user.throttle > 0
     if mObt.pressed
       return -ship.velocity
     if ship.splashed or ship.landed
@@ -110,36 +113,32 @@ def control ship, target, x, y
     var mag = vec.size
     var lim = math.min 90, mag + math.max(1, mag-grav)^1.4
     var ang = ship.away.angle dir
-    var cos = math.deg.cos ang
-    var hrz = vec.project(ship.away).size
+    var vrt = vec.project(ship.away).size
     if ang > 90
-      hrz = -hrz
+      vrt = -vrt
     if ang > lim
       dir = ship.away.rotate lim, ship.away.cross dir
-      cos = math.deg.cos lim
-    autopilot.throttle = math.min user.throttle, (grav - 0.5)/acc/cos +
-      (hrz < 0 ? hrz : mag) / (acc-grav)
-    //todo: add user controls
-    //todo: add button for hovering
-    if time.since(report) >= 1
+    var cos = math.deg.cos ship.away.angle ship.forward
+    var prev = autopilot.throttle
+    autopilot.throttle = math.min user.throttle,
+      ((grav - 0.5)/acc + vrt/(acc-grav))/cos
+    if time.since(report) >= 1 or math.abs(prev-autopilot.throttle) >= 0.1
       report = time()
-      print "V: {0,5:F1}/{1,5:F1} A: {2,5:F1}/{3,4:F1} C: {4:F4}", mag, hrz, acc, grav, 1-cos
+      print "V:{0,5:F1}/{1,5:F1} A:{2,5:F1}/{3,4:F1} C:{4:F4} T:{5:F2}/{6:F2}",
+        mag, vrt, acc, grav, 1-cos, autopilot.throttle, prev
     return dir
 
   row = blk1.addHorizontal()
   var bNormal = xbtn row, "Normal", def
-    autoStage = user.throttle > 0
     return ship.velocity.cross ship.away
   var bAntiN  = xbtn row, "Anti-N", def
-    autoStage = user.throttle > 0
     return -ship.velocity.cross ship.away
   row = blk1.addHorizontal()
   var bRadOut = xbtn row, "Rad-OUT", def
-    autoStage = user.throttle > 0
     return ship.velocity.cross ship.away.cross ship.velocity
-  var bRadIn  = xbtn row, "Rad-IN", def =>
-    autoStage = user.throttle > 0
+  var bRadIn  = xbtn row, "Rad-IN", def
     return -ship.velocity.cross ship.away.cross ship.velocity
+
   row = blk1.addHorizontal()
   var unlock = row.addExclusive2 "UNLOCK", lockdir.bind null
   unlock.flexWidth = 1
@@ -152,7 +151,6 @@ def control ship, target, x, y
   row = blk2.addHorizontal()
   var bTowards = xbtn row, "Towards", def
     prevTgtBtn = bTowards
-    autoStage = user.throttle > 0
     var target = ship.target ?? self.target
     if target != null
       var ctl = ship.controlPart
@@ -163,7 +161,6 @@ def control ship, target, x, y
     return vector.none
   var bAway = xbtn row, "Away Fr.", def
     prevTgtBtn = bAway
-    autoStage = user.throttle > 0
     var target = ship.target ?? self.target
     if target != null
       return ship.position - target.position
@@ -173,12 +170,9 @@ def control ship, target, x, y
   row = blk2.addHorizontal()
   var bMatchSpeed = xbtn row, "Match Speed", def
     prevTgtBtn = bMatchSpeed
-    autoStage = user.throttle > 0
     var dv = vector.none
     var target = ship.target ?? self.target
-    if target == null
-      autopilot.killRot = true
-    else
+    if target != null
       if target is types.part
         target = target.ship
       dv = target.velocity-ship.velocity
@@ -234,7 +228,8 @@ def control ship, target, x, y
     warpDelay = null
     report = nan
     dvMin = inf
-    ship.sas = true
+    autopilot.killRot = true
+    autopilot.userRollFactor = 1
   def execSteer
     if bAbort.pressed
       return vector.none
@@ -245,6 +240,7 @@ def control ship, target, x, y
       bAbort.press
       return vector.none
     autoStage = true
+    autopilot.killRot = true
     var dv = nde.deltav
     var xt = 0.5 * stage.burnTime dv.size
     var dt = nde.eta - xt
@@ -253,9 +249,8 @@ def control ship, target, x, y
     if dt > 30 and time.warp.ready
       if warpDelay == null
         warpDelay = time()
-        ship.sas = true
       else if (time.since(warpDelay) >= 1 and d < 1
-        and ship.angularVelocity.size < 0.1)
+        and ship.angularVelocity.size < 0.3)
         warpDelay = null
         var to = time() + dt - (dt > 300 ? 300 : 10)
         time.warp.to to
@@ -400,9 +395,10 @@ def control ship, target, x, y
       var p2 = its.positionAt(t2)-its.body.position
       r2 = r3 + p2.size
       var p3 = p1.normalized * -r2
-      var ad = p2.angle p3, ship.north
+      var ad = p2.angle p3, ship.velocity.cross ship.away
       if r2 < r1; ad = -ad
       var d2 = ad/(360/math.min(its.period,our.period) - 360/math.max(its.period,our.period))
+      if guard > 3; d2 *= 1.3 - 0.1*guard
       var d3 = math.abs d2
       //todo: we may go into the past with this, would need to add one period
       dt += d2

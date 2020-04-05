@@ -2,6 +2,8 @@
 
 **Base Class:** [Simple](Simple.md)
 
+**Derived:** [ScrollBox](ScrollBox.md)
+
 `UI.Panel` is the basis for more complex layout. You will usually nest few panels with alternating
 `Layout.Horizontal` and `Layout.Vertical` (do not forget to assign its `Layout` property,
 it is set to `Layout.None` when the panel is created).

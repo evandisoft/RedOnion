@@ -90,10 +90,12 @@
     <Compile Include="API\Globals.cs" />
     <Compile Include="API\Node.cs" />
     <Compile Include="API\OrbitInfo.cs" />
+    <Compile Include="API\Science.cs" />
     <Compile Include="Namespaces\Types.cs" />
     <Compile Include="Parts\EngineSet.cs" />
     <Compile Include="Parts\PartChildren.cs" />
     <Compile Include="Parts\PartValues.cs" />
+    <Compile Include="Parts\PartScience.cs" />
     <Compile Include="Parts\Stages.cs" />
     <Compile Include="ROS\RosGlobals.cs" />
     <Compile Include="ROS\RosManager.cs" />
@@ -102,6 +104,7 @@
     <Compile Include="Utilities\InteropUtilities.cs" />
     <Compile Include="API\VectorUtils.cs" />
     <Compile Include="Utilities\MultiValueDictionary.cs" />
+    <Compile Include="Utilities\AutoRemoveList.cs" />
     <Compile Include="Utilities\Properties.cs" />
     <Compile Include="Utilities\ReadOnlyList.cs" />
     <Compile Include="Utilities\ReadOnlySet.cs" />

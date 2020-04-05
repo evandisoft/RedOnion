@@ -18,7 +18,7 @@ Maneuver node.
   - Create new maneuver node for active ship, specifying eta and burn vector. See [`deltav` property](#deltav) for more details.
 
 **Instance Properties:**
-- `native`: ManeuverNode - \[`Unsafe`\] KSP API.
+- `native`: ManeuverNode - \[`Unsafe`\] [KSP API](https://kerbalspaceprogram.com/api/class_maneuver_node.html)
 - `ship`: [Ship](Ship.md) - Ship the node belongs to.
 - `time`: [TimeStamp](TimeStamp.md) - Planned time for the maneuver.
 - `eta`: [TimeDelta](TimeDelta.md) - Seconds until the maneuver.

@@ -4,8 +4,6 @@ namespace RedOnion.ROS
 {
 	public partial class Descriptor
 	{
-		public static readonly Descriptor Void = new OfVoid();
-
 		/// <summary>
 		/// Represents no value (action does not return anything)
 		/// and will cause errors on any attemt to use it in any operation.

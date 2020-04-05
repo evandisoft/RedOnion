@@ -1,3 +1,5 @@
+using RedOnion.Attributes;
+using RedOnion.Debugging;
 using RedOnion.ROS.Objects;
 using System;
 using System.Collections.Generic;
@@ -58,7 +60,9 @@ namespace RedOnion.ROS
 					&& name?.Length > 0
 					&& char.IsUpper(name, 0)
 					&& (name.Length == 1
-					|| char.IsLower(name, 1)))
+					|| (char.IsLower(name, 1)
+					&& (name.Length != 3
+					|| char.IsLower(name, 2)))))
 					name = char.ToLowerInvariant(name[0]) + name.Substring(1);
 				return name;
 			}
@@ -83,19 +87,19 @@ namespace RedOnion.ROS
 				if (member is FieldInfo f)
 				{
 					if (idx >= 0)
-						Value.DebugLog("Conflicting name: {0}.{1} [instace: {2}; field]", Type.Name, name, instance);
+						MainLogger.DebugLog("Conflicting name: {0}.{1} [instace: {2}; field]", Type.Name, name, instance);
 					else ProcessField(name, f, instance, ref dict);
 				}
 				else if (member is PropertyInfo p)
 				{
 					if (idx >= 0)
-						Value.DebugLog("Conflicting name: {0}.{1} [instace: {2}; property]", Type.Name, name, instance);
+						MainLogger.DebugLog("Conflicting name: {0}.{1} [instace: {2}; property]", Type.Name, name, instance);
 					else ProcessProperty(name, p, instance, ref dict);
 				}
 				else if (member is EventInfo e)
 				{
 					if (idx >= 0)
-						Value.DebugLog("Conflicting name: {0}.{1} [instace: {2}; event]", Type.Name, name, instance);
+						MainLogger.DebugLog("Conflicting name: {0}.{1} [instace: {2}; event]", Type.Name, name, instance);
 					else ProcessEvent(name, e, instance, ref dict);
 				}
 				else if (member is MethodInfo m)
@@ -104,7 +108,7 @@ namespace RedOnion.ROS
 					{
 						ref var slot = ref prop.items[idx];
 						if (slot.kind != Prop.Kind.Method && slot.kind != Prop.Kind.MethodGroup)
-							Value.DebugLog("Conflicting name: {0}.{1} [instace: {2}; method]", Type.Name, name, instance);
+							MainLogger.DebugLog("Conflicting name: {0}.{1} [instace: {2}; method]", Type.Name, name, instance);
 						else if (slot.kind == Prop.Kind.Method)
 						{
 							var call = slot.read(null);
@@ -126,7 +130,7 @@ namespace RedOnion.ROS
 				if (browsable.Length == 1 && !((BrowsableAttribute)browsable[0]).Browsable)
 					return;
 
-				Value.ExtraLog("Processing nested type {0}.{1}", Type.Name, nested.Name);
+				MainLogger.ExtraLog("Processing nested type {0}.{1}", Type.Name, nested.Name);
 
 				if (sdict == null)
 					sdict = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
@@ -149,7 +153,7 @@ namespace RedOnion.ROS
 				if (convertAttrs.Length == 1)
 					convert = ((ConvertAttribute)convertAttrs[0]).Type;
 
-				Value.ExtraLog("Processing field {0}.{1} [instace: {2}, convert: {3}]",
+				MainLogger.ExtraLog("Processing field {0}.{1} [instace: {2}, convert: {3}]",
 					Type.Name, f.Name, instance, convert?.Name ?? "False");
 
 				if (dict == null)
@@ -212,7 +216,7 @@ namespace RedOnion.ROS
 				if (convertAttrs.Length == 1)
 					convert = ((ConvertAttribute)convertAttrs[0]).Type;
 
-				Value.ExtraLog("Processing property {0}.{1} [instace: {2}, convert: {3}]",
+				MainLogger.ExtraLog("Processing property {0}.{1} [instace: {2}, convert: {3}]",
 					Type.Name, p.Name, instance, convert?.Name ?? "False");
 
 				var iargs = p.GetIndexParameters();
@@ -334,6 +338,7 @@ namespace RedOnion.ROS
 				ref var it = ref prop.Add();
 				it.name = name;
 				it.kind = Prop.Kind.Event;
+				// TODO: cache these (by type - e.DeclaringType/null, e.EventHandlerType pair)
 				it.read = instance
 					// self => new Value(new EventProxy<T,E>(self, e))
 					? Expression.Lambda<Func<object, Value>>(
@@ -360,9 +365,19 @@ namespace RedOnion.ROS
 			{
 #if DEBUG
 				if (!m.IsSpecialName && !m.IsGenericMethod && !m.ReturnType.IsByRef)
-					Value.ExtraLog("Processing method {0}.{1} [instace: {2}, args: {3}]",
+					MainLogger.ExtraLog("Processing method {0}.{1} [instace: {2}, args: {3}]",
 						Type.Name, m.Name, instance, m.GetParameters().Length);
 #endif
+				if (m.Name == "op_Implicit")
+				{
+					implConvert.Add(new KeyValuePair<Type, Func<object, object>>(
+						m.ReturnType, Expression.Lambda<Func<object, object>>(
+							Expression.Convert(Expression.Convert(
+								Expression.Convert(SelfParameter, Type),
+								m.ReturnType, m), typeof(object)),
+							SelfParameter).Compile()));
+					return;
+				}
 				var value = ReflectMethod(m);
 				if (value.IsVoid)
 					return;
@@ -385,7 +400,7 @@ namespace RedOnion.ROS
 				var args = c.GetParameters();
 				if (args.Length == 0 || args[0].RawDefaultValue != DBNull.Value)
 				{
-					Value.ExtraLog("Found default {0}#ctor [args: {1}]",
+					MainLogger.ExtraLog("Found default {0}#ctor [args: {1}]",
 						Type.Name, args.Length);
 					if (defaultCtor == null || c.GetParameters().Length < defaultCtor.GetParameters().Length)
 						defaultCtor = c;

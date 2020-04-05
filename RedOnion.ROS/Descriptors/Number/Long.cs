@@ -10,8 +10,6 @@ namespace RedOnion.ROS
 				: base("long", typeof(long), ExCode.Long, TypeCode.Int64) { }
 			public override object Box(ref Value self)
 				=> self.num.Long;
-			public override bool Equals(ref Value self, object obj)
-				=> self.num.Long.Equals(obj);
 			public override int GetHashCode(ref Value self)
 				=> self.num.Long.GetHashCode();
 			public override string ToString(ref Value self, string format, IFormatProvider provider, bool debug)
@@ -90,6 +88,23 @@ namespace RedOnion.ROS
 						return true;
 				}
 				return false;
+			}
+			public override bool Equals(ref Value self, object obj)
+			{
+				if (!(obj is Value rhs))
+					return self.num.Long.Equals(obj);
+				if (rhs.desc == this)
+					return self.num.Long == rhs.num.Long;
+				var rtype = rhs.desc.Primitive;
+				if (!rtype.IsNumberOrChar())
+					return false;
+				if (rtype.IsFloatPoint())
+				{
+					if (rtype != ExCode.Double)
+						rhs.desc.Convert(ref rhs, Double);
+					return self.num.Long == rhs.num.Double;
+				}
+				return self.num.Long == rhs.num.Long;
 			}
 			public override bool Binary(ref Value lhs, OpCode op, ref Value rhs)
 			{

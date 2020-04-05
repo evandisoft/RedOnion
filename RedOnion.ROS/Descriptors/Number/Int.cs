@@ -10,11 +10,6 @@ namespace RedOnion.ROS
 				: base("int", typeof(int), ExCode.Int, TypeCode.Int32) { }
 			public override object Box(ref Value self)
 				=> self.num.Int;
-			// TODO: comparision to double and other types
-			// ..... 3.Equals(3.0) surprisingly returns false
-			// ..... while 3.0.Equals(3) returns true (as 3 probably gets promoted to 3.0)
-			public override bool Equals(ref Value self, object obj)
-				=> self.num.Int.Equals(obj);
 			public override int GetHashCode(ref Value self)
 				=> self.num.Int.GetHashCode();
 			public override string ToString(ref Value self, string format, IFormatProvider provider, bool debug)
@@ -105,6 +100,25 @@ namespace RedOnion.ROS
 						return true;
 				}
 				return false;
+			}
+			public override bool Equals(ref Value self, object obj)
+			{
+				if (!(obj is Value rhs))
+					return self.num.Int.Equals(obj);
+				if (rhs.desc == this)
+					return self.num.Int == rhs.num.Int;
+				var rtype = rhs.desc.Primitive;
+				if (!rtype.IsNumberOrChar())
+					return false;
+				if (rtype.IsFloatPoint())
+				{
+					if (rtype != ExCode.Double)
+						rhs.desc.Convert(ref rhs, Double);
+					return self.num.Int == rhs.num.Double;
+				}
+				return rtype.IsSigned()
+					? self.num.Long == rhs.num.Long
+					: (ulong)self.num.Long == rhs.num.ULong;
 			}
 			public override bool Binary(ref Value lhs, OpCode op, ref Value rhs)
 			{

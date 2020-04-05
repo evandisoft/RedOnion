@@ -71,7 +71,7 @@ namespace Kerbalua.Completion.CompletionTypes
 			}
 
 			// This can be active when we have agreed on an attribute to use.
-			if (type.GetCustomAttribute<SafeProps>()!=null)
+			if (type.GetCustomAttribute<SafePropsAttribute>()!=null)
 			{
 				if (CompletionReflectionUtil.TryGetProperty(type, getMember.Name, out PropertyInfo propertyInfo, CompletionReflectionUtil.AllPublic))
 				{

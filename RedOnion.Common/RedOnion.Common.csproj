@@ -41,13 +41,10 @@
     <Compile Include="Attributes\DocBuildAttribute.cs" />
     <Compile Include="Collections\ListCore.cs" />
     <Compile Include="Collections\GenQueue.cs" />
+    <Compile Include="Debugging\MainLogger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilities\StringWrapper.cs" />
     <Compile Include="Debugging\QueueLogger.cs" />
-  </ItemGroup>
-  <ItemGroup />
-  <ItemGroup>
-    <Folder Include="Debugging\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

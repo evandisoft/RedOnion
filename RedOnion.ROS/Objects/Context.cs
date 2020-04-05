@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using RedOnion.Collections;
+using RedOnion.Debugging;
 
 namespace RedOnion.ROS.Objects
 {
@@ -330,7 +331,7 @@ namespace RedOnion.ROS.Objects
 
 					if (!dict.ContainsKey(name))
 					{
-						Value.DebugLog("SeparateVars: '{0}' does not exist in '{1}'.", name, Name);
+						MainLogger.DebugLog("SeparateVars: '{0}' does not exist in '{1}'.", name, Name);
 						continue;
 					}
 

@@ -1,4 +1,6 @@
+using RedOnion.Attributes;
 using RedOnion.Collections;
+using RedOnion.Debugging;
 using RedOnion.ROS.Objects;
 using System;
 using System.Collections;
@@ -46,6 +48,7 @@ namespace RedOnion.ROS
 			protected Action<object, string, Value> strIndexSet;
 			protected ConstructorInfo defaultCtor;
 			protected string callableMemberName;
+			protected ListCore<KeyValuePair<Type, Func<object, object>>> implConvert;
 
 			public Reflected(Type type) : this(type.Name, type) { }
 			public Reflected(string name, Type type) : base(name, type)
@@ -59,7 +62,7 @@ namespace RedOnion.ROS
 					}
 					catch (Exception ex)
 					{
-						Value.Log("Exception {0} when processing static {1}.{2}: {3}",
+						MainLogger.Log("Exception {0} when processing static {1}.{2}: {3}",
 							ex.GetType(), Type.Name, member.Name, ex.Message);
 					}
 				}
@@ -71,7 +74,7 @@ namespace RedOnion.ROS
 					}
 					catch (Exception ex)
 					{
-						Value.Log("Exception {0} when processing {1}.{2}: {3}",
+						MainLogger.Log("Exception {0} when processing {1}.{2}: {3}",
 							ex.GetType(), Type.Name, member.Name, ex.Message);
 					}
 				}
@@ -83,7 +86,7 @@ namespace RedOnion.ROS
 					}
 					catch (Exception ex)
 					{
-						Value.Log("Exception {0} when processing {1}.{2}: {3}",
+						MainLogger.Log("Exception {0} when processing {1}.{2}: {3}",
 							ex.GetType(), Type.Name, nested.Name, ex.Message);
 					}
 				}
@@ -116,6 +119,7 @@ namespace RedOnion.ROS
 						ref var it = ref prop.items[at];
 						if (it.read == null)
 							throw InvalidOperation("{0}.{1} is not readable", Name, callableMemberName);
+						self = result.obj;
 						result = it.read(result.obj);
 						switch (it.kind)
 						{
@@ -171,8 +175,19 @@ namespace RedOnion.ROS
 				return false;
 			}
 			public override bool Convert(ref Value self, Descriptor to)
-				=> self.obj is IConvert cvt && cvt.Convert(ref self, to)
-				|| base.Convert(ref self, to);
+			{
+				if (self.obj is IConvert cvt && cvt.Convert(ref self, to))
+					return true;
+				foreach (var mtd in implConvert)
+				{
+					if (to.Type == mtd.Key)
+					{
+						self = new Value(mtd.Value(self.Box()));
+						return true;
+					}
+				}
+				return base.Convert(ref self, to);
+			}
 
 			public override int Find(object self, string name, bool add)
 			{
@@ -260,8 +275,8 @@ namespace RedOnion.ROS
 				}
 				catch
 				{
-					Value.DebugLog($"Exception in {Name}.Set");
-					Value.DebugLog($"Self: {self}; at: {at}; op: {op}; value: {value}; prop: {NameOf(this, at)}");
+					MainLogger.DebugLog($"Exception in {Name}.Set");
+					MainLogger.DebugLog($"Self: {self}; at: {at}; op: {op}; value: {value}; prop: {NameOf(this, at)}");
 					throw;
 				}
 			}
@@ -303,12 +318,8 @@ namespace RedOnion.ROS
 					if (op != OpCode.AddAssign && op != OpCode.SubAssign)
 						return false;
 					var evt = (IEventProxy)p.read(self.obj).obj;
-					if (!value.desc.Convert(ref value, evt.DelegateDescriptor))
-						return false;
-					if (op == OpCode.AddAssign)
-						evt.Add(ref value);
-					else evt.Remove(ref value);
-					return true;
+					self = value;
+					return op == OpCode.AddAssign ? evt.Add(ref value) : evt.Remove(ref value);
 				}
 				if (op == OpCode.Assign)
 				{

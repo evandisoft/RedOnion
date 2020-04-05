@@ -1,12 +1,22 @@
 using System;
 using System.Collections;
 using NUnit.Framework;
+using RedOnion.Debugging;
 using RedOnion.ROS.Objects;
 
 namespace RedOnion.ROS.Tests
 {
 	public class CoreTests : Processor.WithEvents
 	{
+		public CoreTests()
+		{
+			MainLogger.LogListener = LogListener;
+		}
+		public static void LogListener(string msg)
+			=> System.Diagnostics.Debug.WriteLine(msg);
+		public override void Log(string msg)
+			=> System.Diagnostics.Debug.WriteLine(msg);
+
 		public void Test(string script, int countdown = 1000)
 		{
 			try
@@ -129,6 +139,11 @@ namespace RedOnion.ROS.Tests
 			Test(2.0, "v += 1.0"); // double
 			Test(1.5, "v = math.clamp v, math.max(0, 1.0), math.min(1.5, 2)");
 			//Test("var i, j");//TODO: maybe only as statement, because `if var x = true, y = false` could be a problem (return last?)
+
+			Test(1, "global \"z\", 1");
+			Test(1, "global \"z\", 2");
+			Test(1, "global \"z\", 2, 0");
+			Test(2, "global \"z\", 2, 1");
 		}
 
 		[Test]
@@ -190,6 +205,8 @@ namespace RedOnion.ROS.Tests
 			Test(true,		"\"a\" !== \"b\"");
 			Test(true,		"\"a\" == \"A\"");	// equality is case insensitive
 			Test(false,		"\"a\" === \"A\"");	// identity is case sensitive
+			Test(true,		"1 == \"1\"");      // equality of string and number
+			Test(true,		"1 !== \"1\"");     // no identity of string and number
 
 			// this was causing some problems (fixed)
 			Test("var s = \"hello\"");
@@ -206,6 +223,21 @@ namespace RedOnion.ROS.Tests
 			// property existence tests (comes from JavaScript)
 			Test(true, "\"length\" in s");
 			Test(false, "\"blah\" in s");
+
+			// C# equality tests
+			Assert.IsTrue(new Value(1) == new Value(1));
+			Assert.IsFalse(new Value(1) == new Value(2));
+			Assert.IsFalse(new Value("1") == new Value(1));
+			Assert.IsFalse(new Value(1) == new Value("1"));
+			Assert.IsTrue(new Value(1) == new Value(1.0));
+			Assert.IsTrue(new Value(1.0) == new Value(1));
+			Assert.IsTrue(new Value("a") == new Value("a"));
+			Assert.IsTrue(new Value("a") != new Value("b"));
+			Assert.IsTrue(Value.Null == null);
+			Assert.IsTrue(true == Value.True);
+			Assert.IsFalse(double.NaN == Value.NaN); // nan does not compare to itself
+			Assert.IsTrue(1.0 == new Value(1.0));
+			Assert.IsTrue(2.0 != new Value(1.0));
 		}
 
 		[Test]

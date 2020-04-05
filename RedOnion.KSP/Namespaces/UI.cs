@@ -13,7 +13,7 @@ namespace RedOnion.KSP.Namespaces
 
 		[Description("Window - all elements must belong to some window.")]
 		public static readonly Type Window = typeof(UI_Window);
-		[Description("Scene flags for limiting life-span of windows when switching scenes. (KSP)")]
+		[Description("Scene flags for limiting life-span of windows when switching scenes.")]
 		public static readonly Type SceneFlags = typeof(UI.SceneFlags);
 
 		[Description("Anchors for specifying where to place elements (fill, center, ...)")]
@@ -52,5 +52,10 @@ namespace RedOnion.KSP.Namespaces
 		public static readonly Type Image = typeof(UI.Image);
 		[Description("UnityEngine.UI.Image.Type")]
 		public static readonly Type ImageType = typeof(UnityEngine.UI.Image.Type);
+
+		[WorkInProgress, Description("Scrollable panel.")]
+		public static readonly Type ScrollBox = typeof(UI.ScrollBox);
+		[WorkInProgress, Description("Scroll bar / slider.")]
+		public static readonly Type Scrollbar = typeof(UI.Scrollbar);
 	}
 }

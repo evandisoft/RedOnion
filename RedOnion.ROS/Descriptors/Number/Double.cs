@@ -10,8 +10,6 @@ namespace RedOnion.ROS
 				: base("double", typeof(double), ExCode.Double, TypeCode.Double) { }
 			public override object Box(ref Value self)
 				=> self.num.Double;
-			public override bool Equals(ref Value self, object obj)
-				=> self.num.Double.Equals(obj);
 			public override int GetHashCode(ref Value self)
 				=> self.num.Double.GetHashCode();
 			public override string ToString(ref Value self, string format, IFormatProvider provider, bool debug)
@@ -89,6 +87,19 @@ namespace RedOnion.ROS
 						return true;
 				}
 				return false;
+			}
+			public override bool Equals(ref Value self, object obj)
+			{
+				if (!(obj is Value rhs))
+					return self.num.Double.Equals(obj);
+				if (rhs.desc == this)
+					return self.num.Double == rhs.num.Double;
+				var rtype = rhs.desc.Primitive;
+				if (!rtype.IsNumberOrChar())
+					return false;
+				if (rtype != ExCode.Double)
+					rhs.desc.Convert(ref rhs, Double);
+				return self.num.Double == rhs.num.Double;
 			}
 			public override bool Binary(ref Value lhs, OpCode op, ref Value rhs)
 			{

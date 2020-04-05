@@ -25,30 +25,44 @@ namespace RedOnion.Build
 		internal static void Exec()
 		{
 			var data = Path.GetFullPath("GameData/RedOnion");
-			var dlen1 = data.Length+1;
+			var dlen1 = data.Length+1; // includes final dir separator
+			var sln = Path.GetFullPath(".");
+			var slnlen1 = sln.Length+1; // includes final dir separator
 
-			void ZipFiles(ZipArchive zip, string name, bool indir, string[] whitelist=null)
+			void ZipFiles(ZipArchive zip, string name, bool indir, string[] whitelist = null)
 			{
-				foreach (var resource in Directory.GetFiles(name == null ? data : Path.Combine(data, name)))
+				// "/GameData/RedOnion/Resources" first
+				var dir = name == null ? data : Path.Combine(data, name);
+				bool second = false;
+			again:
+				foreach (var resource in Directory.Exists(dir) ? Directory.GetFiles(dir) : new string[0])
 				{
-					var root = indir || name == null ? dlen1 : dlen1+1+name.Length;
+					var root = indir || name == null ? dlen1 : (second ? slnlen1 : dlen1) + name.Length+1;
+					// ignore hidden files
 					if (resource.Length <= root || resource[root] == '.')
 						continue;
-					var reduced = resource.Substring(root);
-					if (whitelist!=null && whitelist.IndexOf(reduced)==-1)
-					{
+					// get pure name (and convert to zip/linux notation)
+					var reduced = resource.Substring(root).Replace('\\', '/');
+					// ignore scripts that are not explicitly white-listed
+					if (whitelist != null && whitelist.IndexOf(reduced) < 0)
 						continue;
-					}
+					// add to zip
 					Console.WriteLine("- " + reduced);
-					// the replace is needed for compatibility with linux when building this on windows
-					var entry = zip.CreateEntry(reduced.Replace('\\', '/'));
+					var entry = zip.CreateEntry(reduced);
 					using (var write = entry.Open())
 					using (var read = new FileStream(resource, FileMode.Open))
 						read.CopyTo(write);
 				}
+				// "/Resources" as second
+				if (!second && !indir && name != null)
+				{
+					second = true;
+					dir = Path.Combine(sln, name);
+					goto again;
+				}
 			}
 
-			void CreateZip(string name,string[] whitelist=null)
+			void CreateZip(string name, string[] whitelist = null)
 			{
 				Console.WriteLine(name + ".zip");
 				using (var file = new FileStream(Path.Combine(data, name+".zip"), FileMode.Create))
@@ -57,7 +71,7 @@ namespace RedOnion.Build
 			}
 
 			CreateZip("Resources");
-			CreateZip("Scripts",scriptWhitelist);
+			CreateZip("Scripts", scriptWhitelist);
 
 			Console.WriteLine("RedOnion.zip");
 			using (var file = new FileStream("RedOnion.zip", FileMode.Create))

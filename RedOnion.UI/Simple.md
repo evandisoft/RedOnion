@@ -9,7 +9,12 @@ It is meant mainly for internal usage, for implementation of other composite con
 
 
 **Instance Properties:**
+- `RawImage`: RawImage - \[`Unsafe`\] UnityEngine.UI.RawImage component (auto-created on access).
+- `Image`: Image - \[`Unsafe`\] UnityEngine.UI.Image component (auto-created on access).
 - `Color`: Color - Background color.
+- `Texture`: Texture - \[`Unsafe`\] UnityEngine.Texture of integrated UnityEngine.UI.RawImage.
+- `Sprite`: Sprite - \[`Unsafe`\] UnityEngine.Sprite of integrated UnityEngine.UI.Image.
+- `ImageType`: Type - \[`Unsafe`\] UnityEngine.UI.Image.Type of integrated UnityEngine.UI.Image. (Sliced by default)
 - `Layout`: [Layout](Layout.md) - Layout (how child elements are placed).
 - `LayoutPadding`: [LayoutPadding](LayoutPadding.md) - The combined inner padding and spacing (6 floats in total, set to `0f, 3f, 0f, 0f, 3f, 0f` by default).
 - `ChildAnchors`: [Anchors](Anchors.md) - This currently controls layout's `childAlignment` and

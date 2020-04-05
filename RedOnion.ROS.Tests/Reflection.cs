@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using NUnit.Framework;
+using RedOnion.Attributes;
 using RedOnion.ROS.Objects;
 
 namespace RedOnion.ROS.Tests
@@ -71,6 +72,7 @@ namespace RedOnion.ROS.Tests
 			public event MyAction2 Event2 { add => Action2 += value; remove => Action2 -= value; }
 			public void AddAction2(MyAction2 add) => Action2 += add;
 			public void CallAction2(string v) => Action2?.Invoke(v);
+			public bool DefaultBool(bool v = true) => v;
 			public void DefaultArg(string v = "default") => name = v;
 			public void DefaultArg2(string v = "test", int i = 333)
 			{
@@ -88,6 +90,9 @@ namespace RedOnion.ROS.Tests
 				number = convertible.ToInt32(Value.Culture);
 				return number;
 			}
+			public void Overload(string v = "overload") => name = v;
+			public void Overload(string x, string y) => name = x + y;
+			public static implicit operator string(InstanceTest it) => it.name;
 		}
 		public class MixedTest
 		{
@@ -193,6 +198,7 @@ namespace RedOnion.ROS.Tests
 
 			Test("default", "test.defaultArg; test.name");
 			Test("default", "it.defaultArg; it.name");
+			Test(true, "it.defaultbool");
 
 			Test("test", "test.defaultArg2; test.name");
 			Test(333, "test.integer");
@@ -203,6 +209,8 @@ namespace RedOnion.ROS.Tests
 
 			Test(1.0, "test.setNumber 1.1");
 			Test(1.0, "it.setNumber 1.1");
+
+			Test("xy", "it.overload \"x\", \"y\"; return it.name");
 		}
 
 		public struct Point
@@ -425,6 +433,8 @@ namespace RedOnion.ROS.Tests
 
 			[Convert(typeof(CVect))]
 			public static SVect Test { get; set; }
+			public static SVect Test2 { get; set; }
+			public static void set2(SVect value) => Test2 = value;
 		}
 		[Test]
 		public void ROS_Refl10_Convert()
@@ -445,6 +455,10 @@ namespace RedOnion.ROS.Tests
 			Globals.Add(typeof(CVect));
 			Test("cvect.test = cvect 1,2,3");
 			Test(1.0, "cvect.test.x");
+			Test("cvect.test2 = cvect.test");
+			Test(2.0, "cvect.test2.y");
+			Test("cvect.set2 cvect 5,7,11");
+			Test(11.0, "cvect.test2.z");
 		}
 
 		//[Test] - does not currently work

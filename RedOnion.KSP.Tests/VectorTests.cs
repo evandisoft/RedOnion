@@ -1,6 +1,7 @@
 using System;
 using MunOS;
 using NUnit.Framework;
+using RedOnion.Debugging;
 using RedOnion.KSP.API;
 using RedOnion.KSP.ROS;
 using RedOnion.ROS;
@@ -12,7 +13,7 @@ namespace RedOnion.KSP.Tests
 		public ApiTestsBase() : base(new RosProcess(MunCore.Default, lateBind: true))
 		{
 			Descriptor.Create = CustomCreateDescriptor;
-			Value.LogListener = LogListener;
+			MainLogger.LogListener = LogListener;
 			Process.SetProcessor(this);
 		}
 		public static void LogListener(string msg)

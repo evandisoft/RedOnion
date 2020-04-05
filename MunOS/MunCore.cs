@@ -247,6 +247,17 @@ namespace MunOS
 		public ulong UpdateCounter { get; protected set; }
 
 		/// <summary>
+		/// Execute this event before any executor and process update (in FixedUpdate).
+		/// Designed for pre-execution global (process-less) updates (like science situation).
+		/// </summary>
+		public event Action BeforeExecute;
+		/// <summary>
+		/// Execute this event after all executors and process updates (in FixedUpdate).
+		/// Designed for post-execution global (process-less) updates (e.g. to propagate results to UI).
+		/// </summary>
+		public event Action AfterExecute;
+
+		/// <summary>
 		/// To be called every physics update (Unity: FixedUpdate).
 		/// </summary>
 		public void FixedUpdate()
@@ -330,7 +341,10 @@ namespace MunOS
 				}
 			}
 
-			// first execute the scripts
+			// first handle before-execute (e.g. science situation update)
+			BeforeExecute?.Invoke();
+
+			// next execute the scripts
 			foreach (var executor in executors)
 				executor.Execute(startTicks);
 
@@ -347,6 +361,9 @@ namespace MunOS
 			{
 				MunProcess.Current = null;
 			}
+
+			// lastly after-execute (to propagate results)
+			AfterExecute?.Invoke();
 		}
 
 		public void Kill(MunThread thread, bool hard = false)

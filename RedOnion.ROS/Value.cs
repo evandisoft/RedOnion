@@ -40,35 +40,6 @@ namespace RedOnion.ROS
 		public static string Format(StringWrapper msg, params object[] args)
 			=> args?.Length > 0 ? string.Format(Culture, msg.String, args) : msg.String;
 
-		public static Action<string> LogListener;
-
-		public static void Log(FormattableString msg)
-			=> LogListener?.Invoke(msg.ToString(Culture));
-		public static void Log(StringWrapper msg, params object[] args)
-			=> LogListener?.Invoke(Format(msg, args));
-		[Conditional("DEBUG")]
-		public static void DebugLog(FormattableString msg)
-			=> LogListener?.Invoke(msg.ToString(Culture));
-		[Conditional("DEBUG")]
-		public static void DebugLog(StringWrapper msg, params object[] args)
-			=> LogListener?.Invoke(Format(msg, args));
-
-#if DEBUG
-		public static Action<string> ExtraLogListener;
-		[Conditional("DEBUG")]
-		public static void ExtraLog(FormattableString msg)
-			=> ExtraLogListener?.Invoke(msg.ToString(Culture));
-		[Conditional("DEBUG")]
-		public static void ExtraLog(StringWrapper msg, params object[] args)
-			=> ExtraLogListener?.Invoke(Format(msg, args));
-#else
-		[Conditional("DEBUG")]
-		public static void ExtraLog(FormattableString msg) { }
-		[Conditional("DEBUG")]
-		public static void ExtraLog(StringWrapper msg, params object[] args) { }
-#endif
-
-
 		/// <summary>
 		/// The descriptor - how the core interacts with the value
 		/// or what type it represents if obj == null
@@ -86,11 +57,13 @@ namespace RedOnion.ROS
 		/// </summary>
 		internal NumericData num;
 
-		public static readonly Value Void = new Value(Descriptor.Void, null);
-		public static readonly Value Null = new Value(Descriptor.Null, null);
-		public static readonly Value NaN = new Value(double.NaN);
-		public static readonly Value False = new Value(false);
-		public static readonly Value True = new Value(true);
+		// avoid static initialization that would reference Descriptor!
+		// could be creating `Void` when `Descriptor.Void` is still null!
+		public static Value Void => Descriptor.VoidValue;
+		public static Value Null => Descriptor.NullValue;
+		public static Value NaN => Descriptor.NaNValue;
+		public static Value False => Descriptor.FalseValue;
+		public static Value True => Descriptor.TrueValue;
 
 		public Value(Descriptor it) : this(it ?? Descriptor.Null, it) { }
 		public Value(Type type) : this(Descriptor.Of(type), null) { }
@@ -194,7 +167,7 @@ namespace RedOnion.ROS
 		}
 
 		public Value(string s)
-			: this(Descriptor.String, s) { }
+			: this(s == null ? Descriptor.Null : Descriptor.String, s) { }
 		public override string ToString()
 			=> DebugString;
 		public string ToString(string format, IFormatProvider provider)
@@ -229,6 +202,18 @@ namespace RedOnion.ROS
 		public static implicit operator Value(ushort v) => new Value(v);
 		public static implicit operator Value(ulong v) => new Value(v);
 
+		public static bool operator ==(Value lhs, Value rhs)
+			=> lhs.desc.Equals(ref lhs, rhs);
+		public static bool operator !=(Value lhs, Value rhs)
+			=> !lhs.desc.Equals(ref lhs, rhs);
+		public static bool operator ==(Value lhs, object rhs)
+			=> lhs.desc.Equals(ref lhs, rhs);
+		public static bool operator !=(Value lhs, object rhs)
+			=> !lhs.desc.Equals(ref lhs, rhs);
+		public static bool operator ==(object lhs, Value rhs)
+			=> rhs.desc.Equals(ref rhs, lhs);
+		public static bool operator !=(object lhs, Value rhs)
+			=> !rhs.desc.Equals(ref rhs, lhs);
 		public override bool Equals(object obj)
 			=> desc.Equals(ref this, obj);
 		public override int GetHashCode()

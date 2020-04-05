@@ -11,7 +11,6 @@ For example: `native.System.Collections.Generic.List` returns the Generic type L
 
 The returned type, for generic types like List<> is List\<object\>.
 
-(There is a bug in Kerbalua's new that can occur when you pass no arguments except the type. Until this is fixed, you can use `type.__new()` for a zero argument constructor)
 In Kerbalua, you can instantiate one of these types with `new(type)`, while
 in ROS, you can instantiate them with the `new` keyword: `new type`.
 
