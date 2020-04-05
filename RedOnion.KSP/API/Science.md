@@ -4,7 +4,7 @@ Science tools.
 
 
 **Types:**
-- `Subject`: [Science.Subject](Science.Subject.md)
+- `Subject`: [Subject](Science.Subject.md)
 
 **Static Fields:**
 - `situationChanged`: [AutoRemoveList](../Utilities/AutoRemoveList.1.md)\[Action\] - Event executed when `situationId` changes.

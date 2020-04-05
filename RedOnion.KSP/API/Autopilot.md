@@ -4,7 +4,7 @@ Autopilot (throttle and steering) for a ship (vehicle/vessel).
 
 
 **Types:**
-- `PIDs`: [Autopilot.PIDs](Autopilot.PIDs.md)
+- `PIDs`: [PIDs](Autopilot.PIDs.md)
 
 **Instance Properties:**
 - `throttle`: float - Throttle control (0..1). NaN for releasing the control.
@@ -23,7 +23,7 @@ Autopilot (throttle and steering) for a ship (vehicle/vessel).
 - `userPitchFactor`: float - \[`WIP`\] Strength of user pitch-override/correction. \[0, 1] or `nan` - `userFactor` used if `nan` (which is by default).
 - `userYawFactor`: float - \[`WIP`\] Strength of user yaw-override/correction. \[0, 1] or `nan` - `userFactor` used if `nan` (which is by default).
 - `userRollFactor`: float - \[`WIP`\] Strength of user roll-override/correction. \[0, 1] or `nan` - `userFactor` used if `nan` (which is by default).
-- `pids`: [Autopilot.PIDs](Autopilot.PIDs.md) - \[`WIP`\] Set of PID(R) controllers used by the autopilot.
+- `pids`: [PIDs](Autopilot.PIDs.md) - \[`WIP`\] Set of PID(R) controllers used by the autopilot.
 
 **Instance Methods:**
 - `disable()`: void - Disable the autopilot, setting all values to NaN.

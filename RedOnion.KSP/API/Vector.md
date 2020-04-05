@@ -4,7 +4,7 @@ Function to create 3D vector / coordinate. Receives either three arguments (x,y,
 
 
 **Types:**
-- `Draw`: [VectorCreator.Draw](VectorCreator.Draw.md)
+- `Draw`: [Draw](VectorCreator.Draw.md)
 
 **Static Fields:**
 - `zero`: [Vector](Vector.md) - Vector(0, 0, 0).

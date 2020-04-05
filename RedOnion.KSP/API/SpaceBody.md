@@ -4,7 +4,7 @@ Celestial body. (`SpaceBody` selected not to conflict with KSP `CelestialBody`.)
 
 
 **Types:**
-- `Atmosphere`: [SpaceBody.Atmosphere](SpaceBody.Atmosphere.md)
+- `Atmosphere`: [Atmosphere](SpaceBody.Atmosphere.md)
 
 **Instance Properties:**
 - `native`: CelestialBody - \[`Unsafe`\] [KSP API](https://kerbalspaceprogram.com/api/class_celestial_body.html)
@@ -17,8 +17,8 @@ Celestial body. (`SpaceBody` selected not to conflict with KSP `CelestialBody`.)
 - `mass`: double - Mass of the body [kg].
 - `gravParameter`: double - Standard gravitational parameter (μ = GM) [m³/s²]
 - `mu`: double - Standard gravitational parameter (μ = GM) [m³/s²]
-- `atmosphere`: [SpaceBody.Atmosphere](SpaceBody.Atmosphere.md) - Atmosphere parameters of the body.
-- `atm`: [SpaceBody.Atmosphere](SpaceBody.Atmosphere.md) - Atmosphere parameters of the body. (Alias to `atmosphere`)
+- `atmosphere`: [Atmosphere](SpaceBody.Atmosphere.md) - Atmosphere parameters of the body.
+- `atm`: [Atmosphere](SpaceBody.Atmosphere.md) - Atmosphere parameters of the body. (Alias to `atmosphere`)
 - `orbit`: [OrbitInfo](OrbitInfo.md) - \[`WIP`\] Orbit parameters. Null for Sun/Kerbol.
 - `period`: [TimeDelta](TimeDelta.md) - Period of current orbit in seconds. Alias to `orbit.period`. `NaN/none` for Sun/Kerbol.
 - `timeToAp`: [TimeDelta](TimeDelta.md) - Eta to apoapsis in seconds. Alias to `orbit.timeToAp`. `NaN/none` for Sun/Kerbol.

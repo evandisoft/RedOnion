@@ -4,18 +4,18 @@ Designed for events with auto-remove on process shutdown, but can be used with a
 
 
 **Types:**
-- `Subscription`: [AutoRemoveList.1.Subscription](AutoRemoveList.1.Subscription.md)
-- `AutoSubscription`: [AutoRemoveList.1.AutoSubscription](AutoRemoveList.1.AutoSubscription.md)
+- `Subscription`: [Subscription](AutoRemoveList.1.Subscription.md)
+- `AutoSubscription`: [AutoSubscription](AutoRemoveList.1.AutoSubscription.md)
 
 **Instance Properties:**
 - `count`: int - Number of subscription.
-- `subscriptions`: IEnumerable\[[AutoRemoveList.1](AutoRemoveList.1.Subscription.md)\[T\]\] - Enumerate all subscriptions.
+- `subscriptions`: IEnumerable\[[Subscription](AutoRemoveList.1.Subscription.md)\] - Enumerate all subscriptions.
 
 **Instance Methods:**
-- `subscribe()`: [AutoRemoveList.1](AutoRemoveList.1.AutoSubscription.md)\[T\], value T
+- `subscribe()`: [AutoSubscription](AutoRemoveList.1.AutoSubscription.md), value T
   - Subscribe to the list. Similar to `add` but returns auto-remove subscription. This is default member and will be used when you call the object.
-- `add()`: [AutoRemoveList.1](AutoRemoveList.1.Subscription.md)\[T\], value T
+- `add()`: [Subscription](AutoRemoveList.1.Subscription.md), value T
   - Add new item. Returns pure subscribtion (or null for duplicit item). Can also be accessed via `+=` operator in ROS.
-- `remove()`: [AutoRemoveList.1](AutoRemoveList.1.Subscription.md)\[T\], value T
+- `remove()`: [Subscription](AutoRemoveList.1.Subscription.md), value T
   - Remove item. Returns the subscription on success, null if not found. Can also be accessed via `-=` operator in ROS.
 - `clear()`: void - Remove all subscriptions.
