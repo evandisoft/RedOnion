@@ -130,7 +130,7 @@ namespace RedOnion.KSP.Utilities
 		static readonly Descriptor descriptor = Descriptor.Of(typeof(T));
 
 		[Description("Subscription to the list.")]
-		public class Subscription : IDisposable
+		public class Subscription : IDisposable, IEquatable<Subscription>
 		{
 			internal Subscription next, prev;
 			protected internal T item { get; private set; }
@@ -183,6 +183,16 @@ namespace RedOnion.KSP.Utilities
 					auto = null;
 				}
 			}
+
+			[Browsable(false), MoonSharpHidden]
+			public bool Equals(Subscription subscription)
+				=> ReferenceEquals(this, subscription);
+			[Browsable(false), MoonSharpHidden]
+			public override bool Equals(object o)
+				=> o is Subscription s ? Equals(s) : o is Value v && Equals(v);
+			[Browsable(false), MoonSharpHidden]
+			public override int GetHashCode()
+				=> base.GetHashCode();
 		}
 
 		// this level of wrapping is necessary, because subscriptions are in list and dictionary

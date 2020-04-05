@@ -7,7 +7,7 @@ Science tools.
 - `Subject`: [Science.Subject](Science.Subject.md)
 
 **Static Fields:**
-- `situationChanged`: AutoRemoveList\[Action\] - Event executed when `situationId` changes.
+- `situationChanged`: [AutoRemoveList](../Utilities/AutoRemoveList.1.md)\[Action\] - Event executed when `situationId` changes.
 
 **Static Properties:**
 - `body`: [SpaceBody](SpaceBody.md) - Current space/celestial body.

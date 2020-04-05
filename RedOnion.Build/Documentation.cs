@@ -79,6 +79,7 @@ namespace RedOnion.Build
 							RegisterType(nested);
 							continue;
 						}
+						RegisterType(f.FieldType);
 					}
 					if (desc != null)
 						list.Add(new Member<Info>(info, desc));

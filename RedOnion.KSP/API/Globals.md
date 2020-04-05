@@ -19,8 +19,8 @@ Global variables, objects and functions common to all scripting languages.
 - `app`: [App](App.md) - \[`WIP`\] Safe API for KSP Application Launcher (toolbar/buttons). WIP
 
 **Static Fields:**
-- `native`: NamespaceInstance - \[`Unsafe`\] Namespace Mappings (import of native types by namespace). More info [here](../ReflectionUtil/NamespaceInstance.md)
-- `assembly`: GetMappings - \[`Unsafe`\] Assembly Mappings (import of native types by assembly). More info [here](../ReflectionUtil/GetMappings.md)
+- `native`: [NamespaceInstance](../ReflectionUtil/NamespaceInstance.md) - \[`Unsafe`\] Namespace Mappings (import of native types by namespace). More info [here](../ReflectionUtil/NamespaceInstance.md)
+- `assembly`: [GetMappings](../ReflectionUtil/GetMappings.md) - \[`Unsafe`\] Assembly Mappings (import of native types by assembly). More info [here](../ReflectionUtil/GetMappings.md)
 
 **Static Properties:**
 - `vector()`: [Vector](Vector.md) - Function for creating 3D vector / coordinate.
