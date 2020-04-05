@@ -45,10 +45,13 @@ namespace RedOnion.KSP.Parts
 		[Unsafe, Description("[KSP API](https://kerbalspaceprogram.com/api/class_module_science_experiment.html)")]
 		public ModuleScienceExperiment native { get; }
 		public static implicit operator ModuleScienceExperiment(PartScience sci) => sci?.native;
+
 		[Unsafe, Description("[KSP API](https://kerbalspaceprogram.com/api/class_science_experiment.html)")]
-		public ScienceExperiment experiment => native.experiment;
+		public virtual ScienceExperiment experiment => native.experiment;
+
 		[Description("Experiment ID.")]
-		public string experimentId => experiment.id;
+		public string experimentId => native.experimentID; // do not use experiment.id
+
 		[Description("Experiment title.")]
 		public string experimentTitle => experiment.experimentTitle;
 
@@ -72,11 +75,14 @@ namespace RedOnion.KSP.Parts
 			native = module;
 		}
 		internal static PartScience Create(PartBase part, ModuleScienceExperiment module)
-			=> module.ClassName == "DMModuleScienceAnimate"
-			? new DMagic(part, module, DMagic.API1(module))
-			: module.ClassName == "DMModuleScienceAnimateGeneric"
-			? new DMagic(part, module, DMagic.API2(module))
-			: new PartScience(part, module);
+		{
+			var type = module.GetType();
+			if (DMagic.api1?.type.IsAssignableFrom(type) == true)
+				return new DMagic(part, module, DMagic.api1);
+			if (DMagic.api2?.type.IsAssignableFrom(type) == true)
+				return new DMagic(part, module, DMagic.api2);
+			return new PartScience(part, module);
+		}
 
 		public override string ToString()
 			=> Value.Format($"{part.name}/{native.experimentID}");
@@ -151,9 +157,48 @@ namespace RedOnion.KSP.Parts
 
 		protected class DMagic : PartScience
 		{
+			protected internal static API api1, api2;
+
+			static DMagic()
+			{
+				foreach (var asm in AssemblyLoader.loadedAssemblies)
+				{
+					switch (asm.name)
+					{
+					// DMagic's Orbital Science (Magnetometer etc.)
+					case "DMagic":
+						try
+						{
+							api1 = new API(asm.typesDictionary
+								[typeof(PartModule)]
+								["DMModuleScienceAnimate"]);
+						}
+						catch (Exception ex)
+						{
+							MainLogger.Log("Could not reflect DMagic's DMModuleScienceAnimate: " + ex.ToString());
+						}
+						break;
+					// DMagic's generic module used e.g. by ReStock+ (if both installed)
+					case "DMModuleScienceAnimateGeneric":
+						try
+						{
+							api2 = new API(asm.typesDictionary
+								[typeof(PartModule)]
+								["DMModuleScienceAnimateGeneric"]);
+						}
+						catch (Exception ex)
+						{
+							MainLogger.Log("Could not reflect DMagic's DMModuleScienceAnimateGeneric: " + ex.ToString());
+						}
+						break;
+					}
+				}
+			}
+
 			public class API
 			{
 				public readonly Type type;
+				public readonly Func<ModuleScienceExperiment, ScienceExperiment> scienceExp;
 				public readonly Func<ModuleScienceExperiment, bool> canConduct;
 				public readonly Action<ModuleScienceExperiment, bool> gatherScienceData;
 
@@ -161,6 +206,7 @@ namespace RedOnion.KSP.Parts
 				{
 					this.type = type;
 					const BindingFlags flags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy;
+
 					var module = Expression.Parameter(
 						typeof(ModuleScienceExperiment), "module");
 					try
@@ -188,28 +234,42 @@ namespace RedOnion.KSP.Parts
 					{
 						MainLogger.Log($"Could not reflect DMagic's `gatherScienceData` in {type.Name}: {ex}");
 					}
+
+					try
+					{
+						scienceExp = Expression.Lambda<Func<ModuleScienceExperiment, ScienceExperiment>>(
+							Expression.Field(Expression.Convert(module, type),
+							type.GetField("scienceExp", BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic)),
+							module).Compile();
+					}
+					catch (Exception ex)
+					{
+						MainLogger.Log($"Could not reflect DMagic's `scienceExp` in {type.Name}: {ex}");
+					}
 				}
 			}
-			protected static API api1, api2;
-			public static API API1(ModuleScienceExperiment module)
-				=> api1 ?? (api1 = new API(module.GetType()));
-			public static API API2(ModuleScienceExperiment module)
-				=> api2 ?? (api2 = new API(module.GetType()));
 
+			protected readonly Func<ModuleScienceExperiment, ScienceExperiment> _scienceExp;
 			protected readonly Func<ModuleScienceExperiment, bool> _canConduct;
 			protected readonly Action<ModuleScienceExperiment, bool> _gatherScienceData;
 
-			public DMagic(PartBase part, ModuleScienceExperiment module, API api)
+			protected internal DMagic(PartBase part, ModuleScienceExperiment module, API api)
 				: base(part, module)
 			{
+				_scienceExp = api.scienceExp;
 				_canConduct = api.canConduct;
 				_gatherScienceData = api.gatherScienceData;
 			}
+
+			public override ScienceExperiment experiment
+				=> _scienceExp != null ? _scienceExp(native) : base.experiment;
 
 			public override ScienceState state
 			{
 				get
 				{
+					if (_canConduct == null)
+						return base.state;
 					if (native.Deployed)
 						return ScienceState.full;
 					if (native.Inoperable)
@@ -222,6 +282,8 @@ namespace RedOnion.KSP.Parts
 
 			public override bool perform(bool dialog = true)
 			{
+				if (_gatherScienceData == null)
+					return base.perform(dialog);
 				if (state != ScienceState.ready)
 					return false;
 				_gatherScienceData(native, !dialog);

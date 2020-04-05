@@ -18,6 +18,7 @@ namespace RedOnion.KSP.ROS
 			"Equals",
 			"GetHashCode",
 			"GetType",
+			"ReferenceEquals",
 			"ToString"
 		};
 
