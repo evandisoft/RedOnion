@@ -51,7 +51,7 @@ namespace RedOnion.KSP.Tests
 			var thread = new SimpleThread(this);
 			Assert.AreEqual(MunStatus.Incomplete, thread.Status);
 			Assert.AreEqual(1, main.Count);
-			Assert.AreEqual(1, Count);
+			Assert.AreEqual(1, ThreadCount);
 
 			FixedUpdate();
 			Assert.AreEqual(MunStatus.Yielded, thread.Status);
@@ -68,7 +68,7 @@ namespace RedOnion.KSP.Tests
 
 			FixedUpdate();
 			Assert.AreEqual(MunStatus.Finished, thread.Status);
-			Assert.AreEqual(0, Count);
+			Assert.AreEqual(0, ThreadCount);
 			Assert.IsTrue(thread.DoneCalled);
 		}
 
@@ -76,11 +76,27 @@ namespace RedOnion.KSP.Tests
 		public void MUN_Core02_ProcessTerminate()
 		{
 			var pro = new MunProcess(this);
+			Assert.AreEqual(1, ProcessCount);
 			new SimpleThread(this, pro);
+			Assert.AreEqual(1, ThreadCount);
 			new SimpleThread(this, pro);
-			Assert.AreEqual(2, Count);
+			Assert.AreEqual(2, ThreadCount);
 			pro.Terminate();
-			Assert.AreEqual(0, Count);
+			Assert.AreEqual(0, ThreadCount);
+		}
+
+		[Test]
+		public void MUN_Core03_CoreReset()
+		{
+			var pro = new MunProcess(this);
+			Assert.AreEqual(1, ProcessCount);
+			new SimpleThread(this, pro);
+			Assert.AreEqual(1, ThreadCount);
+			new SimpleThread(this, pro);
+			Assert.AreEqual(2, ThreadCount);
+			Reset();
+			Assert.AreEqual(0, ProcessCount);
+			Assert.AreEqual(0, ThreadCount);
 		}
 	}
 }

@@ -11,16 +11,11 @@ namespace RedOnion.KSP.API
 	[Description("Function to create 3D vector / coordinate."
 		+ " Receives either three arguments (x,y,z), two (x,y; z=0), or one (x=y=z)."
 		+ " Can also convert array / list of numbers (`V([1,2,3])` becomes `V(1,2,3)`).")]
-	public partial class VectorCreator : ICallable, IType
+	public partial class VectorCreator : ICallable
 	{
 		[Browsable(false), MoonSharpHidden]
 		public static VectorCreator Instance { get; } = new VectorCreator();
 		protected VectorCreator() { }
-
-		Type IType.Type => typeof(Vector);
-		bool IType.IsType(object type)
-			=> type is string str ? str.Equals("vector", StringComparison.OrdinalIgnoreCase)
-			: type is Type t ? t.IsAssignableFrom(typeof(Vector)) : false;
 
 		[Description("Vector(0, 0, 0).")]
 		public static readonly Vector zero = new Vector(Vector3d.zero);

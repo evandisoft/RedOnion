@@ -412,14 +412,6 @@ namespace RedOnion.ROS
 	{
 		bool Convert(ref Value self, Descriptor to);
 	}
-	/// <summary>
-	/// Interface for type system ('is' and 'as' operators).
-	/// </summary>
-	public interface IType
-	{
-		Type Type { get; }
-		bool IsType(object type);
-	}
 
 	#endregion
 }

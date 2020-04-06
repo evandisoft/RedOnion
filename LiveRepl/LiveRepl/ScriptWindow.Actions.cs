@@ -95,7 +95,9 @@ namespace LiveRepl
 			{
 				engine.Reset();
 			}
+			MunCore.Default.Reset();
 			ApiMain.Reset();
+			RunAutorunScripts();
 		}
 
 		public void Terminate()

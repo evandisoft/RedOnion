@@ -89,6 +89,7 @@
     <Compile Include="API\Autopilot.cs" />
     <Compile Include="API\Globals.cs" />
     <Compile Include="API\Node.cs" />
+    <Compile Include="API\OperatingSystem.cs" />
     <Compile Include="API\OrbitInfo.cs" />
     <Compile Include="API\Science.cs" />
     <Compile Include="Namespaces\Types.cs" />

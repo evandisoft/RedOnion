@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using MunOS.Executors;
@@ -11,7 +12,7 @@ namespace MunOS
 	/// <summary>
 	/// Manages execution of threads among 4 priority levels.
 	/// </summary>
-	public class MunCore
+	public class MunCore : IReadOnlyCollection<MunProcess>
 	{
 		#region Static
 
@@ -94,7 +95,7 @@ namespace MunOS
 
 		#endregion
 
-		#region Instance
+		#region Most critical fields and properties
 
 		/// <summary>
 		/// Event executed on unexpected exceptions.
@@ -106,6 +107,39 @@ namespace MunOS
 			MunLogger.DebugLog("MunCore.OnError: " + err.ToString());
 			Error?.Invoke(err);
 		}
+
+		public MunProcess FirstProcess { get; internal set; }
+		/// <summary>
+		/// Iterate over all processes. Can remove them while iterating.
+		/// </summary>
+		public IEnumerator<MunProcess> GetEnumerator()
+		{
+			if (FirstProcess == null)
+				yield break;
+			for (var it = FirstProcess; ;)
+			{
+				var next = it.Next;
+				var last = next == FirstProcess;
+				yield return it;
+				if (last) break;
+				it = next;
+			}
+		}
+		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+		protected internal readonly Dictionary<MunID, MunProcess> processes = new Dictionary<MunID, MunProcess>();
+		protected internal readonly Dictionary<MunID, MunThread> threads = new Dictionary<MunID, MunThread>();
+		protected readonly Dictionary<MunPriority, MunExecutor> priorities = new Dictionary<MunPriority, MunExecutor>();
+		protected MunExecutor[] executors;
+
+		// access only under lock
+		protected readonly List<MunID> asyncKillList = new List<MunID>();
+		// can be set to true asynchronously (GC finalizers)
+		protected bool asyncKillActive;
+
+		#endregion
+
+		#region Executor settings
 
 		/// <summary>
 		/// Time limit for one update (2ms = 2 * Frequency / 1000).
@@ -191,6 +225,10 @@ namespace MunOS
 			set => main.minTicks = value;
 		}
 
+		#endregion
+
+		#region Executors
+
 		// may add finalizing executor for soft-terminated threads that still need to perform some cleanup (finally-blocks)
 		// and maybe also something in between callback and idle (which could in fact be used for finalizers as well).
 		protected readonly MunSleepingExecutor sleeping;
@@ -198,16 +236,6 @@ namespace MunOS
 		protected readonly MunCallbackExecutor callback;
 		protected readonly MunIdleExecutor idle;
 		protected readonly MunMainExecutor main;
-		protected readonly Dictionary<MunPriority, MunExecutor> priorities = new Dictionary<MunPriority, MunExecutor>();
-		protected MunExecutor[] executors;
-
-		protected internal readonly Dictionary<MunID, MunProcess> processes = new Dictionary<MunID, MunProcess>();
-		protected internal readonly Dictionary<MunID, MunThread> threads = new Dictionary<MunID, MunThread>();
-
-		// access only under lock
-		protected readonly List<MunID> asyncKillList = new List<MunID>();
-		// can be set to true asynchronously (GC finalizers)
-		protected bool asyncKillActive;
 
 		public MunCore()
 		{
@@ -227,19 +255,22 @@ namespace MunOS
 			};
 		}
 
-		protected internal virtual MunExecutor Schedule(MunThread thread)
+		protected internal virtual void Schedule(MunThread thread)
 		{
 			if (thread.Status.IsFinal())
 			{
 				Kill(thread, hard: true);
-				return null;
+				return;
 			}
 			threads[thread.ID] = thread;
 			var executor = thread.Status == MunStatus.Sleeping ?
 				sleeping : priorities[thread.Priority];
 			executor.Add(thread);
-			return executor;
 		}
+
+		#endregion
+
+		#region Update and Execute
 
 		/// <summary>
 		/// Number of updates (incremented at the end of <see cref="FixedUpdate"/>).
@@ -287,7 +318,7 @@ namespace MunOS
 		{
 			try
 			{
-				foreach (var process in processes.Values)
+				foreach (var process in this)
 				{
 					MunProcess.Current = process;
 					process.Update();
@@ -304,17 +335,6 @@ namespace MunOS
 			{
 				MunProcess.Current = null;
 			}
-		}
-
-		/// <summary>
-		/// Kill thread asynchronously. To be used from finalizers (or any other thread).
-		/// </summary>
-		/// <param name="ID"></param>
-		public void KillAsync(MunID id)
-		{
-			lock (asyncKillList)
-				asyncKillList.Add(id);
-			asyncKillActive = true;
 		}
 
 		protected virtual void Execute()
@@ -351,11 +371,18 @@ namespace MunOS
 			// do the updates last (e.g. vector.draw - uses the state created by the scripts)
 			try
 			{
-				foreach (var process in processes.Values)
+				foreach (var process in this)
 				{
 					MunProcess.Current = process;
 					process.FixedUpdate();
 				}
+			}
+			catch (Exception ex)
+			{
+				var err = new MunEvent(this, ex);
+				OnError(err);
+				if (!err.Handled)
+					throw;
 			}
 			finally
 			{
@@ -364,6 +391,41 @@ namespace MunOS
 
 			// lastly after-execute (to propagate results)
 			AfterExecute?.Invoke();
+		}
+
+		#endregion
+
+		#region Reset and Kill
+
+		/// <summary>
+		/// Reset the core, terminating and removing all threads and processes.
+		/// </summary>
+		public void Reset()
+		{
+			// see the enumerator - we can do this
+			foreach (var process in this)
+				process.Dispose();
+			while (threads.Count > 0)
+			{
+				MunThread kill = null;
+				foreach (var pair in threads)
+				{
+					kill = pair.Value;
+					break;
+				}
+				Kill(kill, hard: true);
+			}
+		}
+
+		/// <summary>
+		/// Kill thread asynchronously. To be used from finalizers (or any other thread).
+		/// </summary>
+		/// <param name="ID"></param>
+		public void KillAsync(MunID id)
+		{
+			lock (asyncKillList)
+				asyncKillList.Add(id);
+			asyncKillActive = true;
 		}
 
 		public void Kill(MunThread thread, bool hard = false)
@@ -379,6 +441,7 @@ namespace MunOS
 				if (thread.Status.IsFinal() && thread.Executor != null)
 				{
 					thread.RemoveFromExecutor();
+					threads.Remove(thread.ID);
 					thread.OnDone();
 				}
 				// else ... maybe move to some cleanup executor
@@ -417,6 +480,10 @@ namespace MunOS
 			return false;
 		}
 
+		#endregion
+
+		#region Collections
+
 		public MunProcess GetProcess(MunID id)
 			=> processes.TryGetValue(id, out var process) ? process : null;
 		public MunThread GetThread(MunID id)
@@ -429,16 +496,9 @@ namespace MunOS
 		public bool ContainsThread(MunID id)
 			=> threads.ContainsKey(id);
 
-		public int Count
-		{
-			get
-			{
-				int count = 0;
-				foreach (var executor in executors)
-					count += executor.Count;
-				return count;
-			}
-		}
+		int IReadOnlyCollection<MunProcess>.Count => ProcessCount;
+		public int ProcessCount => processes.Count;
+		public int ThreadCount => threads.Count;
 
 		#endregion
 	}

@@ -8,7 +8,7 @@ using static RedOnion.Debugging.QueueLogger;
 
 namespace MunOS
 {
-	public class MunProcess : ICollection<MunThread>
+	public class MunProcess : ICollection<MunThread>, IDisposable
 	{
 		private static MunProcess _current;
 		public static MunProcess Current
@@ -18,9 +18,21 @@ namespace MunOS
 		}
 		public static MunID CurrentID => Current?.ID ?? MunID.Zero;
 
-		public MunID ID { get; internal set; }
+		public MunID ID { get; }
 		public string Name { get; set; }
 		public MunCore Core { get; }
+		/// <summary>
+		/// Next process on same core (cyclic).
+		/// </summary>
+		public MunProcess Next { get; private set; }
+		/// <summary>
+		/// Previous process on same core (cyclic).
+		/// </summary>
+		public MunProcess Prev { get; private set; }
+		/// <summary>
+		/// First thread of this process.
+		/// </summary>
+		public MunThread First { get; internal set; }
 
 		/// <summary>
 		/// Every thread notifies the process when it is done executing
@@ -74,6 +86,10 @@ namespace MunOS
 		/// Set to false if you want to reuse the process - but you have to remove it yourself.
 		/// </summary>
 		public bool AutoRemove { get; set; } = true;
+		/// <summary>
+		/// Indicates that process was terminated and detached from the core.
+		/// </summary>
+		public bool IsDisposed { get; private set; }
 
 		public MunProcess(MunCore core, string name = null)
 		{
@@ -81,6 +97,20 @@ namespace MunOS
 			Name = name ?? ID.ToString();
 			Core = core;
 			core.processes.Add(ID, this);
+			var first = core.FirstProcess;
+			if (first == null)
+			{
+				core.FirstProcess = this;
+				Next = this;
+				Prev = this;
+			}
+			else
+			{
+				Next = first;
+				Prev = first.Prev;
+				Prev.Next = this;
+				first.Prev = this;
+			}
 		}
 
 		protected readonly Dictionary<MunID, MunThread> threads = new Dictionary<MunID, MunThread>();
@@ -89,17 +119,49 @@ namespace MunOS
 		public int BackgroundCount { get; protected internal set; }
 		bool ICollection<MunThread>.IsReadOnly => false;
 
-		public IEnumerator<MunThread> GetEnumerator() => threads.Values.GetEnumerator();
-		IEnumerator IEnumerable.GetEnumerator() => threads.Values.GetEnumerator();
+		/// <summary>
+		/// Iterate over all threads. Can remove them while iterating.
+		/// </summary>
+		public IEnumerator<MunThread> GetEnumerator()
+		{
+			if (First == null)
+				yield break;
+			for (var it = First; ;)
+			{
+				var next = it.Next;
+				var last = next == First;
+				yield return it;
+				if (last) break;
+				it = next;
+			}
+		}
+		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
 		public virtual void Add(MunThread thread)
 		{
+			if (IsDisposed)
+				throw new ObjectDisposedException(string.IsNullOrWhiteSpace(Name)
+					? "MunProcess#" + ID : "MunProcess#" + ID + ": " + Name);
 			if (thread.Process != null)
 				throw new InvalidOperationException(thread.Process == this
 					? $"Thread {thread} already is in process {thread.Process}"
 					: $"Thread {thread} belongs to process {thread.Process}, cannot add to {this}");
 			threads.Add(thread.ID, thread);
 			thread.Process = this;
+			var first = First;
+			if (first == null)
+			{
+				First = thread;
+				thread.Next = thread;
+				thread.Prev = thread;
+			}
+			else
+			{
+				thread.Next = first;
+				thread.Prev = first.Prev;
+				first.Prev.Next = thread;
+				first.Prev = thread;
+			}
 			if (thread.IsBackground)
 				++BackgroundCount;
 			else ++ForegroundCount;
@@ -114,6 +176,17 @@ namespace MunOS
 			var hadForeground = ForegroundCount > 0;
 			threads.Remove(thread.ID);
 			thread.Process = null;
+			if (thread.Next == thread)
+				First = null;
+			else
+			{
+				if (First == thread)
+					First = thread.Next;
+				thread.Next.Prev = thread.Prev;
+				thread.Prev.Next = thread.Next;
+			}
+			thread.Next = null;
+			thread.Prev = null;
 			if (thread.IsBackground)
 				--BackgroundCount;
 			else --ForegroundCount;
@@ -159,14 +232,14 @@ namespace MunOS
 		/// <summary>
 		/// Event invoked on every physics update (Unity FixedUpdate).
 		/// </summary>
-		public event Action physicsUpdate;
+		public event Action PhysicsUpdate;
 
 		/// <summary>
 		/// To be called on every fixed update.
 		/// </summary>
 		public virtual void FixedUpdate()
 		{
-			var physics = physicsUpdate;
+			var physics = PhysicsUpdate;
 			if (physics != null)
 			{
 				foreach (Action handler in physics.GetInvocationList())
@@ -185,7 +258,7 @@ namespace MunOS
 						{
 							Core.OnError(err);
 							if (!err.Handled)
-								physicsUpdate -= handler;
+								PhysicsUpdate -= handler;
 						}
 
 						if (!err.Printed)
@@ -198,11 +271,11 @@ namespace MunOS
 		/// <summary>
 		/// Event invoked on every graphics update (Unity Update).
 		/// </summary>
-		public event Action graphicsUpdate;
+		public event Action GraphicsUpdate;
 
 		public virtual void Update()
 		{
-			var graphics = graphicsUpdate;
+			var graphics = GraphicsUpdate;
 			if (graphics != null)
 			{
 				foreach (Action handler in graphics.GetInvocationList())
@@ -221,7 +294,7 @@ namespace MunOS
 						{
 							Core.OnError(err);
 							if (!err.Handled)
-								graphicsUpdate -= handler;
+								GraphicsUpdate -= handler;
 						}
 
 						if (!err.Printed)
@@ -237,7 +310,7 @@ namespace MunOS
 		/// All subscriptions are removed prior to executing the handlers.
 		/// This event was optimized for fast removal.
 		/// </summary>
-		public event Action shutdown
+		public event Action Shutdown
 		{
 			add
 			{
@@ -263,11 +336,38 @@ namespace MunOS
 		protected Dictionary<Action, LinkedListNode<Action>> shutdownDict;
 		protected LinkedList<Action> shutdownList;
 
+		/// <summary>
+		/// Process disposed (terminated and cannot be restarted).
+		/// </summary>
+		public event Action<MunProcess> Disposed;
+
+		/// <summary>
+		/// Terminate and dispose the process (cannot be restarted).
+		/// </summary>
+		public void Dispose()
+		{
+			if (IsDisposed)
+				return;
+			IsDisposed = true;
+			Terminate(hard: true);
+		}
+
 		public virtual void Terminate(bool hard = false)
 		{
-			MunLogger.Log($"Process#{ID} terminating. (hard: {hard}; shutdown: {shutdownDict?.Count ?? 0})");
-			// first notify all subscribers that this process is shutting down
+			if (Next == null)
+				return; // already disposed
+			if (hard && AutoRemove)
+				IsDisposed = true; // let them know in shutdown
+
+			// note that it can be called recursively, see below
+
 			var shutdown = shutdownList;
+			if (shutdown != null || threads.Count > 0)
+				MunLogger.Log($@"Process#{ID} terminating. (hard: {hard
+					}; shutdown: {shutdownDict?.Count ?? 0
+					}; threads: {threads.Count})");
+
+			// first notify all subscribers that this process is shutting down
 			if (shutdown != null)
 			{
 				shutdownList = null;
@@ -298,11 +398,29 @@ namespace MunOS
 				var list = new MunThread[threads.Count];
 				threads.Values.CopyTo(list, 0);
 				foreach (var thread in list)
-					thread.Terminate(hard);
+					thread.Terminate(hard); // last can call Terminate again!
 			}
+			if (Next == null)
+				return; // disposed by last thread above
 
-			MunLogger.Log($"Process#{ID} terminated (hard: {hard}).");
-			if (AutoRemove && threads.Count == 0) Core.processes.Remove(ID);
+			if (IsDisposed || (AutoRemove && threads.Count == 0))
+			{
+				IsDisposed = true;
+				Core.processes.Remove(ID);
+				if (Next == this)
+					Core.FirstProcess = null;
+				else
+				{
+					if (Core.FirstProcess == this)
+						Core.FirstProcess = Next;
+					Next.Prev = Prev;
+					Prev.Next = Next;
+				}
+				Next = null;
+				Prev = null;
+				Disposed?.Invoke(this);
+			}
+			MunLogger.Log($"Process#{ID} {(IsDisposed ? "disposed" : "terminating")} (hard: {hard}).");
 		}
 
 		void ICollection<MunThread>.Clear() => Terminate();
@@ -313,7 +431,7 @@ namespace MunOS
 			=> string.IsNullOrWhiteSpace(Name) ? ID.ToString() : Name;
 
 		/// <summary>
-		/// Used to subscribe to <see cref="shutdown"/> but avoid direct hard-link
+		/// Used to subscribe to <see cref="Shutdown"/> but avoid direct hard-link
 		/// so that the target/subscriber can be garbage-collected.
 		/// </summary>
 		/// <remarks>
@@ -324,7 +442,7 @@ namespace MunOS
 			public ShutdownHook(IDisposable target) : base(target) { }
 		}
 		/// <summary>
-		/// Used to subscribe to <see cref="shutdown"/> but avoid direct hard-link
+		/// Used to subscribe to <see cref="Shutdown"/> but avoid direct hard-link
 		/// so that the target/subscriber can be garbage-collected.
 		/// </summary>
 		/// <remarks>
@@ -349,7 +467,7 @@ namespace MunOS
 				MunLogger.DebugLog($"Creating ShutdownHook for process#{CurrentID} in thread#{MunThread.CurrentID}.");
 				_target = new WeakReference<T>(target);
 				process = Current;
-				process.shutdown += Shutdown;
+				process.Shutdown += Shutdown;
 			}
 			~ShutdownHook() => Dispose(false);
 			public void Dispose()
@@ -361,7 +479,7 @@ namespace MunOS
 			{
 				if (process == null)
 					return;
-				process.shutdown -= Shutdown;
+				process.Shutdown -= Shutdown;
 				process = null;
 				_target = null;
 

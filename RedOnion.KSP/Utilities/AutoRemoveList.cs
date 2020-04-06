@@ -144,7 +144,7 @@ namespace RedOnion.KSP.Utilities
 				this.owner = owner;
 				if ((process = MunProcess.Current) == null)
 					return;
-				process.shutdown += remove;
+				process.Shutdown += remove;
 			}
 			void IDisposable.Dispose()
 				=> remove();
@@ -170,7 +170,7 @@ namespace RedOnion.KSP.Utilities
 				item = default;
 				if (process != null)
 				{
-					process.shutdown -= remove;
+					process.Shutdown -= remove;
 					process = null;
 				}
 				if (auto != null)

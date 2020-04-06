@@ -16,6 +16,7 @@ namespace RedOnion.KSP.ROS
 		static readonly HashSet<string> hide = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
 		{
 			"Equals",
+			"GetEnumerator",
 			"GetHashCode",
 			"GetType",
 			"ReferenceEquals",

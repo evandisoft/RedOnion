@@ -79,13 +79,13 @@ namespace RedOnion.KSP.API
 			protected class Hooks : MunProcess.ShutdownHook<Draw>
 			{
 				public Hooks(Draw draw) : base(draw) { }
-				public void show() => process.physicsUpdate += Update;
-				public void hide() => process.physicsUpdate -= Update;
+				public void show() => process.PhysicsUpdate += Update;
+				public void hide() => process.PhysicsUpdate -= Update;
 				protected override void Dispose(bool disposing)
 				{
 					if (process == null)
 						return;
-					process.physicsUpdate -= Update;
+					process.PhysicsUpdate -= Update;
 					base.Dispose(disposing);
 				}
 				protected void Update()

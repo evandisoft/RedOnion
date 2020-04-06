@@ -56,6 +56,8 @@ namespace MunOS.Repl
 		/// <param name="startup">List of scripts (paths) to run first.</param>
 		public virtual void Initialize(MunCore core = null, IList<string> startup = null)
 		{
+			if (Process != null)
+				Reset();
 			Core = core ?? MunCore.Default;
 			Process = CreateProcess();
 			Process.AutoRemove = false;
@@ -68,7 +70,7 @@ namespace MunOS.Repl
 				{
 					var thread = CreateThread(null, path, start: prev == null);
 					if (prev != null)
-						prev.NextThread = thread;
+						prev.ExecNext = thread;
 					prev = thread;
 				}
 				Process.ThreadDone += InitThreadDone;
@@ -77,9 +79,9 @@ namespace MunOS.Repl
 		private void InitThreadDone(MunThread thread)
 		{
 			MunLogger.DebugLog($@"Init script done: {thread}, next: {(
-				thread.NextThread?.ToString() ?? "none")}, ex: {(
+				thread.ExecNext?.ToString() ?? "none")}, ex: {(
 				thread.Exception?.ToString() ?? "none")}");
-			if (thread.NextThread == null && thread.Exception == null)
+			if (thread.ExecNext == null && thread.Exception == null)
 			{
 				MunLogger.DebugLog($"Waiting thread count: {waitingThreads.Count}");
 				foreach (var waiting in waitingThreads)
@@ -108,7 +110,7 @@ namespace MunOS.Repl
 
 		public virtual void Reset()
 		{
-			Process?.Terminate(true);
+			Process?.Dispose();
 			foreach (var thread in waitingThreads)
 				thread.Terminate(hard: true);
 			waitingThreads.Clear();

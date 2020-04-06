@@ -60,7 +60,7 @@ namespace RedOnion.KSP.ROS
 				this.autoRemove = autoRemove;
 				thread.IsBackground = true;
 				if (repeating)
-					thread.NextThread = thread;
+					thread.ExecNext = thread;
 			}
 
 			[Browsable(false)]
