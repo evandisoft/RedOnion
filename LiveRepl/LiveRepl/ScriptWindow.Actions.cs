@@ -91,6 +91,10 @@ namespace LiveRepl
 
 		public void ResetAll()
 		{
+			foreach(var engine in engines.Values)
+			{
+				engine.Reset();
+			}
 			ApiMain.Reset();
 		}
 
