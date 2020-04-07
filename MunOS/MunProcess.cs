@@ -94,7 +94,11 @@ namespace MunOS
 		public MunProcess(MunCore core, string name = null)
 		{
 			ID = MunID.GetPositive();
-			Name = name ?? ID.ToString();
+			if (string.IsNullOrWhiteSpace(name))
+				name = ID.ToString();
+			Name = name;
+			if (core == null)
+				core = MunCore.Default;
 			Core = core;
 			core.processes.Add(ID, this);
 			var first = core.FirstProcess;
@@ -220,13 +224,8 @@ namespace MunOS
 		protected internal virtual void CheckForegroundCount()
 		{
 			Debug.Assert(Count == ForegroundCount + BackgroundCount);
-			if (!AutoRemove)
-				return;
-			if (BackgroundCount > 0)
-				return;
-			if (ForegroundCount == 0)
-				return;
-			Terminate();
+			if (AutoRemove && ForegroundCount == 0)
+				Terminate();
 		}
 
 		/// <summary>
@@ -420,7 +419,7 @@ namespace MunOS
 				Prev = null;
 				Disposed?.Invoke(this);
 			}
-			MunLogger.Log($"Process#{ID} {(IsDisposed ? "disposed" : "terminating")} (hard: {hard}).");
+			MunLogger.Log($"Process#{ID} {(IsDisposed ? "disposed" : "terminated")} (hard: {hard}).");
 		}
 
 		void ICollection<MunThread>.Clear() => Terminate();

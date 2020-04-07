@@ -19,8 +19,11 @@ namespace RedOnion.KSP.ROS
 
 		public static MunProcess ProcessCreator(string path, object[] args)
 		{
-			var process = new RosProcess(MunCore.Default);
+			var current = MunProcess.Current;
+			var manager = current?.ScriptManager as RosManager;
+			var process = manager != null ? new RosProcess(manager) : new RosProcess(current?.Core);
 			process.Name = path;
+			process.OutputBuffer = current?.OutputBuffer;
 			new RosThread(process, MunPriority.Main, $"run \"{path}\"", path);
 			return process;
 		}

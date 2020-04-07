@@ -400,7 +400,7 @@ namespace MunOS
 		/// <summary>
 		/// Reset the core, terminating and removing all threads and processes.
 		/// </summary>
-		public void Reset()
+		public virtual void Reset()
 		{
 			// see the enumerator - we can do this
 			foreach (var process in this)
