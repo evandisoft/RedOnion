@@ -108,7 +108,13 @@ second (optional) the value to assign to it if it does not exist yet
 (`void` if not provided) and optional third argument
 can be used to test for specific value if it already exists,
 to overwrite that value (only if it is same or does not exist).
-That can be used to create locks:
+That can be used to create locks.
+
+Variable names are searched from the point of reference, up through all
+(non-function) blocks, then in `this` if function was executed as method,
+then in outer function or script and lastly in globals.
+Notice that function `click` in example above modified script-local `x`
+when called as function, but `obj.x` when called as method.
 
 ```
 global.x = 1    // assign
@@ -148,16 +154,6 @@ have much higher priority/precedence in ROS than in C#/C++.
 
 All the usual statements can be found in ROS.
 Most of them come from C#, some from other languages.
-
-`var` is used to declare new (local) variable. `global` or `globals`
-can be used for global variables - like `global.x = 1` or `system.globals.x`.
-Such global variable can later be referenced simply as `x`,
-but must be created first (and any `var x` or `this.x` shadows it).
-Variable names are searched from the point of reference, up through all
-(non-function) blocks, then in `this` if function was executed as method,
-then in outer function or script and lastly in globals.
-Notice that function `click` in example above modified script-local `x`
-when called as function, but `obj.x` when called as method.
 
 `if/unless` is followed by a condition,
 optional `then`, colon (`:`) or semicolon (`;`).

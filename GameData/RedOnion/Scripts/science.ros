@@ -1,0 +1,16 @@
+var done = false
+var wnd = new ui.window false, "Science"
+wnd.closed += def => done = true
+
+def refresh
+  return
+
+try
+
+  refresh
+  wnd.show
+  while !done
+    wait
+
+finally
+  wnd.dispose

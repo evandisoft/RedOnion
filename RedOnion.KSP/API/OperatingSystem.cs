@@ -18,7 +18,7 @@ namespace RedOnion.KSP.API
 		/// <summary>
 		/// Register process creator for specific file extension.
 		/// </summary>
-		/// <param name="fileExtension">The extansion like ".ros" or ".lua".</param>
+		/// <param name="fileExtension">The extension like ".ros" or ".lua".</param>
 		/// <param name="creator">Function accepting path and arguments (which can be null).</param>
 		public static void RegisterProcessCreator(
 			string fileExtension, Func<string, object[], MunProcess> creator)

@@ -40,9 +40,9 @@ namespace RedOnion.ROS.Objects
 			System.Add("math", typeof(RosMath));
 			System.Add("print", new Value(Print = new Print(Prototype)));
 			System.Add("run", new Value(Run = new Run(Prototype)));
-			System.Add("list", new Value(typeof(List<Value>)));
-			System.Add("queue", new Value(typeof(Collections.GenQueue<Value>)));
-			System.Add("stack", new Value(typeof(Stack<Value>)));
+			System.Add("list", new Value(typeof(RosList)));
+			System.Add("queue", new Value(typeof(RosQueue)));
+			System.Add("stack", new Value(typeof(RosStack)));
 
 			if (Processor is Processor.WithEvents processor)
 			{
