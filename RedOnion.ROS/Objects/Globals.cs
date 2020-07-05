@@ -43,6 +43,7 @@ namespace RedOnion.ROS.Objects
 			System.Add("list", new Value(typeof(RosList)));
 			System.Add("queue", new Value(typeof(RosQueue)));
 			System.Add("stack", new Value(typeof(RosStack)));
+			System.Add("dictionary", new Value(typeof(RosDictionary)));
 
 			if (Processor is Processor.WithEvents processor)
 			{
