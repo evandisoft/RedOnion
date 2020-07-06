@@ -105,10 +105,11 @@
     <Compile Include="Value.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="README.md" />
+    <None Include="Docs\Links.md" />
     <None Include="Docs\Errors.md" />
     <None Include="Docs\LambdaAdv.md" />
-    <None Include="Docs\Links.md" />
-    <None Include="README.md" />
+    <None Include="Docs\Objects.md" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RedOnion.Common\RedOnion.Common.csproj">

@@ -149,6 +149,8 @@ or just use `**` operator (which works like `math.pow` even for integers).
 Also note that bitwise operators (`&`, `|`, `^`, `<<` and `>>`)
 have much higher priority/precedence in ROS than in C#/C++.
 
+All the number types can be used for conversion (like `string` can as well): `int "1"` returns `1`, `double "3.14"` returns `3.14`, `int 2.7` returns `2` (and `string 1.6` returns `"1.6"`).
+
 
 ## Statements
 
@@ -190,7 +192,7 @@ until done()
 or like `foreach var e in list` with just `for var e in list`.
 
 ```
-for var int i = 0; i < arguments.length; i++
+for var i = 0; i < arguments.length; i++
   print arguments[i]
 for var e in list
   print e
