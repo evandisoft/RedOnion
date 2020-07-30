@@ -31,7 +31,7 @@ namespace RedOnion.KSP.Parts
 		noCrew,
 		[Description("No scientist in ship or the part (as required by the module).")]
 		noScientist,
-		[Description("Module needs sime time before operation.")]
+		[Description("Module needs some time before operation.")]
 		cooldown,
 		[Description("Unknown state, probably cannot perform experiments now.")]
 		uknown

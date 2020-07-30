@@ -5,6 +5,7 @@
 - [List](#list) - sequence of values.
 - [Queue](#queue) - FIFO sequence of values.
 - [Stack](#stack) - LIFO sequence of values.
+- [Dictionary](#dictionary) - collection of key-value pairs
 
 ## String
 
@@ -47,3 +48,16 @@ with `push` redirected to `enqueue` and `pop` redirected to `dequeue` methods.
 
 `Stack` is sequence of values/objects designed for last-in-first-out buffers,
 based on .NET [Stack&lt;Value&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.stack-1).
+
+## Dictionary
+
+`Dictionary` is collection of key-value pairs used to quickly find values by their keys, based on .NET [Dictionary<Value,Value>](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.dictionary-2). This is often used to store additional data related to some identifier (like age for name or UI components describing science experiment).
+
+- `[key]: value`
+  - get or set value associated to a key, returns `null` for non-existent keys.
+- `add(), key, value`
+  - add new key-value pair to the collection, throws if it already exists
+- `tryAdd(): bool, key, value`
+  - try add new key-value pair, returns false if already present (not changing the value)
+- `contains(): bool, key` (alias `containsKey`)
+  - tests whether key exists in the collection (you can usually test `dict[key] == null`, but that won't work if you trully want to store `null`)

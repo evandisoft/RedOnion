@@ -2,15 +2,39 @@ var done = false
 var wnd = new ui.window false, "Science"
 wnd.closed += def => done = true
 
+var rows = new list
+var dict = new dictionary
+
 def refresh
+  for var row in rows
+    row.present = false
+  for var sci in list ship.science // make a copy in case we get interrupted
+    var row = dict[sci.experimentId]
+    if row == null
+      row = new object
+      row.id = sci.experimentId
+      row.present = true
+      dict[sci.experimentId] = row
+      list.add row
+  for var i = 0; i < rows.count
+    var row = rows[i]
+    if !row.present
+      list.removeAt i
+      dict.remove row.id
+      // row.dispose / row.parent = null
+    else i++
   return
 
 try
 
+  var subs = null // finally retains try-context but we want to call refresh first
   refresh
+  subs = science.situationChanged refresh
   wnd.show
   while !done
     wait
 
 finally
   wnd.dispose
+  if subs != null
+    subs.remove

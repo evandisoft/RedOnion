@@ -22,5 +22,13 @@ namespace RedOnion.ROS.Objects
 				Add(key, e.Current);
 			}
 		}
+
+		public new Value this[Value key]
+		{
+			get => TryGetValue(key, out var value) ? value : Value.Null;
+			set => base[key] = value;
+		}
+
+		public bool Contains(Value key) => ContainsKey(key);
 	}
 }
