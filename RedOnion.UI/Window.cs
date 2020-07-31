@@ -112,9 +112,9 @@ It may get garbage-collected otherwise, but that can take time and is rather bac
 		protected FramePanel Frame => frame;
 		public Panel Content { get; private set; }
 
-		[Description("Create new window (immediately visible).")]
+		[Description("Create new window (immediately visible, vertical layout).")]
 		public Window() : this(Layout.Vertical) { }
-		[Description("Create new window with a title (immediately visible).")]
+		[Description("Create new window with a title (immediately visible, vertical layout).")]
 		public Window(string title) : this(Layout.Vertical) => Title = title;
 		[Description("Create new window with a title and defined layout (immediately visible).")]
 		public Window(string title, Layout layout) : this(layout) => Title = title;
@@ -129,9 +129,9 @@ It may get garbage-collected otherwise, but that can take time and is rather bac
 			Content = frame.Content;
 			Content.Layout = layout;
 		}
-		[Description("Create new window with selected visibility.")]
+		[Description("Create new window with selected visibility (and vertical layout).")]
 		public Window(bool visible) : this(Layout.Vertical, visible) { }
-		[Description("Create new window with selected visibility and title.")]
+		[Description("Create new window with selected visibility and title (vertical layout).")]
 		public Window(bool visible, string title) : this(Layout.Vertical, visible) => Title = title;
 		[Description("Create new window with selected visibility, title and layout.")]
 		public Window(bool visible, string title, Layout layout) : this(layout, visible) => Title = title;

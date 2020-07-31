@@ -236,6 +236,8 @@ namespace RedOnion.ROS
 			= Expression.Parameter(typeof(int), "index");
 		internal static readonly ParameterExpression StrIndexParameter
 			= Expression.Parameter(typeof(string), "index");
+		internal static readonly ParameterExpression ValIndexParameter
+			= Expression.Parameter(typeof(Value), "index");
 		internal static readonly ParameterExpression ValueArg0Parameter
 			= Expression.Parameter(typeof(Value), "arg0");
 		internal static readonly ParameterExpression ValueArg1Parameter

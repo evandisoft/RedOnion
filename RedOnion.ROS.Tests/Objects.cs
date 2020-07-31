@@ -24,5 +24,16 @@ namespace RedOnion.ROS.Tests
 			Test("var c = stack ints");
 			Test(3, "c.pop");
 		}
+
+		[Test]
+		public void ROS_Obj02_Indexing()
+		{
+			Globals = new Globals();
+			Test("var d = new dictionary");
+			Test("d.add \"x\", \"y\"");
+			Test("y", "d[\"x\"]");
+			Test("x", "d[\"z\"] = \"x\"");
+			Test("x", "d[\"z\"]");
+		}
 	}
 }

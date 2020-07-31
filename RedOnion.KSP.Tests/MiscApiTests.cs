@@ -9,7 +9,7 @@ using RedOnion.ROS;
 namespace RedOnion.KSP.Tests
 {
 	[TestFixture]
-	public class API_MistTests : ApiTestsBase
+	public class API_MiscTests : ApiTestsBase
 	{
 		[Test]
 		public void API_Misc01_Subscribe()

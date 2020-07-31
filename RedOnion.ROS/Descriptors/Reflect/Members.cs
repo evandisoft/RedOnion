@@ -290,6 +290,38 @@ namespace RedOnion.ROS
 						}
 						return;
 					}
+					//-------------------------------------------------------------- this[Value]
+					if (itype == typeof(Value))
+					{
+						if (p.CanRead)
+						{
+							var read = p.GetGetMethod(false);
+							if (read != null)
+								valIndexGet = Expression.Lambda<Func<object, Value, Value>>(
+									GetNewValueExpression(convert ?? p.PropertyType,
+									GetConvertExpression(Expression.Call(
+										GetConvertExpression(SelfParameter, p.DeclaringType),
+										read, ValIndexParameter), convert)),
+									SelfParameter, ValIndexParameter
+								).Compile();
+						}
+						if (p.CanWrite)
+						{
+							var write = p.GetSetMethod();
+							if (write != null)
+								valIndexSet = Expression.Lambda<Action<object, Value, Value>>(
+									Expression.Call(
+										GetConvertExpression(SelfParameter, p.DeclaringType),
+										write, ValIndexParameter,
+										GetConvertExpression(GetValueConvertExpression(
+											convert ?? p.PropertyType, ValueParameter),
+											convert == null ? null : p.PropertyType)
+									),
+									SelfParameter, ValIndexParameter, ValueParameter
+								).Compile();
+						}
+						return;
+					}
 					return;
 				}
 				//-------------------------------------------------------------- normal property

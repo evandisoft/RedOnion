@@ -333,11 +333,18 @@ namespace RedOnion.ROS.Parsing
 			{ "catch",      ExCode.Catch },
 			{ "finally",    ExCode.Finally },
 			{ "using",      ExCode.Using },
+			{ "yield",      ExCode.Yield },
+			{ "wait",       ExCode.Wait },
+			{ "import",     ExCode.Import },
+			{ "include",    ExCode.Include },
+			{ "namespace",  ExCode.Namespace },
+			{ "package",    ExCode.Package },
+			{ "function",   ExCode.Function },
+			{ "def",        ExCode.Def },// like function (from Python/Ruby)
+			/*
 			{ "from",       ExCode.From },
 			{ "select",     ExCode.Select },
 			{ "orderby",    ExCode.OrderBy },
-			{ "yield",      ExCode.Yield },
-			{ "wait",       ExCode.Wait },
 			{ "public",     ExCode.Public },
 			{ "private",    ExCode.Private },
 			{ "protected",  ExCode.Protected },
@@ -350,24 +357,19 @@ namespace RedOnion.ROS.Parsing
 			{ "readonly",   ExCode.ReadOnly },
 			{ "const",      ExCode.Const },
 			{ "static",     ExCode.Static },
-			{ "import",     ExCode.Import },
-			{ "include",    ExCode.Include },
-			{ "namespace",  ExCode.Namespace },
-			{ "package",    ExCode.Package },
 			{ "class",      ExCode.Class },
 			{ "struct",     ExCode.Struct },
 			{ "enum",       ExCode.Enum },
 			{ "interface",  ExCode.Interface },
 			{ "delegate",   ExCode.Delegate },
 			{ "where",      ExCode.Where },
-			{ "function",   ExCode.Function },
-			{ "def",        ExCode.Def },// like function (from Python/Ruby)
 			{ "event",      ExCode.Event },
 			{ "get",        ExCode.Get },
 			{ "set",        ExCode.Set },
 			{ "add",        ExCode.Combine },
 			{ "combine",    ExCode.Combine },
 			{ "remove",     ExCode.Remove }
+			*/
 		};
 	}
 }
