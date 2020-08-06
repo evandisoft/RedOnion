@@ -16,5 +16,16 @@ namespace RedOnion.ROS.Objects
 		}
 
 		public int Length => Count;
+		public bool Empty => Count == 0;
+		public new Value this[int index]
+		{
+			get => base[index];
+			set
+			{
+				if (index == Count)
+					Add(value);
+				else base[index] = value;
+			}
+		}
 	}
 }

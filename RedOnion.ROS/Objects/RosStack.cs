@@ -14,5 +14,8 @@ namespace RedOnion.ROS.Objects
 			foreach (var it in collection)
 				Push(new Value(it));
 		}
+
+		public int Length => Count;
+		public bool Empty => Count == 0;
 	}
 }

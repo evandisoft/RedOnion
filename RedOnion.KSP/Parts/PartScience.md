@@ -10,6 +10,10 @@ Available science through one part.
 - `experimentId`: string - Experiment ID.
 - `experimentTitle`: string - Experiment title.
 - `subject`: [Science.Subject](../API/Science.Subject.md) - \[`WIP`\] Science subject for the experiment and current situation.
+- `completed`: double - Science returned to KSC.
+- `capacity`: double - Total obtainable science.
+- `value`: double - Science value (when returned to KSC).
+- `nextValue`: double - Next science value (when returned to KSC).
 - `ready`: bool - \[`WIP`\] Ready to perform experiment.
 - `state`: [ScienceState](ScienceState.md) - \[`WIP`\] State of science module.
 

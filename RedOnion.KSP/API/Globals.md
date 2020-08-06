@@ -5,6 +5,7 @@ Global variables, objects and functions common to all scripting languages.
 
 **Types:**
 - `autorun`: [AutoRun](AutoRun.md) - An api for setting which scripts will be ran when an engine is reset.
+- `os`: [OperatingSystem](OperatingSystem.md) - Operating System - interface to MunOS.
 - `ui`: [UI](../Namespaces/UI.md) - User Interface.
 - `ksp`: [KSP](../Namespaces/KSP.md) - \[`Unsafe`\] Shortcuts to KSP API + some tools.
 - `unity`: [Unity](../Namespaces/Unity.md) - \[`Unsafe`\] Shortcuts to Unity API.

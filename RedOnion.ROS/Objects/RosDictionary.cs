@@ -30,5 +30,7 @@ namespace RedOnion.ROS.Objects
 		}
 
 		public bool Contains(Value key) => ContainsKey(key);
+		public int Length => Count;
+		public bool Empty => Count == 0;
 	}
 }

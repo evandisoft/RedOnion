@@ -6,9 +6,9 @@ It may get garbage-collected otherwise, but that can take time and is rather bac
 
 
 **Constructors:**
-- `Window()` - Create new window (immediately visible).
+- `Window()` - Create new window (immediately visible, vertical layout).
 - `Window()`: title string
-  - Create new window with a title (immediately visible).
+  - Create new window with a title (immediately visible, vertical layout).
 - `Window()`: title string, layout [Layout](Layout.md)
   - Create new window with a title and defined layout (immediately visible).
 - `Window()`: layout [Layout](Layout.md), title string
@@ -18,9 +18,9 @@ It may get garbage-collected otherwise, but that can take time and is rather bac
 - `Window()`: layout [Layout](Layout.md), visible bool
   - Create new window with defined layout and selected visibility.
 - `Window()`: visible bool
-  - Create new window with selected visibility.
+  - Create new window with selected visibility (and vertical layout).
 - `Window()`: visible bool, title string
-  - Create new window with selected visibility and title.
+  - Create new window with selected visibility and title (vertical layout).
 - `Window()`: visible bool, title string, layout [Layout](Layout.md)
   - Create new window with selected visibility, title and layout.
 - `Window()`: visible bool, layout [Layout](Layout.md), title string

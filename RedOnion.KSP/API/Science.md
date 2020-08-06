@@ -20,3 +20,4 @@ Science tools.
 - `mainBiomeId`: string - Current main biome ID (spaces removed).
 - `subBiome`: string - Current sub-biome (tag, valid only if landed).
 - `subBiomeId`: string - Current sub-biome ID (spaces removed).
+- `gain`: double - Career gain factor.
