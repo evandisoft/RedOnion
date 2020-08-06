@@ -112,7 +112,7 @@ namespace RedOnion.Shell
 							" !  At line {0}." : " !  At line {0}: {1}",
 							err.LineNumber, err.Line);
 				}
-				var statement = prefix.Code?.Length > 0
+				var statement = prefix?.Code?.Length > 0
 					&& prefix.Code[0] >= (byte)OpKind.Statement
 					&& prefix.Code[0] != (byte)OpCode.Autocall;
 				if (statement && line != "")

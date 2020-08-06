@@ -3,7 +3,7 @@ var wnd = new ui.window false, "Science"
 wnd.closed += def => done = true
 var situation = wnd.addLabel()
 var rowbox = wnd.add new ui.scrollbox
-rowbox.width = 200
+rowbox.width = 250 // need to implement custom layout - replacing that temporary content-size-fitter
 rowbox.height = 200
 
 var rows = new list
@@ -12,8 +12,12 @@ var dict = new dictionary
 def row_ready
   for var sci in this.sci
     if sci.ready
+      button.enabled = true
+      button.text = "DO"
       return true
-   return false
+  button.enabled = false
+  button.text = "---"
+  return false
 
 def row_click button
   var row = button.tag
@@ -23,6 +27,7 @@ def row_click button
       break      
 
 def refresh
+  print "refresh"
   for var row in rows
     row.present = false
     row.sci.clear()
@@ -35,13 +40,18 @@ def refresh
       row.ready = row_ready
       row.panel = rowbox.addHorizontal()
       row.panel.flexWidth = 1
+      row.panel.width = 234 // need to implement custom layout - replacing that temporary content-size-fitter
       row.label = row.panel.addLabel sci.experimentId
       row.label.flexWidth = 1
+      row.value = row.panel.addLabel()
+      row.value.width = 60
       row.button = row.panel.addButton "DO", row_click
+      row.button.width = 40
       row.button.tag = row
       dict[sci.experimentId] = row
       rows.add row
     row.present = true
+    row.value.text = "{0:F1}/{1:F1}".format sci.subject.value, sci.subject.capacity
     row.sci.add sci
   for var i = 0; i < rows.count
     var row = rows[i]
@@ -59,6 +69,7 @@ def tryRefresh
   if refreshing
     return
   refreshing = true
+  lastRefresh = time.now
   for var i = 0; i < 3; i++
     try
       refresh
@@ -70,8 +81,10 @@ def tryRefresh
         wait
   refreshing = false
 
-var all = wnd.addButton "Gather All", def
+var btns = wnd.addHorizontal()
+var all = btns.addButton "Gather All", def
   all.enabled = false
+  need.enabled = false
   try
     for var row in rows
       if row.button.enabled
@@ -80,6 +93,24 @@ var all = wnd.addButton "Gather All", def
     print "Gather All: {0}", e
   finally
     all.enabled = true
+    need.enabled = true
+var need = btns.addButton "Gather >= 0.1", def
+  all.enabled = false
+  need.enabled = false
+  try
+    for var row in rows
+      if row.button.enabled
+        var done = false
+        for var sci in row.sci
+          print "{0:F2} {1}".format sci.subject.value, sci.experimentId
+          if !done and sci.subject.value >= 0.01
+            done = true
+            row_click row.button
+  catch var e
+    print "Gather >= 0.1: {0}", e
+  finally
+    all.enabled = true
+    need.enabled = true
 
 try
 

@@ -147,7 +147,7 @@ namespace RedOnion.ROS.Parsing
 							_stringBuilder.Append('\t');
 							continue;
 						case 'u':
-							if (i + 4 >= n)
+							if (i + 4 > n)
 								throw new BadEscapeSequence(this);
 							var a = Nibble(value[i++]);
 							var b = Nibble(value[i++]);
