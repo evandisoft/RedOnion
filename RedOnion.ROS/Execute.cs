@@ -65,7 +65,11 @@ namespace RedOnion.ROS
 										pending = OpCode.Void;
 										at = blockEnd;
 										if (ctx.BlockCount > 0)
+										{
+											if (ctx.BlockCode == BlockCode.ForEach)
+												vals.Pop(2);
 											ctx.BlockCode = BlockCode.Block;
+										}
 										continue;
 									}
 									if (pending == OpCode.Continue)
@@ -813,7 +817,11 @@ namespace RedOnion.ROS
 							at = blockEnd = ctx.Pop();
 						}
 						if (ctx.BlockCount > 0)
+						{
+							if (ctx.BlockCode == BlockCode.ForEach)
+								vals.Pop(2);
 							ctx.BlockCode = BlockCode.Block;
+						}
 						continue;
 					}
 					case OpCode.Continue:

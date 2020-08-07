@@ -103,6 +103,7 @@ namespace RedOnion.KSP.API
 			}
 			public static implicit operator MunProcess(Process it) => it?.native;
 
+			[Description("Create new process from a script (given path to it).")]
 			public Process(string path)
 			{
 				var ext = System.IO.Path.GetExtension(path);

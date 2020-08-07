@@ -166,7 +166,29 @@ namespace RedOnion.ROS.Tests
 		}
 
 		[Test]
-		public void ROS_Stts06_Yield()
+		public void ROS_Stts06_Break()
+		{
+			Lines(ExitCode.Return, "12",
+				"var s = \"\"",
+				"for var e in [1,2,3]",
+				"  s += e",
+				"  if e == 2",
+				"    break",
+				"return s");
+			Lines(ExitCode.Return, "234",
+				"var s = \"\"",
+				"for var i in [1,2,3]",
+				"  for var j in [1,2,3]",
+				"    s += i+j",
+				"    if j == i",
+				"      break",
+				"  if i == 2",
+				"    break",
+				"return s");
+		}
+
+		[Test]
+		public void ROS_Stts07_Yield()
 		{
 			Yield("yield");
 			YieldLines(ExitCode.Return, "done",

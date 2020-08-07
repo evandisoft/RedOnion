@@ -3,6 +3,10 @@
 OS Process - collection of threads.
 
 
+**Constructors:**
+- `Process()`: path string
+  - Create new process from a script (given path to it).
+
 **Instance Fields:**
 - `id`: long - Unique process identifier.
 

@@ -27,7 +27,6 @@ def row_click button
       break      
 
 def refresh
-  print "refresh"
   for var row in rows
     row.present = false
     row.sci.clear()
@@ -51,7 +50,8 @@ def refresh
       dict[sci.experimentId] = row
       rows.add row
     row.present = true
-    row.value.text = "{0:F1}/{1:F1}".format sci.subject.value, sci.subject.capacity
+    //TODO: see if we already have that experiment and use nextValue in such case
+    row.value.text = "{0:F1}/{1:F1}".format sci.value, sci.capacity
     row.sci.add sci
   for var i = 0; i < rows.count
     var row = rows[i]
@@ -100,12 +100,11 @@ var need = btns.addButton "Gather >= 0.1", def
   try
     for var row in rows
       if row.button.enabled
-        var done = false
         for var sci in row.sci
-          print "{0:F2} {1}".format sci.subject.value, sci.experimentId
-          if !done and sci.subject.value >= 0.01
-            done = true
+          //TODO: skip or use nextValue if we already have it
+          if sci.value >= 0.01
             row_click row.button
+            break
   catch var e
     print "Gather >= 0.1: {0}", e
   finally
