@@ -6,6 +6,8 @@ using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
+// keep all static fields in DescriptorOf.cs (not to mess the order of initialization)
+
 /*	The reason for using struct is to avoid memory allocation
  *	(and therefore frequent garbage collection),
  *	because these would get created very often being a class.
@@ -34,7 +36,11 @@ namespace RedOnion.ROS
 		/// <summary>
 		/// Culture settings for formatting (invariant by default).
 		/// </summary>
-		public static CultureInfo Culture = CultureInfo.InvariantCulture;
+		public static CultureInfo Culture
+		{
+			get => Descriptor.Culture;
+			set => Descriptor.Culture = value;
+		}
 		public static string Format(FormattableString msg)
 			=> msg.ToString(Culture);
 		public static string Format(StringWrapper msg, params object[] args)
