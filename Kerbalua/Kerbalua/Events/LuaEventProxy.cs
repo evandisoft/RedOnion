@@ -1,6 +1,6 @@
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
-using RedOnion.KSP.Completion;
+using RedOnion.Common.Completion;
 using System;
 using System.Collections.Generic;
 using System.Linq;

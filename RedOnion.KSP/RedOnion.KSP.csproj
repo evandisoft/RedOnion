@@ -104,7 +104,6 @@
     <Compile Include="ROS\RosThread.cs" />
     <Compile Include="Utilities\InteropUtilities.cs" />
     <Compile Include="API\VectorUtils.cs" />
-    <Compile Include="Utilities\MultiValueDictionary.cs" />
     <Compile Include="Utilities\AutoRemoveList.cs" />
     <Compile Include="Utilities\Properties.cs" />
     <Compile Include="Utilities\ReadOnlyList.cs" />
@@ -160,7 +159,6 @@
     <Compile Include="UnsafeAPI\KerbalsDictionary.cs" />
     <Compile Include="UnsafeAPI\UnsafeAPI.cs" />
     <Compile Include="Utilities\ReferenceEqualityComparer.cs" />
-    <Compile Include="MoonSharp\Interfaces\IMoonSharpCompletable.cs" />
     <Compile Include="MoonSharp\MoonSharpAPI\MoonSharpGlobals.cs" />
     <Compile Include="Utilities\ScriptStringKeyedConstDictionary.cs" />
     <Compile Include="Settings\ProjectSettings.cs" />
@@ -195,6 +193,7 @@
   <ItemGroup>
     <Folder Include="Settings\" />
     <Folder Include="Kerbalua\" />
+    <Folder Include="MoonSharp\Interfaces\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

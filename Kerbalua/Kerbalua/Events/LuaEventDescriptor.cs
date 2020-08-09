@@ -10,8 +10,7 @@ using MoonSharp.Interpreter.Interop;
 using MoonSharp.Interpreter.Interop.BasicDescriptors;
 using MoonSharp.Interpreter.Interop.StandardDescriptors;
 using MunOS;
-using RedOnion.KSP.MoonSharp.Proxies;
-using RedOnion.KSP.Utilities;
+using RedOnion.Common.Utilities;
 using UnityEngine;
 
 namespace Kerbalua.Events

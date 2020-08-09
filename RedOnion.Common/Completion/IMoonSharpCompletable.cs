@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
-using RedOnion.KSP.Completion;
 
-namespace RedOnion.KSP.MoonSharp.Interfaces
+namespace RedOnion.Common.Completion
 {
 	/// <summary>
 	/// This is to deal with special cases, like NamespaceInstance, where

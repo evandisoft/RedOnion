@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace RedOnion.KSP.Utilities
+namespace RedOnion.Common.Utilities
 {
 	/// <summary>
 	/// A Dictionary where multiple values can be associated to the same key
