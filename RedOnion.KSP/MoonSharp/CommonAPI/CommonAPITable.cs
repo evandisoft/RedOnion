@@ -30,6 +30,8 @@ namespace RedOnion.KSP.MoonSharp.CommonAPI
 			FillTableWithProperties(properties);
 			var methods=type.GetMethods(publicStatic);
 			FillTableWithMethods(methods);
+			var nestedTypes=type.GetNestedTypes(BindingFlags.Public);
+			FillTableWithNestedTypes(nestedTypes);
 
 			var callable=type.GetCustomAttribute<CallableAttribute>();
 			if (callable!=null)
@@ -58,6 +60,14 @@ namespace RedOnion.KSP.MoonSharp.CommonAPI
 			}
 
 			return this;
+		}
+
+		private void FillTableWithNestedTypes(Type[] nestedTypes)
+		{
+			foreach (var t in nestedTypes)
+			{
+				this[t.Name]=UserData.CreateStatic(t);
+			}
 		}
 
 		void FillTableWithFields(FieldInfo[] fieldInfos)

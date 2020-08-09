@@ -20,5 +20,10 @@ namespace KerbaluaNUnit
 
 		public static readonly Type callableprop=typeof(CallableProperty_Namespace);
 		public static readonly Type callablemethod=typeof(CallableMethod_Namespace);
+	
+		public class InternalClass
+		{
+
+		}
 	}
 }

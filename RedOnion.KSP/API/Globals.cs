@@ -27,6 +27,7 @@ namespace RedOnion.KSP.API
 			if (core == null)
 				core = MunOS.MunCore.Default;
 			core.BeforeExecute += Science.update;
+
 			OperatingSystemInterface.RegisterProcessCreator(".ros", ROS.RosManager.ProcessCreator);
 			done = true;
 		}
@@ -48,8 +49,12 @@ namespace RedOnion.KSP.API
 		[Description("An api for setting which scripts will be ran when an engine is reset.")]
 		public static readonly Type autorun = typeof(AutoRun);
 
+		// 'os' conflicts with lua's 'os' namespace so 'munos' is an alias for that.
+		[Description("Operating System - interface to MunOS.")]
+		public static readonly Type munos = typeof(OperatingSystem);
 		[Description("Operating System - interface to MunOS.")]
 		public static readonly Type os = typeof(OperatingSystem);
+
 		[Description("User Interface.")]
 		public static readonly Type ui = typeof(UI_Namespace);
 		[Unsafe, Description("Shortcuts to KSP API + some tools.")]
