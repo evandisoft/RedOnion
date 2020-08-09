@@ -150,29 +150,22 @@
     <Compile Include="ReflectionUtil\NamespaceMappings.cs" />
     <Compile Include="ReflectionUtil\TypeAlternatives.cs" />
     <Compile Include="ReflectionUtil\NameTypeMap.cs" />
-    <Compile Include="Completion\ICompletable.cs" />
-    <Compile Include="Completion\IHasCompletionProxy.cs" />
     <Compile Include="ReflectionUtil\NamespaceInstance.MoonSharp.cs" />
     <Compile Include="Autopilot\RelativeDirection.cs" />
     <Compile Include="ReflectionUtil\DualCaseSensitivityDict.cs" />
     <Compile Include="ReflectionUtil\GetMappings.cs" />
     <Compile Include="ReflectionUtil\GetMappings.Lua.cs" />
     <Compile Include="API\AutoRun.cs" />
-    <Compile Include="Settings\SavedSettings.cs" />
     <Compile Include="UnsafeAPI\BodiesDictionary.cs" />
     <Compile Include="UnsafeAPI\KerbalsDictionary.cs" />
     <Compile Include="UnsafeAPI\UnsafeAPI.cs" />
     <Compile Include="Utilities\ReferenceEqualityComparer.cs" />
-    <Compile Include="MoonSharp\CommonAPI\CommonAPITable.cs" />
-    <Compile Include="MoonSharp\CommonAPI\CommonAPIMetatable.cs" />
-    <Compile Include="Completion\ISafeMetatable.cs" />
-    <Compile Include="Completion\Static.cs" />
-    <Compile Include="Completion\StaticObject.cs" />
-    <Compile Include="Settings\ProjectSettings.cs" />
     <Compile Include="MoonSharp\Interfaces\IMoonSharpCompletable.cs" />
     <Compile Include="MoonSharp\MoonSharpAPI\MoonSharpGlobals.cs" />
-    <Compile Include="Completion\Instance.cs" />
     <Compile Include="Utilities\ScriptStringKeyedConstDictionary.cs" />
+    <Compile Include="Settings\ProjectSettings.cs" />
+    <Compile Include="Settings\SavedSettings.cs" />
+    <Compile Include="Kerbalua\KerbaluaStaticInit.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RedOnion.Common\RedOnion.Common.csproj">
@@ -191,9 +184,17 @@
       <Project>{A4C93278-A705-4AC2-B2A9-16B30C2E2C36}</Project>
       <Name>MunOS</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Kerbalua\Kerbalua.csproj">
+      <Project>{F590B1DB-8F33-4986-8383-180952D63CDA}</Project>
+      <Name>Kerbalua</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Settings\" />
+    <Folder Include="Kerbalua\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

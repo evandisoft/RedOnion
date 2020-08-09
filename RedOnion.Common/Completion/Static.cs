@@ -1,5 +1,5 @@
 using System;
-namespace RedOnion.KSP.Completion
+namespace RedOnion.Common.Completion
 {
 	/// <summary>
 	/// Container to hold a type so it is treated as a static class for completion purposes.

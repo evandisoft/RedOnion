@@ -44,6 +44,15 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilities\StringWrapper.cs" />
     <Compile Include="Debugging\QueueLogger.cs" />
+    <Compile Include="Completion\ICompletable.cs" />
+    <Compile Include="Completion\IHasCompletionProxy.cs" />
+    <Compile Include="Completion\Instance.cs" />
+    <Compile Include="Completion\ISafeMetatable.cs" />
+    <Compile Include="Completion\Static.cs" />
+    <Compile Include="Completion\StaticObject.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Completion\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

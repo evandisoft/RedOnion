@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace RedOnion.KSP.Completion
+namespace RedOnion.Common.Completion
 {
 	public interface ICompletable
 	{

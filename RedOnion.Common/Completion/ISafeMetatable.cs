@@ -1,5 +1,5 @@
 using System;
-namespace RedOnion.KSP.Completion
+namespace RedOnion.Common.Completion
 {
 	public interface ISafeMetatable
 	{

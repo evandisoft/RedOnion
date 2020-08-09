@@ -2,7 +2,7 @@ using System;
 using System.Globalization;
 using System.Reflection;
 
-namespace RedOnion.KSP.Completion
+namespace RedOnion.Common.Completion
 {
 	public class StaticObject:Type
 	{

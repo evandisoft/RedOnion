@@ -4,9 +4,9 @@ using System.Linq;
 using System.Reflection;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
-using RedOnion.KSP.Completion;
+using RedOnion.Common.Completion;
 
-namespace RedOnion.KSP.MoonSharp.CommonAPI
+namespace Kerbalua.CommonAPI
 {
 	/// <summary>
 	/// Property metatable.

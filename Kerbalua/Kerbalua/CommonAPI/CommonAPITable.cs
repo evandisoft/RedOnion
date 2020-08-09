@@ -6,7 +6,7 @@ using MoonSharp.Interpreter;
 using RedOnion.Attributes;
 using RedOnion.Debugging;
 
-namespace RedOnion.KSP.MoonSharp.CommonAPI
+namespace Kerbalua.CommonAPI
 {
 	public class CommonAPITable : Table
 	{
