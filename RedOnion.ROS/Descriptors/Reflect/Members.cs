@@ -532,11 +532,7 @@ namespace RedOnion.ROS
 					}
 					else
 					{
-						Type convert = null;
-						var convertAttrs = m.ReturnTypeCustomAttributes
-							.GetCustomAttributes(typeof(ConvertAttribute), true);
-						if (convertAttrs.Length == 1)
-							convert = ((ConvertAttribute)convertAttrs[0]).Type;
+						Type convert = ConvertAttribute.Get(m);
 						switch (argc)
 						{
 						case 0:
