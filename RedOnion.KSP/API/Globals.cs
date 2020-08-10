@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using RedOnion.ROS;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
-using RedOnion.KSP.Completion;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;

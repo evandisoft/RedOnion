@@ -52,6 +52,7 @@
     <Compile Include="Completion\StaticObject.cs" />
     <Compile Include="Completion\IMoonSharpCompletable.cs" />
     <Compile Include="Utilities\MultiValueDictionary.cs" />
+    <Compile Include="Utilities\ReferenceEqualityComparer.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Completion\" />

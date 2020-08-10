@@ -82,7 +82,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Kerbalua\Scripting\KerbaluaManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Kerbalua\Completion\Grammar\IncompleteLuaBaseListener.cs" />
     <Compile Include="Kerbalua\Completion\Grammar\IncompleteLuaBaseVisitor.cs" />
@@ -108,13 +107,7 @@
     <Compile Include="Kerbalua\Completion\CompletionTypes\InstanceStaticCompletion.cs" />
     <Compile Include="Kerbalua\Completion\MoonSharpIntellisense.cs" />
     <Compile Include="Kerbalua\Completion\CompletionTypes\MoonSharpCompletable.cs" />
-    <Compile Include="Kerbalua\Events\LuaDescriptor.cs" />
-    <Compile Include="Kerbalua\Events\LuaEventDescriptor.cs" />
-    <Compile Include="Kerbalua\Events\LuaEventProxy.cs" />
     <Compile Include="Kerbalua\Completion\CompletionTypes\EnumCompletion.cs" />
-    <Compile Include="Kerbalua\Scripting\KerbaluaProcess.cs" />
-    <Compile Include="Kerbalua\Scripting\KerbaluaThread.cs" />
-    <Compile Include="Kerbalua\Scripting\KerbaluaReplThread.cs" />
     <Compile Include="Kerbalua\CommonAPI\CommonAPIMetatable.cs" />
     <Compile Include="Kerbalua\CommonAPI\CommonAPITable.cs" />
   </ItemGroup>

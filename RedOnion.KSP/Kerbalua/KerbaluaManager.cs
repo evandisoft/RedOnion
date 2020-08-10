@@ -5,14 +5,15 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using Kerbalua.Scripting;
 
-namespace Kerbalua.Scripting
+namespace RedOnion.KSP.Kerbalua
 {
 	public class KerbaluaManager : ScriptManager
 	{
 		public override string Extension => ".lua";
 
-		public override MunProcess CreateProcess()
+		public override MunProcess CreateProcess() 
 			=> new KerbaluaProcess(this);
 		public override MunThread CreateThread(string source, string path,
 			MunProcess process = null, MunPriority priority = MunPriority.Main, bool start = true)

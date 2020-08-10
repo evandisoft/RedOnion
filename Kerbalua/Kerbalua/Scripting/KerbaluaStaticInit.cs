@@ -1,11 +1,11 @@
 using System;
+using Kerbalua.Events;
 using Kerbalua.Scripting;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
 using MunOS;
 using RedOnion.KSP.API;
 using RedOnion.UI;
-using RedOnion.KSP.Kerbalua.Events;
 
 namespace RedOnion.KSP.Kerbalua
 {
@@ -33,24 +33,16 @@ namespace RedOnion.KSP.Kerbalua
 						var kerbaluaScript=closure.OwnerScript as KerbaluaScript;
 						if (kerbaluaScript==null)
 						{
-							throw new Exception("Ownerscript was not KerbaluaScript in KerbaluaStaticInit");
+							throw new Exception("Ownerscript was not KerbaluaScript in LuaEventDescriptor");
 						}
 
 						var process=kerbaluaScript?.kerbaluaProcess;
 						if (process==null)
 						{
-							throw new Exception("Could not get current process in KerbaluaStaticInit");
+							throw new Exception("Could not get current process in LuaEventDescriptor");
 						}
 
-						var kerbaluaProcess=process as KerbaluaProcess;
-
-						// I don't expect this to ever be the case.
-						if (kerbaluaProcess==null)
-						{
-							throw new Exception("Process in LuaEventDescriptor was not a KerbaluaStaticInit");
-						}
-
-						new KerbaluaThread(kerbaluaProcess, MunPriority.Callback, closure);
+						new KerbaluaThread(process, MunPriority.Callback, closure);
 					});
 				});
 		}

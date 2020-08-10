@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Kerbalua.Events
+namespace RedOnion.KSP.Kerbalua.Events
 {
 	public class LuaEventProxy : IUserDataType, ICompletable
 	{

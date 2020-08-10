@@ -2,21 +2,24 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Kerbalua.Completion;
+using Kerbalua.Scripting;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Loaders;
 using MunOS;
 using MunOS.Repl;
+using RedOnion.KSP.API;
+using RedOnion.KSP.MoonSharp.MoonSharpAPI;
 using RedOnion.KSP.Settings;
 using UnityEngine;
 
-namespace Kerbalua.Scripting
+namespace RedOnion.KSP.Kerbalua
 {
 	public class KerbaluaProcess:MunProcess
 	{
 		public KerbaluaScript ScriptEngine { get; private set; }
 
 		//TODO: implement process memory/globals sharing
-		public KerbaluaProcess(KerbaluaManager manager) : this(manager.Core)
+		public KerbaluaProcess(ScriptManager manager) : this(manager.Core)
 			=> ScriptManager = manager;
 		public KerbaluaProcess(MunCore core) : base(core)
 			=> InternalResetEngine();
@@ -24,6 +27,8 @@ namespace Kerbalua.Scripting
 		void InternalResetEngine()
 		{
 			ScriptEngine=new KerbaluaScript(this);
+			ScriptEngine.AddAPI(typeof(Globals));
+			ScriptEngine.AddAPI(typeof(MoonSharpGlobals));
 
 			ScriptEngine.Options.ScriptLoader = new FileSystemScriptLoader();
 			var slb=ScriptEngine.Options.ScriptLoader as ScriptLoaderBase;

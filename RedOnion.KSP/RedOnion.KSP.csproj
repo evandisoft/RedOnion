@@ -158,12 +158,18 @@
     <Compile Include="UnsafeAPI\BodiesDictionary.cs" />
     <Compile Include="UnsafeAPI\KerbalsDictionary.cs" />
     <Compile Include="UnsafeAPI\UnsafeAPI.cs" />
-    <Compile Include="Utilities\ReferenceEqualityComparer.cs" />
     <Compile Include="MoonSharp\MoonSharpAPI\MoonSharpGlobals.cs" />
     <Compile Include="Utilities\ScriptStringKeyedConstDictionary.cs" />
     <Compile Include="Settings\ProjectSettings.cs" />
     <Compile Include="Settings\SavedSettings.cs" />
     <Compile Include="Kerbalua\KerbaluaStaticInit.cs" />
+    <Compile Include="Kerbalua\KerbaluaManager.cs" />
+    <Compile Include="Kerbalua\KerbaluaProcess.cs" />
+    <Compile Include="Kerbalua\KerbaluaReplThread.cs" />
+    <Compile Include="Kerbalua\KerbaluaThread.cs" />
+    <Compile Include="Kerbalua\Events\LuaDescriptor.cs" />
+    <Compile Include="Kerbalua\Events\LuaEventDescriptor.cs" />
+    <Compile Include="Kerbalua\Events\LuaEventProxy.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RedOnion.Common\RedOnion.Common.csproj">
@@ -194,6 +200,7 @@
     <Folder Include="Settings\" />
     <Folder Include="Kerbalua\" />
     <Folder Include="MoonSharp\Interfaces\" />
+    <Folder Include="Kerbalua\Events\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

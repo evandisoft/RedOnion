@@ -1,7 +1,7 @@
 using System;
 using MunOS;
 
-namespace Kerbalua.Scripting
+namespace RedOnion.KSP.Kerbalua
 {
 	public class KerbaluaReplThread : KerbaluaThread
 	{

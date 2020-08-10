@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
-using RedOnion.KSP.Completion;
 using RedOnion.Attributes;
+using RedOnion.Common.Completion;
 
 namespace RedOnion.KSP.ReflectionUtil
 {

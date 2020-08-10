@@ -7,7 +7,7 @@ using MoonSharp.Interpreter.Compatibility;
 using MoonSharp.Interpreter.Interop;
 using MoonSharp.Interpreter.Interop.BasicDescriptors;
 
-namespace Kerbalua.Events
+namespace RedOnion.KSP.Kerbalua.Events
 {
 	public class LuaDescriptor : DispatchingUserDataDescriptor
 	{

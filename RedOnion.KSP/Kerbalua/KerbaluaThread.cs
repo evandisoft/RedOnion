@@ -1,11 +1,12 @@
 using System;
 using System.Diagnostics;
 using Kerbalua.Parsing;
+using Kerbalua.Scripting;
 using MoonSharp.Interpreter;
 using MunOS;
 using static RedOnion.Debugging.QueueLogger;
 
-namespace Kerbalua.Scripting
+namespace RedOnion.KSP.Kerbalua
 {
 	public class KerbaluaThread:MunThread
 	{

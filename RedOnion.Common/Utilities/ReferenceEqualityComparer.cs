@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace RedOnion.KSP.Utilities
+namespace RedOnion.Common.Utilities
 {
 	/// <summary>
 	/// Implementation of IEqualityComparer enforcing reference equality

@@ -1,6 +1,5 @@
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
-using RedOnion.KSP.Completion;
 using RedOnion.ROS;
 using RedOnion.Collections;
 using System;
@@ -10,6 +9,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using RedOnion.Debugging;
+using RedOnion.Common.Completion;
 
 namespace RedOnion.KSP.Utilities
 {

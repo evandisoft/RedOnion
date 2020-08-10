@@ -13,7 +13,7 @@ using MunOS;
 using RedOnion.Common.Utilities;
 using UnityEngine;
 
-namespace Kerbalua.Events
+namespace RedOnion.KSP.Kerbalua.Events
 {
 	/// <summary>
 	/// Class providing easier marshalling of CLR events. Handling is limited to a narrow range of handler signatures, which,
@@ -304,7 +304,15 @@ namespace Kerbalua.Events
 					throw new Exception("Could not get current process in LuaEventDescriptor");
 				}
 
-				new KerbaluaThread(process, MunPriority.Callback, c);
+				var kerbaluaProcess=process as KerbaluaProcess;
+
+				// I don't expect this to ever be the case.
+				if (kerbaluaProcess==null)
+				{
+					throw new Exception("Process in LuaEventDescriptor was not a KerbaluaProcess");
+				}
+
+				new KerbaluaThread(kerbaluaProcess, MunPriority.Callback, c);
 			}
 		}
 

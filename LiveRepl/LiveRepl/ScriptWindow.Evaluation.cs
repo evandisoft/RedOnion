@@ -6,6 +6,7 @@ using Kerbalui.Controls;
 using MunOS;
 using MunOS.Repl;
 using RedOnion.KSP.API;
+using RedOnion.KSP.Kerbalua;
 using RedOnion.KSP.ROS;
 using RedOnion.KSP.Settings;
 using UnityEngine;

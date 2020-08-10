@@ -1,5 +1,5 @@
 using RedOnion.Attributes;
-using RedOnion.KSP.Completion;
+using RedOnion.Common.Completion;
 using RedOnion.KSP.Utilities;
 using RedOnion.ROS.Utilities;
 using System;

@@ -7,7 +7,6 @@ using System.Diagnostics;
 using System.ComponentModel;
 using MoonSharp.Interpreter.Compatibility;
 using RedOnion.UI;
-using Kerbalua.Events;
 using System.IO;
 using MunOS;
 using Kerbalua.CommonAPI;
@@ -57,7 +56,7 @@ namespace Kerbalua.Scripting
 				//});
 		}
 
-		public readonly KerbaluaProcess kerbaluaProcess;
+		public readonly MunProcess kerbaluaProcess;
 
 		public const string LuaNew=@"
 return function(stat,...) 
@@ -80,17 +79,12 @@ end
 
 		CommonAPITable commonAPITable;
 
-		public KerbaluaScript(KerbaluaProcess kerbaluaProcess) : base(CoreModules.Preset_Complete)
+		public KerbaluaScript(MunProcess kerbaluaProcess) : base(CoreModules.Preset_Complete)
 		{
 			this.kerbaluaProcess=kerbaluaProcess;
 
 			var metatable=new Table(this);
 			commonAPITable=new CommonAPITable(this);
-			//var commonAPI=new CommonAPITable(this);
-
-			//EVANTODO: add these api things elsewhere.
-			//commonAPI.AddAPI(typeof(Globals));
-			//commonAPI.AddAPI(typeof(MoonSharpGlobals));
 
 			metatable["__index"]=commonAPITable;
 			Globals.MetaTable=metatable;
