@@ -162,7 +162,6 @@
     <Compile Include="Utilities\ScriptStringKeyedConstDictionary.cs" />
     <Compile Include="Settings\ProjectSettings.cs" />
     <Compile Include="Settings\SavedSettings.cs" />
-    <Compile Include="Kerbalua\KerbaluaStaticInit.cs" />
     <Compile Include="Kerbalua\KerbaluaManager.cs" />
     <Compile Include="Kerbalua\KerbaluaProcess.cs" />
     <Compile Include="Kerbalua\KerbaluaReplThread.cs" />
