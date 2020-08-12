@@ -9,6 +9,7 @@ using System.Reflection;
 using RedOnion.Attributes;
 using RedOnion.KSP.Namespaces;
 using RedOnion.KSP.ReflectionUtil;
+using RedOnion.KSP.Kerbalua;
 
 namespace RedOnion.KSP.API
 {
@@ -27,6 +28,7 @@ namespace RedOnion.KSP.API
 				core = MunOS.MunCore.Default;
 			core.BeforeExecute += Science.update;
 
+			OperatingSystemInterface.RegisterProcessCreator(".lua", KerbaluaManager.ProcessCreator);
 			OperatingSystemInterface.RegisterProcessCreator(".ros", ROS.RosManager.ProcessCreator);
 			done = true;
 		}

@@ -59,7 +59,7 @@ namespace Kerbalua.Scripting
 		public readonly MunProcess kerbaluaProcess;
 
 		public const string LuaNew=@"
-return function(stat,...) 
+return function(stat,...)
 	if type(stat)~='userdata' then
 		error('First argument to `new` must be a type.')
 	end

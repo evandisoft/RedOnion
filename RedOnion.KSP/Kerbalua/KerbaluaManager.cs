@@ -59,6 +59,18 @@ namespace RedOnion.KSP.Kerbalua
 				});
 		}
 
+		public static MunProcess ProcessCreator(string path, object[] args)
+		{
+			var current = MunProcess.Current;
+			var manager = current?.ScriptManager as KerbaluaManager;
+			var process = manager != null ? new KerbaluaProcess(manager) : new KerbaluaProcess(current?.Core);
+			process.Name = path;
+			process.OutputBuffer = current?.OutputBuffer;
+			var basepath=Path.GetFileNameWithoutExtension(path);
+			new KerbaluaThread(process, MunPriority.Main, $"require(\"{basepath}\")", path);
+			return process;
+		}
+
 		public override string Extension => ".lua";
 
 		public override MunProcess CreateProcess() 
