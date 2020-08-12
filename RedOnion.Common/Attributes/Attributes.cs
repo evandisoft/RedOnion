@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 
 namespace RedOnion.Attributes
 {
@@ -47,6 +48,23 @@ namespace RedOnion.Attributes
 	{
 		public Type Type { get; }
 		public ConvertAttribute(Type type) => Type = type;
+
+		// this is also workaround for some bugs in mono
+		// - seen IndexOutOfRangeException thrown from .GetCustomAttributes(typeof... on Linux
+		public static Type Get(MethodInfo m)
+		{
+			try
+			{
+				var convertAttrs = m.ReturnTypeCustomAttributes
+					.GetCustomAttributes(typeof(ConvertAttribute), true);
+				if (convertAttrs.Length == 1)
+					return ((ConvertAttribute)convertAttrs[0]).Type;
+			}
+			catch
+			{
+			}
+			return null;
+		}
 	}
 
 	//TODO: use this in reflected descriptors to disable modification

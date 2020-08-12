@@ -51,11 +51,7 @@ namespace RedOnion.ROS
 				=> new Value(new Function1(m), CreateDelegate(m, type0));
 			internal static Delegate CreateDelegate(MethodInfo m, Type type0)
 			{
-				Type convert = null;
-				var convertAttrs = m.ReturnTypeCustomAttributes
-					.GetCustomAttributes(typeof(ConvertAttribute), true);
-				if (convertAttrs.Length == 1)
-					convert = ((ConvertAttribute)convertAttrs[0]).Type;
+				Type convert = ConvertAttribute.Get(m);
 				return Expression.Lambda<Func<Value, Value>>(GetNewValueExpression(
 					convert ?? m.ReturnType, GetConvertExpression(Expression.Call(m,
 					GetValueConvertExpression(type0, ValueParameter)),
