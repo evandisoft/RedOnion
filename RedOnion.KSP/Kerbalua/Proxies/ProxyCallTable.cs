@@ -3,7 +3,7 @@ using System.Reflection;
 using MoonSharp.Interpreter;
 using System.Collections.Generic;
 
-namespace RedOnion.KSP.MoonSharp.Proxies
+namespace RedOnion.KSP.Kerbalua.Proxies
 {
 	/// <summary>
 	/// Not needed anymore.

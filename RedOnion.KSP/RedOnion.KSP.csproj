@@ -139,12 +139,6 @@
     <Compile Include="Autopilot\FlightControl.cs" />
     <Compile Include="MathUtil\Vec.cs" />
     <Compile Include="MathUtil\Scalar.cs" />
-    <Compile Include="MoonSharp\Proxies\ModuleControlSurfaceProxyTable.cs" />
-    <Compile Include="MoonSharp\Proxies\ExperimentalProxy.cs" />
-    <Compile Include="MoonSharp\Proxies\ProxyTable.cs" />
-    <Compile Include="MoonSharp\Proxies\ProxyCallTable.cs" />
-    <Compile Include="MoonSharp\Proxies\LuaProxy.cs" />
-    <Compile Include="MoonSharp\Proxies\LuaCallProxy.cs" />
     <Compile Include="ReflectionUtil\NamespaceInstance.cs" />
     <Compile Include="ReflectionUtil\NamespaceMappings.cs" />
     <Compile Include="ReflectionUtil\TypeAlternatives.cs" />
@@ -158,7 +152,6 @@
     <Compile Include="UnsafeAPI\BodiesDictionary.cs" />
     <Compile Include="UnsafeAPI\KerbalsDictionary.cs" />
     <Compile Include="UnsafeAPI\UnsafeAPI.cs" />
-    <Compile Include="MoonSharp\MoonSharpAPI\MoonSharpGlobals.cs" />
     <Compile Include="Utilities\ScriptStringKeyedConstDictionary.cs" />
     <Compile Include="Settings\ProjectSettings.cs" />
     <Compile Include="Settings\SavedSettings.cs" />
@@ -169,6 +162,13 @@
     <Compile Include="Kerbalua\Events\LuaDescriptor.cs" />
     <Compile Include="Kerbalua\Events\LuaEventDescriptor.cs" />
     <Compile Include="Kerbalua\Events\LuaEventProxy.cs" />
+    <Compile Include="Kerbalua\KerbaluaGlobals.cs" />
+    <Compile Include="Kerbalua\Proxies\ExperimentalProxy.cs" />
+    <Compile Include="Kerbalua\Proxies\LuaCallProxy.cs" />
+    <Compile Include="Kerbalua\Proxies\LuaProxy.cs" />
+    <Compile Include="Kerbalua\Proxies\ModuleControlSurfaceProxyTable.cs" />
+    <Compile Include="Kerbalua\Proxies\ProxyCallTable.cs" />
+    <Compile Include="Kerbalua\Proxies\ProxyTable.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RedOnion.Common\RedOnion.Common.csproj">
@@ -198,8 +198,8 @@
   <ItemGroup>
     <Folder Include="Settings\" />
     <Folder Include="Kerbalua\" />
-    <Folder Include="MoonSharp\Interfaces\" />
     <Folder Include="Kerbalua\Events\" />
+    <Folder Include="Kerbalua\Proxies\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -61,7 +61,7 @@ namespace Kerbalua.Scripting
 		public const string LuaNew=@"
 return function(stat,...) 
 	if type(stat)~='userdata' then
-		error('First argument to `new` must be a CLR Static Class')
+		error('First argument to `new` must be a type.')
 	end
 	local args={...}
 	if #args>0 then
@@ -77,7 +77,7 @@ end
 			commonAPITable.AddAPI(apiType);
 		}
 
-		CommonAPITable commonAPITable;
+		public CommonAPITable commonAPITable;
 
 		public KerbaluaScript(MunProcess kerbaluaProcess) : base(CoreModules.Preset_Complete)
 		{
@@ -96,11 +96,11 @@ end
 			//Globals.Remove("loadsafe");
 
 			// This is the simplest way to define "new" to use __new.
-			commonAPITable["new"]=DoString(LuaNew);
+			Globals["new"]=DoString(LuaNew);
 
 			//commonAPI["dofile"]=new Func<string, DynValue>(dofile);
 
-			//commonAPI["new"]=new newdel(@new);
+			////commonAPI["new"]=new newdel(@new);
 
 			var coroutineTable=Globals["coroutine"] as Table;
 
@@ -108,7 +108,7 @@ end
 			Globals.Remove("coroutine");
 			//commonAPI["setexeclimit"] = new Action<double>(setexeclimit);
 
-			commonAPITable["sleep"] = yield;
+			Globals["sleep"] = yield;
 		}
 
 		public void setexeclimit(double counterlimit)

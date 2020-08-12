@@ -23,7 +23,7 @@ namespace RedOnion.Build
 		static Type[] rootTypes = new Type[]
 		{
 			typeof(RedOnion.KSP.API.Globals),
-			typeof(KSP.MoonSharp.MoonSharpAPI.MoonSharpGlobals)
+			typeof(RedOnion.KSP.Kerbalua.KerbaluaGlobals)
 		};
 		const BindingFlags iflags = BindingFlags.Instance|BindingFlags.Public|BindingFlags.DeclaredOnly;
 		const BindingFlags sflags = BindingFlags.Static|BindingFlags.Public|BindingFlags.DeclaredOnly;

@@ -2,7 +2,7 @@ using System;
 using MoonSharp.Interpreter;
 using UnityEngine;
 
-namespace RedOnion.KSP.MoonSharp.Proxies
+namespace RedOnion.KSP.Kerbalua.Proxies
 {
 	public class ModuleControlSurfaceProxyTable : ProxyTable
 	{

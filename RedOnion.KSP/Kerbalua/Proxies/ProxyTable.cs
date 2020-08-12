@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using MoonSharp.Interpreter;
 
-namespace RedOnion.KSP.MoonSharp.Proxies
+namespace RedOnion.KSP.Kerbalua.Proxies
 {
 	public class ProxyException : Exception
 	{

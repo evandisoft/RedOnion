@@ -5,7 +5,7 @@ using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
 using RedOnion.Common.Completion;
 
-namespace RedOnion.KSP.MoonSharp.Proxies
+namespace RedOnion.KSP.Kerbalua.Proxies
 {
 	public class LuaProxy:IUserDataType,IHasCompletionProxy
 	{

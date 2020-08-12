@@ -5,14 +5,14 @@ using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
 using RedOnion.Attributes;
 
-namespace RedOnion.KSP.MoonSharp.MoonSharpAPI
+namespace RedOnion.KSP.Kerbalua
 {
 	/// <summary>
 	/// These implementations are just dummies as the real implementations are tied
 	/// to KerbaluaScript
 	/// </summary>
 	[Description("Functionality that is specific to Kerbalua.")]
-	public static class MoonSharpGlobals
+	public static class KerbaluaGlobals
 	{
 		// this will be overriden in KerbaluaScript.cs
 		[Description(
