@@ -22,29 +22,13 @@ namespace RedOnion.KSP.Kerbalua
 			=> ScriptManager = manager;
 		public KerbaluaProcess(MunCore core) : base(core)
 			=> InternalResetEngine();
-
-//		public const string LuaNew=@"
-//return function(stat,...) 
-//	if type(stat)~='userdata' then
-//		error('First argument to `new` must be a CLR Static Class')
-//	end
-//	local args={...}
-//	if #args>0 then
-//		return stat.__new(...)
-//	else
-//		return stat.__new()
-//	end
-//end
-//";
+			
 
 		void InternalResetEngine()
 		{
 			ScriptEngine=new KerbaluaScript(this);
 			ScriptEngine.AddAPI(typeof(Globals));
 			ScriptEngine.AddAPI(typeof(KerbaluaGlobals));
-
-			//ScriptEngine.commonAPITable["new"]=ScriptEngine.DoString(LuaNew);
-
 
 			ScriptEngine.Options.ScriptLoader = new FileSystemScriptLoader();
 			var slb=ScriptEngine.Options.ScriptLoader as ScriptLoaderBase;
