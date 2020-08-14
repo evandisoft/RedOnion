@@ -23,14 +23,15 @@ Constructor of `string` can also be used for conversions (`new` is optional, it 
   - case-sensitive equality check (operator `==` is case-insensitive, `===` is case-sensitive and works like this `equals`).
 - `contains()`: bool, what:string
   - search for substring in this string (case-sensitive).
-- `format()`: string, ...
+- `format()`: string, format:string, ...
   - standard .NET/C# [Composite formatting](https://docs.microsoft.com/en-us/dotnet/standard/base-types/composite-formatting)
   - can be used in both *static form*: `string.format "value of {0} is {1}", "x", 2`
   and *method form*: `"value of {0} is {1}".format "x", 2`
+  - note that providing no argument (after `format` argument or for *method form*) bypasess the formatting (returning the `format` string), so you do not need to take care about `{}` in that case (applies to `print` as well).
 
 ## Print
 
-`Print` is a functions that works the same as `string.format` (*static form* only) but also prints the result to output window of the REPL.
+`Print` is a function that works the same as `string.format` (*static form* only) but also prints the result to output window of the REPL.
 
 ## List
 
@@ -87,9 +88,9 @@ based on .NET [Stack&lt;Value&gt;](https://docs.microsoft.com/en-us/dotnet/api/s
   - number of elements
 - `empty`: bool
   - true if stack is empty (count == 0).
-- `enqueue()`, value (alias `push`)
+- `push()`, value
   - add new value at the end of the queue.
-- `dequeue()`: value (alias `pop`)
+- `pop()`: value
   - remove one from the start of the queue (throws if empty).
 - `peek()`: value
   - get value at the start of the queue (without removing it, throws if empty)
