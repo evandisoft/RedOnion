@@ -121,7 +121,7 @@ namespace KerbaluaNUnit
 			Setup();
 			string source="";
 			var completions=GetCompletions(source,apiTable);
-			Assert.AreEqual(9, completions.Count);
+			Assert.AreEqual(10, completions.Count);
 		}
 	}
 }
