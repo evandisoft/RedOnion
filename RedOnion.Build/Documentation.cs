@@ -164,6 +164,8 @@ namespace RedOnion.Build
 				type = docb.AsType;
 			}
 			var fullType = type;
+			if (type.IsByRef)
+				type = type.GetElementType();
 			if (type.IsGenericType)
 				type = type.GetGenericTypeDefinition();
 			if (type.IsGenericParameter || type.FullName == null)
