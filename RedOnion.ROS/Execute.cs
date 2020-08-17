@@ -65,7 +65,11 @@ namespace RedOnion.ROS
 										pending = OpCode.Void;
 										at = blockEnd;
 										if (ctx.BlockCount > 0)
+										{
+											if (ctx.BlockCode == BlockCode.ForEach)
+												vals.Pop(2);
 											ctx.BlockCode = BlockCode.Block;
+										}
 										continue;
 									}
 									if (pending == OpCode.Continue)
@@ -485,7 +489,7 @@ namespace RedOnion.ROS
 						ref var lhs = ref vals.Top(-2);
 						var idx = lhs.desc.IndexFind(ref lhs, new Arguments(Arguments, 1));
 						if (idx < 0)
-							throw InvalidOperation("'{0}' cannot be indexed by '{1}'", lhs.Name, vals.Top().ToString());
+							throw InvalidOperation("'{0}' cannot be indexed by '{1}' (wrong type or does not contain)", lhs.Name, vals.Top().ToString());
 						lhs.SetRef(idx);
 						vals.Pop(1);
 						continue;
@@ -497,7 +501,7 @@ namespace RedOnion.ROS
 						ref var it = ref vals.Top(-n);
 						var idx = it.desc.IndexFind(ref it, new Arguments(Arguments, n - 1));
 						if (idx < 0)
-							throw InvalidOperation("'{0}' cannot be indexed by '{1}'", it.Name, vals.Top().ToString());
+							throw InvalidOperation("'{0}' cannot be indexed by '{1}' (wrong type or does not contain)", it.Name, vals.Top().ToString());
 						it.SetRef(idx);
 						vals.Pop(n - 1);
 						continue;
@@ -813,7 +817,11 @@ namespace RedOnion.ROS
 							at = blockEnd = ctx.Pop();
 						}
 						if (ctx.BlockCount > 0)
+						{
+							if (ctx.BlockCode == BlockCode.ForEach)
+								vals.Pop(2);
 							ctx.BlockCode = BlockCode.Block;
+						}
 						continue;
 					}
 					case OpCode.Continue:

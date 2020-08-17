@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
+using Kerbalua.CommonAPI;
 using Kerbalua.Completion;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
 using NUnit.Framework;
-using RedOnion.KSP.MoonSharp.CommonAPI;
 using static KerbaluaNUnit.CommonAPITestUtil;
 
 namespace KerbaluaNUnit
@@ -121,7 +121,7 @@ namespace KerbaluaNUnit
 			Setup();
 			string source="";
 			var completions=GetCompletions(source,apiTable);
-			Assert.AreEqual(9, completions.Count);
+			Assert.AreEqual(10, completions.Count);
 		}
 	}
 }

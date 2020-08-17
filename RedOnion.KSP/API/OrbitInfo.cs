@@ -36,7 +36,7 @@ namespace RedOnion.KSP.API
 	[WorkInProgress, Description("Orbit/patch parameters.")]
 	public class OrbitInfo
 	{
-		[Unsafe, Description("[KSP API](https://kerbalspaceprogram.com/api/class_orbit.html): Orbit parameters.")]
+		[Unsafe, Description("[KSP API](https://kerbalspaceprogram.com/api/class_orbit.html)")]
 		public Orbit native { get; internal set; }
 		internal OrbitInfo(Orbit orbit)
 			=> native = orbit;

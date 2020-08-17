@@ -82,7 +82,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Kerbalua\Scripting\KerbaluaManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Kerbalua\Completion\Grammar\IncompleteLuaBaseListener.cs" />
     <Compile Include="Kerbalua\Completion\Grammar\IncompleteLuaBaseVisitor.cs" />
@@ -108,13 +107,9 @@
     <Compile Include="Kerbalua\Completion\CompletionTypes\InstanceStaticCompletion.cs" />
     <Compile Include="Kerbalua\Completion\MoonSharpIntellisense.cs" />
     <Compile Include="Kerbalua\Completion\CompletionTypes\MoonSharpCompletable.cs" />
-    <Compile Include="Kerbalua\Events\LuaDescriptor.cs" />
-    <Compile Include="Kerbalua\Events\LuaEventDescriptor.cs" />
-    <Compile Include="Kerbalua\Events\LuaEventProxy.cs" />
     <Compile Include="Kerbalua\Completion\CompletionTypes\EnumCompletion.cs" />
-    <Compile Include="Kerbalua\Scripting\KerbaluaProcess.cs" />
-    <Compile Include="Kerbalua\Scripting\KerbaluaThread.cs" />
-    <Compile Include="Kerbalua\Scripting\KerbaluaReplThread.cs" />
+    <Compile Include="Kerbalua\CommonAPI\CommonAPIMetatable.cs" />
+    <Compile Include="Kerbalua\CommonAPI\CommonAPITable.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -134,14 +129,6 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <ProjectReference Include="..\RedOnion.KSP\RedOnion.KSP.csproj">
-      <Project>{DEC12E09-29AD-4666-9954-8C8A1D7BF454}</Project>
-      <Name>RedOnion.KSP</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\RedOnion.ROS\RedOnion.ROS.csproj">
-      <Project>{59399c9e-ebac-4d7c-b2cb-6ece22fe8d6e}</Project>
-      <Name>RedOnion.ROS</Name>
-    </ProjectReference>
     <ProjectReference Include="..\RedOnion.UI\RedOnion.UI.csproj">
       <Project>{034c16ab-d16e-4afe-9837-812499ee2f3d}</Project>
       <Name>RedOnion.UI</Name>
@@ -156,6 +143,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Kerbalua\CommonAPI\" />
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
     <MonoDevelop>

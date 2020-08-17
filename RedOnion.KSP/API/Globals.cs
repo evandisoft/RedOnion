@@ -3,16 +3,45 @@ using System.Collections.Generic;
 using RedOnion.ROS;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
-using RedOnion.KSP.Completion;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using RedOnion.Attributes;
 using RedOnion.KSP.Namespaces;
 using RedOnion.KSP.ReflectionUtil;
+using RedOnion.KSP.Kerbalua;
 
 namespace RedOnion.KSP.API
 {
+	public static class ApiMain
+	{
+		static bool done;
+		/// <summary>
+		/// To be called at least once before using <see cref="Globals"/>.
+		/// </summary>
+		/// <param name="core">Core to be used, <see cref="MunCore.Default"/> if null.</param>
+		public static void Init(MunOS.MunCore core = null)
+		{
+			if (done)
+				return;
+			if (core == null)
+				core = MunOS.MunCore.Default;
+			core.BeforeExecute += Science.update;
+
+			OperatingSystemInterface.RegisterProcessCreator(".lua", KerbaluaManager.ProcessCreator);
+			OperatingSystemInterface.RegisterProcessCreator(".ros", ROS.RosManager.ProcessCreator);
+			done = true;
+		}
+		/// <summary>
+		/// Reset API - disable autopiloat, clear all subscriptions.
+		/// </summary>
+		public static void Reset()
+		{
+			Ship.DisableAutopilot();
+			Science.situationChanged.clear();
+		}
+	}
+
 	[Description("Global variables, objects and functions common to all scripting languages.")]
 	public static class Globals
 	{
@@ -20,6 +49,12 @@ namespace RedOnion.KSP.API
 
 		[Description("An api for setting which scripts will be ran when an engine is reset.")]
 		public static readonly Type autorun = typeof(AutoRun);
+
+		// 'os' conflicts with lua's 'os' namespace so 'munos' is an alias for that.
+		[Description("Operating System - interface to MunOS.")]
+		public static readonly Type munos = typeof(OperatingSystem);
+		[Description("Operating System - interface to MunOS.")]
+		public static readonly Type os = typeof(OperatingSystem);
 
 		[Description("User Interface.")]
 		public static readonly Type ui = typeof(UI_Namespace);
@@ -45,6 +80,8 @@ namespace RedOnion.KSP.API
 		public static readonly Type player = typeof(Player);
 		[WorkInProgress, Description("User/player controls.")]
 		public static readonly Type user = typeof(Player);
+		[WorkInProgress, Description("Science tools.")]
+		public static readonly Type science = typeof(Science);
 
 		[Description("PID regulator (alias to `system.pid` in ROS).")]
 		public static readonly Type PID = typeof(PID);
@@ -108,62 +145,5 @@ namespace RedOnion.KSP.API
 		public static SpaceBody.Atmosphere atmosphere => body?.atmosphere ?? SpaceBody.Atmosphere.none;
 
 		#endregion
-	}
-
-	public class LuaGlobals : Table, ICompletable
-	{
-		public static LuaGlobals Instance { get; } = new LuaGlobals();
-
-		public IList<string> PossibleCompletions
-		{
-			get
-			{
-				IList<string> completions =
-					typeof(Globals).GetProperties().Select(t => t.Name).Concat(
-						typeof(Globals).GetFields().Select(t => t.Name)).ToList();
-				return completions;
-			}
-		}
-
-		public object CompletionProxy => UserData.CreateStatic(typeof(Globals));
-
-		public bool TryGetCompletion(string completionName, out object completion)
-		{
-			completion = Get(this, DynValue.NewString(completionName));
-			if (completion == null)
-			{
-				return false;
-			}
-			return true;
-		}
-
-		public LuaGlobals() : base(null)
-		{
-			this["__index"] = new Func<Table, DynValue, DynValue>(Get);
-		}
-		DynValue Get(Table table, DynValue index)
-		{
-			object obj=null;
-			var name = index.String;
-			var field = typeof(Globals).GetField(name, BindingFlags.Static|BindingFlags.Public);
-			if (field !=null)
-			{
-				obj=field.GetValue(null);
-			}
-			var prop = typeof(Globals).GetProperty(name, BindingFlags.Static|BindingFlags.Public);
-			if (prop != null)
-			{
-				obj=prop.GetValue(null, null);
-			}
-
-			if (obj.GetType().Name=="RuntimeType")
-			{
-				Type t=obj as Type;
-				obj=UserData.CreateStatic(t);
-			}
-
-
-			return DynValue.FromObject(table.OwnerScript, obj);
-		}
 	}
 }

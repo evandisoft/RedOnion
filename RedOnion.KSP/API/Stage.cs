@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text;
 using System.Linq;
+using RedOnion.Debugging;
 
 //TODO: redirect these to new `ship.stages` API
 
@@ -344,7 +345,7 @@ namespace RedOnion.KSP.API
 		static internal void SetDirty(string reason)
 		{
 			if (Dirty) return;
-			Value.DebugLog("Stage Dirty: " + reason);
+			MainLogger.DebugLog("Stage Dirty: " + reason);
 			GameEvents.onEngineActiveChange.Remove(hooks.EngineChange);
 			GameEvents.onStageActivate.Remove(hooks.StageActivated);
 			GameEvents.onStageSeparation.Remove(hooks.StageSeparation);
@@ -445,7 +446,7 @@ namespace RedOnion.KSP.API
 			GameEvents.StageManager.OnStagingSeparationIndices.Add(hooks.StagingSeparationIndices);
 			GameEvents.StageManager.OnGUIStageAdded.Add(hooks.StagesChanged);
 			GameEvents.StageManager.OnGUIStageRemoved.Add(hooks.StagesChanged);
-			Value.DebugLog($"Stage #{ship.currentStage} Refreshed (Decouple: {nextDecoupler}, Engines: {engines.count}, Parts: {parts.count}/X:{xparts.count})");
+			MainLogger.DebugLog($"Stage #{ship.currentStage} Refreshed (Decouple: {nextDecoupler}, Engines: {engines.count}, Parts: {parts.count}/X:{xparts.count})");
 		}
 	}
 }

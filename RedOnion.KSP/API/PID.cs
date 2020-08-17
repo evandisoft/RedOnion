@@ -81,7 +81,21 @@ namespace RedOnion.KSP.API
 			R = r;
 		}
 	}
-	[Description("PID(R) regulator (with extra parameters).")]
+	[Description(
+@"PID(R) regulator (with extra parameters). Used to overcome certain problems of direct control.
+P-only regulator is pass-through (doing nothing), but other features like ouput-change-limiting
+can help smooth the control signal. But that alone could stop regulating near the target,
+when there is some minimal threshold for action to be taken. Rotation controll (roll, killRot)
+with P-only regulator could settle with small but non-zero offset, keeping the vessel/ship
+rotating by small amount indefinitely. PI-regulator overcomes this by accumulating the error
+and increasing the control signal until effect can be observed (rotation speed / angular velocity changes).
+But that has its own problem - induced oscillation (and wind-up).
+Two other factors - `R` and `D` - can be used to overcome that oscillation.
+`D` directly lowers output signal when effects are observed
+(decrease raw-roll control signal when observing change in angular velocity)
+and `R` lowers the accumulator used by `I` to dampen the oscillation
+(reducing both oscillation/overshooting and wind-up caused by big changes in input signal).
+Both also react to outside disturbances (like drag).")]
 	public class PID<Params> where Params : PidParams
 	{
 		protected Params _param;
@@ -115,7 +129,7 @@ namespace RedOnion.KSP.API
 			set => _param.targetChangeLimit = value;
 		}
 		[Description("Maximal abs(output-input)"
-			+ " and also abs(target-input) for integral and reduction factors)."
+			+ " and also abs(target-input) for integral and reduction factors."
 			+ " Helps preventing overshooting especially after change of Target (windup)."
 			+ " NaN or +Inf means no limit (which is default).")]
 		public double outputChangeLimit
@@ -258,7 +272,7 @@ namespace RedOnion.KSP.API
 						if (!double.IsNaN(D))
 							result -= D * change / dt;
 						if (!double.IsNaN(R))
-							_accu -= R * change * dt;
+							_accu -= R * change;
 					}
 				}
 				if (double.IsNaN(_accu))

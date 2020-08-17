@@ -12,12 +12,25 @@ namespace RedOnion.KSP.ROS
 {
 	public class RosSuggest
 	{
+		// hide these unless you fully type it
+		static readonly HashSet<string> hide = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+		{
+			"Equals",
+			"GetEnumerator",
+			"GetHashCode",
+			"GetType",
+			"ReferenceEquals",
+			"ToString"
+		};
+
 		public RosProcessor Processor { get; set; }
 		public RosSuggest(RosProcessor processor = null)
 			=> Processor = processor;
 
 		protected bool Matches(string suggestion)
 		{
+			if (hide.Contains(suggestion))
+				return partial?.Length > 0 && partial.Equals(suggestion, StringComparison.OrdinalIgnoreCase);
 			if (partial == null || partial.Length == 0)
 				return true;
 			if (suggestion.Length < partial.Length)

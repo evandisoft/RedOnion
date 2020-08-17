@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using RedOnion.Collections;
+using RedOnion.Debugging;
 using RedOnion.ROS.Objects;
 
 namespace RedOnion.ROS
@@ -111,18 +112,26 @@ namespace RedOnion.ROS
 		}
 
 		public virtual void Log(string msg)
-			=> Debug.Print(msg);
+		{
+			if (processor != null && processor != this)
+				processor.Log(msg);
+			else MainLogger.Log(msg);
+		}
 		public void Log(string msg, params object[] args)
-			=> Log(string.Format(Value.Culture, msg, args));
+			=> Log(Value.Format(msg, args));
 		[Conditional("DEBUG")]
 		public void DebugLog(string msg)
-			=> Debug.Print(msg);
+			=> Log(msg);
 		[Conditional("DEBUG")]
 		public void DebugLog(string msg, params object[] args)
-			=> Log(string.Format(Value.Culture, msg, args));
+			=> Log(msg, args);
 
 		~Core() => Dispose(false);
-		public void Dispose() => Dispose(true);
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
 		protected virtual void Dispose(bool disposing) { }
 
 		public void ResetContext()

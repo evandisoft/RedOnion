@@ -8,10 +8,27 @@
 - More UI library features.
 
 # Next Release
-Just had a release (0.5.1)
+Just had a release (0.5.2)
 
 # Current
 # 0.5
+## 0.5.2
+### API
+- fixed part tags (e.g. "noauto", required "noauto=" or "noauto x=y" before)
+- reworked autopilot override + "pylink" for better 2D/3D control
+- [Science API](https://evandisoft.github.io/RedOnion/RedOnion.KSP/API/Science), science.ros (supports DMagic's Orbital Science and DMModuleScienceAnimateGeneric)
+- [OS/Process API](https://evandisoft.github.io/RedOnion/RedOnion.KSP/API/OperatingSystem) (early version of MunOS API for scripts)
+
+### UI
+- UI: ScollBox and Scrollbar (early versions, some improvements shall come soon)
+
+### Lua
+- Fixed lua completion bug for array literals.
+
+### ROS
+- Built-in functions and objects (added collections, documentation)
+- Fixed break in (nested) foreach (for var e in list)
+
 ## 0.5.1
 ### New Dependency:
 - ModuleManager required for part-values/tags to work
@@ -26,6 +43,7 @@ Just had a release (0.5.1)
 - launch.ros and control.ros: decouplers marked with `noauto` tag won't be auto-staged
 - control.ros: auto-staging disabled until throttling or executing node
 - control.ros: srf-retro landing assist and hohmann improved, can now circularize in different SOI
+- lua tutorial scripts removed: This was done to remove clutter. You can copy in the tutorial code if you want the tutorials back.
 
 ### ROS Changes:
 - fixed shadowing by loop variable (`var i; for var i...`)

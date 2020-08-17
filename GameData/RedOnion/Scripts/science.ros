@@ -1,0 +1,128 @@
+var done = false
+var wnd = new ui.window false, "Science"
+wnd.closed += def => done = true
+var situation = wnd.addLabel()
+var rowbox = wnd.add new ui.scrollbox
+rowbox.width = 250 // need to implement custom layout - replacing that temporary content-size-fitter
+rowbox.height = 200
+
+var rows = new list
+var dict = new dictionary
+
+def row_ready
+  for var sci in this.sci
+    if sci.ready
+      button.enabled = true
+      button.text = "DO"
+      return true
+  button.enabled = false
+  button.text = "---"
+  return false
+
+def row_click button
+  var row = button.tag
+  for var sci in row.sci
+    if sci.perform(false)
+      row.button.enabled = row.ready()
+      break      
+
+def refresh
+  for var row in rows
+    row.present = false
+    row.sci.clear()
+  for var sci in list ship.science // make a copy in case we get interrupted
+    var row = dict[sci.experimentId]
+    if row == null
+      row = new object
+      row.id = sci.experimentId
+      row.sci = new list
+      row.ready = row_ready
+      row.panel = rowbox.addHorizontal()
+      row.panel.flexWidth = 1
+      row.panel.width = 234 // need to implement custom layout - replacing that temporary content-size-fitter
+      row.label = row.panel.addLabel sci.experimentId
+      row.label.flexWidth = 1
+      row.value = row.panel.addLabel()
+      row.value.width = 60
+      row.button = row.panel.addButton "DO", row_click
+      row.button.width = 40
+      row.button.tag = row
+      dict[sci.experimentId] = row
+      rows.add row
+    row.present = true
+    //TODO: see if we already have that experiment and use nextValue in such case
+    row.value.text = "{0:F1}/{1:F1}".format sci.value, sci.capacity
+    row.sci.add sci
+  for var i = 0; i < rows.count
+    var row = rows[i]
+    if !row.present
+      list.removeAt i
+      dict.remove row.id
+      row.panel.dispose
+    else
+      row.button.enabled = row.ready()
+      i++
+  situation.text = "{0}, {1}, {2}".format science.body, science.situation, science.biomeName
+var refreshing = false
+var lastRefresh = time.never
+def tryRefresh
+  if refreshing
+    return
+  refreshing = true
+  lastRefresh = time.now
+  for var i = 0; i < 3; i++
+    try
+      refresh
+      break
+    catch var e
+      print "Refresh: {0}", e
+      var from = time.now
+      while time.since(from) < 1
+        wait
+  refreshing = false
+
+var btns = wnd.addHorizontal()
+var all = btns.addButton "Gather All", def
+  all.enabled = false
+  need.enabled = false
+  try
+    for var row in rows
+      if row.button.enabled
+        row_click row.button
+  catch var e
+    print "Gather All: {0}", e
+  finally
+    all.enabled = true
+    need.enabled = true
+var need = btns.addButton "Gather >= 0.1", def
+  all.enabled = false
+  need.enabled = false
+  try
+    for var row in rows
+      if row.button.enabled
+        for var sci in row.sci
+          //TODO: skip or use nextValue if we already have it
+          if sci.value >= 0.01
+            row_click row.button
+            break
+  catch var e
+    print "Gather >= 0.1: {0}", e
+  finally
+    all.enabled = true
+    need.enabled = true
+
+try
+
+  var subs = null // finally retains try-context but we want to call refresh first
+  tryRefresh
+  subs = science.situationChanged tryRefresh
+  wnd.show
+  while !done
+    wait
+    if time.since(lastRefresh) >= 10
+      tryRefresh
+
+finally
+  wnd.dispose
+  if subs != null
+    subs.remove

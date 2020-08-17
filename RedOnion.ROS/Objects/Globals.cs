@@ -40,9 +40,10 @@ namespace RedOnion.ROS.Objects
 			System.Add("math", typeof(RosMath));
 			System.Add("print", new Value(Print = new Print(Prototype)));
 			System.Add("run", new Value(Run = new Run(Prototype)));
-			System.Add("list", new Value(typeof(List<Value>)));
-			System.Add("queue", new Value(typeof(Collections.GenQueue<Value>)));
-			System.Add("stack", new Value(typeof(Stack<Value>)));
+			System.Add("list", new Value(typeof(RosList)));
+			System.Add("queue", new Value(typeof(RosQueue)));
+			System.Add("stack", new Value(typeof(RosStack)));
+			System.Add("dictionary", new Value(typeof(RosDictionary)));
 
 			if (Processor is Processor.WithEvents processor)
 			{
@@ -83,6 +84,24 @@ namespace RedOnion.ROS.Objects
 			Print?.Reset();
 			Run?.Reset();
 			Object?.Reset();
+		}
+		public override bool Call(ref Value result, object self, Arguments args, bool create)
+		{
+			if (args.Length < 1 || args.Length > 3)
+				return false;
+			var name = args[0].ToStr();
+			var at = Find(name);
+			if (at < 0)
+			{
+				result = args.Length == 1 ? Value.Void : args[1];
+				Add(name, ref result);
+				return true;
+			}
+			ref var it = ref prop.items[at].value;
+			if (args.Length == 3 && it == args[2])
+				it = args[1];
+			result = it;
+			return true;
 		}
 	}
 }

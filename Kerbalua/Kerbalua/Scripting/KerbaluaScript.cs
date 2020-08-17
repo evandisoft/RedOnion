@@ -1,20 +1,15 @@
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
 using System;
-using RedOnion.KSP.MoonSharp.Proxies;
 using Kerbalua.Parsing;
 using UnityEngine.Events;
 using System.Diagnostics;
-using RedOnion.KSP.API;
-using RedOnion.KSP.MoonSharp.CommonAPI;
 using System.ComponentModel;
-using RedOnion.KSP.MoonSharp.MoonSharpAPI;
 using MoonSharp.Interpreter.Compatibility;
 using RedOnion.UI;
-using Kerbalua.Events;
 using System.IO;
-using RedOnion.KSP.Settings;
 using MunOS;
+using Kerbalua.CommonAPI;
 
 namespace Kerbalua.Scripting
 {
@@ -29,44 +24,44 @@ namespace Kerbalua.Scripting
 
 		static KerbaluaScript()
 		{
-			GlobalOptions.CustomConverters
-				.SetClrToScriptCustomConversion(
-					(Script script, Vector3d vector3d)
-						=> DynValue.FromObject(script, new Vector(vector3d)) //DynValue.NewTable(new ModuleControlSurfaceProxyTable(this, m))
-					);
-			UserData.RegisterType<Button>(new LuaDescriptor(typeof(Button)));
+			//GlobalOptions.CustomConverters
+			//	.SetClrToScriptCustomConversion(
+			//		(Script script, Vector3d vector3d)
+			//			=> DynValue.FromObject(script, new Vector(vector3d)) //DynValue.NewTable(new ModuleControlSurfaceProxyTable(this, m))
+			//		);
+			//UserData.RegisterType<Button>(new LuaDescriptor(typeof(Button)));
 
-			UserData.RegistrationPolicy = InteropRegistrationPolicy.Automatic;
-			
-			GlobalOptions.CustomConverters
-				.SetScriptToClrCustomConversion(DataType.Function, typeof(Action<Button>), (f) =>
-				{
-					return new Action<Button>((button) =>
-					{
-						var closure=f.Function;
-						var kerbaluaScript=closure.OwnerScript as KerbaluaScript;
-						if (kerbaluaScript==null)
-						{
-							throw new Exception("Ownerscript was not KerbaluaScript in LuaEventDescriptor");
-						}
+			//UserData.RegistrationPolicy = InteropRegistrationPolicy.Automatic;
 
-						var process=kerbaluaScript?.kerbaluaProcess;
-						if (process==null)
-						{
-							throw new Exception("Could not get current process in LuaEventDescriptor");
-						}
+			//GlobalOptions.CustomConverters
+				//.SetScriptToClrCustomConversion(DataType.Function, typeof(Action<Button>), (f) =>
+				//{
+				//	return new Action<Button>((button) =>
+				//	{
+				//		var closure=f.Function;
+				//		var kerbaluaScript=closure.OwnerScript as KerbaluaScript;
+				//		if (kerbaluaScript==null)
+				//		{
+				//			throw new Exception("Ownerscript was not KerbaluaScript in LuaEventDescriptor");
+				//		}
 
-						new KerbaluaThread(process, MunPriority.Callback, closure);
-					});
-				});
+				//		var process=kerbaluaScript?.kerbaluaProcess;
+				//		if (process==null)
+				//		{
+				//			throw new Exception("Could not get current process in LuaEventDescriptor");
+				//		}
+
+				//		new KerbaluaThread(process, MunPriority.Callback, closure);
+				//	});
+				//});
 		}
 
-		public readonly KerbaluaProcess kerbaluaProcess;
+		public readonly MunProcess kerbaluaProcess;
 
 		public const string LuaNew=@"
-return function(stat,...) 
+return function(stat,...)
 	if type(stat)~='userdata' then
-		error('First argument to `new` must be a CLR Static Class')
+		error('First argument to `new` must be a type.')
 	end
 	local args={...}
 	if #args>0 then
@@ -77,16 +72,21 @@ return function(stat,...)
 end
 ";
 
-		public KerbaluaScript(KerbaluaProcess kerbaluaProcess) : base(CoreModules.Preset_Complete)
+		public void AddAPI(Type apiType)
+		{
+			commonAPITable.AddAPI(apiType);
+		}
+
+		public CommonAPITable commonAPITable;
+
+		public KerbaluaScript(MunProcess kerbaluaProcess) : base(CoreModules.Preset_Complete)
 		{
 			this.kerbaluaProcess=kerbaluaProcess;
 
 			var metatable=new Table(this);
-			var commonAPI=new CommonAPITable(this);
-			commonAPI.AddAPI(typeof(Globals));
-			commonAPI.AddAPI(typeof(MoonSharpGlobals));
+			commonAPITable=new CommonAPITable(this);
 
-			metatable["__index"]=commonAPI;
+			metatable["__index"]=commonAPITable;
 			Globals.MetaTable=metatable;
 			
 			Globals.Remove("dofile");
@@ -96,11 +96,11 @@ end
 			//Globals.Remove("loadsafe");
 
 			// This is the simplest way to define "new" to use __new.
-			commonAPI["new"]=DoString(LuaNew);
+			Globals["new"]=DoString(LuaNew);
 
 			//commonAPI["dofile"]=new Func<string, DynValue>(dofile);
 
-			//commonAPI["new"]=new newdel(@new);
+			////commonAPI["new"]=new newdel(@new);
 
 			var coroutineTable=Globals["coroutine"] as Table;
 
@@ -108,7 +108,7 @@ end
 			Globals.Remove("coroutine");
 			//commonAPI["setexeclimit"] = new Action<double>(setexeclimit);
 
-			commonAPI["sleep"] = yield;
+			Globals["sleep"] = yield;
 		}
 
 		public void setexeclimit(double counterlimit)

@@ -1,3 +1,4 @@
+using RedOnion.Attributes;
 using System;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -33,7 +34,7 @@ namespace RedOnion.ROS
 					result = Value.Void;
 					return true;
 				}
-				if (MinArgs > 0 || Params?.Length != 1)
+				if (args.Length > 1 || MinArgs > 0 || Params?.Length != 1)
 					return false;
 				// TODO: optimize this by preparing the Value in the constructor (or lazy-create and store)
 				((Action<Value>)result.obj)(new Value(Params[0].DefaultValue));
@@ -50,11 +51,7 @@ namespace RedOnion.ROS
 				=> new Value(new Function1(m), CreateDelegate(m, type0));
 			internal static Delegate CreateDelegate(MethodInfo m, Type type0)
 			{
-				Type convert = null;
-				var convertAttrs = m.ReturnTypeCustomAttributes
-					.GetCustomAttributes(typeof(ConvertAttribute), true);
-				if (convertAttrs.Length == 1)
-					convert = ((ConvertAttribute)convertAttrs[0]).Type;
+				Type convert = ConvertAttribute.Get(m);
 				return Expression.Lambda<Func<Value, Value>>(GetNewValueExpression(
 					convert ?? m.ReturnType, GetConvertExpression(Expression.Call(m,
 					GetValueConvertExpression(type0, ValueParameter)),
@@ -75,7 +72,7 @@ namespace RedOnion.ROS
 					result = ((Func<Value, Value>)result.obj)(args[0]);
 					return true;
 				}
-				if (MinArgs > 0 || Params?.Length != 1)
+				if (args.Length > 1 || MinArgs > 0 || Params?.Length != 1)
 					return false;
 				result = ((Func<Value, Value>)result.obj)(new Value(Params[0].DefaultValue));
 				return true;
@@ -101,7 +98,7 @@ namespace RedOnion.ROS
 					result = Value.Void;
 					return true;
 				}
-				if (MinArgs > 0 || IsDelegate || Params?.Length != 1)
+				if (args.Length > 1 || MinArgs > 0 || IsDelegate || Params?.Length != 1)
 					return false;
 				((Action<T, Value>)result.obj)((T)self, new Value(Params[0].DefaultValue));
 				result = Value.Void;
@@ -127,7 +124,7 @@ namespace RedOnion.ROS
 					result = ((Func<T, Value, Value>)result.obj)((T)self, args[0]);
 					return true;
 				}
-				if (MinArgs > 0 || IsDelegate || Params?.Length != 1)
+				if (args.Length > 1 || MinArgs > 0 || IsDelegate || Params?.Length != 1)
 					return false;
 				result = ((Func<T, Value, Value>)result.obj)((T)self, new Value(Params[0].DefaultValue));
 				return true;

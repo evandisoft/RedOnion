@@ -124,11 +124,7 @@
     <Compile Include="LiveRepl\Parts\PrintQueuesArea.cs" />
     <Compile Include="LiveRepl\Parts\QueueTagInputArea.cs" />
     <Compile Include="LiveRepl\Completion\CompletionManager.cs" />
-    <Compile Include="LiveRepl\Execution\Evaluation.cs" />
-    <Compile Include="LiveRepl\Execution\MoonSharpReplEvaluator.cs" />
-    <Compile Include="LiveRepl\Execution\ReplEvaluator.cs" />
     <Compile Include="LiveRepl\Parts\FontSelector.cs" />
-    <Compile Include="LiveRepl\Execution\KerbnluaReplEvaluator.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
@@ -167,7 +163,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Target Name="AfterBuild">
-    <ZipDirectory SourceDirectory="..\GameData\RedOnion\Resources" Overwrite="True" DestinationFile="..\GameData\RedOnion\Resources.zip" />
+    <ZipDirectory SourceDirectory="..\Resources" Overwrite="True" DestinationFile="..\GameData\RedOnion\Resources.zip" />
     <ItemGroup>
       <OutputFiles Include="$(OutDir)**\*.dll" />
       <OutputFiles Include="$(OutDir)**\*.so" />

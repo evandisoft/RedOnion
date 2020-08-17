@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text;
 using Ionic.Zip;
 using MunOS;
+using RedOnion.Debugging;
 using RedOnion.KSP.API;
 using RedOnion.ROS;
 using RedOnion.ROS.Objects;
@@ -25,11 +26,6 @@ namespace RedOnion.KSP.ROS
 			=> new RosGlobals();
 		protected void ProcessorReset()
 			=> base.Reset();
-
-		public override void Log(string msg)
-			=> UE.Debug.Log("[RedOnion] " + msg);
-		static RosProcessor()
-			=> Value.LogListener = msg => UE.Debug.Log("[RedOnion] " + msg);
 
 		private static Ionic.Zip.ZipFile ScriptsZip;
 		public static string LoadScript(string path)

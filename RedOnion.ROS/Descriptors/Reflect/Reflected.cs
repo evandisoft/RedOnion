@@ -1,4 +1,6 @@
+using RedOnion.Attributes;
 using RedOnion.Collections;
+using RedOnion.Debugging;
 using RedOnion.ROS.Objects;
 using System;
 using System.Collections;
@@ -44,8 +46,11 @@ namespace RedOnion.ROS
 			protected Action<object, int, Value> intIndexSet;
 			protected Func<object, string, Value> strIndexGet;
 			protected Action<object, string, Value> strIndexSet;
+			protected Func<object, Value, Value> valIndexGet;
+			protected Action<object, Value, Value> valIndexSet;
 			protected ConstructorInfo defaultCtor;
 			protected string callableMemberName;
+			protected ListCore<KeyValuePair<Type, Func<object, object>>> implConvert;
 
 			public Reflected(Type type) : this(type.Name, type) { }
 			public Reflected(string name, Type type) : base(name, type)
@@ -59,7 +64,7 @@ namespace RedOnion.ROS
 					}
 					catch (Exception ex)
 					{
-						Value.Log("Exception {0} when processing static {1}.{2}: {3}",
+						MainLogger.Log("Exception {0} when processing static {1}.{2}: {3}",
 							ex.GetType(), Type.Name, member.Name, ex.Message);
 					}
 				}
@@ -71,7 +76,7 @@ namespace RedOnion.ROS
 					}
 					catch (Exception ex)
 					{
-						Value.Log("Exception {0} when processing {1}.{2}: {3}",
+						MainLogger.Log("Exception {0} when processing {1}.{2}: {3}",
 							ex.GetType(), Type.Name, member.Name, ex.Message);
 					}
 				}
@@ -83,7 +88,7 @@ namespace RedOnion.ROS
 					}
 					catch (Exception ex)
 					{
-						Value.Log("Exception {0} when processing {1}.{2}: {3}",
+						MainLogger.Log("Exception {0} when processing {1}.{2}: {3}",
 							ex.GetType(), Type.Name, nested.Name, ex.Message);
 					}
 				}
@@ -116,6 +121,7 @@ namespace RedOnion.ROS
 						ref var it = ref prop.items[at];
 						if (it.read == null)
 							throw InvalidOperation("{0}.{1} is not readable", Name, callableMemberName);
+						self = result.obj;
 						result = it.read(result.obj);
 						switch (it.kind)
 						{
@@ -171,8 +177,19 @@ namespace RedOnion.ROS
 				return false;
 			}
 			public override bool Convert(ref Value self, Descriptor to)
-				=> self.obj is IConvert cvt && cvt.Convert(ref self, to)
-				|| base.Convert(ref self, to);
+			{
+				if (self.obj is IConvert cvt && cvt.Convert(ref self, to))
+					return true;
+				foreach (var mtd in implConvert)
+				{
+					if (to.Type == mtd.Key)
+					{
+						self = new Value(mtd.Value(self.Box()));
+						return true;
+					}
+				}
+				return base.Convert(ref self, to);
+			}
 
 			public override int Find(object self, string name, bool add)
 			{
@@ -189,10 +206,22 @@ namespace RedOnion.ROS
 					return -1;
 				ref var index = ref args.GetRef(0);
 				int at;
-				if (index.IsNumberOrChar)
+				if ((intIndexGet != null || intIndexSet != null)
+					&& index.IsNumberOrChar && (index.IsNumber
+					|| (strIndexGet == null && strIndexSet == null)))
 				{
-					if (intIndexGet == null && intIndexSet == null)
-						return -1;
+					//TODO: pool of proxies (at least for simple indexing)
+					var proxy = new Value[1 + args.Length];
+					proxy[0] = self;
+					for (int i = 1; i < proxy.Length; i++)
+						proxy[i] = args[i-1];
+					self.obj = proxy;
+					return int.MaxValue; // complex indexing
+				}
+				if ((valIndexGet != null || valIndexSet != null)
+					&& ((strIndexGet == null && strIndexSet == null)
+					|| !index.IsStringOrChar))
+				{
 					var proxy = new Value[1 + args.Length];
 					proxy[0] = self;
 					for (int i = 1; i < proxy.Length; i++)
@@ -228,21 +257,20 @@ namespace RedOnion.ROS
 				{
 					var proxy = (Value[])self.obj;
 					ref var index = ref proxy[1];
-					if (index.IsNumberOrChar)
+					if (index.IsStringOrChar && strIndexGet != null)
 					{
-						if (intIndexGet == null)
-							throw InvalidOperation("{0}[{1}] is write only", Name, proxy[1]);
-						self = intIndexGet(proxy[0].obj, index.num.Int);
-						return true;
-					}
-					if (index.IsString)
-					{
-						if (strIndexGet == null)
-							throw InvalidOperation("{0}[{1}] is write only", Name, proxy[1]);
 						self = strIndexGet(proxy[0].obj, index.obj.ToString());
 						return true;
 					}
-					return false;
+					if (index.IsNumberOrChar && intIndexGet != null)
+					{
+						self = intIndexGet(proxy[0].obj, index.num.Int);
+						return true;
+					}
+					if (valIndexGet == null)
+						throw InvalidOperation("{0}[{1}] is write only", Name, proxy[1]);
+					self = valIndexGet(proxy[0].obj, index);
+					return true;
 				}
 				if (at < 0 || at >= prop.size)
 					return false;
@@ -260,8 +288,8 @@ namespace RedOnion.ROS
 				}
 				catch
 				{
-					Value.DebugLog($"Exception in {Name}.Set");
-					Value.DebugLog($"Self: {self}; at: {at}; op: {op}; value: {value}; prop: {NameOf(this, at)}");
+					MainLogger.DebugLog($"Exception in {Name}.Set");
+					MainLogger.DebugLog($"Self: {self}; at: {at}; op: {op}; value: {value}; prop: {NameOf(this, at)}");
 					throw;
 				}
 			}
@@ -276,21 +304,20 @@ namespace RedOnion.ROS
 						return false;
 					var proxy = (Value[])self.obj;
 					ref var index = ref proxy[1];
-					if (index.IsNumberOrChar)
+					if (index.IsStringOrChar && strIndexSet != null)
 					{
-						if (intIndexSet == null)
-							throw InvalidOperation("{0}[{1}] is read only", Name, proxy[1]);
-						intIndexSet(proxy[0].obj, index.num.Int, value);
-						return true;
-					}
-					if (index.IsString)
-					{
-						if (strIndexGet == null)
-							throw InvalidOperation("{0}[{1}] is read only", Name, proxy[1]);
 						strIndexSet(proxy[0].obj, index.obj.ToString(), value);
 						return true;
 					}
-					return false;
+					if (index.IsNumberOrChar && intIndexSet != null)
+					{
+						intIndexSet(proxy[0].obj, index.num.Int, value);
+						return true;
+					}
+					if (valIndexSet == null)
+						throw InvalidOperation("{0}[{1}] is read only", Name, proxy[1]);
+					valIndexSet(proxy[0].obj, index, value);
+					return true;
 				}
 				if (at < 0 || at >= prop.size)
 					return false;
@@ -303,12 +330,8 @@ namespace RedOnion.ROS
 					if (op != OpCode.AddAssign && op != OpCode.SubAssign)
 						return false;
 					var evt = (IEventProxy)p.read(self.obj).obj;
-					if (!value.desc.Convert(ref value, evt.DelegateDescriptor))
-						return false;
-					if (op == OpCode.AddAssign)
-						evt.Add(ref value);
-					else evt.Remove(ref value);
-					return true;
+					self = value;
+					return op == OpCode.AddAssign ? evt.Add(ref value) : evt.Remove(ref value);
 				}
 				if (op == OpCode.Assign)
 				{

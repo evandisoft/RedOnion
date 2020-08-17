@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
-using RedOnion.KSP.MoonSharp.Interfaces;
+using RedOnion.Common.Completion;
 using UnityEngine;
 
 namespace RedOnion.KSP.ReflectionUtil

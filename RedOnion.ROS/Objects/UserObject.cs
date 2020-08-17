@@ -177,7 +177,7 @@ namespace RedOnion.ROS.Objects
 				return false;
 			if (op == OpCode.Assign)
 			{
-				prop.items[at].value = value;
+				self = prop.items[at].value = value;
 				return true;
 			}
 			ref var it = ref prop.items[at].value;

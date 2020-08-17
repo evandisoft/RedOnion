@@ -5,7 +5,6 @@ using System.Linq;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
 using RedOnion.KSP.Utilities;
-using RedOnion.KSP.Completion;
 
 namespace RedOnion.KSP.UnsafeAPI
 {

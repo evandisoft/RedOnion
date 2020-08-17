@@ -1,5 +1,6 @@
 using MunOS;
 using RedOnion.Attributes;
+using RedOnion.Debugging;
 using RedOnion.ROS;
 using System;
 using System.ComponentModel;
@@ -51,7 +52,7 @@ namespace RedOnion.KSP.API
 			public Draw()
 			{
 				id = ++id_counter;
-				Value.DebugLog("Creating new VectorDraw #{0} in process #{1}", id, MunProcess.CurrentID);
+				MainLogger.DebugLog("Creating new VectorDraw #{0} in process #{1}", id, MunProcess.CurrentID);
 				_hooks = new Hooks(this);
 			}
 
@@ -61,7 +62,7 @@ namespace RedOnion.KSP.API
 			{
 				if (_hooks != null)
 				{
-					Value.DebugLog("Disposing VectorDraw #{0} in process #{1} (original: #{2}, dispose: {3})",
+					MainLogger.DebugLog("Disposing VectorDraw #{0} in process #{1} (original: #{2}, dispose: {3})",
 						id, MunProcess.CurrentID, _hooks?.process.ID ?? MunID.Zero, disposing);
 					var hooks = _hooks;
 					_hooks = null;
@@ -78,13 +79,13 @@ namespace RedOnion.KSP.API
 			protected class Hooks : MunProcess.ShutdownHook<Draw>
 			{
 				public Hooks(Draw draw) : base(draw) { }
-				public void show() => process.physicsUpdate += Update;
-				public void hide() => process.physicsUpdate -= Update;
+				public void show() => process.PhysicsUpdate += Update;
+				public void hide() => process.PhysicsUpdate -= Update;
 				protected override void Dispose(bool disposing)
 				{
 					if (process == null)
 						return;
-					process.physicsUpdate -= Update;
+					process.PhysicsUpdate -= Update;
 					base.Dispose(disposing);
 				}
 				protected void Update()
@@ -115,8 +116,8 @@ namespace RedOnion.KSP.API
 			[Description("Dispose the vector. (Cannot be shown again after that.)")]
 			public void dispose()
 			{
-				GC.SuppressFinalize(this);
 				Dispose(true);
+				GC.SuppressFinalize(this);
 			}
 
 			// see https://wiki.kerbalspaceprogram.com/wiki/API:Layers
@@ -140,7 +141,7 @@ namespace RedOnion.KSP.API
 				}
 				if (_bodyObject == null)
 				{
-					Value.DebugLog("Showing VectorDraw #{0} in process #{1}", id, MunProcess.CurrentID);
+					MainLogger.DebugLog("Showing VectorDraw #{0} in process #{1}", id, MunProcess.CurrentID);
 
 					// see https://github.com/GER-Space/Kerbal-Konstructs/wiki/Shaders-in-KSP
 					// + KSP 1.8: https://forum.kerbalspaceprogram.com/index.php?/topic/188933-180-modders-notes/

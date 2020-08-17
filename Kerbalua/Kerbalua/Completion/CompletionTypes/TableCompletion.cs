@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using MoonSharp.Interpreter;
-using RedOnion.KSP.Completion;
 using static RedOnion.Debugging.QueueLogger;
 
 namespace Kerbalua.Completion.CompletionTypes

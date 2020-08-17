@@ -1,5 +1,5 @@
 using RedOnion.Attributes;
-using RedOnion.KSP.Completion;
+using RedOnion.Common.Completion;
 using RedOnion.KSP.Utilities;
 using RedOnion.ROS.Utilities;
 using System;
@@ -60,8 +60,10 @@ and elements are also properties (`bodies.kerbin`, `bodies.mun`).")]
 	[Description("Celestial body. (`SpaceBody` selected not to conflict with KSP `CelestialBody`.)")]
 	public class SpaceBody : ISpaceObject
 	{
-		[Unsafe, Description("KSP API. Native `CelestialBody`.")]
+		[Unsafe, Description("[KSP API](https://kerbalspaceprogram.com/api/class_celestial_body.html)")]
 		public CelestialBody native { get; private set; }
+		public static implicit operator CelestialBody(SpaceBody body) => body?.native;
+
 		protected internal SpaceBody(CelestialBody body)
 		{
 			native = body;

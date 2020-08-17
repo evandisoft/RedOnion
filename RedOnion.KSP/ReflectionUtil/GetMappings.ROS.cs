@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using RedOnion.KSP.Completion;
+using RedOnion.Common.Completion;
 using RedOnion.KSP.ROS;
 using RedOnion.ROS;
 

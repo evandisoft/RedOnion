@@ -19,7 +19,6 @@ namespace RedOnion.KSP.ROS
 			System.Add(typeof(PID));
 
 			//TODO: link all non-main to some main to simulate process-like thread group
-			var process = ((RosProcessor)Processor).Process;
 			System.Add("update", new Event(MunPriority.Realtime));
 			System.Add("idle", new Event(MunPriority.Idle));
 			System.Add("once", new Event(MunPriority.Callback));
@@ -61,7 +60,7 @@ namespace RedOnion.KSP.ROS
 				this.autoRemove = autoRemove;
 				thread.IsBackground = true;
 				if (repeating)
-					thread.NextThread = thread;
+					thread.ExecNext = thread;
 			}
 
 			[Browsable(false)]

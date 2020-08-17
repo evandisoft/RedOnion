@@ -49,7 +49,7 @@ namespace MunOS
 			=> Status = MunStatus.Terminated;
 		/// <summary>
 		/// Called when thread is done executing (<see cref="MunStatus.Finished"/> or <see cref="MunStatus.Terminated"/>)
-		/// and is not restarted (<see cref="NextThread"/> != this).
+		/// and is not restarted (<see cref="ExecNext"/> != this).
 		/// Base implementation calls <see cref="Done"/> and <see cref="MunProcess.OnThreadDone(MunThread)"/>.
 		/// </summary>
 		protected internal virtual void OnDone()
@@ -101,6 +101,14 @@ namespace MunOS
 		/// Process this thread belongs to. Can be null.
 		/// </summary>
 		public MunProcess Process { get; protected internal set; }
+		/// <summary>
+		/// Next thread in same process (cyclic).
+		/// </summary>
+		public MunThread Next { get; internal set; }
+		/// <summary>
+		/// Previous thread in same process (cyclic).
+		/// </summary>
+		public MunThread Prev { get; internal set; }
 
 		/// <summary>
 		/// Execute that thread after this one finishes.
@@ -112,7 +120,7 @@ namespace MunOS
 		/// Main can point to another main to create a chain
 		/// (the last being the actual script, the previous being init scripts).
 		/// </remarks>
-		public MunThread NextThread { get; set; }
+		public MunThread ExecNext { get; set; }
 
 		bool isBackground;
 		/// <summary>
@@ -147,7 +155,7 @@ namespace MunOS
 			if (process != null)
 				process.Add(this);
 			if (start)
-				Executor = core.Schedule(this);
+				core.Schedule(this);
 		}
 
 		public void Terminate(bool hard = false)
@@ -162,7 +170,7 @@ namespace MunOS
 		}
 
 		/// <summary>
-		/// Called when executor is restarting a thread (which has <see cref="NextThread"/> == this).
+		/// Called when executor is restarting a thread (which has <see cref="ExecNext"/> == this).
 		/// Designed to do context-reset or whatever the scripting engine may need to do in such situation.
 		/// </summary>
 		public virtual void Restart()

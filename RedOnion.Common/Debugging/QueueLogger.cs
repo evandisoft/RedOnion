@@ -156,8 +156,8 @@ namespace RedOnion.Debugging
 			=> Push(msg.ToString(Culture));
 		[Conditional("DEBUG")]
 		public void DebugLog(StringWrapper msg, params object[] args)
-			=> Push(string.Format(Culture, msg.String, args));
-
+			=> Push(args?.Length > 0 ? string.Format(Culture, msg.String, args) : msg.String);
+			
 		void Push(string msg)
 		{
 			if (logQueue.Count >= queueSize)

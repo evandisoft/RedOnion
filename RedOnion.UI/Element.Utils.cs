@@ -72,9 +72,12 @@ namespace RedOnion.UI
 		[Unsafe, Description("Load icon of specified dimensions as `Texture2D` from a file (from `Resources` directory or `Resources.zip` ).")]
 		public static Texture2D LoadIcon(int width, int height, string path)
 		{
+			// TODO: Try GameDatabase first
 			var data = ResourceData(Assembly.GetCallingAssembly(), path);
 			var icon = new Texture2D(width, height, TextureFormat.BGRA32, false);
 			icon.LoadImage(data);
+			icon.Compress(true);
+			icon.Apply(false, true);
 			return icon;
 		}
 	}

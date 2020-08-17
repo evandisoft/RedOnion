@@ -55,6 +55,7 @@
     <Compile Include="ParseExpression.cs" />
     <Compile Include="ParseStatements.cs" />
     <Compile Include="Reflection.cs" />
+    <Compile Include="Objects.cs" />
     <Compile Include="Scope.cs" />
     <Compile Include="Statements.cs" />
   </ItemGroup>

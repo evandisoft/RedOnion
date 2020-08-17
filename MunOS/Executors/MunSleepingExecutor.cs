@@ -30,7 +30,7 @@ namespace MunOS.Executors
 					break;
 				case MunStatus.Finished:
 				{
-					var next = thread.NextThread;
+					var next = thread.ExecNext;
 					if (next != null)
 					{
 						if (next == thread)
@@ -40,7 +40,7 @@ namespace MunOS.Executors
 							break;
 						}
 						// this is probably init-chain
-						thread.NextThread = null; // rather clean this in case Core.Schedule(thread) also implements the logic
+						thread.ExecNext = null; // rather clean this in case Core.Schedule(thread) also implements the logic
 						Core.Schedule(next);
 					}
 					goto default;

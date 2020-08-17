@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using RedOnion.KSP.Completion;
+using RedOnion.Common.Completion;
 
 namespace Kerbalua.Completion.CompletionTypes
 {

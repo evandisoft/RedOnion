@@ -5,6 +5,8 @@ Global variables, objects and functions common to all scripting languages.
 
 **Types:**
 - `autorun`: [AutoRun](AutoRun.md) - An api for setting which scripts will be ran when an engine is reset.
+- `munos`: [OperatingSystem](OperatingSystem.md) - Operating System - interface to MunOS.
+- `os`: [OperatingSystem](OperatingSystem.md) - Operating System - interface to MunOS.
 - `ui`: [UI](../Namespaces/UI.md) - User Interface.
 - `ksp`: [KSP](../Namespaces/KSP.md) - \[`Unsafe`\] Shortcuts to KSP API + some tools.
 - `unity`: [Unity](../Namespaces/Unity.md) - \[`Unsafe`\] Shortcuts to Unity API.
@@ -14,12 +16,13 @@ Global variables, objects and functions common to all scripting languages.
 - `node`: [Node](Node.md) - Maneuver node.
 - `player`: [Player](Player.md) - \[`WIP`\] User/player controls.
 - `user`: [Player](Player.md) - \[`WIP`\] User/player controls.
+- `science`: [Science](Science.md) - \[`WIP`\] Science tools.
 - `PID`: [PID](PID.md) - PID regulator (alias to `system.pid` in ROS).
 - `app`: [App](App.md) - \[`WIP`\] Safe API for KSP Application Launcher (toolbar/buttons). WIP
 
 **Static Fields:**
-- `native`: NamespaceInstance - \[`Unsafe`\] Namespace Mappings (import of native types by namespace). More info [here](../ReflectionUtil/NamespaceInstance.md)
-- `assembly`: GetMappings - \[`Unsafe`\] Assembly Mappings (import of native types by assembly). More info [here](../ReflectionUtil/GetMappings.md)
+- `native`: [NamespaceInstance](../ReflectionUtil/NamespaceInstance.md) - \[`Unsafe`\] Namespace Mappings (import of native types by namespace). More info [here](../ReflectionUtil/NamespaceInstance.md)
+- `assembly`: [GetMappings](../ReflectionUtil/GetMappings.md) - \[`Unsafe`\] Assembly Mappings (import of native types by assembly). More info [here](../ReflectionUtil/GetMappings.md)
 
 **Static Properties:**
 - `vector()`: [Vector](Vector.md) - Function for creating 3D vector / coordinate.

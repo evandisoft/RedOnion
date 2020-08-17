@@ -1,3 +1,4 @@
+using RedOnion.Attributes;
 using System;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -39,11 +40,7 @@ namespace RedOnion.ROS
 				=> new Value(new Function0(m), CreateDelegate(m));
 			internal static Delegate CreateDelegate(MethodInfo m)
 			{
-				Type convert = null;
-				var convertAttrs = m.ReturnTypeCustomAttributes
-					.GetCustomAttributes(typeof(ConvertAttribute), true);
-				if (convertAttrs.Length == 1)
-					convert = ((ConvertAttribute)convertAttrs[0]).Type;
+				Type convert = ConvertAttribute.Get(m);
 				return Expression.Lambda<Func<Value>>(GetNewValueExpression(
 					convert ?? m.ReturnType, GetConvertExpression(
 						Expression.Call(m), convert))).Compile();

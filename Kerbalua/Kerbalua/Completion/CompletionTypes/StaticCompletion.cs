@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Reflection;
 using MoonSharp.Interpreter;
 using RedOnion.Attributes;
-using RedOnion.ROS;
 using static RedOnion.Debugging.QueueLogger;
 
 namespace Kerbalua.Completion.CompletionTypes
@@ -66,7 +65,7 @@ namespace Kerbalua.Completion.CompletionTypes
 
 			// This can be active when we have agreed on an attribute to use for classes that have
 			// safe properties
-			if (type.GetCustomAttribute<SafeProps>()!=null)
+			if (type.GetCustomAttribute<SafePropsAttribute>()!=null)
 			{
 				if (CompletionReflectionUtil.TryGetProperty(type, getMember.Name, out PropertyInfo propertyInfo, CompletionReflectionUtil.StaticPublic))
 				{

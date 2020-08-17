@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Reflection;
 using System.Text;
+using System.Diagnostics;
 
 namespace RedOnion.Build
 {
@@ -22,11 +23,12 @@ namespace RedOnion.Build
 		static Type[] rootTypes = new Type[]
 		{
 			typeof(RedOnion.KSP.API.Globals),
-			typeof(KSP.MoonSharp.MoonSharpAPI.MoonSharpGlobals)
+			typeof(RedOnion.KSP.Kerbalua.KerbaluaGlobals)
 		};
 		const BindingFlags iflags = BindingFlags.Instance|BindingFlags.Public|BindingFlags.DeclaredOnly;
 		const BindingFlags sflags = BindingFlags.Static|BindingFlags.Public|BindingFlags.DeclaredOnly;
 
+		[DebuggerDisplay("{info}: {desc}")]
 		readonly struct Member<Info>
 		{
 			public readonly Info info;
@@ -38,6 +40,7 @@ namespace RedOnion.Build
 			}
 		}
 
+		[DebuggerDisplay("{name}/{path}/{type}: {desc}")]
 		class Document
 		{
 			public Type type;
@@ -45,7 +48,7 @@ namespace RedOnion.Build
 			public string path;
 			public string desc;
 
-			public Document baseClass;
+			public Document baseClass, outerClass;
 			public ListCore<Document> derived;
 			public ListCore<Member<MemberInfo>> nested;
 			public ListCore<Member<ConstructorInfo>> ctors;
@@ -79,6 +82,7 @@ namespace RedOnion.Build
 							RegisterType(nested);
 							continue;
 						}
+						RegisterType(f.FieldType);
 					}
 					if (desc != null)
 						list.Add(new Member<Info>(info, desc));
@@ -160,6 +164,8 @@ namespace RedOnion.Build
 				type = docb.AsType;
 			}
 			var fullType = type;
+			if (type.IsByRef)
+				type = type.GetElementType();
 			if (type.IsGenericType)
 				type = type.GetGenericTypeDefinition();
 			if (type.IsGenericParameter || type.FullName == null)
@@ -191,10 +197,15 @@ namespace RedOnion.Build
 			{
 				var type = queue[i];
 				var desc = type.GetCustomAttribute<DescriptionAttribute>(false)?.Description;
-				var name = type.GetCustomAttribute<DisplayNameAttribute>(false)?.DisplayName
-					?? (type.DeclaringType == null ? type.Name :
-					type.FullName.Substring(type.Namespace.Length + 1).Replace('+', '.') // nested type
-					).Replace('`', '.');
+				var name = type.GetCustomAttribute<DisplayNameAttribute>(false)?.DisplayName;
+				if (name == null)
+				{
+					if (type.DeclaringType == null)
+						name = type.Name;
+					else
+						name = type.FullName.Substring(type.Namespace.Length + 1).Replace('+', '.'); // nested type
+					name = name.Replace('`', '.');
+				}
 				var path = "";
 				var full = type.FullName;
 				if (full.StartsWith("RedOnion.KSP."))
@@ -242,7 +253,10 @@ namespace RedOnion.Build
 				{
 					var ndoc = ResolveType(nested);
 					if (ndoc != null)
+					{
 						doc.nested.Add(new Member<MemberInfo>(ndoc.type, null));
+						ndoc.outerClass = doc;
+					}
 				}
 			}
 			foreach (var doc in docs.Values)
@@ -407,18 +421,35 @@ namespace RedOnion.Build
 						name = objtype.Name;
 					}
 					path = GetRelativePath(doc.path, tdoc.path) + ".md";
+					if (tdoc.outerClass == doc
+						&& name.Length > doc.name.Length + 1
+						&& name.StartsWith(doc.name)
+						&& !char.IsLetterOrDigit(name, doc.name.Length))
+						name = name.Substring(doc.name.Length + 1);
 				}
 			}
 			if (type == fullType)
 				return path == null ? name : string.Format("[{0}]({1})", name, path);
 			var sb = new StringBuilder();
-			name = name.Substring(0, name.LastIndexOfAny(new char[] { '.', '`' }));
+			if (char.IsDigit(name, name.Length-1))
+				name = name.Substring(0, name.LastIndexOfAny(new char[] { '.', '`' }));
 			if (path == null) sb.Append(name);
 			else sb.AppendFormat("[{0}]({1})", name, path);
+			var pgen = fullType.DeclaringType?.IsGenericType == true
+				? fullType.DeclaringType.GetGenericArguments() : null;
+			var fgen = fullType.GetGenericArguments();
+			if (pgen?.Length == fgen.Length)
+				return sb.ToString();
 			sb.Append("\\[");
 			var first = true;
-			foreach (var gen in fullType.GetGenericArguments())
+			var skip = pgen?.Length ?? 0;
+			foreach (var gen in fgen)
 			{
+				if (skip > 0)
+				{
+					skip++;
+					continue;
+				}
 				if (!first)
 					sb.Append(", ");
 				first = false;

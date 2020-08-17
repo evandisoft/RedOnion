@@ -77,7 +77,11 @@
     <Compile Include="Interface.cs" />
     <Compile Include="Objects\Context.cs" />
     <Compile Include="Objects\EventProxy.cs" />
+    <Compile Include="Objects\RosDictionary.cs" />
+    <Compile Include="Objects\RosList.cs" />
+    <Compile Include="Objects\RosQueue.cs" />
     <Compile Include="Objects\Namespace.cs" />
+    <Compile Include="Objects\RosStack.cs" />
     <Compile Include="Utilities\RosMath.cs" />
     <Compile Include="Processor.cs" />
     <Compile Include="Objects\Function.cs" />
@@ -101,10 +105,11 @@
     <Compile Include="Value.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="README.md" />
+    <None Include="Docs\Links.md" />
     <None Include="Docs\Errors.md" />
     <None Include="Docs\LambdaAdv.md" />
-    <None Include="Docs\Links.md" />
-    <None Include="README.md" />
+    <None Include="Docs\Objects.md" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RedOnion.Common\RedOnion.Common.csproj">

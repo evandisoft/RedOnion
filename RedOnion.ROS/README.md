@@ -97,6 +97,41 @@ print "{0} and {1} {2}", (abs start-now), (sum x, y), "seconds"
 ```
 
 
+## Variables
+
+Local variables are declared using `var x` or `var x = 1` syntax,
+global variables can either be directly assigned using `global.x = 1`
+(and can then be accessed as `x` without the `global` prefix)
+or by a call to `global` (or `globals` which is alias).
+First argument shall be name of the variable,
+second (optional) the value to assign to it if it does not exist yet
+(`void` if not provided) and optional third argument
+can be used to test for specific value if it already exists,
+to overwrite that value (only if it is same or does not exist).
+That can be used to create locks.
+
+Variable names are searched from the point of reference, up through all
+(non-function) blocks, then in `this` if function was executed as method,
+then in outer function or script and lastly in globals.
+Notice that function `click` in example above modified script-local `x`
+when called as function, but `obj.x` when called as method.
+
+```
+global.x = 1    // assign
+if x == 1       // access as any other variable
+  global "y", 2 // create new global variable, unless it already exists
+if "y" in globals // test existence of a property = global variable here
+  var x = 2     // shadow global.x
+  print x       // prints 2
+print x         // prints 1
+
+// lock - wait until we can change it from "none" to "me" or it did not exist
+until global("lock", "me", "none") == "me" do wait
+do_what_only_me_can_do
+lock = "none"   // unlock
+```
+
+
 ## Number types
 
 Beware that ROS distinguishes between various types of numbers,
@@ -114,21 +149,13 @@ or just use `**` operator (which works like `math.pow` even for integers).
 Also note that bitwise operators (`&`, `|`, `^`, `<<` and `>>`)
 have much higher priority/precedence in ROS than in C#/C++.
 
+All the number types can be used for conversion (like `string` can as well): `int "1"` returns `1`, `double "3.14"` returns `3.14`, `int 2.7` returns `2` (and `string 1.6` returns `"1.6"`).
+
 
 ## Statements
 
 All the usual statements can be found in ROS.
 Most of them come from C#, some from other languages.
-
-`var` is used to declare new (local) variable. `global` or `globals`
-can be used for global variables - like `global.x = 1` or `system.globals.x`.
-Such global variable can later be referenced simply as `x`,
-but must be created first (and any `var x` or `this.x` shadows it).
-Variable names are searched from the point of reference, up through all
-(non-function) blocks, then in `this` if function was executed as method,
-then in outer function or script and lastly in globals.
-Notice that function `click` in example above modified script-local `x`
-when called as function, but `obj.x` when called as method.
 
 `if/unless` is followed by a condition,
 optional `then`, colon (`:`) or semicolon (`;`).
@@ -165,7 +192,7 @@ until done()
 or like `foreach var e in list` with just `for var e in list`.
 
 ```
-for var int i = 0; i < arguments.length; i++
+for var i = 0; i < arguments.length; i++
   print arguments[i]
 for var e in list
   print e

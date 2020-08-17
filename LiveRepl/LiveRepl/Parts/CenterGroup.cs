@@ -32,6 +32,7 @@ namespace LiveRepl.Parts
 				FlightControl.Instance.Shutdown();
 				Ship.DisableAutopilot();
 			}));
+			disableableStuff.AddMinSized(new Button("Reset All", uiparts.scriptWindow.ResetAll));
 			AddMinSized(new ScriptDisabledElement(uiparts, disableableStuff));
 			AddMinSized(uiparts.scriptEngineSelector=new ScriptEngineSelector(uiparts));
 		}

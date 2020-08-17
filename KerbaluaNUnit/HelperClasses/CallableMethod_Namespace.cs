@@ -1,5 +1,6 @@
 using System;
 using RedOnion.ROS;
+using RedOnion.Attributes;
 
 namespace KerbaluaNUnit
 {

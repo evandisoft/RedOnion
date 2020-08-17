@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using LiveRepl.Execution;
 using MunOS;
 using RedOnion.KSP.API;
 using UnityEngine;
@@ -26,19 +25,6 @@ namespace LiveRepl
 			};
 		}
 
-		//public void SetReplEvaluatorByFilename(string filename)
-		//{
-		//	string extension=Path.GetExtension(filename);
-
-		//	foreach (var replEvaluatorEntry in replEvaluators)
-		//	{
-		//		if (replEvaluatorEntry.Value.Extension.ToLower()==extension.ToLower())
-		//		{
-		//			SetCurrentEvaluator(replEvaluatorEntry.Key);
-		//		}
-		//	}
-		//}
-
 		public void SetEngineProcessByFilename(string filename)
 		{
 			string extension=Path.GetExtension(filename);
@@ -51,20 +37,6 @@ namespace LiveRepl
 				}
 			}
 		}
-
-		//public ReplEvaluator GetReplEvaluatorByFilename(string filename)
-		//{
-		//	string extension=Path.GetExtension(filename);
-
-		//	foreach (var replEvaluatorEntry in replEvaluators)
-		//	{
-		//		if (replEvaluatorEntry.Value.Extension.ToLower()==extension.ToLower())
-		//		{
-		//			return replEvaluatorEntry.Value;
-		//		}
-		//	}
-		//	return null;
-		//}
 
 		public void ToggleEditor()
 		{
@@ -117,6 +89,17 @@ namespace LiveRepl
 			}
 		}
 
+		public void ResetAll()
+		{
+			foreach(var engine in engines.Values)
+			{
+				engine.Reset();
+			}
+			MunCore.Default.Reset();
+			ApiMain.Reset();
+			RunAutorunScripts();
+		}
+
 		public void Terminate()
 		{
 			//MunLogger.Log("Scriptwindow terminate start");
@@ -159,9 +142,5 @@ namespace LiveRepl
 
 			needsResize=true;
 		}
-
-
-
-
 	}
 }

@@ -5,8 +5,8 @@ using RedOnion.KSP.API;
 
 namespace RedOnion.KSP.Parts
 {
-	[Description("Type of part.")]
-	public enum PartType
+	[WorkInProgress, Description("Type of part.")]
+	public enum PartType : byte
 	{
 		[Description("Uknown type.")]
 		Unknown,
@@ -30,10 +30,22 @@ namespace RedOnion.KSP.Parts
 	[DocBuild(typeof(Engine), typeof(Sensor), typeof(LinkPart))]
 	public class PartBase
 	{
-		[Unsafe, Description("Native `Part` - KSP API.")]
+		[Unsafe, Description("[KSP API](https://kerbalspaceprogram.com/api/class_part.html)")]
 		public Part native { get; }
-		[Description("Type of the part.")]
+		public static implicit operator Part(PartBase it) => it?.native;
+		[WorkInProgress, Description("Type of the part.")]
 		public PartType type { get; }
+
+		[Description("Science available through this part, `null` if none.")]
+		public PartScience science => scienceQueried ? _science : _science = FindScience();
+		private bool scienceQueried;
+		private PartScience _science;
+		private PartScience FindScience()
+		{
+			scienceQueried = true;
+			var mod = native.FindModuleImplementing<ModuleScienceExperiment>();
+			return mod == null ? null : PartScience.Create(this, mod);
+		}
 
 		[Description("Ship (vehicle/vessel) this part belongs to.")]
 		public Ship ship { get; }
@@ -64,12 +76,13 @@ namespace RedOnion.KSP.Parts
 
 		[Description("Name of the part (assigned by KSP).")]
 		public string name => native.name;
+		public override string ToString() => native.ToString();
 		[Description("Title of the part (assigned by KSP).")]
 		public string title => native.partInfo.title;
 
 		[Description("Method to test the type of the part (e.g. `.istype(\"LaunchClamp\")`)."
 			+ " Note that ROS has `is` operator and Lua has `isa` function that can be used togehter with"
-			+ " `types.engine` etc.")]
+			+ " `types.engine` etc. Another classification is through `type` property.")]
 		public virtual bool istype(string name) => false;
 
 		[Description("Position of the part (relative to CoM of active ship/vessel).")]
@@ -82,9 +95,6 @@ namespace RedOnion.KSP.Parts
 
 		[Description("Explode the part.")]
 		public void explode() => native.explode();
-
-		public override string ToString()
-			=> native.ToString();
 
 		protected internal PartBase(PartType type, Ship ship, Part native, PartBase parent, LinkPart decoupler)
 		{

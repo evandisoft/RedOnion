@@ -7,6 +7,7 @@ using System.IO;
 using System.IO.Compression;
 using RedOnion.ROS;
 using RedOnion.ROS.Objects;
+using RedOnion.ROS.Parsing;
 
 namespace RedOnion.Shell
 {
@@ -33,6 +34,7 @@ namespace RedOnion.Shell
 		{
 			public ShellProcessor() => Globals = new ShellGlobals();
 			public bool Eof => Parser.Eof;
+			public Parser PrefixParser { get; } = new Parser(Parser.DefaultOptions | Parser.Option.Prefix);
 		}
 		static void Main(string[] args)
 		{
@@ -94,9 +96,11 @@ namespace RedOnion.Shell
 				var line = Console.ReadLine();
 				sb.AppendLine(line);
 				CompiledCode code = null;
+				CompiledCode prefix = null;
 				try
 				{
 					code = processor.Compile(sb.ToString());
+					prefix = processor.PrefixParser.Compile(sb.ToString());
 				}
 				catch (Exception ex)
 				{
@@ -108,9 +112,9 @@ namespace RedOnion.Shell
 							" !  At line {0}." : " !  At line {0}: {1}",
 							err.LineNumber, err.Line);
 				}
-				var statement = code.Code?.Length > 0
-					&& code.Code[0] >= (byte)OpKind.Statement
-					&& code.Code[0] != (byte)OpCode.Autocall;
+				var statement = prefix?.Code?.Length > 0
+					&& prefix.Code[0] >= (byte)OpKind.Statement
+					&& prefix.Code[0] != (byte)OpCode.Autocall;
 				if (statement && line != "")
 				{
 					if (line == "return" || line == "break")

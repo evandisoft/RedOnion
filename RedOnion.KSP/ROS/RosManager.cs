@@ -17,6 +17,17 @@ namespace RedOnion.KSP.ROS
 			=> new RosThread((RosProcess)(process ?? Process), priority,
 				source ?? $"run \"{path}\"", path, start);
 
+		public static MunProcess ProcessCreator(string path, object[] args)
+		{
+			var current = MunProcess.Current;
+			var manager = current?.ScriptManager as RosManager;
+			var process = manager != null ? new RosProcess(manager) : new RosProcess(current?.Core);
+			process.Name = path;
+			process.OutputBuffer = current?.OutputBuffer;
+			new RosThread(process, MunPriority.Main, $"run \"{path}\"", path);
+			return process;
+		}
+
 		RosSuggest suggest;
 		public override IList<string> GetCompletions(string source, int cursorPos, out int replaceStart, out int replaceEnd, MunProcess process = null)
 		{

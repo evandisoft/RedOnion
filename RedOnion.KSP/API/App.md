@@ -5,7 +5,7 @@ Safe API for KSP Application Launcher (toolbar/buttons). WIP
 
 **Types:**
 - `scenes`: AppScenes - Scenes in which to have the button.
-- `Button`: [App.Button](App.Button.md)
+- `Button`: [Button](App.Button.md)
 
 **Static Fields:**
 - `center`: AppScenes - The button should be visible in Space Center.
@@ -22,7 +22,7 @@ Safe API for KSP Application Launcher (toolbar/buttons). WIP
 - `defaultIcon`: Texture2D - Default Red Onion Icon.
 
 **Static Methods:**
-- `add()`: [App.Button](App.Button.md), scenes AppScenes, iconPath string, onTrue Callback, onFalse Callback, onHover Callback, onHoverOut Callback, onEnable Callback, onDisable Callback
+- `add()`: [Button](App.Button.md), scenes AppScenes, iconPath string, onTrue Callback, onFalse Callback, onHover Callback, onHoverOut Callback, onEnable Callback, onDisable Callback
   - Add new app launcher button. Keep the returned object in a variable, the button would eventually be removed otherwise.
-- `add()`: [App.Button](App.Button.md), onTrue Callback, onFalse Callback, onHover Callback, onHoverOut Callback, onEnable Callback, onDisable Callback, scenes AppScenes, texture Texture
+- `add()`: [Button](App.Button.md), onTrue Callback, onFalse Callback, onHover Callback, onHoverOut Callback, onEnable Callback, onDisable Callback, scenes AppScenes, texture Texture
   - Add new app launcher button. Keep the returned object in a variable, the button would eventually be removed otherwise.
