@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using MoonSharp.Interpreter.Compatibility;
+using MunSharp.Interpreter.Compatibility;
 
-namespace MoonSharp.Interpreter.Interop
+namespace MunSharp.Interpreter.Interop
 {
 	/// <summary>
 	/// Utility class which may be used to set properties on an object of type T, from values contained in a Lua table.

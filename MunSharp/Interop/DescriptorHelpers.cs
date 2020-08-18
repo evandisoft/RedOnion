@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using MoonSharp.Interpreter.Compatibility;
+using MunSharp.Interpreter.Compatibility;
 
-namespace MoonSharp.Interpreter.Interop
+namespace MunSharp.Interpreter.Interop
 {
 	/// <summary>
 	/// Helper extension methods used to simplify some parts of userdata descriptor implementations

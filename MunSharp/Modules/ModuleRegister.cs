@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
-using MoonSharp.Interpreter.Compatibility;
-using MoonSharp.Interpreter.CoreLib;
-using MoonSharp.Interpreter.Platforms;
+using MunSharp.Interpreter.Compatibility;
+using MunSharp.Interpreter.CoreLib;
+using MunSharp.Interpreter.Platforms;
 
-namespace MoonSharp.Interpreter
+namespace MunSharp.Interpreter
 {
 	/// <summary>
 	/// Class managing modules (mostly as extension methods)

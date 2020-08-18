@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using MoonSharp.Interpreter.Compatibility;
-using MoonSharp.Interpreter.Interop.Converters;
+using MunSharp.Interpreter.Compatibility;
+using MunSharp.Interpreter.Interop.Converters;
 
-namespace MoonSharp.Interpreter.Interop.BasicDescriptors
+namespace MunSharp.Interpreter.Interop.BasicDescriptors
 {
 	/// <summary>
 	/// An abstract user data descriptor which accepts members described by <see cref="IMemberDescriptor"/> objects and

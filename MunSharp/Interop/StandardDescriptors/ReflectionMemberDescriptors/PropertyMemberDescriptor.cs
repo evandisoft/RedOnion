@@ -2,12 +2,12 @@
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading;
-using MoonSharp.Interpreter.Compatibility;
-using MoonSharp.Interpreter.Diagnostics;
-using MoonSharp.Interpreter.Interop.BasicDescriptors;
-using MoonSharp.Interpreter.Interop.Converters;
+using MunSharp.Interpreter.Compatibility;
+using MunSharp.Interpreter.Diagnostics;
+using MunSharp.Interpreter.Interop.BasicDescriptors;
+using MunSharp.Interpreter.Interop.Converters;
 
-namespace MoonSharp.Interpreter.Interop
+namespace MunSharp.Interpreter.Interop
 {
 	/// <summary>
 	/// Class providing easier marshalling of CLR properties

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MoonSharp.Interpreter.Loaders
+namespace MunSharp.Interpreter.Loaders
 {
 	/// <summary>
 	/// Class dictating how requests to read scripts from files are handled.

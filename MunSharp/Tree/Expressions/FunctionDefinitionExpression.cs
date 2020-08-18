@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using MoonSharp.Interpreter.Debugging;
-using MoonSharp.Interpreter.Execution;
-using MoonSharp.Interpreter.Execution.VM;
+using MunSharp.Interpreter.Debugging;
+using MunSharp.Interpreter.Execution;
+using MunSharp.Interpreter.Execution.VM;
 
-using MoonSharp.Interpreter.Tree.Statements;
+using MunSharp.Interpreter.Tree.Statements;
 
-namespace MoonSharp.Interpreter.Tree.Expressions
+namespace MunSharp.Interpreter.Tree.Expressions
 {
 	class FunctionDefinitionExpression : Expression, IClosureBuilder
 	{

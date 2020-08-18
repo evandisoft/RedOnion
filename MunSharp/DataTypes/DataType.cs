@@ -1,6 +1,6 @@
 ﻿
 
-namespace MoonSharp.Interpreter
+namespace MunSharp.Interpreter
 {
 	/// <summary>
 	/// Enumeration of possible data types in MoonSharp

@@ -32,8 +32,8 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion(MoonSharp.Interpreter.Script.VERSION)]
-[assembly: AssemblyFileVersion(MoonSharp.Interpreter.Script.VERSION)]
+[assembly: AssemblyVersion(MunSharp.Interpreter.Script.VERSION)]
+[assembly: AssemblyFileVersion(MunSharp.Interpreter.Script.VERSION)]
 
 // Give 
 [assembly: InternalsVisibleTo("MoonSharp.Interpreter.Tests, PublicKey=0024000004800000940000000602000000240000525341310004000001000100F704C50BBDC3F2F011CC26A8C6C4797A40E0B4BC94CFB1335E9BA208326340696B686DC13099F10D3054544532F5E3E66C26A13FF260AEA2343E0410511FE56EDCC2AFB898AAA1BC21DA33C0D0AE60824EB441D02A0E6B7AE251CDE0946BFC748209C12B062573ECDB008A3D10CC40534B314847591CE5342A3BC6AA83CE23B8")]

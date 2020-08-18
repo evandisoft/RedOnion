@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using MoonSharp.Interpreter;
+using MunSharp.Interpreter;
 
 namespace RedOnion.KSP.Kerbalua.Proxies
 {
@@ -21,8 +21,8 @@ namespace RedOnion.KSP.Kerbalua.Proxies
 	public class ProxyTable : Table
 	{
 		public object ProxiedObject;
-		global::MoonSharp.Interpreter.Script script;
-		public ProxyTable(global::MoonSharp.Interpreter.Script script, object proxied) : base(script)
+		global::MunSharp.Interpreter.Script script;
+		public ProxyTable(global::MunSharp.Interpreter.Script script, object proxied) : base(script)
 		{
 			this.script = script;
 			ProxiedObject = proxied;

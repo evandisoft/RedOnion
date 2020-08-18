@@ -1,6 +1,6 @@
-﻿using MoonSharp.Interpreter.Interop.BasicDescriptors;
+﻿using MunSharp.Interpreter.Interop.BasicDescriptors;
 
-namespace MoonSharp.Interpreter.Interop
+namespace MunSharp.Interpreter.Interop
 {
 	/// <summary>
 	/// Class providing a simple descriptor for constant DynValues in userdata

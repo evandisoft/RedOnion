@@ -1,8 +1,8 @@
 using System;
 using System.ComponentModel;
 using System.Reflection;
-using MoonSharp.Interpreter;
-using MoonSharp.Interpreter.Interop;
+using MunSharp.Interpreter;
+using MunSharp.Interpreter.Interop;
 using RedOnion.Attributes;
 
 namespace RedOnion.KSP.Kerbalua

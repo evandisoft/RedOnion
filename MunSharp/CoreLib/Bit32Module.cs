@@ -3,7 +3,7 @@
 
 using System;
 
-namespace MoonSharp.Interpreter.CoreLib
+namespace MunSharp.Interpreter.CoreLib
 {
 	/// <summary>
 	/// Class implementing bit32 Lua functions 

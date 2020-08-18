@@ -1,7 +1,7 @@
-﻿using MoonSharp.Interpreter.Execution;
-using MoonSharp.Interpreter.Execution.VM;
+﻿using MunSharp.Interpreter.Execution;
+using MunSharp.Interpreter.Execution.VM;
 
-namespace MoonSharp.Interpreter.Tree
+namespace MunSharp.Interpreter.Tree
 {
 	abstract class NodeBase
 	{

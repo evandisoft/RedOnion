@@ -1,6 +1,6 @@
-﻿using MoonSharp.Interpreter.Tree.Expressions;
+﻿using MunSharp.Interpreter.Tree.Expressions;
 
-namespace MoonSharp.Interpreter
+namespace MunSharp.Interpreter
 {
 	/// <summary>
 	/// Represents a dynamic expression in the script

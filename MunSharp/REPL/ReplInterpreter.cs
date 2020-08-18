@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MoonSharp.Interpreter.REPL
+namespace MunSharp.Interpreter.REPL
 {
 	/// <summary>
 	/// This class provides a simple REPL intepreter ready to be reused in a simple way.

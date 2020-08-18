@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
-using MoonSharp.Interpreter.Compatibility;
+using MunSharp.Interpreter.Compatibility;
 
-namespace MoonSharp.Interpreter.Interop.BasicDescriptors
+namespace MunSharp.Interpreter.Interop.BasicDescriptors
 {
 	/// <summary>
 	/// Descriptor of parameters used in <see cref="IOverloadableMemberDescriptor"/> implementations.

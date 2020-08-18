@@ -1,7 +1,7 @@
 ﻿using System;
-using MoonSharp.Interpreter.Execution;
+using MunSharp.Interpreter.Execution;
 
-namespace MoonSharp.Interpreter.Tree.Expressions
+namespace MunSharp.Interpreter.Tree.Expressions
 {
 	class DynamicExprExpression : Expression
 	{

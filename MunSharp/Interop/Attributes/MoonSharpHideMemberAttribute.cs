@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MoonSharp.Interpreter
+namespace MunSharp.Interpreter
 {
 	/// <summary>
 	/// Lists a userdata member not to be exposed to scripts referencing it by name.

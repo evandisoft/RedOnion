@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MoonSharp.Interpreter.Interop.RegistrationPolicies
+namespace MunSharp.Interpreter.Interop.RegistrationPolicies
 {
 	/// <summary>
 	/// A registration policy which makes registration permanent and not deletable.

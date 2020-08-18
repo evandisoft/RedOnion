@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
-using MoonSharp.Interpreter.Interop;
-using MoonSharp.Interpreter.Loaders;
+using MunSharp.Interpreter.Interop;
+using MunSharp.Interpreter.Loaders;
 
-namespace MoonSharp.Interpreter.Platforms
+namespace MunSharp.Interpreter.Platforms
 {
 	/// <summary>
 	/// A static class offering properties for autodetection of system/platform details

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace MoonSharp.Interpreter.Execution
+namespace MunSharp.Interpreter.Execution
 {
 	/// <summary>
 	/// The scope of a closure (container of upvalues)

@@ -1,5 +1,5 @@
 ﻿
-namespace MoonSharp.Interpreter.Interop.BasicDescriptors
+namespace MunSharp.Interpreter.Interop.BasicDescriptors
 {
 	/// <summary>
 	/// Interface for descriptors with the capability of being serialized

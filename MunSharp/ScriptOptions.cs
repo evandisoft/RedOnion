@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO;
-using MoonSharp.Interpreter.Loaders;
+using MunSharp.Interpreter.Loaders;
 
-namespace MoonSharp.Interpreter
+namespace MunSharp.Interpreter
 {
 	/// <summary>
 	/// This class contains options to customize behaviour of Script objects.

@@ -1,6 +1,6 @@
-﻿using MoonSharp.Interpreter.Debugging;
+﻿using MunSharp.Interpreter.Debugging;
 
-namespace MoonSharp.Interpreter.Execution.VM
+namespace MunSharp.Interpreter.Execution.VM
 {
 	sealed partial class Processor
 	{

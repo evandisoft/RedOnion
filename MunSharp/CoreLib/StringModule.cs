@@ -4,9 +4,9 @@
 using System;
 using System.IO;
 using System.Text;
-using MoonSharp.Interpreter.CoreLib.StringLib;
+using MunSharp.Interpreter.CoreLib.StringLib;
 
-namespace MoonSharp.Interpreter.CoreLib
+namespace MunSharp.Interpreter.CoreLib
 {
 	/// <summary>
 	/// Class implementing string Lua functions 

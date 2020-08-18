@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MoonSharp.Interpreter.Execution.VM
+namespace MunSharp.Interpreter.Execution.VM
 {
 	// This part is practically written procedural style - it looks more like C than C#.
 	// This is intentional so to avoid this-calls and virtual-calls as much as possible.

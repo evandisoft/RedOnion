@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MoonSharp.Interpreter.Debugging
+namespace MunSharp.Interpreter.Debugging
 {
 	/// <summary>
 	/// Wrapper for a debugger initiated action 

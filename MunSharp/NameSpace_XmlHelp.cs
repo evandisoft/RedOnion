@@ -1,5 +1,5 @@
 ﻿
-namespace MoonSharp.Interpreter 
+namespace MunSharp.Interpreter 
 {
 	/// <summary>
 	/// Namespace containing all the most commonly used classes for MoonSharp operation.
@@ -8,7 +8,7 @@ namespace MoonSharp.Interpreter
 	internal static class NamespaceDoc { }
 }
 
-namespace MoonSharp.Interpreter.CoreLib
+namespace MunSharp.Interpreter.CoreLib
 {
 	/// <summary>
 	/// Namespace containing the implementation of the Lua standard library, as MoonSharp modules.
@@ -17,7 +17,7 @@ namespace MoonSharp.Interpreter.CoreLib
 	internal static class NamespaceDoc { }
 }
 
-namespace MoonSharp.Interpreter.CoreLib.IO
+namespace MunSharp.Interpreter.CoreLib.IO
 {
 	/// <summary>
 	/// Namespace containing userdata classes for the 'io' module
@@ -25,7 +25,7 @@ namespace MoonSharp.Interpreter.CoreLib.IO
 	internal static class NamespaceDoc { }
 }
 
-namespace MoonSharp.Interpreter.Debugging
+namespace MunSharp.Interpreter.Debugging
 {
 	/// <summary>
 	/// Namespace containing classes used to support debuggers
@@ -33,7 +33,7 @@ namespace MoonSharp.Interpreter.Debugging
 	internal static class NamespaceDoc { }
 }
 
-namespace MoonSharp.Interpreter.Diagnostics
+namespace MunSharp.Interpreter.Diagnostics
 {
 	/// <summary>
 	/// Namespace containing classes used to support self diagnostics (e.g. performance counters)
@@ -41,7 +41,7 @@ namespace MoonSharp.Interpreter.Diagnostics
 	internal static class NamespaceDoc { }
 }
 
-namespace MoonSharp.Interpreter.Interop
+namespace MunSharp.Interpreter.Interop
 {
 	/// <summary>
 	/// Namespace containing classes used to customize and support advanced interoperations between
@@ -50,7 +50,7 @@ namespace MoonSharp.Interpreter.Interop
 	internal static class NamespaceDoc { }
 }
 
-namespace MoonSharp.Interpreter.Interop.LuaStateInterop
+namespace MunSharp.Interpreter.Interop.LuaStateInterop
 {
 	/// <summary>
 	/// Namespace containing classes used to provide a minimal support for porting code based on the classic
@@ -60,7 +60,7 @@ namespace MoonSharp.Interpreter.Interop.LuaStateInterop
 }
 
 
-namespace MoonSharp.Interpreter.Loaders
+namespace MunSharp.Interpreter.Loaders
 {
 	/// <summary>
 	/// Namespace containing classes used to customized how scripts are loaded from external files.
@@ -69,7 +69,7 @@ namespace MoonSharp.Interpreter.Loaders
 }
 
 
-namespace MoonSharp.Interpreter.Platforms
+namespace MunSharp.Interpreter.Platforms
 {
 	/// <summary>
 	/// Namespace containing classes used to customize how the interfacing with the operative system happens
@@ -79,7 +79,7 @@ namespace MoonSharp.Interpreter.Platforms
 	internal static class NamespaceDoc { }
 }
 
-namespace MoonSharp.Interpreter.REPL
+namespace MunSharp.Interpreter.REPL
 {
 	/// <summary>
 	/// Contains classes useful to implement REPL interpreters.

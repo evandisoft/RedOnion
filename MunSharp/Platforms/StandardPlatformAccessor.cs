@@ -78,7 +78,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 
-namespace MoonSharp.Interpreter.Platforms
+namespace MunSharp.Interpreter.Platforms
 {
 	/// <summary>
 	/// Class providing the IPlatformAccessor interface for standard full-feaured implementations.

@@ -1,5 +1,5 @@
 ﻿
-namespace MoonSharp.Interpreter
+namespace MunSharp.Interpreter
 {
 	/// <summary>
 	/// A class representing a key/value pair for Table use

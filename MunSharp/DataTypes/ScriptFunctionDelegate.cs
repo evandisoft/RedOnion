@@ -1,5 +1,5 @@
 ﻿
-namespace MoonSharp.Interpreter
+namespace MunSharp.Interpreter
 {
 	/// <summary>
 	/// A Delegate type which can wrap a script function

@@ -1,5 +1,5 @@
 ﻿
-namespace MoonSharp.Interpreter
+namespace MunSharp.Interpreter
 {
 	/// <summary>
 	/// Common interface for all resources which are uniquely bound to a script.

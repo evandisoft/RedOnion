@@ -1,9 +1,9 @@
 ﻿using System;
-using MoonSharp.Interpreter.Debugging;
-using MoonSharp.Interpreter.Execution.VM;
-using MoonSharp.Interpreter.Interop.LuaStateInterop;
+using MunSharp.Interpreter.Debugging;
+using MunSharp.Interpreter.Execution.VM;
+using MunSharp.Interpreter.Interop.LuaStateInterop;
 
-namespace MoonSharp.Interpreter
+namespace MunSharp.Interpreter
 {
 	/// <summary>
 	/// Class giving access to details of the environment where the script is executing

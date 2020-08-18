@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using MoonSharp.Interpreter.Compatibility;
-using MoonSharp.Interpreter.DataStructs;
-using MoonSharp.Interpreter.Interop.BasicDescriptors;
-using MoonSharp.Interpreter.Interop.StandardDescriptors;
+using MunSharp.Interpreter.Compatibility;
+using MunSharp.Interpreter.DataStructs;
+using MunSharp.Interpreter.Interop.BasicDescriptors;
+using MunSharp.Interpreter.Interop.StandardDescriptors;
 
-namespace MoonSharp.Interpreter.Interop
+namespace MunSharp.Interpreter.Interop
 {
 	/// <summary>
 	/// Class providing easier marshalling of CLR events. Handling is limited to a narrow range of handler signatures, which,

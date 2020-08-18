@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace MoonSharp.Interpreter.Debugging
+namespace MunSharp.Interpreter.Debugging
 {
 	/// <summary>
 	/// Class representing the source code of a given script

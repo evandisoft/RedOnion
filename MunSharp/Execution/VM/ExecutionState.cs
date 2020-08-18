@@ -1,6 +1,6 @@
-﻿using MoonSharp.Interpreter.DataStructs;
+﻿using MunSharp.Interpreter.DataStructs;
 
-namespace MoonSharp.Interpreter.Execution.VM
+namespace MunSharp.Interpreter.Execution.VM
 {
 	internal sealed class ExecutionState
 	{

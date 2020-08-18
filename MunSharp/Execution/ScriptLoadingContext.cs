@@ -1,7 +1,7 @@
-﻿using MoonSharp.Interpreter.Debugging;
-using MoonSharp.Interpreter.Tree;
+﻿using MunSharp.Interpreter.Debugging;
+using MunSharp.Interpreter.Tree;
 
-namespace MoonSharp.Interpreter.Execution
+namespace MunSharp.Interpreter.Execution
 {
 	class ScriptLoadingContext
 	{

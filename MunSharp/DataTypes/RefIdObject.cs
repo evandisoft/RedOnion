@@ -1,5 +1,5 @@
 ﻿
-namespace MoonSharp.Interpreter
+namespace MunSharp.Interpreter
 {
 	/// <summary>
 	/// A base class for many MoonSharp objects. 

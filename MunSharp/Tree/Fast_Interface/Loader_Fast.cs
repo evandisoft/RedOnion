@@ -1,10 +1,10 @@
-﻿using MoonSharp.Interpreter.Debugging;
-using MoonSharp.Interpreter.Execution;
-using MoonSharp.Interpreter.Execution.VM;
-using MoonSharp.Interpreter.Tree.Expressions;
-using MoonSharp.Interpreter.Tree.Statements;
+﻿using MunSharp.Interpreter.Debugging;
+using MunSharp.Interpreter.Execution;
+using MunSharp.Interpreter.Execution.VM;
+using MunSharp.Interpreter.Tree.Expressions;
+using MunSharp.Interpreter.Tree.Statements;
 
-namespace MoonSharp.Interpreter.Tree.Fast_Interface
+namespace MunSharp.Interpreter.Tree.Fast_Interface
 {
 	internal static class Loader_Fast
 	{

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace MoonSharp.Interpreter.DataStructs
+namespace MunSharp.Interpreter.DataStructs
 {
 	/// <summary>
 	/// Provides facility to create a "sliced" view over an existing IList<typeparamref name="T"/>

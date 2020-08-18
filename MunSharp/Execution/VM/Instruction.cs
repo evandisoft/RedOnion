@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using MoonSharp.Interpreter.Debugging;
+using MunSharp.Interpreter.Debugging;
 
-namespace MoonSharp.Interpreter.Execution.VM
+namespace MunSharp.Interpreter.Execution.VM
 {
 	internal class Instruction
 	{

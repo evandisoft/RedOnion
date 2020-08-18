@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MoonSharp.Interpreter
+namespace MunSharp.Interpreter
 {
 	/// <summary>
 	/// Forces a class member visibility to scripts. Can be used to hide public members. Equivalent to MoonSharpVisible(false).

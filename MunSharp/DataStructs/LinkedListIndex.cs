@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace MoonSharp.Interpreter.DataStructs
+namespace MunSharp.Interpreter.DataStructs
 {
 	/// <summary>
 	/// An index to accelerate operations on a LinkedList<typeparamref name="TValue"/> using a single key of type <typeparamref name="TKey"/>

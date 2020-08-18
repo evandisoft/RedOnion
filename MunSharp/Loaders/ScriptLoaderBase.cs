@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace MoonSharp.Interpreter.Loaders
+namespace MunSharp.Interpreter.Loaders
 {
 	/// <summary>
 	/// A base implementation of IScriptLoader, offering resolution of module names.

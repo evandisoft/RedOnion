@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace MoonSharp.Interpreter.Tree
+namespace MunSharp.Interpreter.Tree
 {
 	class Lexer
 	{

@@ -1,8 +1,8 @@
 ﻿using System;
-using MoonSharp.Interpreter.Compatibility;
-using MoonSharp.Interpreter.Interop;
+using MunSharp.Interpreter.Compatibility;
+using MunSharp.Interpreter.Interop;
 
-namespace MoonSharp.Interpreter
+namespace MunSharp.Interpreter
 {
 	/// <summary>
 	/// Descriptor which acts as a non-containing adapter from IUserDataType to IUserDataDescriptor

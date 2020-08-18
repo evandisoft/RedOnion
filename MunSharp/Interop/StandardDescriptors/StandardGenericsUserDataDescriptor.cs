@@ -1,7 +1,7 @@
 ﻿using System;
-using MoonSharp.Interpreter.Compatibility;
+using MunSharp.Interpreter.Compatibility;
 
-namespace MoonSharp.Interpreter.Interop
+namespace MunSharp.Interpreter.Interop
 {
 	/// <summary>
 	/// Standard user data descriptor used to instantiate generics.

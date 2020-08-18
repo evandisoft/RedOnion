@@ -12,7 +12,7 @@ using System.Text;
 	using TTypeInfo = System.Type;
 #endif
 
-namespace MoonSharp.Interpreter.Compatibility.Frameworks
+namespace MunSharp.Interpreter.Compatibility.Frameworks
 {
 	abstract class FrameworkReflectionBase : FrameworkBase
 	{

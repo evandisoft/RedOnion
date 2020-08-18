@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace MoonSharp.Interpreter.Interop.Converters
+namespace MunSharp.Interpreter.Interop.Converters
 {
 	/// <summary>
 	/// Static functions to handle conversions of numeric types

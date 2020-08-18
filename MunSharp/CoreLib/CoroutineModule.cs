@@ -3,7 +3,7 @@
 
 using System.Collections.Generic;
 
-namespace MoonSharp.Interpreter.CoreLib
+namespace MunSharp.Interpreter.CoreLib
 {
 	/// <summary>
 	/// Class implementing coroutine Lua functions 

@@ -1,8 +1,8 @@
-﻿using MoonSharp.Interpreter.Execution;
-using MoonSharp.Interpreter.Tree.Expressions;
-using MoonSharp.Interpreter.Tree.Statements;
+﻿using MunSharp.Interpreter.Execution;
+using MunSharp.Interpreter.Tree.Expressions;
+using MunSharp.Interpreter.Tree.Statements;
 
-namespace MoonSharp.Interpreter.Tree
+namespace MunSharp.Interpreter.Tree
 {
 	abstract class Statement : NodeBase
 	{

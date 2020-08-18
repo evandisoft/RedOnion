@@ -2,7 +2,7 @@ using System;
 using System.Diagnostics;
 using Kerbalua.Parsing;
 using Kerbalua.Scripting;
-using MoonSharp.Interpreter;
+using MunSharp.Interpreter;
 using MunOS;
 using static RedOnion.Debugging.QueueLogger;
 

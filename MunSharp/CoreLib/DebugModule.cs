@@ -3,10 +3,10 @@
 
 using System;
 using System.Text;
-using MoonSharp.Interpreter.Debugging;
-using MoonSharp.Interpreter.REPL;
+using MunSharp.Interpreter.Debugging;
+using MunSharp.Interpreter.REPL;
 
-namespace MoonSharp.Interpreter.CoreLib
+namespace MunSharp.Interpreter.CoreLib
 {
 	/// <summary>
 	/// Class implementing debug Lua functions. Support for the debug module is partial. 

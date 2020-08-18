@@ -3,7 +3,7 @@
 
 using System;
 
-namespace MoonSharp.Interpreter.CoreLib
+namespace MunSharp.Interpreter.CoreLib
 {
 	/// <summary>
 	/// Class implementing system related Lua functions from the 'os' module.

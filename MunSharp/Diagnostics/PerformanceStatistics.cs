@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Text;
-using MoonSharp.Interpreter.Diagnostics.PerformanceCounters;
+using MunSharp.Interpreter.Diagnostics.PerformanceCounters;
 
-namespace MoonSharp.Interpreter.Diagnostics
+namespace MunSharp.Interpreter.Diagnostics
 {
 	/// <summary>
 	/// A single object of this type exists for every script and gives access to performance statistics.

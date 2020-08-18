@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Linq;
-using MoonSharp.Interpreter.Interop;
-using MoonSharp.Interpreter.Interop.BasicDescriptors;
-using MoonSharp.Interpreter.Interop.RegistrationPolicies;
-using MoonSharp.Interpreter.Interop.StandardDescriptors;
-using MoonSharp.Interpreter.Interop.UserDataRegistries;
-using MoonSharp.Interpreter.Serialization.Json;
+using MunSharp.Interpreter.Interop;
+using MunSharp.Interpreter.Interop.BasicDescriptors;
+using MunSharp.Interpreter.Interop.RegistrationPolicies;
+using MunSharp.Interpreter.Interop.StandardDescriptors;
+using MunSharp.Interpreter.Interop.UserDataRegistries;
+using MunSharp.Interpreter.Serialization.Json;
 
-namespace MoonSharp.Interpreter
+namespace MunSharp.Interpreter
 {
 	/// <summary>
 	/// Class exposing C# objects as Lua userdata.

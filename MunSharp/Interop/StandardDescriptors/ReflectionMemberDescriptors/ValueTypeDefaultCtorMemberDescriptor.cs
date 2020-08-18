@@ -1,9 +1,9 @@
 ﻿using System;
-using MoonSharp.Interpreter.Compatibility;
-using MoonSharp.Interpreter.Interop.BasicDescriptors;
-using MoonSharp.Interpreter.Interop.Converters;
+using MunSharp.Interpreter.Compatibility;
+using MunSharp.Interpreter.Interop.BasicDescriptors;
+using MunSharp.Interpreter.Interop.Converters;
 
-namespace MoonSharp.Interpreter.Interop
+namespace MunSharp.Interpreter.Interop
 {
 	/// <summary>
 	/// Member descriptor for the default constructor of value types.

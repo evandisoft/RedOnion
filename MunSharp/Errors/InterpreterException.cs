@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using MoonSharp.Interpreter.Debugging;
+using MunSharp.Interpreter.Debugging;
 
-namespace MoonSharp.Interpreter
+namespace MunSharp.Interpreter
 {
 	/// <summary>
 	/// Base type of all exceptions thrown in MoonSharp
@@ -61,7 +61,7 @@ namespace MoonSharp.Interpreter
 		/// <summary>
 		/// Gets the interpreter call stack.
 		/// </summary>
-		public IList<MoonSharp.Interpreter.Debugging.WatchItem> CallStack { get; internal set; }
+		public IList<MunSharp.Interpreter.Debugging.WatchItem> CallStack { get; internal set; }
 
 		/// <summary>
 		/// Gets the decorated message (error message plus error location in script) if possible.

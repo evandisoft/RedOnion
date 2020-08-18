@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MoonSharp.Interpreter.Loaders
+namespace MunSharp.Interpreter.Loaders
 {
 	/// <summary>
 	/// A script loader used for platforms we cannot initialize in any better way..

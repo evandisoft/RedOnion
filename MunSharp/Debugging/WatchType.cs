@@ -1,5 +1,5 @@
 ﻿
-namespace MoonSharp.Interpreter.Debugging
+namespace MunSharp.Interpreter.Debugging
 {
 	/// <summary>
 	/// Enumeration of the possible watch types

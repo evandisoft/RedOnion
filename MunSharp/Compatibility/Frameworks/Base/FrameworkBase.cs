@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 
-namespace MoonSharp.Interpreter.Compatibility.Frameworks
+namespace MunSharp.Interpreter.Compatibility.Frameworks
 {
 	public abstract class FrameworkBase
 	{

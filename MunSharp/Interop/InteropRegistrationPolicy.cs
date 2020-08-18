@@ -1,7 +1,7 @@
 ﻿using System;
-using MoonSharp.Interpreter.Interop.RegistrationPolicies;
+using MunSharp.Interpreter.Interop.RegistrationPolicies;
 
-namespace MoonSharp.Interpreter.Interop
+namespace MunSharp.Interpreter.Interop
 {
 	/// <summary>
 	/// Collection of the standard policies to handle UserData type registrations.

@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using MoonSharp.Interpreter.Compatibility;
-using MoonSharp.Interpreter.DataStructs;
-using MoonSharp.Interpreter.Interop.BasicDescriptors;
+using MunSharp.Interpreter.Compatibility;
+using MunSharp.Interpreter.DataStructs;
+using MunSharp.Interpreter.Interop.BasicDescriptors;
 
-namespace MoonSharp.Interpreter.Interop.UserDataRegistries
+namespace MunSharp.Interpreter.Interop.UserDataRegistries
 {
 	/// <summary>
 	/// Registry of all extension methods. Use UserData statics to access these.

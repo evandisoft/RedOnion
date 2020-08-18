@@ -55,7 +55,7 @@ using System.Text.RegularExpressions;
 
 #endregion
 
-namespace MoonSharp.Interpreter.Interop.LuaStateInterop
+namespace MunSharp.Interpreter.Interop.LuaStateInterop
 {
 	internal static class Tools
 	{

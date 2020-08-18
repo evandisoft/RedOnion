@@ -6,11 +6,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using MoonSharp.Interpreter.Compatibility;
-using MoonSharp.Interpreter.CoreLib.IO;
-using MoonSharp.Interpreter.Platforms;
+using MunSharp.Interpreter.Compatibility;
+using MunSharp.Interpreter.CoreLib.IO;
+using MunSharp.Interpreter.Platforms;
 
-namespace MoonSharp.Interpreter.CoreLib
+namespace MunSharp.Interpreter.CoreLib
 {
 	/// <summary>
 	/// Class implementing io Lua functions. Proper support requires a compatible IPlatformAccessor

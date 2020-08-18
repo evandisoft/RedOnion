@@ -4,7 +4,7 @@
 using System;
 using lua_Integer = System.Int32;
 
-namespace MoonSharp.Interpreter.Interop.LuaStateInterop
+namespace MunSharp.Interpreter.Interop.LuaStateInterop
 {
 	public partial class LuaBase
 	{

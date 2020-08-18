@@ -1,8 +1,8 @@
 ﻿using System;
-using MoonSharp.Interpreter.Debugging;
-using MoonSharp.Interpreter.Tree;
+using MunSharp.Interpreter.Debugging;
+using MunSharp.Interpreter.Tree;
 
-namespace MoonSharp.Interpreter
+namespace MunSharp.Interpreter
 {
 	/// <summary>
 	/// Exception for all parsing/lexing errors. 

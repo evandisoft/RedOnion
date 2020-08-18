@@ -5,9 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
-using MoonSharp.Interpreter.Debugging;
+using MunSharp.Interpreter.Debugging;
 
-namespace MoonSharp.Interpreter.CoreLib
+namespace MunSharp.Interpreter.CoreLib
 {
 	/// <summary>
 	/// Class implementing basic Lua functions (print, type, tostring, etc) as a MoonSharp module.

@@ -1,8 +1,8 @@
 ﻿using System;
-using MoonSharp.Interpreter.Interop;
-using MoonSharp.Interpreter.Interop.BasicDescriptors;
+using MunSharp.Interpreter.Interop;
+using MunSharp.Interpreter.Interop.BasicDescriptors;
 
-namespace MoonSharp.Interpreter
+namespace MunSharp.Interpreter
 {
 	/// <summary>
 	/// Exception for all runtime errors. In addition to constructors, it offers a lot of static methods

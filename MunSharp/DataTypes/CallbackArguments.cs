@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using MoonSharp.Interpreter.DataStructs;
+using MunSharp.Interpreter.DataStructs;
 
-namespace MoonSharp.Interpreter
+namespace MunSharp.Interpreter
 {
 	/// <summary>
 	/// This class is a container for arguments received by a CallbackFunction

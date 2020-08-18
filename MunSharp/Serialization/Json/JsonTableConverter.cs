@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using MoonSharp.Interpreter.Tree;
+using MunSharp.Interpreter.Tree;
 
-namespace MoonSharp.Interpreter.Serialization.Json
+namespace MunSharp.Interpreter.Serialization.Json
 {
 	/// <summary>
 	/// Class performing conversions between Tables and Json.

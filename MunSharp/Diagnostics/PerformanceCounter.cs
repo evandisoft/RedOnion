@@ -1,5 +1,5 @@
 ﻿
-namespace MoonSharp.Interpreter.Diagnostics
+namespace MunSharp.Interpreter.Diagnostics
 {
 	/// <summary>
 	/// Enumeration of the possible performance counters

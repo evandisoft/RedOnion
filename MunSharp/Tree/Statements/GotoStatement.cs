@@ -1,8 +1,8 @@
-﻿using MoonSharp.Interpreter.Debugging;
-using MoonSharp.Interpreter.Execution;
-using MoonSharp.Interpreter.Execution.VM;
+﻿using MunSharp.Interpreter.Debugging;
+using MunSharp.Interpreter.Execution;
+using MunSharp.Interpreter.Execution.VM;
 
-namespace MoonSharp.Interpreter.Tree.Statements
+namespace MunSharp.Interpreter.Tree.Statements
 {
 	class GotoStatement : Statement
 	{

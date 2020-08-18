@@ -1,9 +1,9 @@
 ﻿using System;
-using MoonSharp.Interpreter.Execution;
-using MoonSharp.Interpreter.Execution.VM;
-using MoonSharp.Interpreter.Tree.Expressions;
+using MunSharp.Interpreter.Execution;
+using MunSharp.Interpreter.Execution.VM;
+using MunSharp.Interpreter.Tree.Expressions;
 
-namespace MoonSharp.Interpreter.Tree.Statements
+namespace MunSharp.Interpreter.Tree.Statements
 {
 	class FunctionCallStatement : Statement
 	{

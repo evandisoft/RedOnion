@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using MoonSharp.Interpreter.Interop;
+using MunSharp.Interpreter.Interop;
 using System.Reflection;
 
-namespace MoonSharp.Interpreter
+namespace MunSharp.Interpreter
 {
 	/// <summary>
 	/// This class wraps a CLR function 

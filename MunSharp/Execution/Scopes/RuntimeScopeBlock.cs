@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MoonSharp.Interpreter.Execution
+namespace MunSharp.Interpreter.Execution
 {
 	internal class RuntimeScopeBlock
 	{

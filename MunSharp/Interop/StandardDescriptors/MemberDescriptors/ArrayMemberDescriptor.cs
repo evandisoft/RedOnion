@@ -1,8 +1,8 @@
 ﻿using System;
-using MoonSharp.Interpreter.Interop.BasicDescriptors;
-using MoonSharp.Interpreter.Interop.Converters;
+using MunSharp.Interpreter.Interop.BasicDescriptors;
+using MunSharp.Interpreter.Interop.Converters;
 
-namespace MoonSharp.Interpreter.Interop
+namespace MunSharp.Interpreter.Interop
 {
 	/// <summary>
 	/// Member descriptor for indexer of array types

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace MoonSharp.Interpreter.DataStructs
+namespace MunSharp.Interpreter.DataStructs
 {
 	/// <summary>
 	/// Implementation of IEqualityComparer enforcing reference equality

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MoonSharp.Interpreter.Diagnostics
+namespace MunSharp.Interpreter.Diagnostics
 {
 	/// <summary>
 	/// The result of a performance counter

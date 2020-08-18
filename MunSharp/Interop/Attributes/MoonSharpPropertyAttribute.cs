@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MoonSharp.Interpreter
+namespace MunSharp.Interpreter
 {
 
 	/// <summary>

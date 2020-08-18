@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using MoonSharp.Interpreter.Compatibility;
+using MunSharp.Interpreter.Compatibility;
 
-namespace MoonSharp.Interpreter.Interop
+namespace MunSharp.Interpreter.Interop
 {
 	/// <summary>
 	/// A user data descriptor which aggregates multiple descriptors and tries dispatching members

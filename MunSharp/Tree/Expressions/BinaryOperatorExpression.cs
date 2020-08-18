@@ -1,8 +1,8 @@
 ﻿using System;
-using MoonSharp.Interpreter.Execution;
-using MoonSharp.Interpreter.Execution.VM;
+using MunSharp.Interpreter.Execution;
+using MunSharp.Interpreter.Execution.VM;
 
-namespace MoonSharp.Interpreter.Tree.Expressions
+namespace MunSharp.Interpreter.Tree.Expressions
 {
 	/// <summary>
 	/// 

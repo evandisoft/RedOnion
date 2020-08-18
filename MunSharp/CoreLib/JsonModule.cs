@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using MoonSharp.Interpreter.Serialization.Json;
+using MunSharp.Interpreter.Serialization.Json;
 
-namespace MoonSharp.Interpreter.CoreLib
+namespace MunSharp.Interpreter.CoreLib
 {
 	[MoonSharpModule(Namespace = "json")]
 	public class JsonModule

@@ -4,11 +4,11 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
-using MoonSharp.Interpreter.Compatibility;
-using MoonSharp.Interpreter.Interop.BasicDescriptors;
-using MoonSharp.Interpreter.Interop.RegistrationPolicies;
+using MunSharp.Interpreter.Compatibility;
+using MunSharp.Interpreter.Interop.BasicDescriptors;
+using MunSharp.Interpreter.Interop.RegistrationPolicies;
 
-namespace MoonSharp.Interpreter.Interop.UserDataRegistries
+namespace MunSharp.Interpreter.Interop.UserDataRegistries
 {
 	/// <summary>
 	/// Registry of all type descriptors. Use UserData statics to access these.

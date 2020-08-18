@@ -1,5 +1,5 @@
 ﻿
-namespace MoonSharp.Interpreter
+namespace MunSharp.Interpreter
 {
 	/// <summary>
 	/// Class used to support "tail" continuations - a way for C# / Lua interaction which supports 

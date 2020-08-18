@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using MoonSharp.Interpreter.Execution.VM;
+using MunSharp.Interpreter.Execution.VM;
 
-namespace MoonSharp.Interpreter.Debugging
+namespace MunSharp.Interpreter.Debugging
 {
 	/// <summary>
 	/// Class providing services specific to debugger implementations.
 	/// </summary>
-	/// <seealso cref="MoonSharp.Interpreter.IScriptPrivateResource" />
+	/// <seealso cref="MunSharp.Interpreter.IScriptPrivateResource" />
 	public sealed class DebugService : IScriptPrivateResource
 	{
 		Processor m_Processor;

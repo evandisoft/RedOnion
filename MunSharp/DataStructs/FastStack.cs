@@ -3,7 +3,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace MoonSharp.Interpreter.DataStructs
+namespace MunSharp.Interpreter.DataStructs
 {
 	/// <summary>
 	/// A preallocated, non-resizable, stack

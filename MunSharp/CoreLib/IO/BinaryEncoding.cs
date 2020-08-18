@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace MoonSharp.Interpreter.CoreLib.IO
+namespace MunSharp.Interpreter.CoreLib.IO
 {
 	class BinaryEncoding : Encoding
 	{

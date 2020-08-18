@@ -1,6 +1,6 @@
-﻿using MoonSharp.Interpreter.Execution;
+﻿using MunSharp.Interpreter.Execution;
 
-namespace MoonSharp.Interpreter.Tree.Statements
+namespace MunSharp.Interpreter.Tree.Statements
 {
 	class EmptyStatement : Statement
 	{

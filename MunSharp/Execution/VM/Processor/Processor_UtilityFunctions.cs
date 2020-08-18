@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace MoonSharp.Interpreter.Execution.VM
+namespace MunSharp.Interpreter.Execution.VM
 {
 	sealed partial class Processor
 	{

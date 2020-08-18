@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 
-namespace MoonSharp.Interpreter
+namespace MunSharp.Interpreter
 {
 	/// <summary>
 	/// A class representing a value in a Lua/MoonSharp script.
@@ -849,7 +849,7 @@ namespace MoonSharp.Interpreter
 		/// <returns></returns>
 		public static DynValue FromObject(Script script, object obj)
 		{
-			return MoonSharp.Interpreter.Interop.Converters.ClrToScriptConversions.ObjectToDynValue(script, obj);
+			return MunSharp.Interpreter.Interop.Converters.ClrToScriptConversions.ObjectToDynValue(script, obj);
 		}
 
 		/// <summary>
@@ -857,7 +857,7 @@ namespace MoonSharp.Interpreter
 		/// </summary>
 		public object ToObject()
 		{
-			return MoonSharp.Interpreter.Interop.Converters.ScriptToClrConversions.DynValueToObject(this);
+			return MunSharp.Interpreter.Interop.Converters.ScriptToClrConversions.DynValueToObject(this);
 		}
 
 		/// <summary>
@@ -866,7 +866,7 @@ namespace MoonSharp.Interpreter
 		public object ToObject(Type desiredType)
 		{
 			//Contract.Requires(desiredType != null);
-			return MoonSharp.Interpreter.Interop.Converters.ScriptToClrConversions.DynValueToObjectOfType(this, desiredType, null, false);
+			return MunSharp.Interpreter.Interop.Converters.ScriptToClrConversions.DynValueToObjectOfType(this, desiredType, null, false);
 		}
 
 		/// <summary>

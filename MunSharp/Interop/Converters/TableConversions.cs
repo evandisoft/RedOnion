@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using MoonSharp.Interpreter.Compatibility;
+using MunSharp.Interpreter.Compatibility;
 
-namespace MoonSharp.Interpreter.Interop.Converters
+namespace MunSharp.Interpreter.Interop.Converters
 {
 	internal static class TableConversions
 	{

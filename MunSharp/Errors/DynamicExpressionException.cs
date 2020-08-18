@@ -1,7 +1,7 @@
 ﻿
 using System;
 
-namespace MoonSharp.Interpreter
+namespace MunSharp.Interpreter
 {
 	/// <summary>
 	/// Exception thrown when a dynamic expression is invalid

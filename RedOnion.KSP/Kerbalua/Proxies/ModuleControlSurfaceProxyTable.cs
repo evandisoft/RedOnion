@@ -1,12 +1,12 @@
 using System;
-using MoonSharp.Interpreter;
+using MunSharp.Interpreter;
 using UnityEngine;
 
 namespace RedOnion.KSP.Kerbalua.Proxies
 {
 	public class ModuleControlSurfaceProxyTable : ProxyTable
 	{
-		public ModuleControlSurfaceProxyTable(global::MoonSharp.Interpreter.Script script, object proxied) : base(script, proxied)
+		public ModuleControlSurfaceProxyTable(global::MunSharp.Interpreter.Script script, object proxied) : base(script, proxied)
 		{
 			//this["GetPotentialTorque"] = new GetPotentialTorque(GetPotentialTorqueImpl);
 		}

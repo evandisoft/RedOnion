@@ -3,7 +3,7 @@
 
 using System.Text;
 
-namespace MoonSharp.Interpreter.Interop.LuaStateInterop
+namespace MunSharp.Interpreter.Interop.LuaStateInterop
 {
 	public class LuaLBuffer 
 	{

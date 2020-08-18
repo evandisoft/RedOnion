@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using MoonSharp.Interpreter.Interop.BasicDescriptors;
+using MunSharp.Interpreter.Interop.BasicDescriptors;
 
-namespace MoonSharp.Interpreter.Interop.StandardDescriptors.HardwiredDescriptors
+namespace MunSharp.Interpreter.Interop.StandardDescriptors.HardwiredDescriptors
 {
 	public abstract class HardwiredMethodMemberDescriptor : FunctionMemberDescriptorBase
 	{

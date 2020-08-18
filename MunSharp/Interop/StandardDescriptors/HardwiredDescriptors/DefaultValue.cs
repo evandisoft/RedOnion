@@ -1,5 +1,5 @@
 ﻿
-namespace MoonSharp.Interpreter.Interop.StandardDescriptors.HardwiredDescriptors
+namespace MunSharp.Interpreter.Interop.StandardDescriptors.HardwiredDescriptors
 {
 	public sealed class DefaultValue
 	{

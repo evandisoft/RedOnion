@@ -1,5 +1,5 @@
 ﻿
-namespace MoonSharp.Interpreter.Interop
+namespace MunSharp.Interpreter.Interop
 {
 	/// <summary>
 	/// As a convenience, every type deriving from IUserDataType is "self-described". That is, no descriptor is needed/generated

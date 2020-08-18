@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace MoonSharp.Interpreter.Interop.StandardDescriptors
+namespace MunSharp.Interpreter.Interop.StandardDescriptors
 {
 	internal class EventFacade : IUserDataType
 	{

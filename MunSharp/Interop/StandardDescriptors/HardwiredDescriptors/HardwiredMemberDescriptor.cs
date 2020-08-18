@@ -1,8 +1,8 @@
 ﻿using System;
-using MoonSharp.Interpreter.Interop.BasicDescriptors;
-using MoonSharp.Interpreter.Interop.Converters;
+using MunSharp.Interpreter.Interop.BasicDescriptors;
+using MunSharp.Interpreter.Interop.Converters;
 
-namespace MoonSharp.Interpreter.Interop.StandardDescriptors.HardwiredDescriptors
+namespace MunSharp.Interpreter.Interop.StandardDescriptors.HardwiredDescriptors
 {
 	public abstract class HardwiredMemberDescriptor : IMemberDescriptor
 	{

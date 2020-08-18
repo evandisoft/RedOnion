@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using MoonSharp.Interpreter.Tree.Statements;
+using MunSharp.Interpreter.Tree.Statements;
 
-namespace MoonSharp.Interpreter.Execution.Scopes
+namespace MunSharp.Interpreter.Execution.Scopes
 {
 	internal class BuildTimeScopeBlock
 	{

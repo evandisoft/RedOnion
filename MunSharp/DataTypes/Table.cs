@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using MoonSharp.Interpreter.DataStructs;
+using MunSharp.Interpreter.DataStructs;
 
-namespace MoonSharp.Interpreter
+namespace MunSharp.Interpreter
 {
 	/// <summary>
 	/// A class representing a Lua table.

@@ -2,7 +2,7 @@
 #pragma warning disable 1591
 
 
-namespace MoonSharp.Interpreter.CoreLib
+namespace MunSharp.Interpreter.CoreLib
 {
 	/// <summary>
 	/// Class implementing dynamic expression evaluations at runtime (a MoonSharp addition).

@@ -1,7 +1,7 @@
-﻿using MoonSharp.Interpreter.Interop;
-using MoonSharp.Interpreter.Platforms;
+﻿using MunSharp.Interpreter.Interop;
+using MunSharp.Interpreter.Platforms;
 
-namespace MoonSharp.Interpreter
+namespace MunSharp.Interpreter
 {
 	/// <summary>
 	/// Class containing script global options, that is options which cannot be customized per-script.

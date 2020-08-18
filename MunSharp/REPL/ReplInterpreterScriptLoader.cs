@@ -1,8 +1,8 @@
 ﻿#if !(PCL || ENABLE_DOTNET || NETFX_CORE)
 using System;
-using MoonSharp.Interpreter.Loaders;
+using MunSharp.Interpreter.Loaders;
 
-namespace MoonSharp.Interpreter.REPL
+namespace MunSharp.Interpreter.REPL
 {
 	/// <summary>
 	/// A script loader loading scripts directly from the file system (does not go through platform object)

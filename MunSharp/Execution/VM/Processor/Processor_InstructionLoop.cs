@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using MoonSharp.Interpreter.DataStructs;
-using MoonSharp.Interpreter.Debugging;
-using MoonSharp.Interpreter.Interop;
+using MunSharp.Interpreter.DataStructs;
+using MunSharp.Interpreter.Debugging;
+using MunSharp.Interpreter.Interop;
 
-namespace MoonSharp.Interpreter.Execution.VM
+namespace MunSharp.Interpreter.Execution.VM
 {
 	sealed partial class Processor
 	{

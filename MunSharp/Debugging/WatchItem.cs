@@ -1,5 +1,5 @@
 ﻿
-namespace MoonSharp.Interpreter.Debugging
+namespace MunSharp.Interpreter.Debugging
 {
 	/// <summary>
 	/// A watch item for the debugger to consume.

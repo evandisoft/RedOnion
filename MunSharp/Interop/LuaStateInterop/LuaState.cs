@@ -3,7 +3,7 @@
 
 using System.Collections.Generic;
 
-namespace MoonSharp.Interpreter.Interop.LuaStateInterop
+namespace MunSharp.Interpreter.Interop.LuaStateInterop
 {
 	/// <summary>
 	/// 

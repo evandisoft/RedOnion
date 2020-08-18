@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MoonSharp.Interpreter.Interop.BasicDescriptors
+namespace MunSharp.Interpreter.Interop.BasicDescriptors
 {
 	/// <summary>
 	/// Permissions for members access

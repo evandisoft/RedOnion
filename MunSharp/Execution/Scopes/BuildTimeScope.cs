@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using MoonSharp.Interpreter.Execution.Scopes;
-using MoonSharp.Interpreter.Tree.Statements;
+using MunSharp.Interpreter.Execution.Scopes;
+using MunSharp.Interpreter.Tree.Statements;
 
-namespace MoonSharp.Interpreter.Execution
+namespace MunSharp.Interpreter.Execution
 {
 	internal class BuildTimeScope
 	{

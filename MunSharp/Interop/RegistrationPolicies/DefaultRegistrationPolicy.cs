@@ -1,7 +1,7 @@
 ﻿using System;
-using MoonSharp.Interpreter.Interop.StandardDescriptors.HardwiredDescriptors;
+using MunSharp.Interpreter.Interop.StandardDescriptors.HardwiredDescriptors;
 
-namespace MoonSharp.Interpreter.Interop.RegistrationPolicies
+namespace MunSharp.Interpreter.Interop.RegistrationPolicies
 {
 	/// <summary>
 	/// The default registration policy used by MoonSharp unless explicitely replaced.

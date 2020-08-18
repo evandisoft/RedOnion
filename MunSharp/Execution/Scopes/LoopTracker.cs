@@ -1,7 +1,7 @@
-﻿using MoonSharp.Interpreter.DataStructs;
-using MoonSharp.Interpreter.Execution.VM;
+﻿using MunSharp.Interpreter.DataStructs;
+using MunSharp.Interpreter.Execution.VM;
 
-namespace MoonSharp.Interpreter.Execution
+namespace MunSharp.Interpreter.Execution
 {
 	interface ILoop
 	{

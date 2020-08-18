@@ -4,7 +4,7 @@
 using System;
 using lua_Integer = System.Int32;
 
-namespace MoonSharp.Interpreter.Interop.LuaStateInterop
+namespace MunSharp.Interpreter.Interop.LuaStateInterop
 {
 	/// <summary>
 	/// Classes using the classic interface should inherit from this class.

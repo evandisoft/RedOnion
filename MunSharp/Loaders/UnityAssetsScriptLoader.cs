@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using MoonSharp.Interpreter.Compatibility;
+using MunSharp.Interpreter.Compatibility;
 
-namespace MoonSharp.Interpreter.Loaders
+namespace MunSharp.Interpreter.Loaders
 {
 	/// <summary>
 	/// A script loader which can load scripts from assets in Unity3D.

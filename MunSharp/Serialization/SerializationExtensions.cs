@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Text;
 
-namespace MoonSharp.Interpreter.Serialization
+namespace MunSharp.Interpreter.Serialization
 {
 	/// <summary>
 	/// 

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MoonSharp.Interpreter.Diagnostics.PerformanceCounters
+namespace MunSharp.Interpreter.Diagnostics.PerformanceCounters
 {
 	class DummyPerformanceStopwatch : IPerformanceStopwatch, IDisposable
 	{

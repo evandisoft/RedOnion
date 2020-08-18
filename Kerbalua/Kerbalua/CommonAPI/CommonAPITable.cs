@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
-using MoonSharp.Interpreter;
+using MunSharp.Interpreter;
 using RedOnion.Attributes;
 using RedOnion.Debugging;
 

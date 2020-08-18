@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using MoonSharp.Interpreter.Compatibility;
+using MunSharp.Interpreter.Compatibility;
 
-namespace MoonSharp.Interpreter.CoreLib.IO
+namespace MunSharp.Interpreter.CoreLib.IO
 {
 	/// <summary>
 	/// Abstract class implementing a file Lua userdata. Methods are meant to be called by Lua code.

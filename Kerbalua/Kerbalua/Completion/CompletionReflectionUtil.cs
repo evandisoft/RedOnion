@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using Kerbalua.Completion.CompletionTypes;
-using MoonSharp.Interpreter;
+using MunSharp.Interpreter;
 
 namespace Kerbalua.Completion
 {

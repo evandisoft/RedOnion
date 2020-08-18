@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using MoonSharp.Interpreter.Debugging;
-using MoonSharp.Interpreter.Execution;
+using MunSharp.Interpreter.Debugging;
+using MunSharp.Interpreter.Execution;
 
-namespace MoonSharp.Interpreter.Tree.Statements
+namespace MunSharp.Interpreter.Tree.Statements
 {
 	class LabelStatement : Statement
 	{

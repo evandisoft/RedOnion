@@ -1,5 +1,5 @@
 using System;
-using MoonSharp.Interpreter;
+using MunSharp.Interpreter;
 using NUnit.Framework;
 
 namespace KerbaluaNUnit

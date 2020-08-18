@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using MoonSharp.Interpreter.Execution;
+using MunSharp.Interpreter.Execution;
 
-namespace MoonSharp.Interpreter
+namespace MunSharp.Interpreter
 {
 	/// <summary>
 	/// A class representing a script function

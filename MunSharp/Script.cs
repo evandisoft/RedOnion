@@ -3,16 +3,16 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using MoonSharp.Interpreter.CoreLib;
-using MoonSharp.Interpreter.Debugging;
-using MoonSharp.Interpreter.Diagnostics;
-using MoonSharp.Interpreter.Execution.VM;
-using MoonSharp.Interpreter.IO;
-using MoonSharp.Interpreter.Platforms;
-using MoonSharp.Interpreter.Tree.Expressions;
-using MoonSharp.Interpreter.Tree.Fast_Interface;
+using MunSharp.Interpreter.CoreLib;
+using MunSharp.Interpreter.Debugging;
+using MunSharp.Interpreter.Diagnostics;
+using MunSharp.Interpreter.Execution.VM;
+using MunSharp.Interpreter.IO;
+using MunSharp.Interpreter.Platforms;
+using MunSharp.Interpreter.Tree.Expressions;
+using MunSharp.Interpreter.Tree.Fast_Interface;
 
-namespace MoonSharp.Interpreter
+namespace MunSharp.Interpreter
 {
 	/// <summary>
 	/// This class implements a MoonSharp scripting session. Multiple Script objects can coexist in the same program but cannot share

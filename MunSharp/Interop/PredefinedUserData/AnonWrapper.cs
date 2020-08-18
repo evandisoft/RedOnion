@@ -1,5 +1,5 @@
 ﻿
-namespace MoonSharp.Interpreter.Interop
+namespace MunSharp.Interpreter.Interop
 {
 	/// <summary>
 	/// Internal type used by <see cref="AnonWrapper{T}"/> for registration

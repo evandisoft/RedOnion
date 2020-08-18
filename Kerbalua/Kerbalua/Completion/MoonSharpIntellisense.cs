@@ -6,7 +6,7 @@ using Antlr4.Runtime.Tree;
 using Grammar.IncompleteLuaParsing;
 using Kerbalua.Completion.CompletionTypes;
 using Kerbalua.Parsing;
-using MoonSharp.Interpreter;
+using MunSharp.Interpreter;
 using UnityEngine;
 using static RedOnion.Debugging.QueueLogger;
 

@@ -48,7 +48,7 @@
 using System;
 using System.Diagnostics;
 
-namespace MoonSharp.Interpreter.Interop.LuaStateInterop
+namespace MunSharp.Interpreter.Interop.LuaStateInterop
 {
 	public class CharPtr
 	{

@@ -1,7 +1,7 @@
 ﻿using System;
-using MoonSharp.Interpreter.Execution.VM;
+using MunSharp.Interpreter.Execution.VM;
 
-namespace MoonSharp.Interpreter.Execution
+namespace MunSharp.Interpreter.Execution
 {
 	[Flags]
 	internal enum InstructionFieldUsage

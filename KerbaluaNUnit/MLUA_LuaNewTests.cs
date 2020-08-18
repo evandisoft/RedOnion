@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using Kerbalua.Scripting;
-using MoonSharp.Interpreter;
-using MoonSharp.Interpreter.Interop;
+using MunSharp.Interpreter;
+using MunSharp.Interpreter.Interop;
 using NUnit.Framework;
 
 namespace KerbaluaNUnit
