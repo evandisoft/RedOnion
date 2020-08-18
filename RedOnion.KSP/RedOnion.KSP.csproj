@@ -80,9 +80,6 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="mscorlib" />
-    <Reference Include="MunSharp">
-      <HintPath>..\packages\MunSharp.2.0.0\lib\net35\MunSharp.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="API\App.cs" />
@@ -191,9 +188,10 @@
       <Project>{F590B1DB-8F33-4986-8383-180952D63CDA}</Project>
       <Name>Kerbalua</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
+    <ProjectReference Include="..\MunSharp\MunSharp.csproj">
+      <Project>{91EA9B9D-FE03-4273-BDAF-8AD42EDE1E59}</Project>
+      <Name>MunSharp</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Settings\" />

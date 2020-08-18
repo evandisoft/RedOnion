@@ -77,9 +77,6 @@
       <HintPath>$(KerbalLibs)\System.Xml.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="MunSharp">
-      <HintPath>..\packages\MunSharp.2.0.0\lib\net35\MunSharp.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -140,6 +137,10 @@
     <ProjectReference Include="..\MunOS\MunOS.csproj">
       <Project>{A4C93278-A705-4AC2-B2A9-16B30C2E2C36}</Project>
       <Name>MunOS</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MunSharp\MunSharp.csproj">
+      <Project>{91EA9B9D-FE03-4273-BDAF-8AD42EDE1E59}</Project>
+      <Name>MunSharp</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />
