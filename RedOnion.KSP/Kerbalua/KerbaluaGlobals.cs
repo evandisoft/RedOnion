@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel;
 using System.Reflection;
+using MunOS;
 using MunSharp.Interpreter;
 using MunSharp.Interpreter.Interop;
 using RedOnion.Attributes;
@@ -22,13 +23,20 @@ namespace RedOnion.KSP.Kerbalua
 			return null;
 		}
 
-		//This will be overridden in KerbaluaScript.cs
+		// this will be overriden in KerbaluaScript.cs
 		[Description("Causes the script to wait, for the given number of seconds. "
 		+"This is not a precise timing mechanism. Sleeping for 0 seconds will cause the script "
 			+"to wait until the next unity FixedUpdate")]
 		public static void sleep(double seconds)
 		{
+			//var currentThread=MunThread.Current as KerbaluaThread;
 
+			//if (currentThread==null)
+			//{
+			//	throw new Exception("The current thread was not a "+nameof(KerbaluaThread)+" in sleep");
+			//}
+
+			//currentThread.Sleep(seconds);
 		}
 
 		//This will be overridden in KerbaluaScript.cs

@@ -16,5 +16,5 @@ Optional Goals:
 - Give the user something close to the normal lua debugging experience.
 
 Todo:
-- Integrate munsharp tests
 - Modify license
+- Make some test scripts for in and out of the game.

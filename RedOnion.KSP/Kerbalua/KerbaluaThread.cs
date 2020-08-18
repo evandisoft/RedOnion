@@ -40,6 +40,14 @@ namespace RedOnion.KSP.Kerbalua
 			return mainFunction;
 		}
 
+		public void Sleep(double seconds)
+		{
+			sleeptimeMillis=(long)(seconds*1000);
+			sleepwatch.Reset();
+			sleepwatch.Start();
+			Status=MunStatus.Sleeping;
+		}
+
 		long sleeptimeMillis=0;
 		Stopwatch sleepwatch=new Stopwatch();
 

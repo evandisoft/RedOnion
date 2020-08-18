@@ -15,12 +15,8 @@ namespace Kerbalua.Scripting
 {
 	public class KerbaluaScript : Script
 	{
+		//EVANTODO: This seems to not be needed
 		public Action<string> PrintErrorAction { get; set; }
-
-		private int execlimit = defaultExecLimit;
-		private const int defaultExecLimit=1000;
-		private const int execLimitMin=100;
-		private const int execLimitMax=5000;
 
 		public readonly MunProcess kerbaluaProcess;
 
@@ -61,14 +57,12 @@ end
 
 			// This is the simplest way to define "new" to use __new.
 			Globals["new"]=DoString(LuaNew);
-
-
+			
 			var coroutineTable=Globals["coroutine"] as Table;
 
 			var yield = coroutineTable["yield"];
 			Globals.Remove("coroutine");
-
-			Globals["sleep"] = yield;
+			//Globals["sleep"] = yield;
 		}
 	}
 }
