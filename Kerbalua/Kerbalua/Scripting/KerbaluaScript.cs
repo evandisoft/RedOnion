@@ -58,10 +58,10 @@ end
 			// This is the simplest way to define "new" to use __new.
 			Globals["new"]=DoString(LuaNew);
 			
-			var coroutineTable=Globals["coroutine"] as Table;
+			//var coroutineTable=Globals["coroutine"] as Table;
 
-			var yield = coroutineTable["yield"];
-			Globals.Remove("coroutine");
+			//var yield = coroutineTable["yield"];
+			//Globals.Remove("coroutine");
 			//Globals["sleep"] = yield;
 		}
 	}

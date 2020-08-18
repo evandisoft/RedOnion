@@ -21,12 +21,22 @@ namespace MunSharp.Interpreter.Execution.VM
 			long executedInstructions = 0;
 			bool canAutoYield = (AutoYieldCounter > 0) && m_CanYield && (this.State != CoroutineState.Main);
 
+			// Added to implement a per script execution time-limit.
+			bool canTimedInterrupt = m_Script.TimedInterruptActive && m_CanYield && (this.State != CoroutineState.Main);
+
 			repeat_execution:
 
 			try
 			{
 				while (true)
 				{
+					// Added to allow for an implementation of sleep.
+					if (m_Script.ForceYield)
+					{
+						m_Script.ForceYield=false;
+						return DynValue.NewForcedYieldReq();
+					}
+
 					Instruction i = m_RootChunk.Code[instructionPtr];
 
 					if (m_Debug.DebuggerAttached != null)
@@ -35,6 +45,12 @@ namespace MunSharp.Interpreter.Execution.VM
 					}
 
 					++executedInstructions;
+
+					if (canTimedInterrupt && m_Script.TimesUp)
+					{
+						m_Script.ResetTimer();
+						return DynValue.NewForcedYieldReq();
+					}
 
 					if (canAutoYield && executedInstructions > AutoYieldCounter)
 					{

@@ -29,14 +29,14 @@ namespace RedOnion.KSP.Kerbalua
 			+"to wait until the next unity FixedUpdate")]
 		public static void sleep(double seconds)
 		{
-			//var currentThread=MunThread.Current as KerbaluaThread;
+			var currentThread=MunThread.Current as KerbaluaThread;
 
-			//if (currentThread==null)
-			//{
-			//	throw new Exception("The current thread was not a "+nameof(KerbaluaThread)+" in sleep");
-			//}
+			if (currentThread==null)
+			{
+				throw new Exception("The current thread was not a "+nameof(KerbaluaThread)+" in sleep");
+			}
 
-			//currentThread.Sleep(seconds);
+			currentThread.Sleep(seconds);
 		}
 
 		//This will be overridden in KerbaluaScript.cs

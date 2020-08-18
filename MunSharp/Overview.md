@@ -1,6 +1,7 @@
 Status:
 - On local munsharpintegration branch
 - RedOnion successfully compiles and runs using the MunSharp project instead of the package.
+- MunSharp.Tests project is integrated
 
 Goals:
 - Remove redundancy. The Kerbalua layer on top of MunSharp is probably mostly redundant.

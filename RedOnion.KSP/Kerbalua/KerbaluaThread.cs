@@ -46,6 +46,7 @@ namespace RedOnion.KSP.Kerbalua
 			sleepwatch.Reset();
 			sleepwatch.Start();
 			Status=MunStatus.Sleeping;
+			ScriptEngine.ForceYield=true;
 		}
 
 		long sleeptimeMillis=0;
@@ -76,58 +77,81 @@ namespace RedOnion.KSP.Kerbalua
 				return MunStatus.Incomplete;
 			}
 
-			tickwatch.Reset();
-			tickwatch.Start();
-
-			//MunLogger.Log("tick limit is "+tickLimit);
-			DynValue retval=null;
 			CoroutineState state=CoroutineState.ForceSuspended;
-			// We want this to run at least once, to always give anything that woke up a guarantee
-			// of at least perIterationCounter instructions
-			do
-			{
-				coroutine.Coroutine.AutoYieldCounter = perIterationCounter;
-				retval = coroutine.Coroutine.Resume();
-				state=coroutine.Coroutine.State;
-			} while (tickwatch.ElapsedTicks<tickLimit && state==CoroutineState.ForceSuspended);
+			DynValue retval=null;
+			ScriptEngine.SetTimedInterrupt(tickLimit);
+			retval = coroutine.Coroutine.Resume();
+			state=coroutine.Coroutine.State;
+			ScriptEngine.ResetTimer();
 
-			//MunLogger.Log("state was "+state);
-
-			if (state == CoroutineState.Dead)
+			switch (state)
 			{
+			case CoroutineState.Suspended:
+			case CoroutineState.Dead:
 				ReturnValue=retval;
 				return MunStatus.Finished;
-			}
-			if (state == CoroutineState.ForceSuspended)
-			{
-				return MunStatus.Incomplete;
-			}
-			if (state == CoroutineState.Suspended)
-			{
-				// if it is suspended we assume sleep (which is just a renamed yield)
-				// was called. The argument passed to yield 
-				// as the amount of time to sleep.
-				if (retval.Tuple!=null) 
+			case CoroutineState.ForceSuspended:
+				if (Status==MunStatus.Sleeping)
 				{
-					throw new Exception("Too many arguments to sleep");
+					return Status;
 				}
-				if (retval.IsNil())
-				{
-					return MunStatus.Yielded;
-				}
-				if (retval.Type!=DataType.Number)
-				{
-					throw new Exception("Argument to sleep must be a number");
-				}
-				double sleepSeconds=retval.Number;
-				sleeptimeMillis=(long)(sleepSeconds*1000);
-				sleepwatch.Start();
-				
 
-				return MunStatus.Sleeping;
+				return MunStatus.Incomplete;
 			}
 
 			throw new Exception("State of coroutine should not have been "+state);
+			//tickwatch.Reset();
+			//tickwatch.Start();
+
+			////MunLogger.Log("tick limit is "+tickLimit);
+			//DynValue retval=null;
+			//CoroutineState state=CoroutineState.ForceSuspended;
+			//// We want this to run at least once, to always give anything that woke up a guarantee
+			//// of at least perIterationCounter instructions
+			//do
+			//{
+			//	coroutine.Coroutine.AutoYieldCounter = perIterationCounter;
+			//	retval = coroutine.Coroutine.Resume();
+			//	state=coroutine.Coroutine.State;
+			//} while (tickwatch.ElapsedTicks<tickLimit && state==CoroutineState.ForceSuspended);
+
+			////MunLogger.Log("state was "+state);
+
+			//if (state == CoroutineState.Dead)
+			//{
+			//	ReturnValue=retval;
+			//	return MunStatus.Finished;
+			//}
+			//if (state == CoroutineState.ForceSuspended)
+			//{
+			//	return MunStatus.Incomplete;
+			//}
+			//if (state == CoroutineState.Suspended)
+			//{
+			//	// if it is suspended we assume sleep (which is just a renamed yield)
+			//	// was called. The argument passed to yield 
+			//	// as the amount of time to sleep.
+			//	if (retval.Tuple!=null) 
+			//	{
+			//		throw new Exception("Too many arguments to sleep");
+			//	}
+			//	if (retval.IsNil())
+			//	{
+			//		return MunStatus.Yielded;
+			//	}
+			//	if (retval.Type!=DataType.Number)
+			//	{
+			//		throw new Exception("Argument to sleep must be a number");
+			//	}
+			//	double sleepSeconds=retval.Number;
+			//	sleeptimeMillis=(long)(sleepSeconds*1000);
+			//	sleepwatch.Start();
+
+
+			//	return MunStatus.Sleeping;
+			//}
+
+			//throw new Exception("State of coroutine should not have been "+state);
 		}
 
 		public string GetOutputString(DynValue dynResult)
