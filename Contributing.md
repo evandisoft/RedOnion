@@ -35,4 +35,8 @@ On Windows, you can make symbolic links using [mklink](https://www.howtogeek.com
 Once you have that set up, you can build the project. The output will go into GameData/RedOnion/Plugins. In order for your KSP install to see these resulting dll's, you can create a link in the GameData folder of your ksp install called "RedOnion" that links to GameData/RedOnion in your project folder.
 
 Firda has created a cmd script (create-links.cmd) for windows that will create these links assuming that you have set your ksp install directory in the environment variable "ksp". If you have not, it assumes ksp is installed in the default location it would be installed under steam.
-("C:\Program Files (x86)\Steam\steamapps\common\Kehttps://forum.kerbalspaceprogram.com/index.php?/topic/183050-redonion-033-unrestricted-in-game-scripting-has-repl-editor-and-intellisense-lua-and-a-custom-jsruby-like-language-implemented-tested-on-ksp-17/&tab=comments#comment-3566618
+("C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program")
+
+Once again, any questions, feedback, concerns for now can be placed into "issues" on the project github page.
+
+If you would like to interact more with us about development, we can give you an invite to our discord.
