@@ -52,8 +52,8 @@ namespace RedOnion.KSP.Kerbalua
 		long sleeptimeMillis=0;
 		Stopwatch sleepwatch=new Stopwatch();
 
-		Stopwatch tickwatch=new Stopwatch();
-		int perIterationCounter=100;
+		//Stopwatch tickwatch=new Stopwatch();
+		//int perIterationCounter=100;
 		protected override MunStatus Execute(long tickLimit)
 		{
 			if (coroutine == null)
