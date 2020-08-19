@@ -3,7 +3,7 @@ Status:
 - RedOnion successfully compiles and runs using the MunSharp project instead of the package.
 - MunSharp.Tests project is integrated
 - LICENSES were modified and placed in the MunSharp and MunSharp.Tests project folders.
-- Implementations that allow coroutines, and implement sleep, are in effect but untested.
+- Implementations that allow coroutines, and implement sleep, are in effect. Sleep works. Coroutines do not work.
 - Out of game tests for the new features of MunSharp were implemented.
 
 Goals:
@@ -22,3 +22,5 @@ Optional Goals:
 Todo:
 - Make some in-game test scripts.
 - Do something about the failing lua os test.
+- Ensure that lua error handling is not effected by the changes I make
+- Ensure that debugging is not effected by the changes I make

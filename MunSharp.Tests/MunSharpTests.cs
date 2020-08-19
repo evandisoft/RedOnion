@@ -110,7 +110,7 @@ return coroutine.resume(c)
 			Assert.AreEqual(CoroutineState.ForceSuspended, coroutine.State);
 		}
 
-		[Test]
+		[Test] //EVANTODO: this test doesn't actually test anything.
 		public void MunSharp_04_InnerCoroutine_ForcedYield()
 		{
 			source=innerCoroutineRet;
@@ -139,7 +139,7 @@ return coroutine.resume(c)
 			Assert.AreEqual(1, result.Tuple[1].Number);
 		}
 
-		[Test]
+		[Test] //EVANTODO: this test doesn't actually test anything.
 		public void MunSharp_05_InnerCoroutine_TimedInterrupt()
 		{
 			source = innerCoroutineLoop;
@@ -160,7 +160,7 @@ return coroutine.resume(c)
 		}
 
 		[Test]
-		public void MunSharp_06_InnerCoroutine_AutoYieldCounter()
+		public void MunSharp_06_InnerFiniteLoop_AutoYieldCounter()
 		{
 			source = innerCoroutineFiniteLoop;
 			coroutine = CreateCoroutine(source);

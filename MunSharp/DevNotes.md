@@ -6,6 +6,9 @@ I could put the stopwatch in MunSharp
 ### Requirements:
 - Need to create a new implementation of sleep.
 
+### Problems:
+- Coroutines do not work. A forced yield does not go all the way up the chain.
+
 ### Benefits:
 - Users can use coroutines.
 - They may even be able to use autoyield.
