@@ -82,14 +82,14 @@ namespace RedOnion.KSP.Kerbalua
 			ScriptEngine.SetTimedInterrupt(tickLimit);
 			retval = coroutine.Coroutine.Resume();
 			state=coroutine.Coroutine.State;
-			ScriptEngine.ResetTimer();
+			ScriptEngine.DeactivateTimer();
 
 			switch (state)
 			{
-			case CoroutineState.Suspended:
 			case CoroutineState.Dead:
 				ReturnValue=retval;
 				return MunStatus.Finished;
+			case CoroutineState.Suspended:
 			case CoroutineState.ForceSuspended:
 				if (Status==MunStatus.Sleeping)
 				{
@@ -99,7 +99,7 @@ namespace RedOnion.KSP.Kerbalua
 				return MunStatus.Incomplete;
 			}
 
-			throw new Exception("State of coroutine should not have been "+state);
+			throw new Exception("State of coroutine in "+nameof(KerbaluaThread)+" should not have been "+state);
 			//tickwatch.Reset();
 			//tickwatch.Start();
 

@@ -35,6 +35,7 @@
     <Compile Include="TapRunner.cs" />
     <Compile Include="TestMoreTests.cs" />
     <Compile Include="TestRunner.cs" />
+    <Compile Include="MunSharpTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

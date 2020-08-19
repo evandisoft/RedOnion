@@ -762,7 +762,7 @@ namespace MunSharp.Interpreter
 			InterruptWatch.Start();
 		}
 
-		public void ResetTimer()
+		public void DeactivateTimer()
 		{
 			TickLimit=0;
 			InterruptWatch.Stop();
@@ -771,7 +771,7 @@ namespace MunSharp.Interpreter
 
 		public bool TimedInterruptActive { get; private set; } = false;
 
-		public bool TimesUp => InterruptWatch.ElapsedTicks>TickLimit;
+		public bool TickLimitReached => InterruptWatch.ElapsedTicks>TickLimit;
 
 		long TickLimit = 0;
 		Stopwatch InterruptWatch = new Stopwatch();

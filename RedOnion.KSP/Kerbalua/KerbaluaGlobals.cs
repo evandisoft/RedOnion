@@ -27,7 +27,7 @@ namespace RedOnion.KSP.Kerbalua
 		[Description("Causes the script to wait, for the given number of seconds. "
 		+"This is not a precise timing mechanism. Sleeping for 0 seconds will cause the script "
 			+"to wait until the next unity FixedUpdate")]
-		public static void sleep(double seconds)
+		public static void sleep(double seconds=0)
 		{
 			var currentThread=MunThread.Current as KerbaluaThread;
 
@@ -39,16 +39,17 @@ namespace RedOnion.KSP.Kerbalua
 			currentThread.Sleep(seconds);
 		}
 
-		//This will be overridden in KerbaluaScript.cs
-		[Description("Executes the file with the given filename. The base directory is" +
-			" KSPDir/GameData/RedOnion/Scripts.")]
-		public static DynValue dofile(string filename)
-		{
-			return null;
-		}
+		// This is not yet implemented.
+		////This will be overridden in KerbaluaScript.cs
+		//[Description("Executes the file with the given filename. The base directory is" +
+		//	" KSPDir/GameData/RedOnion/Scripts.")]
+		//public static DynValue dofile(string filename)
+		//{
+		//	return null;
+		//}
 
-		[Unsafe,Description("Unsafe, Kerbalua specific reflection stuff.")]
-		public static readonly Type reflection=typeof(Reflection);
+		//[Unsafe,Description("Unsafe, Kerbalua specific reflection stuff.")]
+		//public static readonly Type reflection=typeof(Reflection);
 	}
 
 	[Description("Reflection functionality specific to Moonsharp.")]

@@ -21,7 +21,8 @@ namespace MunSharp.Interpreter.Execution.VM
 			long executedInstructions = 0;
 			bool canAutoYield = (AutoYieldCounter > 0) && m_CanYield && (this.State != CoroutineState.Main);
 
-			// Added to implement a per script execution time-limit.
+			// Added to implement a per script execution time-limit. For our use
+			// the interrupt should always be active while MunSharp scripts are executing.
 			bool canTimedInterrupt = m_Script.TimedInterruptActive && m_CanYield && (this.State != CoroutineState.Main);
 
 			repeat_execution:
@@ -34,6 +35,7 @@ namespace MunSharp.Interpreter.Execution.VM
 					if (m_Script.ForceYield)
 					{
 						m_Script.ForceYield=false;
+						m_SavedInstructionPtr = instructionPtr;
 						return DynValue.NewForcedYieldReq();
 					}
 
@@ -46,9 +48,10 @@ namespace MunSharp.Interpreter.Execution.VM
 
 					++executedInstructions;
 
-					if (canTimedInterrupt && m_Script.TimesUp)
+					if (canTimedInterrupt && m_Script.TickLimitReached)
 					{
-						m_Script.ResetTimer();
+						m_Script.DeactivateTimer();
+						m_SavedInstructionPtr = instructionPtr;
 						return DynValue.NewForcedYieldReq();
 					}
 
