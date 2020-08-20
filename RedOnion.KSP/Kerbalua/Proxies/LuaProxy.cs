@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using MoonSharp.Interpreter;
-using MoonSharp.Interpreter.Interop;
+using MunSharp.Interpreter;
+using MunSharp.Interpreter.Interop;
 using RedOnion.Common.Completion;
 
 namespace RedOnion.KSP.Kerbalua.Proxies
@@ -16,7 +16,7 @@ namespace RedOnion.KSP.Kerbalua.Proxies
 			this.ProxiedObject = ProxiedObject;
 		}
 
-		public DynValue Index(global::MoonSharp.Interpreter.Script script, DynValue index, bool isDirectIndexing)
+		public DynValue Index(global::MunSharp.Interpreter.Script script, DynValue index, bool isDirectIndexing)
 		{
 			if (index.Type != DataType.String)
 			{
@@ -62,12 +62,12 @@ namespace RedOnion.KSP.Kerbalua.Proxies
 			throw new NotImplementedException("Member " + memberName + " was not in proxied object " + ProxiedObject.GetType());
 		}
 
-		public DynValue MetaIndex(global::MoonSharp.Interpreter.Script script, string metaname)
+		public DynValue MetaIndex(global::MunSharp.Interpreter.Script script, string metaname)
 		{
 			throw new NotImplementedException();
 		}
 
-		public bool SetIndex(global::MoonSharp.Interpreter.Script script, DynValue index, DynValue value, bool isDirectIndexing)
+		public bool SetIndex(global::MunSharp.Interpreter.Script script, DynValue index, DynValue value, bool isDirectIndexing)
 		{
 			throw new NotImplementedException();
 		}

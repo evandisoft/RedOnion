@@ -1,12 +1,12 @@
 ﻿using System;
-using MoonSharp.Interpreter;
-using MoonSharp.Interpreter.Interop;
+using MunSharp.Interpreter;
+using MunSharp.Interpreter.Interop;
 
 namespace RedOnion.KSP.ReflectionUtil
 {
 	public partial class GetMappings : IUserDataType
 	{
-		public DynValue Index(global::MoonSharp.Interpreter.Script script, DynValue index, bool isDirectIndexing)
+		public DynValue Index(global::MunSharp.Interpreter.Script script, DynValue index, bool isDirectIndexing)
 		{
 			if (index.Type != DataType.String)
 			{
@@ -21,12 +21,12 @@ namespace RedOnion.KSP.ReflectionUtil
 			throw new Exception("index not found");
 		}
 
-		public DynValue MetaIndex(global::MoonSharp.Interpreter.Script script, string metaname)
+		public DynValue MetaIndex(global::MunSharp.Interpreter.Script script, string metaname)
 		{
 			throw new NotImplementedException();
 		}
 
-		public bool SetIndex(global::MoonSharp.Interpreter.Script script, DynValue index, DynValue value, bool isDirectIndexing)
+		public bool SetIndex(global::MunSharp.Interpreter.Script script, DynValue index, DynValue value, bool isDirectIndexing)
 		{
 			throw new NotImplementedException();
 		}

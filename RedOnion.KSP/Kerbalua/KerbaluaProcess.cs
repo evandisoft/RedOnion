@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using Kerbalua.Completion;
 using Kerbalua.Scripting;
-using MoonSharp.Interpreter;
-using MoonSharp.Interpreter.Loaders;
+using MunSharp.Interpreter;
+using MunSharp.Interpreter.Loaders;
 using MunOS;
 using MunOS.Repl;
 using RedOnion.KSP.API;
@@ -66,62 +66,5 @@ namespace RedOnion.KSP.Kerbalua
 				Debug.Log(exception);
 			}
 		}
-
-		/*
-		public override string GetImportString(string scriptname)
-		{
-			string basename = Path.GetFileNameWithoutExtension(scriptname);
-
-			return "require(\""+basename+"\")";
-		}
-
-		public void Execute(ExecPriority priority, Closure closure)
-		{
-			try
-			{
-				var thread=new KerbaluaThread(closure,this);
-				EnqueueThread(priority, thread);
-			}
-			catch (Exception e)
-			{
-				PrintException(e);
-			}
-		}
-
-		public override void Execute(ExecPriority priority, string source, string path, bool inRepl)
-		{
-			try
-			{
-				MunThread thread=null;
-				if (inRepl)
-				{
-					thread=new KerbaluaReplThread(source, path, this);
-				}
-				else
-				{
-					thread=new KerbaluaThread(source, path, this);
-				}
-				EnqueueThread(priority, thread);
-			}
-			catch(Exception e)
-			{
-				PrintException(e);
-			}
-		}
-
-		public override void ResetEngine()
-		{
-			base.ResetEngine();
-			InternalResetEngine();
-		}
-
-		protected override void ThreadExecutionComplete(MunThread thread, Exception e)
-		{
-			if (e!=null)
-			{
-				PrintException(e);
-			}
-		}
-		*/
 	}
 }

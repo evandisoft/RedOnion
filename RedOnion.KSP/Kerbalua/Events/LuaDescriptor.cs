@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using MoonSharp.Interpreter;
-using MoonSharp.Interpreter.Compatibility;
-using MoonSharp.Interpreter.Interop;
-using MoonSharp.Interpreter.Interop.BasicDescriptors;
+using MunSharp.Interpreter;
+using MunSharp.Interpreter.Compatibility;
+using MunSharp.Interpreter.Interop;
+using MunSharp.Interpreter.Interop.BasicDescriptors;
 
 namespace RedOnion.KSP.Kerbalua.Events
 {

@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using MoonSharp.Interpreter;
+using MunSharp.Interpreter;
 using RedOnion.Common.Completion;
 
 namespace Kerbalua.Completion.CompletionTypes

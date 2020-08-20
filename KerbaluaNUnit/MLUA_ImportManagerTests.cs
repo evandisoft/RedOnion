@@ -2,8 +2,8 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using RedOnion.KSP.ReflectionUtil;
-using MoonSharp.Interpreter.Interop;
-using MoonSharp.Interpreter;
+using MunSharp.Interpreter.Interop;
+using MunSharp.Interpreter;
 
 namespace KerbaluaNUnit {
 	[TestFixture()]

@@ -1,6 +1,6 @@
 using System;
 using System.Reflection;
-using MoonSharp.Interpreter;
+using MunSharp.Interpreter;
 using System.Collections.Generic;
 
 namespace RedOnion.KSP.Kerbalua.Proxies
@@ -11,10 +11,10 @@ namespace RedOnion.KSP.Kerbalua.Proxies
 	public class ProxyCallTable : Table
 	{
 		public object ProxiedObject;
-		global::MoonSharp.Interpreter.Script script;
+		global::MunSharp.Interpreter.Script script;
 		public string MemberName;
 
-		public ProxyCallTable(global::MoonSharp.Interpreter.Script script,object proxiedObject,string memberName) : base(script)
+		public ProxyCallTable(global::MunSharp.Interpreter.Script script,object proxiedObject,string memberName) : base(script)
 		{
 			this.script = script;
 			MemberName = memberName;

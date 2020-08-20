@@ -46,9 +46,6 @@
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>$(KerbalLibs)\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
-    <Reference Include="MunSharp">
-      <HintPath>..\packages\MunSharp.2.0.0\lib\net35\MunSharp.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Kerbalua\Kerbalua.csproj">
@@ -74,6 +71,10 @@
     <ProjectReference Include="..\RedOnion.UI\RedOnion.UI.csproj">
       <Project>{034c16ab-d16e-4afe-9837-812499ee2f3d}</Project>
       <Name>RedOnion.UI</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MunSharp\MunSharp.csproj">
+      <Project>{91EA9B9D-FE03-4273-BDAF-8AD42EDE1E59}</Project>
+      <Name>MunSharp</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

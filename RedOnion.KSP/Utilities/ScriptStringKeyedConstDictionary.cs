@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using MoonSharp.Interpreter;
-using MoonSharp.Interpreter.Interop;
+using MunSharp.Interpreter;
+using MunSharp.Interpreter.Interop;
 using RedOnion.Common.Completion;
 
 namespace RedOnion.KSP.Utilities

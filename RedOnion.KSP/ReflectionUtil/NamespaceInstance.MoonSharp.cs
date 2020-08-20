@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using MoonSharp.Interpreter;
-using MoonSharp.Interpreter.Interop;
+using MunSharp.Interpreter;
+using MunSharp.Interpreter.Interop;
 using RedOnion.Common.Completion;
 using UnityEngine;
 
@@ -9,7 +9,7 @@ namespace RedOnion.KSP.ReflectionUtil
 {
 	public partial class NamespaceInstance : IUserDataType, IMoonSharpCompletable
 	{
-		public DynValue Index(global::MoonSharp.Interpreter.Script script, DynValue index, bool isDirectIndexing)
+		public DynValue Index(global::MunSharp.Interpreter.Script script, DynValue index, bool isDirectIndexing)
 		{
 			//Debug.Log(index);
 
@@ -33,7 +33,7 @@ namespace RedOnion.KSP.ReflectionUtil
 			throw new Exception("No type or subnamespace named " + index + " found in namespace " + ToString());
 		}
 
-		DynValue IUserDataType.MetaIndex(global::MoonSharp.Interpreter.Script script, string metaname)
+		DynValue IUserDataType.MetaIndex(global::MunSharp.Interpreter.Script script, string metaname)
 		{
 			//if (metaname == "__tostring")
 			//{
@@ -49,7 +49,7 @@ namespace RedOnion.KSP.ReflectionUtil
 		//}
 
 
-		bool IUserDataType.SetIndex(global::MoonSharp.Interpreter.Script script, DynValue index, DynValue value, bool isDirectIndexing)
+		bool IUserDataType.SetIndex(global::MunSharp.Interpreter.Script script, DynValue index, DynValue value, bool isDirectIndexing)
 		{
 			throw new NotSupportedException("Cannot modify fields of "+nameof(NamespaceInstance));
 		}

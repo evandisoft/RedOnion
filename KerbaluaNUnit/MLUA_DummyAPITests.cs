@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using Kerbalua.CommonAPI;
 using Kerbalua.Completion;
-using MoonSharp.Interpreter;
-using MoonSharp.Interpreter.Interop;
+using MunSharp.Interpreter;
+using MunSharp.Interpreter.Interop;
 using NUnit.Framework;
 using static KerbaluaNUnit.CommonAPITestUtil;
 

@@ -86,9 +86,6 @@
       <HintPath>$(KerbalLibs)\UnityEngine.IMGUIModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="MunSharp">
-      <HintPath>..\packages\MunSharp.2.0.0\lib\net35\MunSharp.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -156,11 +153,12 @@
       <Project>{2D34D879-1A21-4F8F-BF49-38CED2B40406}</Project>
       <Name>RedOnion.Common</Name>
     </ProjectReference>
+    <ProjectReference Include="..\MunSharp\MunSharp.csproj">
+      <Project>{91EA9B9D-FE03-4273-BDAF-8AD42EDE1E59}</Project>
+      <Name>MunSharp</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup />
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Target Name="AfterBuild">
     <ZipDirectory SourceDirectory="..\Resources" Overwrite="True" DestinationFile="..\GameData\RedOnion\Resources.zip" />
