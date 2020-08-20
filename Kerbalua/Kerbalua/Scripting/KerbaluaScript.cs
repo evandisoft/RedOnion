@@ -61,7 +61,7 @@ end
 			//var coroutineTable=Globals["coroutine"] as Table;
 
 			//var yield = coroutineTable["yield"];
-			//Globals.Remove("coroutine");
+			Globals.Remove("coroutine");
 			//Globals["sleep"] = yield;
 		}
 	}
