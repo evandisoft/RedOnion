@@ -51,6 +51,9 @@
     <Reference Include="Assembly-CSharp-firstpass">
       <HintPath>$(KerbalLibs)\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
+    <Reference Include="Antlr4.Runtime.Standard">
+      <HintPath>..\packages\Antlr4.Runtime.Standard.4.7.1\lib\net35\Antlr4.Runtime.Standard.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MLUA_ProcessedIncompleteVarTests.cs" />
@@ -101,6 +104,10 @@
     <ProjectReference Include="..\MunSharp\MunSharp.csproj">
       <Project>{91EA9B9D-FE03-4273-BDAF-8AD42EDE1E59}</Project>
       <Name>MunSharp</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RedOnion.UI\RedOnion.UI.csproj">
+      <Project>{034C16AB-D16E-4AFE-9837-812499EE2F3D}</Project>
+      <Name>RedOnion.UI</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
