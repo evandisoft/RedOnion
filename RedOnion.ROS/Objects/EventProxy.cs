@@ -74,26 +74,22 @@ namespace RedOnion.ROS.Objects
 			return true;
 		}
 
-		public override int Find(object self, string name, bool add = false)
+		public override void Get(ref Value self)
 		{
-			if (name.Equals("add", StringComparison.OrdinalIgnoreCase))
-				return 0;
-			if (name.Equals("remove", StringComparison.OrdinalIgnoreCase))
-				return 1;
-			return -1;
-		}
-		public override bool Get(ref Value self, int at)
-		{
-			switch (at)
+			if (self.idx is string name)
 			{
-			case 0:
-				self = new Value(AddFunc.Instance);
-				return true;
-			case 1:
-				self = new Value(RemoveFunc.Instance);
-				return true;
+				if (name.Equals("add", StringComparison.OrdinalIgnoreCase))
+				{
+					self = new Value(AddFunc.Instance);
+					return;
+				}
+				if (name.Equals("remove", StringComparison.OrdinalIgnoreCase))
+				{
+					self = new Value(RemoveFunc.Instance);
+					return;
+				}
 			}
-			return false;
+			GetError(ref self);
 		}
 		public override IEnumerable<string> EnumerateProperties(object self)
 		{
@@ -193,26 +189,22 @@ namespace RedOnion.ROS.Objects
 			return true;
 		}
 
-		public override int Find(object self, string name, bool add = false)
+		public override void Get(ref Value self)
 		{
-			if (name.Equals("add", StringComparison.OrdinalIgnoreCase))
-				return 0;
-			if (name.Equals("remove", StringComparison.OrdinalIgnoreCase))
-				return 1;
-			return -1;
-		}
-		public override bool Get(ref Value self, int at)
-		{
-			switch (at)
+			if (self.idx is string name)
 			{
-			case 0:
-				self = new Value(AddFunc.Instance);
-				return true;
-			case 1:
-				self = new Value(RemoveFunc.Instance);
-				return true;
+				if (name.Equals("add", StringComparison.OrdinalIgnoreCase))
+				{
+					self = new Value(AddFunc.Instance);
+					return;
+				}
+				if (name.Equals("remove", StringComparison.OrdinalIgnoreCase))
+				{
+					self = new Value(RemoveFunc.Instance);
+					return;
+				}
 			}
-			return false;
+			GetError(ref self);
 		}
 		public override IEnumerable<string> EnumerateProperties(object self)
 		{

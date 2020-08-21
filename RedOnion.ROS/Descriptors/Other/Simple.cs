@@ -95,9 +95,6 @@ namespace RedOnion.ROS
 				sindex = props.sindex;
 			}
 
-			public override int Find(object self, string name, bool add = false)
-				=> self == this ? sindex != null && sindex.TryGetValue(name, out var it) ? it : -1
-				: index.TryGetValue(name, out it) ? it : -1;
 			public override IEnumerable<string> EnumerateProperties(object self)
 			{
 				if (self == this)
@@ -111,19 +108,31 @@ namespace RedOnion.ROS
 				foreach (var prop in props)
 					yield return prop.name;
 			}
-			public override bool Get(ref Value self, int at)
+			public override bool Has(ref Value self, string name)
 			{
+				var index = this.index;
+				if (self.obj == this)
+					index = sindex;
+				return index != null && index.ContainsKey(name);
+			}
+			public override void Get(ref Value self)
+			{
+				if (!(self.idx is string name))
+					goto fail;
+				var props = this.props;
+				var index = this.index;
 				if (self.obj == this)
 				{
-					if (sprops == null || at < 0 || at >= sprops.Length)
-						return false;
-					self = sprops[at].value;
-					return true;
+					props = sprops;
+					index = sindex;
 				}
-				if (at < 0 || at >= props.Length)
-					return false;
+				int at = index != null && index.TryGetValue(name, out var found) ? found : -1;
+				if (at < 0)
+					goto fail;
 				self = props[at].value;
-				return true;
+				return;
+			fail:
+				GetError(ref self);
 			}
 		}
 	}

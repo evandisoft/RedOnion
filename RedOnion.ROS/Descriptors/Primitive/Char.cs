@@ -75,30 +75,30 @@ namespace RedOnion.ROS
 				return false;
 			}
 
-			public override bool Unary(ref Value self, OpCode op)
+			public override void Unary(ref Value self, OpCode op)
 			{
 				switch (op)
 				{
 				case OpCode.Plus:
 					self = +self.num.Char;
-					return true;
+					return;
 				case OpCode.Neg:
 					self = -self.num.Char;
-					return true;
+					return;
 				case OpCode.Flip:
 					self = ~self.num.Char;
-					return true;
+					return;
 				case OpCode.Not:
 					self = new Value(self.num.Long == 0);
-					return true;
+					return;
 				case OpCode.Inc:
 					self.num.Char += (char)1;
-					return true;
+					return;
 				case OpCode.Dec:
 					self.num.Char -= (char)1;
-					return true;
+					return;
 				}
-				return false;
+				UnaryError(op);
 			}
 			public override bool Equals(ref Value self, object obj)
 			{

@@ -2,6 +2,8 @@ using MunOS;
 using RedOnion.KSP.API;
 using RedOnion.ROS;
 using RedOnion.ROS.Objects;
+using RedOnion.ROS.Utilities;
+using Smooth.Algebraics;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -95,7 +97,7 @@ namespace RedOnion.KSP.ROS
 			public void Replace(Value value)
 			{
 				if (!value.IsFunction)
-					throw InvalidOperation("Not a function");
+					throw new InvalidOperation("Not a function");
 				thread.Function = value.obj as Function;
 				if (thread.Status.IsFinal())
 					thread.Restart();
@@ -107,46 +109,70 @@ namespace RedOnion.KSP.ROS
 			public ReflectedGlobals() : base(typeof(API.Globals)) { }
 			public int Count => prop.Count;
 			public ref Prop this[int idx] => ref prop.items[idx];
+			public int Find(string name) => sdict.TryGetValue(name, out var idx) ? idx : -1;
+			public bool Has(string name) => sdict.ContainsKey(name);
 			public IEnumerator<string> GetEnumerator()
 			{
 				for (int i = 0; i < prop.size; i++)
 					yield return prop.items[i].name;
 			}
 		}
+		static readonly ReflectedGlobals reflected = new ReflectedGlobals();
 		const int mark = 0x7F000000;
-		static ReflectedGlobals reflected = new ReflectedGlobals();
 
 		public override int Find(string name)
 		{
-			int at = reflected.Find(null, name, false);
+			int at = reflected.Find(name);
 			if (at >= 0) return at + mark;
 			return base.Find(name);
 		}
-		public override bool Get(ref Value self, int at)
+		public override void Get(ref Value self)
 		{
-			if (at < mark)
-				return base.Get(ref self, at);
-			if ((at -= mark) >= reflected.Count)
-				return false;
-			ref var member = ref reflected[at];
-			if (member.read == null)
-				return false;
-			self = member.read(self.obj);
-			return true;
+			if (self.idx is string name)
+			{
+				if (reflected.Has(name))
+				{
+					reflected.Get(ref self);
+					return;
+				}
+			}
+			else if (self.idx is ValueBox box)
+			{
+				if (box.Value.IsStringOrChar)
+				{
+					name = box.Value.ToStr();
+					if (reflected.Has(name))
+					{
+						reflected.Get(ref self);
+						return;
+					}
+				}
+			}
+			base.Get(ref self);
 		}
-		public override bool Set(ref Value self, int at, OpCode op, ref Value value)
+		public override void Set(ref Value self, OpCode op, ref Value value)
 		{
-			if (at < mark)
-				return base.Set(ref self, at, op, ref value);
-			if ((at -= mark) >= reflected.Count)
-				return false;
-			ref var member = ref reflected[at];
-			if (member.write == null)
-				return false;
-			if (op != OpCode.Assign)
-				return false;
-			member.write(self.obj, value);
-			return true;
+			if (self.idx is string name)
+			{
+				if (reflected.Has(name))
+				{
+					reflected.Set(ref self, op, ref value);
+					return;
+				}
+			}
+			else if (self.idx is ValueBox box)
+			{
+				if (box.Value.IsStringOrChar)
+				{
+					name = box.Value.ToStr();
+					if (reflected.Has(name))
+					{
+						reflected.Set(ref self, op, ref value);
+						return;
+					}
+				}
+			}
+			base.Set(ref self, op, ref value);
 		}
 		public override IEnumerable<string> EnumerateProperties(object self)
 		{

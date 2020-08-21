@@ -9,8 +9,8 @@ namespace RedOnion.ROS
 	{
 		public class Custom : Descriptor
 		{
-			public delegate bool Read(ref Value self);
-			public delegate bool Write(ref Value self, ref Value value);
+			public delegate void Read(ref Value self);
+			public delegate void Write(ref Value self, ref Value value);
 			[DebuggerDisplay("{name}")]
 			public readonly struct Prop
 			{
@@ -28,7 +28,7 @@ namespace RedOnion.ROS
 				public Prop(string name, Value value)
 				{
 					this.name = name;
-					read = (ref Value self) => { self = value; return true; };
+					read = (ref Value self) => self = value;
 					write = null;
 				}
 			}
@@ -102,9 +102,6 @@ namespace RedOnion.ROS
 				sindex = sprops?.index;
 			}
 
-			public override int Find(object self, string name, bool add = false)
-				=> self == this ? sindex != null && sindex.TryGetValue(name, out var it) ? it : -1
-				: index.TryGetValue(name, out it) ? it : -1;
 			public override IEnumerable<string> EnumerateProperties(object self)
 			{
 				if (self == this)
@@ -118,70 +115,87 @@ namespace RedOnion.ROS
 				foreach (var prop in props)
 					yield return prop.name;
 			}
-			public override bool Get(ref Value self, int at)
+			public override bool Has(ref Value self, string name)
 			{
-				var props = this.props;
+				var index = this.index;
 				if (self.obj == this)
-				{
-					if (sprops == null)
-						return false;
-					props = sprops;
-				}
-				if (at < 0 || at >= props.Length)
-					return false;
-				var read = props[at].read;
-				if (read == null)
-					return false;
-				return read(ref self);
+					index = sindex;
+				return index != null && index.ContainsKey(name);
 			}
-			public override bool Set(ref Value self, int at, OpCode op, ref Value value)
+			public override void Get(ref Value self)
 			{
+				if (!(self.idx is string name))
+					goto fail;
 				var props = this.props;
 				var index = this.index;
 				if (self.obj == this)
 				{
-					if (sprops == null)
-						return false;
 					props = sprops;
 					index = sindex;
 				}
-				if (at < 0 || at >= props.Length)
-					return false;
+				int at = index != null && index.TryGetValue(name, out var found) ? found : -1;
+				if (at < 0)
+					goto fail;
+				var read = sprops[at].read;
+				if (read != null)
+				{
+					read(ref self);
+					return;
+				}
+			fail:
+				GetError(ref self);
+			}
+			public override void Set(ref Value self, OpCode op, ref Value value)
+			{
+				if (!(self.idx is string name))
+					goto fail;
+				var props = this.props;
+				var index = this.index;
+				if (self.obj == this)
+				{
+					props = sprops;
+					index = sindex;
+				}
+				int at = index != null && index.TryGetValue(name, out var found) ? found : -1;
+				if (at < 0)
+					goto fail;
 				ref var prop = ref props[at];
 				var write = prop.write;
 				if (write == null)
-					return false;
+					goto fail;
 				if (op == OpCode.Assign)
-					return write(ref self, ref value);
+				{
+					write(ref self, ref value);
+					return;
+				}
 				var read = prop.read;
 				if (read == null)
-					return false;
+					goto fail;
 				var it = self;
-				if (!read(ref it))
-					return false;
+				read(ref it);
 				if (op.Kind() == OpKind.Assign)
 				{
 					if (!it.desc.Binary(ref it, op + 0x10, ref value)
 						&& !value.desc.Binary(ref it, op + 0x10, ref value))
-						return false;
+						goto fail;
 					write(ref self, ref it);
-					return true;
+					return;
 				}
 				if (op.Kind() != OpKind.PreOrPost)
-					return false;
+					goto fail;
 				if (op >= OpCode.Inc)
 				{
-					if (!it.desc.Unary(ref it, op))
-						return false;
+					it.desc.Unary(ref it, op);
 					write(ref self, ref it);
-					return true;
+					return;
 				}
 				var tmp = it;
-				if (!it.desc.Unary(ref it, op + 0x08))
-					return false;
+				it.desc.Unary(ref it, op + 0x08);
 				write(ref self, ref it);
 				self = tmp;
-				return true;
+				return;
+			fail:
+				GetError(ref self);
 			}
 		}
 	}

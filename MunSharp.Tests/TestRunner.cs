@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -138,16 +138,18 @@ namespace MunSharp.Interpreter.Tests
 				};
 			}
 
+			/* UNUSED, was probably for MSTests
 			ExpectedExceptionAttribute expectedEx = mi.GetCustomAttributes(typeof(ExpectedExceptionAttribute), true)
 				.OfType<ExpectedExceptionAttribute>()
 				.FirstOrDefault();
-
+			*/
 
 			try
 			{
 				object o = Activator.CreateInstance(t);
 				mi.Invoke(o, new object[0]);
 
+				/* UNUSED, was probably for MSTests
 				if (expectedEx != null)
 				{
 					return new TestResult()
@@ -158,6 +160,7 @@ namespace MunSharp.Interpreter.Tests
 					};
 				}
 				else
+				*/
 				{
 					return new TestResult()
 					{
@@ -181,6 +184,7 @@ namespace MunSharp.Interpreter.Tests
 					};
 				}
 
+				/* UNUSED, was probably for MSTests
 				if (expectedEx != null && Framework.Do.IsInstanceOfType(expectedEx.ExpectedException, ex))
 				{
 					return new TestResult()
@@ -191,6 +195,7 @@ namespace MunSharp.Interpreter.Tests
 					};
 				}
 				else
+				*/
 				{
 					return new TestResult()
 					{

@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text;
 using RedOnion.Debugging;
 using RedOnion.Common.Completion;
+using RedOnion.ROS.Utilities;
 
 namespace RedOnion.KSP.Utilities
 {
@@ -114,35 +115,34 @@ discovered assemblies, namespaces, classes etc.")]
 		DynValue IUserDataType.MetaIndex(Script script, string metaname)
 			=> null;
 
+
+		int Find(string name) => strict.TryGetValue(name, out var at) || dict.TryGetValue(name, out at) ? at : -1;
 		Descriptor ISelfDescribing.Descriptor => SelfDescriptor.Instance;
 		protected class SelfDescriptor : Descriptor
 		{
 			public static SelfDescriptor Instance { get; } = new SelfDescriptor();
 			protected SelfDescriptor() { }
-			public override int Find(object self, string name, bool add = false)
+			public override void Get(ref Value self)
 			{
-				var it = (Properties<T>)self;
-				return it.strict.TryGetValue(name, out var at) || it.dict.TryGetValue(name, out at)
-					? at : -1;
-			}
-			public override string NameOf(object self, int at)
-			{
-				var it = (Properties<T>)self;
-				return at < 0 || at >= it.list.size ? "[?]" : it.list[at].Key;
-			}
-			public override bool Get(ref Value self, int at)
-			{
-				self = new Value(((Properties<T>)self.obj).list[at].Value);
-				return true;
-			}
-			public override int IndexFind(ref Value self, Arguments args)
-			{
-				if (args.Length != 1)
-					return -1;
-				var index = args[0];
-				if (!index.desc.Convert(ref index, String))
-					return -1;
-				return Find(self.obj, index.obj.ToString());
+				var it = (Properties<T>)self.obj;
+				var name = self.idx as string;
+				if (name == null && self.idx is ValueBox box
+					&& box.Value.desc.Convert(ref box.Value, String))
+				{
+					name = (string)box.Value.obj;
+					self.idx = name;
+					ValueBox.Return(box);
+				}
+				if (name != null)
+				{
+					int at = it.Find(name);
+					if (at >= 0)
+					{
+						self = new Value(it.list[at].Value);
+						return;
+					}
+				}
+				GetError(ref self);
 			}
 			public override IEnumerable<string> EnumerateProperties(object self)
 			{

@@ -208,19 +208,27 @@ namespace RedOnion.KSP.ROS
 			for (; ; i = j + 1)
 			{
 				string name = source.Substring(i, dotAt-i);
-				int index = value.desc.Find(value.obj, name);
-				if (index >= 0)
+				if (value.desc.Has(ref value, name))
 				{
-					if (!value.desc.Get(ref value, index))
-						return;
-				} else
+					value.idx = name;
+					try
+					{
+						value.desc.Get(ref value);
+					}
+					catch (InvalidOperation) { }
+				}
+				else
 				{
 					if (!(value.obj is Context))
 						return;
-					if ((index = Processor.Globals.Find(name)) < 0)
+					if (!Processor.Globals.Has(name))
 						return;
-					if (!Processor.Globals.Get(ref value, index))
-						return;
+					value.idx = name;
+					try
+					{
+						Processor.Globals.Get(ref value);
+					}
+					catch (InvalidOperation) { }
 				}
 				j = dotAt;
 				while (++dotAt < interest)

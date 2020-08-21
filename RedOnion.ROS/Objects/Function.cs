@@ -97,19 +97,20 @@ namespace RedOnion.ROS.Objects
 			Add("prototype", Value.Null);
 		}
 
-		public override bool Get(ref Value self, int at)
+		public override void Get(ref Value self)
 		{
-			if (at == 0 && prototype == null)
+			if (prototype == null && self.idx is string name
+				&& name.Equals("prototype", StringComparison.OrdinalIgnoreCase))
 			{
 				prototype = OriginalFunction == null
 					? new UserObject() : OriginalFunction.Prototype;
 				prop.items[0].value = new Value(prototype);
 			}
-			return base.Get(ref self, at);
+			base.Get(ref self);
 		}
 
 		public override bool Call(ref Value result, object self, Arguments args, bool create)
-			=> throw InvalidOperation("Function objects cannot be called via Descriptor.Call");
+			=> throw new InvalidOperation("Function objects cannot be called via Descriptor.Call");
 
 		#region Execute later
 

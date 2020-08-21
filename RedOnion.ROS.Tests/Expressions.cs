@@ -159,8 +159,9 @@ namespace RedOnion.ROS.Tests
 			Test("xyz",		"obj.s");
 			Test(3,			"obj.s.length");// test internal property
 			Test(3,			"obj[\"s\"].length");
-			Test(3,			"obj[\"s\"][\"length\"]");
-			Test(3,			"obj[\"s\", \"length\"]");
+			//dropping these (at least for now)
+			//Test(3,			"obj[\"s\"][\"length\"]");
+			//Test(3,			"obj[\"s\", \"length\"]");
 
 			Test("obj.test = new obj");     // derived object
 			Test(3.14, "obj.test.x");       // inherited property

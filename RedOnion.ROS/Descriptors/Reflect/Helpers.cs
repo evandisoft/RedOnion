@@ -66,7 +66,7 @@ namespace RedOnion.ROS
 			var ctor = to.GetConstructor(new Type[] { type });
 			if (ctor != null)
 				return Expression.New(ctor, from);
-			throw Value.InvalidOperation("Cannot convert from {0} to {1}", type.FullName, to.FullName);
+			throw new InvalidOperation("Cannot convert from {0} to {1}", type.FullName, to.FullName);
 		}
 		public static bool IsNullable(Type type)
 			=> type.IsValueType && IsGenericInstanceOf(type, typeof(Nullable<>));

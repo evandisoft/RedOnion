@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -74,6 +74,9 @@ namespace MunSharp.Interpreter.Tests
 		public static void Run(string filename)
 		{
 			TapRunner t = new TapRunner(filename);
+			var path = Directory.GetParent(Directory.GetParent(Directory.GetParent(
+				typeof(TapRunner).Assembly.Location).FullName).FullName).FullName;
+			Directory.SetCurrentDirectory(path);
 			t.Run();
 		}
 

@@ -27,67 +27,67 @@ namespace RedOnion.ROS
 			{
 				switch (to.Primitive)
 				{
-					case ExCode.String:
-						self = ToString(ref self, null, Value.Culture, false);
-						return true;
-					case ExCode.Char:
-					case ExCode.WideChar:
-						self = new Value(self.num.Char);
-						return true;
-					case ExCode.Byte:
-						self = new Value(self.num.Byte);
-						return true;
-					case ExCode.UShort:
-						self = new Value(self.num.UShort);
-						return true;
-					case ExCode.UInt:
-						self = new Value(self.num.UInt);
-						return true;
-					case ExCode.ULong:
-					case ExCode.Number:
-						return true;
-					case ExCode.SByte:
-						self = new Value(self.num.SByte);
-						return true;
-					case ExCode.Short:
-						self = new Value(self.num.Short);
-						return true;
-					case ExCode.Int:
-						self = new Value(self.num.Int);
-						return true;
-					case ExCode.Long:
-						self = new Value(self.num.Long);
-						return true;
-					case ExCode.Float:
-						self = new Value((float)self.num.ULong);
-						return true;
-					case ExCode.Double:
-						self = new Value((double)self.num.ULong);
-						return true;
-					case ExCode.Bool:
-						self = new Value(self.num.Long != 0);
-						return true;
+				case ExCode.String:
+					self = ToString(ref self, null, Value.Culture, false);
+					return true;
+				case ExCode.Char:
+				case ExCode.WideChar:
+					self = new Value(self.num.Char);
+					return true;
+				case ExCode.Byte:
+					self = new Value(self.num.Byte);
+					return true;
+				case ExCode.UShort:
+					self = new Value(self.num.UShort);
+					return true;
+				case ExCode.UInt:
+					self = new Value(self.num.UInt);
+					return true;
+				case ExCode.ULong:
+				case ExCode.Number:
+					return true;
+				case ExCode.SByte:
+					self = new Value(self.num.SByte);
+					return true;
+				case ExCode.Short:
+					self = new Value(self.num.Short);
+					return true;
+				case ExCode.Int:
+					self = new Value(self.num.Int);
+					return true;
+				case ExCode.Long:
+					self = new Value(self.num.Long);
+					return true;
+				case ExCode.Float:
+					self = new Value((float)self.num.ULong);
+					return true;
+				case ExCode.Double:
+					self = new Value((double)self.num.ULong);
+					return true;
+				case ExCode.Bool:
+					self = new Value(self.num.Long != 0);
+					return true;
 				}
 				return false;
 			}
 
-			public override bool Unary(ref Value self, OpCode op)
+			public override void Unary(ref Value self, OpCode op)
 			{
 				switch (op)
 				{
-					case OpCode.Plus:
-						return true;
-					case OpCode.Neg:
-						self = new Value(-self.num.Long);
-						return true;
-					case OpCode.Flip:
-						self.num.ULong = ~self.num.ULong;
-						return true;
-					case OpCode.Not:
-						self = new Value(self.num.Long == 0);
-						return true;
+				case OpCode.Plus:
+					return;
+				case OpCode.Neg:
+					self = new Value(-self.num.Long);
+					return;
+				case OpCode.Flip:
+					self.num.ULong = ~self.num.ULong;
+					return;
+				case OpCode.Not:
+					self = new Value(self.num.Long == 0);
+					return;
 				}
-				return false;
+				UnaryError(op);
 			}
 			public override bool Equals(ref Value self, object obj)
 			{
@@ -125,56 +125,56 @@ namespace RedOnion.ROS
 					return false;
 				switch (op)
 				{
-					case OpCode.BitOr:
-						lhs.num.ULong |= rhs.num.ULong;
-						return true;
-					case OpCode.BitXor:
-						lhs.num.ULong ^= rhs.num.ULong;
-						return true;
-					case OpCode.BitAnd:
-						lhs.num.ULong &= rhs.num.ULong;
-						return true;
-					case OpCode.ShiftLeft:
-						lhs.num.ULong <<= rhs.num.Int;
-						return true;
-					case OpCode.ShiftRight:
-						lhs.num.ULong >>= rhs.num.Int;
-						return true;
-					case OpCode.Add:
-						lhs.num.ULong += rhs.num.ULong;
-						return true;
-					case OpCode.Sub:
-						lhs.num.ULong -= rhs.num.ULong;
-						return true;
-					case OpCode.Mul:
-						lhs.num.ULong *= rhs.num.ULong;
-						return true;
-					case OpCode.Div:
-						if (rhs.num.Long == 0)
-							lhs = Value.NaN;
-						else lhs.num.ULong /= rhs.num.ULong;
-						return true;
-					case OpCode.Power:
-						lhs = Math.Pow(lhs.num.ULong, rhs.num.ULong);
-						return true;
-					case OpCode.Equals:
-						lhs = lhs.num.ULong == rhs.num.ULong;
-						return true;
-					case OpCode.Differ:
-						lhs = lhs.num.ULong != rhs.num.ULong;
-						return true;
-					case OpCode.Less:
-						lhs = lhs.num.ULong < rhs.num.ULong;
-						return true;
-					case OpCode.More:
-						lhs = lhs.num.ULong > rhs.num.ULong;
-						return true;
-					case OpCode.LessEq:
-						lhs = lhs.num.ULong <= rhs.num.ULong;
-						return true;
-					case OpCode.MoreEq:
-						lhs = lhs.num.ULong >= rhs.num.ULong;
-						return true;
+				case OpCode.BitOr:
+					lhs.num.ULong |= rhs.num.ULong;
+					return true;
+				case OpCode.BitXor:
+					lhs.num.ULong ^= rhs.num.ULong;
+					return true;
+				case OpCode.BitAnd:
+					lhs.num.ULong &= rhs.num.ULong;
+					return true;
+				case OpCode.ShiftLeft:
+					lhs.num.ULong <<= rhs.num.Int;
+					return true;
+				case OpCode.ShiftRight:
+					lhs.num.ULong >>= rhs.num.Int;
+					return true;
+				case OpCode.Add:
+					lhs.num.ULong += rhs.num.ULong;
+					return true;
+				case OpCode.Sub:
+					lhs.num.ULong -= rhs.num.ULong;
+					return true;
+				case OpCode.Mul:
+					lhs.num.ULong *= rhs.num.ULong;
+					return true;
+				case OpCode.Div:
+					if (rhs.num.Long == 0)
+						lhs = Value.NaN;
+					else lhs.num.ULong /= rhs.num.ULong;
+					return true;
+				case OpCode.Power:
+					lhs = Math.Pow(lhs.num.ULong, rhs.num.ULong);
+					return true;
+				case OpCode.Equals:
+					lhs = lhs.num.ULong == rhs.num.ULong;
+					return true;
+				case OpCode.Differ:
+					lhs = lhs.num.ULong != rhs.num.ULong;
+					return true;
+				case OpCode.Less:
+					lhs = lhs.num.ULong < rhs.num.ULong;
+					return true;
+				case OpCode.More:
+					lhs = lhs.num.ULong > rhs.num.ULong;
+					return true;
+				case OpCode.LessEq:
+					lhs = lhs.num.ULong <= rhs.num.ULong;
+					return true;
+				case OpCode.MoreEq:
+					lhs = lhs.num.ULong >= rhs.num.ULong;
+					return true;
 				}
 				return false;
 			}

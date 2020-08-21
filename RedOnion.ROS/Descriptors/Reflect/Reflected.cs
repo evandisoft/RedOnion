@@ -2,6 +2,7 @@ using RedOnion.Attributes;
 using RedOnion.Collections;
 using RedOnion.Debugging;
 using RedOnion.ROS.Objects;
+using RedOnion.ROS.Utilities;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -115,12 +116,12 @@ namespace RedOnion.ROS
 				{
 					if (callableMemberName?.Length > 0)
 					{
-						int at = Find(result.obj, callableMemberName, false);
+						int at = Find(result.obj, callableMemberName);
 						if (at < 0)
-							throw InvalidOperation("{0}.{1} does not exist", Name, callableMemberName);
+							throw new InvalidOperation("{0}.{1} does not exist", Name, callableMemberName);
 						ref var it = ref prop.items[at];
 						if (it.read == null)
-							throw InvalidOperation("{0}.{1} is not readable", Name, callableMemberName);
+							throw new InvalidOperation("{0}.{1} is not readable", Name, callableMemberName);
 						self = result.obj;
 						result = it.read(result.obj);
 						switch (it.kind)
@@ -132,7 +133,7 @@ namespace RedOnion.ROS
 						case Prop.Kind.MethodGroup:
 							return result.desc.Call(ref result, self, args);
 						}
-						throw InvalidOperation("{0}.{1} is of type {2} which is not callable", Name, callableMemberName, it.kind);
+						throw new InvalidOperation("{0}.{1} is of type {2} which is not callable", Name, callableMemberName, it.kind);
 					}
 					if (result.obj != null && !(result.obj is Type))
 						return false;
@@ -155,8 +156,13 @@ namespace RedOnion.ROS
 			}
 
 			//TODO: reflect operators
-			public override bool Unary(ref Value self, OpCode op)
-				=> self.obj is IOperators ops ? ops.Unary(ref self, op) : false;
+			public override void Unary(ref Value self, OpCode op)
+			{
+				if (self.obj is IOperators ops
+					&& ops.Unary(ref self, op))
+					return;
+				UnaryError(op);
+			}
 			public override bool Binary(ref Value lhs, OpCode op, ref Value rhs)
 			{
 				if (lhs.obj is IOperators ops && ops.Binary(ref lhs, op, ref rhs))
@@ -191,7 +197,7 @@ namespace RedOnion.ROS
 				return base.Convert(ref self, to);
 			}
 
-			public override int Find(object self, string name, bool add)
+			protected int Find(object self, string name)
 			{
 				if (self != null && idict != null && !(self is Type)
 					&& idict.TryGetValue(name, out var idx))
@@ -200,170 +206,129 @@ namespace RedOnion.ROS
 					return idx;
 				return -1;
 			}
-			public override int IndexFind(ref Value self, Arguments args)
+			public override bool Has(ref Value self, string name)
+				=> Find(self.obj, name) >= 0;
+			public override void Get(ref Value self)
 			{
-				if (args.Length == 0)
-					return -1;
-				ref var index = ref args.GetRef(0);
-				int at;
-				if ((intIndexGet != null || intIndexSet != null)
-					&& index.IsNumberOrChar && (index.IsNumber
-					|| (strIndexGet == null && strIndexSet == null)))
+				if (self.idx is string name)
 				{
-					//TODO: pool of proxies (at least for simple indexing)
-					var proxy = new Value[1 + args.Length];
-					proxy[0] = self;
-					for (int i = 1; i < proxy.Length; i++)
-						proxy[i] = args[i-1];
-					self.obj = proxy;
-					return int.MaxValue; // complex indexing
+					int at = Find(self.obj, name);
+					if (at < 0) goto fail;
+					var read = prop.items[at].read;
+					if (read == null) goto fail;
+					self = read(self.obj);
+					return;
 				}
-				if ((valIndexGet != null || valIndexSet != null)
-					&& ((strIndexGet == null && strIndexSet == null)
-					|| !index.IsStringOrChar))
+				if (self.IsIntIndex)
 				{
-					var proxy = new Value[1 + args.Length];
-					proxy[0] = self;
-					for (int i = 1; i < proxy.Length; i++)
-						proxy[i] = args[i-1];
-					self.obj = proxy;
-					return int.MaxValue; // complex indexing
+					if (intIndexGet == null)
+						goto fail;
+					self = intIndexGet(self.obj, self.num.Int);
+					return;
 				}
-				var strIndex = index;
-				if (!strIndex.desc.Convert(ref strIndex, String))
-					return -1;
-				if (strIndexGet != null || strIndexSet != null)
+				if (self.idx is ValueBox box)
 				{
-					var proxy = new Value[1 + args.Length];
-					proxy[0] = self;
-					for (int i = 1; i < proxy.Length; i++)
-						proxy[i] = args[i-1];
-					self.obj = proxy;
-					return int.MaxValue; // complex indexing
+					if (box.Value.IsStringOrChar && strIndexGet != null)
+					{
+						self = strIndexGet(self.obj, box.Value.obj.ToString());
+						ValueBox.Return(box);
+						return;
+					}
+					if (box.Value.IsNumberOrChar && intIndexGet != null)
+					{
+						self = intIndexGet(self.obj, box.Value.num.Int);
+						ValueBox.Return(box);
+						return;
+					}
+					if (valIndexGet != null)
+					{
+						self = valIndexGet(self.obj, box.Value);
+						return;
+					}
 				}
-				var name = strIndex.obj.ToString();
-				at = Find(self.obj, name, true);
-				if (at < 0 || args.Length == 1)
-					return at;
-				if (!Get(ref self, at))
-					return -1;
-				return self.desc.IndexFind(ref self, new Arguments(args, args.Length-1));
+			fail:
+				GetError(ref self);
 			}
-			public override string NameOf(object self, int at)
-				=> at < 0 || at >= prop.size ? "[?]" : prop[at].name;
-			public override bool Get(ref Value self, int at)
+
+			public override void Set(ref Value self, OpCode op, ref Value value)
 			{
-				if (at == int.MaxValue)
+				if (self.idx is string name)
 				{
-					var proxy = (Value[])self.obj;
-					ref var index = ref proxy[1];
-					if (index.IsStringOrChar && strIndexGet != null)
+					int at = Find(self.obj, name);
+					if (at < 0) goto fail;
+					ref Prop p = ref prop.items[at];
+					var write = p.write;
+					if (write == null)
 					{
-						self = strIndexGet(proxy[0].obj, index.obj.ToString());
-						return true;
+						if (p.kind != Prop.Kind.Event)
+							goto fail;
+						if (op != OpCode.AddAssign && op != OpCode.SubAssign)
+							goto fail;
+						var evt = (IEventProxy)p.read(self.obj).obj;
+						self = value;
+						if (op == OpCode.AddAssign ? evt.Add(ref value) : evt.Remove(ref value))
+							return;
+						goto fail;
 					}
-					if (index.IsNumberOrChar && intIndexGet != null)
+					if (op == OpCode.Assign)
 					{
-						self = intIndexGet(proxy[0].obj, index.num.Int);
-						return true;
+						write(self.obj, value);
+						return;
 					}
-					if (valIndexGet == null)
-						throw InvalidOperation("{0}[{1}] is write only", Name, proxy[1]);
-					self = valIndexGet(proxy[0].obj, index);
-					return true;
-				}
-				if (at < 0 || at >= prop.size)
-					return false;
-				var read = prop.items[at].read;
-				if (read == null) return false;
-				self = read(self.obj);
-				return true;
-			}
-#if DEBUG
-			public override bool Set(ref Value self, int at, OpCode op, ref Value value)
-			{
-				try
-				{
-					return InternalSet(ref self, at, op, ref value);
-				}
-				catch
-				{
-					MainLogger.DebugLog($"Exception in {Name}.Set");
-					MainLogger.DebugLog($"Self: {self}; at: {at}; op: {op}; value: {value}; prop: {NameOf(this, at)}");
-					throw;
-				}
-			}
-			private bool InternalSet(ref Value self, int at, OpCode op, ref Value value)
-#else
-			public override bool Set(ref Value self, int at, OpCode op, ref Value value)
-#endif
-			{
-				if (at == int.MaxValue)
-				{
-					if (op != OpCode.Assign)
-						return false;
-					var proxy = (Value[])self.obj;
-					ref var index = ref proxy[1];
-					if (index.IsStringOrChar && strIndexSet != null)
+					var read = p.read;
+					if (read == null) goto fail;
+					var it = read(self.obj);
+					if (op.Kind() == OpKind.Assign)
 					{
-						strIndexSet(proxy[0].obj, index.obj.ToString(), value);
-						return true;
+						if (!it.desc.Binary(ref it, op + 0x10, ref value)
+							&& !value.desc.Binary(ref it, op + 0x10, ref value))
+							goto fail;
+						write(self.obj, it);
+						return;
 					}
-					if (index.IsNumberOrChar && intIndexSet != null)
+					if (op.Kind() != OpKind.PreOrPost)
+						goto fail;
+					if (op >= OpCode.Inc)
 					{
-						intIndexSet(proxy[0].obj, index.num.Int, value);
-						return true;
+						it.desc.Unary(ref it, op);
+						write(self.obj, it);
+						return;
 					}
-					if (valIndexSet == null)
-						throw InvalidOperation("{0}[{1}] is read only", Name, proxy[1]);
-					valIndexSet(proxy[0].obj, index, value);
-					return true;
-				}
-				if (at < 0 || at >= prop.size)
-					return false;
-				ref Prop p = ref prop.items[at];
-				var write = p.write;
-				if (write == null)
-				{
-					if (p.kind != Prop.Kind.Event)
-						return false;
-					if (op != OpCode.AddAssign && op != OpCode.SubAssign)
-						return false;
-					var evt = (IEventProxy)p.read(self.obj).obj;
-					self = value;
-					return op == OpCode.AddAssign ? evt.Add(ref value) : evt.Remove(ref value);
-				}
-				if (op == OpCode.Assign)
-				{
-					write(self.obj, value);
-					return true;
-				}
-				var read = p.read;
-				if (read == null) return false;
-				var it = read(self.obj);
-				if (op.Kind() == OpKind.Assign)
-				{
-					if (!it.desc.Binary(ref it, op + 0x10, ref value)
-						&& !value.desc.Binary(ref it, op + 0x10, ref value))
-						return false;
+					var tmp = it;
+					it.desc.Unary(ref it, op + 0x08);
 					write(self.obj, it);
-					return true;
+					self = tmp;
+					return;
 				}
-				if (op.Kind() != OpKind.PreOrPost)
-					return false;
-				if (op >= OpCode.Inc)
+				if (op != OpCode.Assign)
+					goto fail;
+				if (self.IsIntIndex)
 				{
-					if (!it.desc.Unary(ref it, op))
-						return false;
-					write(self.obj, it);
-					return true;
+					if (intIndexSet == null)
+						goto fail;
+					intIndexSet(self.obj, self.num.Int, value);
+					return;
 				}
-				var tmp = it;
-				if (!it.desc.Unary(ref it, op + 0x08))
-					return false;
-				write(self.obj, it);
-				self = tmp;
-				return true;
+				if (self.idx is ValueBox box)
+				{
+					if (box.Value.IsStringOrChar && strIndexSet != null)
+					{
+						strIndexSet(self.obj, box.Value.obj.ToString(), value);
+						return;
+					}
+					if (box.Value.IsNumberOrChar && intIndexSet != null)
+					{
+						intIndexSet(self.obj, box.Value.num.Int, value);
+						return;
+					}
+					if (valIndexSet != null)
+					{
+						valIndexSet(self.obj, box.Value, value);
+						return;
+					}
+				}
+			fail:
+				GetError(ref self);
 			}
 			public override IEnumerable<Value> Enumerate(object self)
 			{

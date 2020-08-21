@@ -2,12 +2,27 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.Serialization;
 using RedOnion.Collections;
 using RedOnion.ROS.Parsing;
 
 namespace RedOnion.ROS
 {
 	#region Error (ParseError and RuntimeError)
+
+	public class InvalidOperation : InvalidOperationException
+	{
+		public InvalidOperation() { }
+		public InvalidOperation(string message) : base(message) { }
+		public InvalidOperation(string message, params object[] args)
+			: base(string.Format(Value.Culture, message, args)) { }
+		public InvalidOperation(Exception inner) : base(inner.Message, inner) { }
+		public InvalidOperation(Exception inner, string message) : base(message, inner) { }
+		public InvalidOperation(Exception inner, string message, params object[] args)
+			: base(string.Format(Value.Culture, message, args), inner) { }
+
+		protected InvalidOperation(SerializationInfo info, StreamingContext context) : base(info, context) { }
+	}
 
 	/// <summary>
 	/// Base class for ParseError and RuntimeError

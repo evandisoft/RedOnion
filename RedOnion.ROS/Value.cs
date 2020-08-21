@@ -57,11 +57,19 @@ namespace RedOnion.ROS
 		/// </summary>
 		public object obj;
 		/// <summary>
+		/// Null for lvalues, string for property references,
+		/// ValueBox with index for simple indexing, Value[] for complex indexing.
+		/// </summary>
+		public object idx;
+		/// <summary>
 		/// Numeric / extra data. Only internal / built-in descriptors can use this,
 		/// standard descriptors (of objects) are not allowed to use this,
 		/// because non-zero numeric data marks references (and possibly other things).
 		/// </summary>
-		internal NumericData num;
+		public NumericData num;
+
+		// helper to be used in `idx` for simple integer indexing (real index in num.Int)
+		public static readonly object IntIndex = new object();
 
 		// avoid static initialization that would reference Descriptor!
 		// could be creating `Void` when `Descriptor.Void` is still null!
@@ -157,18 +165,35 @@ namespace RedOnion.ROS
 		{
 			desc = descriptor;
 			obj = it;
+			idx = null;
 			num = new NumericData();
+		}
+		internal Value(Descriptor descriptor, object it, string name)
+		{
+			desc = descriptor;
+			obj = it;
+			idx = name;
+			num = new NumericData();
+		}
+		internal Value(Descriptor descriptor, object it, int i)
+		{
+			desc = descriptor;
+			obj = it;
+			idx = IntIndex;
+			num = new NumericData(i);
 		}
 		internal Value(Descriptor descriptor, NumericData it)
 		{
 			desc = descriptor;
 			obj = null;
+			idx = null;
 			num = it;
 		}
 		internal Value(Descriptor descriptor, object it, NumericData data)
 		{
 			desc = descriptor;
 			obj = it;
+			idx = null;
 			num = data;
 		}
 
@@ -250,14 +275,14 @@ namespace RedOnion.ROS
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		public bool IsInt => desc.Primitive == ExCode.Int;
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		internal bool IsReference => num.HighInt != 0 && !IsNumberOrChar;
-		// note: the higher part may get changed (but must be non-zero)
-		internal void SetRef(int idx)
-			=> num.Long = (uint)idx | ((long)~idx << 32);
-		internal void SetRef(UserObject ctx, int idx)
+		public bool IsReference => idx != null;
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+		public bool IsIntIndex => ReferenceEquals(idx, IntIndex);
+
+		public void Dereference()
 		{
-			obj = desc = ctx;
-			num.Long = (uint)idx | ((long)~idx << 32);
+			if (IsReference)
+				desc.Get(ref this);
 		}
 
 		public int ToInt()
@@ -271,7 +296,7 @@ namespace RedOnion.ROS
 			var it = this;
 			if (it.desc.Convert(ref it, Descriptor.Int))
 				return it.num.Int;
-			throw InvalidOperation("Could not convert {0} to int", this);
+			throw new InvalidOperation("Could not convert {0} to int", this);
 		}
 		public double ToDouble()
 		{
@@ -283,7 +308,7 @@ namespace RedOnion.ROS
 			var it = this;
 			if (it.desc.Convert(ref it, Descriptor.Double))
 				return it.num.Double;
-			throw InvalidOperation("Could not convert {0} to double", this);
+			throw new InvalidOperation("Could not convert {0} to double", this);
 		}
 		public uint ToUInt()
 		{
@@ -296,7 +321,7 @@ namespace RedOnion.ROS
 			var it = this;
 			if (it.desc.Convert(ref it, Descriptor.UInt))
 				return it.num.UInt;
-			throw InvalidOperation("Could not convert {0} to uint", this);
+			throw new InvalidOperation("Could not convert {0} to uint", this);
 		}
 		public long ToLong()
 		{
@@ -309,7 +334,7 @@ namespace RedOnion.ROS
 			var it = this;
 			if (it.desc.Convert(ref it, Descriptor.Long))
 				return it.num.Long;
-			throw InvalidOperation("Could not convert {0} to long", this);
+			throw new InvalidOperation("Could not convert {0} to long", this);
 		}
 		public ulong ToULong()
 		{
@@ -322,7 +347,7 @@ namespace RedOnion.ROS
 			var it = this;
 			if (it.desc.Convert(ref it, Descriptor.ULong))
 				return it.num.ULong;
-			throw InvalidOperation("Could not convert {0} to ulong", this);
+			throw new InvalidOperation("Could not convert {0} to ulong", this);
 		}
 		public bool ToBool()
 		{
@@ -335,7 +360,7 @@ namespace RedOnion.ROS
 			var it = this;
 			if (it.desc.Convert(ref it, Descriptor.Bool))
 				return it.num.Long != 0;
-			throw InvalidOperation("Could not convert {0} to boolean", this);
+			throw new InvalidOperation("Could not convert {0} to boolean", this);
 		}
 		public char ToChar()
 		{
@@ -345,7 +370,7 @@ namespace RedOnion.ROS
 			var it = this;
 			if (it.desc.Convert(ref it, Descriptor.Char))
 				return it.num.Char;
-			throw InvalidOperation("Could not convert {0} to char", this);
+			throw new InvalidOperation("Could not convert {0} to char", this);
 		}
 
 		public T ToType<T>() => (T)ToType(typeof(T));
@@ -399,7 +424,7 @@ namespace RedOnion.ROS
 		/// </summary>
 		[StructLayout(LayoutKind.Explicit)]
 		[DebuggerDisplay("{Double}|{Long}|{HighInt}|{Int}")]
-		internal struct NumericData
+		public struct NumericData
 		{
 			[FieldOffset(0)]
 			public long Long;
@@ -480,9 +505,6 @@ namespace RedOnion.ROS
 			}
 		}
 
-		static internal InvalidOperationException InvalidOperation(string msg, params object[] args)
-			=> new InvalidOperationException(string.Format(Culture, msg, args));
-
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		private string DebugString
 		{
@@ -492,9 +514,10 @@ namespace RedOnion.ROS
 					return obj == null ? "null" : obj.ToString();
 				if (IsReference)
 				{
-					var name = desc.NameOf(obj, num.Int);
-					return string.Format(Culture, name == null || name.Length == 0 || name[0] == '#'
-						? "'{0}'#{1}" : "'{0}'.{2}", desc.Name, num.Int, name);
+					if (ReferenceEquals(idx, IntIndex))
+						return string.Format(Culture, "{0}[{1}]", desc.Name, num.Int);
+					if (idx is string name)
+						return string.Format(Culture, "{0}.{1}", desc.Name, name);
 				}
 				return string.Format(Culture, "{0}: {1}",
 					desc.Name, desc.ToString(ref this, null, Culture, true));

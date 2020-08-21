@@ -207,101 +207,37 @@ namespace RedOnion.ROS
 		protected void Identifier(int at)
 		{
 			var code = this.code;
-			int idx = Int(code, at);
-
-			/* The following optimisation is too dangerous
-			 * because sometimes slots are created at first access
-			 * which then causes problems when invoking the same function
-			 * or lambda/closure for second time, where the slot does not exist yet.
-			 * TODO: Create OpCode.Local and let parser/compiler do the optimisation
-			 * for local variables where we are 100% sure it must have been created already.
-
-			int found;
-			string name;
-			if (idx >= 0)
-			{
-				// encountered this for the first time
-				// => try to find it in local variables
-				name = str[idx];
-				found = ctx.Find(name);
-				if (found >= 0)
-				{
-					!! WARNING !!
-					!! exactly that needs some indicator (e.g. int Find(string, out bool local))
-					!! becase found is not automatically local (see closures)
-
-					// we found it to be local, mark it as such
-					// and embed known index to speed things up
-					// TODO: do that in parser/compiler
-					idx = ~found;
-					code[at++] = (byte)idx;
-					code[at++] = (byte)(idx >> 8);
-					code[at++] = (byte)(idx >> 16);
-					code[at++] = (byte)(idx >> 24);
-					ref var local = ref vals.Push();
-					local.obj = local.desc = ctx;
-					local.num = new Value.NumericData(found, idx);
-					return;
-				}
-				// not local - the index may be changing,
-				// but at least skip the search to this+globals
-				// note: the method could be transfered to other objects
-				// making this-index not reliable (and globals as well - libs)
-				idx = ~(idx | 0x40000000);
-				code[at++] = (byte)idx;
-				code[at++] = (byte)(idx >> 8);
-				code[at++] = (byte)(idx >> 16);
-				code[at++] = (byte)(idx >> 24);
-				// note: neither idx nor found is used later, only the name
-				// TODO: use similar bound-index approach for strong types
-			}
-			else
-			{
-				// not the first time, let us decode it
-				found = ~idx;
-				if ((found & 0x40000000) == 0)
-				{
-					// local, marked previously, this speeds up loops
-					ref var local = ref vals.Push();
-					local.obj = local.desc = ctx;
-					local.num = new Value.NumericData(found, idx);
-					return;
-				}
-				// get back the original index and load the name
-				idx = found & 0x3FFFFFFF;
-				name = str[idx];
-			}
-			*/
-
-			string name = str[idx];
-			int found = ctx.Find(name);
+			string name = str[Int(code, at)];
 			// if local (or tracked reference in closure)
-			if (found >= 0)
+			if (ctx.Has(name))
 			{
 				ref var it = ref vals.Push();
 				it.obj = it.desc = ctx;
-				it.num = new Value.NumericData(found, ~found);
+				it.idx = name;
+				it.num = new Value.NumericData();
 				return;
 			}
 			// try `this` first
 			if (self.obj != null
-			&& (found = self.desc.Find(self.obj, name, false)) >= 0)
+			&& self.desc.Has(ref self, name))
 			{
 				ref var it = ref vals.Push();
 				it.desc = self.desc;
 				it.obj = self.obj;
-				it.num = new Value.NumericData(found, ~found);
+				it.idx = name;
+				it.num = new Value.NumericData();
 				return;
 			}
 			// try globals last
-			if ((found = Globals?.Find(name) ?? -1) >= 0)
+			if (Globals?.Has(name) == true)
 			{
 				ref var it = ref vals.Push();
 				it.obj = it.desc = Globals;
-				it.num = new Value.NumericData(found, ~found);
+				it.idx = name;
+				it.num = new Value.NumericData();
 				return;
 			}
-			throw InvalidOperation("Variable '{0}' not found", name);
+			throw new InvalidOperation("Variable '{0}' not found", name);
 		}
 
 		protected void Dereference(int argc)
@@ -309,14 +245,8 @@ namespace RedOnion.ROS
 			for (int i = 0; i < argc; i++)
 			{
 				ref var arg = ref vals.Top(i - argc);
-				if (arg.IsReference && !arg.desc.Get(ref arg, arg.num.Int))
-					throw CouldNotGet(ref arg);
+				arg.Dereference();
 			}
-		}
-		protected void Dereference(ref Value arg)
-		{
-			if (arg.IsReference && !arg.desc.Get(ref arg, arg.num.Int))
-				throw CouldNotGet(ref arg);
 		}
 
 		protected void Call(int argc, bool create, OpCode op = OpCode.Void)
@@ -325,7 +255,6 @@ namespace RedOnion.ROS
 				Dereference(argc);
 			object self = null;
 			Descriptor selfDesc = Descriptor.NullSelf;
-			int idx = -1;
 			ref var it = ref vals.Top(-argc-1);
 			if (it.IsReference)
 			{
@@ -334,9 +263,7 @@ namespace RedOnion.ROS
 					selfDesc = it.desc;
 					self = it.obj;
 				}
-				idx = it.num.Int;
-				if (!it.desc.Get(ref it, idx))
-					throw CouldNotGet(ref it);
+				it.desc.Get(ref it);
 			}
 			if (it.IsFunction)
 			{
@@ -385,7 +312,7 @@ namespace RedOnion.ROS
 			if (!it.desc.Call(ref it, self, new Arguments(Arguments, argc), create)
 				&& op != OpCode.Autocall)
 			{
-				throw InvalidOperation(create ? op == OpCode.Identifier
+				throw new InvalidOperation(create ? op == OpCode.Identifier
 					? "Could not create new {0}" : argc == 0
 					? "{0} cannot create object given zero arguments" : argc == 1
 					? "{0} cannot create object given that argument"
@@ -393,7 +320,7 @@ namespace RedOnion.ROS
 					? "{0} cannot be called with zero arguments" : argc == 1
 					? "{0} cannot be called with that argument"
 					: "{0} cannot be called with these two arguments",
-					self != null ? selfDesc.NameOf(self, idx) : it.Name);
+					it.Name);
 			}
 #if DEBUG
 			Debug.Assert(argc <= vals.Count || wasReplace);
@@ -457,14 +384,6 @@ namespace RedOnion.ROS
 			int v = code[at++];
 			return (short)(v | (code[at++] << 8));
 		}
-
-		static internal InvalidOperationException InvalidOperation(string msg)
-			=> new InvalidOperationException(msg);
-		static internal InvalidOperationException InvalidOperation(string msg, params object[] args)
-			=> new InvalidOperationException(string.Format(Value.Culture, msg, args));
-		static internal InvalidOperationException CouldNotGet(ref Value it)
-			=> new InvalidOperationException(string.Format(Value.Culture,
-			"Could not get '{0}' of '{1}'", it.desc.NameOf(it.obj, it.num.Int), it.desc.Name));
 
 		private string DebugString
 		{

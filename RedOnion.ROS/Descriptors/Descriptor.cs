@@ -1,3 +1,4 @@
+using RedOnion.ROS.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -80,12 +81,40 @@ namespace RedOnion.ROS
 
 		// TODO: ConvertFrom or CreateFrom and maybe CanCreateFrom - for argument matching
 
-		public virtual int Find(object self, string name, bool add = false) => -1;
-		public virtual string NameOf(object self, int at) => null;
-		public virtual bool Get(ref Value self, int at) => false;
-		public virtual bool Set(ref Value self, int at, OpCode op, ref Value value) => false;
+		/// <summary>
+		/// Check existence of a property in value <paramref name="self"/> named <paramref name="name"/>.
+		/// </summary>
+		public virtual bool Has(ref Value self, string name) => false;
+		/// <summary>
+		/// Get value of property (if <paramref name="self"/>.idx is string) or indexed value.
+		/// </summary>
+		public virtual void Get(ref Value self) => GetError(ref self);
+		/// <summary>
+		/// Set/modify value of property (if <paramref name="self"/>.idx is string) or indexed value.
+		/// </summary>
+		public virtual void Set(ref Value self, OpCode op, ref Value value) => GetError(ref self);
 
-		public virtual bool Unary(ref Value self, OpCode op) => false;
+		protected void GetError(ref Value self)
+		{
+			if (self.IsIntIndex)
+				throw new InvalidOperationException(string.Format(Value.Culture,
+					"`{0}` cannot be indexed by [int: {1}]", Name, self.num.Int));
+			if (self.idx is string name)
+				throw new InvalidOperationException(string.Format(Value.Culture,
+					"`{0}` does not have property named `{1}`", Name, name));
+			if (self.idx is ValueBox idx)
+				throw new InvalidOperationException(string.Format(Value.Culture,
+					"`{0}` cannot be indexed by '{1}'", Name, idx.ToString()));
+			if (self.idx is ValueBox[] arr)
+				throw new InvalidOperationException(string.Format(Value.Culture,
+					"`{0}` cannot be indexed by '{1}', ...", Name, arr[0].ToString()));
+			throw new InvalidOperationException("Unknown indexing");
+		}
+
+		public virtual void Unary(ref Value self, OpCode op)
+			=> UnaryError(op);
+		protected void UnaryError(OpCode op)
+			=> throw new InvalidOperation("Unary operator '{0}' not supported on operand '{1}'", op.Text(), Name);
 		public virtual bool Binary(ref Value lhs, OpCode op, ref Value rhs) => false;
 		public virtual bool Call(ref Value result, object self, Arguments args, bool create = false) => false;
 
@@ -94,29 +123,5 @@ namespace RedOnion.ROS
 		{
 			yield break;
 		}
-
-		public virtual int IndexFind(ref Value self, Arguments args)
-		{
-			if (args.Length == 0)
-				return -1;
-			ref var index = ref args.GetRef(0);
-			int at;
-			if (index.IsNumber)
-				return -1;
-			if (!index.desc.Convert(ref index, String))
-				return -1;
-			var name = index.obj.ToString();
-			at = Find(self.obj, name, true);
-			if (at < 0 || args.Length == 1)
-				return at;
-			if (!Get(ref self, at))
-				return -1;
-			return self.desc.IndexFind(ref self, new Arguments(args, args.Length-1));
-		}
-
-		static protected InvalidOperationException InvalidOperation(string msg)
-			=> new InvalidOperationException(msg);
-		static protected InvalidOperationException InvalidOperation(string msg, params object[] args)
-			=> new InvalidOperationException(string.Format(Value.Culture, msg, args));
 	}
 }

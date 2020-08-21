@@ -127,47 +127,25 @@ namespace RedOnion.ROS
 				}
 			};
 
-			public override bool Get(ref Value self, int at)
+			public override void Get(ref Value self)
 			{
 				if (self.obj != this)
 				{
-					if (at == 0)
+					if (self.idx is string name
+						&& name.Equals("length", StringComparison.OrdinalIgnoreCase))
 					{
 						self = self.obj.ToString().Length;
-						return true;
+						return;
 					}
-					if (at >= 0x100)
+					if (self.IsIntIndex)
 					{
-						self = self.obj.ToString()[at-0x100];
-						return true;
+						self = self.obj.ToString()[self.num.Int];
+						return;
 					}
 				}
-				return base.Get(ref self, at);
+				base.Get(ref self);
 			}
 
-			public override int IndexFind(ref Value self, Arguments args)
-			{
-				if (args.Length == 0)
-					return -1;
-				var index = args[0];
-				int at;
-				if (index.IsNumberOrChar)
-				{
-					at = index.ToInt();
-					if (at < 0 || at >= self.obj.ToString().Length)
-						throw new IndexOutOfRangeException();
-					return at + 0x100;
-				}
-				if (!index.desc.Convert(ref index, String))
-					return -1;
-				var name = index.obj.ToString();
-				at = Find(self.obj, name, true);
-				if (at < 0 || args.Length == 1)
-					return at;
-				if (!Get(ref self, at))
-					return -1;
-				return self.desc.IndexFind(ref self, new Arguments(args, args.Length-1));
-			}
 			public override IEnumerable<Value> Enumerate(object self)
 			{
 				foreach (var c in self.ToString())

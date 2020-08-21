@@ -26,15 +26,15 @@ namespace RedOnion.ROS
 				return true;
 			}
 
-			public override bool Unary(ref Value self, OpCode op)
+			public override void Unary(ref Value self, OpCode op)
 			{
 				switch(op)
 				{
 				case OpCode.Not:
 					self.num.Bool = !self.num.Bool;
-					return true;
+					return;
 				}
-				return false;
+				UnaryError(op);
 			}
 
 			public override bool Equals(ref Value self, object obj)

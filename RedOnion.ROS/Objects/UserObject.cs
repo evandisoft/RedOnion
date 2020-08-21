@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using RedOnion.Collections;
+using RedOnion.ROS.Utilities;
 
 namespace RedOnion.ROS.Objects
 {
@@ -154,67 +155,94 @@ namespace RedOnion.ROS.Objects
 					prop.items[at].value = value;
 			}
 		}
-		public override int Find(object self, string name, bool add)
+		public bool Has(string name)
+			=> Find(name) >= 0;
+		public override bool Has(ref Value self, string name)
+			=> Find(name) >= 0;
+		public override void Get(ref Value self)
 		{
-			int at = Find(name);
-			return at < 0 && add ? Add(name, Value.Void) : at;
-		}
-		public override string NameOf(object self, int at)
-			=> prop.GetOrDefault(at).name ?? "#" + at;
-		public override bool Get(ref Value self, int at)
-		{
-			if (at < 0 || at >= prop.size)
-				return false;
-			ref var it = ref prop.items[at].value;
-			if (it.IsVoid)
-				return false;
-			self = it;
-			return true;
-		}
-		public override bool Set(ref Value self, int at, OpCode op, ref Value value)
-		{
-			if (at < readOnlyTop || at >= prop.size)
-				return false;
-			if (op == OpCode.Assign)
+			if (self.idx is string name)
 			{
-				self = prop.items[at].value = value;
-				return true;
+				int at = Find(name);
+				if (at >= 0)
+					self = prop.items[at].value;
+				return;
 			}
-			ref var it = ref prop.items[at].value;
-			if (op.Kind() == OpKind.Assign)
-				return it.desc.Binary(ref it, op + 0x10, ref value);
-			if (op.Kind() != OpKind.PreOrPost)
-				return false;
-			if (op >= OpCode.Inc)
-				return it.desc.Unary(ref it, op);
-			self = it;
-			return it.desc.Unary(ref it, op + 0x08);
-		}
-		public override int IndexFind(ref Value self, Arguments args)
-		{
-			if (args.Length == 0 || dict == null)
-				return -1;
-			var index = args[0];
-			int at;
-			if (index.IsNumber)
+			if (self.IsIntIndex)
 			{
-				at = index.ToInt();
-				if (at < 0 || at >= prop.size)
-					return -1;
+				int at = self.num.Int;
+				if (at >= 0 && at < prop.size)
+					self = prop.items[at].value;
+				return;
 			}
-			else
+			if (self.idx is ValueBox box)
 			{
-				if (!index.desc.Convert(ref index, String))
-					return -1;
-				var name = index.obj.ToString();
+				if (box.Value.IsStringOrChar)
+				{
+					var at = Find(box.Value.ToStr());
+					if (at >= 0)
+					{
+						self = prop.items[at].value;
+						ValueBox.Return(box);
+						return;
+					}
+				}
+			}
+			GetError(ref self);
+		}
+		public override void Set(ref Value self, OpCode op, ref Value value)
+		{
+			int at = -1;
+			ValueBox box = null;
+			if (self.idx is string name)
+			{
 				at = Find(name);
-				if (at < 0)
-					return -1;
+				if (at < 0 && op == OpCode.Assign)
+					at = Add(name, Value.Void);
 			}
-			if (args.Length == 1)
-				return at;
-			self = prop.items[at].value;
-			return self.desc.IndexFind(ref self, new Arguments(args, args.Length-1));
+			else if (self.IsIntIndex)
+			{
+				at = self.num.Int;
+				if (at >= prop.size)
+					at = -1;
+			}
+			else if (self.idx is ValueBox box2)
+			{
+				box = box2;
+				if (box.Value.IsStringOrChar)
+				{
+					at = Find(name = box.Value.ToStr());
+					if (at < 0 && op == OpCode.Assign)
+						at = Add(name, Value.Void);
+				}
+			}
+			if (at >= readOnlyTop)
+			{
+				if (op == OpCode.Assign)
+				{
+					prop.items[at].value = value;
+					return;
+				}
+				ref var it = ref prop.items[at].value;
+				if (op.Kind() == OpKind.Assign)
+				{
+					if (it.desc.Binary(ref it, op + 0x10, ref value))
+						return;
+				}
+				else if (op.Kind() == OpKind.PreOrPost)
+				{
+					if (op >= OpCode.Inc)
+					{
+						it.desc.Unary(ref it, op);
+						return;
+					}
+					self = it;
+					if (box != null) ValueBox.Return(box);
+					it.desc.Unary(ref it, op + 0x08);
+					return;
+				}
+			}
+			GetError(ref self);
 		}
 
 		public override IEnumerable<string> EnumerateProperties(object self)

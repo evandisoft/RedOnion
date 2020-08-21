@@ -214,15 +214,16 @@ namespace RedOnion.ROS.Tests
 				"  else set x+1",
 				"test",
 				"return x");
-			var test = Value.Void;
-			Assert.IsTrue(ctx.Get(ref test, ctx.Find("test")));
+			var test = ctx["test"];     // ctx is script-local here
+			var main = ctx;				// make a copy for later use
 			Execute(test.obj as Function);
-			var xval = Value.Void;
-			Assert.IsTrue(ctx.Get(ref xval, ctx.Find("x")));
+			var xval = main["x"];       // ctx is test-local here (because of the Execute), so use the copy
 			Assert.IsTrue(xval.IsInt);
 			Assert.AreEqual(2, xval.ToInt());
 			Execute(test.obj as Function);
-			Assert.IsTrue(ctx.Get(ref xval, ctx.Find("x")));
+			xval = ctx["x"];            // reference to script-local 'x' here from test-context
+			Assert.IsTrue(xval.IsReference); 
+			xval.Dereference();
 			Assert.IsTrue(xval.IsInt);
 			Assert.AreEqual(3, xval.ToInt());
 		}

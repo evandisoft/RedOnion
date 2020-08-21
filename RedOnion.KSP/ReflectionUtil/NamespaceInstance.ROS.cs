@@ -14,12 +14,13 @@ namespace RedOnion.KSP.ReflectionUtil
 		{
 			public static NamespaceInstanceDescriptor Instance { get; } = new NamespaceInstanceDescriptor();
 			public NamespaceInstanceDescriptor() : base("namespace", typeof(NamespaceInstance)) { }
-			public override int Find(object self, string name, bool add)
-				=> ((NamespaceInstance)self).RosFind(name);
-			public override bool Get(ref Value self, int at)
-				=> ((NamespaceInstance)self.obj).RosGet(ref self, at);
 			public override IEnumerable<string> EnumerateProperties(object self)
 				=> ((NamespaceInstance)self).PossibleCompletions;
+			public override void Get(ref Value self)
+			{
+				if (!((NamespaceInstance)self.obj).RosGet(ref self))
+					GetError(ref self);
+			}
 		}
 		RosProps ros;
 		internal int RosFind(string name)
@@ -50,14 +51,26 @@ namespace RedOnion.KSP.ReflectionUtil
 			}
 			return -1;
 		}
-		internal bool RosGet(ref Value self, int at)
+		internal bool RosGet(ref Value self)
 		{
-			if (at < 0 || at >= ros.prop.size)
-				return false;
-			self = ros.prop.items[at].value;
-			return true;
+			var name = self.idx as string;
+			if (name == null && self.idx is ValueBox box
+				&& box.Value.desc.Convert(ref box.Value, Descriptor.String))
+			{
+				name = (string)box.Value.obj;
+				self.idx = name;
+				ValueBox.Return(box);
+			}
+			if (name != null)
+			{
+				int at = RosFind(name);
+				if (at >= 0)
+				{
+					self = ros.prop[at].value;
+					return true;
+				}
+			}
+			return false;
 		}
-		internal string RosNameOf(int at)
-			=> ros.prop.items[at].name;
 	}
 }

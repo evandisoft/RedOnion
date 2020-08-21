@@ -251,7 +251,7 @@ namespace RedOnion.ROS.Objects
 		public int Pop()
 		{
 			if (blockStack.size == 0)
-				throw InvalidOperation("No block left to remove");
+				throw new InvalidOperation("No block left to remove");
 
 			ref var top = ref blockStack.Top();
 			BlockStart = top.start;
@@ -349,7 +349,7 @@ namespace RedOnion.ROS.Objects
 					}
 					int idx = closure.Find(name);
 					Debug.Assert(idx >= 0);
-					closure.prop.items[idx].value.SetRef(cousin, newIdx);
+					closure.prop.items[idx].value = new Value(cousin, cousin, idx);
 				}
 				dict.Remove(name);
 			}
@@ -398,7 +398,7 @@ namespace RedOnion.ROS.Objects
 						idx = prop.size;
 						ref var link = ref prop.Add();
 						link.name = name;
-						link.value.SetRef(obj, refIdx);
+						link.value = new Value(obj, obj, refIdx);
 						if (blockStack.size > 0)
 							blockStack.Top().added.Add(name);
 						if (dict == null)
@@ -417,36 +417,64 @@ namespace RedOnion.ROS.Objects
 				return idx;
 			return Add(name, ref parent.prop.items[idx].value);
 		}
-		public override bool Get(ref Value self, int at)
+		public override void Get(ref Value self)
 		{
-			if (at < 0 || at >= prop.size)
-				return false;
-			self = prop.items[at].value;
-			if (self.IsReference)
-				return self.desc.Get(ref self, self.num.Int);
-			return true;
-		}
-		public override bool Set(ref Value self, int at, OpCode op, ref Value value)
-		{
-			if (at < readOnlyTop || at >= prop.size)
-				return false;
-			ref var it = ref prop.items[at].value;
-			if (it.IsReference)
-				return it.desc.Set(ref self, it.num.Int, op, ref value);
-			if (op == OpCode.Assign)
+			int at = -1;
+			if (self.idx is string name)
+				at = Find(name);
+			else if (self.IsIntIndex)
+				at = self.num.Int;
+			//TODO: complex indexing
+			if (at >= 0)
 			{
-				it = value;
-				return true;
+				self = prop.items[at].value;
+				if (self.IsReference)
+					self.desc.Get(ref self);
 			}
-			if (op.Kind() == OpKind.Assign)
-				return it.desc.Binary(ref it, op + 0x10, ref value)
-					|| value.desc.Binary(ref it, op + 0x10, ref value);
-			if (op.Kind() != OpKind.PreOrPost)
-				return false;
-			if (op >= OpCode.Inc)
-				return it.desc.Unary(ref it, op);
-			self = it;
-			return it.desc.Unary(ref it, op + 0x08);
+			else GetError(ref self);
+		}
+		public override void Set(ref Value self, OpCode op, ref Value value)
+		{
+			int at = -1;
+			if (self.idx is string name)
+				at = Find(name);
+			else if (self.IsIntIndex)
+				at = self.num.Int;
+			//TODO: complex indexing
+			if (at >= readOnlyTop)
+			{
+				ref var it = ref prop.items[at].value;
+				if (it.IsReference)
+				{
+					self = it;
+					self.desc.Set(ref self, op, ref value);
+					return;
+				}
+				if (op.Kind() == OpKind.Assign)
+				{
+					if (op == OpCode.Assign)
+					{
+						it = value;
+						return;
+					}
+					if (it.desc.Binary(ref it, op + 0x10, ref value))
+						return;
+					if (value.desc.Binary(ref it, op + 0x10, ref value))
+						return;
+				}
+				else if (op.Kind() == OpKind.PreOrPost)
+				{
+					if (op >= OpCode.Inc)
+					{
+						it.desc.Unary(ref it, op);
+						return;
+					}
+					self = it;
+					it.desc.Unary(ref it, op + 0x08);
+					return;
+				}
+			}
+			GetError(ref self);
 		}
 	}
 }
