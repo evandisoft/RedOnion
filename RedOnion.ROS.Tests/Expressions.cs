@@ -325,6 +325,9 @@ namespace RedOnion.ROS.Tests
 		[Test]
 		public void ROS_Expr12_Create()
 		{
+			Test("", "new string");
+			Test(0, "new int");
+
 			Test("1", "new string 1");
 			Test(2, "new int(\"2\")");
 		}

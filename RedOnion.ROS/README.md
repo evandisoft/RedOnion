@@ -1,6 +1,7 @@
 ﻿## Basics
 
-ROS (Red Onion Script) is inspired by C#,
+ROS (Red Onion Script) is inspired by
+[C#](https://docs.microsoft.com/en-us/dotnet/csharp/),
 [Ruby](https://www.ruby-lang.org/),
 [Python](https://www.python.org/) and
 [ActionScript](https://en.wikipedia.org/wiki/ActionScript).
@@ -9,7 +10,7 @@ most features and operators come from C#,
 some ideas were taken from ActionScript (and Pascal) and first design was based on JavaScript,
 but ROS is on its own path now.
 
-For other documents see [Links](Docs/Links.md),
+For other documents see [Links](Docs/Links.md),<br>
 [Vim syntax file here](redonion.vim).
 
 ```
@@ -150,6 +151,20 @@ Also note that bitwise operators (`&`, `|`, `^`, `<<` and `>>`)
 have much higher priority/precedence in ROS than in C#/C++.
 
 All the number types can be used for conversion (like `string` can as well): `int "1"` returns `1`, `double "3.14"` returns `3.14`, `int 2.7` returns `2` (and `string 1.6` returns `"1.6"`).
+
+
+## Operators
+
+ROS knows most operators you can find in other languages, but there are some changes (and some missing operators).
+
+* `+ - * / **` - all the usual arithmetic operators + `**` for power
+* `and or not && || !` - common logic operators
+* `& | ^ << >>` - common bitwise operators, but higher priority than in C#/C++, `^` can also be used for power
+* `= += -= ...` - assignment and compound assignment ( `x+=y` means `x = x + y`)
+* `++ --` - post- end pre- increment and decrement (like `+=1`)
+* `?:` - *ternary if-then-else* operator: `ok ? success : fail`
+* `??` - null-coalescing operator (return right side if left is `null`; `??=` and `?.` not implemented yet)
+* `[]` - indexing (`mylist[1]`, `tab["red"]`), can also be used for *array literals*: `[1,2,3]`
 
 
 ## Statements

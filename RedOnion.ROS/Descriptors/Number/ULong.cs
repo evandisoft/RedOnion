@@ -17,8 +17,17 @@ namespace RedOnion.ROS
 
 			public override bool Call(ref Value result, object self, Arguments args, bool create = false)
 			{
-				if (args.Length != 1 || (result.obj != null && result.obj != this))
+				if (result.obj != this)
 					return false;
+				if (args.Length != 1)
+				{
+					if (args.Length == 0)
+					{
+						result = new Value(this, null);
+						return true;
+					}
+					return false;
+				}
 				result = args[0].ToULong();
 				return true;
 			}

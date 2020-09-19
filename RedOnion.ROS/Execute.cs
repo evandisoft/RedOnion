@@ -434,6 +434,46 @@ namespace RedOnion.ROS
 							blockEnd = ctx.BlockEnd;
 							continue;
 						}
+
+						case OpCode.String:
+							vals.Add("");
+							continue;
+						case OpCode.Char:
+							vals.Add('\0');
+							continue;
+						case OpCode.Byte:
+							vals.Add((byte)0);
+							continue;
+						case OpCode.UShort:
+							vals.Add((ushort)0);
+							continue;
+						case OpCode.UInt:
+							vals.Add((uint)0);
+							continue;
+						case OpCode.ULong:
+							vals.Add((ulong)0);
+							continue;
+						case OpCode.SByte:
+							vals.Add((sbyte)0);
+							continue;
+						case OpCode.Short:
+							vals.Add((short)0);
+							continue;
+						case OpCode.Int:
+							vals.Add(0);
+							continue;
+						case OpCode.Long:
+							vals.Add((long)0);
+							continue;
+						case OpCode.Bool:
+							vals.Add(false);
+							continue;
+						case OpCode.Float:
+							vals.Add(0f);
+							continue;
+						case OpCode.Double:
+							vals.Add(0.0);
+							continue;
 						}
 						throw new NotImplementedException("Not implemented: OpCode.Create + " + op.ToString());
 

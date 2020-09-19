@@ -244,7 +244,7 @@ namespace RedOnion.ROS.Parsing
 				}
 				Debug.Assert(op > OpCode.Identifier || op == OpCode.Void || op == OpCode.This || op == OpCode.Null);
 				if (!HasOption(Option.Prefix) && op != OpCode.Void)
-					Write(OpCode.Type);
+					Write(create ? OpCode.Create : OpCode.Type);
 				Write(op);
 				return op;
 			}
