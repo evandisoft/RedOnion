@@ -23,6 +23,9 @@ namespace RedOnion.ROS
 		public static CultureInfo Culture = CultureInfo.InvariantCulture;
 		public static Func<Type,Descriptor> Create = StandardCreate;
 
+		internal static readonly MethodInfo Constructor
+			= typeof(Descriptor).GetMethod("Construct");
+
 		internal static Dictionary<Type, ConstructorInfo>
 			PrimitiveValueConstructors = GetPrimitiveValueConstructors();
 		internal static readonly ConstructorInfo DefaultValueConstructor

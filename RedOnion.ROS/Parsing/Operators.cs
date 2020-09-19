@@ -34,8 +34,7 @@ namespace RedOnion.ROS.Parsing
 		/// </summary>
 		protected ExCode TopOperator()
 		{
-			Debug.Assert(operators.size > 0);
-			return operators[operators.size - 1];
+			return operators.size > 0 ? operators[operators.size - 1] : ExCode.Void;
 		}
 
 		/// <summary>

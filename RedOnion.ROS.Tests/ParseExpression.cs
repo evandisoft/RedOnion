@@ -951,6 +951,7 @@ namespace RedOnion.ROS.Tests
 		{
 			Test(
 				"new pt()",
+				/* NOTE: this was the origianl version (the engine can still execute)
 				() =>
 				{
 					ValueCheck( 0, 0, "pt");
@@ -974,6 +975,30 @@ namespace RedOnion.ROS.Tests
 					CodeCheck(5, OpCode.Create);
 					CodeCheck(6, OpCode.Call0);
 					CodeCheck(7);
+				}
+				*/// and got updated to following by removing the redundant OpCode.Call0
+				() =>
+				{
+					ValueCheck(0, 0, "pt");
+					ValueCheck(4, OpCode.Identifier);
+					//ValueCheck(5, OpCode.Call0);//removed
+					ValueCheck(5, OpCode.Create);
+					ValueFinal(10);
+				},
+				() =>
+				{
+					CodeCheck(0, OpCode.Create);
+					//CodeCheck(1, OpCode.Call0);//removed
+					CodeCheck(1, OpCode.Identifier);
+					CodeCheck(2, 0, "pt");
+					CodeCheck(6);
+				},
+				() =>
+				{
+					CodeCheck(0, OpCode.Create);
+					CodeCheck(1, OpCode.Identifier); //got reordered a bit, OpCode.Create is "two-bytes" instruction (or a prefix)
+					CodeCheck(2, 0, "pt");
+					CodeCheck(6);
 				}
 			);
 		}

@@ -6,11 +6,10 @@ using RedOnion.ROS.Utilities;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq.Expressions;
 using System.Reflection;
-
-// TODO: make it case semi-sensitive = prefer insensitive (present as camelCase),
-// but use the case on collisions (requiring exact match to use the non-default).
 
 namespace RedOnion.ROS
 {
@@ -33,24 +32,65 @@ namespace RedOnion.ROS
 					Method,
 					MethodGroup
 				}
+				/// <summary>
+				/// Name of the property (after mangling/DisplayName and conflict resolution)
+				/// </summary>
 				public string name;
+				/// <summary>
+				/// Original name of the property (used only for conflict resolution)
+				/// </summary>
+				public string strict;
+				/// <summary>
+				/// Type/kind/class of property (used either to upgrade methods to group or for <see cref="CallableAttribute"/> implementation).
+				/// </summary>
 				public Kind kind;
+				/// <summary>
+				/// Index of next property with conflicting name (-1 for no conflict and in last in chain,
+				/// search the chain to find exact match or use the first).
+				/// Note that `next` is either higher than current index (always growing)
+				/// or shall be considered terminator of the chain (thus ).
+				/// </summary>
+				public int next;
+				/// <summary>
+				/// Used to implement <see cref="Reflected.Get(ref Value)"/>
+				/// </summary>
 				public Func<object, Value> read;
+				/// <summary>
+				/// Used to implement <see cref="Reflected.Set(ref Value, OpCode, ref Value)"/>
+				/// </summary>
 				public Action<object, Value> write;
+
 				public override string ToString()
 					=> name;
 			}
+			/// <summary>List of all properties (for enumeration and indexing given by <see cref="sdict"/> or <see cref="idict"/></summary>
 			protected ListCore<Prop> prop;
+			/// <summary>Map of static properties (name-to-index in <see cref="prop"/>)</summary>
 			protected Dictionary<string, int> sdict;
+			/// <summary>Map of instance properties (name-to-index in <see cref="prop"/>)</summary>
 			protected Dictionary<string, int> idict;
-			protected Func<object, int, Value> intIndexGet;
-			protected Action<object, int, Value> intIndexSet;
-			protected Func<object, string, Value> strIndexGet;
-			protected Action<object, string, Value> strIndexSet;
-			protected Func<object, Value, Value> valIndexGet;
-			protected Action<object, Value, Value> valIndexSet;
+
+			/// <summary>Default constructor (if found)</summary>
 			protected ConstructorInfo defaultCtor;
+			/// <summary>Default constructor converted to action (done after discovery of final <see cref="defaultCtor"/>)</summary>
+			protected Func<object> defaultConstruct;
+
+			/// <summary>Reflected this[int].get (if present and public)</summary>
+			protected Func<object, int, Value> intIndexGet;
+			/// <summary>Reflected this[int].set (if present and public)</summary>
+			protected Action<object, int, Value> intIndexSet;
+			/// <summary>Reflected this[string].get (if present and public)</summary>
+			protected Func<object, string, Value> strIndexGet;
+			/// <summary>Reflected this[string].set (if present and public)</summary>
+			protected Action<object, string, Value> strIndexSet;
+			/// <summary>Reflected this[Value].get (if present and public)</summary>
+			protected Func<object, Value, Value> valIndexGet;
+			/// <summary>Reflected this[Value].set (if present and public)</summary>
+			protected Action<object, Value, Value> valIndexSet;
+
+			//TODO: store index to props instead
 			protected string callableMemberName;
+			//TODO: implement all operators in similar way (this is for "op_Implicit" only)
 			protected ListCore<KeyValuePair<Type, Func<object, object>>> implConvert;
 
 			public Reflected(Type type) : this(type.Name, type) { }
@@ -91,6 +131,56 @@ namespace RedOnion.ROS
 					{
 						MainLogger.Log("Exception {0} when processing {1}.{2}: {3}",
 							ex.GetType(), Type.Name, nested.Name, ex.Message);
+					}
+				}
+				if (defaultCtor != null)
+				{
+					try
+					{
+						var pars = defaultCtor.GetParameters();
+						var args = new Expression[pars.Length];
+						for (int i = 0; i < args.Length; i++)
+						{
+							var par = pars[i];
+							var v = par.DefaultValue;
+							// value types (e.g. int or enum) signal `default` using `DefaultValue == null`
+							if (v == null && par.ParameterType.IsValueType)
+								args[0] = Expression.Default(par.ParameterType);
+							// check type before using constants
+							else if (v == null || par.ParameterType.IsAssignableFrom(v.GetType()))
+								args[0] = Expression.Constant(v);
+							// convert
+							else args[0] = Expression.Convert(Expression.Constant(v), par.ParameterType);
+						}
+						defaultConstruct = Expression.Lambda<Func<object>>(
+							Expression.New(defaultCtor, args)).Compile();
+					}
+					catch (Exception ex)
+					{
+						MainLogger.DebugLog("Exception {0} when processing defaultCtor of {1}: {2}",
+							ex.GetType(), Type.Name, ex.Message);
+					}
+				}
+				if (defaultConstruct == null)
+				{
+					try
+					{
+						if (type.IsValueType)
+						{
+							defaultConstruct = Expression.Lambda<Func<object>>(
+								Expression.Convert(Expression.Default(type), typeof(object))).Compile();
+						}
+						else
+						{
+							var construct = Constructor.MakeGenericMethod(type);
+							defaultConstruct = (Func<object>)construct.CreateDelegate(typeof(Func<object>), construct);
+						}
+					}
+					catch (Exception ex)
+					{
+						// this is quite normal, the MakeGenericMethod fails if its `where T:new()` is not satisfied
+						MainLogger.DebugLog("Type {0} does not seem to be default constructible - {1}: {2}",
+							Type.Name, ex.GetType(), ex.Message);
 					}
 				}
 				if (intIndexGet == null && intIndexSet == null)
@@ -140,9 +230,17 @@ namespace RedOnion.ROS
 				}
 				if (args.Count == 0)
 				{
+					if (defaultConstruct != null)
+					{
+						result = new Value(this, defaultConstruct());
+						return true;
+					}
+					// this is kept as fallback for situations we could not create defaultConstruct from defaultCtor
+					// (which may no longer be required since we updated the creation of defaultConstruct using Expression.Default)
 					if (defaultCtor != null
 						&& Callable.TryCall(defaultCtor, ref result, self, args))
 						return true;
+					// try this last (unlikely to succeed but... another fallback to generic solution)
 					result = new Value(Activator.CreateInstance(Type));
 					return true;
 				}
@@ -214,7 +312,23 @@ namespace RedOnion.ROS
 				{
 					int at = Find(self.obj, name);
 					if (at < 0) goto fail;
-					var read = prop.items[at].read;
+					ref var p = ref prop.items[at];
+					if (p.next > at)
+					{// resolve case conflict
+						ref var q = ref p;
+						for (var i = at; ;)
+						{
+							if (q.strict == name)
+							{
+								p = ref q;
+								break;
+							}
+							if (q.next <= i)
+								break;
+							q = ref prop.items[q.next];
+						}
+					}
+					var read = p.read;
 					if (read == null) goto fail;
 					self = read(self.obj);
 					return;
@@ -256,7 +370,22 @@ namespace RedOnion.ROS
 				{
 					int at = Find(self.obj, name);
 					if (at < 0) goto fail;
-					ref Prop p = ref prop.items[at];
+					ref var p = ref prop.items[at];
+					if (p.next > at)
+					{// resolve case conflict
+						ref var q = ref p;
+						for (var i = at; ;)
+						{
+							if (q.strict == name)
+							{
+								p = ref q;
+								break;
+							}
+							if (q.next <= i)
+								break;
+							q = ref prop.items[q.next];
+						}
+					}
 					var write = p.write;
 					if (write == null)
 					{
@@ -344,19 +473,35 @@ namespace RedOnion.ROS
 					yield return new Value(v);
 			}
 			public override IEnumerable<string> EnumerateProperties(object self)
+				=> self == null || self is Type ? EnumerateStatic() : EnumerateInstance();
+
+			IEnumerable<string> EnumerateInstance()
 			{
-				// static only
-				if (self == null || self is Type)
-				{
-					if (sdict != null)
-					{
-						foreach (var name in sdict.Keys)
-							yield return name;
-					}
-					yield break;
-				}
 				foreach (var p in prop)
 					yield return p.name;
+			}
+			IEnumerable<string> EnumerateStatic()
+			{
+				if (sdict != null)
+				{
+					foreach (var i in sdict.Values)
+					{
+						int curr = i, next = i;
+						yield return GetNextProp(ref next);
+						while (next > curr)
+						{
+							curr = next;
+							yield return GetNextProp(ref next);
+						}
+					}
+				}
+			}
+			// to avoid CS8176: Iterators cannot have by-reference locals
+			string GetNextProp(ref int next)
+			{
+				ref var p = ref prop.items[next];
+				next = p.next;
+				return p.name;
 			}
 		}
 	}

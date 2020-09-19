@@ -552,6 +552,54 @@ namespace RedOnion.ROS
 						continue;
 					}
 
+					case OpCode.Type:
+					{
+						op = (OpCode)code[at++];
+						switch (op)
+						{
+						case OpCode.String:
+							vals.Add(new Value(Descriptor.String));
+							continue;
+						case OpCode.Char:
+							vals.Add(new Value(Descriptor.Char));
+							continue;
+						case OpCode.Byte:
+							vals.Add(new Value(Descriptor.Byte));
+							continue;
+						case OpCode.UShort:
+							vals.Add(new Value(Descriptor.UShort));
+							continue;
+						case OpCode.UInt:
+							vals.Add(new Value(Descriptor.UInt));
+							continue;
+						case OpCode.ULong:
+							vals.Add(new Value(Descriptor.ULong));
+							continue;
+						case OpCode.SByte:
+							vals.Add(new Value(Descriptor.SByte));
+							continue;
+						case OpCode.Short:
+							vals.Add(new Value(Descriptor.Short));
+							continue;
+						case OpCode.Int:
+							vals.Add(new Value(Descriptor.Int));
+							continue;
+						case OpCode.Long:
+							vals.Add(new Value(Descriptor.Long));
+							continue;
+						case OpCode.Bool:
+							vals.Add(new Value(Descriptor.Bool));
+							continue;
+						case OpCode.Float:
+							vals.Add(new Value(Descriptor.Float));
+							continue;
+						case OpCode.Double:
+							vals.Add(new Value(Descriptor.Double));
+							continue;
+						}
+						throw new NotImplementedException("Not implemented: OpCode.Type + " + op.ToString());
+					}
+
 					#endregion
 
 					#region Other operators

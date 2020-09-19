@@ -9,11 +9,27 @@ namespace RedOnion.ROS.Parsing
 	partial class Parser
 	{
 		/// <summary>
-		/// Value buffer/stack (variables, expression trees in postfix notation)
+		/// Value buffer/stack (variables, expression trees in postfix notation).
+		/// Designed to be written left-to-right during expression parsing
+		/// and rewritten in <see cref="Rewrite(int, bool, int, bool)"/> to <see cref="code"/>
+		/// by reading the buffer semi-backwards (recursively according to op-codes and block-start positions).
 		/// </summary>
+		/// <remarks><para>
+		/// Every block/node ends with OpCode and index to the start of the block,
+		/// which can be used to rewrite literals or statements(already compiled code wrapped inside expression)
+		/// as well as during parsing in <see cref="PrepareOperator"/> when the buffer is still a sequence of blocks
+		/// (ends up being single block at the end of full expression, but that can still be inside other expression,
+		/// therefore the buffer works as stack of nodes/blocks as well).
+		/// Some blocks may loose their starting position marker when wrapped by single-argument operation
+		/// (e.g. zero-arg function/method call and operator <c>new</c>).</para>
+		/// <example>
+		/// <para><c>[int i = 0][Identifier][int start = 0]</c> Identifier named stringValues[i]. (<c>[Identifier]</c> means byte with value <see cref="OpCode.Identifier"/>.)</para>
+		/// <para><c>[0][Identifier][Call0][0]</c> Call function named stringValues[i]. This shows how inner block (<c>Identifier</c>) lost its start marker when wrapped.</para>
+		/// <para><c>[0][Identifier][0] [1][Int][9] [Add][0]</c> Represents "<c>x + 1</c>" (if stringValues[0] = "x").</para>
+		/// </example></remarks>
 		public ListCore<byte> values = new ListCore<byte>(256);
 		/// <summary>
-		/// Strings associated with value buffer/stack
+		/// Strings associated with value buffer/stack (indexed from inside <see cref="values"/>).
 		/// </summary>
 		public ListCore<string> stringValues = new ListCore<string>(64);
 

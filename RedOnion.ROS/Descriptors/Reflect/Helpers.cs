@@ -201,5 +201,7 @@ namespace RedOnion.ROS
 				return Expression.Call(expr, ValueToObject);
 			return GetConvertExpression(Expression.Call(expr, ValueToType, Expression.Constant(type)), type);
 		}
+
+		public static T Construct<T>() where T : new() => new T();
 	}
 }

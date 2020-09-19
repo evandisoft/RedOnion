@@ -321,5 +321,12 @@ namespace RedOnion.ROS.Tests
 			Test("yz", "\"xyz\".substr 1");
 			Test("y", "\"xyz\".substring 1, 1");
 		}
+
+		[Test]
+		public void ROS_Expr12_Create()
+		{
+			Test("1", "new string 1");
+			Test(2, "new int(\"2\")");
+		}
 	}
 }

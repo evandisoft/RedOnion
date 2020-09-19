@@ -62,7 +62,7 @@ namespace RedOnion.ROS.Parsing
 			var op = ExCode;
 			var kind = op.Kind();
 			if (op == ExCode.Identifier   //------------------------------------------- identifier
-				|| kind == OpKind.Number    // type specifier (byte, bool, int, ...)
+				|| kind == OpKind.Number  // type specifier (byte, bool, int, ...)
 				|| op == ExCode.String || op == ExCode.Char	// type names
 				|| op == ExCode.Function || op == ExCode.Def
 				|| op == ExCode.Get || op == ExCode.Set
@@ -157,6 +157,8 @@ namespace RedOnion.ROS.Parsing
 			binary_check:
 				CheckUnary(unary, false);
 			binary:
+				if (TopOperator() == ExCode.Create)
+					PrepareOperator(PopOperator(), bottom);
 				Next();
 				PushOperator(op, bottom);
 				goto unext;
@@ -190,6 +192,11 @@ namespace RedOnion.ROS.Parsing
 			case OpKind.Special:	//###################################################### special
 				switch (op)
 				{
+				//FIXME: we have some problems here:
+				// - don't know `unary` state yet: `new e 1` vs. `new e + 1`, `new e() +1` vs. `new e +1`
+				// - and `new string 1` or `new string(1)` are triggering asserts (`string 1` and `string(1)` work)
+				// * added `if (TopOperator() == ExCode.Create) PrepareOperator(PopOperator(), bottom);`
+				// * on many places, but that is ugly (and may cause problems, who knows)
 				case ExCode.Create:
 					if (!unary)
 						goto autocall;
@@ -289,7 +296,8 @@ namespace RedOnion.ROS.Parsing
 					}
 					if (Next(true).Curr == ')')
 					{
-						PrepareOperator(ExCode.Call0, bottom);
+						PrepareOperator(TopOperator() == ExCode.Create // e.g. `new e() == 0`
+							? PopOperator() : ExCode.Call0, bottom);
 						Next();
 						unary = false;
 						goto next;
@@ -300,6 +308,8 @@ namespace RedOnion.ROS.Parsing
 					if (Curr == ')')
 					{
 						PrepareOperator(ExCode.Call1, bottom);
+						if (TopOperator() == ExCode.Create)
+							PrepareOperator(PopOperator(), bottom);
 						Next();
 						unary = false;
 						goto next;
@@ -318,6 +328,8 @@ namespace RedOnion.ROS.Parsing
 						throw new ParseError(this, "Expected matching ')'");
 					Next();
 					PrepareOperator(ExCode.CallN, bottom);
+					if (TopOperator() == ExCode.Create)
+						PrepareOperator(PopOperator(), bottom);
 					unary = false;
 					goto next;
 				case '[':           //------------------------------------------------------------ [

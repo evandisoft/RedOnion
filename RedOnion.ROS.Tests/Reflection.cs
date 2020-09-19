@@ -1,5 +1,7 @@
 using System;
 using System.Collections;
+using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using NUnit.Framework;
 using RedOnion.Attributes;
 using RedOnion.ROS.Objects;
@@ -287,7 +289,10 @@ namespace RedOnion.ROS.Tests
 			Test("hello", "(new enumTest \"hello\").name");
 
 			Test(true, "testEnum.zero == \"zero\"");
-			Test(false, "testEnum.one != \"ONE\"");
+			Test(false, "testEnum.one != \"ONE\""); // case-insensitive compare to string
+			Test(true, "(new testEnum) == \"zero\""); // default constructor
+			Test(true, "new testEnum() == \"zero\""); // for parser validation (to see the `new` ends at ())
+			Test(true, "new testEnum == \"zero\""); // for parser validation (to see the `new` ends at `==`)
 		}
 
 		[Test]
@@ -471,6 +476,65 @@ namespace RedOnion.ROS.Tests
 			Test(1.0, "v.x");
 			Test("v.scale2x");
 			Test(2.0, "v.x");
+		}
+
+		class Conflicts
+		{
+			public string name;
+			public string Name
+			{
+				get
+				{
+					accessed = true;
+					return name;
+				}
+				set
+				{
+					accessed = true;
+					name = value;
+				}
+			}
+			public static bool accessed;
+			public static int number;
+			public static int Number
+			{
+				get
+				{
+					accessed = true;
+					return number;
+				}
+				set
+				{
+					accessed = true;
+					number = value;
+				}
+			}
+		}
+		[Test]
+		public void ROS_Refl12_Conflicts()
+		{
+			Globals = new Globals();
+			Globals.Add(typeof(Conflicts));
+			Test("var c = new conflicts");
+			var cv = ctx["c"];
+			var c = cv.obj as Conflicts;
+			Assert.NotNull(c);
+			Test("x", "c.name = \"x\""); // field
+			Assert.IsFalse(Conflicts.accessed);
+			Test("y", "c.Name = \"y\""); // property
+			Assert.IsTrue(Conflicts.accessed);
+			var names = cv.desc.EnumerateProperties(c).ToList();
+			Assert.IsTrue(names.Contains("name"));
+			Assert.IsTrue(names.Contains("Name"));
+
+			Conflicts.accessed = false;
+			Test(1, "conflicts.number = 1"); // field
+			Assert.IsFalse(Conflicts.accessed);
+			Test(2, "conflicts.Number = 2"); // property
+			Assert.IsTrue(Conflicts.accessed);
+			names = cv.desc.EnumerateProperties(null).ToList();
+			Assert.IsTrue(names.Contains("number"));
+			Assert.IsTrue(names.Contains("Number"));
 		}
 	}
 }

@@ -18,12 +18,50 @@ namespace RedOnion.ROS
 				public static MemberComparer Instance { get; } = new MemberComparer();
 				public int Compare(MemberInfo x, MemberInfo y)
 				{
-					// BIG letters first to prefer properties over fields
+					var xmt = x.MemberType;
+					var ymt = y.MemberType;
+					// Constructors first
+					if (xmt == MemberTypes.Constructor && ymt != MemberTypes.Constructor)
+						return -1;
+					if (ymt == MemberTypes.Constructor && xmt != MemberTypes.Constructor)
+						return +1;
+					// Properties next (prefer over fields)
+					if (xmt == MemberTypes.Property && ymt != MemberTypes.Property)
+						return -1;
+					if (ymt == MemberTypes.Property && xmt != MemberTypes.Property)
+						return +1;
+					// Methods last (need that for conflict resolution vs. method to group upgrade)
+					if (xmt == MemberTypes.Method && ymt != MemberTypes.Method)
+						return +1;
+					if (ymt == MemberTypes.Method && xmt != MemberTypes.Method)
+						return -1;
+
+					// sort by name, BIG letters first
 					int cmp = string.CompareOrdinal(x.Name, y.Name);
+					if (cmp != 0)
+						return cmp;
+
+					// prefer member declared later (e.g. RosList[int] over List<Value>[int])
+					int xic = InheritanceDepth(x.DeclaringType);
+					int yic = InheritanceDepth(y.DeclaringType);
+					cmp = yic - xic; // deeper means newer/recent (therefore descending order here)
+					if (cmp != 0)
+						return cmp;
+
 					// sorting by MetadataToken ensures stability
 					// (to avoid problems with reflection cache)
-					return cmp != 0 ? cmp
-						: x.MetadataToken.CompareTo(y.MetadataToken);
+					// e.g. RosMath overloads get processed in declared order
+					return x.MetadataToken.CompareTo(y.MetadataToken);
+				}
+				static int InheritanceDepth(Type type)
+				{
+					int i = 0;
+					while (type != null)
+					{
+						i++;
+						type = type.BaseType;
+					}
+					return i;
 				}
 			}
 			public static MemberInfo[] GetMembers(Type type, string name = null, bool instance = true)
@@ -38,7 +76,7 @@ namespace RedOnion.ROS
 				return members;
 			}
 
-			public static string GetName(ICustomAttributeProvider provider)
+			public static string GetName(ICustomAttributeProvider provider, out string strict)
 			{
 				string name = provider is MemberInfo member ? member is ConstructorInfo ci
 					? ci.DeclaringType.Name : member.Name
@@ -52,10 +90,11 @@ namespace RedOnion.ROS
 						foreach (char c in display)
 							if (c != '_' && !char.IsLetterOrDigit(c))
 								goto mangle;
-						return display;
+						return strict = display;
 					}
 				}
 			mangle:
+				strict = name;
 				if (LowerFirstLetter
 					&& name?.Length > 0
 					&& char.IsUpper(name, 0)
@@ -67,13 +106,27 @@ namespace RedOnion.ROS
 				return name;
 			}
 
+			protected virtual bool Conflict(string name, string strict, ref int idx)
+			{
+				int i = idx;
+				while (i >= 0)
+				{
+					ref var it = ref prop.items[idx = i];
+					//note: (it.strict ?? it.name) is here for sure, it.strict should never be null
+					if ((it.strict ?? it.name) == strict)
+						return true;
+					i = it.next;
+				}
+				return false;
+			}
+
 			protected virtual void ProcessMember(
 				MemberInfo member, bool instance, ref Dictionary<string, int> dict)
 			{
 				var browsable = member.GetCustomAttributes(typeof(BrowsableAttribute), true);
 				if (browsable.Length == 1 && !((BrowsableAttribute)browsable[0]).Browsable)
 					return;
-				string name = GetName(member);
+				string name = GetName(member, out var strict);
 
 				if (instance && member is ConstructorInfo c)
 				{
@@ -83,23 +136,25 @@ namespace RedOnion.ROS
 
 				if (dict == null || !dict.TryGetValue(name, out var idx))
 					idx = -1;
+				int first = idx;
+				int size = prop.size;
 
 				if (member is FieldInfo f)
 				{
-					if (idx >= 0)
-						MainLogger.DebugLog("Conflicting name: {0}.{1} [instace: {2}; field]", Type.Name, name, instance);
-					else ProcessField(name, f, instance, ref dict);
+					if (idx >= 0 && Conflict(name, strict, ref idx))
+						MainLogger.DebugLog("Conflicting name: {0}.{1} [instace: {2}; field]", Type.Name, strict, instance);
+					else ProcessField(f, name, strict, idx, instance, ref dict);
 				}
 				else if (member is PropertyInfo p)
 				{
-					if (idx >= 0)
-						MainLogger.DebugLog("Conflicting name: {0}.{1} [instace: {2}; property]", Type.Name, name, instance);
-					else ProcessProperty(name, p, instance, ref dict);
+					if (idx >= 0 && Conflict(name, strict, ref idx))
+						MainLogger.DebugLog("Conflicting name: {0}.{1} [instace: {2}; property]", Type.Name, strict, instance);
+					else ProcessProperty(p, name, strict, idx, instance, ref dict);
 				}
 				else if (member is EventInfo e)
 				{
-					if (idx >= 0)
-						MainLogger.DebugLog("Conflicting name: {0}.{1} [instace: {2}; event]", Type.Name, name, instance);
+					if (idx >= 0 && Conflict(name, strict, ref idx))
+						MainLogger.DebugLog("Conflicting name: {0}.{1} [instace: {2}; event]", Type.Name, strict, instance);
 					else ProcessEvent(name, e, instance, ref dict);
 				}
 				else if (member is MethodInfo m)
@@ -108,7 +163,7 @@ namespace RedOnion.ROS
 					{
 						ref var slot = ref prop.items[idx];
 						if (slot.kind != Prop.Kind.Method && slot.kind != Prop.Kind.MethodGroup)
-							MainLogger.DebugLog("Conflicting name: {0}.{1} [instace: {2}; method]", Type.Name, name, instance);
+							MainLogger.DebugLog("Conflicting name: {0}.{1} [instace: {2}; method]", Type.Name, strict, instance);
 						else if (slot.kind == Prop.Kind.Method)
 						{
 							var call = slot.read(null);
@@ -121,6 +176,15 @@ namespace RedOnion.ROS
 						}
 					}
 					ProcessMethod(name, m, instance, ref dict, idx);
+				}
+
+				// update the name to strict on conflicts
+				if (first >= 0 && prop.size > size)
+				{
+					ref var it = ref prop.items[first];
+					it.name = it.strict;
+					it = ref prop.items[size];
+					it.name = it.strict;
 				}
 			}
 
@@ -138,6 +202,7 @@ namespace RedOnion.ROS
 				ref var it = ref prop.Add();
 				it.name = nested.Name;
 				it.kind = Prop.Kind.Type;
+				it.next = -1;
 				it.read = Expression.Lambda<Func<object, Value>>(
 					GetNewValueExpression(nested,
 						Expression.Constant(nested)),
@@ -146,7 +211,8 @@ namespace RedOnion.ROS
 			}
 
 			protected virtual void ProcessField(
-				string name, FieldInfo f, bool instance, ref Dictionary<string, int> dict)
+				FieldInfo f, string name, string strict, int idx,
+				bool instance, ref Dictionary<string, int> dict)
 			{
 				Type convert = null;
 				var convertAttrs = f.GetCustomAttributes(typeof(ConvertAttribute), true);
@@ -156,12 +222,18 @@ namespace RedOnion.ROS
 				MainLogger.ExtraLog("Processing field {0}.{1} [instace: {2}, convert: {3}]",
 					Type.Name, f.Name, instance, convert?.Name ?? "False");
 
-				if (dict == null)
-					dict = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-				dict[name] = prop.size;
+				if (idx < 0)
+				{
+					if (dict == null)
+						dict = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+					dict[name] = prop.size;
+				}
+				else prop.items[idx].next = prop.Count;
 				ref var it = ref prop.Add();
 				it.name = name;
+				it.strict = strict;
 				it.kind = Prop.Kind.Field;
+				it.next = -1;
 				var type = f.FieldType;
 				it.read = Expression.Lambda<Func<object, Value>>(
 					// WARNING: Mono may crash if const field is fed into Expression.Field!
@@ -209,7 +281,8 @@ namespace RedOnion.ROS
 			}
 
 			protected virtual void ProcessProperty(
-				string name, PropertyInfo p, bool instance, ref Dictionary<string, int> dict)
+				PropertyInfo p, string name, string strict, int idx,
+				bool instance, ref Dictionary<string, int> dict)
 			{
 				Type convert = null;
 				var convertAttrs = p.GetCustomAttributes(typeof(ConvertAttribute), true);
@@ -223,7 +296,10 @@ namespace RedOnion.ROS
 				if (p.IsSpecialName || iargs.Length > 0)
 				{
 					if (iargs.Length != 1)
+					{
+						MainLogger.DebugLog("Property with multiple indexers: {0}.{1} [{2}]", Type.Name, p.Name, iargs.Length);
 						return;
+					}
 					var itype = iargs[0].ParameterType;
 
 					//---------------------------------------------------------------- this[int]
@@ -325,12 +401,18 @@ namespace RedOnion.ROS
 					return;
 				}
 				//-------------------------------------------------------------- normal property
-				if (dict == null)
-					dict = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-				dict[name] = prop.size;
+				if (idx < 0)
+				{
+					if (dict == null)
+						dict = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+					dict[name] = prop.size;
+				}
+				else prop.items[idx].next = prop.Count;
 				ref var it = ref prop.Add();
 				it.name = name;
+				it.strict = strict;
 				it.kind = Prop.Kind.Property;
+				it.next = -1;
 				var type = p.PropertyType;
 				if (p.CanRead)
 				{
@@ -370,6 +452,7 @@ namespace RedOnion.ROS
 				ref var it = ref prop.Add();
 				it.name = name;
 				it.kind = Prop.Kind.Event;
+				it.next = -1;
 				// TODO: cache these (by type - e.DeclaringType/null, e.EventHandlerType pair)
 				it.read = instance
 					// self => new Value(new EventProxy<T,E>(self, e))
@@ -423,6 +506,7 @@ namespace RedOnion.ROS
 					ref var it = ref prop.Add();
 					it.name = name;
 					it.kind = Prop.Kind.Method;
+					it.next = -1;
 					it.read = obj => value;
 				}
 			}

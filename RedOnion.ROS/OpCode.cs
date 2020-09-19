@@ -543,17 +543,17 @@ namespace RedOnion.ROS
 		/// <summary>
 		/// Operator priority (binary 'or', 'xor' and 'and' have higher priority than in C#)
 		/// </summary>
-		public static ExCode Priority(this ExCode self)
-			=> self & ExCode.mPriority;
+		public static ushort Priority(this ExCode self)
+			=> (ushort)(self & ExCode.mPriority);
 		/// <summary>
 		/// Operator priority in C# (C/C++/Java and derivates - binary or/xor/and with same priority as logic)
 		/// </summary>
-		public static ExCode StdPriority(this ExCode self)
-			=> self.Code() >= ExCode.BitOr.Code()
+		public static ushort StdPriority(this ExCode self)
+			=> (ushort)(self.Code() >= ExCode.BitOr.Code()
 			&& self.Code() <= ExCode.ShiftRight.Code()
 			? self.Priority() - 0x0900
 			: self.Code() == ExCode.Cast.Code()
-			? 0 : self.Priority();
+			? 0 : self.Priority());
 
 		public static byte Code(this OpCode self)
 			=> (byte)self;

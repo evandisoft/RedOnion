@@ -272,7 +272,7 @@ namespace RedOnion.ROS.Parsing
 			if (ex.Binary())
 			{
 				// first/left argument
-				Rewrite(TopInt(top), type);
+				Rewrite(TopInt(top), type || create);
 				// second/right argument
 				if (op == OpCode.Dot)
 				{
@@ -404,12 +404,6 @@ namespace RedOnion.ROS.Parsing
 			if (n > 1)
 			{
 				var next = TopInt(top);
-				/*if (type && !HasOption(Option.Prefix))
-				{
-					var peek = (OpCode)values.items[next-5];
-					if (peek >= OpCode.String && peek < OpCode.Create || peek == OpCode.Array)
-						Write(OpCode.Type);
-				}*/
 				Rewrite(next, n - 1, type, create);
 				create = false;
 			}

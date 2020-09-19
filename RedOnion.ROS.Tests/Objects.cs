@@ -10,7 +10,7 @@ namespace RedOnion.ROS.Tests
 	public class ROS_Objects : CoreTests
 	{
 		[Test]
-		public void ROS_Obj01_EnumCtor()
+		public void ROS_Obj01_CtorEnumerable()
 		{
 			Globals = new Globals();
 			Globals.Add("ints", new int[] { 1, 2, 3 });
