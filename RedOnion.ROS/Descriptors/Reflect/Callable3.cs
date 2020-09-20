@@ -26,10 +26,8 @@ namespace RedOnion.ROS
 			public Action3(string name, MethodInfo m = null)
 				: base(name, typeof(Action<Value, Value, Value>), false, m) { }
 
-			public override bool Call(ref Value result, object self, Arguments args, bool create)
+			public override bool Call(ref Value result, object self, in Arguments args)
 			{
-				if (create)
-					return false;
 				if (args.Length == 3)
 				{
 					((Action<Value, Value, Value>)result.obj)(args[0], args[1], args[2]);
@@ -69,10 +67,8 @@ namespace RedOnion.ROS
 			public Function3(string name, MethodInfo m = null)
 				: base(name, typeof(Func<Value, Value, Value, Value>), false, m) { }
 
-			public override bool Call(ref Value result, object self, Arguments args, bool create)
+			public override bool Call(ref Value result, object self, in Arguments args)
 			{
-				if (create)
-					return false;
 				if (args.Length == 3)
 				{
 					result = ((Func<Value, Value, Value, Value>)result.obj)(args[0], args[1], args[2]);
@@ -97,10 +93,8 @@ namespace RedOnion.ROS
 			public Procedure3(string name, MethodInfo m = null)
 				: base(name, typeof(Action<T, Value, Value, Value>), true, m) { }
 
-			public override bool Call(ref Value result, object self, Arguments args, bool create)
+			public override bool Call(ref Value result, object self, in Arguments args)
 			{
-				if (create)
-					return false;
 				if (args.Length == 3)
 				{
 					((Action<T, Value, Value, Value>)result.obj)((T)self, args[0], args[1], args[2]);
@@ -127,10 +121,8 @@ namespace RedOnion.ROS
 			public Method3(string name, MethodInfo m = null)
 				: base(name, typeof(Func<T, Value, Value, Value, Value>), true, m) { }
 
-			public override bool Call(ref Value result, object self, Arguments args, bool create)
+			public override bool Call(ref Value result, object self, in Arguments args)
 			{
-				if (create)
-					return false;
 				if (args.Length == 3)
 				{
 					result = ((Func<T, Value, Value, Value, Value>)result.obj)((T)self, args[0], args[1], args[2]);

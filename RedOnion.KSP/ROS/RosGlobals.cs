@@ -34,7 +34,7 @@ namespace RedOnion.KSP.ROS
 			public Event(MunPriority priority)
 				=> this.priority = priority;
 
-			bool ICallable.Call(ref Value result, object self, Arguments args, bool create)
+			bool ICallable.Call(ref Value result, object self, in Arguments args)
 			{
 				if (args.Length != 1)
 					return false;

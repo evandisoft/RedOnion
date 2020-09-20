@@ -97,9 +97,9 @@ namespace RedOnion.ROS
 				return new Reflected(type);
 			}
 
-			public override bool Call(ref Value result, object self, Arguments args, bool create = false)
+			public override bool Call(ref Value result, object self, in Arguments args)
 			{
-				if (create || args.Length < MinArgs || args.Length > MaxArgs)
+				if (args.Create || args.Length < MinArgs || args.Length > MaxArgs)
 					return false;
 				return TryCall(Info, ref result, self, args);
 			}

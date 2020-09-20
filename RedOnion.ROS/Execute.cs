@@ -384,7 +384,7 @@ namespace RedOnion.ROS
 							Identifier(at);
 							at += 4;
 							this.at = at;
-							Call(0, true, op);
+							Call(0, CallFlags.Create, op);
 							code = this.code;
 							str = this.str;
 							at = this.at;
@@ -399,7 +399,7 @@ namespace RedOnion.ROS
 							it.Dereference(this);
 							it.idx = name;
 							this.at = at;
-							Call(0, true, op);
+							Call(0, CallFlags.Create, op);
 							code = this.code;
 							str = this.str;
 							at = this.at;
@@ -408,7 +408,7 @@ namespace RedOnion.ROS
 						}
 						case OpCode.Call0:
 							this.at = at;
-							Call(0, true, op);
+							Call(0, CallFlags.Create, op);
 							code = this.code;
 							str = this.str;
 							at = this.at;
@@ -416,7 +416,7 @@ namespace RedOnion.ROS
 							continue;
 						case OpCode.Call1:
 							this.at = at;
-							Call(1, true, op);
+							Call(1, CallFlags.Create, op);
 							code = this.code;
 							str = this.str;
 							at = this.at;
@@ -424,7 +424,7 @@ namespace RedOnion.ROS
 							continue;
 						case OpCode.Call2:
 							this.at = at;
-							Call(2, true, op);
+							Call(2, CallFlags.Create, op);
 							code = this.code;
 							str = this.str;
 							at = this.at;
@@ -434,7 +434,7 @@ namespace RedOnion.ROS
 						{
 							var n = code[at++];
 							this.at = at;
-							Call(n-1, true, op);
+							Call(n-1, CallFlags.Create, op);
 							code = this.code;
 							str = this.str;
 							at = this.at;
@@ -487,7 +487,7 @@ namespace RedOnion.ROS
 					case OpCode.Autocall:
 					case OpCode.Call0:
 						this.at = at;
-						Call(0, false, op);
+						Call(0, op == OpCode.Autocall ? CallFlags.Autocall : CallFlags.None, op);
 						code = this.code;
 						str = this.str;
 						at = this.at;
@@ -495,7 +495,7 @@ namespace RedOnion.ROS
 						continue;
 					case OpCode.Call1:
 						this.at = at;
-						Call(1, false, op);
+						Call(1, CallFlags.None, op);
 						code = this.code;
 						str = this.str;
 						at = this.at;
@@ -503,7 +503,7 @@ namespace RedOnion.ROS
 						continue;
 					case OpCode.Call2:
 						this.at = at;
-						Call(2, false, op);
+						Call(2, CallFlags.None, op);
 						code = this.code;
 						str = this.str;
 						at = this.at;
@@ -513,7 +513,7 @@ namespace RedOnion.ROS
 					{
 						var n = code[at++];
 						this.at = at;
-						Call(n-1, false, op);
+						Call(n-1, CallFlags.None, op);
 						code = this.code;
 						str = this.str;
 						at = this.at;

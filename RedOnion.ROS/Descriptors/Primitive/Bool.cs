@@ -15,7 +15,7 @@ namespace RedOnion.ROS
 			public override string ToString(ref Value self, string format, IFormatProvider provider, bool debug)
 				=> self.num.Bool.ToString(provider);
 
-			public override bool Call(ref Value result, object self, Arguments args, bool create = false)
+			public override bool Call(ref Value result, object self, in Arguments args)
 			{
 				if (result.obj != this)
 					return false;

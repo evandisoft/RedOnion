@@ -258,7 +258,7 @@ namespace RedOnion.ROS
 			}
 		}
 
-		protected void Call(int argc, bool create, OpCode op = OpCode.Void)
+		protected void Call(int argc, CallFlags flags = CallFlags.None, OpCode op = OpCode.Void)
 		{
 			if (argc > 0)
 				Dereference(argc);
@@ -285,13 +285,13 @@ namespace RedOnion.ROS
 				ret.code = compiled;
 				ret.at = at;
 				ret.vtop = vals.Size - argc;
-				ret.create = create;
+				ret.create = (flags & CallFlags.Create) != 0;
 				compiled = fn.Code;
 				code = compiled.Code;
 				str = compiled.Strings;
 				at = fn.CodeAt;
 				ctx = new Context(fn, fn.Context, null);
-				if (create)
+				if ((flags & CallFlags.Create) != 0)
 					this.self = new Value(new UserObject(fn.Prototype));
 				else this.self = new Value(selfDesc, self);
 				var args = new Value[argc];
@@ -319,10 +319,12 @@ namespace RedOnion.ROS
 #if DEBUG
 			bool wasReplace = it.desc is Functions.Run.RunReplace || it.desc is Functions.Run.RunReplaceSource;
 #endif
-			if (!it.desc.Call(ref it, self, new Arguments(Arguments, argc), create)
-				&& op != OpCode.Autocall)
+			if (op == OpCode.Autocall)
+				flags |= CallFlags.Autocall;
+			if (!it.desc.Call(ref it, self, new Arguments(Arguments, argc, flags))
+				&& (flags & CallFlags.Autocall) == 0)
 			{
-				throw new InvalidOperation(create ? op == OpCode.Identifier
+				throw new InvalidOperation((flags & CallFlags.Create) != 0 ? op == OpCode.Identifier
 					? "Could not create new {0}" : argc == 0
 					? "{0} cannot create object given zero arguments" : argc == 1
 					? "{0} cannot create object given that argument"

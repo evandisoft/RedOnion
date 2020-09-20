@@ -250,11 +250,11 @@ namespace RedOnion.ROS
 				}
 			}
 
-			public override bool Call(ref Value result, object self, Arguments args, bool create)
+			public override bool Call(ref Value result, object self, in Arguments args)
 			{
 				if (result.obj is ICallable call)
-					return call.Call(ref result, self, args, create);
-				if (!create)
+					return call.Call(ref result, self, args);
+				if (!args.Create)
 				{
 					if (callableMemberName?.Length > 0)
 					{
@@ -332,9 +332,9 @@ namespace RedOnion.ROS
 				}
 				return false;
 			}
-			public override bool Convert(ref Value self, Descriptor to)
+			public override bool Convert(ref Value self, Descriptor to, CallFlags flags = CallFlags.Convert)
 			{
-				if (self.obj is IConvert cvt && cvt.Convert(ref self, to))
+				if (self.obj is IConvert cvt && cvt.Convert(ref self, to, flags))
 					return true;
 				foreach (var mtd in implConvert)
 				{

@@ -415,7 +415,7 @@ Beware that multiplication is scaling, not cross product or dot - use appropriat
 				/ VectorCreator.ToVector(args[1].ToObject()));
 		}
 
-		bool IConvert.Convert(ref Value self, Descriptor to)
+		bool IConvert.Convert(ref Value self, Descriptor to, CallFlags flags)
 		{
 			if (to.Type == typeof(Vector))
 			{

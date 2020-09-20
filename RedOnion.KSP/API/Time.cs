@@ -210,7 +210,7 @@ namespace RedOnion.KSP.API
 		public static bool operator >(TimeStamp lhs, TimeStamp rhs) => lhs.seconds > rhs.seconds;
 		public static bool operator <(TimeStamp lhs, TimeStamp rhs) => lhs.seconds < rhs.seconds;
 
-		bool IConvert.Convert(ref Value self, Descriptor to)
+		bool IConvert.Convert(ref Value self, Descriptor to, CallFlags flags)
 		{
 			if (to.IsNumber)
 			{
@@ -416,7 +416,7 @@ namespace RedOnion.KSP.API
 		public static TimeDelta operator ^(TimeDelta delta, double power) => new TimeDelta(Math.Pow(delta.seconds, power));
 		public static double operator ^(double x, TimeDelta y) => Math.Pow(x, y.seconds);
 
-		bool IConvert.Convert(ref Value self, Descriptor to)
+		bool IConvert.Convert(ref Value self, Descriptor to, CallFlags flags)
 		{
 			if (to.IsNumber)
 			{

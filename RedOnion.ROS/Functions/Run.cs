@@ -32,7 +32,7 @@ namespace RedOnion.ROS.Functions
 			Include.Reset();
 			base.Reset();
 		}
-		public override bool Call(ref Value result, object self, Arguments args, bool create)
+		public override bool Call(ref Value result, object self, in Arguments args)
 		{
 			if (args.Length != 1)
 				return false;
@@ -51,7 +51,7 @@ namespace RedOnion.ROS.Functions
 		public class RunSource : UserObject
 		{
 			public RunSource(UserObject baseClass) : base("run.source", baseClass) { }
-			public override bool Call(ref Value result, object self, Arguments args, bool create)
+			public override bool Call(ref Value result, object self, in Arguments args)
 			{
 				if (args.Length != 1)
 					return false;
@@ -70,7 +70,7 @@ namespace RedOnion.ROS.Functions
 		{
 			public readonly HashSet<string> packages = new HashSet<string>();
 			public RunOnce(UserObject baseClass) : base("run.once", baseClass) { }
-			public override bool Call(ref Value result, object self, Arguments args, bool create)
+			public override bool Call(ref Value result, object self, in Arguments args)
 			{
 				if (args.Length != 1)
 					return false;
@@ -106,7 +106,7 @@ namespace RedOnion.ROS.Functions
 				Source.Reset();
 				base.Reset();
 			}
-			public override bool Call(ref Value result, object self, Arguments args, bool create)
+			public override bool Call(ref Value result, object self, in Arguments args)
 			{
 				if (args.Length != 1)
 					return false;
@@ -125,7 +125,7 @@ namespace RedOnion.ROS.Functions
 		public class RunIncludeSource : UserObject
 		{
 			public RunIncludeSource(UserObject baseClass) : base("run.include.source", baseClass) { }
-			public override bool Call(ref Value result, object self, Arguments args, bool create)
+			public override bool Call(ref Value result, object self, in Arguments args)
 			{
 				if (args.Length != 1)
 					return false;
@@ -153,7 +153,7 @@ namespace RedOnion.ROS.Functions
 				Source.Reset();
 				base.Reset();
 			}
-			public override bool Call(ref Value result, object self, Arguments args, bool create)
+			public override bool Call(ref Value result, object self, in Arguments args)
 			{
 				if (args.Length != 1)
 					return false;
@@ -172,7 +172,7 @@ namespace RedOnion.ROS.Functions
 		public class RunReplaceSource : UserObject
 		{
 			public RunReplaceSource(UserObject baseClass) : base("run.replace.source", baseClass) { }
-			public override bool Call(ref Value result, object self, Arguments args, bool create)
+			public override bool Call(ref Value result, object self, in Arguments args)
 			{
 				if (args.Length != 1)
 					return false;

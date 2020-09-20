@@ -361,27 +361,43 @@ namespace RedOnion.ROS
 		public AddGuard Guard()
 			=> new AddGuard(this);
 	}
+	public enum CallFlags
+	{
+		None = 0,
+		Create = 1<<0,
+		Autocall = 1<<1,
+		Implicit = 1<<2,
+		Explicit = 1<<3,
+		Convert = Implicit|Explicit
+	}
 	public readonly struct Arguments : IEnumerable<Value>
 	{
 		readonly ArgumentList list;
 		public readonly int argc;
+		public readonly CallFlags flags;
 		public Processor Processor => list?.Processor;
 		public Core Core => list?.Core;
 		public int Length => argc;
 		public int Count => argc;
 		public int Size => argc;
+		public bool Create => (flags & CallFlags.Create) != 0;
+		public bool Autocall => (flags & CallFlags.Autocall) != 0;
+		public bool Implicit => (flags & CallFlags.Implicit) != 0;
+		public bool Explicit => (flags & CallFlags.Explicit) != 0;
 
 		[DebuggerStepThrough]
-		public Arguments(ArgumentList list, int argc)
+		public Arguments(ArgumentList list, int argc, CallFlags flags)
 		{
 			this.list = list;
 			this.argc = argc;
+			this.flags = flags;
 		}
 		[DebuggerStepThrough]
-		public Arguments(Arguments args, int argc)
+		public Arguments(Arguments args, int argc, CallFlags flags)
 		{
 			this.list = args.list;
 			this.argc = Math.Min(argc, args.argc);
+			this.flags = flags;
 		}
 
 		public Value this[int i] => i >= argc ? Value.Void : list.Get(argc, i);
@@ -410,14 +426,41 @@ namespace RedOnion.ROS
 	/// </summary>
 	public interface ICallable
 	{
-		bool Call(ref Value result, object self, Arguments args, bool create);
+		/// <summary>
+		/// Try to call the object.
+		/// Should not throw exceptions (return false instead,
+		/// may be part of method group and different overload may be attempted).
+		/// </summary>
+		/// <param name="result">Both input (the callable) and output (the result)</param>
+		/// <param name="self">Value of `this` (null for function/static call)</param>
+		/// <param name="args">Arguments and <see cref="CallFlags"/></param>
+		bool Call(ref Value result, object self, in Arguments args);
 	}
 	/// <summary>
 	/// Object with custom operator implementation.
 	/// </summary>
 	public interface IOperators
 	{
+		/// <summary>
+		/// Implements unary operators.
+		/// Execution engine will directly only use <see cref="OpKind.Unary"/>
+		/// but <see cref="Set(Core, ref Value, OpCode, ref Value)"/> may redirect
+		/// <see cref="OpKind.PreOrPost"/> here (even from different descriptor).
+		/// See <see cref="Descriptor.Unary(ref Value, OpCode)"/>
+		/// </summary>
+		/// <param name="self">Both input (<see cref="Value.IsReference"/>) and output</param>
+		/// <param name="op">The operation (<see cref="OpKind.Unary"/> or <see cref="OpKind.PreOrPost"/>)</param>
 		bool Unary(ref Value self, OpCode op);
+		/// <summary>
+		/// Implements binary operators (<see cref="OpKind.Binary"/> and <see cref="OpKind.Logic"/>
+		/// except <see cref="OpCode.As"/> and higher).
+		/// Should not throw exceptions (return false instead,
+		/// the descriptor of second argument may handle it).
+		/// See <see cref="Descriptor.Binary(ref Value, OpCode, ref Value)"/>.
+		/// </summary>
+		/// <param name="lhs">Both first argument and output</param>
+		/// <param name="op"></param>
+		/// <param name="rhs">Second argument (input only, do not modify)</param>
 		bool Binary(ref Value lhs, OpCode op, ref Value rhs);
 	}
 	/// <summary>
@@ -425,7 +468,16 @@ namespace RedOnion.ROS
 	/// </summary>
 	public interface IConvert
 	{
-		bool Convert(ref Value self, Descriptor to);
+		/// <summary>
+		/// Try to convert the value to new type (<paramref name="to"/> could be <c>this</c>).
+		/// Should not throw exceptions (return false instead).
+		/// See <see cref="Descriptor.Convert(ref Value, Descriptor, bool)"/>
+		/// </summary>
+		/// <param name="self">The value to be converted</param>
+		/// <param name="to">Target descriptor</param>
+		/// <param name="flags">Conversion flags (currently only <see cref="CallFlags.Explicit"/> is relevant)</param>
+		/// <returns>True if converted, false if not</returns>
+		bool Convert(ref Value self, Descriptor to, CallFlags flags = CallFlags.Convert);
 	}
 
 	#endregion

@@ -22,9 +22,9 @@ namespace RedOnion.ROS
 			public Action0(string name, MethodInfo m = null)
 				: base(name, typeof(Action), false, m) { }
 
-			public override bool Call(ref Value result, object self, Arguments args, bool create)
+			public override bool Call(ref Value result, object self, in Arguments args)
 			{
-				if (create || args.Length != 0)
+				if (args.Length != 0)
 					return false;
 				((Action)result.obj)();
 				result = Value.Void;
@@ -51,9 +51,9 @@ namespace RedOnion.ROS
 			public Function0(string name, MethodInfo m = null)
 				: base(name, typeof(Func<Value>), false, m) { }
 
-			public override bool Call(ref Value result, object self, Arguments args, bool create)
+			public override bool Call(ref Value result, object self, in Arguments args)
 			{
-				if (create || args.Length != 0)
+				if (args.Length != 0)
 					return false;
 				result = ((Func<Value>)result.obj)();
 				return true;
@@ -69,9 +69,9 @@ namespace RedOnion.ROS
 			public Procedure0(string name, MethodInfo m = null)
 				: base(name, typeof(Action<T>), true, m) { }
 
-			public override bool Call(ref Value result, object self, Arguments args, bool create)
+			public override bool Call(ref Value result, object self, in Arguments args)
 			{
-				if (create || args.Length != 0)
+				if (args.Length != 0)
 					return false;
 				((Action<T>)result.obj)((T)self);
 				result = Value.Void;
@@ -88,9 +88,9 @@ namespace RedOnion.ROS
 			public Method0(string name, MethodInfo m = null)
 				: base(name, typeof(Func<T, Value>), true, m) { }
 
-			public override bool Call(ref Value result, object self, Arguments args, bool create)
+			public override bool Call(ref Value result, object self, in Arguments args)
 			{
-				if (create || args.Length != 0)
+				if (args.Length != 0)
 					return false;
 				result = ((Func<T, Value>)result.obj)((T)self);
 				return true;

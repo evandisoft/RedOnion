@@ -18,7 +18,7 @@ namespace RedOnion.ROS
 				=> list.AddRange(methods);
 
 			int argc = int.MaxValue;
-			public override bool Call(ref Value result, object self, Arguments args, bool create = false)
+			public override bool Call(ref Value result, object self, in Arguments args)
 			{
 				// this is designed for Math.Abs/Max etc. to match the type
 				if (argc >= 0)
@@ -57,7 +57,7 @@ namespace RedOnion.ROS
 								&& args[1].desc.Primitive != ExCode.Double))
 								{
 									var it = m;
-									if (it.desc.Call(ref it, self, args, create))
+									if (it.desc.Call(ref it, self, args))
 									{
 										result = it;
 										return true;
@@ -73,7 +73,7 @@ namespace RedOnion.ROS
 							if (desc.Params[0].ParameterType == type)
 							{
 								var it = m;
-								if (it.desc.Call(ref it, self, args, create))
+								if (it.desc.Call(ref it, self, args))
 								{
 									result = it;
 									return true;
@@ -90,7 +90,7 @@ namespace RedOnion.ROS
 								if (ptype == typeof(double) || ptype == typeof(float))
 								{
 									var it = m;
-									if (it.desc.Call(ref it, self, args, create))
+									if (it.desc.Call(ref it, self, args))
 									{
 										result = it;
 										return true;
@@ -110,7 +110,7 @@ namespace RedOnion.ROS
 									if (ptype == typeof(int))
 									{
 										var it = m;
-										if (it.desc.Call(ref it, self, args, create))
+										if (it.desc.Call(ref it, self, args))
 										{
 											result = it;
 											return true;
@@ -127,7 +127,7 @@ namespace RedOnion.ROS
 									if (ptype == typeof(uint))
 									{
 										var it = m;
-										if (it.desc.Call(ref it, self, args, create))
+										if (it.desc.Call(ref it, self, args))
 										{
 											result = it;
 											return true;
@@ -142,7 +142,7 @@ namespace RedOnion.ROS
 				foreach (var call in list)
 				{
 					var it = call;
-					if (it.desc.Call(ref it, self, args, create))
+					if (it.desc.Call(ref it, self, args))
 					{
 						result = it;
 						return true;

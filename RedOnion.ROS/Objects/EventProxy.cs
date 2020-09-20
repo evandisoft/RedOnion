@@ -62,9 +62,9 @@ namespace RedOnion.ROS.Objects
 			return true;
 		}
 
-		public override bool Call(ref Value result, object self, Arguments args, bool create)
+		public override bool Call(ref Value result, object self, in Arguments args)
 		{
-			if (create || args.Length != 1)
+			if (args.Length != 1)
 				return false;
 			var it = args[0];
 			if (!it.desc.Convert(ref it, DelegateDescriptor))
@@ -101,7 +101,7 @@ namespace RedOnion.ROS.Objects
 		{
 			Descriptor ISelfDescribing.Descriptor => this;
 			public static AddFunc Instance { get; } = new AddFunc();
-			public override bool Call(ref Value result, object self, Arguments args, bool create = false)
+			public override bool Call(ref Value result, object self, in Arguments args)
 			{
 				if (args.Length == 1 && self is EventProxy<Obj,Fn> it)
 				{
@@ -118,7 +118,7 @@ namespace RedOnion.ROS.Objects
 		{
 			Descriptor ISelfDescribing.Descriptor => this;
 			public static RemoveFunc Instance { get; } = new RemoveFunc();
-			public override bool Call(ref Value result, object self, Arguments args, bool create = false)
+			public override bool Call(ref Value result, object self, in Arguments args)
 			{
 				if (args.Length == 1 && self is EventProxy<Obj, Fn> it)
 				{
@@ -177,9 +177,9 @@ namespace RedOnion.ROS.Objects
 			return true;
 		}
 
-		public override bool Call(ref Value result, object self, Arguments args, bool create)
+		public override bool Call(ref Value result, object self, in Arguments args)
 		{
-			if (create || args.Length != 1)
+			if (args.Length != 1)
 				return false;
 			var it = args[0];
 			if (!it.desc.Convert(ref it, DelegateDescriptor))
@@ -216,7 +216,7 @@ namespace RedOnion.ROS.Objects
 		{
 			Descriptor ISelfDescribing.Descriptor => this;
 			public static AddFunc Instance { get; } = new AddFunc();
-			public override bool Call(ref Value result, object self, Arguments args, bool create = false)
+			public override bool Call(ref Value result, object self, in Arguments args)
 			{
 				if (args.Length == 1 && self is EventProxy<Fn> it)
 				{
@@ -233,7 +233,7 @@ namespace RedOnion.ROS.Objects
 		{
 			Descriptor ISelfDescribing.Descriptor => this;
 			public static RemoveFunc Instance { get; } = new RemoveFunc();
-			public override bool Call(ref Value result, object self, Arguments args, bool create = false)
+			public override bool Call(ref Value result, object self, in Arguments args)
 			{
 				if (args.Length == 1 && self is EventProxy<Fn> it)
 				{

@@ -15,7 +15,7 @@ namespace RedOnion.ROS
 			public override string ToString(ref Value self, string format, IFormatProvider provider, bool debug)
 				=> self.num.Double.ToString(format, provider);
 
-			public override bool Call(ref Value result, object self, Arguments args, bool create = false)
+			public override bool Call(ref Value result, object self, in Arguments args)
 			{
 				if (result.obj != this)
 					return false;
@@ -32,7 +32,7 @@ namespace RedOnion.ROS
 				return true;
 			}
 
-			public override bool Convert(ref Value self, Descriptor to)
+			public override bool Convert(ref Value self, Descriptor to, CallFlags flags = CallFlags.Convert)
 			{
 				switch (to.Primitive)
 				{

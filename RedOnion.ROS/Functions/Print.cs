@@ -10,7 +10,7 @@ namespace RedOnion.ROS.Functions
 	{
 		public Print(UserObject baseClass) : base("Print", baseClass) { }
 
-		public override bool Call(ref Value result, object self, Arguments args, bool create)
+		public override bool Call(ref Value result, object self, in Arguments args)
 		{
 			if (args.Length == 0)
 			{

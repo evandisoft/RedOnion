@@ -46,13 +46,13 @@ namespace RedOnion.KSP.Utilities
 			}
 			if (from.Count <= 1)
 			{
-				to = new Arguments(null, 0);
+				to = new Arguments(null, 0, CallFlags.None);
 				return self;
 			}
 			var list = new ArgumentList(null);
 			for (int i = 1; i < from.Count; i++)
 				list.Add(ToRos(from[i]));
-			to = new Arguments(list, list.Count);
+			to = new Arguments(list, list.Count, CallFlags.None);
 			return self;
 		}
 	}

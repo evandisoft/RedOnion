@@ -69,9 +69,9 @@ namespace RedOnion.KSP.API
 		public static Vector3 shrink(Vector3 a, Vector3 b)
 			=> new Vector3(a.x / b.x, a.y / b.y, a.z / b.z);
 
-		bool ICallable.Call(ref Value result, object self, Arguments args, bool create)
-			=> Call(ref result, self, args, create);
-		static bool Call(ref Value result, object self, Arguments args, bool create)
+		bool ICallable.Call(ref Value result, object self, in Arguments args)
+			=> Call(ref result, self, args);
+		static bool Call(ref Value result, object self, in Arguments args)
 		{
 			switch (args.Length)
 			{
@@ -99,7 +99,7 @@ namespace RedOnion.KSP.API
 		{
 			var result = Value.Void;
 			var self = args.ToRos(out var ros);
-			return Call(ref result, self, ros, false) ? result.ToLua() : DynValue.Void;
+			return Call(ref result, self, ros) ? result.ToLua() : DynValue.Void;
 		}
 
 		public static Vector? ToVector(object value)

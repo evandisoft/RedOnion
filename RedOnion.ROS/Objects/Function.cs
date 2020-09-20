@@ -114,7 +114,7 @@ namespace RedOnion.ROS.Objects
 			base.Get(core, ref self);
 		}
 
-		public override bool Call(ref Value result, object self, Arguments args, bool create)
+		public override bool Call(ref Value result, object self, in Arguments args)
 			=> throw new InvalidOperation("Function objects cannot be called via Descriptor.Call");
 
 		#region Execute later
@@ -182,7 +182,7 @@ namespace RedOnion.ROS.Objects
 		#endregion
 
 		protected Dictionary<Type, Delegate> delegates;
-		public override bool Convert(ref Value self, Descriptor to)
+		public override bool Convert(ref Value self, Descriptor to, CallFlags flags = CallFlags.Convert)
 		{
 			var type = to.Type;
 			if (!type.IsSubclassOf(typeof(Delegate)))
@@ -350,9 +350,9 @@ namespace RedOnion.ROS.Objects
 			public class Bind : UserObject
 			{
 				public Bind(UserObject baseClass) : base("Function.bind", baseClass) { }
-				public override bool Call(ref Value result, object self, Arguments args, bool create)
+				public override bool Call(ref Value result, object self, in Arguments args)
 				{
-					if (!create && self is Function fn)
+					if (!args.Create && self is Function fn)
 					{
 						result = new Value(fn.Bind(args.ToArray()));
 						return true;
