@@ -122,7 +122,7 @@ discovered assemblies, namespaces, classes etc.")]
 		{
 			public static SelfDescriptor Instance { get; } = new SelfDescriptor();
 			protected SelfDescriptor() { }
-			public override void Get(ref Value self)
+			public override void Get(Core core, ref Value self)
 			{
 				var it = (Properties<T>)self.obj;
 				var name = self.idx as string;

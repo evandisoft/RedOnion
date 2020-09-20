@@ -24,14 +24,18 @@ namespace RedOnion.ROS.Objects
 			return true;
 		}
 
+		public delegate void Read(Core core, UserObject self, out Value value);
+		public delegate void Write(Core core, UserObject self, ref Value value);
 		/// <summary>
 		/// Single property of an object (with name and value)
 		/// </summary>
 		[DebuggerDisplay("{name} = {value}")]
-		protected internal struct Prop
+		public struct Prop
 		{
 			public string name;
 			public Value value;
+			public Read read;
+			public Write write;
 			public override string ToString()
 				=> string.Format(Value.Culture, "{0} = {1}", name, value.ToString());
 		}
@@ -43,7 +47,7 @@ namespace RedOnion.ROS.Objects
 		/// <summary>
 		/// Map of all properties (name-to-index into <see cref="prop"/>)
 		/// </summary>
-		protected internal Dictionary<string, int> dict;
+		protected internal readonly Dictionary<string, int> dict = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 		/// <summary>
 		/// Parent object (this one is derived from, null if no such)
 		/// </summary>
@@ -119,130 +123,252 @@ namespace RedOnion.ROS.Objects
 			it.name = name;
 			it.value = value;
 			if (name != null)
-			{
-				if (dict == null)
-					dict = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 				dict[name] = idx;
-			}
+			return idx;
+		}
+		public virtual int Add(string name, Read read, Write write = null)
+		{
+			var idx = prop.size;
+			ref var it = ref prop.Add();
+			it.name = name;
+			it.read = read;
+			it.write = write;
+			if (name != null)
+				dict[name] = idx;
 			return idx;
 		}
 		public virtual int Find(string name)
 		{
-			if (dict != null && dict.TryGetValue(name, out var idx))
-				return idx;
+			if (dict.TryGetValue(name, out var at))
+				return at;
 			if (parent == null)
 				return -1;
-			idx = parent.Find(name);
-			if (idx < 0)
-				return idx;
-			return Add(name, ref parent.prop.items[idx].value);
+			at = parent.Find(name);
+			if (at < 0)
+				return at;
+			return ImportFrom(parent, name, at);
 		}
 		protected int ImportFrom(UserObject space, string name, int at)
-			=> Add(name, ref space.prop.items[at].value);
+		{
+			ref var p = ref space.prop.items[at];
+			if (p.value.IsValid)
+				return Add(name, p.value);
+			return Add(name, p.read, p.write);
+		}
 		public Value this[string name]
 		{
 			get
 			{
 				int at = Find(name);
-				return at < 0 ? Value.Void : prop.items[at].value;
+				if (at < 0) return Value.Void;
+				ref var p = ref prop.items[at];
+				if (p.value.IsValid)
+					return p.value;
+				var read = p.read;
+				if (read == null)
+					throw new InvalidOperation($"{name} is write-only");
+				read(null, this, out var v);
+				return v;
 			}
 			set
 			{
 				int at = Find(name);
 				if (at < 0)
 					Add(name, ref value);
-				else if (at >= readOnlyTop)
-					prop.items[at].value = value;
+				else if (at < readOnlyTop)
+					throw new InvalidOperation($"{name} is read-only");
+				else
+				{
+					ref var p = ref prop.items[at];
+					if (p.value.IsValid)
+						p.value = value;
+					else
+					{
+						var write = p.write;
+						if (write == null)
+							throw new InvalidOperation($"{name} is read-only");
+						write(null, this, ref value);
+					}
+				}
 			}
 		}
 		public bool Has(string name)
 			=> Find(name) >= 0;
-		public override bool Has(ref Value self, string name)
+		public override bool Has(Core core, ref Value self, string name)
 			=> Find(name) >= 0;
-		public override void Get(ref Value self)
+		public override void Get(Core core, ref Value self)
 		{
+			int at;
+			ValueBox box = null;
 			if (self.idx is string name)
 			{
-				int at = Find(name);
-				if (at >= 0)
-					self = prop.items[at].value;
-				return;
+				at = Find(name);
+				goto getit2;
 			}
 			if (self.IsIntIndex)
 			{
-				int at = self.num.Int;
-				if (at >= 0 && at < prop.size)
-					self = prop.items[at].value;
+				at = self.num.Int;
+				goto getit;
+			}
+			box = self.idx as ValueBox;
+			if (box == null)
+				goto fail;
+			if (box.Value.IsStringOrChar)
+			{
+				at = Find(box.Value.ToStr());
+				goto getit2;
+			}
+			if (box.Value.IsIntegral)
+			{
+				var num = box.Value.num.Long;
+				if (num < 0 || num >= prop.size)
+					goto fail;
+				at = (int)num;
+				goto getit3;
+			}
+		fail:
+			GetError(ref self);
+			return;
+		getit:
+			if (at >= prop.size)
+				goto fail;
+			getit2:
+			if (at < 0)
+				goto fail;
+			getit3:
+			ref var p = ref prop.items[at];
+			if (p.value.IsValid)
+			{
+				self = p.value;
+				if (box != null)
+					ValueBox.Return(box);
 				return;
 			}
-			if (self.idx is ValueBox box)
-			{
-				if (box.Value.IsStringOrChar)
-				{
-					var at = Find(box.Value.ToStr());
-					if (at >= 0)
-					{
-						self = prop.items[at].value;
-						ValueBox.Return(box);
-						return;
-					}
-				}
-			}
-			GetError(ref self);
+			var read = p.read;
+			if (read == null)
+				goto fail;
+			read(core, this, out self);
+			if (box != null)
+				ValueBox.Return(box);
 		}
-		public override void Set(ref Value self, OpCode op, ref Value value)
+		public override void Set(Core core, ref Value self, OpCode op, ref Value value)
 		{
 			int at = -1;
 			ValueBox box = null;
 			if (self.idx is string name)
 			{
 				at = Find(name);
-				if (at < 0 && op == OpCode.Assign)
-					at = Add(name, Value.Void);
+				if (at >= 0)
+					goto setit3;
+				if (op != OpCode.Assign)
+					goto fail;
+				at = Add(name, Value.Void);
+				goto setit3;
 			}
-			else if (self.IsIntIndex)
+			if (self.IsIntIndex)
 			{
 				at = self.num.Int;
-				if (at >= prop.size)
-					at = -1;
+				goto setit;
 			}
-			else if (self.idx is ValueBox box2)
+			box = self.idx as ValueBox;
+			if (box == null)
+				goto fail;
+			if (box.Value.IsStringOrChar)
 			{
-				box = box2;
-				if (box.Value.IsStringOrChar)
-				{
-					at = Find(name = box.Value.ToStr());
-					if (at < 0 && op == OpCode.Assign)
-						at = Add(name, Value.Void);
-				}
+				name = box.Value.ToStr();
+				at = Find(name);
+				if (at >= 0)
+					goto setit3;
+				if (op != OpCode.Assign)
+					goto fail;
+				at = Add(name, Value.Void);
+				goto setit3;
 			}
-			if (at >= readOnlyTop)
+			if (box.Value.IsIntegral)
 			{
-				if (op == OpCode.Assign)
+				var num = box.Value.num.Long;
+				if (num < 0 || num >= prop.size)
+					goto fail;
+				at = (int)num;
+				goto setit3;
+			}
+		fail:
+			SetError(ref self, ref value);
+		setit:
+			if (at >= prop.size)
+				goto fail;
+		//setit2:
+			if (at < readOnlyTop)
+				goto fail;
+		setit3:
+			ref var p = ref prop.items[at];
+			if (op == OpCode.Assign)
+			{
+				if (p.value.IsValid)
 				{
-					prop.items[at].value = value;
+					p.value = value;
 					return;
 				}
-				ref var it = ref prop.items[at].value;
-				if (op.Kind() == OpKind.Assign)
+				var write = p.write;
+				if (write == null)
+					goto fail;
+				write(core, this, ref value);
+			}
+			if (op.Kind() == OpKind.Assign)
+			{
+				if (p.value.IsValid)
 				{
-					if (it.desc.Binary(ref it, op + 0x10, ref value))
-						return;
+					if (!p.value.desc.Binary(ref p.value, op + 0x10, ref value)
+					&& !value.desc.Binary(ref p.value, op + 0x10, ref value))
+						goto fail;
+					return;
 				}
-				else if (op.Kind() == OpKind.PreOrPost)
+				var read = p.read;
+				if (read == null)
+					goto fail;
+				var write = p.write;
+				if (write == null)
+					goto fail;
+				read(core, this, out var it);
+				if (!it.desc.Binary(ref it, op + 0x10, ref value)
+				&& !value.desc.Binary(ref it, op + 0x10, ref value))
+					goto fail;
+				write(core, this, ref it);
+				return;
+			}
+			if (op.Kind() == OpKind.PreOrPost)
+			{
+				if (p.value.IsValid)
 				{
 					if (op >= OpCode.Inc)
 					{
-						it.desc.Unary(ref it, op);
+						p.value.desc.Unary(ref p.value, op);
 						return;
 					}
+					self = p.value;
+					if (box != null) ValueBox.Return(box);
+					p.value.desc.Unary(ref p.value, op + 0x08);
+					return;
+				}
+				var read = p.read;
+				if (read == null)
+					goto fail;
+				var write = p.write;
+				if (write == null)
+					goto fail;
+				read(core, this, out var it);
+				if (op >= OpCode.Inc)
+					it.desc.Unary(ref it, op);
+				else
+				{
 					self = it;
 					if (box != null) ValueBox.Return(box);
 					it.desc.Unary(ref it, op + 0x08);
-					return;
 				}
+				write(core, this, ref it);
+				return;
 			}
-			GetError(ref self);
+			goto fail;
 		}
 
 		public override IEnumerable<string> EnumerateProperties(object self)

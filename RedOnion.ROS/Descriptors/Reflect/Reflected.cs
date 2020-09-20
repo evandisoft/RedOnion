@@ -351,9 +351,9 @@ namespace RedOnion.ROS
 				=> (self is Type ? sdict : idict).TryGetValue(name, out var idx) ? idx : -1;
 			protected int FindStrict(object self, string name)
 				=> (self is Type ? scase : icase).TryGetValue(name, out var idx) ? idx : -1;
-			public override bool Has(ref Value self, string name)
+			public override bool Has(Core core, ref Value self, string name)
 				=> Find(self.obj, name) >= 0;
-			public override void Get(ref Value self)
+			public override void Get(Core core, ref Value self)
 			{
 				if (self.idx is string name)
 				{
@@ -405,7 +405,7 @@ namespace RedOnion.ROS
 				GetError(ref self);
 			}
 
-			public override void Set(ref Value self, OpCode op, ref Value value)
+			public override void Set(Core core, ref Value self, OpCode op, ref Value value)
 			{
 				if (self.idx is string name)
 				{
@@ -480,7 +480,9 @@ namespace RedOnion.ROS
 						strIndexSet(self.obj, box.Value.obj.ToString(), value);
 						return;
 					}
-					if (box.Value.IsNumberOrChar && intIndexSet != null)
+					if (box.Value.IsIntegral && intIndexSet != null
+						&& box.Value.num.Long >= int.MinValue
+						&& box.Value.num.Long <= int.MaxValue)
 					{
 						intIndexSet(self.obj, box.Value.num.Int, value);
 						return;

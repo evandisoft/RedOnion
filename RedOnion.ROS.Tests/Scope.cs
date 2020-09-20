@@ -13,17 +13,21 @@ namespace RedOnion.ROS.Tests
 		public override void Reset() => base.Reset();
 
 		[Test]
-		public void ROS_Scope01_Global()
+		public void ROS_Scope01_Script()
 		{
 			Lines(1,
 				"var x = 1",
 				"function f",
 				"  return x",
 				"f()");
+			Lines(2,
+				"function g",
+				"  return local.x + 1",
+				"g()");
 		}
 
 		[Test]
-		public void ROS_Scope02_Local()
+		public void ROS_Scope02_Function()
 		{
 			Lines(2,
 				"var x = 1",
@@ -112,7 +116,7 @@ namespace RedOnion.ROS.Tests
 				"return (new f).x");    // prototype.x
 
 			// it is questionable whether `x` inside `f`
-			// shoud be `this.x` or global `x` here,
+			// shoud be `this.x` or script-local `x` here,
 			// but we want functions to see each other
 			// regardless of the position in the scope
 			// and therefore have the same behaviour
@@ -223,7 +227,7 @@ namespace RedOnion.ROS.Tests
 			Execute(test.obj as Function);
 			xval = ctx["x"];            // reference to script-local 'x' here from test-context
 			Assert.IsTrue(xval.IsReference); 
-			xval.Dereference();
+			xval.Dereference(this);
 			Assert.IsTrue(xval.IsInt);
 			Assert.AreEqual(3, xval.ToInt());
 		}

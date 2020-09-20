@@ -343,8 +343,6 @@ namespace RedOnion.ROS.Objects
 					{
 						newIdx = cousin.prop.size;
 						cousin.prop.Add() = prop[dict[name]];
-						if (cousin.dict == null)
-							cousin.dict = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 						cousin.dict[name] = newIdx;
 					}
 					int idx = closure.Find(name);
@@ -366,7 +364,7 @@ namespace RedOnion.ROS.Objects
 				if (blockStack.size > 0)
 				{
 					ref var top = ref blockStack.Top();
-					if (dict != null && dict.ContainsKey(name))
+					if (dict.ContainsKey(name))
 					{
 						if (top.shadow == null)
 							top.shadow = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
@@ -375,8 +373,31 @@ namespace RedOnion.ROS.Objects
 					else
 						top.added.Add(name);
 				}
-				if (dict == null)
-					dict = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+				dict[name] = idx;
+			}
+			return idx;
+		}
+		public override int Add(string name, Read read, Write write = null)
+		{
+			var idx = prop.size;
+			ref var it = ref prop.Add();
+			it.name = name;
+			it.read = read;
+			it.write = write;
+			if (name != null)
+			{
+				if (blockStack.size > 0)
+				{
+					ref var top = ref blockStack.Top();
+					if (dict.ContainsKey(name))
+					{
+						if (top.shadow == null)
+							top.shadow = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+						top.shadow[name] = dict[name];
+					}
+					else
+						top.added.Add(name);
+				}
 				dict[name] = idx;
 			}
 			return idx;
@@ -401,8 +422,6 @@ namespace RedOnion.ROS.Objects
 						link.value = new Value(obj, obj, refIdx);
 						if (blockStack.size > 0)
 							blockStack.Top().added.Add(name);
-						if (dict == null)
-							dict = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 						dict[name] = idx;
 						return idx;
 					}
@@ -417,7 +436,7 @@ namespace RedOnion.ROS.Objects
 				return idx;
 			return Add(name, ref parent.prop.items[idx].value);
 		}
-		public override void Get(ref Value self)
+		public override void Get(Core core, ref Value self)
 		{
 			int at = -1;
 			if (self.idx is string name)
@@ -429,11 +448,11 @@ namespace RedOnion.ROS.Objects
 			{
 				self = prop.items[at].value;
 				if (self.IsReference)
-					self.desc.Get(ref self);
+					self.desc.Get(core, ref self);
 			}
 			else GetError(ref self);
 		}
-		public override void Set(ref Value self, OpCode op, ref Value value)
+		public override void Set(Core core, ref Value self, OpCode op, ref Value value)
 		{
 			int at = -1;
 			if (self.idx is string name)
@@ -447,7 +466,7 @@ namespace RedOnion.ROS.Objects
 				if (it.IsReference)
 				{
 					self = it;
-					self.desc.Set(ref self, op, ref value);
+					self.desc.Set(core, ref self, op, ref value);
 					return;
 				}
 				if (op.Kind() == OpKind.Assign)

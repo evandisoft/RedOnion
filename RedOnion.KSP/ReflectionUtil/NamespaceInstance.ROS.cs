@@ -16,7 +16,7 @@ namespace RedOnion.KSP.ReflectionUtil
 			public NamespaceInstanceDescriptor() : base("namespace", typeof(NamespaceInstance)) { }
 			public override IEnumerable<string> EnumerateProperties(object self)
 				=> ((NamespaceInstance)self).PossibleCompletions;
-			public override void Get(ref Value self)
+			public override void Get(Core core, ref Value self)
 			{
 				if (!((NamespaceInstance)self.obj).RosGet(ref self))
 					GetError(ref self);

@@ -47,6 +47,10 @@ namespace RedOnion.ROS.Objects
 		/// </summary>
 		public Context Context { get; protected set; }
 		/// <summary>
+		/// Script context (for `local`)
+		/// </summary>
+		public Context ScriptContext { get; protected set; }
+		/// <summary>
 		/// The processor this function belongs to
 		/// (needed for ExecuteLater action)
 		/// </summary>
@@ -83,7 +87,7 @@ namespace RedOnion.ROS.Objects
 		/// </summary>
 		public Function(string name, UserObject baseClass,
 			CompiledCode code, int codeAt, int codeSize, int typeAt,
-			ArgumentInfo[] args, Context context, HashSet<string> cvars, Processor processor)
+			ArgumentInfo[] args, Context context, Context lctx, HashSet<string> cvars, Processor processor)
 			: base(name ?? "lambda", typeof(Function), ExCode.Function, TypeCode.Object, baseClass)
 		{
 			Code = code;
@@ -93,11 +97,12 @@ namespace RedOnion.ROS.Objects
 			Arguments = args;
 			ArgsString = args == null ? "" : string.Join(", ", args.Select(x => x.Name).ToArray());
 			Context = new Context(this, context, cvars);
+			ScriptContext = lctx;
 			Processor = processor;
 			Add("prototype", Value.Null);
 		}
 
-		public override void Get(ref Value self)
+		public override void Get(Core core, ref Value self)
 		{
 			if (prototype == null && self.idx is string name
 				&& name.Equals("prototype", StringComparison.OrdinalIgnoreCase))
@@ -106,7 +111,7 @@ namespace RedOnion.ROS.Objects
 					? new UserObject() : OriginalFunction.Prototype;
 				prop.items[0].value = new Value(prototype);
 			}
-			base.Get(ref self);
+			base.Get(core, ref self);
 		}
 
 		public override bool Call(ref Value result, object self, Arguments args, bool create)

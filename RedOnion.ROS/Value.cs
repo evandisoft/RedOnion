@@ -255,6 +255,8 @@ namespace RedOnion.ROS
 		public Value(Action action) : this(Descriptor.Actions[0], action) { }
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+		public bool IsValid => desc != null;
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		public bool IsVoid => desc.Primitive == ExCode.Void;
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		public bool IsNull => desc.Primitive == ExCode.Null;
@@ -279,10 +281,10 @@ namespace RedOnion.ROS
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		public bool IsIntIndex => ReferenceEquals(idx, IntIndex);
 
-		public void Dereference()
+		public void Dereference(Core core)
 		{
 			if (IsReference)
-				desc.Get(ref this);
+				desc.Get(core, ref this);
 		}
 
 		public int ToInt()

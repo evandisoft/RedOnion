@@ -219,6 +219,8 @@ namespace RedOnion.ROS.Tests
 			Test(1.0, "test.setNumber 1.1");
 			Test(1.0, "it.setNumber 1.1");
 
+			Test("overload", "it.overload; return it.name");
+			Test("z", "it.overload \"z\"; return it.name");
 			Test("xy", "it.overload \"x\", \"y\"; return it.name");
 
 			Globals.Add("mt", typeof(MethodTests));

@@ -7,7 +7,7 @@ namespace RedOnion.ROS.Objects
 {
 	public class Globals : Namespace
 	{
-		public Processor Processor { get; set; }
+		public Processor Processor { get; internal set; }
 		public UserObject System => parent;
 
 		public Globals() : base("Globals", typeof(Globals)) { }
@@ -37,13 +37,18 @@ namespace RedOnion.ROS.Objects
 
 			System.Add("global", this);
 			System.Add("globals", this);
+			var local = new UserObject.Read(Local);
+			System.Add("local", local);
+			System.Add("locals", local);
 			System.Add("math", typeof(RosMath));
 			System.Add("print", new Value(Print = new Print(Prototype)));
 			System.Add("run", new Value(Run = new Run(Prototype)));
 			System.Add("list", new Value(typeof(RosList)));
 			System.Add("queue", new Value(typeof(RosQueue)));
 			System.Add("stack", new Value(typeof(RosStack)));
-			System.Add("dictionary", new Value(typeof(RosDictionary)));
+			var table = new Value(typeof(RosDictionary));
+			System.Add("table", ref table);
+			System.Add("dictionary", ref table);
 
 			if (Processor is Processor.WithEvents processor)
 			{
@@ -103,5 +108,8 @@ namespace RedOnion.ROS.Objects
 			result = it;
 			return true;
 		}
+
+		protected void Local(Core core, UserObject self, out Value v)
+			=> v = new Value(core.ScriptContext);
 	}
 }

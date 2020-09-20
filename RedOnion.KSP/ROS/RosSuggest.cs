@@ -208,12 +208,12 @@ namespace RedOnion.KSP.ROS
 			for (; ; i = j + 1)
 			{
 				string name = source.Substring(i, dotAt-i);
-				if (value.desc.Has(ref value, name))
+				if (value.desc.Has(Processor, ref value, name))
 				{
 					value.idx = name;
 					try
 					{
-						value.desc.Get(ref value);
+						value.desc.Get(Processor, ref value);
 					}
 					catch (InvalidOperation) { }
 				}
@@ -226,7 +226,7 @@ namespace RedOnion.KSP.ROS
 					value.idx = name;
 					try
 					{
-						Processor.Globals.Get(ref value);
+						Processor.Globals.Get(Processor, ref value);
 					}
 					catch (InvalidOperation) { }
 				}

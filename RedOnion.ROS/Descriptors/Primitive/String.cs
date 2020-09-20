@@ -136,7 +136,7 @@ namespace RedOnion.ROS
 				}
 			};
 
-			public override void Get(ref Value self)
+			public override void Get(Core core, ref Value self)
 			{
 				if (self.obj != this)
 				{
@@ -152,7 +152,7 @@ namespace RedOnion.ROS
 						return;
 					}
 				}
-				base.Get(ref self);
+				base.Get(core, ref self);
 			}
 
 			public override IEnumerable<Value> Enumerate(object self)

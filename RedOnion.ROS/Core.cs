@@ -30,6 +30,8 @@ namespace RedOnion.ROS
 		protected ArgumentList vals;
 		/// <summary>Active context (current function or script).</summary>
 		protected Context ctx;
+		/// <summary>Script context (for `local`).</summary>
+		protected Context lctx;
 		/// <summary>Value of `this` for current code.</summary>
 		protected Value self;
 		/// <summary>Result when exiting.</summary>
@@ -45,7 +47,7 @@ namespace RedOnion.ROS
 
 		protected struct SavedContext
 		{
-			public Context context;
+			public Context context, lctx;
 			public Value prevSelf;
 			public Value prevError;
 			public CompiledCode code;
@@ -73,6 +75,7 @@ namespace RedOnion.ROS
 			=> processor?.globals ?? new Globals();
 		public Processor Processor => processor;
 		public Context Context => ctx;
+		public Context ScriptContext => lctx;
 		public ExitCode Exit { get; protected set; }
 		public bool Paused => Exit == ExitCode.Yield || Exit == ExitCode.Countdown;
 		public Value Result => result;
@@ -90,7 +93,11 @@ namespace RedOnion.ROS
 			if (stack.size > 0)
 			{
 				if (!reset)
-					ctx = stack[0].context;
+				{
+					ref var first = ref stack.items[0];
+					ctx = first.context;
+					lctx = first.lctx;
+				}
 				stack.Clear();
 			}
 			at = 0;
@@ -105,7 +112,7 @@ namespace RedOnion.ROS
 			pendingAt = 0;
 			compiled = value;
 			if (ctx == null || reset)
-				ctx = new Context();
+				lctx = ctx = new Context();
 			ctx.RootStart = 0;
 			ctx.RootEnd = code.Length;
 			ctx.PopAll();
@@ -138,7 +145,9 @@ namespace RedOnion.ROS
 		{
 			if (stack.size > 0)
 			{
-				ctx = stack[0].context;
+				ref var first = ref stack.items[0];
+				ctx = first.context;
+				lctx = first.lctx;
 				stack.Clear();
 			}
 			ctx?.Reset();
@@ -219,7 +228,7 @@ namespace RedOnion.ROS
 			}
 			// try `this` first
 			if (self.obj != null
-			&& self.desc.Has(ref self, name))
+			&& self.desc.Has(this, ref self, name))
 			{
 				ref var it = ref vals.Push();
 				it.desc = self.desc;
@@ -245,7 +254,7 @@ namespace RedOnion.ROS
 			for (int i = 0; i < argc; i++)
 			{
 				ref var arg = ref vals.Top(i - argc);
-				arg.Dereference();
+				arg.Dereference(this);
 			}
 		}
 
@@ -263,13 +272,14 @@ namespace RedOnion.ROS
 					selfDesc = it.desc;
 					self = it.obj;
 				}
-				it.desc.Get(ref it);
+				it.desc.Get(this, ref it);
 			}
 			if (it.IsFunction)
 			{
 				var fn = (Function)it.desc;
 				ref var ret = ref stack.Add();
 				ret.context = ctx;
+				ret.lctx = ctx;
 				ret.prevSelf = this.self;
 				ret.prevError = error;
 				ret.code = compiled;
@@ -332,6 +342,7 @@ namespace RedOnion.ROS
 		{
 			ref var ret = ref stack.Add();
 			ret.context = ctx;
+			ret.lctx = lctx;
 			ret.prevSelf = self;
 			ret.prevError = error;
 			ret.code = compiled;
@@ -350,7 +361,7 @@ namespace RedOnion.ROS
 				// see Execute(int): `while (at == blockEnd)` at the top
 				ctx.BlockCode = BlockCode.Library;
 			}
-			else ctx = new Context() { RootEnd = code.Length };
+			else lctx = ctx = new Context() { RootEnd = code.Length };
 			result = Value.Void;
 			error = Value.Void;
 			vals.GetRef(2, 0) = Value.Void;

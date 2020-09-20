@@ -16,7 +16,7 @@ namespace RedOnion.KSP.ReflectionUtil
 			public GetMappingsDescriptor() : base("mappings", typeof(GetMappings)) { }
 			public override IEnumerable<string> EnumerateProperties(object self)
 				=> ((ICompletable)self).PossibleCompletions;
-			public override void Get(ref Value self)
+			public override void Get(Core core, ref Value self)
 			{
 				if (!((GetMappings)self.obj).RosGet(ref self))
 					GetError(ref self);

@@ -29,7 +29,7 @@ namespace RedOnion.ROS.Objects
 
 		public override int Find(string name)
 		{
-			if (dict != null && dict.TryGetValue(name, out var idx))
+			if (dict.TryGetValue(name, out var idx))
 				return idx;
 			if (parent != null)
 			{

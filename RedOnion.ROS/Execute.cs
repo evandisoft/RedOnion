@@ -19,6 +19,8 @@ namespace RedOnion.ROS
 		{
 			if (Exit == ExitCode.Exception)
 				return true;
+			if (processor != null)
+				processor.Core = this;
 			var at = this.at;
 			var code = this.code;
 			var str = this.str;
@@ -50,6 +52,8 @@ namespace RedOnion.ROS
 							this.at = at;
 							Exit = ExitCode.Countdown;
 							Countdown = countdown;
+							if (processor != null)
+								processor.Core = null;
 							return false;
 						}
 						countdown--;
@@ -149,7 +153,7 @@ namespace RedOnion.ROS
 						case BlockCode.DoUntil:
 						{
 							ref var cond = ref vals.Top();
-							cond.Dereference();
+							cond.Dereference(this);
 							if (cond.desc.Primitive != ExCode.Bool && !cond.desc.Convert(ref cond, Descriptor.Bool))
 								throw new InvalidOperation("Could not convert '{0}' to boolean", cond.Name);
 
@@ -173,7 +177,7 @@ namespace RedOnion.ROS
 							}
 							ref var evar = ref vals.Top(-2);
 							var value = enu.Current;
-							evar.desc.Set(ref evar, OpCode.Assign, ref value);
+							evar.desc.Set(this, ref evar, OpCode.Assign, ref value);
 							at = ctx.BlockStart;
 							ctx.ResetTop();
 							continue;
@@ -196,6 +200,7 @@ namespace RedOnion.ROS
 							{
 								ctx.PopAll();
 								ctx = top.context;
+								lctx = top.context;
 								blockEnd = ctx.BlockEnd;
 							}
 							if (error.IsVoid)
@@ -272,6 +277,8 @@ namespace RedOnion.ROS
 						this.at = at;
 						Exit = ExitCode.Countdown;
 						Countdown = countdown;
+						if (processor != null)
+							processor.Core = null;
 						return false;
 					}
 					countdown--;
@@ -389,7 +396,7 @@ namespace RedOnion.ROS
 							var name = str[Int(code, at)];
 							at += 4;
 							ref var it = ref vals.Top();
-							it.Dereference();
+							it.Dereference(this);
 							it.idx = name;
 							this.at = at;
 							Call(0, true, op);
@@ -517,9 +524,9 @@ namespace RedOnion.ROS
 					case OpCode.Index:
 					{
 						ref var lhs = ref vals.Top(-2);
-						lhs.Dereference();
+						lhs.Dereference(this);
 						ref var rhs = ref vals.Top(-1);
-						rhs.Dereference();
+						rhs.Dereference(this);
 						if (rhs.IsInt)
 						{
 							lhs.idx = Value.IntIndex;
@@ -533,7 +540,7 @@ namespace RedOnion.ROS
 					{
 						var n = code[at++];
 						ref var it = ref vals.Top(-n);
-						it.Dereference();
+						it.Dereference(this);
 						var idx = new Value[n-1];
 						for (int i = 0; i < idx.Length; i++)
 							idx[i] = vals.Top(1 + i - n);
@@ -546,7 +553,7 @@ namespace RedOnion.ROS
 						var name = str[Int(code, at)];
 						at += 4;
 						ref var it = ref vals.Top();
-						it.Dereference();
+						it.Dereference(this);
 						it.idx = name;
 						continue;
 					}
@@ -556,7 +563,7 @@ namespace RedOnion.ROS
 						at += 4;
 						// lhs is type, TODO: typed variables
 						ref var rhs = ref vals.Top(-1);
-						rhs.Dereference();
+						rhs.Dereference(this);
 						ctx.Add(name, ref rhs);
 						vals.Pop(1);
 						vals.Top() = new Value(ctx, ctx, name);
@@ -580,7 +587,7 @@ namespace RedOnion.ROS
 					case OpCode.Ternary:
 					{
 						ref var cond = ref vals.Top();
-						cond.Dereference();
+						cond.Dereference(this);
 						if (cond.desc.Primitive != ExCode.Bool && !cond.desc.Convert(ref cond, Descriptor.Bool))
 							throw new InvalidOperation("Could not convert '{0}' to boolean", cond.Name);
 						int sz = Int(code, at);
@@ -659,7 +666,7 @@ namespace RedOnion.ROS
 					{
 						ref var lhs = ref vals.Top(-2);
 						ref var rhs = ref vals.Top(-1);
-						rhs.Dereference();
+						rhs.Dereference(this);
 						if (!lhs.IsReference)
 						{
 							if (op == OpCode.Assign && self.obj == null && lhs.obj == null
@@ -674,7 +681,7 @@ namespace RedOnion.ROS
 								op == OpCode.Assign ? "assign to" : "modify",
 								lhs.desc.Name);
 						}
-						lhs.desc.Set(ref lhs, op, ref rhs);
+						lhs.desc.Set(this, ref lhs, op, ref rhs);
 						if (op == OpCode.Assign)
 							lhs = rhs;
 						vals.Pop(1);
@@ -693,9 +700,9 @@ namespace RedOnion.ROS
 					case OpCode.Div:
 					{
 						ref var lhs = ref vals.Top(-2);
-						lhs.Dereference();
+						lhs.Dereference(this);
 						ref var rhs = ref vals.Top(-1);
-						rhs.Dereference();
+						rhs.Dereference(this);
 						if (!lhs.desc.Binary(ref lhs, op, ref rhs)
 						&& !rhs.desc.Binary(ref lhs, op, ref rhs))
 							throw new InvalidOperation(
@@ -712,9 +719,9 @@ namespace RedOnion.ROS
 					case OpCode.MoreEq:
 					{
 						ref var lhs = ref vals.Top(-2);
-						lhs.Dereference();
+						lhs.Dereference(this);
 						ref var rhs = ref vals.Top(-1);
-						rhs.Dereference();
+						rhs.Dereference(this);
 						if ((rhs.desc.Primitive == ExCode.String
 						|| !lhs.desc.Binary(ref lhs, op, ref rhs))
 						&& !rhs.desc.Binary(ref lhs, op, ref rhs))
@@ -728,7 +735,7 @@ namespace RedOnion.ROS
 					case OpCode.NullCol:
 					{
 						ref var lhs = ref vals.Top();
-						lhs.Dereference();
+						lhs.Dereference(this);
 						int sz = Int(code, at);
 						at += 4;
 						if (!lhs.IsNull)
@@ -743,7 +750,7 @@ namespace RedOnion.ROS
 					case OpCode.LogicAnd:
 					{
 						ref var lhs = ref vals.Top();
-						lhs.Dereference();
+						lhs.Dereference(this);
 						var test = lhs;
 						if (test.desc.Primitive != ExCode.Bool
 							&& test.desc.Primitive != ExCode.Null
@@ -763,9 +770,9 @@ namespace RedOnion.ROS
 					case OpCode.NotIdentity:
 					{
 						ref var lhs = ref vals.Top(-2);
-						lhs.Dereference();
+						lhs.Dereference(this);
 						ref var rhs = ref vals.Top(-1);
-						rhs.Dereference();
+						rhs.Dereference(this);
 						lhs = (lhs.desc == rhs.desc && (lhs.desc.Primitive == ExCode.String
 							? (string)lhs.obj == (string)rhs.obj : lhs.obj == rhs.obj)
 							&& lhs.num.Long == rhs.num.Long) == (op == OpCode.Identity);
@@ -776,9 +783,9 @@ namespace RedOnion.ROS
 					case OpCode.IsNot:
 					{
 						ref var lhs = ref vals.Top(-2);
-						lhs.Dereference();
+						lhs.Dereference(this);
 						ref var rhs = ref vals.Top(-1);
-						rhs.Dereference();
+						rhs.Dereference(this);
 						lhs = rhs.desc.IsInstanceOf(ref lhs) == (op == OpCode.Is);
 						vals.Pop(1);
 						continue;
@@ -786,12 +793,12 @@ namespace RedOnion.ROS
 					case OpCode.In:
 					{
 						ref var lhs = ref vals.Top(-2);
-						lhs.Dereference();
+						lhs.Dereference(this);
 						ref var rhs = ref vals.Top(-1);
-						rhs.Dereference();
+						rhs.Dereference(this);
 						if (!lhs.IsStringOrChar)
 							throw new InvalidOperation("Operator 'in' can only be used with strings (or char)");
-						lhs = rhs.desc.Has(ref rhs, lhs.ToStr());
+						lhs = rhs.desc.Has(this, ref rhs, lhs.ToStr());
 						vals.Pop(1);
 						continue;
 					}
@@ -803,7 +810,7 @@ namespace RedOnion.ROS
 					case OpCode.Not:
 					{
 						ref var it = ref vals.Top();
-						it.Dereference();
+						it.Dereference(this);
 						it.desc.Unary(ref it, op);
 						continue;
 					}
@@ -817,7 +824,7 @@ namespace RedOnion.ROS
 						ref var it = ref vals.Top();
 						if (!it.IsReference)
 							throw new InvalidOperation("Cannot modify '{0}'", it.desc.Name);
-						it.desc.Set(ref it, op, ref it);
+						it.desc.Set(this, ref it, op, ref it);
 						continue;
 					}
 					#endregion
@@ -963,7 +970,7 @@ namespace RedOnion.ROS
 					case OpCode.Unless:
 					{
 						ref var cond = ref vals.Top();
-						cond.Dereference();
+						cond.Dereference(this);
 						if (cond.desc.Primitive != ExCode.Bool && !cond.desc.Convert(ref cond, Descriptor.Bool))
 							throw new InvalidOperation("Could not convert '{0}' to boolean", cond.Name);
 
@@ -1005,7 +1012,7 @@ namespace RedOnion.ROS
 							if (!evar.IsReference)
 								throw new InvalidOperation("Enumeration variable is not a reference");
 							ref var list = ref vals.Top(-1);
-							list.Dereference();
+							list.Dereference(this);
 							var enu = list.desc.Enumerate(list.obj);
 							if (enu == null)
 								throw new InvalidOperation(list.Name + " is not enumerable");
@@ -1017,7 +1024,7 @@ namespace RedOnion.ROS
 							continue;
 						}
 						ref var cond = ref vals.Top();
-						cond.Dereference();
+						cond.Dereference(this);
 						if (cond.desc.Primitive != ExCode.Bool && !cond.desc.Convert(ref cond, Descriptor.Bool))
 							throw new InvalidOperation("Could not convert '{0}' to boolean", cond.Name);
 
@@ -1082,7 +1089,7 @@ namespace RedOnion.ROS
 					{
 						countdown++; // do not even count this instruction
 						result = vals.Pop();
-						result.Dereference();
+						result.Dereference(this);
 						if (ctx.BlockCode != BlockCode.For)
 							continue;
 						if (at == ctx.BlockStart - 4)   // end of final expression
@@ -1095,6 +1102,8 @@ namespace RedOnion.ROS
 						this.at = at;
 						Exit = ExitCode.Yield;
 						result = Value.Void;
+						if (processor != null)
+							processor.Core = null;
 						return false;
 					#endregion
 
@@ -1175,7 +1184,7 @@ namespace RedOnion.ROS
 						at += size;
 
 						var it = new Function(fname, globals.Function.Prototype,
-							compiled, bodyAt, bodySz, ftat, args, ctx, cvars, processor);
+							compiled, bodyAt, bodySz, ftat, args, ctx, lctx, cvars, processor);
 						if (fname?.Length > 0)
 							ctx.Add(fname, it);
 						else vals.Add(new Value(it));
@@ -1198,10 +1207,12 @@ namespace RedOnion.ROS
 						if (error.obj is RuntimeError re)
 							throw re;
 					}
-					result.Dereference();
+					result.Dereference(this);
 					vals.Clear();
 					ctx.PopAll();
 					Countdown = countdown;
+					if (processor != null)
+						processor.Core = null;
 					return true;
 				}
 				catch (Exception ex)
@@ -1257,6 +1268,7 @@ namespace RedOnion.ROS
 				vals.Pop(vals.Count - top.vtop);
 				ctx.PopAll();
 				ctx = top.context;
+				lctx = top.lctx;
 			}
 			else
 			{

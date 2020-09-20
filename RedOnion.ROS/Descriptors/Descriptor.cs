@@ -84,15 +84,15 @@ namespace RedOnion.ROS
 		/// <summary>
 		/// Check existence of a property in value <paramref name="self"/> named <paramref name="name"/>.
 		/// </summary>
-		public virtual bool Has(ref Value self, string name) => false;
+		public virtual bool Has(Core core, ref Value self, string name) => false;
 		/// <summary>
 		/// Get value of property (if <paramref name="self"/>.idx is string) or indexed value.
 		/// </summary>
-		public virtual void Get(ref Value self) => GetError(ref self);
+		public virtual void Get(Core core, ref Value self) => GetError(ref self);
 		/// <summary>
 		/// Set/modify value of property (if <paramref name="self"/>.idx is string) or indexed value.
 		/// </summary>
-		public virtual void Set(ref Value self, OpCode op, ref Value value) => GetError(ref self);
+		public virtual void Set(Core core, ref Value self, OpCode op, ref Value value) => GetError(ref self);
 
 		protected void GetError(ref Value self)
 		{
@@ -110,6 +110,8 @@ namespace RedOnion.ROS
 					"`{0}` cannot be indexed by '{1}', ...", Name, arr[0].ToString()));
 			throw new InvalidOperationException("Unknown indexing");
 		}
+		protected void SetError(ref Value self, ref Value value)
+			=> GetError(ref self);
 
 		public virtual void Unary(ref Value self, OpCode op)
 			=> UnaryError(op);

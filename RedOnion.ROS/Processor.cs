@@ -15,6 +15,11 @@ namespace RedOnion.ROS
 {
 	public abstract class Processor : Core
 	{
+		/// <summary>
+		/// Currently executing core (valid only inside Core.Execute(int), null otherwise)
+		/// </summary>
+		public Core Core { get; internal set; }
+
 		public event Action Shutdown;
 		public Action<string> Print;
 		public Action<string> PrintError;

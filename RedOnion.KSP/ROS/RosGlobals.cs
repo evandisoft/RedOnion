@@ -126,13 +126,13 @@ namespace RedOnion.KSP.ROS
 			if (at >= 0) return at + mark;
 			return base.Find(name);
 		}
-		public override void Get(ref Value self)
+		public override void Get(Core core, ref Value self)
 		{
 			if (self.idx is string name)
 			{
 				if (reflected.Has(name))
 				{
-					reflected.Get(ref self);
+					reflected.Get(core, ref self);
 					return;
 				}
 			}
@@ -143,20 +143,20 @@ namespace RedOnion.KSP.ROS
 					name = box.Value.ToStr();
 					if (reflected.Has(name))
 					{
-						reflected.Get(ref self);
+						reflected.Get(core, ref self);
 						return;
 					}
 				}
 			}
-			base.Get(ref self);
+			base.Get(core, ref self);
 		}
-		public override void Set(ref Value self, OpCode op, ref Value value)
+		public override void Set(Core core, ref Value self, OpCode op, ref Value value)
 		{
 			if (self.idx is string name)
 			{
 				if (reflected.Has(name))
 				{
-					reflected.Set(ref self, op, ref value);
+					reflected.Set(core, ref self, op, ref value);
 					return;
 				}
 			}
@@ -167,12 +167,12 @@ namespace RedOnion.KSP.ROS
 					name = box.Value.ToStr();
 					if (reflected.Has(name))
 					{
-						reflected.Set(ref self, op, ref value);
+						reflected.Set(core, ref self, op, ref value);
 						return;
 					}
 				}
 			}
-			base.Set(ref self, op, ref value);
+			base.Set(core, ref self, op, ref value);
 		}
 		public override IEnumerable<string> EnumerateProperties(object self)
 		{

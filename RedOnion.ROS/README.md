@@ -64,28 +64,29 @@ the `click` is syntactically inside `+=` operator).
 
 ```
 var x = -1
-var y = abs x   // abs(x)
-var z = abs -y  // abs(-y)
+var y = abs x           // abs(x)
+var z = abs -y          // abs(-y)
 
-var a = x+y     // ok, x + y
-var b = x + y   // ok, x + y
-var c = x+ y    // allowed, x + y
-var d = x +y    // warning! x(+y)
+var a = x+y             // ok, x + y
+var b = x + y           // ok, x + y
+var c = x+ y            // allowed, x + y
+var d = x +y            // warning! x(+y)
 
-var fn = abs    // no call to abs, fn is now alias to abs
-z = fn (x)      // warning! it works but means fn((x))
-z = sum (x,y)   // problem! (x,y) as one argument does not have meaning (yet)
-z = sum(x, y)   // ok, this works as expected
+var fn = abs            // no call to abs, fn is now alias to abs
+z = fn (x)              // warning! it works but means fn((x))
+z = sum (x,y)           // problem! (x,y) as one argument does not have meaning (yet)
+z = sum(x, y)           // ok, this works as expected
 
-def click => x++
-button.click += click // no call to click
-click           // yes, this calls click()
+global.counter = 0      // script-local var would shadow this.counter
+def click => counter++
+button.click += click   // no call to click, event handler added
+click                   // yes, this calls click() and increments counter
 
 var obj = new object
-obj.x = 0
-obj.action = click
-def get => obj
-get().action    // calls obj.action() and increments obj.x
+obj.counter = 0         // following action will reference this when called as method
+obj.action = click      // again no call here, method added
+def get => obj          // to demonstrate following auto-invoke
+get().action            // calls obj.action() and increments obj.counter
 ```
 
 There also has to be a rule which comma belongs to which function call,
@@ -111,25 +112,34 @@ can be used to test for specific value if it already exists,
 to overwrite that value (only if it is same or does not exist).
 That can be used to create locks.
 
-Variable names are searched from the point of reference, up through all
-(non-function) blocks, then in `this` if function was executed as method,
-then in outer function or script and lastly in globals.
-Notice that function `click` in example above modified script-local `x`
+Variable names are searched from the point of reference, up through all blocks (including function blocks upto script-local scope) then in `this` if function was executed as method (note that script-local variables can shadow `this`-properties) and lastly in globals.
+Notice that function `click` in example above modified script-global `x`
 when called as function, but `obj.x` when called as method.
 
+Global variables can always be accessed using `global` or `globals` (or `system.globals`), script-local (`var`-declared on script level) using `local` or `locals`, properties of objects inside methods using `this`. It is advised to always use `this` for properties to avoid shadowing by `local`.
+
 ```
-global.x = 1    // assign
-if x == 1       // access as any other variable
-  global "y", 2 // create new global variable, unless it already exists
-if "y" in globals // test existence of a property = global variable here
-  var x = 2     // shadow global.x
-  print x       // prints 2
-print x         // prints 1
+global.x = 1            // assign
+if x == 1               // access as any other variable
+  global "y", 2         // create new global variable, unless it already exists
+if "y" in globals       // test existence of a property = global variable here
+  var x = 2             // shadow global.x
+  print x               // prints 2
+print x                 // prints 1
 
 // lock - wait until we can change it from "none" to "me" or it did not exist
 until global("lock", "me", "none") == "me" do wait
 do_what_only_me_can_do
-lock = "none"   // unlock
+lock = "none"           // unlock
+
+global.i = 0            // global scope (shadowed by this-props)
+var j = 0               // local scope (shadows this-props)
+def inc => i++; j++     // used as method later
+var obj = new object
+obj.inc = inc
+obj.i = 0               // inc will increment this.i (ignoring global.i)
+obj.j = 0               // inc would have to use this.j (increments var j instead)
+obj.inc                 // obj.i = 1; obj.j = 0; local.j = 1; global.j = 0
 ```
 
 
@@ -161,6 +171,7 @@ ROS knows most operators you can find in other languages, but there are some cha
 * `and or not && || !` - common logic operators
 * `& | ^ << >>` - common bitwise operators, but higher priority than in C#/C++, `^` can also be used for power
 * `= += -= ...` - assignment and compound assignment ( `x+=y` means `x = x + y`)
+* `== != === !== < > <= >=` - compare (`==` for equality, `===` for identity)
 * `++ --` - post- end pre- increment and decrement (like `+=1`)
 * `?:` - *ternary if-then-else* operator: `ok ? success : fail`
 * `??` - null-coalescing operator (return right side if left is `null`; `??=` and `?.` not implemented yet)

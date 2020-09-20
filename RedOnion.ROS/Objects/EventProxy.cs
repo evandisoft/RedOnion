@@ -74,7 +74,7 @@ namespace RedOnion.ROS.Objects
 			return true;
 		}
 
-		public override void Get(ref Value self)
+		public override void Get(Core core, ref Value self)
 		{
 			if (self.idx is string name)
 			{
@@ -189,7 +189,7 @@ namespace RedOnion.ROS.Objects
 			return true;
 		}
 
-		public override void Get(ref Value self)
+		public override void Get(Core core, ref Value self)
 		{
 			if (self.idx is string name)
 			{

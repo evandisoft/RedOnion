@@ -115,14 +115,14 @@ namespace RedOnion.ROS
 				foreach (var prop in props)
 					yield return prop.name;
 			}
-			public override bool Has(ref Value self, string name)
+			public override bool Has(Core core, ref Value self, string name)
 			{
 				var index = this.index;
 				if (self.obj == this)
 					index = sindex;
 				return index != null && index.ContainsKey(name);
 			}
-			public override void Get(ref Value self)
+			public override void Get(Core core, ref Value self)
 			{
 				if (!(self.idx is string name))
 					goto fail;
@@ -145,7 +145,7 @@ namespace RedOnion.ROS
 			fail:
 				GetError(ref self);
 			}
-			public override void Set(ref Value self, OpCode op, ref Value value)
+			public override void Set(Core core, ref Value self, OpCode op, ref Value value)
 			{
 				if (!(self.idx is string name))
 					goto fail;
