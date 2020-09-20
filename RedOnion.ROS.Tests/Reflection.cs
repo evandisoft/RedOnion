@@ -179,6 +179,13 @@ namespace RedOnion.ROS.Tests
 			Test(12f, "m.value");
 		}
 
+		public class MethodTests
+		{
+			public static double sum10(
+				int a, int b, int c, double d, double e,
+				float f, float g, float h, long i, long j)
+				=> a + b + c + d + e  +  f + g + h + i + j;
+		}
 		[Test]
 		public void ROS_Refl03_Methods()
 		{
@@ -213,6 +220,10 @@ namespace RedOnion.ROS.Tests
 			Test(1.0, "it.setNumber 1.1");
 
 			Test("xy", "it.overload \"x\", \"y\"; return it.name");
+
+			Globals.Add("mt", typeof(MethodTests));
+			Test(1+2+3+4.5+6.7 + 8.9f+10.11f+12.13f+1415+1617,
+				"mt.sum10 1,2,3,4.5,6.7, 8.9f,10.11f,12.13f,1415,1617");
 		}
 
 		public struct Point
@@ -528,7 +539,7 @@ namespace RedOnion.ROS.Tests
 			var cv = ctx["c"];
 			var c = cv.obj as Conflicts;
 			Assert.NotNull(c);
-			Test("var i = 0; c.NAME += def => i++");
+			Test("var i = 0; c.NAME += def => i++"); // event
 			Test("x", "c.name = \"x\""); // field
 			Assert.IsFalse(Conflicts.accessed);
 			UpdatePhysics();
@@ -541,12 +552,11 @@ namespace RedOnion.ROS.Tests
 			Assert.IsTrue(names.Contains("name"));
 			Assert.IsTrue(names.Contains("Name"));
 			Assert.IsTrue(names.Contains("NAME"));
-			Assert.IsTrue(names.Contains("NaMe"));
-			Test("conflicts.NaMe.test = true");
+			Test("conflicts.NaMe.test = true"); // nested type
 			Assert.IsTrue(Conflicts.NaMe.test);
 
 			Conflicts.accessed = false;
-			Test("var j = 0; conflicts.NUMBER += def => j++");
+			Test("var j = 0; conflicts.NUMBER += def => j++"); // event
 			Test(1, "conflicts.number = 1"); // field
 			Assert.IsFalse(Conflicts.accessed);
 			UpdatePhysics();
@@ -555,13 +565,17 @@ namespace RedOnion.ROS.Tests
 			Assert.IsTrue(Conflicts.accessed);
 			UpdatePhysics();
 			Assert.AreEqual(1, ctx["j"].ToInt());
-			names = cv.desc.EnumerateProperties(null).ToList();
+			names = cv.desc.EnumerateProperties(typeof(Conflicts)).ToList();
 			Assert.IsTrue(names.Contains("number"));
 			Assert.IsTrue(names.Contains("Number"));
 			Assert.IsTrue(names.Contains("NUMBER"));
 			Assert.IsTrue(names.Contains("NumBer"));
-			Test("conflicts.NumBer.test = true");
+			// can be "naMe" because static/nested get shadowed and therefore the name can get case-mangled
+			Assert.IsTrue(names.Contains("NaMe", StringComparer.OrdinalIgnoreCase));
+			Test("conflicts.NumBer.test = true"); // nested type
 			Assert.IsTrue(Conflicts.NumBer.test);
+
+			//TODO: methods
 		}
 	}
 }

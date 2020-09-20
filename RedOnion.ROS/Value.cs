@@ -80,7 +80,7 @@ namespace RedOnion.ROS
 		public static Value True => Descriptor.TrueValue;
 
 		public Value(Descriptor it) : this(it ?? Descriptor.Null, it) { }
-		public Value(Type type) : this(Descriptor.Of(type), null) { }
+		public Value(Type type) : this(Descriptor.Of(type), type) { }
 		public Value(object it) : this()
 		{
 			if (it == null)

@@ -19,36 +19,21 @@ namespace RedOnion.ROS
 		{
 			public static bool LowerFirstLetter = true;
 
-			[DebuggerDisplay("{name}")]
+			[DebuggerDisplay("{DebugString}")]
 			public struct Prop
 			{
-				public enum Kind
-				{
-					Unknown,
-					Type,
-					Field,
-					Property,
-					Event,
-					Method,
-					MethodGroup
-				}
 				/// <summary>
 				/// Name of the property (after mangling/DisplayName and conflict resolution)
 				/// </summary>
 				public string name;
 				/// <summary>
-				/// Original name of the property (used only for conflict resolution)
-				/// </summary>
-				public string strict;
-				/// <summary>
-				/// Type/kind/class of property (used either to upgrade methods to group or for <see cref="CallableAttribute"/> implementation).
-				/// </summary>
-				public Kind kind;
-				/// <summary>
-				/// Index of next property with conflicting name (-1 for no conflict and in last in chain,
-				/// search the chain to find exact match or use the first).
+				/// Index of next property with conflicting name
+				/// (search the chain to find exact match or use the first).
 				/// Note that `next` is either higher than current index (always growing)
-				/// or shall be considered terminator of the chain (thus ).
+				/// or shall be considered terminator of the chain
+				/// (thus zero and negative numbers are terminators).
+				/// Also note that static and instance chains do not overlap
+				/// (static members are shadowed by instance members, not merged).
 				/// </summary>
 				public int next;
 				/// <summary>
@@ -60,15 +45,58 @@ namespace RedOnion.ROS
 				/// </summary>
 				public Action<object, Value> write;
 
+				// The following may not be necessary after the descriptor is created
+				// and may be moved to some temporary (build time only) list in the future
+
+				/// <summary>
+				/// Original name of the property (used only for conflict resolution)
+				/// </summary>
+				public string strict;
+				/// <summary>
+				/// Type/kind/class of property (used either to upgrade methods to group or for <see cref="CallableAttribute"/> implementation).
+				/// </summary>
+				public Kind kind;
+				public enum Kind
+				{
+					Unknown,
+					Type,
+					Field,
+					Property,
+					Event,
+					Method,
+					MethodGroup
+				}
+				public Flag flags;
+				[Flags]
+				public enum Flag
+				{
+					Instance = 1<<0,
+				}
+				public bool instance
+				{
+					get => (flags & Flag.Instance) != 0;
+					set
+					{
+						if (value) flags |= Flag.Instance;
+						else flags &=~Flag.Instance;
+					}
+				}
+
 				public override string ToString()
 					=> name;
+				private string DebugString
+					=> $"{name} ({strict}; {next}; {(instance ? "Instance" : "Static")} {kind})";
 			}
 			/// <summary>List of all properties (for enumeration and indexing given by <see cref="sdict"/> or <see cref="idict"/></summary>
 			protected ListCore<Prop> prop;
-			/// <summary>Map of static properties (name-to-index in <see cref="prop"/>)</summary>
-			protected Dictionary<string, int> sdict;
-			/// <summary>Map of instance properties (name-to-index in <see cref="prop"/>)</summary>
-			protected Dictionary<string, int> idict;
+			/// <summary>Map of (non-conflicting) static properties (case-insensitive, name-to-index in <see cref="prop"/>)</summary>
+			protected readonly Dictionary<string, int> sdict = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+			/// <summary>Map of (non-conflicting) instance properties (case-insensitive, name-to-index in <see cref="prop"/>)</summary>
+			protected readonly Dictionary<string, int> idict = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+			/// <summary>Map of all static properties (case-sensitive, name-to-index in <see cref="prop"/>)</summary>
+			protected readonly Dictionary<string, int> scase = new Dictionary<string, int>();
+			/// <summary>Map of all instance properties (case-sensitive, name-to-index in <see cref="prop"/>)</summary>
+			protected readonly Dictionary<string, int> icase = new Dictionary<string, int>();
 
 			/// <summary>Default constructor (if found)</summary>
 			protected ConstructorInfo defaultCtor;
@@ -97,23 +125,13 @@ namespace RedOnion.ROS
 			public Reflected(string name, Type type) : base(name, type)
 			{
 				callableMemberName = type.GetCustomAttribute<CallableAttribute>()?.Name;
-				foreach (var nested in type.GetNestedTypes())
-				{
-					try
-					{
-						ProcessMember(nested, false, ref sdict);
-					}
-					catch (Exception ex)
-					{
-						MainLogger.Log("Exception {0} when processing {1}.{2}: {3}",
-							ex.GetType(), Type.Name, nested.Name, ex.Message);
-					}
-				}
+
+				// process static members and nested types
 				foreach (var member in GetMembers(type, null, false))
 				{
 					try
 					{
-						ProcessMember(member, false, ref sdict);
+						ProcessMember(member, false);
 					}
 					catch (Exception ex)
 					{
@@ -121,11 +139,12 @@ namespace RedOnion.ROS
 							ex.GetType(), Type.Name, member.Name, ex.Message);
 					}
 				}
+				// process instance members
 				foreach (var member in GetMembers(type, null, true))
 				{
 					try
 					{
-						ProcessMember(member, true, ref idict);
+						ProcessMember(member, true);
 					}
 					catch (Exception ex)
 					{
@@ -133,6 +152,38 @@ namespace RedOnion.ROS
 							ex.GetType(), Type.Name, member.Name, ex.Message);
 					}
 				}
+				// add all non-conflicting static/nested to instance members
+				foreach (var pair in sdict)
+				{
+					if (!idict.ContainsKey(pair.Key))
+						idict[pair.Key] = pair.Value;
+				}
+				// fill case-sensitive dictionaries (warning: the key may not match the selected casing)
+				foreach (var pair in sdict)
+				{
+					ref var p = ref prop.items[pair.Value];
+					scase[p.name] = pair.Value;
+					int curr = pair.Value, next = p.next;
+					while (next > curr)
+					{
+						p = ref prop.items[curr = next];
+						scase[p.name] = curr;
+						next = p.next;
+					}
+				}
+				foreach (var pair in idict)
+				{
+					ref var p = ref prop.items[pair.Value];
+					icase[p.name] = pair.Value;
+					int curr = pair.Value, next = p.next;
+					while (next > curr)
+					{
+						p = ref prop.items[curr = next];
+						icase[p.name] = curr;
+						next = p.next;
+					}
+				}
+				// prepare default constructor
 				if (defaultCtor != null)
 				{
 					try
@@ -183,6 +234,7 @@ namespace RedOnion.ROS
 							Type.Name, ex.GetType(), ex.Message);
 					}
 				}
+				// add int-indexers from list interface if none found yet
 				if (intIndexGet == null && intIndexSet == null)
 				{
 					if (typeof(IList<Value>).IsAssignableFrom(type))
@@ -296,14 +348,9 @@ namespace RedOnion.ROS
 			}
 
 			protected int Find(object self, string name)
-			{
-				if (self != null && idict != null && !(self is Type)
-					&& idict.TryGetValue(name, out var idx))
-					return idx;
-				if (sdict != null && sdict.TryGetValue(name, out idx))
-					return idx;
-				return -1;
-			}
+				=> (self is Type ? sdict : idict).TryGetValue(name, out var idx) ? idx : -1;
+			protected int FindStrict(object self, string name)
+				=> (self is Type ? scase : icase).TryGetValue(name, out var idx) ? idx : -1;
 			public override bool Has(ref Value self, string name)
 				=> Find(self.obj, name) >= 0;
 			public override void Get(ref Value self)
@@ -315,17 +362,11 @@ namespace RedOnion.ROS
 					ref var p = ref prop.items[at];
 					if (p.next > at)
 					{// resolve case conflict
-						ref var q = ref p;
-						for (var i = at; ;)
+						int at2 = FindStrict(self.obj, name);
+						if (at2 >= 0)
 						{
-							if (q.strict == name)
-							{
-								p = ref q;
-								break;
-							}
-							if (q.next <= i)
-								break;
-							q = ref prop.items[q.next];
+							at = at2;
+							p = ref prop.items[at];
 						}
 					}
 					var read = p.read;
@@ -373,17 +414,11 @@ namespace RedOnion.ROS
 					ref var p = ref prop.items[at];
 					if (p.next > at)
 					{// resolve case conflict
-						ref var q = ref p;
-						for (var i = at; ;)
+						int at2 = FindStrict(self.obj, name);
+						if (at2 >= 0)
 						{
-							if (q.strict == name)
-							{
-								p = ref q;
-								break;
-							}
-							if (q.next <= i)
-								break;
-							q = ref prop.items[q.next];
+							at = at2;
+							p = ref prop.items[at];
 						}
 					}
 					var write = p.write;
@@ -473,36 +508,7 @@ namespace RedOnion.ROS
 					yield return new Value(v);
 			}
 			public override IEnumerable<string> EnumerateProperties(object self)
-				=> self == null || self is Type ? EnumerateStatic() : EnumerateInstance();
-
-			IEnumerable<string> EnumerateInstance()
-			{
-				foreach (var p in prop)
-					yield return p.name;
-			}
-			IEnumerable<string> EnumerateStatic()
-			{
-				if (sdict != null)
-				{
-					foreach (var i in sdict.Values)
-					{
-						int curr = i, next = i;
-						yield return GetNextProp(ref next);
-						while (next > curr)
-						{
-							curr = next;
-							yield return GetNextProp(ref next);
-						}
-					}
-				}
-			}
-			// to avoid CS8176: Iterators cannot have by-reference locals
-			string GetNextProp(ref int next)
-			{
-				ref var p = ref prop.items[next];
-				next = p.next;
-				return p.name;
-			}
+				=> self is Type ? scase.Keys : icase.Keys;
 		}
 	}
 }

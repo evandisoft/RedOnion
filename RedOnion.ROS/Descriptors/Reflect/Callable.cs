@@ -33,6 +33,8 @@ namespace RedOnion.ROS
 			/// </summary>
 			public bool IsDelegate { get; protected set; }
 
+			public Callable(MethodInfo method)
+				: this("MethodInfo", typeof(MethodInfo), !method.IsStatic, method) { }
 			public Callable(Type type, bool method, MethodInfo invoke = null)
 				: this(type.Name, type, method, invoke) { }
 			public Callable(string name, Type type, bool method, MethodInfo invoke = null)

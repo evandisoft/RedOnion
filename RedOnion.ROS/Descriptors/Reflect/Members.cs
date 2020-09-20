@@ -4,8 +4,11 @@ using RedOnion.ROS.Objects;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Reflection;
+
+//TODO: reuse props of base class (from it's descriptor)
 
 namespace RedOnion.ROS
 {
@@ -20,7 +23,12 @@ namespace RedOnion.ROS
 				{
 					var xmt = x.MemberType;
 					var ymt = y.MemberType;
-					// Constructors first
+					// Nested types first
+					if (xmt == MemberTypes.NestedType && ymt != MemberTypes.NestedType)
+						return -1;
+					if (ymt == MemberTypes.NestedType && xmt != MemberTypes.NestedType)
+						return +1;
+					// Constructors next
 					if (xmt == MemberTypes.Constructor && ymt != MemberTypes.Constructor)
 						return -1;
 					if (ymt == MemberTypes.Constructor && xmt != MemberTypes.Constructor)
@@ -66,11 +74,28 @@ namespace RedOnion.ROS
 			}
 			public static MemberInfo[] GetMembers(Type type, string name = null, bool instance = true)
 			{
-				var flags = BindingFlags.IgnoreCase|BindingFlags.Public
-				| (instance ? BindingFlags.Instance : BindingFlags.Static|BindingFlags.FlattenHierarchy);
+				var flags = (name == null ? BindingFlags.Public : BindingFlags.IgnoreCase|BindingFlags.Public)
+					| (instance ? BindingFlags.Instance : BindingFlags.Static|BindingFlags.FlattenHierarchy);
 				var members = name == null
 				? type.GetMembers(flags)
 				: type.GetMember(name, flags);
+				// we are getting nested types twice (for instance as well),
+				// although BindingFlags.FlattenHierarchy states "Nested types are not returned" (clearly not true)
+				// so we rather make sure we include nested along static and not for instance
+				var nested = type.GetNestedTypes();
+				if (nested.Length > 0)
+				{
+					var list = new List<MemberInfo>(members.Length);
+					// 1. remove all nested types
+					foreach (var m in members)
+						if (m as Type == null)
+							list.Add(m);
+					// 2. add nested types if instance = false
+					if (!instance)
+						foreach (var m in nested)
+							list.Add(m);
+					members = list.ToArray();
+				}
 				if (members.Length > 1)
 					Array.Sort(members, MemberComparer.Instance);
 				return members;
@@ -112,16 +137,14 @@ namespace RedOnion.ROS
 				while (i >= 0)
 				{
 					ref var it = ref prop.items[idx = i];
-					//note: (it.strict ?? it.name) is here for sure, it.strict should never be null
-					if ((it.strict ?? it.name) == strict)
+					if (it.strict == strict)
 						return true;
 					i = it.next;
 				}
 				return false;
 			}
 
-			protected virtual void ProcessMember(
-				MemberInfo member, bool instance, ref Dictionary<string, int> dict)
+			protected virtual void ProcessMember(MemberInfo member, bool instance)
 			{
 				var browsable = member.GetCustomAttributes(typeof(BrowsableAttribute), true);
 				if (browsable.Length == 1 && !((BrowsableAttribute)browsable[0]).Browsable)
@@ -134,34 +157,36 @@ namespace RedOnion.ROS
 					return;
 				}
 
-				if (dict == null || !dict.TryGetValue(name, out var idx))
+				var dict = instance ? idict : sdict;
+				if (!dict.TryGetValue(name, out var idx))
 					idx = -1;
 				int first = idx;
 				int size = prop.size;
 
 				if (member is Type t)
 				{
+					Debug.Assert(!instance);
 					if (idx >= 0 && Conflict(name, strict, ref idx))
 						MainLogger.DebugLog("Conflicting name: {0}.{1} [nested type]", Type.Name, strict);
-					else ProcessNested(t, name, strict, idx);
+					else ProcessNested(t, name, idx);
 				}
 				else if (member is FieldInfo f)
 				{
 					if (idx >= 0 && Conflict(name, strict, ref idx))
 						MainLogger.DebugLog("Conflicting name: {0}.{1} [instace: {2}; field]", Type.Name, strict, instance);
-					else ProcessField(f, name, strict, idx, instance, ref dict);
+					else ProcessField(f, name, idx, dict);
 				}
 				else if (member is PropertyInfo p)
 				{
 					if (idx >= 0 && Conflict(name, strict, ref idx))
 						MainLogger.DebugLog("Conflicting name: {0}.{1} [instace: {2}; property]", Type.Name, strict, instance);
-					else ProcessProperty(p, name, strict, idx, instance, ref dict);
+					else ProcessProperty(p, name, idx, dict);
 				}
 				else if (member is EventInfo e)
 				{
 					if (idx >= 0 && Conflict(name, strict, ref idx))
 						MainLogger.DebugLog("Conflicting name: {0}.{1} [instace: {2}; event]", Type.Name, strict, instance);
-					else ProcessEvent(e, name, strict, idx, instance, ref dict);
+					else ProcessEvent(e, name, idx, dict);
 				}
 				else if (member is MethodInfo m)
 				{
@@ -181,36 +206,36 @@ namespace RedOnion.ROS
 							slot.kind = Prop.Kind.MethodGroup;
 						}
 					}
-					ProcessMethod(name, m, instance, ref dict, idx);
+					ProcessMethod(m, name, idx, dict);
 				}
 
+				// check if we added anything
+				if (prop.size == size)
+					return;
+				ref var it = ref prop.items[size];
+				it.strict = strict;
+				it.next = -1; // not necessary as zero already is terminator, but to be nice
+				it.instance = instance;
 				// update the name to strict on conflicts
-				if (first >= 0 && prop.size > size)
+				if (first >= 0)
 				{
-					ref var it = ref prop.items[first];
+					// current always needs renaming (on conflict)
 					it.name = it.strict;
-					it = ref prop.items[size];
+					// first needs updating when we add second (no harm in doing it repeatedly)
+					it = ref prop.items[first];
 					it.name = it.strict;
 				}
 			}
 
-			protected virtual void ProcessNested(
-				Type nested, string name, string strict, int idx)
+			protected virtual void ProcessNested(Type nested, string name, int idx)
 			{
 				MainLogger.ExtraLog("Processing nested type {0}.{1}", Type.Name, nested.Name);
 
-				if (idx < 0)
-				{
-					if (sdict == null)
-						sdict = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-					sdict[name] = prop.size;
-				}
+				if (idx < 0) sdict[name] = prop.size;
 				else prop.items[idx].next = prop.Count;
 				ref var it = ref prop.Add();
 				it.name = name;
-				it.strict = strict;
 				it.kind = Prop.Kind.Type;
-				it.next = -1;
 				it.read = Expression.Lambda<Func<object, Value>>(
 					GetNewValueExpression(nested,
 						Expression.Constant(nested)),
@@ -218,28 +243,20 @@ namespace RedOnion.ROS
 				).Compile();
 			}
 
-			protected virtual void ProcessField(
-				FieldInfo f, string name, string strict, int idx,
-				bool instance, ref Dictionary<string, int> dict)
+			protected virtual void ProcessField(FieldInfo f, string name, int idx, Dictionary<string, int> dict)
 			{
 				Type convert = null;
 				var convertAttrs = f.GetCustomAttributes(typeof(ConvertAttribute), true);
 				if (convertAttrs.Length == 1)
 					convert = ((ConvertAttribute)convertAttrs[0]).Type;
 
-				MainLogger.ExtraLog("Processing field {0}.{1} [instace: {2}, convert: {3}]",
-					Type.Name, f.Name, instance, convert?.Name ?? "False");
+				MainLogger.ExtraLog("Processing field {0}.{1} [static: {2}, convert: {3}]",
+					Type.Name, f.Name, f.IsStatic, convert?.Name ?? "False");
 
-				if (idx < 0)
-				{
-					if (dict == null)
-						dict = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-					dict[name] = prop.size;
-				}
+				if (idx < 0) dict[name] = prop.size;
 				else prop.items[idx].next = prop.Count;
 				ref var it = ref prop.Add();
 				it.name = name;
-				it.strict = strict;
 				it.kind = Prop.Kind.Field;
 				it.next = -1;
 				var type = f.FieldType;
@@ -247,30 +264,26 @@ namespace RedOnion.ROS
 					// WARNING: Mono may crash if const field is fed into Expression.Field!
 					GetNewValueExpression(convert ?? type,
 					GetConvertExpression(f.IsLiteral ? (Expression)
-						// self => new Value(T.name)
 						Expression.Constant(f.GetValue(null), f.FieldType) :
-						Expression.Field(instance
-							// self => new Value(((T)self).name)
-							? GetConvertExpression(SelfParameter, f.DeclaringType)
-							// self => new Value(T.name)
-							: null,
+						Expression.Field(f.IsStatic ? null :
+							GetConvertExpression(SelfParameter, f.DeclaringType),
 						f),	convert)),
 					SelfParameter
 				).Compile();
 				if (f.IsInitOnly || f.IsLiteral)
 					return;
 				// maybe use Reflection.Emit: https://docs.microsoft.com/en-us/dotnet/api/system.reflection.emit.dynamicmethod?view=netframework-3.5
-				if (instance)
+				if (f.IsStatic)
 				{
 					it.write = (self, value) =>
 					{
 						var fv = value.Box();
-						if (!f.FieldType.IsAssignableFrom(fv.GetType()))
-						{
-							value.desc.Convert(ref value, Of(f.FieldType));
+						if (!type.IsAssignableFrom(fv.GetType()))
+						{// warning: do not even try to pre-fetch Of(type), may not exist now!
+							value.desc.Convert(ref value, Of(type));
 							fv = value.Box();
 						}
-						f.SetValue(self, fv);
+						f.SetValue(null, fv);
 					};
 				}
 				else
@@ -278,27 +291,25 @@ namespace RedOnion.ROS
 					it.write = (self, value) =>
 					{
 						var fv = value.Box();
-						if (!f.FieldType.IsAssignableFrom(fv.GetType()))
+						if (!type.IsAssignableFrom(fv.GetType()))
 						{
-							value.desc.Convert(ref value, Of(f.FieldType));
+							value.desc.Convert(ref value, Of(type));
 							fv = value.Box();
 						}
-						f.SetValue(null, fv);
+						f.SetValue(self, fv);
 					};
 				}
 			}
 
-			protected virtual void ProcessProperty(
-				PropertyInfo p, string name, string strict, int idx,
-				bool instance, ref Dictionary<string, int> dict)
+			protected virtual void ProcessProperty(PropertyInfo p, string name, int idx, Dictionary<string, int> dict)
 			{
 				Type convert = null;
 				var convertAttrs = p.GetCustomAttributes(typeof(ConvertAttribute), true);
 				if (convertAttrs.Length == 1)
 					convert = ((ConvertAttribute)convertAttrs[0]).Type;
 
-				MainLogger.ExtraLog("Processing property {0}.{1} [instace: {2}, convert: {3}]",
-					Type.Name, p.Name, instance, convert?.Name ?? "False");
+				MainLogger.ExtraLog("Processing property {0}.{1} [static: {2}, convert: {3}]",
+					Type.Name, p.Name, dict == sdict, convert?.Name ?? "False");
 
 				var iargs = p.GetIndexParameters();
 				if (p.IsSpecialName || iargs.Length > 0)
@@ -409,66 +420,56 @@ namespace RedOnion.ROS
 					return;
 				}
 				//-------------------------------------------------------------- normal property
-				if (idx < 0)
-				{
-					if (dict == null)
-						dict = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-					dict[name] = prop.size;
-				}
+				if (idx < 0) dict[name] = prop.size;
 				else prop.items[idx].next = prop.Count;
 				ref var it = ref prop.Add();
 				it.name = name;
-				it.strict = strict;
 				it.kind = Prop.Kind.Property;
-				it.next = -1;
 				var type = p.PropertyType;
 				if (p.CanRead)
 				{
-					if (p.GetGetMethod() != null)
+					var read = p.GetGetMethod();
+					if (read != null)
+					{
 						it.read = Expression.Lambda<Func<object, Value>>(
 							GetNewValueExpression(convert ?? type,
-							GetConvertExpression(Expression.Property(instance
-								? GetConvertExpression(SelfParameter, p.DeclaringType)
-								: null,
+							GetConvertExpression(Expression.Property(dict == sdict ? null :
+								GetConvertExpression(SelfParameter, p.DeclaringType),
 							p), convert)),
 							SelfParameter
 						).Compile();
+					}
 				}
 				if (p.CanWrite)
 				{
 					var write = p.GetSetMethod();
 					if (write != null)
+					{
 						it.write = Expression.Lambda<Action<object, Value>>(
-							Expression.Call(instance
-								? GetConvertExpression(SelfParameter, p.DeclaringType)
-								: null,
+							Expression.Call(dict == sdict ? null :
+								GetConvertExpression(SelfParameter, p.DeclaringType),
 								write,
 								GetConvertExpression(GetValueConvertExpression(
 									convert ?? type, ValueParameter),
 									convert == null ? null : type)),
 							SelfParameter, ValueParameter
 						).Compile();
+					}
 				}
 			}
 
-			protected virtual void ProcessEvent(
-				EventInfo e, string name, string strict, int idx,
-				bool instance, ref Dictionary<string, int> dict)
+			protected virtual void ProcessEvent(EventInfo e, string name, int idx, Dictionary<string, int> dict)
 			{
-				if (idx < 0)
-				{
-					if (dict == null)
-						dict = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-					dict[name] = prop.size;
-				}
+				MainLogger.ExtraLog("Processing event {0}.{1} [static: {2}]",
+					Type.Name, e.Name, dict == sdict);
+
+				if (idx < 0) dict[name] = prop.size;
 				else prop.items[idx].next = prop.Count;
 				ref var it = ref prop.Add();
 				it.name = name;
-				it.strict = strict;
 				it.kind = Prop.Kind.Event;
-				it.next = -1;
 				// TODO: cache these (by type - e.DeclaringType/null, e.EventHandlerType pair)
-				it.read = instance
+				it.read = dict == idict
 					// self => new Value(new EventProxy<T,E>(self, e))
 					? Expression.Lambda<Func<object, Value>>(
 						GetNewValueExpression(typeof(Descriptor),
@@ -488,14 +489,12 @@ namespace RedOnion.ROS
 					SelfParameter).Compile();
 			}
 
-
-			protected virtual void ProcessMethod(
-				string name, MethodInfo m, bool instance, ref Dictionary<string, int> dict, int idx)
+			protected virtual void ProcessMethod(MethodInfo m, string name, int idx, Dictionary<string, int> dict)
 			{
 #if DEBUG
 				if (!m.IsSpecialName && !m.IsGenericMethod && !m.ReturnType.IsByRef)
-					MainLogger.ExtraLog("Processing method {0}.{1} [instace: {2}, args: {3}]",
-						Type.Name, m.Name, instance, m.GetParameters().Length);
+					MainLogger.ExtraLog("Processing method {0}.{1} [static: {2}, args: {3}]",
+						Type.Name, m.Name, m.IsStatic, m.GetParameters().Length);
 #endif
 				if (m.Name == "op_Implicit")
 				{
@@ -510,8 +509,6 @@ namespace RedOnion.ROS
 				var value = ReflectMethod(m);
 				if (value.IsVoid)
 					return;
-				if (dict == null)
-					dict = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 				if (idx >= 0)
 					((MethodGroup)prop.items[idx].read(null).desc).list.Add(ref value);
 				else
@@ -678,7 +675,8 @@ namespace RedOnion.ROS
 						}
 					}
 				}
-				return Value.Void;
+				//TODO: use inversal descriptor
+				return new Value(new Callable(m), m);
 			}
 		}
 	}
