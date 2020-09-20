@@ -73,8 +73,7 @@ Active vessel
 - `away`: [Vector](Vector.md) - Vector pointing away from orbited body (aka *up*, but we use `up` for cockpit-up).
 - `pitch`: double - Current pitch / elevation (the angle between forward vector and tangent plane) \[-90..+90]
 - `heading`: double - Current heading / yaw (the angle between forward and north vectors in tangent plane) \[0..360]. Note that it can change violently around the poles.
-- `roll`: double - Current roll / bank (the angle between up and away vectors in the plane perpendicular to forward vector) \[-180..+180]. 
-Note that it can change violently when facing up or down.
+- `roll`: double - Current roll / bank (the angle between up and away vectors in the plane perpendicular to forward vector) \[-180..+180]. Note that it can change violently when facing up or down.
 - `angularVelocity`: [Vector](Vector.md) - Angular velocity \[ω, deg/s], how fast the ship rotates
 - `angularMomentum`: [Vector](Vector.md) - Angular momentum \[L = Iω, kg⋅m²⋅deg/s=N⋅m⋅s⋅deg] aka moment of momentum or rotational momentum.
 - `momentOfInertia`: [Vector](Vector.md) - Moment of inertia \[I, kg⋅m²=N⋅m⋅s²] aka angular mass or rotational inertia.

@@ -8,13 +8,15 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Diagnostics;
+using System.Text.RegularExpressions;
 
 namespace RedOnion.Build
 {
 	static class Documentation
 	{
-		static string unsafeMark = "\\[`Unsafe`\\] {0}";
-		static string wipMark = "\\[`WIP`\\] {0}";
+		static readonly string NewLine = "\r\n"; // make it behave the same on all platforms (can use NewLine="\n", does not matter)
+		static readonly string UnsafeMark = "\\[`Unsafe`\\] {0}";
+		static readonly string WipMark = "\\[`WIP`\\] {0}";
 		static HashSet<Assembly> assemblies = new HashSet<Assembly>()
 		{
 			typeof(RedOnion.KSP.API.Globals).Assembly,
@@ -36,7 +38,7 @@ namespace RedOnion.Build
 			public Member(Info info, string desc)
 			{
 				this.info = info;
-				this.desc = desc;
+				this.desc = NormalizeLines(desc);
 			}
 		}
 
@@ -98,13 +100,13 @@ namespace RedOnion.Build
 				}
 			}
 		}
-		static Dictionary<string, Document> docs = new Dictionary<string, Document>();
-		static Dictionary<Type, Document> types = new Dictionary<Type, Document>();
-		static HashSet<Type> discovered = new HashSet<Type>();
-		static Dictionary<Type, Type> obj2fn = new Dictionary<Type, Type>();
-		static Dictionary<Type, Type> fn2obj = new Dictionary<Type, Type>();
-		static Dictionary<Type, Type> redirects = new Dictionary<Type, Type>();
-		static Dictionary<Type, string> typeNames = new Dictionary<Type, string>()
+		static readonly Dictionary<string, Document> docs = new Dictionary<string, Document>();
+		static readonly Dictionary<Type, Document> types = new Dictionary<Type, Document>();
+		static readonly HashSet<Type> discovered = new HashSet<Type>();
+		static readonly Dictionary<Type, Type> obj2fn = new Dictionary<Type, Type>();
+		static readonly Dictionary<Type, Type> fn2obj = new Dictionary<Type, Type>();
+		static readonly Dictionary<Type, Type> redirects = new Dictionary<Type, Type>();
+		static readonly Dictionary<Type, string> typeNames = new Dictionary<Type, string>()
 		{
 			{ typeof(void), "void" },
 			{ typeof(string), "string" },
@@ -120,6 +122,10 @@ namespace RedOnion.Build
 			{ typeof(byte), "byte" },
 			{ typeof(bool), "bool" },
 		};
+
+		static Regex normLns = new Regex(@"\r\n|\n\r|\n|\r");
+		public static string NormalizeLines(string s)
+			=> s == null ? s : normLns.Replace(s, NewLine);
 
 		// Compare by RID (record ID)
 		class MetaCmp : IComparer<MemberInfo>
@@ -234,7 +240,7 @@ namespace RedOnion.Build
 					type = type,
 					name = name,
 					path = path,
-					desc = desc
+					desc = NormalizeLines(desc)
 				};
 				docs.Add(name, doc);
 				types.Add(type, doc);
@@ -267,7 +273,7 @@ namespace RedOnion.Build
 				if (obj2fn.TryGetValue(doc.type, out var ctype))
 					cdoc = types[ctype];
 				using (var file = new FileStream(doc.path + ".md", FileMode.Create))
-				using (var wr = new StreamWriter(file))
+				using (var wr = new StreamWriter(file) { NewLine = NewLine })
 				{
 					if (cdoc != null)
 					{
@@ -494,9 +500,9 @@ namespace RedOnion.Build
 		static string AddMarks(string desc, bool notsafe, bool wip)
 		{
 			if (wip)
-				desc = string.Format(wipMark, desc);
+				desc = string.Format(WipMark, desc);
 			if (notsafe)
-				desc = string.Format(unsafeMark, desc);
+				desc = string.Format(UnsafeMark, desc);
 			return desc;
 		}
 

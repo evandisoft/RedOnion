@@ -1,6 +1,6 @@
 ## \[`WIP`\] Science
 
-Science tools.
+Science tools. See also [ship.science](Ship.md) and [PartScience](../Parts/PartScience.md).
 
 
 **Types:**

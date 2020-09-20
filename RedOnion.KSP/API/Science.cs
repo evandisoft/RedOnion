@@ -12,7 +12,7 @@ using static System.FormattableString;
 
 namespace RedOnion.KSP.API
 {
-	[WorkInProgress, Description("Science tools.")]
+	[WorkInProgress, Description("Science tools. See also [ship.science](Ship.md) and [PartScience](../Parts/PartScience.md).")]
 	public static class Science
 	{
 		static string landedAt;

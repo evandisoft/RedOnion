@@ -436,7 +436,7 @@ namespace RedOnion.KSP.API
 		}
 		[Description("Current roll / bank (the angle between up and away vectors"
 			+ " in the plane perpendicular to forward vector) \\[-180..+180]."
-			+ " \nNote that it can change violently when facing up or down.")]
+			+ " Note that it can change violently when facing up or down.")]
 		public double roll
 		{
 			get
