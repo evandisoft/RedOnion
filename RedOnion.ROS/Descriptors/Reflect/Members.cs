@@ -139,7 +139,13 @@ namespace RedOnion.ROS
 				int first = idx;
 				int size = prop.size;
 
-				if (member is FieldInfo f)
+				if (member is Type t)
+				{
+					if (idx >= 0 && Conflict(name, strict, ref idx))
+						MainLogger.DebugLog("Conflicting name: {0}.{1} [nested type]", Type.Name, strict);
+					else ProcessNested(t, name, strict, idx);
+				}
+				else if (member is FieldInfo f)
 				{
 					if (idx >= 0 && Conflict(name, strict, ref idx))
 						MainLogger.DebugLog("Conflicting name: {0}.{1} [instace: {2}; field]", Type.Name, strict, instance);
@@ -155,7 +161,7 @@ namespace RedOnion.ROS
 				{
 					if (idx >= 0 && Conflict(name, strict, ref idx))
 						MainLogger.DebugLog("Conflicting name: {0}.{1} [instace: {2}; event]", Type.Name, strict, instance);
-					else ProcessEvent(name, e, instance, ref dict);
+					else ProcessEvent(e, name, strict, idx, instance, ref dict);
 				}
 				else if (member is MethodInfo m)
 				{
@@ -188,19 +194,21 @@ namespace RedOnion.ROS
 				}
 			}
 
-			protected virtual void ProcessNested(Type nested)
+			protected virtual void ProcessNested(
+				Type nested, string name, string strict, int idx)
 			{
-				var browsable = nested.GetCustomAttributes(typeof(BrowsableAttribute), true);
-				if (browsable.Length == 1 && !((BrowsableAttribute)browsable[0]).Browsable)
-					return;
-
 				MainLogger.ExtraLog("Processing nested type {0}.{1}", Type.Name, nested.Name);
 
-				if (sdict == null)
-					sdict = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-				sdict[nested.Name] = prop.size;
+				if (idx < 0)
+				{
+					if (sdict == null)
+						sdict = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+					sdict[name] = prop.size;
+				}
+				else prop.items[idx].next = prop.Count;
 				ref var it = ref prop.Add();
-				it.name = nested.Name;
+				it.name = name;
+				it.strict = strict;
 				it.kind = Prop.Kind.Type;
 				it.next = -1;
 				it.read = Expression.Lambda<Func<object, Value>>(
@@ -444,13 +452,19 @@ namespace RedOnion.ROS
 			}
 
 			protected virtual void ProcessEvent(
-				string name, EventInfo e, bool instance, ref Dictionary<string, int> dict)
+				EventInfo e, string name, string strict, int idx,
+				bool instance, ref Dictionary<string, int> dict)
 			{
-				if (dict == null)
-					dict = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-				dict[name] = prop.size;
+				if (idx < 0)
+				{
+					if (dict == null)
+						dict = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+					dict[name] = prop.size;
+				}
+				else prop.items[idx].next = prop.Count;
 				ref var it = ref prop.Add();
 				it.name = name;
+				it.strict = strict;
 				it.kind = Prop.Kind.Event;
 				it.next = -1;
 				// TODO: cache these (by type - e.DeclaringType/null, e.EventHandlerType pair)

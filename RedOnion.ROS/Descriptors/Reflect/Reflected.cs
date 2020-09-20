@@ -97,6 +97,18 @@ namespace RedOnion.ROS
 			public Reflected(string name, Type type) : base(name, type)
 			{
 				callableMemberName = type.GetCustomAttribute<CallableAttribute>()?.Name;
+				foreach (var nested in type.GetNestedTypes())
+				{
+					try
+					{
+						ProcessMember(nested, false, ref sdict);
+					}
+					catch (Exception ex)
+					{
+						MainLogger.Log("Exception {0} when processing {1}.{2}: {3}",
+							ex.GetType(), Type.Name, nested.Name, ex.Message);
+					}
+				}
 				foreach (var member in GetMembers(type, null, false))
 				{
 					try
@@ -119,18 +131,6 @@ namespace RedOnion.ROS
 					{
 						MainLogger.Log("Exception {0} when processing {1}.{2}: {3}",
 							ex.GetType(), Type.Name, member.Name, ex.Message);
-					}
-				}
-				foreach (var nested in type.GetNestedTypes())
-				{
-					try
-					{
-						ProcessNested(nested);
-					}
-					catch (Exception ex)
-					{
-						MainLogger.Log("Exception {0} when processing {1}.{2}: {3}",
-							ex.GetType(), Type.Name, nested.Name, ex.Message);
 					}
 				}
 				if (defaultCtor != null)

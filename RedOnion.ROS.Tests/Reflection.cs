@@ -492,6 +492,7 @@ namespace RedOnion.ROS.Tests
 				{
 					accessed = true;
 					name = value;
+					NAME?.Invoke(this, EventArgs.Empty);
 				}
 			}
 			public static bool accessed;
@@ -507,8 +508,16 @@ namespace RedOnion.ROS.Tests
 				{
 					accessed = true;
 					number = value;
+					NUMBER?.Invoke(null, EventArgs.Empty);
 				}
 			}
+
+			public event EventHandler NAME;
+			public static event EventHandler NUMBER;
+#pragma warning disable CS0649
+			public class NaMe { public static bool test; }
+			public class NumBer { public static bool test; }
+#pragma warning restore CS0649
 		}
 		[Test]
 		public void ROS_Refl12_Conflicts()
@@ -519,22 +528,40 @@ namespace RedOnion.ROS.Tests
 			var cv = ctx["c"];
 			var c = cv.obj as Conflicts;
 			Assert.NotNull(c);
+			Test("var i = 0; c.NAME += def => i++");
 			Test("x", "c.name = \"x\""); // field
 			Assert.IsFalse(Conflicts.accessed);
+			UpdatePhysics();
+			Assert.AreEqual(0, ctx["i"].ToInt());
 			Test("y", "c.Name = \"y\""); // property
 			Assert.IsTrue(Conflicts.accessed);
+			UpdatePhysics();
+			Assert.AreEqual(1, ctx["i"].ToInt());
 			var names = cv.desc.EnumerateProperties(c).ToList();
 			Assert.IsTrue(names.Contains("name"));
 			Assert.IsTrue(names.Contains("Name"));
+			Assert.IsTrue(names.Contains("NAME"));
+			Assert.IsTrue(names.Contains("NaMe"));
+			Test("conflicts.NaMe.test = true");
+			Assert.IsTrue(Conflicts.NaMe.test);
 
 			Conflicts.accessed = false;
+			Test("var j = 0; conflicts.NUMBER += def => j++");
 			Test(1, "conflicts.number = 1"); // field
 			Assert.IsFalse(Conflicts.accessed);
+			UpdatePhysics();
+			Assert.AreEqual(0, ctx["j"].ToInt());
 			Test(2, "conflicts.Number = 2"); // property
 			Assert.IsTrue(Conflicts.accessed);
+			UpdatePhysics();
+			Assert.AreEqual(1, ctx["j"].ToInt());
 			names = cv.desc.EnumerateProperties(null).ToList();
 			Assert.IsTrue(names.Contains("number"));
 			Assert.IsTrue(names.Contains("Number"));
+			Assert.IsTrue(names.Contains("NUMBER"));
+			Assert.IsTrue(names.Contains("NumBer"));
+			Test("conflicts.NumBer.test = true");
+			Assert.IsTrue(Conflicts.NumBer.test);
 		}
 	}
 }
