@@ -529,6 +529,11 @@ namespace RedOnion.ROS.Tests
 			public class NaMe { public static bool test; }
 			public class NumBer { public static bool test; }
 #pragma warning restore CS0649
+
+			public static int method() => 1;
+			public static int Method() => 2;
+			public static int Method(int i) => i;
+			public static int METHOD = -1;
 		}
 		[Test]
 		public void ROS_Refl12_Conflicts()
@@ -575,7 +580,10 @@ namespace RedOnion.ROS.Tests
 			Test("conflicts.NumBer.test = true"); // nested type
 			Assert.IsTrue(Conflicts.NumBer.test);
 
-			//TODO: methods
+			Test(1, "conflicts.method");
+			Test(2, "conflicts.Method");
+			Test(3, "conflicts.Method 3");
+			Test(-1, "conflicts.METHOD");
 		}
 	}
 }

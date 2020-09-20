@@ -190,23 +190,7 @@ namespace RedOnion.ROS
 				}
 				else if (member is MethodInfo m)
 				{
-					if (idx >= 0)
-					{
-						ref var slot = ref prop.items[idx];
-						if (slot.kind != Prop.Kind.Method && slot.kind != Prop.Kind.MethodGroup)
-							MainLogger.DebugLog("Conflicting name: {0}.{1} [instace: {2}; method]", Type.Name, strict, instance);
-						else if (slot.kind == Prop.Kind.Method)
-						{
-							var call = slot.read(null);
-							var desc = (Callable)call.desc;
-							var group = new MethodGroup(desc.Name, desc.Type, desc.IsMethod);
-							group.list.Add(call);
-							var  value = new Value(group);
-							slot.read = obj => value;
-							slot.kind = Prop.Kind.MethodGroup;
-						}
-					}
-					ProcessMethod(m, name, idx, dict);
+					ProcessMethod(m, name, strict, idx, dict);
 				}
 
 				// check if we added anything
@@ -489,7 +473,7 @@ namespace RedOnion.ROS
 					SelfParameter).Compile();
 			}
 
-			protected virtual void ProcessMethod(MethodInfo m, string name, int idx, Dictionary<string, int> dict)
+			protected virtual void ProcessMethod(MethodInfo m, string name, string strict, int idx, Dictionary<string, int> dict)
 			{
 #if DEBUG
 				if (!m.IsSpecialName && !m.IsGenericMethod && !m.ReturnType.IsByRef)
@@ -509,16 +493,34 @@ namespace RedOnion.ROS
 				var value = ReflectMethod(m);
 				if (value.IsVoid)
 					return;
-				if (idx >= 0)
-					((MethodGroup)prop.items[idx].read(null).desc).list.Add(ref value);
-				else
+				if (idx < 0 || !Conflict(name, strict, ref idx))
 				{
-					dict[name] = prop.size;
+					if (idx < 0) dict[name] = prop.size; // no conflict (we are first / the only one)
+					else prop.items[idx].next = prop.Count; // no case-sensitive conflict (add case-sensitive slot)
 					ref var it = ref prop.Add();
 					it.name = name;
 					it.kind = Prop.Kind.Method;
-					it.next = -1;
 					it.read = obj => value;
+				}
+				else // try to merge overload
+				{
+					ref var slot = ref prop.items[idx];
+					if (slot.kind != Prop.Kind.Method && slot.kind != Prop.Kind.MethodGroup)
+					{
+						MainLogger.DebugLog("Conflicting name: {0}.{1} [instace: {2}; method]", Type.Name, strict, dict == idict);
+						return;
+					}
+					if (slot.kind == Prop.Kind.Method)
+					{
+						var call = slot.read(null);
+						var desc = (Callable)call.desc;
+						var group = new MethodGroup(desc.Name, desc.Type, desc.IsMethod);
+						group.list.Add(call);
+						var gvalue = new Value(group);
+						slot.read = obj => gvalue;
+						slot.kind = Prop.Kind.MethodGroup;
+					}
+					((MethodGroup)slot.read(null).desc).list.Add(ref value);
 				}
 			}
 
