@@ -190,7 +190,7 @@ namespace RedOnion.KSP.API
 		}
 		internal readonly static string autoLocMarker = "#autoLOC_";
 
-		[WorkInProgress, Description("Target of active ship. Null if none.")]
+		[Description("Target of active ship. Null if none.")]
 		public object target
 		{
 			get
@@ -308,7 +308,7 @@ namespace RedOnion.KSP.API
 		ISpaceObject ISpaceObject.body => body;
 
 		OrbitInfo _orbit;
-		[WorkInProgress, Description("Orbit parameters.")]
+		[Description("Orbit parameters.")]
 		public OrbitInfo orbit
 		{
 			get
@@ -565,7 +565,7 @@ namespace RedOnion.KSP.API
 
 		#region Tools
 
-		[WorkInProgress, Description("Get orbit info relevant for given time. See [orbit.png](orbit.png).")]
+		[Description("Get orbit info relevant for given time. See [orbit.png](orbit.png).")]
 		public OrbitInfo orbitAt(TimeStamp time)
 		{
 			var orbit = this.orbit;
@@ -578,7 +578,7 @@ namespace RedOnion.KSP.API
 			}
 			return orbit;
 		}
-		[WorkInProgress, Description(
+		[Description(
 			"Predicted position at specified time."
 			+ " Includes the movement of bodies (e.g. Mun or Ike) when ship is currently orbiting the (grand)parent (e.g. Kerbin or Sun/Kerbol)."
 			+ " This method is trying to be reasonably smooth/continuous, use `orbitAt(time).positionAt(time)` if that is not desired."
@@ -609,7 +609,7 @@ namespace RedOnion.KSP.API
 			}
 			return new Vector(pos - FlightGlobals.ActiveVessel.CoMD);
 		}
-		[WorkInProgress, Description(
+		[Description(
 			"Predicted velocity at specified time."
 			+ " Includes the movement of bodies (e.g. Mun or Ike) when ship is currently orbiting the (grand)parent (e.g. Kerbin or Sun/Kerbol)."
 			+ " This method is trying to be reasonably smooth/continuous, use `orbitAt(time).velocityAt(time)` if that is not desired."
@@ -648,10 +648,10 @@ namespace RedOnion.KSP.API
 		public Vector world(Vector v)
 			=> new Vector(native.ReferenceTransform.TransformDirection(v));
 
-		[WorkInProgress, Description("Get time at true anomaly (absolute time of angle from direction of periapsis).")]
+		[Description("Get time at true anomaly (absolute time of angle from direction of periapsis).")]
 		public TimeStamp timeAtTrueAnomaly(double trueAnomaly)
 			=> Time.now + timeToTrueAnomaly(trueAnomaly);
-		[WorkInProgress, Description("Get time to true anomaly (relative time of angle from direction of periapsis). [0, period)")]
+		[Description("Get time to true anomaly (relative time of angle from direction of periapsis). [0, period)")]
 		public TimeDelta timeToTrueAnomaly(double trueAnomaly)
 			=> new TimeDelta(native.orbit.GetDTforTrueAnomaly(trueAnomaly * RosMath.Deg2Rad, 0.0) % native.orbit.period);
 

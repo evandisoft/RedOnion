@@ -129,14 +129,14 @@ namespace RedOnion.KSP.Parts
 		public double ignitionThreshold => activeModule.ignitionThreshold;
 
 		PropellantList _propellants, _propellants2;
-		[WorkInProgress, Description("List of propellants used by the engine (by currently active mode).")]
+		[Description("List of propellants used by the engine (by currently active mode).")]
 		public PropellantList propellants => firstIsActive ? propellants1 : propellants2;
-		[WorkInProgress, Description("List of propellants used by first mode.")]
+		[Description("List of propellants used by first mode.")]
 		public PropellantList propellants1 => _propellants ?? (_propellants = new PropellantList(firstModule));
-		[WorkInProgress, Description("List of propellants used by second mode (null for single-mode engines).")]
+		[Description("List of propellants used by second mode (null for single-mode engines).")]
 		public PropellantList propellants2 => _propellants2 ?? (multiMode ? _propellants2 = new PropellantList(secondModule) : null);
 
-		[WorkInProgress, Description("Indicator that the engines is (probably) solid rocket booster (contains propellant that does not flow).")]
+		[Description("Indicator that the engines is (probably) solid rocket booster (contains propellant that does not flow).")]
 		public bool booster { get; }
 	}
 }

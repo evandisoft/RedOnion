@@ -1,4 +1,4 @@
-## \[`WIP`\] PropellantList
+## PropellantList
 
 **Base Class:** [ReadOnlyList](../API/ReadOnlyList.1.md)\[[Propellant](Propellant.md)\]
 

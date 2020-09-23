@@ -1,4 +1,4 @@
-## \[`WIP`\] OrbitInfo
+## OrbitInfo
 
 Orbit/patch parameters.
 

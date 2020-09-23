@@ -176,7 +176,7 @@ namespace RedOnion.KSP.API
 		public void delete() => remove();
 
 		OrbitInfo _orbit;
-		[WorkInProgress, Description("Orbit parameters after the node.")]
+		[Description("Orbit parameters after the node.")]
 		public OrbitInfo orbit
 		{
 			get

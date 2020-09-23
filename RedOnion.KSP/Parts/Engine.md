@@ -23,10 +23,10 @@ Engine of a ship (vehicle/vessel).
 - `seaLevelIsp`: double - Sea-level ISP. \[seconds]
 - `thrust`: double - Current thrust [kN] (at current pressure, with current `thrustPercentage` and current throttle).
 - `thrustPercentage`: double - Thrust limiter in percents.
-- `propellants`: [PropellantList](PropellantList.md) - \[`WIP`\] List of propellants used by the engine (by currently active mode).
-- `propellants1`: [PropellantList](PropellantList.md) - \[`WIP`\] List of propellants used by first mode.
-- `propellants2`: [PropellantList](PropellantList.md) - \[`WIP`\] List of propellants used by second mode (null for single-mode engines).
-- `booster`: bool - \[`WIP`\] Indicator that the engines is (probably) solid rocket booster (contains propellant that does not flow).
+- `propellants`: [PropellantList](PropellantList.md) - List of propellants used by the engine (by currently active mode).
+- `propellants1`: [PropellantList](PropellantList.md) - List of propellants used by first mode.
+- `propellants2`: [PropellantList](PropellantList.md) - List of propellants used by second mode (null for single-mode engines).
+- `booster`: bool - Indicator that the engines is (probably) solid rocket booster (contains propellant that does not flow).
 
 **Instance Methods:**
 - `istype()`: bool, name string

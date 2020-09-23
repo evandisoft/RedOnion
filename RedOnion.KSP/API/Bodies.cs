@@ -82,9 +82,9 @@ and elements are also properties (`bodies.kerbin`, `bodies.mun`).")]
 		public Vector position => new Vector(native.position - FlightGlobals.ActiveVessel.CoMD);
 		[Description("Current orbital velocity (relative to parent body, zero for Sun/Kerbol).")]
 		public Vector velocity => new Vector(native.orbit?.vel.xzy ?? Vector3d.zero);
-		[WorkInProgress, Description("Predicted position at specified time.")]
+		[Description("Predicted position at specified time.")]
 		public Vector positionAt(TimeStamp time) => new Vector(native.getPositionAtUT(time) - FlightGlobals.ActiveVessel.CoMD);
-		[WorkInProgress, Description("Predicted velocity at specified time.")]
+		[Description("Predicted velocity at specified time.")]
 		public Vector velocityAt(TimeStamp time) => new Vector(native.orbit?.getOrbitalVelocityAtUT(time).xzy ?? Vector3d.zero);
 
 		[Description("Orbiting celestial bodies.")]
@@ -131,7 +131,7 @@ and elements are also properties (`bodies.kerbin`, `bodies.mun`).")]
 		}
 
 		OrbitInfo _orbit;
-		[WorkInProgress, Description("Orbit parameters. Null for Sun/Kerbol.")]
+		[Description("Orbit parameters. Null for Sun/Kerbol.")]
 		public OrbitInfo orbit
 		{
 			get
@@ -188,10 +188,10 @@ and elements are also properties (`bodies.kerbin`, `bodies.mun`).")]
 		[Description("Argument of periapsis. Angle from ascending node to periapsis. `NaN` for Sun/Kerbol.")]
 		public double aop => native.orbit?.argumentOfPeriapsis ?? double.NaN;
 
-		[WorkInProgress, Description("Get time at true anomaly (absolute time of angle from direction of periapsis). `NaN/none` for Sun/Kerbol.")]
+		[Description("Get time at true anomaly (absolute time of angle from direction of periapsis). `NaN/none` for Sun/Kerbol.")]
 		public TimeStamp timeAtTrueAnomaly(double trueAnomaly)
 			=> Time.now + timeToTrueAnomaly(trueAnomaly);
-		[WorkInProgress, Description("Get time to true anomaly (relative time of angle from direction of periapsis). [0, period) `NaN/none` for Sun/Kerbol.")]
+		[Description("Get time to true anomaly (relative time of angle from direction of periapsis). [0, period) `NaN/none` for Sun/Kerbol.")]
 		public TimeDelta timeToTrueAnomaly(double trueAnomaly)
 			=> native.orbit == null ? TimeDelta.none : new TimeDelta(
 				native.orbit.GetDTforTrueAnomaly(trueAnomaly * RosMath.Deg2Rad, 0.0) % native.orbit.period);

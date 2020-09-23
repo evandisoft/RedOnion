@@ -12,7 +12,7 @@ namespace RedOnion.KSP.Parts
 		protected internal EngineSet(Ship ship) : base(ship) { }
 		protected internal EngineSet(Ship ship, Action refresh) : base(ship, refresh) { }
 
-		[WorkInProgress, Description("Propellants consumed by the engines.")]
+		[Description("Propellants consumed by the engines.")]
 		public PropellantList propellants => _propellants ?? (_propellants = new PropellantList(this));
 		protected PropellantList _propellants;
 

@@ -19,7 +19,7 @@ Celestial body. (`SpaceBody` selected not to conflict with KSP `CelestialBody`.)
 - `mu`: double - Standard gravitational parameter (μ = GM) [m³/s²]
 - `atmosphere`: [Atmosphere](SpaceBody.Atmosphere.md) - Atmosphere parameters of the body.
 - `atm`: [Atmosphere](SpaceBody.Atmosphere.md) - Atmosphere parameters of the body. (Alias to `atmosphere`)
-- `orbit`: [OrbitInfo](OrbitInfo.md) - \[`WIP`\] Orbit parameters. Null for Sun/Kerbol.
+- `orbit`: [OrbitInfo](OrbitInfo.md) - Orbit parameters. Null for Sun/Kerbol.
 - `period`: [TimeDelta](TimeDelta.md) - Period of current orbit in seconds. Alias to `orbit.period`. `NaN/none` for Sun/Kerbol.
 - `timeToAp`: [TimeDelta](TimeDelta.md) - Eta to apoapsis in seconds. Alias to `orbit.timeToAp`. `NaN/none` for Sun/Kerbol.
 - `timeToPe`: [TimeDelta](TimeDelta.md) - Eta to periapsis in seconds. Alias to `orbit.timeToPe`. `NaN/none` for Sun/Kerbol.
@@ -41,10 +41,10 @@ Celestial body. (`SpaceBody` selected not to conflict with KSP `CelestialBody`.)
 
 **Instance Methods:**
 - `positionAt()`: [Vector](Vector.md), time [TimeStamp](TimeStamp.md)
-  - \[`WIP`\] Predicted position at specified time.
+  - Predicted position at specified time.
 - `velocityAt()`: [Vector](Vector.md), time [TimeStamp](TimeStamp.md)
-  - \[`WIP`\] Predicted velocity at specified time.
+  - Predicted velocity at specified time.
 - `timeAtTrueAnomaly()`: [TimeStamp](TimeStamp.md), trueAnomaly double
-  - \[`WIP`\] Get time at true anomaly (absolute time of angle from direction of periapsis). `NaN/none` for Sun/Kerbol.
+  - Get time at true anomaly (absolute time of angle from direction of periapsis). `NaN/none` for Sun/Kerbol.
 - `timeToTrueAnomaly()`: [TimeDelta](TimeDelta.md), trueAnomaly double
-  - \[`WIP`\] Get time to true anomaly (relative time of angle from direction of periapsis). [0, period) `NaN/none` for Sun/Kerbol.
+  - Get time to true anomaly (relative time of angle from direction of periapsis). [0, period) `NaN/none` for Sun/Kerbol.

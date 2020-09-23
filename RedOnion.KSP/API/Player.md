@@ -1,4 +1,4 @@
-## \[`WIP`\] Player
+## Player
 
 User/player controls.
 

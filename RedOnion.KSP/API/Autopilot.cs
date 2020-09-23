@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace RedOnion.KSP.API
 {
-	[WorkInProgress, Description("Autopilot (throttle and steering) for a ship (vehicle/vessel).")]
+	[Description("Autopilot (throttle and steering) for a ship (vehicle/vessel).")]
 	public class Autopilot : IDisposable
 	{
 		protected Ship _ship;

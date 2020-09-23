@@ -33,7 +33,7 @@ namespace RedOnion.KSP.API
 			=> double.IsNaN(utime) || double.IsInfinity(utime) ? utime : orbit.getObtAtUT(utime);
 	}
 
-	[WorkInProgress, Description("Orbit/patch parameters.")]
+	[Description("Orbit/patch parameters.")]
 	public class OrbitInfo
 	{
 		[Unsafe, Description("[KSP API](https://kerbalspaceprogram.com/api/class_orbit.html)")]

@@ -117,7 +117,7 @@ namespace RedOnion.KSP.API
 			}
 		}
 
-		[WorkInProgress, Description("Amount of solid-like fuel available in active engines."
+		[Description("Amount of solid-like fuel available in active engines."
 			+ " Similar to `engines.resources.getAmountOf(engines.propellants.namesOfSolid)`"
 			+ " but ignores engines/boosters not separated in next stage."
 			+ " Useful when using central booster with smaller side-boosters (decoupled first)."
@@ -154,7 +154,7 @@ namespace RedOnion.KSP.API
 			=> xparts.resources.getAmountOf("LiquidFuel");
 
 		static readonly HashSet<ResourceID> liquidFuels = new HashSet<ResourceID>();
-		[WorkInProgress, Description("Amount of liquid fuel available in tanks of current stage to active engines."
+		[Description("Amount of liquid fuel available in tanks of current stage to active engines."
 			+ " Similar to `xparts.resources.getAmountOf(engines.propellants.namesOfLiquid)`."
 			+ " Universal version (should be compatible with mods - e.g. Karbonite and CryoEngiens).")]
 		public static double liquidlike
@@ -176,11 +176,11 @@ namespace RedOnion.KSP.API
 			}
 		}
 
-		[WorkInProgress, Description("Total amount of fuel avialable for active engines in current stage."
+		[Description("Total amount of fuel avialable for active engines in current stage."
 			+ " Designed with Ion and Monopropellant engines as well as mods in mind,"
 			+ " use `solidfuel + liquidfuel` as fallback, if this does not work.")]
 		public static double fuel { get { UpdateBurnTime(); return _fuel; } }
-		[WorkInProgress, Description("Indicator for staging - `fuel == 0.0`. Note that it could be better to use `fuel < 0.1` instead.")]
+		[Description("Indicator for staging - `fuel == 0.0`. Note that it could be better to use `fuel < 0.1` instead.")]
 		public static bool nofuel => fuel == 0.0;
 
 		static readonly Dictionary<ResourceID, PartResourceDefinition>

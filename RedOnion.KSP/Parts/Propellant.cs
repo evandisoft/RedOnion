@@ -9,7 +9,7 @@ using RedOnion.ROS;
 
 namespace RedOnion.KSP.Parts
 {
-	[WorkInProgress, Description("List/set of propellants of single engine or list/set of engines.")]
+	[Description("List/set of propellants of single engine or list/set of engines.")]
 	public class PropellantList : ReadOnlyList<Propellant>
 	{
 		protected Dictionary<string, Propellant> dict = new Dictionary<string, Propellant>();
@@ -139,7 +139,7 @@ namespace RedOnion.KSP.Parts
 			}
 		}
 	}
-	[WorkInProgress, Description("Propellant consumed by engine.")]
+	[Description("Propellant consumed by engine.")]
 	public class Propellant
 	{
 		protected internal ListCore<global::Propellant> list;
@@ -161,9 +161,9 @@ namespace RedOnion.KSP.Parts
 		public PartResourceDefinition resourceDef => native.resourceDef;
 		[Description("Flow mode of the propellant. First in the list if aggregate, which works for most propellants, but may be random when you combine e.g. Karbonite SRB's with normal engines.")]
 		public ResourceFlowMode flowMode => native.GetFlowMode();
-		[WorkInProgress, Description("No flow propellant - usually solid fuel, bound to SRB.")]
+		[Description("No flow propellant - usually solid fuel, bound to SRB.")]
 		public bool solid => flowMode == ResourceFlowMode.NO_FLOW;
-		[WorkInProgress, Description("Flowing propellant - liquid fuel and oxidizer, does not include Monopropellant, Xenon Gas or electricity.")]
+		[Description("Flowing propellant - liquid fuel and oxidizer, does not include Monopropellant, Xenon Gas or electricity.")]
 		public bool liquid => flowMode == ResourceFlowMode.STACK_PRIORITY_SEARCH;
 
 		public override string ToString() => name;

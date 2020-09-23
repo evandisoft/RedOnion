@@ -6,7 +6,7 @@ Active vessel
 **Instance Properties:**
 - `native`: Vessel - \[`Unsafe`\] Native `Vessel` for unrestricted access to [KSP API](https://kerbalspaceprogram.com/api/class_vessel.html). Same as `FlightGlobals.ActiveVessel` if accessed through global `ship`.
 - `name`: string - Name of the ship (vehicle/vessel).
-- `target`: Object - \[`WIP`\] Target of active ship. Null if none.
+- `target`: Object - Target of active ship. Null if none.
 - `autopilot`: [Autopilot](Autopilot.md) - Autopilot of this ship (vehicle/vessel).
 - `throttle`: float - Current throttle (assign redirects to `Autopilot`, reads control state if autopilot disabled)
 - `controllable`: bool - Indicator that ship is controllable.
@@ -38,7 +38,7 @@ Active vessel
 - `dynamicPressure`: double - Dynamic pressure [atm = 101.325kPa]
 - `q`: double - Dynamic pressure [atm = 101.325kPa]
 - `body`: [SpaceBody](SpaceBody.md) - Orbited body.
-- `orbit`: [OrbitInfo](OrbitInfo.md) - \[`WIP`\] Orbit parameters.
+- `orbit`: [OrbitInfo](OrbitInfo.md) - Orbit parameters.
 - `period`: [TimeDelta](TimeDelta.md) - Period of current orbit in seconds. Alias to `orbit.period`.
 - `timeToAp`: [TimeDelta](TimeDelta.md) - Eta to apoapsis in seconds. Alias to `orbit.timeToAp`.
 - `timeToPe`: [TimeDelta](TimeDelta.md) - Eta to periapsis in seconds. Alias to `orbit.timeToPe`.
@@ -86,16 +86,16 @@ Active vessel
 
 **Instance Methods:**
 - `orbitAt()`: [OrbitInfo](OrbitInfo.md), time [TimeStamp](TimeStamp.md)
-  - \[`WIP`\] Get orbit info relevant for given time. See [orbit.png](orbit.png).
+  - Get orbit info relevant for given time. See [orbit.png](orbit.png).
 - `positionAt()`: [Vector](Vector.md), time [TimeStamp](TimeStamp.md)
-  - \[`WIP`\] Predicted position at specified time. Includes the movement of bodies (e.g. Mun or Ike) when ship is currently orbiting the (grand)parent (e.g. Kerbin or Sun/Kerbol). This method is trying to be reasonably smooth/continuous, use `orbitAt(time).positionAt(time)` if that is not desired. See [orbit.png](orbit.png).
+  - Predicted position at specified time. Includes the movement of bodies (e.g. Mun or Ike) when ship is currently orbiting the (grand)parent (e.g. Kerbin or Sun/Kerbol). This method is trying to be reasonably smooth/continuous, use `orbitAt(time).positionAt(time)` if that is not desired. See [orbit.png](orbit.png).
 - `velocityAt()`: [Vector](Vector.md), time [TimeStamp](TimeStamp.md)
-  - \[`WIP`\] Predicted velocity at specified time. Includes the movement of bodies (e.g. Mun or Ike) when ship is currently orbiting the (grand)parent (e.g. Kerbin or Sun/Kerbol). This method is trying to be reasonably smooth/continuous, use `orbitAt(time).velocityAt(time)` if that is not desired. See [orbit.png](orbit.png).
+  - Predicted velocity at specified time. Includes the movement of bodies (e.g. Mun or Ike) when ship is currently orbiting the (grand)parent (e.g. Kerbin or Sun/Kerbol). This method is trying to be reasonably smooth/continuous, use `orbitAt(time).velocityAt(time)` if that is not desired. See [orbit.png](orbit.png).
 - `local()`: [Vector](Vector.md), v [Vector](Vector.md)
   - Translate vector/direction into ship-local coordinates (like looking at it from the cockpit - or rather from the controlling part).
 - `world()`: [Vector](Vector.md), v [Vector](Vector.md)
   - Translate vector/direction into world coordinates (reverse the `local` transformation).
 - `timeAtTrueAnomaly()`: [TimeStamp](TimeStamp.md), trueAnomaly double
-  - \[`WIP`\] Get time at true anomaly (absolute time of angle from direction of periapsis).
+  - Get time at true anomaly (absolute time of angle from direction of periapsis).
 - `timeToTrueAnomaly()`: [TimeDelta](TimeDelta.md), trueAnomaly double
-  - \[`WIP`\] Get time to true anomaly (relative time of angle from direction of periapsis). [0, period)
+  - Get time to true anomaly (relative time of angle from direction of periapsis). [0, period)

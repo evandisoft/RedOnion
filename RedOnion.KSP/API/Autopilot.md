@@ -1,4 +1,4 @@
-## \[`WIP`\] Autopilot
+## Autopilot
 
 Autopilot (throttle and steering) for a ship (vehicle/vessel).
 

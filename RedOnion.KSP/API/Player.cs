@@ -9,7 +9,7 @@ using System.Text;
 
 namespace RedOnion.KSP.API
 {
-	[WorkInProgress, Description("User/player controls.")]
+	[Description("User/player controls.")]
 	public static class Player
 	{
 		[Description("Throttle control. \\[0, 1]")]

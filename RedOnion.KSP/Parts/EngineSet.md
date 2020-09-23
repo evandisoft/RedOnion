@@ -6,7 +6,7 @@ Read-only set of engines.
 
 
 **Instance Properties:**
-- `propellants`: [PropellantList](PropellantList.md) - \[`WIP`\] Propellants consumed by the engines.
+- `propellants`: [PropellantList](PropellantList.md) - Propellants consumed by the engines.
 - `anyOperational`: bool - Whether any engine in the set is operational.
 - `allOperational`: bool - Whether all the engines in the set are operational.
 - `anyFlameout`: bool - Wheter any engine in the set flamed out.

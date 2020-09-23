@@ -5,7 +5,7 @@ Time warping utilities
 
 **Static Properties:**
 - `engaged`: bool - Warp-to engaged / in progress. Looks for `TimeWarpTo` lock.
-- `ready`: bool - \[`WIP`\] Indicator that `warp.to` can be used.
+- `ready`: bool - Indicator that `warp.to` can be used.
 - `low`: bool - Warp mode set to low aka physics warp. Note that it can only be changed on zero rate-index (and when not `engaged`).
 - `high`: bool - Warp mode set to high aka on-rails warp. Note that it can only be changed on zero rate-index (and when not `engaged`).
 - `rate`: float - Current rate.

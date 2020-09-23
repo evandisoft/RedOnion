@@ -70,7 +70,7 @@ namespace RedOnion.KSP.API
 		[Description("Warp-to engaged / in progress. Looks for `TimeWarpTo` lock.")]
 		public static bool engaged => KSPTW.fetch.setAutoWarp || InputLockManager.lockStack.ContainsKey("TimeWarpTo");
 
-		[WorkInProgress, Description("Indicator that `warp.to` can be used.")]
+		[Description("Indicator that `warp.to` can be used.")]
 		public static bool ready
 		{
 			get

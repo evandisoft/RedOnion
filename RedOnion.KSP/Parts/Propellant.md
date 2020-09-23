@@ -1,4 +1,4 @@
-## \[`WIP`\] Propellant
+## Propellant
 
 Propellant consumed by engine.
 
@@ -8,5 +8,5 @@ Propellant consumed by engine.
 - `native`: Propellant - \[`Unsafe`\] [KSP API](https://kerbalspaceprogram.com/api/class_propellant.html). First in the list if aggregate.
 - `resourceDef`: PartResourceDefinition - \[`Unsafe`\] [KSP API](https://kerbalspaceprogram.com/api/class_part_resource_definition.html). First in the list if aggregate.
 - `flowMode`: ResourceFlowMode - Flow mode of the propellant. First in the list if aggregate, which works for most propellants, but may be random when you combine e.g. Karbonite SRB's with normal engines.
-- `solid`: bool - \[`WIP`\] No flow propellant - usually solid fuel, bound to SRB.
-- `liquid`: bool - \[`WIP`\] Flowing propellant - liquid fuel and oxidizer, does not include Monopropellant, Xenon Gas or electricity.
+- `solid`: bool - No flow propellant - usually solid fuel, bound to SRB.
+- `liquid`: bool - Flowing propellant - liquid fuel and oxidizer, does not include Monopropellant, Xenon Gas or electricity.

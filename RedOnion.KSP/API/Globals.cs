@@ -76,9 +76,9 @@ namespace RedOnion.KSP.API
 		public static readonly Type time = typeof(Time);
 		[Description("Maneuver node.")]
 		public static readonly Type node = typeof(Node);
-		[WorkInProgress, Description("User/player controls.")]
+		[Description("User/player controls.")]
 		public static readonly Type player = typeof(Player);
-		[WorkInProgress, Description("User/player controls.")]
+		[Description("User/player controls.")]
 		public static readonly Type user = typeof(Player);
 		[WorkInProgress, Description("Science tools.")]
 		public static readonly Type science = typeof(Science);
@@ -108,7 +108,7 @@ namespace RedOnion.KSP.API
 		//[Unsafe, Description("A map of kerbal names to kerbals for kerbals in the crew.")]
 		//public static KerbalsDictionary kerbals => KerbalsDictionary.Instance;
 
-		[WorkInProgress, Description("Target of active ship. Null if none.")]
+		[Description("Target of active ship. Null if none.")]
 		public static object target
 		{
 			get

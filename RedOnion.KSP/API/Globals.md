@@ -14,8 +14,8 @@ Global variables, objects and functions common to all scripting languages.
 - `stage`: [Stage](Stage.md) - Staging logic.
 - `time`: [Time](Time.md) - Current time and related functions.
 - `node`: [Node](Node.md) - Maneuver node.
-- `player`: [Player](Player.md) - \[`WIP`\] User/player controls.
-- `user`: [Player](Player.md) - \[`WIP`\] User/player controls.
+- `player`: [Player](Player.md) - User/player controls.
+- `user`: [Player](Player.md) - User/player controls.
 - `science`: [Science](Science.md) - \[`WIP`\] Science tools.
 - `PID`: [PID](PID.md) - PID regulator (alias to `system.pid` in ROS).
 - `app`: [App](App.md) - \[`WIP`\] Safe API for KSP Application Launcher (toolbar/buttons). WIP
@@ -29,7 +29,7 @@ Global variables, objects and functions common to all scripting languages.
 - `ship`: [Ship](Ship.md) - Active vessel (in flight only, null otherwise).
 - `autopilot`: [Autopilot](Autopilot.md) - Autopilot for active vessel. (`null` if no ship)
 - `bodies`: [Bodies](Bodies.md) - A collection of space/celestial bodies. (Safe API)
-- `target`: Object - \[`WIP`\] Target of active ship. Null if none.
+- `target`: Object - Target of active ship. Null if none.
 - `altitude`: double - Alias to `ship.altitude`. (`NaN` if no ship.)
 - `apoapsis`: double - Alias to `ship.apoapsis`. (`NaN` if no ship.)
 - `periapsis`: double - Alias to `ship.periapsis`. (`NaN` if no ship.)
