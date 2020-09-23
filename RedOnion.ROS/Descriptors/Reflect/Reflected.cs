@@ -227,12 +227,16 @@ namespace RedOnion.ROS
 							defaultConstruct = (Func<object>)construct.CreateDelegate(typeof(Func<object>), construct);
 						}
 					}
+#if DEBUG
 					catch (Exception ex)
 					{
 						// this is quite normal, the MakeGenericMethod fails if its `where T:new()` is not satisfied
-						MainLogger.DebugLog("Type {0} does not seem to be default constructible - {1}: {2}",
+						MainLogger.ExtraLog("Type {0} does not seem to be default constructible - {1}: {2}",
 							Type.Name, ex.GetType(), ex.Message);
 					}
+#else
+					catch {}
+#endif
 				}
 				// add int-indexers from list interface if none found yet
 				if (intIndexGet == null && intIndexSet == null)

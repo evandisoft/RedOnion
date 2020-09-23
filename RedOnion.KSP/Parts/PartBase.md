@@ -1,6 +1,6 @@
 ## Part
 
-**Derived:** [Engine](Engine.md), [Sensor](Sensor.md), [LinkPart](LinkPart.md)
+**Derived:** [Engine](Engine.md), [Sensor](Sensor.md), [LinkPart](LinkPart.md), [Generator](Generator.md)
 
 Part of the ship (vehicle/vessel).
 
@@ -24,6 +24,7 @@ Part of the ship (vehicle/vessel).
 - `position`: [Vector](../API/Vector.md) - Position of the part (relative to CoM of active ship/vessel).
 - `mass`: double - Mass of the part including resources.
 - `resourceMass`: double - Mass of the resources contained.
+- `modules`: [PartModules](PartModules.md) - \[`Unsafe`\] Modules of this part.
 
 **Instance Methods:**
 - `istype()`: bool, name string

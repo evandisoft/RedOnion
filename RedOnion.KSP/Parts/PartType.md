@@ -12,3 +12,5 @@ Type of part.
 - `Separator`: PartType - Separator (both-ways).
 - `EnginePlate`: PartType - Engine plate (EP-nn).
 - `LaunchClamp`: PartType - Launch clamp.
+- `SolarPanel`: PartType - Solar panel.
+- `Generator`: PartType - Resource generator.

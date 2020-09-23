@@ -41,7 +41,7 @@ namespace RedOnion.KSP.API
 
 		so we handle it differently: */
 		[Description("Time delta/span since some previous time (`TimeStamp` or `double`). Returns `infinite` if `time` is `none`. (Use `.s` or `.seconds` on the result if you want pure `double` value).")]
-		public static TimeDelta since(object time)
+		public static TimeDelta since([Types(typeof(TimeStamp), typeof(double))] object time)
 		{
 			if (!(time is IConvertible convertible))
 				throw new ArgumentException("Not convertible (expected TimeStamp or double).", nameof(time));

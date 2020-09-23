@@ -509,18 +509,48 @@ namespace RedOnion.Build
 		static void PrintMethod<Info>(StreamWriter wr, Document doc, Member<Info> member) where Info : MethodBase
 		{
 			var desc = member.desc;
-			var method = member.info as MethodInfo;
-			var type = method?.ReturnType;
-			var typeMd = type != null ? ResolveType(doc, type, out _) : null;
 			var name = GetName(member.info);
-			wr.Write(typeMd == null ? "- `{0}()`" : "- `{0}()`: {1}", name, typeMd);
-			var pars = member.info.GetParameters();
+			var method = member.info as MethodInfo;
+			var type = ConvertAttribute.Get(method) ?? method?.ReturnType;
+			var typeMd = type != null ? ResolveType(doc, type, out _) : null;
+			var types = TypesAttribute.Get(method);
 			var first = true;
+			if (types != null)
+			{
+				wr.Write("- `{0}()`: ", name);
+				first = true;
+				foreach (var type2 in types)
+				{
+					if (!first)
+						wr.Write("|");
+					wr.Write(ResolveType(doc, type2, out _));
+					first = false;
+				}
+				first = true;
+			}
+			else wr.Write(typeMd == null ? "- `{0}()`" : "- `{0}()`: {1}", name, typeMd);
+			var pars = member.info.GetParameters();
 			foreach (var par in pars)
 			{
-				type = par.ParameterType;
-				typeMd = ResolveType(doc, type, out _);
-				wr.Write(first && method == null ? ": {0} {1}" : ", {0} {1}", par.Name, typeMd);
+				var types2 = par.GetCustomAttribute<TypesAttribute>()?.Types;
+				if (types2 != null)
+				{
+					wr.Write(first && method == null ? ": {0} " : ", {0} ", par.Name);
+					first = true;
+					foreach (var type2 in types2)
+					{
+						if (!first)
+							wr.Write("|");
+						wr.Write(ResolveType(doc, type2, out _));
+						first = false;
+					}
+				}
+				else
+				{
+					type = par.GetCustomAttribute<ConvertAttribute>()?.Type ?? par.ParameterType;
+					typeMd = ResolveType(doc, type, out _);
+					wr.Write(first && method == null ? ": {0} {1}" : ", {0} {1}", par.Name, typeMd);
+				}
 				first = false;
 			}
 			if (pars.Length > 0)

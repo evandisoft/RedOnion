@@ -14,5 +14,7 @@ Collection of all the parts in one ship/vessel.
 - `dockingports`: [ReadOnlyList](../API/ReadOnlyList.1.md)\[[DockingPort](DockingPort.md)\] - List of all docking ports (regardless of staging).
 - `engines`: [EngineSet](EngineSet.md) - All engines (regardless of state).
 - `sensors`: [ReadOnlyList](../API/ReadOnlyList.1.md)\[[Sensor](Sensor.md)\] - All sensors.
+- `panels`: [SolarPanelList](SolarPanelList.md) - All solar panels.
+- `generators`: [ReadOnlyList](../API/ReadOnlyList.1.md)\[[Generator](Generator.md)\] - All generators.
 - `science`: [ReadOnlyList](../API/ReadOnlyList.1.md)\[[PartScience](PartScience.md)\] - \[`WIP`\] All science modules.
 - `stages`: [Stages](Stages.md) - \[`WIP`\] Parts per stage (by `decoupledin+1`).

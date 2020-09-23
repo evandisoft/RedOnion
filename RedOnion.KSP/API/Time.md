@@ -18,7 +18,7 @@ The simulation time, in seconds, since the game or this save was started. Return
 - `real`: double - Real time since startup in seconds. (Good for printing reports e.g. every second.)
 
 **Static Methods:**
-- `since()`: [TimeDelta](TimeDelta.md), time Object
+- `since()`: [TimeDelta](TimeDelta.md), time [TimeStamp](TimeStamp.md)|double
   - Time delta/span since some previous time (`TimeStamp` or `double`). Returns `infinite` if `time` is `none`. (Use `.s` or `.seconds` on the result if you want pure `double` value).
 - `sinceReal()`: double, real double
   - Real time since previous point. Returns infinity if input is `nan`.

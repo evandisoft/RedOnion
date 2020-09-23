@@ -1,4 +1,3 @@
-using MunSharp.Interpreter;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -26,6 +25,7 @@ namespace RedOnion.KSP.Parts
 				yield return parts[part];
 		}
 
+		[Description("Get child part at specified index.")]
 		public PartBase this[int index] => parent.ship.parts[parent.native.children[index]];
 
 		int IReadOnlyCollection<PartBase>.Count => count;

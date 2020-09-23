@@ -21,6 +21,7 @@ Active vessel
 - `dockingports`: [ReadOnlyList](ReadOnlyList.1.md)\[[DockingPort](../Parts/DockingPort.md)\] - List of all docking ports (regardless of staging).
 - `engines`: [EngineSet](../Parts/EngineSet.md) - All engines (regardless of state).
 - `sensors`: [ReadOnlyList](ReadOnlyList.1.md)\[[Sensor](../Parts/Sensor.md)\] - All sensors.
+- `panels`: [SolarPanelList](../Parts/SolarPanelList.md) - All solar panels.
 - `science`: [ReadOnlyList](ReadOnlyList.1.md)\[[PartScience](../Parts/PartScience.md)\] - \[`WIP`\] All science modules.
 - `id`: Guid - Unique identifier of the ship (vehicle/vessel). Can change when docking/undocking.
 - `persistentId`: uint - Unique identifier of the ship (vehicle/vessel). Should be same as it was before docking (after undocking).

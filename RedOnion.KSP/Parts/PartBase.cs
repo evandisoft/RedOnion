@@ -23,11 +23,15 @@ namespace RedOnion.KSP.Parts
 		[Description("Engine plate (EP-nn).")]
 		EnginePlate,
 		[Description("Launch clamp.")]
-		LaunchClamp
+		LaunchClamp,
+		[Description("Solar panel.")]
+		SolarPanel,
+		[Description("Resource generator.")]
+		Generator,
 	}
 
 	[DisplayName("Part"), Description("Part of the ship (vehicle/vessel).")]
-	[DocBuild(typeof(Engine), typeof(Sensor), typeof(LinkPart))]
+	[DocBuild(typeof(Engine), typeof(Sensor), typeof(LinkPart), typeof(Generator))]
 	public class PartBase
 	{
 		[Unsafe, Description("[KSP API](https://kerbalspaceprogram.com/api/class_part.html)")]
@@ -104,5 +108,9 @@ namespace RedOnion.KSP.Parts
 			this.parent = parent;
 			this.decoupler = decoupler;
 		}
+
+		[Unsafe, Description("Modules of this part.")]
+		public PartModules modules => _modules ?? (_modules = new PartModules(this));
+		PartModules _modules;
 	}
 }

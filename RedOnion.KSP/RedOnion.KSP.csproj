@@ -23,7 +23,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;DEBUG_PARTS_REFRESH</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <NoWarn>IDE1006</NoWarn>
@@ -91,9 +91,12 @@
     <Compile Include="API\Science.cs" />
     <Compile Include="Namespaces\Types.cs" />
     <Compile Include="Parts\EngineSet.cs" />
+    <Compile Include="Parts\Generator.cs" />
     <Compile Include="Parts\PartChildren.cs" />
+    <Compile Include="Parts\PartModules.cs" />
     <Compile Include="Parts\PartValues.cs" />
     <Compile Include="Parts\PartScience.cs" />
+    <Compile Include="Parts\SolarPanel.cs" />
     <Compile Include="Parts\Stages.cs" />
     <Compile Include="ROS\RosGlobals.cs" />
     <Compile Include="ROS\RosManager.cs" />
@@ -193,11 +196,6 @@
       <Name>MunSharp</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Settings\" />
-    <Folder Include="Kerbalua\" />
-    <Folder Include="Kerbalua\Events\" />
-    <Folder Include="Kerbalua\Proxies\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

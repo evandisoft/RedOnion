@@ -4,11 +4,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Text;
 
 namespace RedOnion.KSP.API
 {
 	[Description("Read-only list (or set). Enumerable (can be used in `foreach`)."
-		+ "\nUsed e.g. for parts and all lists and sets you are not allowed to modify.")]
+		+ "Used e.g. for parts and all lists and sets you are not allowed to modify.")]
 	public class ReadOnlyList<T> : IList<T>, IReadOnlyList<T>
 	{
 		protected internal ListCore<T> list;
@@ -120,5 +121,24 @@ namespace RedOnion.KSP.API
 		bool ICollection<T>.Remove(T item) => throw new NotImplementedException();
 		void IList<T>.Insert(int index, T item) => throw new NotImplementedException();
 		void IList<T>.RemoveAt(int index) => throw new NotImplementedException();
+
+		public override string ToString()
+		{
+			var sb = new StringBuilder();
+			sb.Append("[");
+			for (int i = 0; i < count; i++)
+			{
+				if (sb.Length >= 64)
+				{
+					sb.Append(", ...");
+					break;
+				}
+				if (i > 0)
+					sb.Append(", ");
+				sb.Append(this[i].ToString());
+			}
+			sb.Append("]");
+			return sb.ToString();
+		}
 	}
 }

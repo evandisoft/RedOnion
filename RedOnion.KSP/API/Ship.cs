@@ -259,6 +259,8 @@ namespace RedOnion.KSP.API
 		public EngineSet engines => parts.engines;
 		[Description("All sensors.")]
 		public ReadOnlyList<Sensor> sensors => parts.sensors;
+		[Description("All solar panels.")]
+		public SolarPanelList panels => parts.panels;
 		[WorkInProgress, Description("All science modules.")]
 		public ReadOnlyList<PartScience> science => parts.science;
 

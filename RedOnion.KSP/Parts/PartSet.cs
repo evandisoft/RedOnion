@@ -11,6 +11,8 @@ using KSP.UI.Screens;
 using static RedOnion.Debugging.QueueLogger;
 using RedOnion.Attributes;
 using System.Text;
+using System.Diagnostics;
+using RedOnion.Debugging;
 
 namespace RedOnion.KSP.Parts
 {
@@ -180,6 +182,10 @@ namespace RedOnion.KSP.Parts
 		public EngineSet engines { get; protected set; }
 		[Description("All sensors.")]
 		public ReadOnlyList<Sensor> sensors { get; protected set; }
+		[Description("All solar panels.")]
+		public SolarPanelList panels { get; protected set; }
+		[Description("All generators.")]
+		public ReadOnlyList<Generator> generators { get; protected set; }
 		[WorkInProgress, Description("All science modules.")]
 		public ReadOnlyList<PartScience> science { get; protected set; }
 		[WorkInProgress, Description("Parts per stage (by `decoupledin+1`).")]
@@ -191,6 +197,8 @@ namespace RedOnion.KSP.Parts
 			dockingports = new ReadOnlyList<DockingPort>(DoRefresh);
 			engines = new EngineSet(ship, DoRefresh);
 			sensors = new ReadOnlyList<Sensor>(DoRefresh);
+			panels = new SolarPanelList(DoRefresh);
+			generators = new ReadOnlyList<Generator>(DoRefresh);
 			science = new ReadOnlyList<PartScience>(FindScience);
 			stages = new Stages(ship, DoRefresh);
 		}
@@ -208,7 +216,7 @@ namespace RedOnion.KSP.Parts
 		protected internal override void SetDirty(bool value)
 		{
 #if DEBUG && DEBUG_PARTS_REFRESH
-			Value.DebugLog($"Ship Parts Dirty = {value}");
+			MainLogger.DebugLog($"Ship Parts Dirty = {value}");
 #endif
 			if (value)
 			{
@@ -221,6 +229,8 @@ namespace RedOnion.KSP.Parts
 			dockingports.Dirty = value;
 			engines.Dirty = value;
 			sensors.Dirty = value;
+			panels.Dirty = value;
+			generators.Dirty = value;
 			stages.Dirty = value;
 			base.SetDirty(value);
 		}
@@ -229,12 +239,6 @@ namespace RedOnion.KSP.Parts
 			var prev = prevCache;
 			prevCache = cache;
 			cache = prev;
-			//not needed, cleared as part of SetDirty
-			//decouplers.Clear();
-			//dockingports.Clear();
-			//engines.Clear();
-			//sensors.Clear();
-			//stages.Clear();
 			base.Clear();
 		}
 		void VesselModified(Vessel vessel)
@@ -242,7 +246,7 @@ namespace RedOnion.KSP.Parts
 #if DEBUG && DEBUG_PARTS_REFRESH
 			if (_ship == null)
 			{
-				Value.DebugLog("VesselModified: ship not assigned");
+				MainLogger.DebugLog("VesselModified: ship not assigned");
 				return;
 			}
 #endif
@@ -276,6 +280,8 @@ namespace RedOnion.KSP.Parts
 			dockingports.Clear();
 			engines.Clear();
 			sensors.Clear();
+			panels.Clear();
+			generators.Clear();
 			stages.Clear();
 			decouplers = null;
 			dockingports = null;
@@ -291,7 +297,7 @@ namespace RedOnion.KSP.Parts
 		protected override void DoRefresh()
 		{
 #if DEBUG && DEBUG_PARTS_REFRESH
-			Value.DebugLog($"Refreshing Ship Parts, Guid: {_ship.id}");
+			MainLogger.DebugLog($"Refreshing Ship Parts, Guid: {_ship.id}");
 			if (refreshing)
 				throw new InvalidOperationException("Already refreshing");
 			if (!Dirty)
@@ -313,7 +319,7 @@ namespace RedOnion.KSP.Parts
 			ApiLogger.Log($"Ship Parts Refreshed: {list.Count}, Engines: {engines.count}, Guid: {_ship.id}");
 
 #if DEBUG && DEBUG_PARTS_REFRESH
-			Value.DebugLog($"Ship Parts Refreshed: {list.Count}/{cache.Count}, Engines: {engines.count}, Guid: {_ship.id}");
+			MainLogger.DebugLog($"Ship Parts Refreshed: {list.Count}/{cache.Count}, Engines: {engines.count}, Sensors: {sensors.count}, Guid: {_ship.id}");
 			refreshing = false;
 #endif
 		}
@@ -327,7 +333,7 @@ namespace RedOnion.KSP.Parts
 			if (prevCache.TryGetValue(part, out var self))
 			{
 #if DEBUG && DEBUG_PARTS_REFRESH
-				Value.DebugLog($"Wrapper for part {part} taken from cache, decoupler: {decoupler}/{decoupler?.stage??-1}");
+				MainLogger.DebugLog($"Wrapper for part {part} taken from cache, decoupler: {decoupler}/{decoupler?.stage??-1}");
 #endif
 				self.decoupler = decoupler;
 				if (self is Engine eng)
@@ -341,7 +347,7 @@ namespace RedOnion.KSP.Parts
 						decoupler = dec;
 						decouplers.Add(dec);
 #if DEBUG && DEBUG_PARTS_REFRESH
-						Value.DebugLog($"Part {part} is decoupler");
+						MainLogger.DebugLog($"Part {part} is decoupler");
 #endif
 
 						if ((_nextDecoupler == null || decoupler.stage > _nextDecoupler.stage)
@@ -351,12 +357,17 @@ namespace RedOnion.KSP.Parts
 				}
 				else if (self is Sensor sensor)
 					sensors.Add(sensor);
+				else if (self is SolarPanel panel)
+					panels.Add(panel);
+				else if (self is Generator gen)
+					generators.Add(gen);
 			}
 			else
 			{
 #if DEBUG && DEBUG_PARTS_REFRESH
-				Value.DebugLog($"Creating wrapper for part {part}, decoupler: {decoupler}/{decoupler?.stage??-1}");
+				MainLogger.DebugLog($"Creating wrapper for part {part}, decoupler: {decoupler}/{decoupler?.stage??-1}");
 #endif
+				//TODO: maybe scan the modules first, decide what it is after having all known
 				foreach (var module in part.Modules)
 				{
 					if (module is IEngineStatus)
@@ -399,7 +410,7 @@ namespace RedOnion.KSP.Parts
 								continue; // rather continue the search
 						}
 #if DEBUG && DEBUG_PARTS_REFRESH
-						Value.DebugLog($"Part {part} is decoupler");
+						MainLogger.DebugLog($"Part {part} is decoupler");
 #endif
 						decouplers.Add(decoupler);
 						// ignore leftover decouplers
@@ -410,12 +421,24 @@ namespace RedOnion.KSP.Parts
 							_nextDecoupler = decoupler;
 						break;
 					}
-					var sensor = module as ModuleEnviroSensor;
-					if (sensor != null)
+					if (module is ModuleEnviroSensor sensor)
 					{
 						var sense = new Sensor(_ship, part, parent, decoupler, sensor);
 						sensors.Add(sense);
 						self = sense;
+						break;
+					}
+					if (module is ModuleDeployableSolarPanel solar)
+					{
+						var sol = new SolarPanel(_ship, part, parent, decoupler, solar);
+						panels.Add(sol);
+						self = sol;
+					}
+					if (module is ModuleGenerator generator)
+					{
+						var gen = new Generator(_ship, part, parent, decoupler, generator);
+						generators.Add(gen);
+						self = gen;
 						break;
 					}
 				}

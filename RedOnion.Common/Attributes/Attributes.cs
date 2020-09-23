@@ -43,7 +43,8 @@ namespace RedOnion.Attributes
 	/// <summary>
 	/// Convert values to specified type (when presenting to script)
 	/// </summary>
-	[AttributeUsage(AttributeTargets.Property|AttributeTargets.Field|AttributeTargets.ReturnValue|AttributeTargets.Parameter)]
+	[AttributeUsage(AttributeTargets.Property|AttributeTargets.Field|AttributeTargets.Method
+		|AttributeTargets.ReturnValue|AttributeTargets.Parameter)]
 	public class ConvertAttribute : Attribute
 	{
 		public Type Type { get; }
@@ -55,6 +56,9 @@ namespace RedOnion.Attributes
 		{
 			try
 			{
+				var it = m.GetCustomAttribute<ConvertAttribute>();
+				if (it != null)
+					return it.Type;
 				var convertAttrs = m.ReturnTypeCustomAttributes
 					.GetCustomAttributes(typeof(ConvertAttribute), true);
 				if (convertAttrs.Length == 1)
@@ -67,7 +71,38 @@ namespace RedOnion.Attributes
 		}
 	}
 
-	//TODO: use this in reflected descriptors to disable modification
+	/// <summary>
+	/// Hint for documentation builder that set of types can be used
+	/// (where the signature usually accepts object but requires one of the types)
+	/// </summary>
+	[AttributeUsage(AttributeTargets.Property|AttributeTargets.Field|AttributeTargets.Method
+		|AttributeTargets.ReturnValue|AttributeTargets.Parameter)]
+	public class TypesAttribute : Attribute
+	{
+		public Type[] Types { get; }
+		public TypesAttribute(params Type[] types) => Types = types;
+		// this is also workaround for some bugs in mono
+		// - seen IndexOutOfRangeException thrown from .GetCustomAttributes(typeof... on Linux
+		public static Type[] Get(MethodInfo m)
+		{
+			try
+			{
+				var it = m.GetCustomAttribute<TypesAttribute>();
+				if (it != null)
+					return it.Types;
+				var convertAttrs = m.ReturnTypeCustomAttributes
+					.GetCustomAttributes(typeof(TypesAttribute), true);
+				if (convertAttrs.Length == 1)
+					return ((TypesAttribute)convertAttrs[0]).Types;
+			}
+			catch
+			{
+			}
+			return null;
+		}
+	}
+
+	/* TODO: use this in reflected descriptors to disable modification
 
 	/// <summary>
 	/// Make the value read-only for the script (disable writes and most methods)
@@ -89,4 +124,5 @@ namespace RedOnion.Attributes
 		public ReadOnlyItems() => ItemsAreReadOnly = true;
 		public ReadOnlyItems(bool itemsAreReadOnly) => ItemsAreReadOnly = itemsAreReadOnly;
 	}
+	*/
 }

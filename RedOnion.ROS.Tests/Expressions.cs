@@ -11,6 +11,7 @@ namespace RedOnion.ROS.Tests
 		public CoreTests()
 		{
 			MainLogger.LogListener = LogListener;
+			MainLogger.ExtraLogListener = LogListener;
 		}
 		public static void LogListener(string msg)
 			=> System.Diagnostics.Debug.WriteLine(msg);
