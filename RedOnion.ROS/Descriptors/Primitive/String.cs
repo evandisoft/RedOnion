@@ -14,7 +14,7 @@ namespace RedOnion.ROS
 
 			public override bool Call(ref Value result, object self, in Arguments args)
 			{
-				if (result.obj != this)
+				if (result.obj != (object)typeof(string))
 					return false;
 				if (args.Length != 1)
 				{
@@ -138,7 +138,7 @@ namespace RedOnion.ROS
 
 			public override void Get(Core core, ref Value self)
 			{
-				if (self.obj != this)
+				if (self.obj != (object)typeof(string))
 				{
 					if (self.idx is string name
 						&& name.Equals("length", StringComparison.OrdinalIgnoreCase))

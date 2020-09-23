@@ -43,6 +43,16 @@ namespace RedOnion.ROS
 						return +1;
 					if (ymt == MemberTypes.Method && xmt != MemberTypes.Method)
 						return -1;
+					// Generic methods after normal methods
+					if (xmt == MemberTypes.Method)
+					{
+						var xg = (x as MethodBase)?.ContainsGenericParameters == true;
+						var yg = (y as MethodBase)?.ContainsGenericParameters == true;
+						if (!xg && yg)
+							return -1;
+						if (xg && !yg)
+							return +1;
+					}
 
 					// sort by name, BIG letters first
 					int cmp = string.CompareOrdinal(x.Name, y.Name);
@@ -74,11 +84,10 @@ namespace RedOnion.ROS
 			}
 			public static MemberInfo[] GetMembers(Type type, string name = null, bool instance = true)
 			{
-				var flags = (name == null ? BindingFlags.Public : BindingFlags.IgnoreCase|BindingFlags.Public)
-					| (instance ? BindingFlags.Instance : BindingFlags.Static|BindingFlags.FlattenHierarchy);
-				var members = name == null
-				? type.GetMembers(flags)
-				: type.GetMember(name, flags);
+				var flags = BindingFlags.Public|BindingFlags.FlattenHierarchy
+					| (instance ? BindingFlags.Instance : BindingFlags.Static);
+				if (name != null) flags |= BindingFlags.IgnoreCase;
+				var members = name == null ? type.GetMembers(flags) : type.GetMember(name, flags);
 				// we are getting nested types twice (for instance as well),
 				// although BindingFlags.FlattenHierarchy states "Nested types are not returned" (clearly not true)
 				// so we rather make sure we include nested along static and not for instance
@@ -539,9 +548,32 @@ namespace RedOnion.ROS
 
 			protected static Value ReflectMethod(MethodInfo m)
 			{
-				if (m.IsSpecialName || m.IsGenericMethod || m.ReturnType.IsByRef)
+				if (m.IsSpecialName || m.ReturnType.IsByRef)
 					return Value.Void;
 				var args = m.GetParameters();
+				if (m.ContainsGenericParameters)
+				{
+					if (args.Length > 0)
+						return Value.Void;
+					if (m.IsStatic)
+					{
+						if (m.ReturnType == typeof(void))
+							return new Value(new Action0.Gen1(m));
+						else
+							return new Value(new Function0.Gen1(m));
+					}
+					else if (m.ReturnType == typeof(void))
+					{
+						return new Value((Descriptor)Activator.CreateInstance(
+							typeof(Procedure0<>.Gen1).MakeGenericType(m.DeclaringType), m), m);
+					}
+					else
+					{
+						return new Value((Descriptor)Activator.CreateInstance(
+							typeof(Method0<>.Gen1).MakeGenericType(m.DeclaringType), m), m);
+					}
+					return Value.Void;
+				}
 				foreach (var arg in args)
 				{
 					if (arg.ParameterType.IsByRef || arg.IsOut)

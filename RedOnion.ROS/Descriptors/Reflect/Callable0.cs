@@ -30,6 +30,32 @@ namespace RedOnion.ROS
 				result = Value.Void;
 				return true;
 			}
+
+			/// <summary>
+			/// static void Action&lt;T&gt;() converted to void Action(Value type)
+			/// </summary>
+			public class Gen1 : Callable
+			{
+				public Gen1(MethodInfo m)
+					: this(m.Name, m) { }
+				public Gen1(string name, MethodInfo m = null)
+					: base(name, typeof(MethodInfo), true, m) { }
+
+				protected Type cachedType;
+				protected MethodInfo cachedInfo;
+				public override bool Call(ref Value result, object self, in Arguments args)
+				{
+					if (args.Length != 1)
+						return false;
+					if (!(args[0].obj is Type type))
+						return false;
+					if (type != cachedType)
+						cachedInfo = Info.MakeGenericMethod(cachedType = type);
+					cachedInfo.Invoke(null, new object[0]);
+					result = Value.Void;
+					return true;
+				}
+			}
 		}
 		/// <summary>
 		/// static Value Function()
@@ -58,6 +84,31 @@ namespace RedOnion.ROS
 				result = ((Func<Value>)result.obj)();
 				return true;
 			}
+
+			/// <summary>
+			/// static Value Function&lt;T&gt;() converted to Value Function(Value type)
+			/// </summary>
+			public class Gen1 : Callable
+			{
+				public Gen1(MethodInfo m)
+					: this(m.Name, m) { }
+				public Gen1(string name, MethodInfo m = null)
+					: base(name, typeof(MethodInfo), true, m) { }
+
+				protected Type cachedType;
+				protected MethodInfo cachedInfo;
+				public override bool Call(ref Value result, object self, in Arguments args)
+				{
+					if (args.Length != 1)
+						return false;
+					if (!(args[0].obj is Type type))
+						return false;
+					if (type != cachedType)
+						cachedInfo = Info.MakeGenericMethod(cachedType = type);
+					result = new Value(cachedInfo.Invoke(null, new object[0]));
+					return true;
+				}
+			}
 		}
 		/// <summary>
 		/// void Procedure()
@@ -77,6 +128,32 @@ namespace RedOnion.ROS
 				result = Value.Void;
 				return true;
 			}
+
+			/// <summary>
+			/// void Procedure&lt;T&gt;() converted to void Procedure(Value type)
+			/// </summary>
+			public class Gen1 : Callable
+			{
+				public Gen1(MethodInfo m)
+					: this(m.Name, m) { }
+				public Gen1(string name, MethodInfo m = null)
+					: base(name, typeof(MethodInfo), true, m) { }
+
+				protected Type cachedType;
+				protected MethodInfo cachedInfo;
+				public override bool Call(ref Value result, object self, in Arguments args)
+				{
+					if (args.Length != 1)
+						return false;
+					if (!(args[0].obj is Type type))
+						return false;
+					if (type != cachedType)
+						cachedInfo = Info.MakeGenericMethod(cachedType = type);
+					cachedInfo.Invoke(self, new object[0]);
+					result = Value.Void;
+					return true;
+				}
+			}
 		}
 		/// <summary>
 		/// Value Method()
@@ -94,6 +171,31 @@ namespace RedOnion.ROS
 					return false;
 				result = ((Func<T, Value>)result.obj)((T)self);
 				return true;
+			}
+
+			/// <summary>
+			/// Value Method&lt;T&gt;() converted to Value Method(Value type)
+			/// </summary>
+			public class Gen1 : Callable
+			{
+				public Gen1(MethodInfo m)
+					: this(m.Name, m) { }
+				public Gen1(string name, MethodInfo m = null)
+					: base(name, typeof(MethodInfo), true, m) { }
+
+				protected Type cachedType;
+				protected MethodInfo cachedInfo;
+				public override bool Call(ref Value result, object self, in Arguments args)
+				{
+					if (args.Length != 1)
+						return false;
+					if (!(args[0].obj is Type type))
+						return false;
+					if (type != cachedType)
+						cachedInfo = Info.MakeGenericMethod(cachedType = type);
+					result = new Value(cachedInfo.Invoke(self, new object[0]));
+					return true;
+				}
 			}
 		}
 	}

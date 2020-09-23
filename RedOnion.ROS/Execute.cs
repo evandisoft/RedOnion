@@ -605,43 +605,43 @@ namespace RedOnion.ROS
 						switch (op)
 						{
 						case OpCode.String:
-							vals.Add(new Value(Descriptor.String));
+							vals.Add(new Value(Descriptor.String, typeof(string)));
 							continue;
 						case OpCode.Char:
-							vals.Add(new Value(Descriptor.Char));
+							vals.Add(new Value(Descriptor.Char, typeof(char)));
 							continue;
 						case OpCode.Byte:
-							vals.Add(new Value(Descriptor.Byte));
+							vals.Add(new Value(Descriptor.Byte, typeof(byte)));
 							continue;
 						case OpCode.UShort:
-							vals.Add(new Value(Descriptor.UShort));
+							vals.Add(new Value(Descriptor.UShort, typeof(ushort)));
 							continue;
 						case OpCode.UInt:
-							vals.Add(new Value(Descriptor.UInt));
+							vals.Add(new Value(Descriptor.UInt, typeof(uint)));
 							continue;
 						case OpCode.ULong:
-							vals.Add(new Value(Descriptor.ULong));
+							vals.Add(new Value(Descriptor.ULong, typeof(ulong)));
 							continue;
 						case OpCode.SByte:
-							vals.Add(new Value(Descriptor.SByte));
+							vals.Add(new Value(Descriptor.SByte, typeof(sbyte)));
 							continue;
 						case OpCode.Short:
-							vals.Add(new Value(Descriptor.Short));
+							vals.Add(new Value(Descriptor.Short, typeof(short)));
 							continue;
 						case OpCode.Int:
-							vals.Add(new Value(Descriptor.Int));
+							vals.Add(new Value(Descriptor.Int, typeof(int)));
 							continue;
 						case OpCode.Long:
-							vals.Add(new Value(Descriptor.Long));
+							vals.Add(new Value(Descriptor.Long, typeof(long)));
 							continue;
 						case OpCode.Bool:
-							vals.Add(new Value(Descriptor.Bool));
+							vals.Add(new Value(Descriptor.Bool, typeof(bool)));
 							continue;
 						case OpCode.Float:
-							vals.Add(new Value(Descriptor.Float));
+							vals.Add(new Value(Descriptor.Float, typeof(float)));
 							continue;
 						case OpCode.Double:
-							vals.Add(new Value(Descriptor.Double));
+							vals.Add(new Value(Descriptor.Double, typeof(double)));
 							continue;
 						}
 						throw new NotImplementedException("Not implemented: OpCode.Type + " + op.ToString());

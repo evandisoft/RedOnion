@@ -185,6 +185,10 @@ namespace RedOnion.ROS.Tests
 				int a, int b, int c, double d, double e,
 				float f, float g, float h, long i, long j)
 				=> a + b + c + d + e  +  f + g + h + i + j;
+			public static string name<T>()
+				=> typeof(T).Name;
+			public string Name<T>()
+				=> typeof(T).Name;
 		}
 		[Test]
 		public void ROS_Refl03_Methods()
@@ -226,6 +230,8 @@ namespace RedOnion.ROS.Tests
 			Globals.Add("mt", typeof(MethodTests));
 			Test(1+2+3+4.5+6.7 + 8.9f+10.11f+12.13f+1415+1617,
 				"mt.sum10 1,2,3,4.5,6.7, 8.9f,10.11f,12.13f,1415,1617");
+			Test("Int32", "mt.name int");
+			Test("String", "var mt2 = new mt; mt2.name string");
 		}
 
 		public struct Point

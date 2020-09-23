@@ -63,18 +63,18 @@ namespace RedOnion.ROS.Objects
 			System.Add("nan", Value.NaN);
 			System.Add("inf", double.PositiveInfinity);
 
-			System.Add("double", new Value(Descriptor.Double));
-			System.Add("float", new Value(Descriptor.Float));
-			System.Add("long", new Value(Descriptor.Long));
-			System.Add("ulong", new Value(Descriptor.ULong));
-			System.Add("int", new Value(Descriptor.Int));
-			System.Add("uint", new Value(Descriptor.UInt));
-			System.Add("short", new Value(Descriptor.Short));
-			System.Add("ushort", new Value(Descriptor.UShort));
-			System.Add("sbyte", new Value(Descriptor.SByte));
-			System.Add("byte", new Value(Descriptor.Byte));
-			System.Add("char", new Value(Descriptor.Char));
-			System.Add("string", new Value(Descriptor.String));
+			System.Add("double", new Value(Descriptor.Double, typeof(double)));
+			System.Add("float", new Value(Descriptor.Float, typeof(float)));
+			System.Add("long", new Value(Descriptor.Long, typeof(long)));
+			System.Add("ulong", new Value(Descriptor.ULong, typeof(ulong)));
+			System.Add("int", new Value(Descriptor.Int, typeof(int)));
+			System.Add("uint", new Value(Descriptor.UInt, typeof(uint)));
+			System.Add("short", new Value(Descriptor.Short, typeof(short)));
+			System.Add("ushort", new Value(Descriptor.UShort, typeof(ushort)));
+			System.Add("sbyte", new Value(Descriptor.SByte, typeof(sbyte)));
+			System.Add("byte", new Value(Descriptor.Byte, typeof(byte)));
+			System.Add("char", new Value(Descriptor.Char, typeof(char)));
+			System.Add("string", new Value(Descriptor.String, typeof(string)));
 
 			System.Lock();
 			Lock();

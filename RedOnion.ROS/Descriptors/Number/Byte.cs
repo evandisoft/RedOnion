@@ -17,7 +17,7 @@ namespace RedOnion.ROS
 
 			public override bool Call(ref Value result, object self, in Arguments args)
 			{
-				if (result.obj != this)
+				if (result.obj != (object)typeof(byte))
 					return false;
 				if (args.Length != 1)
 				{
