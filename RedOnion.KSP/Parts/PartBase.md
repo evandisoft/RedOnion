@@ -1,6 +1,6 @@
 ## Part
 
-**Derived:** [Engine](Engine.md), [Sensor](Sensor.md), [LinkPart](LinkPart.md), [Generator](Generator.md)
+**Derived:** [Engine](Engine.md), [Sensor](Sensor.md), [LinkPart](LinkPart.md), [SolarPanel](SolarPanel.md), [Generator](Generator.md)
 
 Part of the ship (vehicle/vessel).
 

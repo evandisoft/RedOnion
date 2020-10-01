@@ -1,6 +1,6 @@
 ## SolarPanelList
 
-**Base Class:** [ReadOnlyList](../API/ReadOnlyList.1.md)\[SolarPanel\]
+**Base Class:** [ReadOnlyList](../API/ReadOnlyList.1.md)\[[SolarPanel](SolarPanel.md)\]
 
 List/set of solar panels.
 

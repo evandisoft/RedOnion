@@ -31,7 +31,7 @@ namespace RedOnion.KSP.Parts
 	}
 
 	[DisplayName("Part"), Description("Part of the ship (vehicle/vessel).")]
-	[DocBuild(typeof(Engine), typeof(Sensor), typeof(LinkPart), typeof(Generator))]
+	[DocBuild(typeof(Engine), typeof(Sensor), typeof(LinkPart), typeof(SolarPanel), typeof(Generator))]
 	public class PartBase
 	{
 		[Unsafe, Description("[KSP API](https://kerbalspaceprogram.com/api/class_part.html)")]
