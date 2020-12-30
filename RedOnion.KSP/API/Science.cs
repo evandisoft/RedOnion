@@ -115,31 +115,38 @@ namespace RedOnion.KSP.API
 			public SpaceBody body { get; private set; }
 			[Description("Subject situation.")]
 			public ExperimentSituations situation { get; private set; }
-			[Description("Subject biome.")]
+			[Description("Subject biome (if relevant).")]
 			public string biome { get; private set; }
+			[Description("Subject biome ID (if relevant).")]
+			public string biomeId { get; private set; }
 
 			internal Subject(ScienceExperiment exp)
 			{
 				experiment = exp;
-				body = Science.body;
-				situation = Science.situation;
-				biome = Science.biome;
-				var id = Invariant(
-					$"{experiment.id}@{body.name}{situation}{biomeId}");
-				native = ResearchAndDevelopment.GetSubjectByID(id) ??
-					new ScienceSubject(exp, situation, body, biome, biomeName);
+				Update();
 			}
 			internal void Update()
 			{
-				var body = Science.body;
-				var situation = Science.situation;
-				var biomeId = Science.biomeId;
+				body = Science.body;
+				situation = Science.situation;
+				string biomeName = null;
+				if (experiment.BiomeIsRelevantWhile(situation))
+				{
+					biome = Science.biome;
+					biomeId = Science.biomeId;
+					biomeName = Science.biomeName;
+				}
+				else
+				{
+					biome = null;
+					biomeId = null;
+				}
 				var id = Invariant(
 					$"{experiment.id}@{body.name}{situation}{biomeId}");
-				if (id == this.id)
+				if (native != null && id == native.id)
 					return;
 				native = ResearchAndDevelopment.GetSubjectByID(id) ??
-					new ScienceSubject(experiment, situation, body, Science.biome, Science.biomeName);
+					new ScienceSubject(experiment, situation, body, biome, biomeName);
 			}
 
 			[Description("Science returned to KSC.")]

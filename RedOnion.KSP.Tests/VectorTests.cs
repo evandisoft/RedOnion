@@ -14,7 +14,9 @@ namespace RedOnion.KSP.Tests
 		{
 			Descriptor.Create = CustomCreateDescriptor;
 			MainLogger.LogListener = LogListener;
+#if DEBUG
 			MainLogger.ExtraLogListener = LogListener;
+#endif
 			Process.SetProcessor(this);
 		}
 		public static void LogListener(string msg)

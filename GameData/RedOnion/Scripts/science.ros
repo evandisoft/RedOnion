@@ -56,7 +56,7 @@ def refresh
   for var i = 0; i < rows.count
     var row = rows[i]
     if !row.present
-      list.removeAt i
+      rows.removeAt i
       dict.remove row.id
       row.panel.dispose
     else
