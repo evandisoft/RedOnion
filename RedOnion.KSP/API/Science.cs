@@ -143,10 +143,9 @@ namespace RedOnion.KSP.API
 				}
 				var id = Invariant(
 					$"{experiment.id}@{body.name}{situation}{biomeId}");
-				if (native != null && id == native.id)
-					return;
 				native = ResearchAndDevelopment.GetSubjectByID(id) ??
-					new ScienceSubject(experiment, situation, body, biome, biomeName);
+					(native?.id == id ? native :
+					new ScienceSubject(experiment, situation, body, biome, biomeName));
 			}
 
 			[Description("Science returned to KSC.")]

@@ -120,7 +120,7 @@ namespace RedOnion.UI
 		[Description("Vertically scrollable.")]
 		public Scroll Vertical
 		{
-			get => !ScrollRect.horizontal ? Scroll.No : vscroll == null ? Scroll.Hide : (Scroll)ScrollRect.verticalScrollbarVisibility;
+			get => !ScrollRect.vertical ? Scroll.No : vscroll == null ? Scroll.Hide : (Scroll)ScrollRect.verticalScrollbarVisibility;
 			set
 			{
 				if (value == Scroll.No)

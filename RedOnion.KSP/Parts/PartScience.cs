@@ -70,7 +70,7 @@ namespace RedOnion.KSP.Parts
 				else
 				{
 					var now = Time.now;
-					if (Time.now > _subjectUpdate)
+					if (now > _subjectUpdate)
 					{
 						_subjectUpdate = now;
 						_subject.Update();

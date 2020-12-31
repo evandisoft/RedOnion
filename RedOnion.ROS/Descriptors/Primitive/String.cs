@@ -121,11 +121,12 @@ namespace RedOnion.ROS
 					=> new Prop(name, new Value(new Method1<string>(name), fn));
 				public StringProps() : base(new Prop[]
 				{
-					new Prop("length", new Value(0)),
-					new Prop("substring", new Value(new Substring())),
-					M("compare", (it, arg) => it.CompareTo(arg.ToStr())),
-					M("equals", (it, arg) => it.Equals(arg.ToStr())),
-					M("contains", (it, arg) => it.Contains(arg.ToStr()))
+					new Prop("length", new Value(0)),						//0
+					new Prop("substring", new Value(new Substring())),		//1
+					M("compare", (it, arg) => it.CompareTo(arg.ToStr())),	//2
+					M("equals", (it, arg) => it.Equals(arg.ToStr())),		//3
+					M("contains", (it, arg) => it.Contains(arg.ToStr())),	//4
+					M("starts", (it, arg) => it.StartsWith(arg.ToStr()))	//5
 				}, new Prop[] {
 					new Prop("format", new Value(new Format()))
 				})
@@ -133,6 +134,7 @@ namespace RedOnion.ROS
 					Alias("count", 0);
 					Alias("substr", 1);
 					Alias("compareTo", 2);
+					Alias("startsWith", 5);
 				}
 			};
 

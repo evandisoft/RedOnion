@@ -8,6 +8,7 @@ rowbox.height = 200
 
 var rows = new list
 var dict = new dictionary
+var compact = false
 
 def row_ready
   for var sci in this.sci
@@ -31,8 +32,11 @@ def refresh
     row.present = false
     row.sci.clear()
   for var sci in list ship.science // make a copy in case we get interrupted
+    var present = !compact || sci.value > 0
     var row = dict[sci.experimentId]
     if row == null
+      if !present
+        continue
       row = new object
       row.id = sci.experimentId
       row.sci = new list
@@ -49,10 +53,11 @@ def refresh
       row.button.tag = row
       dict[sci.experimentId] = row
       rows.add row
-    row.present = true
-    //TODO: see if we already have that experiment and use nextValue in such case
-    row.value.text = "{0:F1}/{1:F1}".format sci.value, sci.capacity
     row.sci.add sci
+    if present
+      row.present = true
+      //TODO: see if we already have that experiment and use nextValue in such case
+      row.value.text = (sci.capacity >= 100 ? "{0:F1}/{1:F0}" : "{0:F1}/{1:F1}").format sci.value, sci.capacity
   for var i = 0; i < rows.count
     var row = rows[i]
     if !row.present
@@ -82,6 +87,11 @@ def tryRefresh
   refreshing = false
 
 var btns = wnd.addHorizontal()
+btns.flexWidth = 1
+var xcomp = btns.addToggle "Compact", def
+  compact = xcomp.pressed
+  tryRefresh
+btns.addHorizontal().flexWidth = 1
 var all = btns.addButton "Gather All", def
   all.enabled = false
   need.enabled = false
@@ -119,7 +129,7 @@ try
   wnd.show
   while !done
     wait
-    if time.since(lastRefresh) >= 10
+    if time.since(lastRefresh) >= 3
       tryRefresh
 
 finally
