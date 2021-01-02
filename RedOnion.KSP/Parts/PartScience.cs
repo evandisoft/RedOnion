@@ -108,8 +108,8 @@ namespace RedOnion.KSP.Parts
 		public override string ToString()
 			=> Value.Format($"{part.name}/{native.experimentID}");
 
-		[WorkInProgress, Description("Ready to perform experiment.")]
-		public bool ready => state == ScienceState.ready;
+		[WorkInProgress, Description("Ready to perform experiment (`state == \"ready\" and capacity > 0`).")]
+		public bool ready => state == ScienceState.ready && capacity > 0.0;
 		[WorkInProgress, Description("State of science module.")]
 		public virtual ScienceState state
 		{

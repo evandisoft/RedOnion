@@ -28,15 +28,27 @@ def row_click button
       break      
 
 def refresh
+//startup condition
+  var body = science.body
+  var sit = science.situation
+  var biomeName = science.biomeName
+//signal we are computing
+  situation.text = "{0}; {1}; {2}".format body, sit, biomeName
+//pre-clean
   for var row in rows
     row.present = false
+    row.maxval = -1
     row.sci.clear()
+//update
   for var sci in list ship.science // make a copy in case we get interrupted
-    var present = !compact || sci.value > 0
+    var ready = sci.ready
+    var present = !compact || ready && sci.value > 0
     var row = dict[sci.experimentId]
     if row == null
       if !present
         continue
+    //note that you have to assign all the properties here (when creating new object)
+    //.... or you will face error/exception when acessing non-existing properities
       row = new object
       row.id = sci.experimentId
       row.sci = new list
@@ -48,16 +60,23 @@ def refresh
       row.label.flexWidth = 1
       row.value = row.panel.addLabel()
       row.value.width = 60
-      row.button = row.panel.addButton "DO", row_click
+      row.button = row.panel.addButton ready ? "DO" : "---", row_click
       row.button.width = 40
       row.button.tag = row
+      row.present = true
+      row.maxval = -1
       dict[sci.experimentId] = row
       rows.add row
     row.sci.add sci
     if present
+      if !row.present // first time this refresh
+        row.button.enabled = ready
+        row.button.text = ready ? "DO" : "---"
       row.present = true
       //TODO: see if we already have that experiment and use nextValue in such case
-      row.value.text = (sci.capacity >= 100 ? "{0:F1}/{1:F0}" : "{0:F1}/{1:F1}").format sci.value, sci.capacity
+      if sci.value > row.maxval
+        row.maxval = sci.value
+        row.value.text = (sci.capacity >= 100 ? "{0:F1}/{1:F0}" : "{0:F1}/{1:F1}").format sci.value, sci.capacity
   for var i = 0; i < rows.count
     var row = rows[i]
     if !row.present
@@ -67,7 +86,11 @@ def refresh
     else
       row.button.enabled = row.ready()
       i++
-  situation.text = "{0}, {1}, {2}".format science.body, science.situation, science.biomeName
+//final output
+  if science.body == body && sit == science.situation && biomeName == science.biomeName
+    situation.text = "{0}, {1}, {2}".format body, sit, biomeName
+    return true
+  return false
 var refreshing = false
 var lastRefresh = time.never
 def tryRefresh
@@ -77,8 +100,8 @@ def tryRefresh
   lastRefresh = time.now
   for var i = 0; i < 3; i++
     try
-      refresh
-      break
+      if refresh()
+        break
     catch var e
       print "Refresh: {0}", e
       var from = time.now
