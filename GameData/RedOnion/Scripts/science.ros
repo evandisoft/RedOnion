@@ -42,7 +42,7 @@ def refresh
 //update
   for var sci in list ship.science // make a copy in case we get interrupted
     var ready = sci.ready
-    var present = !compact || ready && sci.value > 0
+    var present = !compact || ready && sci.value >= 0.05
     var row = dict[sci.experimentId]
     if row == null
       if !present

@@ -25,6 +25,8 @@ namespace RedOnion.KSP.Parts
 		inoperable,
 		[Description("Module is shielded and cannot perform experiments now.")]
 		shielded,
+		[Description("Experiment not available in this situation.")]
+		unavailable,
 		[Description("Ship is currently not controllable (and module requires it).")]
 		noControl,
 		[Description("No crew in ship or the part (as required by the module).")]
@@ -121,6 +123,8 @@ namespace RedOnion.KSP.Parts
 					return ScienceState.inoperable;
 				if (!native.availableShielded && native.part.ShieldedFromAirstream)
 					return ScienceState.shielded;
+				if (!experiment.IsAvailableWhile(ScienceUtil.GetExperimentSituation(native.vessel), native.vessel.mainBody))
+					return ScienceState.unavailable;
 				var usage = (ExperimentUsageReqs)native.usageReqMaskInternal;
 				string msg = null;
 				if (!ScienceUtil.RequiredUsageInternalAvailable(
