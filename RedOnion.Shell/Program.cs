@@ -124,7 +124,20 @@ namespace RedOnion.Shell
 				sb.Length = 0;
 				try
 				{
+					DateTime start = DateTime.UtcNow;
 					processor.Execute(code);
+					int dots = 0;
+					while (processor.Exit == ExitCode.Countdown)
+					{
+						if (start + TimeSpan.FromSeconds(dots + 1) >= DateTime.UtcNow)
+						{
+							Console.Write('~');
+							dots++;
+						}
+						processor.Execute();
+					}
+					if (dots > 0)
+						Console.WriteLine();
 				}
 				catch (Exception ex)
 				{

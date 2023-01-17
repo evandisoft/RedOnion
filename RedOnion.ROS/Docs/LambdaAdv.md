@@ -4,7 +4,7 @@
 var s = ""
 var a = new list
 for var i = 0; i < 3; i++
-  a.add def => s += i + 1",
+  a.add def => s += i + 1
 for var f in a; f
 return s
 ```
@@ -43,11 +43,11 @@ return s;
 ```
 
 The first `a.add def => s += i + 1` will capture `i` by reference
-and when those lambdas are first called, the `i` is already `4`, producing `s = "444"`.
+and when those lambdas are first called, the `i` is already `3`, producing `s = "444"`.
 But that `(def; var n = ...)()` is a call in the moment where `i` is `0`, `1` or `2` in each call,
 therefore the inner lambda (`def => s += n`) is referencing `n` which was already set to `1`, `2` or `3`,
 producing the final result of `"123"`. The difference is that calling the outer lambda creates new context,
 where the `n` lives and the inner lambda is referencing that particular `n`
 (each inner lambda referencing different context). All the simple `a.add def => s += i + 1`
-would reference same context where `i` ceased to exist with last value being `4`
+would reference same context where `i` ceased to exist with last value being `3`
 (and also the one and only `s`).
